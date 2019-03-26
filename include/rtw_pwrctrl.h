@@ -419,8 +419,10 @@ struct pwrctrl_priv {
 	struct aoac_report wowlan_aoac_rpt;
 	u8		wowlan_dis_lps;/*for debug purpose*/
 #endif /* CONFIG_WOWLAN */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	_timer	pwr_state_check_timer;
 	int		pwr_state_check_interval;
+#endif
 	u8		pwr_state_check_cnts;
 
 

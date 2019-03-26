@@ -3289,9 +3289,17 @@ void _tdls_tpk_timer_hdl(void *FunctionContext)
 }
 
 #ifdef CONFIG_TDLS_CH_SW
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void _tdls_ch_switch_timer_hdl(void *FunctionContext)
+#else
+void _tdls_ch_switch_timer_hdl(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	struct sta_info *ptdls_sta = (struct sta_info *)FunctionContext;
+#else
+	struct sta_info *ptdls_sta = from_timer(ptdls_sta, t, _tdls_ch_switch_timer_hdl);
+#endif
 	_adapter *padapter = ptdls_sta->padapter;
 	struct tdls_ch_switch *pchsw_info = &padapter->tdlsinfo.chsw_info;
 
@@ -3354,9 +3362,17 @@ void _tdls_handshake_timer_hdl(void *FunctionContext)
 	}
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void _tdls_pti_timer_hdl(void *FunctionContext)
+#else
+void _tdls_pti_timer_hdl(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	struct sta_info *ptdls_sta = (struct sta_info *)FunctionContext;
+#else
+	struct sta_info *ptdls_sta = from_timer(ptdls_sta, t, _tdls_tpk_timer_hdl);
+#endif
 	_adapter *padapter = NULL;
 	struct tdls_txmgmt txmgmt;
 
@@ -3378,6 +3394,7 @@ void _tdls_pti_timer_hdl(void *FunctionContext)
 void rtw_init_tdls_timer(_adapter *padapter, struct sta_info *psta)
 {
 	psta->padapter = padapter;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	rtw_init_timer(&psta->TPK_timer, padapter, _tdls_tpk_timer_hdl, psta);
 #ifdef CONFIG_TDLS_CH_SW
 	rtw_init_timer(&psta->ch_sw_timer, padapter, _tdls_ch_switch_timer_hdl, psta);
@@ -3387,6 +3404,17 @@ void rtw_init_tdls_timer(_adapter *padapter, struct sta_info *psta)
 #endif
 	rtw_init_timer(&psta->handshake_timer, padapter, _tdls_handshake_timer_hdl, psta);
 	rtw_init_timer(&psta->pti_timer, padapter, _tdls_pti_timer_hdl, psta);
+#else
+	timer_setup(&psta->TPK_timer, _tdls_tpk_timer_hdl, 0);
+#ifdef CONFIG_TDLS_CH_SW
+	timer_setup(&psta->ch_sw_timer, _tdls_ch_switch_timer_hdl, 0);
+	timer_setup(&psta->delay_timer, _tdls_delay_timer_hdl, 0);
+	timer_setup(&psta->stay_on_base_chnl_timer, _tdls_stay_on_base_chnl_timer_hdl, 0);
+	timer_setup(&psta->ch_sw_monitor_timer, _tdls_ch_switch_monitor_timer_hdl, 0);
+#endif
+	timer_setup(&psta->handshake_timer, _tdls_handshake_timer_hdl, 0);
+	timer_setup(&psta->pti_timer, _tdls_pti_timer_hdl, 0);
+#endif
 }
 
 void rtw_cancel_tdls_timer(struct sta_info *psta)

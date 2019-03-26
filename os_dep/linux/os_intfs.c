@@ -1258,13 +1258,15 @@ unsigned int rtw_classify8021d(struct sk_buff *skb)
 	return dscp >> 5;
 }
 
-
 static u16 rtw_select_queue(struct net_device *dev, struct sk_buff *skb
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0)
-	, void *accel_priv
-	#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)
-	, select_queue_fallback_t fallback
-	#endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0))
+			    ,struct net_device *sb_dev
+                            ,select_queue_fallback_t fallback
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0))
+ 			    ,void *unused
+                             ,select_queue_fallback_t fallback
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0)
+			, void *accel_priv
 #endif
 )
 {
@@ -2040,7 +2042,11 @@ struct dvobj_priv *devobj_init(void)
 #endif
 #endif
 
-	rtw_init_timer(&(pdvobj->dynamic_chk_timer), NULL, rtw_dynamic_check_timer_handlder, pdvobj);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	timer_setup(&pdvobj->dynamic_chk_timer, rtw_dynamic_check_timer_handler, 0);
+#else
+	rtw_init_timer(&(pdvobj->dynamic_chk_timer), NULL, rtw_dynamic_check_timer_handler, pdvobj);
+#endif
 
 #ifdef CONFIG_MCC_MODE
 	_rtw_mutex_init(&(pdvobj->mcc_objpriv.mcc_mutex));
@@ -2363,7 +2369,11 @@ void rtw_cancel_all_timer(_adapter *padapter)
 	/* cancel sw led timer */
 	rtw_hal_sw_led_deinit(padapter);
 #endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	_cancel_timer_ex(&(adapter_to_pwrctl(padapter)->pwr_state_check_timer));
+#else
+	_cancel_timer_ex(&padapter->pwr_state_check_timer);
+#endif
 
 #ifdef CONFIG_TX_AMSDU
 	_cancel_timer_ex(&padapter->xmitpriv.amsdu_bk_timer);
@@ -3214,7 +3224,11 @@ int _netdev_open(struct net_device *pnetdev)
 	_set_timer(&adapter_to_dvobj(padapter)->dynamic_chk_timer, 2000);
 
 #ifndef CONFIG_IPS_CHECK_IN_WD
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	rtw_set_pwr_state_check_timer(pwrctrlpriv);
+#else
+	rtw_set_pwr_state_check_timer(padapter);
+#endif
 #endif
 
 	/* rtw_netif_carrier_on(pnetdev); */ /* call this func when rtw_joinbss_event_callback return success */
@@ -3335,7 +3349,11 @@ int  ips_netdrv_open(_adapter *padapter)
 #endif /* !RTW_HALMAC */
 
 #ifndef CONFIG_IPS_CHECK_IN_WD
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	rtw_set_pwr_state_check_timer(adapter_to_pwrctl(padapter));
+#else
+	rtw_set_pwr_state_check_timer(padapter);
+#endif
 #endif
 	_set_timer(&adapter_to_dvobj(padapter)->dynamic_chk_timer, 2000);
 

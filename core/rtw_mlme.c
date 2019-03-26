@@ -24,6 +24,7 @@ void rtw_init_mlme_timer(_adapter *padapter)
 {
 	struct	mlme_priv *pmlmepriv = &padapter->mlmepriv;
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	rtw_init_timer(&(pmlmepriv->assoc_timer), padapter, rtw_join_timeout_handler, padapter);
 	rtw_init_timer(&(pmlmepriv->scan_to_timer), padapter, rtw_scan_timeout_handler, padapter);
 
@@ -33,6 +34,18 @@ void rtw_init_mlme_timer(_adapter *padapter)
 
 #ifdef CONFIG_SET_SCAN_DENY_TIMER
 	rtw_init_timer(&(pmlmepriv->set_scan_deny_timer), padapter, rtw_set_scan_deny_timer_hdl, padapter);
+#endif
+#else
+	timer_setup(&pmlmepriv->assoc_timer, rtw_join_timeout_handler, 0);
+	timer_setup(&pmlmepriv->scan_to_timer, rtw_scan_timeout_handler, 0);
+
+#ifdef CONFIG_DFS_MASTER
+	timer_setup(&pmlmepriv->dfs_master_timer, rtw_dfs_master_timer_hdl, 0);
+#endif
+
+#ifdef CONFIG_SET_SCAN_DENY_TIMER
+	timer_setup(&pmlmepriv->set_scan_deny_timer, rtw_set_scan_deny_timer_hdl, 0);
+#endif
 #endif
 
 #ifdef RTK_DMP_PLATFORM
@@ -1698,7 +1711,11 @@ inline void rtw_indicate_scan_done(_adapter *padapter, bool aborted)
 #ifdef CONFIG_IPS_CHECK_IN_WD
 		_set_timer(&adapter_to_dvobj(padapter)->dynamic_chk_timer, 1);
 #else /* !CONFIG_IPS_CHECK_IN_WD */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 		_rtw_set_pwr_state_check_timer(pwrpriv, 1);
+#else
+		_rtw_set_pwr_state_check_timer(padapter, 1);
+#endif
 #endif /* !CONFIG_IPS_CHECK_IN_WD */
 	}
 #endif /* CONFIG_IPS */
@@ -2857,9 +2874,17 @@ void rtw_wmm_event_callback(PADAPTER padapter, u8 *pbuf)
 /*
 * rtw_join_timeout_handler - Timeout/failure handler for CMD JoinBss
 */
-void rtw_join_timeout_handler(void *ctx)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+void rtw_join_timeout_handler(struct timer_list *t)
+#else
+void rtw_join_timeout_handler (void *FunctionContext)
+#endif
 {
-	_adapter *adapter = (_adapter *)ctx;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	_adapter *adapter = from_timer(adapter, t, mlmepriv.assoc_timer);
+#else
+	_adapter *adapter = (_adapter *)FunctionContext;
+#endif
 	_irqL irqL;
 	struct	mlme_priv *pmlmepriv = &adapter->mlmepriv;
 
@@ -2939,9 +2964,17 @@ void rtw_join_timeout_handler(void *ctx)
 * rtw_scan_timeout_handler - Timeout/Faliure handler for CMD SiteSurvey
 * @adapter: pointer to _adapter structure
 */
-void rtw_scan_timeout_handler(void *ctx)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+void rtw_scan_timeout_handler(struct timer_list *t)
+#else
+void rtw_scan_timeout_handler(void *FunctionContext)
+#endif
 {
-	_adapter *adapter = (_adapter *)ctx;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	_adapter *adapter = from_timer(adapter, t, mlmepriv.scan_to_timer);
+#else
+	_adapter *adapter = (_adapter *)FunctionContext;
+#endif
 	_irqL irqL;
 	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
 	RTW_INFO(FUNC_ADPT_FMT" fw_state=%x\n", FUNC_ADPT_ARG(adapter), get_fwstate(pmlmepriv));
@@ -3155,7 +3188,7 @@ void rtw_iface_dynamic_check_timer_handlder(_adapter *adapter)
 
 		if (adapter->pppoe_connection_in_progress > 0)
 			adapter->pppoe_connection_in_progress--;
-		/* due to rtw_dynamic_check_timer_handlder() is called every 2 seconds */
+		/* due to rtw_dynamic_check_timer_handler() is called every 2 seconds */
 		if (adapter->pppoe_connection_in_progress > 0)
 			adapter->pppoe_connection_in_progress--;
 	}
@@ -3264,9 +3297,17 @@ static void collect_traffic_statistics(_adapter *padapter)
 	#endif
 }
 
-void rtw_dynamic_check_timer_handlder(void *ctx)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+void rtw_dynamic_check_timer_handler(struct timer_list *t)
+#else
+void rtw_dynamic_check_timer_handler(void *ctx)
+#endif
 {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+        struct dvobj_priv *pdvobj = from_timer(pdvobj, t, dynamic_chk_timer);
+#else
 	struct dvobj_priv *pdvobj = (struct dvobj_priv *)ctx;
+#endif
 	_adapter *adapter = dvobj_get_primary_adapter(pdvobj);
 
 #if (MP_DRIVER == 1)
@@ -3312,9 +3353,17 @@ inline void rtw_clear_scan_deny(_adapter *adapter)
 		RTW_INFO(FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(adapter));
 }
 
-void rtw_set_scan_deny_timer_hdl(void *ctx)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+void rtw_set_scan_deny_timer_hdl(struct timer_list *t)
+#else
+void rtw_set_scan_deny_timer_hdl(void *FunctionContext)
+#endif
 {
-	_adapter *adapter = (_adapter *)ctx;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	_adapter *adapter = from_timer(adapter, t, mlmepriv.set_scan_deny_timer);
+#else
+	_adapter *adapter = (_adapter *)FunctionContext;
+#endif
 
 	rtw_clear_scan_deny(adapter);
 }

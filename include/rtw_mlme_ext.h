@@ -1044,12 +1044,21 @@ void linked_status_chk(_adapter *padapter, u8 from_timer);
 
 void _linked_info_dump(_adapter *padapter);
 
-void survey_timer_hdl(void *ctx);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+void survey_timer_hdl(struct timer_list *t);
+#else
+void survey_timer_hdl (void *FunctionContext);
+#endif
 #ifdef CONFIG_RTW_REPEATER_SON
 void rson_timer_hdl(void *ctx);
 #endif
-void link_timer_hdl(void *ctx);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+void link_timer_hdl(struct timer_list *t);
+void addba_timer_hdl(struct timer_list *t);
+#else
+void link_timer_hdl (void *FunctionContext);
 void addba_timer_hdl(void *ctx);
+#endif
 #ifdef CONFIG_IEEE80211W
 void sa_query_timer_hdl(void *ctx);
 #endif /* CONFIG_IEEE80211W */

@@ -655,6 +655,7 @@ odm_set_timer(
 
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void
 odm_initialize_timer(
 	struct PHY_DM_STRUCT			*p_dm,
@@ -684,7 +685,7 @@ odm_initialize_timer(
 	PlatformInitializeTimer(adapter, p_timer, (RT_TIMER_CALL_BACK)call_back_func, p_context, sz_id);
 #endif
 }
-
+#endif
 
 void
 odm_cancel_timer(

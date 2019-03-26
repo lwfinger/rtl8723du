@@ -1304,6 +1304,10 @@ struct tsf_info {
 #define ADAPTER_TX_BW_5G(adapter) BW_MODE_5G((adapter)->driver_tx_bw_mode)
 
 struct _ADAPTER {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	_timer	pwr_state_check_timer;
+	int	pwr_state_check_interval;
+#endif
 	int	DriverState;/* for disable driver using module, use dongle to replace module. */
 	int	pid[3];/* process id from UI, 0:wps, 1:hostapd, 2:dhcpcd */
 	int	bDongle;/* build-in module or external dongle */

@@ -25,7 +25,11 @@
 
 
 #ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
-static void rtw_signal_stat_timer_hdl(void *ctx);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+void rtw_signal_stat_timer_hdl(struct timer_list *t);
+#else
+void rtw_signal_stat_timer_hdl(RTW_TIMER_HDL_ARGS);
+#endif
 
 enum {
 	SIGNAL_STAT_CALC_PROFILE_0 = 0,
@@ -139,7 +143,11 @@ sint _rtw_init_recv_priv(struct recv_priv *precvpriv, _adapter *padapter)
 	res = rtw_hal_init_recv_priv(padapter);
 
 #ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	timer_setup(&precvpriv->signal_stat_timer, rtw_signal_stat_timer_hdl, 0);
+#else
 	rtw_init_timer(&precvpriv->signal_stat_timer, padapter, rtw_signal_stat_timer_hdl, padapter);
+#endif
 
 	precvpriv->signal_stat_sampling_interval = 2000; /* ms */
 	/* precvpriv->signal_stat_converging_constant = 5000; */ /* ms */
@@ -3337,11 +3345,19 @@ _err_exit:
 }
 
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+void rtw_reordering_ctrl_timeout_handler(struct timer_list *t)
+#else
 void rtw_reordering_ctrl_timeout_handler(void *pcontext)
+#endif
 {
-	_irqL irql;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	struct recv_reorder_ctrl *preorder_ctrl = from_timer(preorder_ctrl, t, reordering_ctrl_timer);
+#else
 	struct recv_reorder_ctrl *preorder_ctrl = (struct recv_reorder_ctrl *)pcontext;
+#endif
 	_adapter *padapter = preorder_ctrl->padapter;
+	_irqL irql;
 	_queue *ppending_recvframe_queue = &preorder_ctrl->pending_recvframe_queue;
 
 
@@ -4270,9 +4286,17 @@ _recv_entry_drop:
 }
 
 #ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
-static void rtw_signal_stat_timer_hdl(void *ctx)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+void rtw_signal_stat_timer_hdl(struct timer_list *t)
+#else
+void rtw_signal_stat_timer_hdl(RTW_TIMER_HDL_ARGS)
+#endif
 {
-	_adapter *adapter = (_adapter *)ctx;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	_adapter *adapter = from_timer(adapter, t, recvpriv.signal_stat_timer);
+#else
+	_adapter *adapter = (_adapter *)FunctionContext;
+#endif
 	struct recv_priv *recvpriv = &adapter->recvpriv;
 
 	u32 tmp_s, tmp_q;
