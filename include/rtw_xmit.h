@@ -60,9 +60,6 @@
 	#define NR_XMITBUFF	(128)
 #endif
 
-#ifdef PLATFORM_OS_CE
-	#define XMITBUF_ALIGN_SZ 4
-#else
 	#ifdef CONFIG_PCI_HCI
 		#define XMITBUF_ALIGN_SZ 4
 	#else
@@ -72,7 +69,6 @@
 			#define XMITBUF_ALIGN_SZ 512
 		#endif
 	#endif
-#endif
 
 /* xmit extension buff defination */
 #define MAX_XMIT_EXTBUF_SZ	(1536)
@@ -578,18 +574,8 @@ struct xmit_buf {
 	u8 bulkout_id; /* for halmac */
 #endif /* RTW_HALMAC */
 
-#if defined(PLATFORM_OS_XP) || defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD)
 	PURB	pxmit_urb[8];
 	dma_addr_t dma_transfer_addr;	/* (in) dma addr for transfer_buffer */
-#endif
-
-#ifdef PLATFORM_OS_XP
-	PIRP		pxmit_irp[8];
-#endif
-
-#ifdef PLATFORM_OS_CE
-	USB_TRANSFER	usb_transfer_write_port;
-#endif
 
 	u8 bpending[8];
 
@@ -605,11 +591,6 @@ struct xmit_buf {
 	u32 ff_hwaddr;
 	u8	pg_num;
 	u8	agg_num;
-#ifdef PLATFORM_OS_XP
-	PMDL pxmitbuf_mdl;
-	PIRP  pxmitbuf_irp;
-	PSDBUS_REQUEST_PACKET pxmitbuf_sdrp;
-#endif
 #endif
 
 #ifdef CONFIG_PCI_HCI
@@ -776,10 +757,6 @@ struct	xmit_priv	{
 	_sema	tx_retevt;/* all tx return event; */
 	u8		txirp_cnt;
 
-#ifdef PLATFORM_OS_CE
-	USB_TRANSFER	usb_transfer_write_port;
-	/*	USB_TRANSFER	usb_transfer_write_mem; */
-#endif
 #ifdef PLATFORM_LINUX
 	struct tasklet_struct xmit_tasklet;
 #endif
