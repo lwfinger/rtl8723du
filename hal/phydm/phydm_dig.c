@@ -1773,13 +1773,17 @@ phydm_lna_sat_chk(
 	odm_set_timer(p_dm, &p_lna_info->phydm_lna_sat_chk_timer, p_dm->lna_sat_chk_period_ms);
 }
 
-void
-phydm_lna_sat_chk_callback(
-	void		*p_dm_void
-
-	)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+void phydm_lna_sat_chk_callback(void *p_dm_void)
+#else
+void phydm_lna_sat_chk_callback(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
+#else
+struct PHY_DM_STRUCT    *p_dm = from_timer(p_dm, t, dm_lna_sat_info.phydm_lna_sat_chk_timer);
+#endif
 
 	PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK, ("\n%s ==>\n", __FUNCTION__));
 	phydm_lna_sat_chk(p_dm);
@@ -1795,8 +1799,13 @@ phydm_lna_sat_chk_timers(
 	struct phydm_lna_sat_info_struct *p_lna_info = &p_dm->dm_lna_sat_info;
 
 	if (state == INIT_LNA_SAT_CHK_TIMMER) {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 		odm_initialize_timer(p_dm, &(p_lna_info->phydm_lna_sat_chk_timer),
 			(void *)phydm_lna_sat_chk_callback, NULL, "phydm_lna_sat_chk_timer");
+#else
+		timer_setup(&p_lna_info->phydm_lna_sat_chk_timer,
+			phydm_lna_sat_chk_callback, 0);
+#endif
 	} else if (state == CANCEL_LNA_SAT_CHK_TIMMER) {
 		odm_cancel_timer(p_dm, &(p_lna_info->phydm_lna_sat_chk_timer));
 	} else if (state == RELEASE_LNA_SAT_CHK_TIMMER) {

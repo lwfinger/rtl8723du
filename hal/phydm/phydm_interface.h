@@ -344,6 +344,7 @@ odm_set_timer(
 	u32			ms_delay
 );
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void
 odm_initialize_timer(
 	struct PHY_DM_STRUCT			*p_dm,
@@ -352,6 +353,7 @@ odm_initialize_timer(
 	void				*p_context,
 	const char			*sz_id
 );
+#endif
 
 void
 odm_cancel_timer(
