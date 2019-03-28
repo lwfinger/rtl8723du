@@ -31,7 +31,6 @@
 	#define _FALSE	FALSE
 #endif
 
-#ifdef PLATFORM_LINUX
 	#include <linux/version.h>
 	#include <linux/types.h>
 	#include <linux/module.h>
@@ -100,9 +99,6 @@ enum {
 #define UINT u32
 #define ULONG u32
 #define PULONG u32*
-
-#endif
-
 
 #define MEM_ALIGNMENT_OFFSET	(sizeof (SIZE_T))
 #define MEM_ALIGNMENT_PADDING	(sizeof(SIZE_T) - 1)

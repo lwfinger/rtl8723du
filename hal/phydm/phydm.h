@@ -507,15 +507,7 @@ struct	phydm_iot_center {
 
 };
 
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	#if (RT_PLATFORM != PLATFORM_LINUX)
-		typedef
-	#endif
-
 	struct PHY_DM_STRUCT
-#else/*for AP, CE Team*/
-	struct PHY_DM_STRUCT
-#endif
 {
 	/*Add for different team use temporarily*/
 	struct _ADAPTER		*adapter;		/*For CE/NIC team*/
@@ -958,15 +950,6 @@ struct	phydm_iot_center {
 #endif
 /*==========================================================*/
 
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-
-#if (RT_PLATFORM != PLATFORM_LINUX)
-}PHY_DM_STRUCT;		/*DM_Dynamic_Mechanism_Structure*/
-#else
-};
-#endif
-
-#else	/*for AP,CE Team*/
 };
 #endif
 
@@ -1263,4 +1246,3 @@ void
 phydm_receiver_blocking(
 	void *p_dm_void
 );
-#endif

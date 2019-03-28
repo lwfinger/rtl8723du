@@ -29,8 +29,6 @@
 #endif
 #define CONFIG_USB_HCI
 
-#define PLATFORM_LINUX 1
-
 /*
  * Wi-Fi Functions Configure
  */

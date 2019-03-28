@@ -65,11 +65,9 @@ s32 rtl8723du_init_xmit_priv(PADAPTER padapter)
 {
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
 
-#ifdef PLATFORM_LINUX
 	tasklet_init(&pxmitpriv->xmit_tasklet,
 		     (void (*)(unsigned long))rtl8723du_xmit_tasklet,
 		     (unsigned long)padapter);
-#endif
 	return _SUCCESS;
 }
 
@@ -662,9 +660,7 @@ s32 rtl8723du_hal_xmitframe_enqueue(PADAPTER padapter, struct xmit_frame *pxmitf
 
 		pxmitpriv->tx_drop++;
 	} else {
-#ifdef PLATFORM_LINUX
 		tasklet_hi_schedule(&pxmitpriv->xmit_tasklet);
-#endif
 	}
 
 	return err;
@@ -701,18 +697,13 @@ void rtl8723d_cal_txdesc_chksum(struct tx_desc *ptxdesc)
 
 static void rtl8723du_hostap_mgnt_xmit_cb(struct urb *urb)
 {
-#ifdef PLATFORM_LINUX
 	struct sk_buff *skb = (struct sk_buff *)urb->context;
 
-	/* RTW_INFO("%s\n", __func__); */
-
 	rtw_skb_free(skb);
-#endif
 }
 
 s32 rtl8723du_hostap_mgnt_xmit_entry(PADAPTER padapter, _pkt *pkt)
 {
-#ifdef PLATFORM_LINUX
 	u16 fc;
 	int rc, len, pipe;
 	unsigned int bmcst, tid, qsel;
@@ -812,15 +803,8 @@ s32 rtl8723du_hostap_mgnt_xmit_entry(PADAPTER padapter, _pkt *pkt)
 		kfree_skb(skb);
 	}
 	usb_free_urb(urb);
-
-
 _exit:
-
 	rtw_skb_free(skb);
-
-#endif
-
 	return 0;
-
 }
 #endif

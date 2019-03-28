@@ -169,13 +169,8 @@
 	#define ___ntohl(x) __be32_to_cpu(x)
 	#define ___ntohs(x) __be16_to_cpu(x)
 
-	#if defined(PLATFORM_LINUX) || (defined(__GLIBC__) && __GLIBC__ >= 2)
-		#define htonl(x) ___htonl(x)
-		#define ntohl(x) ___ntohl(x)
-	#else
-		#define htonl(x) ((unsigned long)___htonl(x))
-		#define ntohl(x) ((unsigned long)___ntohl(x))
-	#endif
+	#define htonl(x) ___htonl(x)
+	#define ntohl(x) ___ntohl(x)
 	#define htons(x) ___htons(x)
 	#define ntohs(x) ___ntohs(x)
 

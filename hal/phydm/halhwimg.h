@@ -19,8 +19,6 @@
 /*
  * 2011/03/15 MH Add for different IC HW image file selection. code size consideration.
  *   */
-#if RT_PLATFORM == PLATFORM_LINUX
-
 	#if (DEV_BUS_TYPE == RT_PCI_INTERFACE)
 		/* For 92C */
 		#define		RTL8192CE_HWIMG_SUPPORT					1
@@ -90,7 +88,5 @@
 		#define		RTL8188EU_HWIMG_SUPPORT					0
 		#define		RTL8188ES_HWIMG_SUPPORT					0
 	#endif
-
-#endif
 
 #endif /* __INC_HW_IMG_H */

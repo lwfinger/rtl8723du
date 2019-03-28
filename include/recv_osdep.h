@@ -52,12 +52,10 @@ void rtw_os_recv_indicate_pkt(_adapter *padapter, _pkt *pkt, union recv_frame *r
 
 void rtw_os_read_port(_adapter *padapter, struct recv_buf *precvbuf);
 
-#ifdef PLATFORM_LINUX
 #ifdef CONFIG_RTW_NAPI
 #include <linux/netdevice.h>	/* struct napi_struct */
 
 int rtw_recv_napi_poll(struct napi_struct *, int budget);
 #endif /* CONFIG_RTW_NAPI */
-#endif /* PLATFORM_LINUX */
 
 #endif /*  */
