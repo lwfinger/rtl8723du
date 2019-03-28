@@ -1098,12 +1098,6 @@ void halbtc8723d1ant_low_penalty_ra(IN struct btc_coexist *btcoexist,
 	halbtc8723d1ant_set_fw_low_penalty_ra(btcoexist,
 					      coex_dm->cur_low_penalty_ra);
 
-#if 0
-	if (low_penalty_ra)
-		btcoexist->btc_phydm_modify_RA_PCR_threshold(btcoexist, 0, 15);
-	else
-		btcoexist->btc_phydm_modify_RA_PCR_threshold(btcoexist, 0, 0);
-#endif
 	coex_dm->pre_low_penalty_ra = coex_dm->cur_low_penalty_ra;
 
 #endif
@@ -1280,28 +1274,10 @@ void halbtc8723d1ant_monitor_bt_enable_disable(IN struct btc_coexist *btcoexist)
 	u16			u16tmp;
 
 	/* This function check if bt is disabled */
-#if 0
-	if (coex_sta->high_priority_tx == 0 &&
-	    coex_sta->high_priority_rx == 0 &&
-	    coex_sta->low_priority_tx == 0 &&
-	    coex_sta->low_priority_rx == 0)
-		bt_active = FALSE;
-	if (coex_sta->high_priority_tx == 0xffff &&
-	    coex_sta->high_priority_rx == 0xffff &&
-	    coex_sta->low_priority_tx == 0xffff &&
-	    coex_sta->low_priority_rx == 0xffff)
-		bt_active = FALSE;
-
-
-#else
-
 	/* Read BT on/off status from scoreboard[1], enable this only if BT patch support this feature */
 	halbtc8723d1ant_read_score_board(btcoexist,	&u16tmp);
 
 	bt_active = u16tmp & BIT(1);
-
-
-#endif
 
 	if (bt_active) {
 		bt_disable_cnt = 0;
@@ -1988,19 +1964,6 @@ void halbtc8723d1ant_ps_tdma(IN struct btc_coexist *btcoexist,
 	boolean	wifi_busy = FALSE;
 	static u8	psTdmaByte4Modify = 0x0, pre_psTdmaByte4Modify = 0x0;
 	static boolean	 pre_wifi_busy = FALSE;
-
-
-#if BT_8723D_1ANT_ANTDET_ENABLE
-
-	if (board_info->btdm_ant_num_by_ant_det == 2) {
-#if 0
-		if (turn_on)
-			type = type +
-			       100;
-#endif
-	}
-
-#endif
 
 	coex_dm->cur_ps_tdma_on = turn_on;
 	coex_dm->cur_ps_tdma = type;
@@ -3082,9 +3045,6 @@ void halbtc8723d1ant_action_wifi_connected_bt_acl_busy(IN struct btc_coexist
 				halbtc8723d1ant_ps_tdma(btcoexist, NORMAL_EXEC, TRUE, 8);
 #endif
 
-#if 0
-			halbtc8723d1ant_action_wifi_cck_dead_lock(btcoexist);
-#endif
 		} else {
 			if (coex_sta->hid_busy_num < 2) /* 2/18 HID */
 				halbtc8723d1ant_coex_table_with_type(btcoexist, NORMAL_EXEC, 3);
@@ -3364,10 +3324,6 @@ void halbtc8723d1ant_run_coexist_mechanism(IN struct btc_coexist *btcoexist)
 				num_of_wifi_link, wifi_link_status);
 		BTC_TRACE(trace_buf);
 
-#if 0
-		halbtc8723d1ant_limited_rx(btcoexist, NORMAL_EXEC, FALSE,
-					FALSE, 0x5);
-#endif
 		if (scan || link || roam || under_4way) {
 			BTC_SPRINTF(trace_buf, BT_TMP_BUF_SIZE,
 				"[BTCoex], scan = %d, link = %d, roam = %d 4way = %d!!!\n",
@@ -3565,13 +3521,6 @@ void halbtc8723d1ant_init_hw_config(IN struct btc_coexist *btcoexist,
 	btcoexist->btc_write_1byte_bitmask(btcoexist, 0x4c6, 0x10, 0x1);
 
 	halbtc8723d1ant_enable_gnt_to_gpio(btcoexist, TRUE);
-
-#if 0
-	/* check if WL firmware download ok */
-	if (btcoexist->btc_read_1byte(btcoexist, 0x80) == 0xc6)
-		halbtc8723d1ant_post_state_to_bt(btcoexist,
-					 BT_8723D_1ANT_SCOREBOARD_ONOFF, TRUE);
-#endif
 
 	/* PTA parameter */
 	halbtc8723d1ant_coex_table_with_type(btcoexist, FORCE_EXEC, 0);
@@ -4500,15 +4449,6 @@ boolean halbtc8723d1ant_psd_antenna_detection(IN struct btc_coexist
 					break;
 				}
 			}
-#if 0
-			wlpsd_sweep_count = bt_tx_time * 238 /
-					    100; /* bt_tx_time/0.42								 */
-			wlpsd_sweep_count = wlpsd_sweep_count / 5;
-
-			if (wlpsd_sweep_count % 5 != 0)
-				wlpsd_sweep_count = (wlpsd_sweep_count /
-						     5 + 1) * 5;
-#endif
 			BTC_SPRINTF(trace_buf, BT_TMP_BUF_SIZE,
 				"xxxxxxxxxxxxxxxx AntennaDetect(), BT_LETxTime=%d,  BT_LECh = %d\n",
 				    bt_tx_time, bt_le_channel);
@@ -4653,16 +4593,6 @@ boolean halbtc8723d1ant_psd_antenna_detection(IN struct btc_coexist
 #if 1
 			psd_scan->ant_det_psd_scan_peak_val =
 				psd_scan->psd_max_value;
-#endif
-#if 0
-			psd_scan->ant_det_psd_scan_peak_val =
-				((psd_scan->psd_max_value - psd_scan->psd_avg_value) <
-				 800) ?
-				psd_scan->psd_max_value : ((
-						psd_scan->psd_max_value -
-					psd_scan->psd_max_value2 <= 300) ?
-						   psd_scan->psd_avg_value :
-						   psd_scan->psd_max_value2);
 #endif
 			psd_scan->ant_det_psd_scan_peak_freq =
 				psd_scan->psd_max_value_point;
@@ -5555,13 +5485,6 @@ void ex_halbtc8723d1ant_ips_notify(IN struct btc_coexist *btcoexist, IN u8 type)
 		BTC_SPRINTF(trace_buf, BT_TMP_BUF_SIZE,
 			    "[BTCoex], IPS LEAVE notify\n");
 		BTC_TRACE(trace_buf);
-#if 0
-		halbtc8723d1ant_post_state_to_bt(btcoexist,
-					 BT_8723D_1ANT_SCOREBOARD_ACTIVE, TRUE);
-
-		halbtc8723d1ant_post_state_to_bt(btcoexist,
-				 BT_8723D_1ANT_SCOREBOARD_ONOFF, TRUE);
-#endif
 
 		halbtc8723d1ant_init_hw_config(btcoexist, FALSE, FALSE);
 		halbtc8723d1ant_init_coex_dm(btcoexist);;
@@ -6178,13 +6101,6 @@ void ex_halbtc8723d1ant_rf_status_notify(IN struct btc_coexist *btcoexist,
 
 		btcoexist->stop_coex_dm = FALSE;
 		coex_sta->is_rf_state_off = FALSE;
-#if 0
-		halbtc8723d1ant_post_state_to_bt(btcoexist,
-					 BT_8723D_1ANT_SCOREBOARD_ACTIVE, TRUE);
-		halbtc8723d1ant_post_state_to_bt(btcoexist,
-					 BT_8723D_1ANT_SCOREBOARD_ONOFF, TRUE);
-#endif
-
 	} else if (BTC_RF_OFF == type) {
 
 		BTC_SPRINTF(trace_buf, BT_TMP_BUF_SIZE,
@@ -6270,12 +6186,6 @@ void ex_halbtc8723d1ant_pnp_notify(IN struct btc_coexist *btcoexist,
 		BTC_SPRINTF(trace_buf, BT_TMP_BUF_SIZE,
 			    "[BTCoex], Pnp notify to WAKE UP\n");
 		BTC_TRACE(trace_buf);
-#if 0
-		halbtc8723d1ant_post_state_to_bt(btcoexist,
-					 BT_8723D_1ANT_SCOREBOARD_ACTIVE, TRUE);
-		halbtc8723d1ant_post_state_to_bt(btcoexist,
-					 BT_8723D_1ANT_SCOREBOARD_ONOFF, TRUE);
-#endif
 		btcoexist->stop_coex_dm = FALSE;
 	}
 }

@@ -908,16 +908,6 @@ static u8 rtw_hal_mcc_update_timing_parameters(PADAPTER padapter, u8 force_updat
 				continue;
 
 			pmccadapriv = &iface->mcc_adapterpriv;
-#if 0
-			if (pmccadapriv->order == 0) {
-				pmccadapriv->mcc_duration = mcc_duration;
-			} else if (pmccadapriv->order == 1) {
-				pmccadapriv->mcc_duration = mcc_interval - mcc_duration;
-			} else {
-				RTW_INFO("[MCC] not support >= 3 interface\n");
-				rtw_warn_on(1);
-			}
-#endif
 			RTW_INFO("********************\n");
 			RTW_INFO(FUNC_ADPT_FMT": order:%d, role:%d\n",
 				FUNC_ADPT_ARG(iface), pmccadapriv->order, pmccadapriv->role);

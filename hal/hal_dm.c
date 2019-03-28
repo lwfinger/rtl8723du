@@ -373,10 +373,6 @@ void rtw_hal_turbo_edca(_adapter *adapter)
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
 	/* Parameter suggested by Scott  */
-#if 0
-	u32	EDCA_BE_UL = edca_setting_UL[p_mgnt_info->iot_peer];
-	u32	EDCA_BE_DL = edca_setting_DL[p_mgnt_info->iot_peer];
-#endif
 	u32	EDCA_BE_UL = 0x5ea42b;
 	u32	EDCA_BE_DL = 0x00a42b;
 	u8	ic_type = rtw_get_chip_type(adapter);
@@ -446,62 +442,56 @@ void rtw_hal_turbo_edca(_adapter *adapter)
 				traffic_index = UP_LINK;
 			}
 		}
-#if 0
-		if ((p_dm_odm->dm_edca_table.prv_traffic_idx != traffic_index)
-			|| (!p_dm_odm->dm_edca_table.is_current_turbo_edca))
-#endif
-		{
-			if (interface_type == RTW_PCIE) {
-				EDCA_BE_UL = 0x6ea42b;
-				EDCA_BE_DL = 0x6ea42b;
-			}
-
-			/* 92D txop can't be set to 0x3e for cisco1250 */
-			if ((iot_peer == HT_IOT_PEER_CISCO) && (wireless_mode == ODM_WM_N24G)) {
-				EDCA_BE_DL = edca_setting_DL[iot_peer];
-				EDCA_BE_UL = edca_setting_UL[iot_peer];
-			}
-			/* merge from 92s_92c_merge temp*/
-			else if ((iot_peer == HT_IOT_PEER_CISCO) && ((wireless_mode == ODM_WM_G) || (wireless_mode == (ODM_WM_B | ODM_WM_G)) || (wireless_mode == ODM_WM_A) || (wireless_mode == ODM_WM_B)))
-				EDCA_BE_DL = edca_setting_dl_g_mode[iot_peer];
-			else if ((iot_peer == HT_IOT_PEER_AIRGO) && ((wireless_mode == ODM_WM_G) || (wireless_mode == ODM_WM_A)))
-				EDCA_BE_DL = 0xa630;
-			else if (iot_peer == HT_IOT_PEER_MARVELL) {
-				EDCA_BE_DL = edca_setting_DL[iot_peer];
-				EDCA_BE_UL = edca_setting_UL[iot_peer];
-			} else if (iot_peer == HT_IOT_PEER_ATHEROS) {
-				/* Set DL EDCA for Atheros peer to 0x3ea42b.*/
-				/* Suggested by SD3 Wilson for ASUS TP issue.*/
-				EDCA_BE_DL = edca_setting_DL[iot_peer];
-			}
-
-			if ((ic_type == RTL8812) || (ic_type == RTL8821) || (ic_type == RTL8192E)) { /* add 8812AU/8812AE */
-				EDCA_BE_UL = 0x5ea42b;
-				EDCA_BE_DL = 0x5ea42b;
-
-				RTW_DBG("8812A: EDCA_BE_UL=0x%x EDCA_BE_DL =0x%x\n", EDCA_BE_UL, EDCA_BE_DL);
-			}
-
-			if (interface_type == RTW_PCIE &&
-				((ic_type == RTL8822B)
-				|| (ic_type == RTL8814A))) {
-				EDCA_BE_UL = 0x6ea42b;
-				EDCA_BE_DL = 0x6ea42b;
-			}
-
-			if (traffic_index == DOWN_LINK)
-				edca_param = EDCA_BE_DL;
-			else
-				edca_param = EDCA_BE_UL;
-#ifdef 	CONFIG_RTW_CUSTOMIZE_BEEDCA
-			edca_param = CONFIG_RTW_CUSTOMIZE_BEEDCA;
-#endif
-			rtw_hal_set_hwreg(adapter, HW_VAR_AC_PARAM_BE, (u8 *)(&edca_param));
-
-			RTW_DBG("Turbo EDCA =0x%x\n", edca_param);
-
-			hal_data->prv_traffic_idx = traffic_index;
+		if (interface_type == RTW_PCIE) {
+			EDCA_BE_UL = 0x6ea42b;
+			EDCA_BE_DL = 0x6ea42b;
 		}
+
+		/* 92D txop can't be set to 0x3e for cisco1250 */
+		if ((iot_peer == HT_IOT_PEER_CISCO) && (wireless_mode == ODM_WM_N24G)) {
+			EDCA_BE_DL = edca_setting_DL[iot_peer];
+			EDCA_BE_UL = edca_setting_UL[iot_peer];
+		}
+		/* merge from 92s_92c_merge temp*/
+		else if ((iot_peer == HT_IOT_PEER_CISCO) && ((wireless_mode == ODM_WM_G) || (wireless_mode == (ODM_WM_B | ODM_WM_G)) || (wireless_mode == ODM_WM_A) || (wireless_mode == ODM_WM_B)))
+			EDCA_BE_DL = edca_setting_dl_g_mode[iot_peer];
+		else if ((iot_peer == HT_IOT_PEER_AIRGO) && ((wireless_mode == ODM_WM_G) || (wireless_mode == ODM_WM_A)))
+			EDCA_BE_DL = 0xa630;
+		else if (iot_peer == HT_IOT_PEER_MARVELL) {
+			EDCA_BE_DL = edca_setting_DL[iot_peer];
+			EDCA_BE_UL = edca_setting_UL[iot_peer];
+		} else if (iot_peer == HT_IOT_PEER_ATHEROS) {
+			/* Set DL EDCA for Atheros peer to 0x3ea42b.*/
+			/* Suggested by SD3 Wilson for ASUS TP issue.*/
+			EDCA_BE_DL = edca_setting_DL[iot_peer];
+		}
+
+		if ((ic_type == RTL8812) || (ic_type == RTL8821) || (ic_type == RTL8192E)) { /* add 8812AU/8812AE */
+			EDCA_BE_UL = 0x5ea42b;
+			EDCA_BE_DL = 0x5ea42b;
+
+			RTW_DBG("8812A: EDCA_BE_UL=0x%x EDCA_BE_DL =0x%x\n", EDCA_BE_UL, EDCA_BE_DL);
+		}
+
+		if (interface_type == RTW_PCIE &&
+			((ic_type == RTL8822B)
+			|| (ic_type == RTL8814A))) {
+			EDCA_BE_UL = 0x6ea42b;
+			EDCA_BE_DL = 0x6ea42b;
+		}
+
+		if (traffic_index == DOWN_LINK)
+			edca_param = EDCA_BE_DL;
+		else
+			edca_param = EDCA_BE_UL;
+#ifdef 	CONFIG_RTW_CUSTOMIZE_BEEDCA
+		edca_param = CONFIG_RTW_CUSTOMIZE_BEEDCA;
+#endif
+		rtw_hal_set_hwreg(adapter, HW_VAR_AC_PARAM_BE, (u8 *)(&edca_param));
+
+		RTW_DBG("Turbo EDCA =0x%x\n", edca_param);
+
+		hal_data->prv_traffic_idx = traffic_index;
 
 		hal_data->is_turbo_edca = _TRUE;
 	} else {
@@ -1049,16 +1039,7 @@ static u8 _rtw_phydm_rfk_condition_check(_adapter *adapter)
 #if ((RTL8822B_SUPPORT == 1) || (RTL8821C_SUPPORT == 1) || (RTL8814B_SUPPORT == 1))
 static u8 _rtw_phydm_iqk_segment_chk(_adapter *adapter)
 {
-	u8 rst = _FALSE;
-	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
-
-#if 0
-	if (dvobj->traffic_stat.cur_tx_tp > 2 || dvobj->traffic_stat.cur_rx_tp > 2)
-		rst = _TRUE;
-#else
-	rst = _TRUE;
-#endif
-	return rst;
+	return _TRUE;
 }
 #endif
 

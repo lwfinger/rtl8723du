@@ -1106,17 +1106,6 @@ phydm_supportability_init_ap(
 		break;
 
 	}
-
-	#if 0
-	/*[Config Antenna Diveristy]*/
-	if (*(p_dm->p_enable_antdiv))
-		support_ability |= ODM_BB_ANT_DIV;
-	
-	/*[Config Adaptivity]*/
-	if (*(p_dm->p_enable_adaptivity))
-		support_ability |= ODM_BB_ADAPTIVITY;
-	#endif
-
 	return support_ability;
 }
 #endif
@@ -1793,20 +1782,6 @@ phydm_watchdog(
 
 	phydm_hw_setting(p_dm);
 
-	#if 0 /*(DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))*/
-	if (*(p_dm->p_is_power_saving) == true) {
-
-		PHYDM_DBG(p_dm, DBG_COMMON_FLOW, ("PHYDM power saving mode\n"));
-		phydm_dig_by_rssi_lps(p_dm);
-		phydm_adaptivity(p_dm);
-
-		#if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
-		odm_antenna_diversity(p_dm); /*enable AntDiv in PS mode, request from SD4 Jeff*/
-		#endif
-		return;
-	}
-	#endif
-
 	#ifdef PHYDM_TDMA_DIG_SUPPORT
 	if (p_dm->original_dig_restore == 0)
 		phydm_tdma_dig_timer_check(p_dm);
@@ -2296,36 +2271,9 @@ odm_cmn_info_update(
 		p_dm->dfs_region_domain = (u8)value;
 		break;
 #endif
-
 	case	ODM_CMNINFO_BT_CONTINUOUS_TURN:
 		p_dm->is_bt_continuous_turn = (boolean)value;
 		break;
-
-#if 0
-	case	ODM_CMNINFO_OP_MODE:
-		p_dm->op_mode = (u8)value;
-		break;
-
-	case	ODM_CMNINFO_BAND:
-		p_dm->band_type = (u8)value;
-		break;
-
-	case	ODM_CMNINFO_SEC_CHNL_OFFSET:
-		p_dm->sec_ch_offset = (u8)value;
-		break;
-
-	case	ODM_CMNINFO_SEC_MODE:
-		p_dm->security = (u8)value;
-		break;
-
-	case	ODM_CMNINFO_BW:
-		p_dm->band_width = (u8)value;
-		break;
-
-	case	ODM_CMNINFO_CHNL:
-		p_dm->channel = (u8)value;
-		break;
-#endif
 	default:
 		/* do nothing */
 		break;
@@ -2840,12 +2788,6 @@ void odm_dtc(struct PHY_DM_STRUCT *p_dm)
 	u8 sign;
 	u8 resp_txagc = 0;
 
-#if 0
-	/* As DIG is disabled, DTC is also disable */
-	if (!(p_dm->support_ability & ODM_XXXXXX))
-		return;
-#endif
-
 	if (p_dm->rssi_min > DTC_BASE) {
 		/* need to decade the CTS TX power */
 		sign = 1;
@@ -2855,21 +2797,7 @@ void odm_dtc(struct PHY_DM_STRUCT *p_dm)
 			else
 				dtc_steps++;
 		}
-	}
-#if 0
-	else if (p_dm->rssi_min > DTC_DWN_BASE) {
-		/* needs to increase the CTS TX power */
-		sign = 0;
-		dtc_steps = 1;
-		for (i = 0; i < ARRAY_SIZE(dtc_table_up); i++) {
-			if ((dtc_table_up[i] <= p_dm->rssi_min) || (dtc_steps >= 10))
-				break;
-			else
-				dtc_steps++;
-		}
-	}
-#endif
-	else {
+	} else {
 		sign = 0;
 		dtc_steps = 0;
 	}

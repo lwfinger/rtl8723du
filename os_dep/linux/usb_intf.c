@@ -473,62 +473,15 @@ static struct dvobj_priv *usb_dvobj_init(struct usb_interface *usb_intf, const s
 
 	pdev_desc = &pusbd->descriptor;
 
-#if 0
-	RTW_INFO("\n8712_usb_device_descriptor:\n");
-	RTW_INFO("bLength=%x\n", pdev_desc->bLength);
-	RTW_INFO("bDescriptorType=%x\n", pdev_desc->bDescriptorType);
-	RTW_INFO("bcdUSB=%x\n", pdev_desc->bcdUSB);
-	RTW_INFO("bDeviceClass=%x\n", pdev_desc->bDeviceClass);
-	RTW_INFO("bDeviceSubClass=%x\n", pdev_desc->bDeviceSubClass);
-	RTW_INFO("bDeviceProtocol=%x\n", pdev_desc->bDeviceProtocol);
-	RTW_INFO("bMaxPacketSize0=%x\n", pdev_desc->bMaxPacketSize0);
-	RTW_INFO("idVendor=%x\n", pdev_desc->idVendor);
-	RTW_INFO("idProduct=%x\n", pdev_desc->idProduct);
-	RTW_INFO("bcdDevice=%x\n", pdev_desc->bcdDevice);
-	RTW_INFO("iManufacturer=%x\n", pdev_desc->iManufacturer);
-	RTW_INFO("iProduct=%x\n", pdev_desc->iProduct);
-	RTW_INFO("iSerialNumber=%x\n", pdev_desc->iSerialNumber);
-	RTW_INFO("bNumConfigurations=%x\n", pdev_desc->bNumConfigurations);
-#endif
-
 	phost_conf = pusbd->actconfig;
 	pconf_desc = &phost_conf->desc;
-
-#if 0
-	RTW_INFO("\n8712_usb_configuration_descriptor:\n");
-	RTW_INFO("bLength=%x\n", pconf_desc->bLength);
-	RTW_INFO("bDescriptorType=%x\n", pconf_desc->bDescriptorType);
-	RTW_INFO("wTotalLength=%x\n", pconf_desc->wTotalLength);
-	RTW_INFO("bNumInterfaces=%x\n", pconf_desc->bNumInterfaces);
-	RTW_INFO("bConfigurationValue=%x\n", pconf_desc->bConfigurationValue);
-	RTW_INFO("iConfiguration=%x\n", pconf_desc->iConfiguration);
-	RTW_INFO("bmAttributes=%x\n", pconf_desc->bmAttributes);
-	RTW_INFO("bMaxPower=%x\n", pconf_desc->bMaxPower);
-#endif
-
-	/* RTW_INFO("\n***** num of altsetting = (%d) *****\n", pusb_interface->num_altsetting); */
 
 	phost_iface = &usb_intf->altsetting[0];
 	piface_desc = &phost_iface->desc;
 
-#if 0
-	RTW_INFO("\n8712_usb_interface_descriptor:\n");
-	RTW_INFO("bLength=%x\n", piface_desc->bLength);
-	RTW_INFO("bDescriptorType=%x\n", piface_desc->bDescriptorType);
-	RTW_INFO("bInterfaceNumber=%x\n", piface_desc->bInterfaceNumber);
-	RTW_INFO("bAlternateSetting=%x\n", piface_desc->bAlternateSetting);
-	RTW_INFO("bNumEndpoints=%x\n", piface_desc->bNumEndpoints);
-	RTW_INFO("bInterfaceClass=%x\n", piface_desc->bInterfaceClass);
-	RTW_INFO("bInterfaceSubClass=%x\n", piface_desc->bInterfaceSubClass);
-	RTW_INFO("bInterfaceProtocol=%x\n", piface_desc->bInterfaceProtocol);
-	RTW_INFO("iInterface=%x\n", piface_desc->iInterface);
-#endif
-
 	pdvobjpriv->NumInterfaces = pconf_desc->bNumInterfaces;
 	pdvobjpriv->InterfaceNumber = piface_desc->bInterfaceNumber;
 	pdvobjpriv->nr_endpoint = piface_desc->bNumEndpoints;
-
-	/* RTW_INFO("\ndump usb_endpoint_descriptor:\n"); */
 
 	for (i = 0; i < pdvobjpriv->nr_endpoint; i++) {
 		phost_endp = phost_iface->endpoint + i;
@@ -1471,11 +1424,6 @@ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device
 
 	status = _SUCCESS;
 
-#if 0 /* not used now */
-os_ndevs_deinit:
-	if (status != _SUCCESS)
-		rtw_os_ndevs_deinit(dvobj);
-#endif
 free_if_vir:
 	if (status != _SUCCESS) {
 		#ifdef CONFIG_CONCURRENT_MODE

@@ -1947,16 +1947,6 @@ phydm_set_per_path_phy_info(
 	p_phy_info->rx_mimo_signal_strength[rx_path] = phydm_query_rx_pwr_percentage(rx_pwr);
 	p_phy_info->rx_mimo_signal_quality[rx_path] = evm_percentage;
 	p_phy_info->rx_snr[rx_path] = rx_snr >> 1;
-
-#if 0
-	/* if (p_pktinfo->is_packet_match_bssid) */
-	{
-		dbg_print("path (%d)--------\n", rx_path);
-		dbg_print("rx_pwr = %d, Signal strength = %d\n", p_phy_info->rx_pwr[rx_path], p_phy_info->rx_mimo_signal_strength[rx_path]);
-		dbg_print("evm_dbm = %d, Signal quality = %d\n", p_phy_info->rx_mimo_evm_dbm[rx_path], p_phy_info->rx_mimo_signal_quality[rx_path]);
-		dbg_print("CFO = %d, SNR = %d\n", p_phy_info->cfo_tail[rx_path], p_phy_info->rx_snr[rx_path]);
-	}
-#endif
 }
 
 void
@@ -1981,16 +1971,6 @@ phydm_set_common_phy_info(
 	p_phy_info->rx_pwdb_all = phydm_query_rx_pwr_percentage(rx_power);				/* RSSI in percentage */
 	p_phy_info->signal_quality = signal_quality;										/* signal quality */
 	p_phy_info->band_width = bandwidth;											/* bandwidth */
-
-#if 0
-	/* if (p_pktinfo->is_packet_match_bssid) */
-	{
-		dbg_print("rx_pwdb_all = %d, rx_power = %d, recv_signal_power = %d\n", p_phy_info->rx_pwdb_all, p_phy_info->rx_power, p_phy_info->recv_signal_power);
-		dbg_print("signal_quality = %d\n", p_phy_info->signal_quality);
-		dbg_print("is_beamformed = %d, is_mu_packet = %d, rx_count = %d\n", p_phy_info->is_beamformed, p_phy_info->is_mu_packet, p_phy_info->rx_count + 1);
-		dbg_print("channel = %d, rxsc = %d, band_width = %d\n", channel, rxsc, bandwidth);
-	}
-#endif
 }
 
 void
@@ -2114,19 +2094,6 @@ phydm_get_rx_phy_status_type0(
 	p_dm->dm_fat_table.antsel_rx_keep_1 = p_phy_sta_rpt->antidx_b;
 	p_dm->dm_fat_table.antsel_rx_keep_2 = p_phy_sta_rpt->antidx_c;
 	p_dm->dm_fat_table.antsel_rx_keep_3 = p_phy_sta_rpt->antidx_d;
-#if 0
-	/* if (p_pktinfo->is_packet_match_bssid) */
-	{
-		dbg_print("pwdb = 0x%x, MP gain index = 0x%x, TRSW = 0x%x\n", p_phy_sta_rpt->pwdb, p_phy_sta_rpt->gain, p_phy_sta_rpt->trsw);
-		dbg_print("channel = %d, band = %d, rxsc = %d\n", p_phy_sta_rpt->channel, p_phy_sta_rpt->band, p_phy_sta_rpt->rxsc);
-		dbg_print("agc_table = 0x%x, agc_rpt 0x%x, bb_power = 0x%x\n", p_phy_sta_rpt->agc_table, p_phy_sta_rpt->agc_rpt, p_phy_sta_rpt->bb_power);
-		dbg_print("length = %d, SQ = %d\n", p_phy_sta_rpt->length, p_phy_sta_rpt->signal_quality);
-		dbg_print("antidx a = 0x%x, b = 0x%x, c = 0x%x, d = 0x%x\n", p_phy_sta_rpt->antidx_a, p_phy_sta_rpt->antidx_b, p_phy_sta_rpt->antidx_c, p_phy_sta_rpt->antidx_d);
-		dbg_print("rsvd_0 = 0x%x, rsvd_1 = 0x%x, rsvd_2 = 0x%x\n", p_phy_sta_rpt->rsvd_0, p_phy_sta_rpt->rsvd_1, p_phy_sta_rpt->rsvd_2);
-		dbg_print("rsvd_3 = 0x%x, rsvd_4 = 0x%x, rsvd_5 = 0x%x\n", p_phy_sta_rpt->rsvd_3, p_phy_sta_rpt->rsvd_4, p_phy_sta_rpt->rsvd_5);
-		dbg_print("rsvd_6 = 0x%x, rsvd_7 = 0x%x, rsvd_8 = 0x%x\n", p_phy_sta_rpt->rsvd_6, p_phy_sta_rpt->rsvd_7, p_phy_sta_rpt->rsvd_8);
-	}
-#endif
 }
 
 void
@@ -2226,26 +2193,6 @@ phydm_get_rx_phy_status_type1(
 	p_dm->dm_fat_table.antsel_rx_keep_1 = p_phy_sta_rpt->antidx_b;
 	p_dm->dm_fat_table.antsel_rx_keep_2 = p_phy_sta_rpt->antidx_c;
 	p_dm->dm_fat_table.antsel_rx_keep_3 = p_phy_sta_rpt->antidx_d;
-
-	#if 0
-	if (p_pktinfo->is_packet_match_bssid) {
-
-		dbg_print("channel = %d, band = %d, l_rxsc = %d, ht_rxsc = %d, rf_mode = %d\n", p_phy_sta_rpt->channel, p_phy_sta_rpt->band, p_phy_sta_rpt->l_rxsc, p_phy_sta_rpt->ht_rxsc, p_phy_sta_rpt->rf_mode);
-		dbg_print("Antidx A = %d, B = %d, C = %d, D = %d\n", p_phy_sta_rpt->antidx_a, p_phy_sta_rpt->antidx_b, p_phy_sta_rpt->antidx_c, p_phy_sta_rpt->antidx_d);
-		dbg_print("pwdb A: 0x%x, B: 0x%x, C: 0x%x, D: 0x%x\n", p_phy_sta_rpt->pwdb[0], p_phy_sta_rpt->pwdb[1], p_phy_sta_rpt->pwdb[2], p_phy_sta_rpt->pwdb[3]);
-		dbg_print("EVM  A: %d, B: %d, C: %d, D: %d\n", p_phy_sta_rpt->rxevm[0], p_phy_sta_rpt->rxevm[1], p_phy_sta_rpt->rxevm[2], p_phy_sta_rpt->rxevm[3]);
-		dbg_print("SNR  A: %d, B: %d, C: %d, D: %d\n", p_phy_sta_rpt->rxsnr[0], p_phy_sta_rpt->rxsnr[1], p_phy_sta_rpt->rxsnr[2], p_phy_sta_rpt->rxsnr[3]);
-		dbg_print("CFO  A: %d, B: %d, C: %d, D: %d\n", p_phy_sta_rpt->cfo_tail[0], p_phy_sta_rpt->cfo_tail[1], p_phy_sta_rpt->cfo_tail[2], p_phy_sta_rpt->cfo_tail[3]);
-		dbg_print("paid = %d, gid = %d, length = %d\n", (p_phy_sta_rpt->paid + (p_phy_sta_rpt->paid_msb<<8)), p_phy_sta_rpt->gid, p_phy_sta_rpt->lsig_length);
-		dbg_print("ldpc: %d, stbc: %d, bf: %d, gnt_bt: %d, antsw: %d\n", p_phy_sta_rpt->ldpc, p_phy_sta_rpt->stbc, p_phy_sta_rpt->beamformed, p_phy_sta_rpt->gnt_bt, p_phy_sta_rpt->hw_antsw_occu);
-		dbg_print("NBI: %d, pos: %d\n", p_phy_sta_rpt->nb_intf_flag, (p_phy_sta_rpt->intf_pos + (p_phy_sta_rpt->intf_pos_msb<<8)));
-		dbg_print("rsvd_0 = %d, rsvd_1 = %d, rsvd_2 = %d, rsvd_3 = %d, rsvd_4 = %d, rsvd_5 = %d\n", p_phy_sta_rpt->rsvd_0, p_phy_sta_rpt->rsvd_1, p_phy_sta_rpt->rsvd_2, p_phy_sta_rpt->rsvd_3, p_phy_sta_rpt->rsvd_4, p_phy_sta_rpt->rsvd_5);
-
-	}
-
-	dbg_print("phydm_get_rx_phy_status_type1   p_pktinfo->is_packet_match_bssid = %d\n", p_pktinfo->is_packet_match_bssid);
-	dbg_print("p_pktinfo->data_rate = 0x%x\n", p_pktinfo->data_rate);
-	#endif
 }
 
 void
@@ -2333,25 +2280,6 @@ phydm_get_rx_phy_status_type2(
 	/* Update packet information */
 	phydm_set_common_phy_info(rx_pwr_db, p_phy_sta_rpt->channel, (boolean)p_phy_sta_rpt->beamformed,
 				  false, bw, 0, rxsc, p_phy_info);
-
-#if 0
-	/* if (p_pktinfo->is_packet_match_bssid) */
-	{
-		dbg_print("channel = %d, band = %d, l_rxsc = %d, ht_rxsc = %d\n", p_phy_sta_rpt->channel, p_phy_sta_rpt->band, p_phy_sta_rpt->l_rxsc, p_phy_sta_rpt->ht_rxsc);
-		dbg_print("pwdb A: 0x%x, B: 0x%x, C: 0x%x, D: 0x%x\n", p_phy_sta_rpt->pwdb[0], p_phy_sta_rpt->pwdb[1], p_phy_sta_rpt->pwdb[2], p_phy_sta_rpt->pwdb[3]);
-		dbg_print("Agc table A: 0x%x, B: 0x%x, C: 0x%x, D: 0x%x\n", p_phy_sta_rpt->agc_table_a, p_phy_sta_rpt->agc_table_b, p_phy_sta_rpt->agc_table_c, p_phy_sta_rpt->agc_table_d);
-		dbg_print("Gain A: 0x%x, B: 0x%x, C: 0x%x, D: 0x%x\n", p_phy_sta_rpt->gain_a, p_phy_sta_rpt->gain_b, p_phy_sta_rpt->gain_c, p_phy_sta_rpt->gain_d);
-		dbg_print("TRSW A: 0x%x, B: 0x%x, C: 0x%x, D: 0x%x\n", p_phy_sta_rpt->trsw_a, p_phy_sta_rpt->trsw_b, p_phy_sta_rpt->trsw_c, p_phy_sta_rpt->trsw_d);
-		dbg_print("AAGC step A: 0x%x, B: 0x%x, C: 0x%x, D: 0x%x\n", p_phy_sta_rpt->aagc_step_a, p_phy_sta_rpt->aagc_step_b, p_phy_sta_rpt->aagc_step_c, p_phy_sta_rpt->aagc_step_d);
-		dbg_print("HT AAGC gain A: 0x%x, B: 0x%x, C: 0x%x, D: 0x%x\n", p_phy_sta_rpt->ht_aagc_gain[0], p_phy_sta_rpt->ht_aagc_gain[1], p_phy_sta_rpt->ht_aagc_gain[2], p_phy_sta_rpt->ht_aagc_gain[3]);
-		dbg_print("DAGC gain A: 0x%x, B: 0x%x, C: 0x%x, D: 0x%x\n", p_phy_sta_rpt->dagc_gain[0], p_phy_sta_rpt->dagc_gain[1], p_phy_sta_rpt->dagc_gain[2], p_phy_sta_rpt->dagc_gain[3]);
-		dbg_print("ldpc: %d, stbc: %d, bf: %d, gnt_bt: %d, antsw: %d\n", p_phy_sta_rpt->ldpc, p_phy_sta_rpt->stbc, p_phy_sta_rpt->beamformed, p_phy_sta_rpt->gnt_bt, p_phy_sta_rpt->hw_antsw_occu);
-		dbg_print("counter: %d, syn_count: %d\n", p_phy_sta_rpt->counter, p_phy_sta_rpt->syn_count);
-		dbg_print("cnt_cca2agc_rdy: %d, cnt_pw2cca: %d, shift_l_map\n", p_phy_sta_rpt->cnt_cca2agc_rdy, p_phy_sta_rpt->cnt_pw2cca, p_phy_sta_rpt->shift_l_map);
-		dbg_print("rsvd_0 = %d, rsvd_1 = %d, rsvd_2 = %d, rsvd_3 = %d, rsvd_4 = %d, rsvd_5 = %d\n", p_phy_sta_rpt->rsvd_0, p_phy_sta_rpt->rsvd_1, p_phy_sta_rpt->rsvd_2, p_phy_sta_rpt->rsvd_3, p_phy_sta_rpt->rsvd_4);
-		dbg_print("rsvd_5 = %d, rsvd_6 = %d, rsvd_6 = %d\n", p_phy_sta_rpt->rsvd_5, p_phy_sta_rpt->rsvd_6, p_phy_sta_rpt->rsvd_7);
-	}
-#endif
 }
 
 void
@@ -2504,11 +2432,6 @@ phydm_rx_phy_status_new_type(
 	case 2:
 		phydm_get_rx_phy_status_type2(p_dm, p_phy_status, p_pktinfo, p_phy_info);
 		break;
-#if 0
-	case 5:
-		phydm_get_rx_phy_status_type5(p_phy_status);
-		return;
-#endif
 	default:
 		return;
 	}

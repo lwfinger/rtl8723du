@@ -68,33 +68,6 @@ struct phydm_pricca_struct {
 /*function prototype*/
 /*============================================================*/
 
-#if 0
-#if (RTL8192E_SUPPORT == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-
-void
-odm_dynamic_primary_cca_mp_8192e(
-	void			*p_dm_void
-);
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-
-void
-odm_dynamic_primary_cca_ap_8192e(
-	void			*p_dm_void
-);
-#endif
-#endif
-
-#if (RTL8188E_SUPPORT == 1)
-
-void
-odm_dynamic_primary_cca_8188e(
-	void			*p_dm_void
-);
-#endif
-#endif
-
 #endif /*#ifdef PHYDM_PRIMARY_CCA*/
 
 

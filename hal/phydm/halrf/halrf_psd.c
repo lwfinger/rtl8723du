@@ -22,31 +22,6 @@
 
 #if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 
-#if 0
-u32 _sqrt(u64 n)
-{
-	u64	ans = 0, q = 0; 
-	s64	i;
-
-	/*for (i = sizeof(n) * 8 - 2; i > -1; i = i - 2) {*/
-	for (i = 8 * 8 - 2; i > -1; i = i - 2) {
-		q = (q << 2) | ((n & (3 << i)) >> i); 
-		if (q >= ((ans << 2) | 1)) 
-		{ 
-			q = q - ((ans << 2) | 1); 
-			ans = (ans << 1) | 1; 
-		} 
-		else 
-			ans = ans << 1; 
-	}
-	DbgPrint("ans=0x%x\n", ans);
-
-	return (u32)ans; 
-}
-#endif
-
-
-
 u64 _sqrt(u64 x)
 {
 	u64 i = 0;
@@ -165,11 +140,6 @@ halrf_psd(
 	else
 		psd_reg = 0x808;
 
-#if 0
-	dbg_print("[PSD]point=%d, start_point=%d, stop_point=%d, average=%d, average_tmp=%d, buf_size=%d\n",
-		point, start_point, stop_point, average, average_tmp, p_psd->buf_size);
-#endif
-
 	for (i = 0; i < p_psd->buf_size; i++)
 		p_psd->psd_data[i] = 0;
 	
@@ -186,17 +156,6 @@ halrf_psd(
 			odm_set_bb_reg(p_dm, psd_reg, 0x3000, 0x1);
 	}
 
-#if 0
-	if (avg_temp == 0)
-		avg = 1;
-	else if (avg_temp == 1)
-		avg = 8;
-	else if (avg_temp == 2)
-		avg = 16;
-	else if (avg_temp == 3)
-		avg = 32;
-#endif
-
 	i = start_point;
 	while (i < stop_point) {
 		data_tatal = 0;
@@ -209,15 +168,7 @@ halrf_psd(
 		for (k = 0; k < average_tmp; k++) {
 			data_temp[k] = halrf_get_psd_data(p_dm, point_temp);
 			data_tatal = data_tatal + (data_temp[k] * data_temp[k]);
-
-#if 0
-			if ((k % 20) == 0)
-				dbg_print("\n ");
-			
-			dbg_print("0x%x ", data_temp[k]);
-#endif
 		}
-		/*dbg_print("\n");*/
 
 		data_tatal = ((data_tatal * 100) / average_tmp);
 		p_psd->psd_data[j] = (u32)_sqrt(data_tatal);
@@ -226,23 +177,11 @@ halrf_psd(
 		j++;
 	}
 
-#if 0
-	for (i = 0; i < p_psd->buf_size; i++) {
-		if ((i % 20) == 0)
-			dbg_print("\n ");
-			
-		dbg_print("0x%x ", p_psd->psd_data[i]);
-	}
-	dbg_print("\n\n");
-#endif
-
 	if (p_dm->support_ic_type & ODM_RTL8710B)
 		odm_set_bb_reg(p_dm, psd_reg, 0x30000, avg_org);
 	else
 		odm_set_bb_reg(p_dm, psd_reg, 0x3000, avg_org);
 }
-
-
 
 enum rt_status
 halrf_psd_init(

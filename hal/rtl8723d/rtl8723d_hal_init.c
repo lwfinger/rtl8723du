@@ -253,11 +253,6 @@ void _8051Reset8723(PADAPTER padapter)
 	u8 cpu_rst;
 	u8 io_rst;
 
-#if 0
-	io_rst = rtw_read8(padapter, REG_RSV_CTRL);
-	rtw_write8(padapter, REG_RSV_CTRL, io_rst & (~BIT(1)));
-#endif
-
 	/* Reset 8051(WLMCU) IO wrapper */
 	/* 0x1c[8] = 0 */
 	/* Suggested by Isaac@SD1 and Gimmy@SD1, coding by Lucas@20130624 */
@@ -268,11 +263,6 @@ void _8051Reset8723(PADAPTER padapter)
 	cpu_rst = rtw_read8(padapter, REG_SYS_FUNC_EN + 1);
 	cpu_rst &= ~BIT(2);
 	rtw_write8(padapter, REG_SYS_FUNC_EN + 1, cpu_rst);
-
-#if 0
-	io_rst = rtw_read8(padapter, REG_RSV_CTRL);
-	rtw_write8(padapter, REG_RSV_CTRL, io_rst & (~BIT(1)));
-#endif
 
 	/* Enable 8051 IO wrapper	 */
 	/* 0x1c[8] = 1 */
@@ -476,34 +466,11 @@ int _WriteBTFWtoTxPktBuf8723D(
 	val8 |= DIS_TSF_UDT;
 	rtw_write8(Adapter, REG_BCN_CTRL, val8);
 
-#if 0/* (DEV_BUS_TYPE == RT_PCI_INTERFACE) */
-	tmpReg422 = PlatformEFIORead1Byte(Adapter, REG_FWHW_TXQ_CTRL + 2);
-	if (tmpReg422 & BIT(6))
-		bRecover = TRUE;
-	PlatformEFIOWrite1Byte(Adapter, REG_FWHW_TXQ_CTRL + 2,  tmpReg422 & (~BIT(6)));
-#else
 	/* Set FWHW_TXQ_CTRL 0x422[6]=0 to tell Hw the packet is not a real beacon frame. */
 	RegFwHwTxQCtrl = PlatformEFIORead1Byte(Adapter, REG_FWHW_TXQ_CTRL + 2);
 
 	RegFwHwTxQCtrl &= (~BIT(6));
 	PlatformEFIOWrite1Byte(Adapter, REG_FWHW_TXQ_CTRL + 2, RegFwHwTxQCtrl);
-#endif
-
-	/* --------------------------------------------------------- */
-	/* 2. Adjust LLT table to an even boundary. */
-	/* --------------------------------------------------------- */
-#if 0/* (DEV_BUS_TYPE == RT_SDIO_INTERFACE) */
-	txpktbuf_bndy = 10; /* rsvd page start address should be an even value.														 */
-	rtStatus =	InitLLTTable8723DS(Adapter, txpktbuf_bndy);
-	if (RT_STATUS_SUCCESS != rtStatus) {
-		RTW_INFO("_CheckWLANFwPatchBTFwReady_8723D(): Failed to init LLT!\n");
-		return RT_STATUS_FAILURE;
-	}
-
-	/* Init Tx boundary. */
-	PlatformEFIOWrite1Byte(Adapter, REG_DWBCN0_CTRL_8723D + 1, (u1Byte)txpktbuf_bndy);
-#endif
-
 
 	/* --------------------------------------------------------- */
 	/* 3. Write Fw to Tx packet buffer by reseverd page. */
@@ -519,17 +486,6 @@ int _WriteBTFWtoTxPktBuf8723D(
 		PlatformEFIOWrite1Byte(Adapter, REG_TDECTRL + 1, (0x90 - 0x20 * (times - 1)));
 		RTW_INFO("0x209:0x%x\n", PlatformEFIORead1Byte(Adapter, REG_TDECTRL + 1));
 
-#if 0
-		/* Acquice TX spin lock before GetFwBuf and send the packet to prevent system deadlock. */
-		/* Advertised by Roger. Added by tynli. 2010.02.22. */
-		PlatformAcquireSpinLock(Adapter, RT_TX_SPINLOCK);
-		if (MgntGetFWBuffer(Adapter, &pTcb, &pBuf)) {
-			PlatformMoveMemory(pBuf->Buffer.VirtualAddress, ReservedPagePacket, TotalPktLen);
-			CmdSendPacket(Adapter, pTcb, pBuf, TotalPktLen, DESC_PACKET_TYPE_NORMAL, FALSE);
-		} else
-			dbgdump("SetFwRsvdPagePkt(): MgntGetFWBuffer FAIL!!!!!!!!.\n");
-		PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);
-#else
 		/*---------------------------------------------------------
 		tx reserved_page_packet
 		----------------------------------------------------------*/
@@ -557,7 +513,6 @@ int _WriteBTFWtoTxPktBuf8723D(
 		dump_mgntframe_and_wait(Adapter, pmgntframe, 100);
 #endif
 
-#endif
 #if 1
 		/* check rsvd page download OK. */
 		BcnValidReg = PlatformEFIORead1Byte(Adapter, REG_TDECTRL + 2);
@@ -686,12 +641,6 @@ _CheckWLANFwPatchBTFwReady(
 	/* --------------------------------------------------------- */
 	/* Reset beacon setting to the initial value. */
 	/* --------------------------------------------------------- */
-#if 0/* (DEV_BUS_TYPE == RT_PCI_INTERFACE) */
-	if (LLT_table_init(Adapter, FALSE, 0) == RT_STATUS_FAILURE) {
-		dbgdump("Init self define for BT Fw patch LLT table fail.\n");
-		/* return RT_STATUS_FAILURE; */
-	}
-#endif
 	u1bTmp = rtw_read8(Adapter, REG_BCN_CTRL);
 	u1bTmp |= EN_BCN_FUNCTION;
 	u1bTmp &= ~DIS_TSF_UDT;
@@ -822,73 +771,6 @@ s32 FirmwareDownloadBT(PADAPTER padapter, PRT_MP_FIRMWARE pFirmware)
 	rtStatus = _SUCCESS;
 	pBTFirmwareBuf = NULL;
 	BTFirmwareLen = 0;
-
-#if 0
-	/* */
-	/* Patch BT Fw. Download BT RAM code to Tx packet buffer. */
-	/* */
-	if (GET_HAL_DATA(padapter)->bBTFWReady) {
-		RTW_INFO("%s: BT Firmware is ready!!\n", __FUNCTION__);
-		return _FAIL;
-	}
-
-#ifdef CONFIG_FILE_FWIMG
-	if (rtw_is_file_readable(rtw_fw_mp_bt_file_path) == _TRUE) {
-		RTW_INFO("%s: acquire MP BT FW from file:%s\n", __FUNCTION__, rtw_fw_mp_bt_file_path);
-
-		rtStatus = rtw_retrieve_from_file(rtw_fw_mp_bt_file_path, FwBuffer, FW_8723D_SIZE);
-		BTFirmwareLen = rtStatus >= 0 ? rtStatus : 0;
-		pBTFirmwareBuf = FwBuffer;
-	} else
-#endif /* CONFIG_FILE_FWIMG */
-	{
-#ifdef CONFIG_EMBEDDED_FWIMG
-		RTW_INFO("%s: Download MP BT FW from header\n", __FUNCTION__);
-
-		pBTFirmwareBuf = (u8 *)Rtl8723DFwBTImgArray;
-		BTFirmwareLen = Rtl8723DFwBTImgArrayLength;
-		pFirmware->szFwBuffer = pBTFirmwareBuf;
-		pFirmware->ulFwLength = BTFirmwareLen;
-#endif /* CONFIG_EMBEDDED_FWIMG */
-	}
-
-	RTW_INFO("%s: MP BT Firmware size=%d\n", __FUNCTION__, BTFirmwareLen);
-
-	/* for h2c cam here should be set to  true */
-	GET_HAL_DATA(padapter)->bFWReady = _TRUE;
-
-	download_time = (BTFirmwareLen + 4095) / 4096;
-	RTW_INFO("%s: download_time is %d\n", __FUNCTION__, download_time);
-	RegFwHwTxQCtrl = rtw_read8(Adapter, REG_FWHW_TXQ_CTRL + 2);
-
-	if (RegFwHwTxQCtrl & BIT(6))
-		bRecover = _TRUE;
-
-	/* Download BT patch Fw. */
-	for (i = (download_time - 1); i >= 0; i--) {
-		if (i == (download_time - 1)) {
-			rtStatus = _WriteBTFWtoTxPktBuf8723D(padapter, pBTFirmwareBuf + (4096 * i), (BTFirmwareLen - (4096 * i)), 1);
-			RTW_INFO("%s: start %d, len %d, time 1\n", __FUNCTION__, 4096 * i, BTFirmwareLen - (4096 * i));
-		} else {
-			rtStatus = _WriteBTFWtoTxPktBuf8723D(padapter, pBTFirmwareBuf + (4096 * i), 4096, (download_time - i));
-			RTW_INFO("%s: start %d, len 4096, time %d\n", __FUNCTION__, 4096 * i, download_time - i);
-		}
-
-		if (rtStatus != _SUCCESS) {
-			RTW_INFO("%s: BT Firmware download to Tx packet buffer fail!\n", __FUNCTION__);
-			GET_HAL_DATA(padapter)->bBTFWReady = _FALSE;
-			return rtStatus;
-		}
-	}
-
-	ReservedPage_Compare(padapter, pFirmware, BTFirmwareLen);
-
-	GET_HAL_DATA(padapter)->bBTFWReady = _TRUE;
-	SetFwBTFwPatchCmd(padapter, (u16)BTFirmwareLen);
-	rtStatus = _CheckWLANFwPatchBTFwReady(padapter, bRecover);
-
-	RTW_INFO("<===%s: return %s!\n", __FUNCTION__, rtStatus == _SUCCESS ? "SUCCESS" : "FAIL");
-#endif
 
 	return rtStatus;
 }
@@ -1913,13 +1795,6 @@ hal_EfuseGetCurrentSize_WiFi(
 	/* switch bank back to bank 0 for later BT and wifi use. */
 	hal_EfuseSwitchToBank(padapter, 0, bPseudoTest);
 
-#if 0 /* for debug test */
-	efuse_OneByteRead(padapter, 0x1FF, &efuse_data, bPseudoTest);
-	RTW_INFO(FUNC_ADPT_FMT ": efuse raw 0x1FF=0x%02X\n",
-		 FUNC_ADPT_ARG(padapter), efuse_data);
-	efuse_data = 0xFF;
-#endif /* for debug test */
-
 	count = 0;
 	while (AVAILABLE_EFUSE_ADDR(efuse_addr)) {
 #if 1
@@ -1927,8 +1802,6 @@ hal_EfuseGetCurrentSize_WiFi(
 			RTW_INFO(KERN_ERR "%s: efuse_OneByteRead Fail! addr=0x%X !!\n", __FUNCTION__, efuse_addr);
 			goto error;
 		}
-#else
-		ReadEFuseByte(padapter, efuse_addr, &efuse_data, bPseudoTest);
 #endif
 
 		if (efuse_data == 0xFF)
@@ -2111,17 +1984,6 @@ hal_EfuseGetCurrentSize_BT(
 		if (efuse_addr < retU2)
 			break;/* don't need to check next bank. */
 	}
-#if 0
-	retU2 = ((bank - 1) * EFUSE_BT_REAL_BANK_CONTENT_LEN) + efuse_addr;
-	if (bPseudoTest) {
-#ifdef HAL_EFUSE_MEMORY
-		pEfuseHal->fakeBTEfuseUsedBytes = retU2;
-#else
-		fakeBTEfuseUsedBytes = retU2;
-#endif
-	} else
-		rtw_hal_set_hwreg(padapter, HW_VAR_EFUSE_BT_BYTES, (u8 *)&retU2);
-#else
 	retU2 = ((bank - 1) * EFUSE_BT_REAL_BANK_CONTENT_LEN) + efuse_addr;
 	if (bPseudoTest) {
 		pEfuseHal->fakeBTEfuseUsedBytes = retU2;
@@ -2130,7 +1992,6 @@ hal_EfuseGetCurrentSize_BT(
 		pEfuseHal->BTEfuseUsedBytes = retU2;
 		/* RT_DISP(FEEPROM, EFUSE_PG, ("Hal_EfuseGetCurrentSize_BT92C(), already use %u bytes\n", pEfuseHal->BTEfuseUsedBytes)); */
 	}
-#endif
 
 	RTW_INFO("%s: CurrentSize=%d\n", __FUNCTION__, retU2);
 	return retU2;
@@ -2329,69 +2190,6 @@ hal_EfuseConstructPGPkt(
 	pTargetPkt->word_cnts = Efuse_CalculateWordCnts(pTargetPkt->word_en);
 }
 
-#if 0
-static u8
-wordEnMatched(
-	PPGPKT_STRUCT	pTargetPkt,
-	PPGPKT_STRUCT	pCurPkt,
-	u8				*pWden)
-{
-	u8	match_word_en = 0x0F;	/* default all words are disabled */
-	u8	i;
-
-	/* check if the same words are enabled both target and current PG packet */
-	if (((pTargetPkt->word_en & BIT(0)) == 0) &&
-	    ((pCurPkt->word_en & BIT(0)) == 0)) {
-		match_word_en &= ~BIT(0);				/* enable word 0 */
-	}
-	if (((pTargetPkt->word_en & BIT(1)) == 0) &&
-	    ((pCurPkt->word_en & BIT(1)) == 0)) {
-		match_word_en &= ~BIT(1);				/* enable word 1 */
-	}
-	if (((pTargetPkt->word_en & BIT(2)) == 0) &&
-	    ((pCurPkt->word_en & BIT(2)) == 0)) {
-		match_word_en &= ~BIT(2);				/* enable word 2 */
-	}
-	if (((pTargetPkt->word_en & BIT(3)) == 0) &&
-	    ((pCurPkt->word_en & BIT(3)) == 0)) {
-		match_word_en &= ~BIT(3);				/* enable word 3 */
-	}
-
-	*pWden = match_word_en;
-
-	if (match_word_en != 0xf)
-		return _TRUE;
-	else
-		return _FALSE;
-}
-
-static u8
-hal_EfuseCheckIfDatafollowed(
-	PADAPTER		pAdapter,
-	u8				word_cnts,
-	u16				startAddr,
-	u8				bPseudoTest)
-{
-	u8 bRet = _FALSE;
-	u8 i, efuse_data;
-
-	for (i = 0; i < (word_cnts * 2); i++) {
-		if (efuse_OneByteRead(pAdapter, (startAddr + i) , &efuse_data, bPseudoTest) == _FALSE) {
-			RTW_INFO("%s: efuse_OneByteRead FAIL!!\n", __FUNCTION__);
-			bRet = _TRUE;
-			break;
-		}
-
-		if (efuse_data != 0xFF) {
-			bRet = _TRUE;
-			break;
-		}
-	}
-
-	return bRet;
-}
-#endif
-
 static u8
 hal_EfusePartialWriteCheck(
 	PADAPTER		padapter,
@@ -2405,12 +2203,6 @@ hal_EfusePartialWriteCheck(
 	u8	bRet = _FALSE;
 	u16	startAddr = 0, efuse_max_available_len = 0, efuse_max = 0;
 	u8	efuse_data = 0;
-#if 0
-	u8	i, cur_header = 0;
-	u8	new_wden = 0, matched_wden = 0, badworden = 0;
-	PGPKT_STRUCT	curPkt;
-#endif
-
 
 	EFUSE_GetEfuseDefinition(padapter, efuseType, TYPE_AVAILABLE_EFUSE_BYTES_TOTAL, &efuse_max_available_len, bPseudoTest);
 	EFUSE_GetEfuseDefinition(padapter, efuseType, TYPE_EFUSE_CONTENT_LEN_BANK, &efuse_max, bPseudoTest);
@@ -3069,34 +2861,10 @@ void rtl8723d_InitAntenna_Selection(PADAPTER padapter)
 
 void rtl8723d_CheckAntenna_Selection(PADAPTER padapter)
 {
-#if 0
-	PHAL_DATA_TYPE pHalData;
-	u8 val;
-
-
-	pHalData = GET_HAL_DATA(padapter);
-
-	val = rtw_read8(padapter, REG_LEDCFG2);
-	/* Let 8051 take control antenna setting */
-	if (!(val & BIT(7))) {
-		val |= BIT(7); /* DPDT_SEL_EN, 0x4C[23] */
-		rtw_write8(padapter, REG_LEDCFG2, val);
-	}
-#endif
 }
+
 void rtl8723d_DeinitAntenna_Selection(PADAPTER padapter)
 {
-#if 0
-	PHAL_DATA_TYPE pHalData;
-	u8 val;
-
-
-	pHalData = GET_HAL_DATA(padapter);
-	val = rtw_read8(padapter, REG_LEDCFG2);
-	/* Let 8051 take control antenna setting */
-	val &= ~BIT(7); /* DPDT_SEL_EN, clear 0x4C[23] */
-	rtw_write8(padapter, REG_LEDCFG2, val);
-#endif
 }
 
 void init_hal_spec_8723d(_adapter *adapter)
@@ -3303,16 +3071,6 @@ void _ResetDigitalProcedure1_8723D(PADAPTER padapter, BOOLEAN bWithoutHWSM)
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
 
 	if (IS_FW_81xxC(padapter) && (pHalData->firmware_version <= 0x20)) {
-#if 0
-		/*****************************
-				f.	SYS_FUNC_EN 0x03[7:0]=0x54
-				g.	MCUFWDL 0x80[7:0]=0
-		******************************/
-		u32	value32 = 0;
-
-		rtw_write8(padapter, REG_SYS_FUNC_EN + 1, 0x54);
-		rtw_write8(padapter, REG_MCUFWDL, 0);
-#else
 		/*****************************
 		f.	MCUFWDL 0x80[7:0]=0
 		g.	SYS_FUNC_EN 0x02[10]= 0
@@ -3331,7 +3089,6 @@ void _ResetDigitalProcedure1_8723D(PADAPTER padapter, BOOLEAN bWithoutHWSM)
 
 		valu16 = rtw_read16(padapter, REG_SYS_FUNC_EN);
 		rtw_write16(padapter, REG_SYS_FUNC_EN, (valu16 | FEN_CPUEN));/* enable MCU ,8051 */
-#endif
 	} else {
 		u8 retry_cnts = 0;
 
@@ -3466,13 +3223,6 @@ void _DisableAnalog(PADAPTER padapter, BOOLEAN bWithoutHWSM)
 	rtw_write16(padapter, REG_APS_FSMCO, value16);/* 0x4802 */
 
 	rtw_write8(padapter, REG_RSV_CTRL, 0x0e);
-
-#if 0
-	/* tynli_test for suspend mode. */
-	if (!bWithoutHWSM)
-		rtw_write8(padapter, 0xfe10, 0x19);
-#endif
-
 }
 
 /* HW Auto state machine */
@@ -4383,25 +4133,12 @@ static void hw_var_set_monitor(PADAPTER Adapter, u8 variable, u8 *val)
 		/* Append FCS */
 		rcr_bits |= RCR_APPFCS;
 
-#if 0
-		/*
-		   CRC and ICV packet will drop in recvbuf2recvframe()
-		   We no turn on it.
-		 */
-		rcr_bits |= (RCR_ACRC32 | RCR_AICV);
-#endif
-
 		rtw_hal_get_hwreg(Adapter, HW_VAR_RCR, (u8 *)&pHalData->rcr_backup);
 		rtw_hal_set_hwreg(Adapter, HW_VAR_RCR, (u8 *)&rcr_bits);
 
 		/* Receive all data frames */
 		value_rxfltmap2 = 0xFFFF;
 		rtw_write16(Adapter, REG_RXFLTMAP2, value_rxfltmap2);
-
-#if 0
-		/* tx pause */
-		rtw_write8(padapter, REG_TXPAUSE, 0xFF);
-#endif
 	} else {
 		/* do nothing */
 	}
@@ -4964,20 +4701,6 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 		break;
 
 	case HW_VAR_RESP_SIFS:
-#if 0
-		/* SIFS for OFDM Data ACK */
-		rtw_write8(padapter, REG_SIFS_CTX + 1, val[0]);
-		/* SIFS for OFDM consecutive tx like CTS data! */
-		rtw_write8(padapter, REG_SIFS_TRX + 1, val[1]);
-
-		rtw_write8(padapter, REG_SPEC_SIFS + 1, val[0]);
-		rtw_write8(padapter, REG_MAC_SPEC_SIFS + 1, val[0]);
-
-		/* 20100719 Joseph: Revise SIFS setting due to Hardware register definition change. */
-		rtw_write8(padapter, REG_R2T_SIFS + 1, val[0]);
-		rtw_write8(padapter, REG_T2T_SIFS + 1, val[0]);
-
-#else
 		/* SIFS_Timer = 0x0a0a0808; */
 		/* RESP_SIFS for CCK */
 		rtw_write8(padapter, REG_RESP_SIFS_CCK, val[0]); /* SIFS_T2T_CCK (0x08) */
@@ -4985,7 +4708,6 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 		/* RESP_SIFS for OFDM */
 		rtw_write8(padapter, REG_RESP_SIFS_OFDM, val[2]); /* SIFS_T2T_OFDM (0x0a) */
 		rtw_write8(padapter, REG_RESP_SIFS_OFDM + 1, val[3]); /* SIFS_R2T_OFDM(0x0a) */
-#endif
 		break;
 
 	case HW_VAR_ACK_PREAMBLE: {
@@ -5080,12 +4802,6 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 		rtw_write32(padapter, REG_AMPDU_MAX_LENGTH_8723D, AMPDULen);
 	}
 		break;
-
-#if 0
-	case HW_VAR_RXDMA_AGG_PG_TH:
-		rtw_write8(padapter, REG_RXDMA_AGG_PG_TH, *val);
-		break;
-#endif
 
 	case HW_VAR_H2C_FW_PWRMODE: {
 		u8 psmode = *val;

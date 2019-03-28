@@ -229,12 +229,6 @@ phydm_dynamic_rx_path_callback(
 
 	if (padapter->net_closed == true)
 		return;
-
-#if 0 /* Can't do I/O in timer callback*/
-	odm_s0s1_sw_ant_div(p_dm, SWAW_STEP_DETERMINE);
-#else
-	/*rtw_run_in_thread_cmd(padapter, odm_sw_antdiv_workitem_callback, padapter);*/
-#endif
 }
 
 #endif

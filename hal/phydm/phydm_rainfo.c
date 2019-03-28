@@ -389,14 +389,6 @@ phydm_c2h_ra_report_handler(
 	}
 
 #endif
-
-	/*trigger dynamic rate ID*/
-/*#if (defined(CONFIG_RA_DYNAMIC_RATE_ID))*/	/*dino will refine here later*/
-#if 0
-	if (p_dm->support_ic_type & (ODM_RTL8812 | ODM_RTL8192E))
-		phydm_update_rate_id(p_dm, rate, macid);
-#endif
-
 }
 
 void
@@ -404,13 +396,6 @@ odm_ra_post_action_on_assoc(
 	void	*p_dm_void
 )
 {
-#if 0
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-
-	p_dm->h2c_rarpt_connect = 1;
-	phydm_rssi_monitor_check(p_dm);
-	p_dm->h2c_rarpt_connect = 0;
-#endif
 }
 
 void
@@ -2068,64 +2053,7 @@ phydm_update_rate_id(
 	u8	platform_macid
 )
 {
-#if 0
-
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_		*p_ra_table = &p_dm->dm_ra_table;
-	u8		current_tx_ss;
-	u8		rate_idx = rate & 0x7f; /*remove bit7 SGI*/
-	u8		wireless_mode;
-	u8		phydm_macid;
-	struct sta_info	*p_entry;
-	struct cmn_sta_info	*p_sta;
-
-
-#if	0
-	if (rate_idx >= ODM_RATEVHTSS2MCS0) {
-		PHYDM_DBG(p_dm, DBG_RA, ("rate[%d]: (( VHT2SS-MCS%d ))\n", platform_macid, (rate_idx - ODM_RATEVHTSS2MCS0)));
-		/*dummy for SD4 check patch*/
-	} else if (rate_idx >= ODM_RATEVHTSS1MCS0) {
-		PHYDM_DBG(p_dm, DBG_RA, ("rate[%d]: (( VHT1SS-MCS%d ))\n", platform_macid, (rate_idx - ODM_RATEVHTSS1MCS0)));
-		/*dummy for SD4 check patch*/
-	} else if (rate_idx >= ODM_RATEMCS0) {
-		PHYDM_DBG(p_dm, DBG_RA, ("rate[%d]: (( HT-MCS%d ))\n", platform_macid, (rate_idx - ODM_RATEMCS0)));
-		/*dummy for SD4 check patch*/
-	} else {
-		PHYDM_DBG(p_dm, DBG_RA, ("rate[%d]: (( HT-MCS%d ))\n", platform_macid, rate_idx));
-		/*dummy for SD4 check patch*/
-	}
-#endif
-
-	phydm_macid = p_dm->phydm_macid_table[platform_macid];
-	p_entry = p_dm->p_odm_sta_info[phydm_macid];
-	p_sta = p_dm->p_phydm_sta_info[phydm_macid];
-
-	if (is_sta_active(p_sta)) {
-		wireless_mode = p_entry->wireless_mode;
-
-		if ((p_dm->rf_type  == RF_2T2R) || (p_dm->rf_type  == RF_2T3R) || (p_dm->rf_type  == RF_2T4R)) {
-
-			if (wireless_mode & (ODM_WM_N24G | ODM_WM_N5G)) { /*N mode*/
-				if (rate_idx >= ODM_RATEMCS8 && rate_idx <= ODM_RATEMCS15) { /*2SS mode*/
-
-					p_sta->ra_info.rate_id  = ARFR_5_RATE_ID;
-					PHYDM_DBG(p_dm, DBG_RA, ("ARFR_5\n"));
-				}
-			} else if (wireless_mode & (ODM_WM_AC_5G | ODM_WM_AC_24G | ODM_WM_AC_ONLY)) {/*AC mode*/
-				if (rate_idx >= ODM_RATEVHTSS2MCS0 && rate_idx <= ODM_RATEVHTSS2MCS9) {/*2SS mode*/
-
-					p_sta->ra_info.rate_id  = ARFR_0_RATE_ID;
-					PHYDM_DBG(p_dm, DBG_RA, ("ARFR_0\n"));
-				}
-			} else
-				p_sta->ra_info.rate_id  = ARFR_0_RATE_ID;
-
-			PHYDM_DBG(p_dm, DBG_RA, ("UPdate_RateID[%d]: (( 0x%x ))\n", platform_macid, p_sta->ra_info.rate_id));
-		}
-	}
-#endif
 }
-
 #endif
 
 #if (defined(CONFIG_RA_DBG_CMD))
@@ -2300,7 +2228,6 @@ odm_ra_para_adjust_init(
 	u8			ra_para_pool_u8[3] = { RADBG_RTY_PENALTY,  RADBG_RATE_UP_RTY_RATIO, RADBG_RATE_DOWN_RTY_RATIO};
 	u8			rate_size_ht_1ss = 20, rate_size_ht_2ss = 28, rate_size_ht_3ss = 36;	 /*4+8+8+8+8 =36*/
 	u8			rate_size_vht_1ss = 10, rate_size_vht_2ss = 20, rate_size_vht_3ss = 30;	 /*10 + 10 +10 =30*/
-#if 0
 	/* RTY_PENALTY		=	1,   u8 */
 	/* N_HIGH 				=	2, */
 	/* N_LOW				=	3, */
@@ -2312,7 +2239,6 @@ odm_ra_para_adjust_init(
 	/* RATE_DOWN_RTY_RATIO=	9,  u8 */
 	/* ALL_PARA		=	0xff */
 
-#endif
 	PHYDM_DBG(p_dm, DBG_RA, ("odm_ra_para_adjust_init\n"));
 
 /* JJ ADD 20161014 */

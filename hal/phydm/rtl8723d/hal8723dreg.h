@@ -572,325 +572,32 @@ Current IOREG MAP
  *	0x0000h ~ 0x00FFh	System Configuration
  *
  * ----------------------------------------------------- */
-#if 0
-	/* 2 SYS_ISO_CTRL */
-	#define ISO_MD2PP						BIT(0)
-	#define ISO_UA2USB					BIT(1)
-	#define ISO_UD2CORE					BIT(2)
-	#define ISO_PA2PCIE					BIT(3)
-	#define ISO_PD2CORE					BIT(4)
-	#define ISO_IP2MAC					BIT(5)
-	#define ISO_DIOP						BIT(6)
-	#define ISO_DIOE						BIT(7)
-	#define ISO_EB2CORE					BIT(8)
-	#define ISO_DIOR						BIT(9)
-	#define PWC_EV12V						BIT(15)
-
-
-	/* 2 SYS_FUNC_EN */
-	#define FEN_BBRSTB					BIT(0)
-	#define FEN_BB_GLB_RSTn				BIT(1)
-	#define FEN_USBA						BIT(2)
-	#define FEN_UPLL						BIT(3)
-	#define FEN_USBD						BIT(4)
-	#define FEN_DIO_PCIE					BIT(5)
-	#define FEN_PCIEA						BIT(6)
-	#define FEN_PPLL						BIT(7)
-	#define FEN_PCIED						BIT(8)
-	#define FEN_DIOE						BIT(9)
-	#define FEN_CPUEN						BIT(10)
-	#define FEN_DCORE						BIT(11)
-	#define FEN_ELDR						BIT(12)
-	#define FEN_DIO_RF					BIT(13)
-	#define FEN_HWPDN					BIT(14)
-	#define FEN_MREGEN					BIT(15)
-
-	/* 2 APS_FSMCO */
-	#define PFM_LDALL						BIT(0)
-	#define PFM_ALDN						BIT(1)
-	#define PFM_LDKP						BIT(2)
-	#define PFM_WOWL					BIT(3)
-	#define EnPDN							BIT(4)
-	#define PDN_PL						BIT(5)
-	#define APFM_ONMAC					BIT(8)
-	#define APFM_OFF						BIT(9)
-	#define APFM_RSM						BIT(10)
-	#define AFSM_HSUS						BIT(11)
-	#define AFSM_PCIE						BIT(12)
-	#define APDM_MAC					BIT(13)
-	#define APDM_HOST					BIT(14)
-	#define APDM_HPDN					BIT(15)
-	#define RDY_MACON					BIT(16)
-	#define SUS_HOST						BIT(17)
-	#define ROP_ALD						BIT(20)
-	#define ROP_PWR						BIT(21)
-	#define ROP_SPS						BIT(22)
-	#define SOP_MRST						BIT(25)
-	#define SOP_FUSE						BIT(26)
-	#define SOP_ABG						BIT(27)
-	#define SOP_AMB						BIT(28)
-	#define SOP_RCK						BIT(29)
-	#define SOP_A8M						BIT(30)
-	#define XOP_BTCK						BIT(31)
-
-	/* 2 SYS_CLKR */
-	#define ANAD16V_EN					BIT(0)
-	#define ANA8M						BIT(1)
-	#define MACSLP						BIT(4)
-	#define LOADER_CLK_EN					BIT(5)
-
-
-	/* 2 9346CR */
-
-	#define		BOOT_FROM_EEPROM		BIT(4)
-	#define		EEPROM_EN				BIT(5)
-
-
-	/* 2 RF_CTRL */
-	#define RF_EN						BIT(0)
-	#define RF_RSTB					BIT(1)
-	#define RF_SDMRSTB				BIT(2)
-
-	/* 2 LDOV12D_CTRL */
-	#define LDV12_EN					BIT(0)
-	#define LDV12_SDBY				BIT(1)
-	#define LPLDO_HSM					BIT(2)
-	#define LPLDO_LSM_DIS				BIT(3)
-	#define _LDV12_VADJ(x)				(((x) & 0xF) << 4)
-
-
-	/* 2 EFUSE_TEST (For RTL8723 partially) */
-	#define EF_TRPT						BIT(7)
-	#define EF_CELL_SEL						(BIT(8) | BIT(9)) /*  00: Wifi Efuse, 01: BT Efuse0, 10: BT Efuse1, 11: BT Efuse2 */
-	#define LDOE25_EN						BIT(31)
-	#define EFUSE_SEL(x)					(((x) & 0x3) << 8)
-	#define EFUSE_SEL_MASK				0x300
-	#define EFUSE_WIFI_SEL_0				0x0
-	#define EFUSE_BT_SEL_0					0x1
-	#define EFUSE_BT_SEL_1					0x2
-	#define EFUSE_BT_SEL_2					0x3
-
-
-	/* 2 8051FWDL */
-	/* 2 MCUFWDL */
-	#define MCUFWDL_EN					BIT(0)
-	#define MCUFWDL_RDY					BIT(1)
-	#define FWDL_ChkSum_rpt				BIT(2)
-	#define MACINI_RDY					BIT(3)
-	#define BBINI_RDY						BIT(4)
-	#define RFINI_RDY						BIT(5)
-	#define WINTINI_RDY					BIT(6)
-	#define RAM_DL_SEL					BIT(7)
-	#define ROM_DLEN						BIT(19)
-	#define CPRST							BIT(23)
-
-
-
-	/* 2 REG_SYS_CFG */
-	#define XCLK_VLD						BIT(0)
-	#define ACLK_VLD						BIT(1)
-	#define UCLK_VLD						BIT(2)
-	#define PCLK_VLD						BIT(3)
-	#define PCIRSTB						BIT(4)
-	#define V15_VLD						BIT(5)
-	#define TRP_B15V_EN					BIT(7)
-	#define SIC_IDLE						BIT(8)
-	#define BD_MAC2						BIT(9)
-	#define BD_MAC1						BIT(10)
-	#define IC_MACPHY_MODE				BIT(11)
-	#define CHIP_VER						(BIT(12) | BIT(13) | BIT(14) | BIT(15))
-	#define BT_FUNC						BIT(16)
-	#define VENDOR_ID						BIT(19)
-	#define PAD_HWPD_IDN					BIT(22)
-	#define TRP_VAUX_EN					BIT(23)	/*  RTL ID */
-	#define TRP_BT_EN						BIT(24)
-	#define BD_PKG_SEL					BIT(25)
-	#define BD_HCI_SEL						BIT(26)
-	#define TYPE_ID						BIT(27)
-
-	#define CHIP_VER_RTL_MASK				0xF000	/* Bit 12 ~ 15 */
-	#define CHIP_VER_RTL_SHIFT				12
-
-#endif
 /* -----------------------------------------------------
  *
  *	0x0100h ~ 0x01FFh	MACTOP General Configuration
  *
  * ----------------------------------------------------- */
-#if 0
-
-	/* 2 Function Enable Registers */
-	/* 2 CR 0x0100-0x0103 */
-
-
-	#define HCI_TXDMA_EN					BIT(0)
-	#define HCI_RXDMA_EN					BIT(1)
-	#define TXDMA_EN						BIT(2)
-	#define RXDMA_EN						BIT(3)
-	#define PROTOCOL_EN					BIT(4)
-	#define SCHEDULE_EN					BIT(5)
-	#define MACTXEN						BIT(6)
-	#define MACRXEN						BIT(7)
-	#define ENSWBCN						BIT(8)
-	#define ENSEC							BIT(9)
-	#define CALTMR_EN					BIT(10)	/*  32k CAL TMR enable */
-
-	/*  Network type */
-	#define _NETTYPE(x)					(((x) & 0x3) << 16)
-	#define MASK_NETTYPE					0x30000
-	#define NT_NO_LINK					0x0
-	#define NT_LINK_AD_HOC				0x1
-	#define NT_LINK_AP						0x2
-	#define NT_AS_AP						0x3
-
-
-	/* 2 PBP - Page Size Register 0x0104 */
-	#define GET_RX_PAGE_SIZE(value)			((value) & 0xF)
-	#define GET_TX_PAGE_SIZE(value)			(((value) & 0xF0) >> 4)
-	#define _PSRX_MASK					0xF
-	#define _PSTX_MASK					0xF0
-	#define _PSRX(x)						(x)
-	#define _PSTX(x)						((x) << 4)
-
-	#define PBP_64						0x0
-	#define PBP_128						0x1
-	#define PBP_256						0x2
-	#define PBP_512						0x3
-	#define PBP_1024						0x4
-
-
-	/* 2 TX/RXDMA 0x010C */
-	#define RXDMA_ARBBW_EN				BIT(0)
-	#define RXSHFT_EN						BIT(1)
-	#define RXDMA_AGG_EN					BIT(2)
-	#define QS_VO_QUEUE					BIT(8)
-	#define QS_VI_QUEUE					BIT(9)
-	#define QS_BE_QUEUE					BIT(10)
-	#define QS_BK_QUEUE					BIT(11)
-	#define QS_MANAGER_QUEUE			BIT(12)
-	#define QS_HIGH_QUEUE					BIT(13)
-
-	#define HQSEL_VOQ						BIT(0)
-	#define HQSEL_VIQ						BIT(1)
-	#define HQSEL_BEQ						BIT(2)
-	#define HQSEL_BKQ						BIT(3)
-	#define HQSEL_MGTQ					BIT(4)
-	#define HQSEL_HIQ						BIT(5)
-
-	/*  For normal driver, 0x10C */
-	#define _TXDMA_HIQ_MAP(x)			(((x) & 0x3) << 14)
-	#define _TXDMA_MGQ_MAP(x)			(((x) & 0x3) << 12)
-	#define _TXDMA_BKQ_MAP(x)			(((x) & 0x3) << 10)
-	#define _TXDMA_BEQ_MAP(x)			(((x) & 0x3) << 8)
-	#define _TXDMA_VIQ_MAP(x)			(((x) & 0x3) << 6)
-	#define _TXDMA_VOQ_MAP(x)			(((x) & 0x3) << 4)
-
-	#define QUEUE_LOW					1
-	#define QUEUE_NORMAL				2
-	#define QUEUE_HIGH					3
-
-
-	/* 2 REG_C2HEVT_CLEAR 0x01AF */
-	#define	C2H_EVT_HOST_CLOSE			0x00	/*  Set by driver and notify FW that the driver has read the C2H command message */
-	#define	C2H_EVT_FW_CLOSE			0xFF		/*  Set by FW indicating that FW had set the C2H command message and it's not yet read by driver. */
-
-
-
-	/* 2 LLT_INIT 0x01E0 */
-	#define _LLT_NO_ACTIVE					0x0
-	#define _LLT_WRITE_ACCESS				0x1
-	#define _LLT_READ_ACCESS				0x2
-
-	#define _LLT_INIT_DATA(x)				((x) & 0xFF)
-	#define _LLT_INIT_ADDR(x)				(((x) & 0xFF) << 8)
-	#define _LLT_OP(x)						(((x) & 0x3) << 30)
-	#define _LLT_OP_VALUE(x)				(((x) >> 30) & 0x3)
-
-#endif
 /* -----------------------------------------------------
  *
  *	0x0200h ~ 0x027Fh	TXDMA Configuration
  *
  * ----------------------------------------------------- */
-#if 0
-	/* 2 TDECTL 0x0208 */
-	#define BLK_DESC_NUM_SHIFT			4
-	#define BLK_DESC_NUM_MASK			0xF
-
-
-	/* 2 TXDMA_OFFSET_CHK 0x020C */
-	#define DROP_DATA_EN				BIT(9)
-#endif
 /* -----------------------------------------------------
  *
  *	0x0280h ~ 0x028Bh	RX DMA Configuration
  *
  * ----------------------------------------------------- */
-#if 0
-	/* 2 REG_RXDMA_CONTROL, 0x0286h */
-
-	/*  Write only. When this bit is set, RXDMA will decrease RX PKT counter by one. Before */
-	/*  this bit is polled, FW shall update RXFF_RD_PTR first. This register is write pulse and auto clear. */
-	#define	RXPKT_RELEASE_POLL			BIT(0)
-	/*  Read only. When RXMA finishes on-going DMA operation, RXMDA will report idle state in */
-	/*  this bit. FW can start releasing packets after RXDMA entering idle mode. */
-	#define	RXDMA_IDLE					BIT(1)
-	/*  When this bit is set, RXDMA will enter this mode after on-going RXDMA packet to host */
-	/*  completed, and stop DMA packet to host. RXDMA will then report Default: 0; */
-	#define	RW_RELEASE_EN				BIT(2)
-#endif
 /* -----------------------------------------------------
  *
  *	0x0400h ~ 0x047Fh	Protocol Configuration
  *
  * ----------------------------------------------------- */
-#if 0
-	/* 2 FWHW_TXQ_CTRL 0x0420 */
-	#define EN_AMPDU_RTY_NEW			BIT(7)
-
-
-	/* 2 REG_LIFECTRL_CTRL 0x0426 */
-	#define	HAL92C_EN_PKT_LIFE_TIME_BK		BIT(3)
-	#define	HAL92C_EN_PKT_LIFE_TIME_BE		BIT(2)
-	#define	HAL92C_EN_PKT_LIFE_TIME_VI		BIT(1)
-	#define	HAL92C_EN_PKT_LIFE_TIME_VO		BIT(0)
-
-	#define	HAL92C_MSDU_LIFE_TIME_UNIT		128		/*  in us, said by Tim. */
-
-
-	/* 2 SPEC SIFS 0x0428 */
-	#define _SPEC_SIFS_CCK(x)				((x) & 0xFF)
-	#define _SPEC_SIFS_OFDM(x)				(((x) & 0xFF) << 8)
-
-	/* 2 RL 0x042A */
-	#define	RETRY_LIMIT_SHORT_SHIFT		8
-	#define	RETRY_LIMIT_LONG_SHIFT		0
-
-	#define _LRL(x)							((x) & 0x3F)
-	#define _SRL(x)							(((x) & 0x3F) << 8)
-#endif
 
 /* -----------------------------------------------------
  *
  *	0x0500h ~ 0x05FFh	EDCA Configuration
  *
  * ----------------------------------------------------- */
-#if 0
-	/* 2 EDCA setting 0x050C */
-	#define AC_PARAM_TXOP_LIMIT_OFFSET		16
-	#define AC_PARAM_ECW_MAX_OFFSET		12
-	#define AC_PARAM_ECW_MIN_OFFSET		8
-	#define AC_PARAM_AIFS_OFFSET			0
-
-
-	/* 2 BCN_CTRL 0x0550 */
-	#define EN_TXBCN_RPT						BIT(2)
-	#define EN_BCN_FUNCTION					BIT(3)
-
-	/* 2 TxPause 0x0522 */
-	#define STOP_BCNQ						BIT(6)
-#endif
-
 
 /* 2 ACMHWCTRL 0x05C0 */
 #define	acm_hw_hw_en_8723d				BIT(0)
@@ -908,35 +615,9 @@ Current IOREG MAP
  *	0x0600h ~ 0x07FFh	WMAC Configuration
  *
  * ----------------------------------------------------- */
-#if 0
-
-	/* 2 TCR 0x0604 */
-	#define DIS_GCLK							BIT(1)
-	#define PAD_SEL							BIT(2)
-	#define PWR_ST							BIT(6)
-	#define PWRBIT_OW_EN					BIT(7)
-	#define ACRC								BIT(8)
-	#define CFENDFORM						BIT(9)
-	#define ICV								BIT(10)
-#endif
-
 /* ----------------------------------------------------------------------------
  * 8195 (RCR) Receive Configuration Register	(Offset 0x608, 32 bits)
  * ---------------------------------------------------------------------------- */
-#if 0
-	#define	RCR_APPFCS					BIT(31)		/*  WMAC append FCS after pauload */
-	#define	RCR_APP_MIC					BIT(30)		/*  MACRX will retain the MIC at the bottom of the packet. */
-	#define	RCR_APP_ICV					BIT(29)       /*  MACRX will retain the ICV at the bottom of the packet. */
-	#define	RCR_APP_PHYST_RXFF			BIT(28)       /*  HY status is appended before RX packet in RXFF */
-	#define	RCR_APP_BA_SSN				BIT(27)		/*  SSN of previous TXBA is appended as after original RXDESC as the 4-th DW of RXDESC. */
-	#define	RCR_RSVD_BIT(26)				BIT26		/*  Reserved */
-#endif
 #define	RCR_TCPOFLD_EN				BIT(25)		/* Enable TCP checksum offload */
-#if 0
-	#define	RCR_ENMBID					BIT(24)		/*  Enable Multiple BssId. Only response ACK to the packets whose DID(A1) matching to the addresses in the MBSSID CAM Entries. */
-	#define	RCR_LSIGEN					BIT(23)		/*  Enable LSIG TXOP Protection function. Search KEYCAM for each rx packet to check if LSIGEN bit is set. */
-	#define	RCR_MFBEN					BIT(22)		/*  Enable immediate MCS Feedback function. When Rx packet with MRQ = 1'b1, then search KEYCAM to find sender's MCS Feedback function and send response. */
-#endif
-
 
 #endif /*  #ifndef __INC_HAL8723DREG_H */

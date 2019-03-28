@@ -305,10 +305,6 @@ if (*(p_dm->p_mp_mode) == true) {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 
 #if (MP_DRIVER != 1)
-#if 0
-		PHY_SetTxPowerLevelByPath8723D(adapter, *p_dm->p_channel, rf_path);   /* Using new set power function */
-		/* PHY_SetTxPowerLevel8723D(p_dm->adapter, *p_dm->p_channel); */
-#endif
 		p_rf_calibrate_info->modify_tx_agc_flag_path_a = true;
 		p_rf_calibrate_info->modify_tx_agc_flag_path_b = true;
 		p_rf_calibrate_info->modify_tx_agc_flag_path_a_cck = true;
@@ -571,82 +567,6 @@ if (*(p_dm->p_mp_mode) == true) {
 
 			p_rf_calibrate_info->modify_tx_agc_value_cck = p_rf_calibrate_info->remnant_cck_swing_idx;
 		}
-#if 0
-		if (rf_path == RF_PATH_B) {
-			if (final_ofdm_swing_index > pwr_tracking_limit_ofdm) {
-				p_rf_calibrate_info->remnant_ofdm_swing_idx[rf_path] = final_ofdm_swing_index - pwr_tracking_limit_ofdm;
-
-				set_iqk_matrix_8723d(p_dm, pwr_tracking_limit_ofdm, RF_PATH_B,
-					p_rf_calibrate_info->iqk_matrix_reg_setting[channel_mapped_index].value[0][4],
-					p_rf_calibrate_info->iqk_matrix_reg_setting[channel_mapped_index].value[0][5]);
-
-				p_rf_calibrate_info->modify_tx_agc_flag_path_a = true;
-
-
-				/*odm_set_tx_power_index_by_rate_section(p_dm, RF_PATH_B, p_hal_data->current_channel, OFDM);
-				odm_set_tx_power_index_by_rate_section(p_dm, RF_PATH_B, p_hal_data->current_channel, HT_MCS0_MCS7);*/
-
-				ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("******Path_B Over BBSwing Limit, pwr_tracking_limit = %d, Remnant tx_agc value = %d\n", pwr_tracking_limit_ofdm, p_rf_calibrate_info->remnant_ofdm_swing_idx[rf_path]));
-			} else if (final_ofdm_swing_index < 0) {
-				p_rf_calibrate_info->remnant_ofdm_swing_idx[rf_path] = final_ofdm_swing_index ;
-
-				set_iqk_matrix_8723d(p_dm, 0, RF_PATH_B,
-					p_rf_calibrate_info->iqk_matrix_reg_setting[channel_mapped_index].value[0][4],
-					p_rf_calibrate_info->iqk_matrix_reg_setting[channel_mapped_index].value[0][5]);
-
-				p_rf_calibrate_info->modify_tx_agc_flag_path_a = true;
-
-
-				/*odm_set_tx_power_index_by_rate_section(p_dm, RF_PATH_B, p_hal_data->current_channel, OFDM);
-				odm_set_tx_power_index_by_rate_section(p_dm, RF_PATH_B, p_hal_data->current_channel, HT_MCS0_MCS7);*/
-
-				ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("******Path_B Lower then BBSwing lower bound  0, Remnant tx_agc value = %d\n", p_rf_calibrate_info->remnant_ofdm_swing_idx[rf_path]));
-			} else {
-				set_iqk_matrix_8723d(p_dm, final_ofdm_swing_index, RF_PATH_B,
-					p_rf_calibrate_info->iqk_matrix_reg_setting[channel_mapped_index].value[0][4],
-					p_rf_calibrate_info->iqk_matrix_reg_setting[channel_mapped_index].value[0][5]);
-
-				ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("******Path_B Compensate with BBSwing, final_ofdm_swing_index = %d\n", final_ofdm_swing_index));
-
-				if (p_rf_calibrate_info->modify_tx_agc_flag_path_b) {
-					p_rf_calibrate_info->remnant_ofdm_swing_idx[rf_path] = 0;
-
-					/*odm_set_tx_power_index_by_rate_section(p_dm, RF_PATH_B, p_hal_data->current_channel, OFDM);
-					odm_set_tx_power_index_by_rate_section(p_dm, RF_PATH_B, p_hal_data->current_channel, HT_MCS0_MCS7);*/
-
-					p_rf_calibrate_info->modify_tx_agc_flag_path_a = false;
-
-					ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("******Path_B p_dm->Modify_TxAGC_Flag = false\n"));
-				}
-			}
-#if (MP_DRIVER == 1)
-			if ((*(p_dm->p_mp_mode)) == 1) {
-				pwr = odm_get_bb_reg(p_dm, REG_TX_AGC_A_RATE18_06, 0xFF);
-				pwr += (p_rf_calibrate_info->remnant_ofdm_swing_idx[RF_PATH_B] - p_rf_calibrate_info->modify_tx_agc_value_ofdm);
-
-				if (pwr > 0x3F)
-					pwr = 0x3F;
-				else if (pwr < 0)
-					pwr = 0;
-
-				tx_agc |= ((pwr << 24) | (pwr << 16) | (pwr << 8) | pwr);
-				odm_set_bb_reg(p_dm, REG_TX_AGC_A_RATE18_06, MASKDWORD, tx_agc);
-				odm_set_bb_reg(p_dm, REG_TX_AGC_A_RATE54_24, MASKDWORD, tx_agc);
-				odm_set_bb_reg(p_dm, REG_TX_AGC_A_MCS03_MCS00, MASKDWORD, tx_agc);
-				odm_set_bb_reg(p_dm, REG_TX_AGC_A_MCS07_MCS04, MASKDWORD, tx_agc);
-
-				ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("ODM_TxPwrTrackSetPwr8723D: OFDM Tx-rf(A) Power = 0x%x\n", tx_agc));
-
-			} else
-#endif
-			{
-
-				odm_set_tx_power_index_by_rate_section(p_dm, RF_PATH_B, *p_dm->p_channel, OFDM);
-				odm_set_tx_power_index_by_rate_section(p_dm, RF_PATH_B, *p_dm->p_channel, HT_MCS0_MCS7);
-			}
-			p_rf_calibrate_info->modify_tx_agc_value_ofdm = p_rf_calibrate_info->remnant_ofdm_swing_idx[RF_PATH_B] ;
-		}
-#endif
 	} else
 		return;
 }
@@ -1986,19 +1906,6 @@ _phy_iq_calibrate_8723d(
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("IQ Calibration for 1T1R_S0/S1 for %d times\n", t));
 
 	_phy_path_adda_on_8723d(p_dm, ADDA_REG, true, is2T);
-#if 0
-	if (t == 0)
-		p_dm->rf_calibrate_info.is_rf_pi_enable = (u8)odm_get_bb_reg(p_dm, REG_FPGA0_XA_HSSI_PARAMETER1, BIT(8));
-
-	if (!p_dm->rf_calibrate_info.is_rf_pi_enable) {
-		/*  Switch BB to PI mode to do IQ Calibration. */
-#if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
-		_phy_pi_mode_switch_8723d(p_adapter, true);
-#else
-		_phy_pi_mode_switch_8723d(p_dm, true);
-#endif
-	}
-#endif
 	_phy_mac_setting_calibration_8723d(p_dm, IQK_MAC_REG, p_dm->rf_calibrate_info.IQK_MAC_backup);
 	/*BB setting*/
 	/*odm_set_bb_reg(p_dm, REG_FPGA0_RFMOD, BIT24, 0x00);*/
@@ -2032,14 +1939,6 @@ _phy_iq_calibrate_8723d(
 			result[t][1] = 0x0;
 			cnt_iqk_fail++;
 		}
-#if 0
-		else if (i == (retry_count - 1) && path_s1_ok == 0x01) {
-			RT_DISP(FINIT, INIT_IQK, ("path S1 IQK Only  Tx Success!!\n"));
-
-			result[t][0] = (odm_get_bb_reg(p_dm, REG_TX_POWER_BEFORE_IQK_A, MASKDWORD) & 0x3FF0000) >> 16;
-			result[t][1] = (odm_get_bb_reg(p_dm, REG_TX_POWER_AFTER_IQK_A, MASKDWORD) & 0x3FF0000) >> 16;
-		}
-#endif
 	}
 #endif
 #if 1
@@ -2083,14 +1982,6 @@ _phy_iq_calibrate_8723d(
 				result[t][5] = 0x0;
 				cnt_iqk_fail++;
 			}
-#if 0
-			else if (i == (retry_count - 1) && path_s1_ok == 0x01) {
-				RT_DISP(FINIT, INIT_IQK, ("path S0 IQK Only  Tx Success!!\n"));
-
-				result[t][0] = (odm_get_bb_reg(p_dm, REG_TX_POWER_BEFORE_IQK_B, MASKDWORD) & 0x3FF0000) >> 16;
-				result[t][1] = (odm_get_bb_reg(p_dm, REG_TX_POWER_AFTER_IQK_B, MASKDWORD) & 0x3FF0000) >> 16;
-			}
-#endif
 		}
 #endif
 

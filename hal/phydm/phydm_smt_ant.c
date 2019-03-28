@@ -111,34 +111,6 @@ phydm_cumitek_smt_ant_init_8822b(
 	odm_set_mac_reg(p_dm, 0x604, BIT(25), (u32)p_smtant_table->tx_desc_mode);
 
 	/*========= BB RFE setting =================================*/
-	#if 0
-	/*path A*/
-	odm_set_bb_reg(p_dm, 0x1990, BIT(3), 0);		/*RFE_CTRL_3*/ /*A_0*/
-	odm_set_bb_reg(p_dm, 0xcbc, BIT(3), 0);		/*inv*/
-	odm_set_bb_reg(p_dm, 0xcb0, 0xf000, 8);
-
-	odm_set_bb_reg(p_dm, 0x1990, BIT(1), 0);		/*RFE_CTRL_0*/ /*A_1*/
-	odm_set_bb_reg(p_dm, 0xcbc, BIT(0), 0);		/*inv*/
-	odm_set_bb_reg(p_dm, 0xcb0, 0xf, 0x9);
-	
-	odm_set_bb_reg(p_dm, 0x1990, BIT(8), 0);		/*RFE_CTRL_8*/ /*A_2*/
-	odm_set_bb_reg(p_dm, 0xcbc, BIT(8), 0);		/*inv*/
-	odm_set_bb_reg(p_dm, 0xcb4, 0xf, 0xa);
-	
-
-	/*path B*/
-	odm_set_bb_reg(p_dm, 0x1990, BIT(4), 1);		/*RFE_CTRL_4*/	/*B_0*/
-	odm_set_bb_reg(p_dm, 0xdbc, BIT(4), 0);		/*inv*/
-	odm_set_bb_reg(p_dm, 0xdb0, 0xf0000, 0xb);
-	
-	odm_set_bb_reg(p_dm, 0x1990, BIT(11), 1);	/*RFE_CTRL_11*/	/*B_1*/
-	odm_set_bb_reg(p_dm, 0xdbc, BIT(11), 0);		/*inv*/
-	odm_set_bb_reg(p_dm, 0xdb4, 0xf000, 0xc);
-	
-	odm_set_bb_reg(p_dm, 0x1990, BIT(9), 1);		/*RFE_CTRL_9*/	/*B_2*/
-	odm_set_bb_reg(p_dm, 0xdbc, BIT(9), 0);		/*inv*/
-	odm_set_bb_reg(p_dm, 0xdb4, 0xf0, 0xd);
-	#endif
 	/*========= BB SmtAnt setting =================================*/
 	odm_set_mac_reg(p_dm, 0x668, BIT(3), 1);
 	odm_set_bb_reg(p_dm, 0x804, BIT(4), 0); /*lathch antsel*/
@@ -718,24 +690,6 @@ phydm_hl_smart_ant_debug_type2(
 			PHYDM_SNPRINTF((output + used, out_len - used, "[ SmartAnt ]  AUTO per_beam_training_pkt_num\n"));
 			/**/
 		}
-	} else if (dm_value[0] == 4) {
-		#if 0
-		if (dm_value[1] == 1) {
-			pdm_sat_table->ant_num = 1;
-			pdm_sat_table->first_train_ant = MAIN_ANT;
-
-		} else if (dm_value[1] == 2) {
-			pdm_sat_table->ant_num = 1;
-			pdm_sat_table->first_train_ant = AUX_ANT;
-
-		} else if (dm_value[1] == 3) {
-			pdm_sat_table->ant_num = 2;
-			pdm_sat_table->first_train_ant = MAIN_ANT;
-		}
-
-		PHYDM_SNPRINTF((output + used, out_len - used, "[ SmartAnt ]  Set ant Num = (( %d )), first_train_ant = (( %d ))\n",
-			pdm_sat_table->ant_num, (pdm_sat_table->first_train_ant - 1)));
-		#endif
 	} else if (dm_value[0] == 5) {	/*set beam set table*/
 
 		PHYDM_SSCANF(input[4], DCMD_HEX, &dm_value[3]);
@@ -767,21 +721,6 @@ phydm_hl_smart_ant_debug_type2(
 			}
 		}
 
-	} else if (dm_value[0] == 6) {
-		#if 0
-		if (dm_value[1] == 0) {
-			if (dm_value[2] < SUPPORT_BEAM_SET_PATTERN_NUM) {
-				pdm_sat_table->rfu_codeword_table_5g[dm_value[2] ][0] = (u8)dm_value[3];
-				pdm_sat_table->rfu_codeword_table_5g[dm_value[2] ][1] = (u8)dm_value[4];
-				PHYDM_SNPRINTF((output + used, out_len - used, "[SmtAnt] Set5G Table[%d] = [A:0x%x, B:0x%x]\n",dm_value[2], dm_value[3], dm_value[4]));
-			}
-		} else {
-			for (i = 0; i < pdm_sat_table->total_beam_set_num_5g; i++) {
-				PHYDM_SNPRINTF((output + used, out_len - used, "[SmtAnt] Read 5G Table[%d] = [A:0x%x, B:0x%x]\n",
-					i, pdm_sat_table->rfu_codeword_table_5g[i][0], pdm_sat_table->rfu_codeword_table_5g[i][1]));
-			}
-		}
-		#endif
 	} else if (dm_value[0] == 7) {
 
 		if (dm_value[1] == 1) {
@@ -1286,17 +1225,6 @@ phydm_hl_smart_ant_type1_init_8821a(
 	u32			value32;
 
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("***8821A SmartAnt_Init => ant_div_type=[Hong-Lin Smart ant Type1]\n"));
-
-#if 0
-	/* ---------------------------------------- */
-	/* GPIO 2-3 for Beam control */
-	/* reg0x66[2]=0 */
-	/* reg0x44[27:26] = 0 */
-	/* reg0x44[23:16]  enable_output for P_GPIO[7:0] */
-	/* reg0x44[15:8]  output_value for P_GPIO[7:0] */
-	/* reg0x40[1:0] = 0  GPIO function */
-	/* ------------------------------------------ */
-#endif
 
 	/*GPIO setting*/
 	odm_set_mac_reg(p_dm, 0x64, BIT(18), 0);

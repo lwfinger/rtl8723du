@@ -657,13 +657,6 @@ odm_txpowertracking_check(
 	void		*p_dm_void
 )
 {
-
-#if 0
-	/* 2011/09/29 MH In HW integration first stage, we provide 4 different handle to operate */
-	/*  at the same time. In the stage2/3, we need to prive universal interface and merge all */
-	/* HW dynamic mechanism. */
-#endif
-
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	switch	(p_dm->support_platform) {
 	case	ODM_WIN:

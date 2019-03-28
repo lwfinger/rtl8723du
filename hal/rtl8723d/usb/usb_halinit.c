@@ -509,15 +509,9 @@ _InitNetworkType(
 	value32 = rtw_read32(padapter, REG_CR);
 
 	/* TODO: use the other function to set network type */
-#if 0 /* RTL8191C_FPGA_NETWORKTYPE_ADHOC */
-	value32 = (value32 & ~MASK_NETTYPE) | _NETTYPE(NT_LINK_AD_HOC);
-#else
 	value32 = (value32 & ~MASK_NETTYPE) | _NETTYPE(NT_LINK_AP);
-#endif
 	rtw_write32(padapter, REG_CR, value32);
-	/* RASSERT(pIoBase->rtw_read8(REG_CR + 2) == 0x2); */
 }
-
 
 static void
 _InitDriverInfoSize(
@@ -908,34 +902,6 @@ HalDetectSelectiveSuspendMode(
 	IN PADAPTER padapter
 )
 {
-#if 0   /* amyma */
-	u8 tmpvalue;
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-	struct dvobj_priv *pdvobjpriv = adapter_to_dvobj(padapter);
-
-	/* If support HW radio detect, we need to enable WOL ability, otherwise, we */
-	/* can not use FW to notify host the power state switch. */
-
-	EFUSE_ShadowRead(padapter, 1, EEPROM_USB_OPTIONAL1, (u32 *)&tmpvalue);
-
-	RTW_INFO("HalDetectSelectiveSuspendMode(): SS ");
-	if (tmpvalue & BIT(1))
-		RTW_INFO("Enable\n");
-	else {
-		RTW_INFO("Disable\n");
-		pdvobjpriv->RegUsbSS = _FALSE;
-	}
-
-	/* 2010/09/01 MH According to Dongle Selective Suspend INF. We can switch SS mode. */
-	if (pdvobjpriv->RegUsbSS && !SUPPORT_HW_RADIO_DETECT(pHalData)) {
-		/*PMGNT_INFO				pMgntInfo = &(padapter->MgntInfo); */
-
-		/*if (!pMgntInfo->bRegDongleSS) */
-		/*{ */
-		pdvobjpriv->RegUsbSS = _FALSE;
-		/*} */
-	}
-#endif
 }   /* HalDetectSelectiveSuspendMode */
 
 /*-----------------------------------------------------------------------------
@@ -1028,17 +994,6 @@ void _InitBBRegBackup_8723du(PADAPTER padapter)
 	pHalData->RegForRecover[2].value =
 		phy_query_bb_reg(padapter,
 			       pHalData->RegForRecover[2].offset, bMaskDWord);
-#if 0
-	/* For 20 MHz	(Default Value)*/
-	pHalData->RegForRecover[2].offset = rBBrx_DFIR;
-	pHalData->RegForRecover[2].value = phy_query_bb_reg(padapter, pHalData->RegForRecover[2].offset, bMaskDWord);
-
-	pHalData->RegForRecover[3].offset = rOFDM0_XATxAFE;
-	pHalData->RegForRecover[3].value = phy_query_bb_reg(padapter, pHalData->RegForRecover[3].offset, bMaskDWord);
-
-	pHalData->RegForRecover[4].offset = 0x1E;
-	pHalData->RegForRecover[4].value = phy_query_rf_reg(padapter, RF_PATH_A, pHalData->RegForRecover[4].offset, bRFRegOffsetMask);
-#endif
 }
 
 u32 rtl8723du_hal_init(PADAPTER padapter)
@@ -1357,18 +1312,6 @@ u32 rtl8723du_hal_init(PADAPTER padapter)
 		rtw_btcoex_HAL_Initialize(padapter, _FALSE);
 #endif
 
-#if 0
-	/* 2010/05/20 MH We need to init timer after update setting. Otherwise, we can not get correct inf setting. */
-	/* 2010/05/18 MH For SE series only now. Init GPIO detect time */
-	if (pDevice->RegUsbSS) {
-		GpioDetectTimerStart8192CU(padapter);    /* Disable temporarily */
-	}
-
-	/* 2010/08/23 MH According to Alfred's suggestion, we need to to prevent HW enter */
-	/* suspend mode automatically. */
-	HwSuspendModeEnable92Cu(padapter, _FALSE);
-#endif
-
 	rtw_hal_set_hwreg(padapter, HW_VAR_NAV_UPPER, (u8 *)&NavUpper);
 
 #ifdef CONFIG_XMIT_ACK
@@ -1564,16 +1507,6 @@ _ResetDigitalProcedure1(
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
 
 	if (pHalData->firmware_version <= 0x20) {
-#if 0
-		/*
-		 * f.	SYS_FUNC_EN 0x03[7:0]=0x54		reset MAC register, DCORE
-		 * g.	MCUFWDL 0x80[7:0]=0				reset MCU ready status
-		 */
-		u4Byte value32 = 0;
-
-		PlatformIOWrite1Byte(padapter, REG_SYS_FUNC_EN + 1, 0x54);
-		PlatformIOWrite1Byte(padapter, REG_MCUFWDL, 0);
-#else
 		/*
 		 * f.	MCUFWDL 0x80[7:0]=0				reset MCU ready status
 		 * g.	SYS_FUNC_EN 0x02[10]= 0			reset MCU register, (8051 reset)
@@ -1606,9 +1539,6 @@ _ResetDigitalProcedure1(
 
 		valu16 = rtw_read16(padapter, REG_SYS_FUNC_EN);
 		rtw_write16(padapter, REG_SYS_FUNC_EN, (valu16 | FEN_CPUEN)); /*enable MCU ,8051 */
-
-
-#endif
 	} else {
 		u8 retry_cnts = 0;
 
@@ -1747,13 +1677,6 @@ _DisableAnalog(
 	rtw_write16(padapter, REG_APS_FSMCO, value16); /* 0x4802 */
 
 	rtw_write8(padapter, REG_RSV_CTRL, 0x0e);
-
-#if 0
-	/* tynli_test for suspend mode. */
-	if (!bWithoutHWSM)
-		rtw_write8(padapter, 0xfe10, 0x19);
-#endif
-
 }
 
 static void rtl8723du_hw_power_down(PADAPTER padapter)
@@ -1961,34 +1884,6 @@ hal_EfuseParseLEDSetting(
 	IN BOOLEAN AutoloadFail
 )
 {
-#if 0
-	struct led_priv *pledpriv = &(padapter->ledpriv);
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-
-#ifdef CONFIG_RTW_SW_LED
-	pledpriv->bRegUseLed = _TRUE;
-
-	/* Led mode */
-	switch (pHalData->CustomerID) {
-	case RT_CID_DEFAULT:
-		pledpriv->LedStrategy = SW_LED_MODE1;
-		pledpriv->bRegUseLed = _TRUE;
-		break;
-
-	case RT_CID_819x_HP:
-		pledpriv->LedStrategy = SW_LED_MODE6;
-		break;
-
-	default:
-		pledpriv->LedStrategy = SW_LED_MODE1;
-		break;
-	}
-
-	pHalData->bLedOpenDrain = _TRUE; /* Support Open-drain arrangement for controlling the LED. Added by Roger, 2009.10.16. */
-#else /* HW LED */
-	pledpriv->LedStrategy = HW_LED;
-#endif /*CONFIG_RTW_SW_LED */
-#endif
 }
 
 static void
