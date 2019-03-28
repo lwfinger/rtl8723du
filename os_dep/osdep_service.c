@@ -79,9 +79,6 @@ inline void *_rtw_vmalloc(u32 sz)
 #ifdef PLATFORM_LINUX
 	pbuf = vmalloc(sz);
 #endif
-#ifdef PLATFORM_FREEBSD
-	pbuf = malloc(sz, M_DEVBUF, M_NOWAIT);
-#endif
 
 #ifdef DBG_MEMORY_LEAK
 #ifdef PLATFORM_LINUX
@@ -103,9 +100,6 @@ inline void *_rtw_zvmalloc(u32 sz)
 	if (pbuf != NULL)
 		memset(pbuf, 0, sz);
 #endif
-#ifdef PLATFORM_FREEBSD
-	pbuf = malloc(sz, M_DEVBUF, M_ZERO | M_NOWAIT);
-#endif
 	return pbuf;
 }
 
@@ -113,9 +107,6 @@ inline void _rtw_vmfree(void *pbuf, u32 sz)
 {
 #ifdef PLATFORM_LINUX
 	vfree(pbuf);
-#endif
-#ifdef PLATFORM_FREEBSD
-	free(pbuf, M_DEVBUF);
 #endif
 
 #ifdef DBG_MEMORY_LEAK
@@ -139,9 +130,6 @@ void *_rtw_malloc(u32 sz)
 		pbuf = kmalloc(sz, in_interrupt() ? GFP_ATOMIC : GFP_KERNEL);
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	pbuf = malloc(sz, M_DEVBUF, M_NOWAIT);
-#endif
 #ifdef DBG_MEMORY_LEAK
 #ifdef PLATFORM_LINUX
 	if (pbuf != NULL) {
@@ -158,20 +146,13 @@ void *_rtw_malloc(u32 sz)
 
 void *_rtw_zmalloc(u32 sz)
 {
-#ifdef PLATFORM_FREEBSD
-	return malloc(sz, M_DEVBUF, M_ZERO | M_NOWAIT);
-#else /* PLATFORM_FREEBSD */
 	void *pbuf = _rtw_malloc(sz);
 
 	if (pbuf != NULL) {
-
-#ifdef PLATFORM_LINUX
 		memset(pbuf, 0, sz);
-#endif
 	}
 
 	return pbuf;
-#endif /* PLATFORM_FREEBSD */
 }
 
 void _rtw_mfree(void *pbuf, u32 sz)
@@ -186,9 +167,6 @@ void _rtw_mfree(void *pbuf, u32 sz)
 		kfree(pbuf);
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	free(pbuf, M_DEVBUF);
-#endif
 #ifdef DBG_MEMORY_LEAK
 #ifdef PLATFORM_LINUX
 	atomic_dec(&_malloc_cnt);
@@ -198,62 +176,11 @@ void _rtw_mfree(void *pbuf, u32 sz)
 
 }
 
-#ifdef PLATFORM_FREEBSD
-/* review again */
-struct sk_buff *dev_alloc_skb(unsigned int size)
-{
-	struct sk_buff *skb = NULL;
-	u8 *data = NULL;
-
-	/* skb = _rtw_zmalloc(sizeof(struct sk_buff)); */ /* for skb->len, etc. */
-	skb = _rtw_malloc(sizeof(struct sk_buff));
-	if (!skb)
-		goto out;
-	data = _rtw_malloc(size);
-	if (!data)
-		goto nodata;
-
-	skb->head = (unsigned char *)data;
-	skb->data = (unsigned char *)data;
-	skb->tail = (unsigned char *)data;
-	skb->end = (unsigned char *)data + size;
-	skb->len = 0;
-	/* printf("%s()-%d: skb=%p, skb->head = %p\n", __FUNCTION__, __LINE__, skb, skb->head); */
-
-out:
-	return skb;
-nodata:
-	_rtw_mfree(skb, sizeof(struct sk_buff));
-	skb = NULL;
-	goto out;
-
-}
-
-void dev_kfree_skb_any(struct sk_buff *skb)
-{
-	/* printf("%s()-%d: skb->head = %p\n", __FUNCTION__, __LINE__, skb->head); */
-	if (skb->head)
-		_rtw_mfree(skb->head, 0);
-	/* printf("%s()-%d: skb = %p\n", __FUNCTION__, __LINE__, skb); */
-	if (skb)
-		_rtw_mfree(skb, 0);
-}
-struct sk_buff *skb_clone(const struct sk_buff *skb)
-{
-	return NULL;
-}
-
-#endif /* PLATFORM_FREEBSD */
-
 inline struct sk_buff *_rtw_skb_alloc(u32 sz)
 {
 #ifdef PLATFORM_LINUX
 	return __dev_alloc_skb(sz, in_interrupt() ? GFP_ATOMIC : GFP_KERNEL);
 #endif /* PLATFORM_LINUX */
-
-#ifdef PLATFORM_FREEBSD
-	return dev_alloc_skb(sz);
-#endif /* PLATFORM_FREEBSD */
 }
 
 inline void _rtw_skb_free(struct sk_buff *skb)
@@ -266,10 +193,6 @@ inline struct sk_buff *_rtw_skb_copy(const struct sk_buff *skb)
 #ifdef PLATFORM_LINUX
 	return skb_copy(skb, in_interrupt() ? GFP_ATOMIC : GFP_KERNEL);
 #endif /* PLATFORM_LINUX */
-
-#ifdef PLATFORM_FREEBSD
-	return NULL;
-#endif /* PLATFORM_FREEBSD */
 }
 
 inline struct sk_buff *_rtw_skb_clone(struct sk_buff *skb)
@@ -277,10 +200,6 @@ inline struct sk_buff *_rtw_skb_clone(struct sk_buff *skb)
 #ifdef PLATFORM_LINUX
 	return skb_clone(skb, in_interrupt() ? GFP_ATOMIC : GFP_KERNEL);
 #endif /* PLATFORM_LINUX */
-
-#ifdef PLATFORM_FREEBSD
-	return skb_clone(skb);
-#endif /* PLATFORM_FREEBSD */
 }
 inline struct sk_buff *_rtw_pskb_copy(struct sk_buff *skb)
 {
@@ -291,10 +210,6 @@ inline struct sk_buff *_rtw_pskb_copy(struct sk_buff *skb)
 	return skb_clone(skb, in_interrupt() ? GFP_ATOMIC : GFP_KERNEL);
 #endif
 #endif /* PLATFORM_LINUX */
-
-#ifdef PLATFORM_FREEBSD
-	return NULL;
-#endif /* PLATFORM_FREEBSD */
 }
 
 inline int _rtw_netif_rx(_nic_hdl ndev, struct sk_buff *skb)
@@ -302,11 +217,6 @@ inline int _rtw_netif_rx(_nic_hdl ndev, struct sk_buff *skb)
 #if defined(PLATFORM_LINUX)
 	skb->dev = ndev;
 	return netif_rx(skb);
-#elif defined(PLATFORM_FREEBSD)
-	return (*ndev->if_input)(ndev, skb);
-#else
-	rtw_warn_on(1);
-	return -1;
 #endif
 }
 
@@ -353,10 +263,6 @@ inline void *_rtw_usb_buffer_alloc(struct usb_device *dev, size_t size, dma_addr
 	return usb_buffer_alloc(dev, size, (in_interrupt() ? GFP_ATOMIC : GFP_KERNEL), dma);
 #endif
 #endif /* PLATFORM_LINUX */
-
-#ifdef PLATFORM_FREEBSD
-	return malloc(size, M_USBDEV, M_NOWAIT | M_ZERO);
-#endif /* PLATFORM_FREEBSD */
 }
 inline void _rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr, dma_addr_t dma)
 {
@@ -367,10 +273,6 @@ inline void _rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr
 	usb_buffer_free(dev, size, addr, dma);
 #endif
 #endif /* PLATFORM_LINUX */
-
-#ifdef PLATFORM_FREEBSD
-	free(addr, M_USBDEV);
-#endif /* PLATFORM_FREEBSD */
 }
 #endif /* CONFIG_USB_HCI */
 
@@ -852,10 +754,6 @@ inline void rtw_os_pkt_free(_pkt *pkt)
 {
 #if defined(PLATFORM_LINUX)
 	rtw_skb_free(pkt);
-#elif defined(PLATFORM_FREEBSD)
-	m_freem(pkt);
-#else
-	#error "TBD\n"
 #endif
 }
 
@@ -863,10 +761,6 @@ inline void *rtw_os_pkt_data(_pkt *pkt)
 {
 #if defined(PLATFORM_LINUX)
 	return pkt->data;
-#elif defined(PLATFORM_FREEBSD)
-	return pkt->m_data;
-#else
-	#error "TBD\n"
 #endif
 }
 
@@ -874,21 +768,12 @@ inline u32 rtw_os_pkt_len(_pkt *pkt)
 {
 #if defined(PLATFORM_LINUX)
 	return pkt->len;
-#elif defined(PLATFORM_FREEBSD)
-	return pkt->m_pkthdr.len;
-#else
-	#error "TBD\n"
 #endif
 }
 
 void _rtw_memcpy(void *dst, const void *src, u32 sz)
 {
-
-#if defined(PLATFORM_LINUX) || defined (PLATFORM_FREEBSD)
-
 	memcpy(dst, src, sz);
-
-#endif
 }
 
 inline void _rtw_memmove(void *dst, const void *src, u32 sz)
@@ -903,50 +788,22 @@ inline void _rtw_memmove(void *dst, const void *src, u32 sz)
 int	_rtw_memcmp(const void *dst, const void *src, u32 sz)
 {
 
-#if defined(PLATFORM_LINUX) || defined (PLATFORM_FREEBSD)
 	/* under Linux/GNU/GLibc, the return value of memcmp for two same mem. chunk is 0 */
 
 	if (!(memcmp(dst, src, sz)))
 		return _TRUE;
 	else
 		return _FALSE;
-#endif
 }
 
 void _rtw_memset(void *pbuf, int c, u32 sz)
 {
-
-#if defined(PLATFORM_LINUX) || defined (PLATFORM_FREEBSD)
-
 	memset(pbuf, c, sz);
-
-#endif
 }
-
-#ifdef PLATFORM_FREEBSD
-static inline void __list_add(_list *pnew, _list *pprev, _list *pnext)
-{
-	pnext->prev = pnew;
-	pnew->next = pnext;
-	pnew->prev = pprev;
-	pprev->next = pnew;
-}
-#endif /* PLATFORM_FREEBSD */
-
 
 void _rtw_init_listhead(_list *list)
 {
-
-#ifdef PLATFORM_LINUX
-
 	INIT_LIST_HEAD(list);
-
-#endif
-
-#ifdef PLATFORM_FREEBSD
-	list->next = list;
-	list->prev = list;
-#endif
 }
 
 /*
@@ -965,14 +822,6 @@ u32	rtw_is_list_empty(_list *phead)
 		return _FALSE;
 
 #endif
-#ifdef PLATFORM_FREEBSD
-
-	if (phead->next == phead)
-		return _TRUE;
-	else
-		return _FALSE;
-
-#endif
 }
 
 void rtw_list_insert_head(_list *plist, _list *phead)
@@ -980,10 +829,6 @@ void rtw_list_insert_head(_list *plist, _list *phead)
 
 #ifdef PLATFORM_LINUX
 	list_add(plist, phead);
-#endif
-
-#ifdef PLATFORM_FREEBSD
-	__list_add(plist, phead, phead->next);
 #endif
 }
 
@@ -995,11 +840,6 @@ void rtw_list_insert_tail(_list *plist, _list *phead)
 	list_add_tail(plist, phead);
 
 #endif
-#ifdef PLATFORM_FREEBSD
-
-	__list_add(plist, phead->prev, phead);
-
-#endif
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
@@ -1009,9 +849,6 @@ void rtw_init_timer(_timer *ptimer, void *padapter, void *pfunc, void *ctx)
 
 #ifdef PLATFORM_LINUX
 	_init_timer(ptimer, adapter->pnetdev, pfunc, ctx);
-#endif
-#ifdef PLATFORM_FREEBSD
-	_init_timer(ptimer, adapter->pifp, pfunc, ctx);
 #endif
 }
 #endif
@@ -1031,16 +868,10 @@ void _rtw_init_sema(_sema	*sema, int init_val)
 	sema_init(sema, init_val);
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	sema_init(sema, init_val, "rtw_drv");
-#endif
 }
 
 void _rtw_free_sema(_sema	*sema)
 {
-#ifdef PLATFORM_FREEBSD
-	sema_destroy(sema);
-#endif
 }
 
 void _rtw_up_sema(_sema	*sema)
@@ -1050,9 +881,6 @@ void _rtw_up_sema(_sema	*sema)
 
 	up(sema);
 
-#endif
-#ifdef PLATFORM_FREEBSD
-	sema_post(sema);
 #endif
 }
 
@@ -1067,20 +895,12 @@ u32 _rtw_down_sema(_sema *sema)
 		return _SUCCESS;
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	sema_wait(sema);
-	return  _SUCCESS;
-#endif
 }
 
 inline void thread_exit(_completion *comp)
 {
 #ifdef PLATFORM_LINUX
 	complete_and_exit(comp, 0);
-#endif
-
-#ifdef PLATFORM_FREEBSD
-	printf("%s", "RTKTHREAD_exit");
 #endif
 }
 
@@ -1114,9 +934,6 @@ void	_rtw_mutex_init(_mutex *pmutex)
 #endif
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	mtx_init(pmutex, "", NULL, MTX_DEF | MTX_RECURSE);
-#endif
 }
 
 void	_rtw_mutex_free(_mutex *pmutex);
@@ -1128,11 +945,6 @@ void	_rtw_mutex_free(_mutex *pmutex)
 	mutex_destroy(pmutex);
 #else
 #endif
-
-#ifdef PLATFORM_FREEBSD
-	sema_destroy(pmutex);
-#endif
-
 #endif
 }
 
@@ -1144,38 +956,11 @@ void	_rtw_spinlock_init(_lock *plock)
 	spin_lock_init(plock);
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	mtx_init(plock, "", NULL, MTX_DEF | MTX_RECURSE);
-#endif
 }
 
 void	_rtw_spinlock_free(_lock *plock)
 {
-#ifdef PLATFORM_FREEBSD
-	mtx_destroy(plock);
-#endif
 }
-
-#ifdef PLATFORM_FREEBSD
-extern PADAPTER prtw_lock;
-
-void rtw_mtx_lock(_lock *plock)
-{
-	if (prtw_lock)
-		mtx_lock(&prtw_lock->glock);
-	else
-		printf("%s prtw_lock==NULL", __FUNCTION__);
-}
-void rtw_mtx_unlock(_lock *plock)
-{
-	if (prtw_lock)
-		mtx_unlock(&prtw_lock->glock);
-	else
-		printf("%s prtw_lock==NULL", __FUNCTION__);
-
-}
-#endif /* PLATFORM_FREEBSD */
-
 
 void	_rtw_spinlock(_lock	*plock)
 {
@@ -1184,9 +969,6 @@ void	_rtw_spinlock(_lock	*plock)
 
 	spin_lock(plock);
 
-#endif
-#ifdef PLATFORM_FREEBSD
-	mtx_lock(plock);
 #endif
 }
 
@@ -1198,9 +980,6 @@ void	_rtw_spinunlock(_lock *plock)
 	spin_unlock(plock);
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	mtx_unlock(plock);
-#endif
 }
 
 void	_rtw_spinlock_ex(_lock	*plock)
@@ -1211,9 +990,6 @@ void	_rtw_spinlock_ex(_lock	*plock)
 	spin_lock(plock);
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	mtx_lock(plock);
-#endif
 }
 
 void	_rtw_spinunlock_ex(_lock *plock)
@@ -1223,9 +999,6 @@ void	_rtw_spinunlock_ex(_lock *plock)
 
 	spin_unlock(plock);
 
-#endif
-#ifdef PLATFORM_FREEBSD
-	mtx_unlock(plock);
 #endif
 }
 
@@ -1261,11 +1034,6 @@ systime _rtw_get_current_time(void)
 #ifdef PLATFORM_LINUX
 	return jiffies;
 #endif
-#ifdef PLATFORM_FREEBSD
-	struct timeval tvp;
-	getmicrotime(&tvp);
-	return tvp.tv_sec;
-#endif
 }
 
 inline u32 _rtw_systime_to_ms(systime stime)
@@ -1273,18 +1041,12 @@ inline u32 _rtw_systime_to_ms(systime stime)
 #ifdef PLATFORM_LINUX
 	return jiffies_to_msecs(stime);
 #endif
-#ifdef PLATFORM_FREEBSD
-	return stime * 1000;
-#endif
 }
 
 inline systime _rtw_ms_to_systime(u32 ms)
 {
 #ifdef PLATFORM_LINUX
 	return msecs_to_jiffies(ms);
-#endif
-#ifdef PLATFORM_FREEBSD
-	return ms / 1000;
 #endif
 }
 
@@ -1316,10 +1078,6 @@ void rtw_sleep_schedulable(int ms)
 	return;
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	DELAY(ms * 1000);
-	return ;
-#endif
 }
 
 
@@ -1336,11 +1094,6 @@ void rtw_msleep_os(int ms)
 		msleep((unsigned int)ms);
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	/* Delay for delay microseconds */
-	DELAY(ms * 1000);
-	return ;
-#endif
 }
 
 void rtw_usleep_os(int us)
@@ -1356,13 +1109,6 @@ void rtw_usleep_os(int us)
 	else
 		msleep((us / 1000) + 1);
 #endif
-#endif
-
-#ifdef PLATFORM_FREEBSD
-	/* Delay for delay microseconds */
-	DELAY(us);
-
-	return ;
 #endif
 }
 
@@ -1417,10 +1163,6 @@ void rtw_mdelay_os(int ms)
 	mdelay((unsigned long)ms);
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	DELAY(ms * 1000);
-	return ;
-#endif
 }
 
 void rtw_udelay_os(int us)
@@ -1431,20 +1173,12 @@ void rtw_udelay_os(int us)
 	udelay((unsigned long)us);
 
 #endif
-#ifdef PLATFORM_FREEBSD
-	/* Delay for delay microseconds */
-	DELAY(us);
-	return ;
-#endif
 }
 #endif
 
 void rtw_yield_os(void)
 {
 #ifdef PLATFORM_LINUX
-	yield();
-#endif
-#ifdef PLATFORM_FREEBSD
 	yield();
 #endif
 }
@@ -1627,8 +1361,6 @@ inline void ATOMIC_SET(ATOMIC_T *v, int i)
 {
 #ifdef PLATFORM_LINUX
 	atomic_set(v, i);
-#elif defined(PLATFORM_FREEBSD)
-	atomic_set_int(v, i);
 #endif
 }
 
@@ -1636,8 +1368,6 @@ inline int ATOMIC_READ(ATOMIC_T *v)
 {
 #ifdef PLATFORM_LINUX
 	return atomic_read(v);
-#elif defined(PLATFORM_FREEBSD)
-	return atomic_load_acq_32(v);
 #endif
 }
 
@@ -1645,16 +1375,12 @@ inline void ATOMIC_ADD(ATOMIC_T *v, int i)
 {
 #ifdef PLATFORM_LINUX
 	atomic_add(i, v);
-#elif defined(PLATFORM_FREEBSD)
-	atomic_add_int(v, i);
 #endif
 }
 inline void ATOMIC_SUB(ATOMIC_T *v, int i)
 {
 #ifdef PLATFORM_LINUX
 	atomic_sub(i, v);
-#elif defined(PLATFORM_FREEBSD)
-	atomic_subtract_int(v, i);
 #endif
 }
 
@@ -1662,8 +1388,6 @@ inline void ATOMIC_INC(ATOMIC_T *v)
 {
 #ifdef PLATFORM_LINUX
 	atomic_inc(v);
-#elif defined(PLATFORM_FREEBSD)
-	atomic_add_int(v, 1);
 #endif
 }
 
@@ -1671,8 +1395,6 @@ inline void ATOMIC_DEC(ATOMIC_T *v)
 {
 #ifdef PLATFORM_LINUX
 	atomic_dec(v);
-#elif defined(PLATFORM_FREEBSD)
-	atomic_subtract_int(v, 1);
 #endif
 }
 
@@ -1680,9 +1402,6 @@ inline int ATOMIC_ADD_RETURN(ATOMIC_T *v, int i)
 {
 #ifdef PLATFORM_LINUX
 	return atomic_add_return(i, v);
-#elif defined(PLATFORM_FREEBSD)
-	atomic_add_int(v, i);
-	return atomic_load_acq_32(v);
 #endif
 }
 
@@ -1690,9 +1409,6 @@ inline int ATOMIC_SUB_RETURN(ATOMIC_T *v, int i)
 {
 #ifdef PLATFORM_LINUX
 	return atomic_sub_return(i, v);
-#elif defined(PLATFORM_FREEBSD)
-	atomic_subtract_int(v, i);
-	return atomic_load_acq_32(v);
 #endif
 }
 
@@ -1700,9 +1416,6 @@ inline int ATOMIC_INC_RETURN(ATOMIC_T *v)
 {
 #ifdef PLATFORM_LINUX
 	return atomic_inc_return(v);
-#elif defined(PLATFORM_FREEBSD)
-	atomic_add_int(v, 1);
-	return atomic_load_acq_32(v);
 #endif
 }
 
@@ -1710,9 +1423,6 @@ inline int ATOMIC_DEC_RETURN(ATOMIC_T *v)
 {
 #ifdef PLATFORM_LINUX
 	return atomic_dec_return(v);
-#elif defined(PLATFORM_FREEBSD)
-	atomic_subtract_int(v, 1);
-	return atomic_load_acq_32(v);
 #endif
 }
 
@@ -2114,76 +1824,6 @@ error:
 }
 #endif
 
-#ifdef PLATFORM_FREEBSD
-/*
- * Copy a buffer from userspace and write into kernel address
- * space.
- *
- * This emulation just calls the FreeBSD copyin function (to
- * copy data from user space buffer into a kernel space buffer)
- * and is designed to be used with the above io_write_wrapper.
- *
- * This function should return the number of bytes not copied.
- * I.e. success results in a zero value.
- * Negative error values are not returned.
- */
-unsigned long
-copy_from_user(void *to, const void *from, unsigned long n)
-{
-	if (copyin(from, to, n) != 0) {
-		/* Any errors will be treated as a failure
-		   to copy any of the requested bytes */
-		return n;
-	}
-
-	return 0;
-}
-
-unsigned long
-copy_to_user(void *to, const void *from, unsigned long n)
-{
-	if (copyout(from, to, n) != 0) {
-		/* Any errors will be treated as a failure
-		   to copy any of the requested bytes */
-		return n;
-	}
-
-	return 0;
-}
-
-
-/*
- * The usb_register and usb_deregister functions are used to register
- * usb drivers with the usb subsystem. In this compatibility layer
- * emulation a list of drivers (struct usb_driver) is maintained
- * and is used for probing/attaching etc.
- *
- * usb_register and usb_deregister simply call these functions.
- */
-int
-usb_register(struct usb_driver *driver)
-{
-	rtw_usb_linux_register(driver);
-	return 0;
-}
-
-
-int
-usb_deregister(struct usb_driver *driver)
-{
-	rtw_usb_linux_deregister(driver);
-	return 0;
-}
-
-void module_init_exit_wrapper(void *arg)
-{
-	int (*func)(void) = arg;
-	func();
-	return;
-}
-
-#endif /* PLATFORM_FREEBSD */
-
 #ifdef CONFIG_PLATFORM_SPRD
 	#ifdef do_div
 		#undef do_div
@@ -2195,8 +1835,6 @@ u64 rtw_modular64(u64 x, u64 y)
 {
 #ifdef PLATFORM_LINUX
 	return do_div(x, y);
-#elif defined(PLATFORM_FREEBSD)
-	return x % y;
 #endif
 }
 
@@ -2205,8 +1843,6 @@ u64 rtw_division64(u64 x, u64 y)
 #ifdef PLATFORM_LINUX
 	do_div(x, y);
 	return x;
-#elif defined(PLATFORM_FREEBSD)
-	return x / y;
 #endif
 }
 
@@ -2222,8 +1858,6 @@ inline u32 rtw_random32(void)
 #else
 	return random32();
 #endif
-#elif defined(PLATFORM_FREEBSD)
-#error "to be implemented\n"
 #endif
 }
 
