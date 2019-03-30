@@ -1214,8 +1214,6 @@ phydm_get_structure(
 		#define IS_HARDWARE_TYPE_8723BU(_adapter)	false
 		#define IS_HARDWARE_TYPE_8822BU(_adapter)	false
 		#define IS_HARDWARE_TYPE_8822BS(_adapter)		false
-		#define IS_HARDWARE_TYPE_JAGUAR(_Adapter)		\
-			(IS_HARDWARE_TYPE_8812(_Adapter) || IS_HARDWARE_TYPE_8821(_Adapter))
 	#else
 		#define	IS_HARDWARE_TYPE_8723A(_adapter)	false
 	#endif

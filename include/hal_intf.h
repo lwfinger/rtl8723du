@@ -501,9 +501,6 @@ typedef enum _HARDWARE_TYPE {
 #define IS_HARDWARE_TYPE_8821(_Adapter)			\
 	(IS_HARDWARE_TYPE_8821E(_Adapter) || IS_HARDWARE_TYPE_8821U(_Adapter) || IS_HARDWARE_TYPE_8821S(_Adapter))
 
-#define IS_HARDWARE_TYPE_JAGUAR(_Adapter)		\
-	(IS_HARDWARE_TYPE_8812(_Adapter) || IS_HARDWARE_TYPE_8821(_Adapter))
-
 /* RTL8192E Series */
 #define IS_HARDWARE_TYPE_8192EE(_Adapter)		(rtw_get_hw_type(_Adapter) == HARDWARE_TYPE_RTL8192EE)
 #define IS_HARDWARE_TYPE_8192EU(_Adapter)		(rtw_get_hw_type(_Adapter) == HARDWARE_TYPE_RTL8192EU)
@@ -571,14 +568,6 @@ typedef enum _HARDWARE_TYPE {
 #define IS_HARDWARE_TYPE_8821CS(_Adapter)		(rtw_get_hw_type(_Adapter) == HARDWARE_TYPE_RTL8821CS)
 #define IS_HARDWARE_TYPE_8821C(_Adapter)		\
 	(IS_HARDWARE_TYPE_8821CE(_Adapter) || IS_HARDWARE_TYPE_8821CU(_Adapter) || IS_HARDWARE_TYPE_8821CS(_Adapter))
-
-#define IS_HARDWARE_TYPE_JAGUAR2(_Adapter)		\
-	(IS_HARDWARE_TYPE_8814A(_Adapter) || IS_HARDWARE_TYPE_8821B(_Adapter) || IS_HARDWARE_TYPE_8822B(_Adapter) || IS_HARDWARE_TYPE_8821C(_Adapter))
-
-#define IS_HARDWARE_TYPE_JAGUAR_AND_JAGUAR2(_Adapter)		\
-	(IS_HARDWARE_TYPE_JAGUAR(_Adapter) || IS_HARDWARE_TYPE_JAGUAR2(_Adapter))
-
-
 
 typedef enum _wowlan_subcode {
 	WOWLAN_ENABLE			= 0,

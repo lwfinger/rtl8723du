@@ -508,8 +508,7 @@ hal_com_txbf_get(
 			*p_boolean = false;
 		else if (/*IS_HARDWARE_TYPE_8822B(adapter)	||*/
 			IS_HARDWARE_TYPE_8821B(adapter)	||
-			IS_HARDWARE_TYPE_8192E(adapter)	||
-			IS_HARDWARE_TYPE_JAGUAR(adapter) || IS_HARDWARE_TYPE_JAGUAR_AND_JAGUAR2(adapter))
+			IS_HARDWARE_TYPE_8192E(adapter))
 			*p_boolean = true;
 		else
 			*p_boolean = false;
@@ -518,8 +517,7 @@ hal_com_txbf_get(
 			*p_boolean = false;
 		else	if (/*IS_HARDWARE_TYPE_8822B(adapter)	||*/
 			IS_HARDWARE_TYPE_8821B(adapter)	||
-			IS_HARDWARE_TYPE_8192E(adapter)	||
-			IS_HARDWARE_TYPE_JAGUAR(adapter) || IS_HARDWARE_TYPE_JAGUAR_AND_JAGUAR2(adapter)) {
+			IS_HARDWARE_TYPE_8192E(adapter))
 			if (p_hal_data->RF_Type == RF_2T2R || p_hal_data->RF_Type == RF_3T3R)
 				*p_boolean = true;
 			else

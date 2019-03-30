@@ -4050,73 +4050,35 @@ static u8 rtw_hal_check_wow_ctrl(_adapter *adapter, u8 chk_type)
 	u8 trycnt = 25;
 	u8 res = _FALSE;
 
-	if (IS_HARDWARE_TYPE_JAGUAR2(adapter)) {
-		if (chk_type) {
-			reason = rtw_read8(adapter, REG_WOWLAN_WAKE_REASON);
-			RTW_DBG("%s reason:0x%02x\n", __func__, reason);
+	mstatus = rtw_read8(adapter, REG_WOW_CTRL);
+	RTW_DBG("%s mstatus:0x%02x\n", __func__, mstatus);
 
-			while (reason && trycnt > 1) {
-				reason = rtw_read8(adapter, REG_WOWLAN_WAKE_REASON);
-				RTW_DBG("Loop index: %d :0x%02x\n",
-					  trycnt, reason);
-				trycnt--;
-				rtw_msleep_os(20);
-			}
-			if (!reason)
-				res = _TRUE;
-			else
-				res = _FALSE;
-		} else {
-			/* Wait FW to cleare 0x120 bit16, 0x284 bit18 to 0 */
-			fe1_imr = rtw_read32(adapter, REG_FE1IMR); /* RxDone IMR for 3081 */
-			rxpkt_num = rtw_read32(adapter, REG_RXPKT_NUM); /* Release RXDMA */
-			RTW_DBG("%s REG_FE1IMR (reg120): 0x%x, REG_RXPKT_NUM(reg284): 0x%x\n", __func__, fe1_imr, rxpkt_num);
 
-			while (((fe1_imr & BIT_FS_RXDONE_INT_EN) || (rxpkt_num & BIT_RW_RELEASE_EN)) && trycnt > 1) {
-				rtw_msleep_os(20);
-				fe1_imr = rtw_read32(adapter, REG_FE1IMR);
-				rxpkt_num = rtw_read32(adapter, REG_RXPKT_NUM);
-				RTW_PRINT("Loop index: %d :0x%x, 0x%x\n",
-					  trycnt, fe1_imr, rxpkt_num);
-				trycnt--;
-			}
-
-			if ((fe1_imr & BIT_FS_RXDONE_INT_EN) || (rxpkt_num & BIT_RW_RELEASE_EN))
-				res = _FALSE;
-			else
-				res = _TRUE;
+	if (chk_type) {
+		while (!(mstatus & BIT1) && trycnt > 1) {
+			mstatus = rtw_read8(adapter, REG_WOW_CTRL);
+			RTW_DBG("Loop index: %d :0x%02x\n",
+				  trycnt, mstatus);
+			trycnt--;
+			rtw_msleep_os(20);
 		}
+		if (mstatus & BIT1)
+			res = _TRUE;
+		else
+			res = _FALSE;
 	} else {
-		mstatus = rtw_read8(adapter, REG_WOW_CTRL);
-		RTW_DBG("%s mstatus:0x%02x\n", __func__, mstatus);
-
-
-		if (chk_type) {
-			while (!(mstatus & BIT1) && trycnt > 1) {
-				mstatus = rtw_read8(adapter, REG_WOW_CTRL);
-				RTW_DBG("Loop index: %d :0x%02x\n",
-					  trycnt, mstatus);
-				trycnt--;
-				rtw_msleep_os(20);
-			}
-			if (mstatus & BIT1)
-				res = _TRUE;
-			else
-				res = _FALSE;
-		} else {
-			while (mstatus & BIT1 && trycnt > 1) {
-				mstatus = rtw_read8(adapter, REG_WOW_CTRL);
-				RTW_DBG("Loop index: %d :0x%02x\n",
-					  trycnt, mstatus);
-				trycnt--;
-				rtw_msleep_os(20);
-			}
-
-			if (mstatus & BIT1)
-				res = _FALSE;
-			else
-				res = _TRUE;
+		while (mstatus & BIT1 && trycnt > 1) {
+			mstatus = rtw_read8(adapter, REG_WOW_CTRL);
+			RTW_DBG("Loop index: %d :0x%02x\n",
+				  trycnt, mstatus);
+			trycnt--;
+			rtw_msleep_os(20);
 		}
+
+		if (mstatus & BIT1)
+			res = _FALSE;
+		else
+			res = _TRUE;
 	}
 
 	RTW_INFO("%s check_type: %d res: %d trycnt: %d\n",
@@ -11645,9 +11607,6 @@ void rtw_dump_mac_rx_counters(_adapter *padapter, struct dbg_rx_counter *rx_coun
 		rtw_warn_on(1);
 		return;
 	}
-	if (IS_HARDWARE_TYPE_JAGUAR(padapter) || IS_HARDWARE_TYPE_JAGUAR2(padapter))
-		phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT26, 0x0);/*clear bit-26*/
-
 	phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT28 | BIT29 | BIT30 | BIT31, 0x3);
 	mac_cck_ok	= phy_query_mac_reg(padapter, REG_RXERR_RPT, bMaskLWord);/* [15:0]	  */
 	phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT28 | BIT29 | BIT30 | BIT31, 0x0);
@@ -11655,13 +11614,6 @@ void rtw_dump_mac_rx_counters(_adapter *padapter, struct dbg_rx_counter *rx_coun
 	phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT28 | BIT29 | BIT30 | BIT31, 0x6);
 	mac_ht_ok	= phy_query_mac_reg(padapter, REG_RXERR_RPT, bMaskLWord);/* [15:0]	 */
 	mac_vht_ok	= 0;
-	if (IS_HARDWARE_TYPE_JAGUAR(padapter) || IS_HARDWARE_TYPE_JAGUAR2(padapter)) {
-		phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT28 | BIT29 | BIT30 | BIT31, 0x0);
-		phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT26, 0x1);
-		mac_vht_ok	= phy_query_mac_reg(padapter, REG_RXERR_RPT, bMaskLWord);/* [15:0]*/
-		phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT26, 0x0);/*clear bit-26*/
-	}
-
 	phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT28 | BIT29 | BIT30 | BIT31, 0x4);
 	mac_cck_err	= phy_query_mac_reg(padapter, REG_RXERR_RPT, bMaskLWord);/* [15:0]	 */
 	phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT28 | BIT29 | BIT30 | BIT31, 0x1);
@@ -11669,12 +11621,6 @@ void rtw_dump_mac_rx_counters(_adapter *padapter, struct dbg_rx_counter *rx_coun
 	phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT28 | BIT29 | BIT30 | BIT31, 0x7);
 	mac_ht_err	= phy_query_mac_reg(padapter, REG_RXERR_RPT, bMaskLWord);/* [15:0]		 */
 	mac_vht_err	= 0;
-	if (IS_HARDWARE_TYPE_JAGUAR(padapter) || IS_HARDWARE_TYPE_JAGUAR2(padapter)) {
-		phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT28 | BIT29 | BIT30 | BIT31, 0x1);
-		phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT26, 0x1);
-		mac_vht_err	= phy_query_mac_reg(padapter, REG_RXERR_RPT, bMaskLWord);/* [15:0]*/
-		phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT26, 0x0);/*clear bit-26*/
-	}
 
 	phy_set_mac_reg(padapter, REG_RXERR_RPT, BIT28 | BIT29 | BIT30 | BIT31, 0x5);
 	mac_cck_fa	= phy_query_mac_reg(padapter, REG_RXERR_RPT, bMaskLWord);/* [15:0]	 */
@@ -11715,32 +11661,19 @@ void rtw_dump_phy_rx_counters(_adapter *padapter, struct dbg_rx_counter *rx_coun
 		rtw_warn_on(1);
 		return;
 	}
-	if (IS_HARDWARE_TYPE_JAGUAR(padapter) || IS_HARDWARE_TYPE_JAGUAR2(padapter)) {
-		cckok	= phy_query_bb_reg(padapter, 0xF04, 0x3FFF);	     /* [13:0] */
-		ofdmok	= phy_query_bb_reg(padapter, 0xF14, 0x3FFF);	     /* [13:0] */
-		htok		= phy_query_bb_reg(padapter, 0xF10, 0x3FFF);     /* [13:0] */
-		vht_ok	= phy_query_bb_reg(padapter, 0xF0C, 0x3FFF);     /* [13:0] */
-		cckcrc	= phy_query_bb_reg(padapter, 0xF04, 0x3FFF0000); /* [29:16]	 */
-		ofdmcrc	= phy_query_bb_reg(padapter, 0xF14, 0x3FFF0000); /* [29:16] */
-		htcrc	= phy_query_bb_reg(padapter, 0xF10, 0x3FFF0000); /* [29:16] */
-		vht_err	= phy_query_bb_reg(padapter, 0xF0C, 0x3FFF0000); /* [29:16] */
-		CCK_FA	= phy_query_bb_reg(padapter, 0xA5C, bMaskLWord);
-		OFDM_FA	= phy_query_bb_reg(padapter, 0xF48, bMaskLWord);
-	} else {
-		cckok	= phy_query_bb_reg(padapter, 0xF88, bMaskDWord);
-		ofdmok	= phy_query_bb_reg(padapter, 0xF94, bMaskLWord);
-		htok		= phy_query_bb_reg(padapter, 0xF90, bMaskLWord);
-		vht_ok	= 0;
-		cckcrc	= phy_query_bb_reg(padapter, 0xF84, bMaskDWord);
-		ofdmcrc	= phy_query_bb_reg(padapter, 0xF94, bMaskHWord);
-		htcrc	= phy_query_bb_reg(padapter, 0xF90, bMaskHWord);
-		vht_err	= 0;
-		OFDM_FA = phy_query_bb_reg(padapter, 0xCF0, bMaskLWord) + phy_query_bb_reg(padapter, 0xCF2, bMaskLWord) +
-			phy_query_bb_reg(padapter, 0xDA2, bMaskLWord) + phy_query_bb_reg(padapter, 0xDA4, bMaskLWord) +
-			phy_query_bb_reg(padapter, 0xDA6, bMaskLWord) + phy_query_bb_reg(padapter, 0xDA8, bMaskLWord);
+	cckok	= phy_query_bb_reg(padapter, 0xF88, bMaskDWord);
+	ofdmok	= phy_query_bb_reg(padapter, 0xF94, bMaskLWord);
+	htok		= phy_query_bb_reg(padapter, 0xF90, bMaskLWord);
+	vht_ok	= 0;
+	cckcrc	= phy_query_bb_reg(padapter, 0xF84, bMaskDWord);
+	ofdmcrc	= phy_query_bb_reg(padapter, 0xF94, bMaskHWord);
+	htcrc	= phy_query_bb_reg(padapter, 0xF90, bMaskHWord);
+	vht_err	= 0;
+	OFDM_FA = phy_query_bb_reg(padapter, 0xCF0, bMaskLWord) + phy_query_bb_reg(padapter, 0xCF2, bMaskLWord) +
+		phy_query_bb_reg(padapter, 0xDA2, bMaskLWord) + phy_query_bb_reg(padapter, 0xDA4, bMaskLWord) +
+		phy_query_bb_reg(padapter, 0xDA6, bMaskLWord) + phy_query_bb_reg(padapter, 0xDA8, bMaskLWord);
 
-		CCK_FA = (rtw_read8(padapter, 0xA5B) << 8) | (rtw_read8(padapter, 0xA5C));
-	}
+	CCK_FA = (rtw_read8(padapter, 0xA5B) << 8) | (rtw_read8(padapter, 0xA5C));
 
 	rx_counter->rx_pkt_ok = cckok + ofdmok + htok + vht_ok;
 	rx_counter->rx_pkt_crc_error = cckcrc + ofdmcrc + htcrc + vht_err;
@@ -11751,36 +11684,23 @@ void rtw_dump_phy_rx_counters(_adapter *padapter, struct dbg_rx_counter *rx_coun
 
 void rtw_reset_phy_trx_ok_counters(_adapter *padapter)
 {
-	if (IS_HARDWARE_TYPE_JAGUAR(padapter) || IS_HARDWARE_TYPE_JAGUAR2(padapter)) {
-		phy_set_bb_reg(padapter, 0xB58, BIT0, 0x1);
-		phy_set_bb_reg(padapter, 0xB58, BIT0, 0x0);
-	}
 }
+
 void rtw_reset_phy_rx_counters(_adapter *padapter)
 {
-	/* reset phy counter */
-	if (IS_HARDWARE_TYPE_JAGUAR(padapter) || IS_HARDWARE_TYPE_JAGUAR2(padapter)) {
-		rtw_reset_phy_trx_ok_counters(padapter);
+	phy_set_bb_reg(padapter, 0xF14, BIT16, 0x1);
+	rtw_msleep_os(10);
+	phy_set_bb_reg(padapter, 0xF14, BIT16, 0x0);
 
-		phy_set_bb_reg(padapter, 0x9A4, BIT17, 0x1);/* reset  OFDA FA counter */
-		phy_set_bb_reg(padapter, 0x9A4, BIT17, 0x0);
+	phy_set_bb_reg(padapter, 0xD00, BIT27, 0x1);/* reset  OFDA FA counter */
+	phy_set_bb_reg(padapter, 0xC0C, BIT31, 0x1);/* reset  OFDA FA counter */
+	phy_set_bb_reg(padapter, 0xD00, BIT27, 0x0);
+	phy_set_bb_reg(padapter, 0xC0C, BIT31, 0x0);
 
-		phy_set_bb_reg(padapter, 0xA2C, BIT15, 0x0);/* reset  CCK FA counter */
-		phy_set_bb_reg(padapter, 0xA2C, BIT15, 0x1);
-	} else {
-		phy_set_bb_reg(padapter, 0xF14, BIT16, 0x1);
-		rtw_msleep_os(10);
-		phy_set_bb_reg(padapter, 0xF14, BIT16, 0x0);
-
-		phy_set_bb_reg(padapter, 0xD00, BIT27, 0x1);/* reset  OFDA FA counter */
-		phy_set_bb_reg(padapter, 0xC0C, BIT31, 0x1);/* reset  OFDA FA counter */
-		phy_set_bb_reg(padapter, 0xD00, BIT27, 0x0);
-		phy_set_bb_reg(padapter, 0xC0C, BIT31, 0x0);
-
-		phy_set_bb_reg(padapter, 0xA2C, BIT15, 0x0);/* reset  CCK FA counter */
-		phy_set_bb_reg(padapter, 0xA2C, BIT15, 0x1);
-	}
+	phy_set_bb_reg(padapter, 0xA2C, BIT15, 0x0);/* reset  CCK FA counter */
+	phy_set_bb_reg(padapter, 0xA2C, BIT15, 0x1);
 }
+
 #ifdef DBG_RX_COUNTER_DUMP
 void rtw_dump_drv_rx_counters(_adapter *padapter, struct dbg_rx_counter *rx_counter)
 {
