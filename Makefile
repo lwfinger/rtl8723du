@@ -28,17 +28,7 @@ CONFIG_AUTOCFG_CP = n
 
 ########################## WIFI IC ############################
 CONFIG_MULTIDRV = n
-CONFIG_RTL8188E = n
-CONFIG_RTL8812A = n
-CONFIG_RTL8821A = n
-CONFIG_RTL8192E = n
-CONFIG_RTL8723B = n
-CONFIG_RTL8814A = n
-CONFIG_RTL8723C = n
-CONFIG_RTL8188F = n
-CONFIG_RTL8822B = n
 CONFIG_RTL8723D = y
-CONFIG_RTL8821C = n
 ######################### Interface ###########################
 CONFIG_USB_HCI = y
 CONFIG_PCI_HCI = n
@@ -344,113 +334,6 @@ endif
 
 endif
 
-########### HAL_RTL8812A_RTL8821A #################################
-
-ifneq ($(CONFIG_RTL8812A)_$(CONFIG_RTL8821A), n_n)
-
-RTL871X = rtl8812a
-ifeq ($(CONFIG_USB_HCI), y)
-MODULE_NAME = 8812au
-endif
-ifeq ($(CONFIG_PCI_HCI), y)
-MODULE_NAME = 8812ae
-endif
-ifeq ($(CONFIG_SDIO_HCI), y)
-MODULE_NAME = 8812as
-endif
-
-_HAL_INTFS_FILES +=  hal/HalPwrSeqCmd.o \
-					hal/$(RTL871X)/Hal8812PwrSeq.o \
-					hal/$(RTL871X)/Hal8821APwrSeq.o\
-					hal/$(RTL871X)/$(RTL871X)_xmit.o\
-					hal/$(RTL871X)/$(RTL871X)_sreset.o
-
-_HAL_INTFS_FILES +=	hal/$(RTL871X)/$(RTL871X)_hal_init.o \
-			hal/$(RTL871X)/$(RTL871X)_phycfg.o \
-			hal/$(RTL871X)/$(RTL871X)_rf6052.o \
-			hal/$(RTL871X)/$(RTL871X)_dm.o \
-			hal/$(RTL871X)/$(RTL871X)_rxdesc.o \
-			hal/$(RTL871X)/$(RTL871X)_cmd.o \
-			hal/$(RTL871X)/$(HCI_NAME)/$(HCI_NAME)_halinit.o \
-			hal/$(RTL871X)/$(HCI_NAME)/rtl$(MODULE_NAME)_led.o \
-			hal/$(RTL871X)/$(HCI_NAME)/rtl$(MODULE_NAME)_xmit.o \
-			hal/$(RTL871X)/$(HCI_NAME)/rtl$(MODULE_NAME)_recv.o
-
-ifeq ($(CONFIG_SDIO_HCI), y)
-_HAL_INTFS_FILES += hal/$(RTL871X)/$(HCI_NAME)/$(HCI_NAME)_ops.o
-else
-ifeq ($(CONFIG_GSPI_HCI), y)
-_HAL_INTFS_FILES += hal/$(RTL871X)/$(HCI_NAME)/$(HCI_NAME)_ops.o
-else
-_HAL_INTFS_FILES += hal/$(RTL871X)/$(HCI_NAME)/$(HCI_NAME)_ops_linux.o
-endif
-endif
-
-ifeq ($(CONFIG_RTL8812A), y)
-ifeq ($(CONFIG_USB_HCI), y)
-_HAL_INTFS_FILES +=hal/efuse/$(RTL871X)/HalEfuseMask8812A_USB.o
-endif
-ifeq ($(CONFIG_PCI_HCI), y)
-_HAL_INTFS_FILES +=hal/efuse/$(RTL871X)/HalEfuseMask8812A_PCIE.o
-endif
-endif
-ifeq ($(CONFIG_RTL8821A), y)
-ifeq ($(CONFIG_USB_HCI), y)
-_HAL_INTFS_FILES +=hal/efuse/$(RTL871X)/HalEfuseMask8821A_USB.o
-endif
-ifeq ($(CONFIG_PCI_HCI), y)
-_HAL_INTFS_FILES +=hal/efuse/$(RTL871X)/HalEfuseMask8821A_PCIE.o
-endif
-ifeq ($(CONFIG_SDIO_HCI), y)
-_HAL_INTFS_FILES +=hal/efuse/$(RTL871X)/HalEfuseMask8821A_SDIO.o
-endif
-endif
-
-ifeq ($(CONFIG_RTL8812A), y)
-EXTRA_CFLAGS += -DCONFIG_RTL8812A
-_HAL_INTFS_FILES +=	hal/rtl8812a/hal8812a_fw.o
-endif
-
-ifeq ($(CONFIG_RTL8821A), y)
-
-ifeq ($(CONFIG_RTL8812A), n)
-
-RTL871X = rtl8821a
-ifeq ($(CONFIG_USB_HCI), y)
-ifeq ($(CONFIG_BT_COEXIST), y)
-MODULE_NAME := 8821au
-else
-MODULE_NAME := 8811au
-endif
-endif
-ifeq ($(CONFIG_PCI_HCI), y)
-MODULE_NAME := 8821ae
-endif
-ifeq ($(CONFIG_SDIO_HCI), y)
-MODULE_NAME := 8821as
-endif
-
-endif
-
-EXTRA_CFLAGS += -DCONFIG_RTL8821A
-
-_HAL_INTFS_FILES +=	hal/rtl8812a/hal8821a_fw.o
-		
-endif
-
-ifeq ($(CONFIG_BT_COEXIST), y)
-ifeq ($(CONFIG_RTL8812A), y)
-_BTC_FILES += hal/btc/halbtc8812a1ant.o \
-				hal/btc/halbtc8812a2ant.o
-endif
-ifeq ($(CONFIG_RTL8821A), y)
-_BTC_FILES += hal/btc/halbtc8821a1ant.o \
-				hal/btc/halbtc8821a2ant.o
-endif
-endif
-
-endif
-
 ########### HAL_RTL8723B #################################
 ifeq ($(CONFIG_RTL8723B), y)
 
@@ -505,64 +388,6 @@ _BTC_FILES += hal/btc/halbtc8723bwifionly.o
 ifeq ($(CONFIG_BT_COEXIST), y)
 _BTC_FILES += hal/btc/halbtc8723b1ant.o \
 				hal/btc/halbtc8723b2ant.o
-endif
-
-endif
-
-########### HAL_RTL8814A #################################
-ifeq ($(CONFIG_RTL8814A), y)
-## ADD NEW VHT MP HW TX MODE ##
-#EXTRA_CFLAGS += -DCONFIG_MP_VHT_HW_TX_MODE
-#CONFIG_MP_VHT_HW_TX_MODE = y
-##########################################
-RTL871X = rtl8814a
-ifeq ($(CONFIG_USB_HCI), y)
-MODULE_NAME = 8814au
-endif
-ifeq ($(CONFIG_PCI_HCI), y)
-MODULE_NAME = 8814ae
-endif
-ifeq ($(CONFIG_SDIO_HCI), y)
-MODULE_NAME = 8814as
-endif
-
-EXTRA_CFLAGS += -DCONFIG_RTL8814A
-
-_HAL_INTFS_FILES +=  hal/HalPwrSeqCmd.o \
-					hal/$(RTL871X)/Hal8814PwrSeq.o \
-					hal/$(RTL871X)/$(RTL871X)_xmit.o\
-					hal/$(RTL871X)/$(RTL871X)_sreset.o
-
-_HAL_INTFS_FILES +=	hal/$(RTL871X)/$(RTL871X)_hal_init.o \
-			hal/$(RTL871X)/$(RTL871X)_phycfg.o \
-			hal/$(RTL871X)/$(RTL871X)_rf6052.o \
-			hal/$(RTL871X)/$(RTL871X)_dm.o \
-			hal/$(RTL871X)/$(RTL871X)_rxdesc.o \
-			hal/$(RTL871X)/$(RTL871X)_cmd.o \
-			hal/$(RTL871X)/hal8814a_fw.o
-
-
-_HAL_INTFS_FILES +=	\
-			hal/$(RTL871X)/$(HCI_NAME)/$(HCI_NAME)_halinit.o \
-			hal/$(RTL871X)/$(HCI_NAME)/rtl$(MODULE_NAME)_led.o \
-			hal/$(RTL871X)/$(HCI_NAME)/rtl$(MODULE_NAME)_xmit.o \
-			hal/$(RTL871X)/$(HCI_NAME)/rtl$(MODULE_NAME)_recv.o
-
-ifeq ($(CONFIG_SDIO_HCI), y)
-_HAL_INTFS_FILES += hal/$(RTL871X)/$(HCI_NAME)/$(HCI_NAME)_ops.o
-else
-ifeq ($(CONFIG_GSPI_HCI), y)
-_HAL_INTFS_FILES += hal/$(RTL871X)/$(HCI_NAME)/$(HCI_NAME)_ops.o
-else
-_HAL_INTFS_FILES += hal/$(RTL871X)/$(HCI_NAME)/$(HCI_NAME)_ops_linux.o
-endif
-endif
-
-ifeq ($(CONFIG_USB_HCI), y)
-_HAL_INTFS_FILES +=hal/efuse/$(RTL871X)/HalEfuseMask8814A_USB.o
-endif
-ifeq ($(CONFIG_PCI_HCI), y)
-_HAL_INTFS_FILES +=hal/efuse/$(RTL871X)/HalEfuseMask8814A_PCIE.o
 endif
 
 endif
@@ -730,16 +555,6 @@ ifeq ($(CONFIG_SDIO_HCI), y)
 _HAL_INTFS_FILES +=hal/efuse/$(RTL871X)/HalEfuseMask8188F_SDIO.o
 endif
 
-endif
-
-########### HAL_RTL8822B #################################
-ifeq ($(CONFIG_RTL8822B), y)
-include $(TopDIR)/rtl8822b.mk
-endif
-
-########### HAL_RTL8821C #################################
-ifeq ($(CONFIG_RTL8821C), y)
-include $(TopDIR)/rtl8821c.mk
 endif
 
 ########### AUTO_CFG  #################################
@@ -1692,10 +1507,6 @@ EXTRA_CFLAGS += -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT
 EXTRA_CFLAGS += -DCONFIG_QOS_OPTIMIZATION
 # Enable this for Android 5.0
 EXTRA_CFLAGS += -DCONFIG_RADIO_WORK
-ifeq ($(CONFIG_RTL8821C)$(CONFIG_SDIO_HCI),yy)
-EXTRA_CFLAGS += -DCONFIG_WAKEUP_GPIO_INPUT_MODE
-EXTRA_CFLAGS += -DCONFIG_BT_WAKE_HST_OPEN_DRAIN
-endif
 EXTRA_CFLAGS += -Wno-error=date-time
 # default setting for Android 7.0
 ifeq ($(RTK_ANDROID_VERSION), nougat)

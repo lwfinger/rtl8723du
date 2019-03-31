@@ -111,17 +111,6 @@ void hal_btcoex_wifionly_switchband_notify(PADAPTER padapter)
 
 	if (pHalData->current_band_type == BAND_ON_5G)
 		is_5g = _TRUE;
-
-	if (IS_HARDWARE_TYPE_8822B(padapter)) {
-#ifdef CONFIG_RTL8822B
-		ex_hal8822b_wifi_only_switchbandnotify(&GLBtCoexistWifiOnly, is_5g);
-#endif
-	}
-
-#ifdef CONFIG_RTL8821C
-	else if (IS_HARDWARE_TYPE_8821C(padapter))
-		ex_hal8821c_wifi_only_switchbandnotify(&GLBtCoexistWifiOnly, is_5g);
-#endif
 }
 
 void hal_btcoex_wifionly_scan_notify(PADAPTER padapter)
@@ -131,17 +120,6 @@ void hal_btcoex_wifionly_scan_notify(PADAPTER padapter)
 
 	if (pHalData->current_band_type == BAND_ON_5G)
 		is_5g = _TRUE;
-
-	if (IS_HARDWARE_TYPE_8822B(padapter)) {
-#ifdef CONFIG_RTL8822B
-		ex_hal8822b_wifi_only_scannotify(&GLBtCoexistWifiOnly, is_5g);
-#endif
-	}
-
-#ifdef CONFIG_RTL8821C
-	else if (IS_HARDWARE_TYPE_8821C(padapter))
-		ex_hal8821c_wifi_only_scannotify(&GLBtCoexistWifiOnly, is_5g);
-#endif
 }
 
 void hal_btcoex_wifionly_hw_config(PADAPTER padapter)
@@ -153,16 +131,6 @@ void hal_btcoex_wifionly_hw_config(PADAPTER padapter)
 		ex_hal8723b_wifi_only_hw_config(pwifionlycfg);
 #endif
 	}
-
-#ifdef CONFIG_RTL8822B
-	else if (IS_HARDWARE_TYPE_8822B(padapter))
-		ex_hal8822b_wifi_only_hw_config(pwifionlycfg);
-#endif
-
-#ifdef CONFIG_RTL8821C
-	else if (IS_HARDWARE_TYPE_8821C(padapter))
-		ex_hal8821c_wifi_only_hw_config(pwifionlycfg);
-#endif
 }
 
 void hal_btcoex_wifionly_initlizevariables(PADAPTER padapter)

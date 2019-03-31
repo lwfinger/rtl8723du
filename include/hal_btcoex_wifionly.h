@@ -19,11 +19,7 @@
 #include <hal_data.h>
 
 /* Define the ICs that support wifi only cfg in coex. codes */
-#if defined(CONFIG_RTL8723B) || defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C)
-#define CONFIG_BTCOEX_SUPPORT_WIFI_ONLY_CFG 1
-#else
 #define CONFIG_BTCOEX_SUPPORT_WIFI_ONLY_CFG 0
-#endif
 
 #if (CONFIG_BTCOEX_SUPPORT_WIFI_ONLY_CFG == 1)
 

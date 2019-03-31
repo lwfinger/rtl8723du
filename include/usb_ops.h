@@ -39,20 +39,6 @@ void interrupt_handler_8188eu(_adapter *padapter, u16 pkt_len, u8 *pbuf);
 #endif
 #endif
 
-#if defined(CONFIG_RTL8812A) || defined(CONFIG_RTL8821A)
-void rtl8812au_set_hw_type(struct dvobj_priv *pdvobj);
-#ifdef CONFIG_SUPPORT_USB_INT
-void interrupt_handler_8812au(_adapter *padapter, u16 pkt_len, u8 *pbuf);
-#endif
-#endif
-
-#ifdef CONFIG_RTL8814A
-void rtl8814au_set_hw_type(struct dvobj_priv *pdvobj);
-#ifdef CONFIG_SUPPORT_USB_INT
-void interrupt_handler_8814au(_adapter *padapter, u16 pkt_len, u8 *pbuf);
-#endif
-#endif /* CONFIG_RTL8814 */
-
 #ifdef CONFIG_RTL8192E
 void rtl8192eu_set_hw_type(struct dvobj_priv *pdvobj);
 #ifdef CONFIG_SUPPORT_USB_INT

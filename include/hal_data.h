@@ -127,16 +127,10 @@ typedef enum _RX_AGG_MODE {
 #ifdef CONFIG_RTL8188E
 	#define EFUSE_MAP_SIZE	512
 #endif
-#if defined(CONFIG_RTL8812A) || defined(CONFIG_RTL8821A) || defined(CONFIG_RTL8814A)
-	#define EFUSE_MAP_SIZE	512
-#endif
 #ifdef CONFIG_RTL8192E
 	#define EFUSE_MAP_SIZE	512
 #endif
 #ifdef CONFIG_RTL8723B
-	#define EFUSE_MAP_SIZE	512
-#endif
-#ifdef CONFIG_RTL8814A
 	#define EFUSE_MAP_SIZE	512
 #endif
 #ifdef CONFIG_RTL8703B
@@ -149,13 +143,7 @@ typedef enum _RX_AGG_MODE {
 	#define EFUSE_MAP_SIZE	512
 #endif
 
-#if defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C)
-	#define EFUSE_MAX_SIZE	1024
-#elif defined(CONFIG_RTL8188E) || defined(CONFIG_RTL8188F) || defined(CONFIG_RTL8703B)
-	#define EFUSE_MAX_SIZE	256
-#else
-	#define EFUSE_MAX_SIZE	512
-#endif
+#define EFUSE_MAX_SIZE	512
 /* end of E-Fuse */
 
 #define Mac_OFDM_OK			0x00000000
@@ -613,25 +601,6 @@ typedef struct hal_com_data {
 
 #ifndef RTW_HALMAC
 	u32			sdio_tx_max_len[SDIO_MAX_TX_QUEUE];/* H, N, L, used for sdio tx aggregation max length per queue */
-#else
-#ifdef CONFIG_RTL8821C
-	u16			tx_high_page;
-	u16			tx_low_page;
-	u16			tx_normal_page;
-	u16			tx_extra_page;
-	u16			tx_pub_page;
-	u8			max_oqt_size;
-	#ifdef XMIT_BUF_SIZE
-	u32			max_xmit_size_vovi;
-	u32			max_xmit_size_bebk;
-	#endif /*XMIT_BUF_SIZE*/
-	u16			max_xmit_page;
-	u16			max_xmit_page_vo;
-	u16			max_xmit_page_vi;
-	u16			max_xmit_page_be;
-	u16			max_xmit_page_bk;
-
-#endif /*#ifdef CONFIG_RTL8821C*/
 #endif /* !RTW_HALMAC */
 #endif /* CONFIG_SDIO_HCI */
 

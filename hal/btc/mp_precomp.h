@@ -73,16 +73,6 @@ extern u4Byte GLBtcDbgType[];
 #include "halbtc8723b2ant.h"
 #endif
 
-#ifdef CONFIG_RTL8812A
-#include "halbtc8812a1ant.h"
-#include "halbtc8812a2ant.h"
-#endif
-
-#ifdef CONFIG_RTL8821A
-#include "halbtc8821a1ant.h"
-#include "halbtc8821a2ant.h"
-#endif
-
 #ifdef CONFIG_RTL8703B
 #include "halbtc8703b1ant.h"
 #endif
@@ -92,30 +82,10 @@ extern u4Byte GLBtcDbgType[];
 #include "halbtc8723d2ant.h"
 #endif
 
-#ifdef CONFIG_RTL8822B
-#include "halbtc8822bwifionly.h"
-#include "halbtc8822b1ant.h"
-#include "halbtc8822b2ant.h"
-#endif
-
-#ifdef CONFIG_RTL8821C
-#include "halbtc8821cwifionly.h"
-#include "halbtc8821c1ant.h"
-#include "halbtc8821c2ant.h"
-#endif
-
 #else /* CONFIG_BT_COEXIST */
 
 #ifdef CONFIG_RTL8723B
 #include "halbtc8723bwifionly.h"
-#endif
-
-#ifdef CONFIG_RTL8822B
-#include "halbtc8822bwifionly.h"
-#endif
-
-#ifdef CONFIG_RTL8821C
-#include "halbtc8821cwifionly.h"
 #endif
 
 #endif /* CONFIG_BT_COEXIST */

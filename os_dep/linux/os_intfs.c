@@ -143,14 +143,7 @@ int rtw_uapsd_max_sp = NO_LIMIT;
 int rtw_uapsd_ac_enable = 0x0;
 #endif /* CONFIG_WMMPS_STA */
 
-#if defined(CONFIG_RTL8814A)
-	int rtw_pwrtrim_enable = 2; /* disable kfree , rename to power trim disable */
-#elif defined(CONFIG_RTL8821C) || defined(CONFIG_RTL8822B)
-	/*PHYDM API, must enable by default*/
-	int rtw_pwrtrim_enable = 1;
-#else
-	int rtw_pwrtrim_enable = 0; /* Default Enalbe  power trim by efuse config */
-#endif
+int rtw_pwrtrim_enable = 0; /* Default Enalbe  power trim by efuse config */
 
 uint rtw_tx_bw_mode = 0x21;
 module_param(rtw_tx_bw_mode, uint, 0644);
@@ -168,11 +161,7 @@ int rtw_bw_mode = 0x21;
 #endif
 int rtw_ampdu_enable = 1;/* for enable tx_ampdu , */ /* 0: disable, 0x1:enable */
 int rtw_rx_stbc = 1;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
-#if (defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B)) && defined(CONFIG_PCI_HCI)
-int rtw_rx_ampdu_amsdu = 2;/* 0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on */
-#else
 int rtw_rx_ampdu_amsdu;/* 0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on */
-#endif
 /*
 * 2: Follow the AMSDU filed in ADDBA Resp. (Deault)
 * 0: Force the AMSDU filed in ADDBA Resp. to be disabled.

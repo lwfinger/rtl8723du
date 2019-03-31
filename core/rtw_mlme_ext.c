@@ -10966,28 +10966,18 @@ unsigned int send_beacon(_adapter *padapter)
 	)
 		return _SUCCESS;
 
-#if defined(CONFIG_USB_HCI)
-#if defined(CONFIG_RTL8812A)
-	if (IS_FULL_SPEED_USB(padapter)) {
-		issue_beacon(padapter, 300);
-		bxmitok = _TRUE;
-	} else
-#endif
-#endif
-	{
-		rtw_hal_set_hwreg(padapter, HW_VAR_BCN_VALID, NULL);
-		rtw_hal_set_hwreg(padapter, HW_VAR_DL_BCN_SEL, NULL);
+	rtw_hal_set_hwreg(padapter, HW_VAR_BCN_VALID, NULL);
+	rtw_hal_set_hwreg(padapter, HW_VAR_DL_BCN_SEL, NULL);
+	do {
+		issue_beacon(padapter, 100);
+		issue++;
 		do {
-			issue_beacon(padapter, 100);
-			issue++;
-			do {
-				rtw_yield_os();
-				rtw_hal_get_hwreg(padapter, HW_VAR_BCN_VALID, (u8 *)(&bxmitok));
-				poll++;
-			} while ((poll % 10) != 0 && _FALSE == bxmitok && !RTW_CANNOT_RUN(padapter));
+			rtw_yield_os();
+			rtw_hal_get_hwreg(padapter, HW_VAR_BCN_VALID, (u8 *)(&bxmitok));
+			poll++;
+		} while ((poll % 10) != 0 && _FALSE == bxmitok && !RTW_CANNOT_RUN(padapter));
 
-		} while (bxmitok == _FALSE && (issue < 100) && !RTW_CANNOT_RUN(padapter));
-	}
+	} while (bxmitok == _FALSE && (issue < 100) && !RTW_CANNOT_RUN(padapter));
 	if (RTW_CANNOT_RUN(padapter))
 		return _FAIL;
 

@@ -141,35 +141,6 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 
 	}
 
-#if (defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C))
-	
-	if (GET_HAL_DATA(padapter)->bFWReady) {
-		if (value < 0xFE00) {
-			unsigned int t_pipe = usb_sndctrlpipe(udev, 0);/* write_out */
-			u8 t_reqtype =  REALTEK_USB_VENQT_WRITE;
-			u8 t_len = 1;
-			u8 t_req = 0x05;
-			u16 t_reg = 0;
-			u16 t_index = 0;
-
-			if (0x00 <= value && value <= 0xff)
-				t_reg = 0xe1;
-			else if (0x1000 <= value && value <= 0x10ff)
-				t_reg = 0xe1;
-			else
-				t_reg = 0x4e0;
-
-			status = rtw_usb_control_msg(udev, t_pipe, t_req, t_reqtype, t_reg, t_index, pIo_buf, t_len, RTW_USB_CONTROL_MSG_TIMEOUT);
-
-			if (status == t_len)
-				rtw_reset_continual_io_error(pdvobjpriv);
-			else {
-				RTW_INFO("reg 0x%x, usb %s %u fail, status:%d\n", t_reg, "write" , t_len, status);
-			}
-		}
-	}
-#endif
-
 	/* release IO memory used by vendorreq */
 #ifdef CONFIG_USB_VENDOR_REQ_BUFFER_DYNAMIC_ALLOCATE
 	rtw_mfree(tmp_buf, tmp_buflen);
