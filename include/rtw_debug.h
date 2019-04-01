@@ -223,11 +223,6 @@ void dump_drv_version(void *sel);
 void dump_log_level(void *sel);
 void dump_drv_cfg(void *sel);
 
-#ifdef CONFIG_SDIO_HCI
-void sd_f0_reg_dump(void *sel, _adapter *adapter);
-void sdio_local_reg_dump(void *sel, _adapter *adapter);
-#endif /* CONFIG_SDIO_HCI */
-
 void mac_reg_dump(void *sel, _adapter *adapter);
 void bb_reg_dump(void *sel, _adapter *adapter);
 void bb_reg_dump_ex(void *sel, _adapter *adapter);
@@ -424,16 +419,6 @@ ssize_t proc_set_odm_adaptivity(struct file *file, const char __user *buffer, si
 int proc_get_rx_logs(struct seq_file *m, void *v);
 int proc_get_tx_logs(struct seq_file *m, void *v);
 int proc_get_int_logs(struct seq_file *m, void *v);
-#endif
-
-#ifdef CONFIG_PCI_HCI
-int proc_get_rx_ring(struct seq_file *m, void *v);
-int proc_get_tx_ring(struct seq_file *m, void *v);
-int proc_get_pci_aspm(struct seq_file *m, void *v);
-#ifdef DBG_TXBD_DESC_DUMP
-int proc_get_tx_ring_ext(struct seq_file *m, void *v);
-ssize_t proc_set_tx_ring_ext(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#endif
 #endif
 
 #ifdef CONFIG_WOWLAN

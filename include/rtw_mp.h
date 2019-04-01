@@ -31,8 +31,6 @@ struct mp_xmit_frame {
 
 	_adapter *padapter;
 
-#ifdef CONFIG_USB_HCI
-
 	/* insert urb, irp, and irpcnt info below... */
 	/* max frag_cnt = 8 */
 
@@ -46,7 +44,6 @@ struct mp_xmit_frame {
 	sint last[8];
 	uint irpcnt;
 	uint fragcnt;
-#endif /* CONFIG_USB_HCI */
 
 	uint mem[(MAX_MP_XMITBUF_SZ >> 2)];
 };

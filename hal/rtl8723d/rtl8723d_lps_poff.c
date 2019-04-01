@@ -354,12 +354,7 @@ static void rtl8723d_lps_poff_send_config_frame(PADAPTER padapter,
 
 	RTW_INFO("%s, len: %d, MAX_CMDBUF_SZ: %d\n", __func__, len,
 		 MAX_CMDBUF_SZ);
-#ifdef CONFIG_PCI_HCI
-	dump_mgntframe(padapter, pcmdframe);
-#else
 	dump_mgntframe_and_wait(padapter, pcmdframe, 100);
-#endif
-
 }
 
 /****************************************************************************
@@ -431,11 +426,9 @@ static void rtl8723d_lps_poff_send_config_file(PADAPTER padapter,
 
 	/*restore 0x100[8]=0 for SW beacon*/
 	/* Clear CR[8] or beacon packet will not be send to TxBuf anymore.*/
-#ifndef CONFIG_PCI_HCI
 	val8 = rtw_read8(padapter, REG_CR + 1);
 	val8 &= ~BIT(0);
 	rtw_write8(padapter, REG_CR + 1, val8);
-#endif
 }
 
 /****************************************************************************
@@ -804,11 +797,7 @@ void rtl8723d_lps_poff_init(PADAPTER padapter)
 				   _FALSE);
 			ATOMIC_SET(&pwrpriv->plps_poff_info->bTxBoundInProgress,
 				   _FALSE);
-#ifdef CONFIG_PCI_HCI
-			pwrpriv->plps_poff_info->ConfFileOffset = 40;
-#else
-			pwrpriv->plps_poff_info->ConfFileOffset = 0;
-#endif
+#			pwrpriv->plps_poff_info->ConfFileOffset = 0;
 			pwrpriv->plps_poff_info->tx_bndy_static =
 				tx_bndy - total_page;
 			page_num = PageNum(LPS_POFF_DYNAMIC_FILE_LEN,

@@ -177,11 +177,6 @@ void rtw_mi_buddy_beacon_update(_adapter *padapter);
 void rtw_mi_hal_dump_macaddr(_adapter *padapter);
 void rtw_mi_buddy_hal_dump_macaddr(_adapter *padapter);
 
-#ifdef CONFIG_PCI_HCI
-void rtw_mi_xmit_tasklet_schedule(_adapter *padapter);
-void rtw_mi_buddy_xmit_tasklet_schedule(_adapter *padapter);
-#endif
-
 u8 rtw_mi_busy_traffic_check(_adapter *padapter, bool check_sc_interval);
 u8 rtw_mi_buddy_busy_traffic_check(_adapter *padapter, bool check_sc_interval);
 
@@ -262,11 +257,6 @@ _adapter *rtw_get_iface_by_macddr(_adapter *padapter, u8 *mac_addr);
 _adapter *rtw_get_iface_by_hwport(_adapter *padapter, u8 hw_port);
 
 void rtw_mi_buddy_clone_bcmc_packet(_adapter *padapter, union recv_frame *precvframe, u8 *pphy_status);
-
-#ifdef CONFIG_PCI_HCI
-/*API be create temporary for MI, caller is interrupt-handler, PCIE's interrupt handler cannot apply to multi-AP*/
-_adapter *rtw_mi_get_ap_adapter(_adapter *padapter);
-#endif
 
 void rtw_mi_update_ap_bmc_camid(_adapter *padapter, u8 camid_a, u8 camid_b);
 

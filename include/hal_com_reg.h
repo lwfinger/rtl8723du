@@ -1739,12 +1739,8 @@ Current IOREG MAP
 #define SDIO_TX_FREE_PG_QUEUE			4	/* The number of Tx FIFO free page */
 #define SDIO_TX_FIFO_PAGE_SZ			128
 
-#ifdef CONFIG_SDIO_HCI
-	#define MAX_TX_AGG_PACKET_NUMBER	0x8
-#else
-	#define MAX_TX_AGG_PACKET_NUMBER	0xFF
-	#define MAX_TX_AGG_PACKET_NUMBER_8812	64
-#endif
+#define MAX_TX_AGG_PACKET_NUMBER	0xFF
+#define MAX_TX_AGG_PACKET_NUMBER_8812	64
 
 /* -----------------------------------------------------
  *
@@ -1794,36 +1790,28 @@ Current IOREG MAP
 #define HAL92C_MSDU_LIFE_TIME_UNIT		128	/* in us, said by Tim. */
 
 /* 2 8192D PartNo. */
-#define PARTNO_92D_NIC							(BIT7 | BIT6)
-#define PARTNO_92D_NIC_REMARK				(BIT5 | BIT4)
-#define PARTNO_SINGLE_BAND_VS				BIT(3)
+#define PARTNO_92D_NIC				(BIT7 | BIT6)
+#define PARTNO_92D_NIC_REMARK			(BIT5 | BIT4)
+#define PARTNO_SINGLE_BAND_VS			BIT(3)
 #define PARTNO_SINGLE_BAND_VS_REMARK		BIT(1)
-#define PARTNO_CONCURRENT_BAND_VC			(BIT3 | BIT2)
+#define PARTNO_CONCURRENT_BAND_VC		(BIT3 | BIT2)
 #define PARTNO_CONCURRENT_BAND_VC_REMARK	(BIT1 | BIT0)
 
 /* ********************************************************
  * General definitions
  * ******************************************************** */
 
-#ifdef CONFIG_USB_HCI
-	#define LAST_ENTRY_OF_TX_PKT_BUFFER_8188E(__Adapter)	(175)
-#else
-	#define LAST_ENTRY_OF_TX_PKT_BUFFER_8188E(__Adapter)	(IS_VENDOR_8188E_I_CUT_SERIES(__Adapter) ? 255 : 175)
-#endif
-#define LAST_ENTRY_OF_TX_PKT_BUFFER_8812			255
+#define LAST_ENTRY_OF_TX_PKT_BUFFER_8188E(__Adapter)	(175)
+#define LAST_ENTRY_OF_TX_PKT_BUFFER_8812		255
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_8723B		255
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_8192C		255
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_8703B		255
-#define LAST_ENTRY_OF_TX_PKT_BUFFER_DUAL_MAC	127
+#define LAST_ENTRY_OF_TX_PKT_BUFFER_DUAL_MAC		127
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_8188F		255
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_8723D		255
 
 #define POLLING_LLT_THRESHOLD				20
-#if defined(CONFIG_RTL8723B) && defined(CONFIG_PCI_HCI)
-	#define POLLING_READY_TIMEOUT_COUNT		6000
-#else
-	#define POLLING_READY_TIMEOUT_COUNT		1000
-#endif
+#define POLLING_READY_TIMEOUT_COUNT		1000
 
 
 /* GPIO BIT */

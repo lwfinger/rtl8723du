@@ -12,16 +12,13 @@
  * more details.
  *
  *****************************************************************************/
+#ifndef _HCI_INTF_C_
 #define _HCI_INTF_C_
 
 #include <drv_types.h>
 #include <hal_data.h>
 
 #include <platform_ops.h>
-
-#ifndef CONFIG_USB_HCI
-#error "CONFIG_USB_HCI shall be on!\n"
-#endif
 
 #ifdef CONFIG_80211N_HT
 extern int rtw_ht_enable;
@@ -1479,3 +1476,5 @@ _adapter  *rtw_usb_get_sw_pointer(void)
 }
 EXPORT_SYMBOL(rtw_usb_get_sw_pointer);
 #endif /* CONFIG_INTEL_PROXIM */
+
+#endif

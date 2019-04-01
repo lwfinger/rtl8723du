@@ -27,7 +27,6 @@
 #ifndef CONFIG_RTL8723D
 #define CONFIG_RTL8723D
 #endif
-#define CONFIG_USB_HCI
 
 /*
  * Wi-Fi Functions Configure

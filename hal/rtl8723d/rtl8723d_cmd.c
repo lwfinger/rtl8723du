@@ -511,13 +511,10 @@ void rtl8723d_download_rsvd_page(PADAPTER padapter, u8 mstatus)
 		}
 
 		/* Clear CR[8] or beacon packet will not be send to TxBuf anymore. */
-#ifndef CONFIG_PCI_HCI
 		v8 = rtw_read8(padapter, REG_CR + 1);
 		v8 &= ~BIT(0); /* ~ENSWBCN */
 		rtw_write8(padapter, REG_CR + 1, v8);
-#endif
 	}
-
 }
 
 void rtl8723d_set_FwJoinBssRpt_cmd(PADAPTER padapter, u8 mstatus)
@@ -618,11 +615,7 @@ static void SetFwRsvdPagePkt_BTCoex(PADAPTER padapter)
 	update_mgntframe_attrib(padapter, pattrib);
 	pattrib->qsel = QSLT_BEACON;
 	pattrib->pktlen = pattrib->last_txcmdsz = TotalPacketLen - TxDescOffset;
-#ifdef CONFIG_PCI_HCI
-	dump_mgntframe(padapter, pcmdframe);
-#else
 	dump_mgntframe_and_wait(padapter, pcmdframe, 100);
-#endif
 
 	/*	RTW_INFO(FUNC_ADPT_FMT ": Set RSVD page location to Fw, TotalPacketLen(%d), TotalPageNum(%d)\n",
 	 *		FUNC_ADPT_ARG(padapter), TotalPacketLen, TotalPageNum); */
@@ -737,11 +730,9 @@ void rtl8723d_download_BTCoex_AP_mode_rsvd_page(PADAPTER padapter)
 	}
 
 	/* Clear CR[8] or beacon packet will not be send to TxBuf anymore. */
-#ifndef CONFIG_PCI_HCI
 	val8 = rtw_read8(padapter, REG_CR + 1);
 	val8 &= ~BIT(0); /* ~ENSWBCN */
 	rtw_write8(padapter, REG_CR + 1, val8);
-#endif
 }
 #endif /* CONFIG_BT_COEXIST */
 

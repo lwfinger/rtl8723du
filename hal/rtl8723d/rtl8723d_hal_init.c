@@ -77,16 +77,8 @@ _BlockWrite(
 	u32			remainSize_p1 = 0, remainSize_p2 = 0;
 	u8			*bufferPtr	= (u8 *)buffer;
 	u32			i = 0, offset = 0;
-#ifdef CONFIG_PCI_HCI
-	u8			remainFW[4] = {0, 0, 0, 0};
-	u8			*p = NULL;
-#endif
 
-#ifdef CONFIG_USB_HCI
 	blockSize_p1 = 254;
-#endif
-
-	/*	printk("====>%s %d\n", __func__, __LINE__); */
 
 	/* 3 Phase #1 */
 	blockCount_p1 = buffSize / blockSize_p1;
@@ -95,35 +87,12 @@ _BlockWrite(
 
 
 	for (i = 0; i < blockCount_p1; i++) {
-#ifdef CONFIG_USB_HCI
 		ret = rtw_writeN(padapter, (FW_8723D_START_ADDRESS + i * blockSize_p1), blockSize_p1, (bufferPtr + i * blockSize_p1));
-#else
-		ret = rtw_write32(padapter, (FW_8723D_START_ADDRESS + i * blockSize_p1), le32_to_cpu(*((u32 *)(bufferPtr + i * blockSize_p1))));
-#endif
 		if (ret == _FAIL) {
 			printk(KERN_ERR "====>%s %d i:%d\n", __func__, __LINE__, i);
 			goto exit;
 		}
 	}
-
-#ifdef CONFIG_PCI_HCI
-	p = (u8 *)((u32 *)(bufferPtr + blockCount_p1 * blockSize_p1));
-	if (remainSize_p1) {
-		switch (remainSize_p1) {
-		case 0:
-			break;
-		case 3:
-			remainFW[2] = *(p + 2);
-		case 2:
-			remainFW[1] = *(p + 1);
-		case 1:
-			remainFW[0] = *(p);
-			ret = rtw_write32(padapter, (FW_8723D_START_ADDRESS + blockCount_p1 * blockSize_p1),
-					  le32_to_cpu(*(u32 *)remainFW));
-		}
-		return ret;
-	}
-#endif
 
 	/* 3 Phase #2 */
 	if (remainSize_p1) {
@@ -132,16 +101,12 @@ _BlockWrite(
 		blockCount_p2 = remainSize_p1 / blockSize_p2;
 		remainSize_p2 = remainSize_p1 % blockSize_p2;
 
-
-
-#ifdef CONFIG_USB_HCI
 		for (i = 0; i < blockCount_p2; i++) {
 			ret = rtw_writeN(padapter, (FW_8723D_START_ADDRESS + offset + i * blockSize_p2), blockSize_p2, (bufferPtr + offset + i * blockSize_p2));
 
 			if (ret == _FAIL)
 				goto exit;
 		}
-#endif
 	}
 
 	/* 3 Phase #3 */
@@ -213,12 +178,6 @@ _WriteFW(
 	u32 pageNums, remainSize;
 	u32 page, offset;
 	u8 *bufferPtr = (u8 *)buffer;
-
-#ifdef CONFIG_PCI_HCI
-	/* 20100120 Joseph: Add for 88CE normal chip. */
-	/* Fill in zero to make firmware image to dword alignment. */
-	_FillDummy(bufferPtr, &size);
-#endif
 
 	pageNums = size / MAX_DLFW_PAGE_SIZE;
 	/* RT_ASSERT((pageNums <= 4), ("Page numbers should not greater then 4\n")); */
@@ -507,13 +466,8 @@ int _WriteBTFWtoTxPktBuf8723D(
 		_rtw_memcpy((u8 *)(pmgntframe->buf_addr + txdesc_offset), ReservedPagePacket, FwBufLen);
 		RTW_INFO("[%d]===>TotalPktLen + TXDESC_OFFSET TotalPacketLen:%d\n", DLBcnCount, (FwBufLen + txdesc_offset));
 
-#ifdef CONFIG_PCI_HCI
-		dump_mgntframe(Adapter, pmgntframe);
-#else
 		dump_mgntframe_and_wait(Adapter, pmgntframe, 100);
-#endif
 
-#if 1
 		/* check rsvd page download OK. */
 		BcnValidReg = PlatformEFIORead1Byte(Adapter, REG_TDECTRL + 2);
 		while (!(BcnValidReg & BIT(0)) && count < 200) {
@@ -529,8 +483,6 @@ int _WriteBTFWtoTxPktBuf8723D(
 
 	} while ((!(BcnValidReg & BIT(0))) && DLBcnCount < 5);
 
-
-#endif
 	if (DLBcnCount >= 5) {
 		RTW_INFO(" check rsvd page download OK DLBcnCount =%d\n", DLBcnCount);
 		rtStatus = _FAIL;
@@ -775,96 +727,6 @@ s32 FirmwareDownloadBT(PADAPTER padapter, PRT_MP_FIRMWARE pFirmware)
 	return rtStatus;
 }
 #endif /* CONFIG_MP_INCLUDED */
-
-#if defined(CONFIG_SDIO_HCI) && defined(CONFIG_DLFW_TXPKT)
-u8 send_fw_packet(PADAPTER padapter, u8 *pRam_code, u32 length)
-{
-	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(padapter);
-	struct xmit_buf xmit_buf_tmp;
-	struct submit_ctx sctx_tmp;
-	u8 *pTx_data_buffer = NULL;
-	u8 *pTmp_buffer = NULL;
-	u8 bRet = 0, value8 = 0, res = _FAIL;
-	u32 modify_ram_size = 0;
-	u32 tmp_size = 0, tmp_value = 0;
-	u32 i = 0, counter = 0;
-	u32 dwDataLength = 0, writeLength = 0;
-
-	/* Due to SDIO can not send 32K packet */
-	if (FW_DOWNLOAD_SIZE_8723D == length)
-		length--;
-
-	modify_ram_size = length << 2;
-
-	pTx_data_buffer = rtw_zmalloc(modify_ram_size);
-
-	if (NULL == pTx_data_buffer) {
-		RTW_INFO("Allocate buffer fail!!\n");
-		return _FALSE;
-	}
-
-	_rtw_memset(pTx_data_buffer, 0, modify_ram_size);
-
-	/* Transfer to new format */
-	tmp_size = length >> 1;
-	for (i = 0; i <= tmp_size; i++) {
-		*(pTx_data_buffer + i * 8) = *(pRam_code + i * 2);
-		*(pTx_data_buffer + i * 8 + 1) = *(pRam_code + i * 2 + 1);
-	}
-
-	/* Gen TX_DESC */
-	_rtw_memset(pTx_data_buffer, 0, TXDESC_SIZE);
-	pTmp_buffer = pTx_data_buffer;
-	SET_TX_DESC_QUEUE_SEL_8723D(pTmp_buffer, QSLT_BEACON);
-	SET_TX_DESC_PKT_SIZE_8723D(pTmp_buffer, modify_ram_size - TXDESC_SIZE);
-	SET_TX_DESC_OFFSET_8723D(pTmp_buffer, TXDESC_SIZE);
-
-	/* Send packet */
-	xmit_buf_tmp.pdata = pTx_data_buffer;
-	xmit_buf_tmp.len = modify_ram_size;
-	rtw_sctx_init(&sctx_tmp, 10);
-	xmit_buf_tmp.sctx = &sctx_tmp;
-
-	res = rtw_write_port(padapter,
-			     pdvobjpriv->Queue2Pipe[BCN_QUEUE_INX],
-			     xmit_buf_tmp.len,
-			     (u8 *)&xmit_buf_tmp);
-	if (res == _FAIL) {
-		RTW_INFO("rtw_write_port fail\n");
-		return _FAIL;
-	}
-
-	/* check if DMA is OK */
-	counter = 100;
-	do {
-		if (0 == counter) {
-			RTW_INFO("DMA time out!!\n");
-			return _FALSE;
-		}
-		value8 = rtw_read8(padapter, REG_DWBCN0_CTRL_8723D + 2);
-		counter--;
-	} while (0 == (value8 & BIT(0)));
-
-	rtw_write8(padapter, REG_DWBCN0_CTRL_8723D + 2, value8);
-
-	/* Modify ram code by IO method */
-	tmp_value = rtw_read8(padapter, REG_MCUFWDL + 1);
-	/* Disable DMA */
-	rtw_write8(padapter, REG_MCUFWDL + 1, (u8)tmp_value & ~(BIT(5)));
-	tmp_value = (tmp_value >> 6) << 1;
-	/* Set page start address */
-	rtw_write8(padapter, REG_MCUFWDL + 2,
-		   (rtw_read8(padapter, REG_MCUFWDL + 2) & 0xF8) | tmp_value);
-	tmp_size = TXDESC_SIZE >> 2; /* 10bytes */
-
-	_BlockWrite(padapter, pRam_code, tmp_size);
-
-	if (pTmp_buffer != NULL)
-		rtw_mfree((u8 *)pTmp_buffer, modify_ram_size);
-
-	return _TRUE;
-}
-#endif /* CONFIG_SDIO_HCI */
 
 /*
  *	Description:
@@ -1398,41 +1260,6 @@ Hal_EfusePowerSwitch(
 
 
 	if (PwrState == _TRUE) {
-#ifdef CONFIG_SDIO_HCI
-		/* To avoid cannot access efuse regsiters after disable/enable several times during DTM test. */
-		/* Suggested by SD1 IsaacHsu. 2013.07.08, added by tynli. */
-		tempval = rtw_read8(padapter, SDIO_LOCAL_BASE | SDIO_REG_HSUS_CTRL);
-		if (tempval & BIT(0)) { /* SDIO local register is suspend */
-			u8 count = 0;
-
-
-			tempval &= ~BIT(0);
-			rtw_write8(padapter, SDIO_LOCAL_BASE | SDIO_REG_HSUS_CTRL, tempval);
-
-			/* check 0x86[1:0]=10'2h, wait power state to leave suspend */
-			do {
-				tempval = rtw_read8(padapter, SDIO_LOCAL_BASE | SDIO_REG_HSUS_CTRL);
-				tempval &= 0x3;
-				if (tempval == 0x02)
-					break;
-
-				count++;
-				if (count >= 100)
-					break;
-
-				rtw_mdelay_os(10);
-			} while (1);
-
-			if (count >= 100) {
-				RTW_INFO(FUNC_ADPT_FMT ": Leave SDIO local register suspend fail! Local 0x86=%#X\n",
-					 FUNC_ADPT_ARG(padapter), tempval);
-			} else {
-				RTW_INFO(FUNC_ADPT_FMT ": Leave SDIO local register suspend OK! Local 0x86=%#X\n",
-					 FUNC_ADPT_ARG(padapter), tempval);
-			}
-		}
-#endif /* CONFIG_SDIO_HCI */
-
 		rtw_write8(padapter, REG_EFUSE_ACCESS_8723, EFUSE_ACCESS_ON_8723);
 
 		/* Reset: 0x0000h[28], default valid */
@@ -2845,13 +2672,11 @@ void rtl8723d_fill_fake_txdesc(
 		}
 	}
 
-#if defined(CONFIG_USB_HCI)
 	/*
 	 * USB interface drop packet if the checksum of descriptor isn't correct.
 	 * Using this checksum can let hardware recovery from packet bulk out error (e.g. Cancel URC, Bulk out error.).
 	 */
 	rtl8723d_cal_txdesc_chksum((struct tx_desc *)pDesc);
-#endif
 }
 
 void rtl8723d_InitAntenna_Selection(PADAPTER padapter)
@@ -2993,7 +2818,6 @@ s32 rtl8723d_InitLLTTable(PADAPTER padapter)
 	return ret;
 }
 
-#if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 void _DisableGPIO(PADAPTER	padapter)
 {
 	/***************************************
@@ -3277,7 +3101,6 @@ s32 CardDisableWithoutHWSM(PADAPTER padapter)
 
 	return rtStatus;
 }
-#endif /* CONFIG_USB_HCI || CONFIG_SDIO_HCI || CONFIG_GSPI_HCI */
 
 void
 Hal_InitPGData(
@@ -3531,15 +3354,6 @@ Hal_EfuseParsePackageType_8723D(
 	}
 
 	RTW_INFO("PackageType = 0x%X\n", pHalData->PackageType);
-
-#ifdef CONFIG_SDIO_HCI
-	/* RTL8703AS: 0x1FB[5:4] 2b'10 */
-	/* RTL8723DS: 0x1FB[5:4] 2b'11 */
-	if ((efuseContent & 0x30) == 0x20) {
-		pAdapter->registrypriv.bw_mode &= 0xF0;
-		RTW_INFO("This is the case of 8703AS\n");
-	}
-#endif
 }
 
 VOID
@@ -3997,7 +3811,7 @@ static void rtl8723d_fill_default_txdesc(
 				FUNC_ADPT_ARG(padapter), pattrib->ether_type, MRateToHwRate(pmlmeext->tx_rate));
 		}
 
-#if defined(CONFIG_USB_TX_AGGREGATION) || defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_USB_TX_AGGREGATION)
 		SET_TX_DESC_USB_TXAGG_NUM_8723D(pbuf, pxmitframe->agg_num);
 #endif
 
@@ -4065,10 +3879,8 @@ static void rtl8723d_fill_default_txdesc(
 
 		pkt_offset = 0;
 		offset = TXDESC_SIZE;
-#ifdef CONFIG_USB_HCI
 		pkt_offset = pxmitframe->pkt_offset;
 		offset += (pxmitframe->pkt_offset >> 3);
-#endif /* CONFIG_USB_HCI */
 
 #ifdef CONFIG_TX_EARLY_MODE
 		if (pxmitframe->frame_tag == DATA_FRAMETAG) {
@@ -4112,9 +3924,7 @@ void rtl8723d_update_txdesc(struct xmit_frame *pxmitframe, u8 *pbuf)
 {
 	rtl8723d_fill_default_txdesc(pxmitframe, pbuf);
 
-#if defined(CONFIG_USB_HCI)
 	rtl8723d_cal_txdesc_chksum((struct tx_desc *)pbuf);
-#endif
 }
 
 static void hw_var_set_monitor(PADAPTER Adapter, u8 variable, u8 *val)
@@ -4187,9 +3997,6 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 		if ((mode == _HW_STATE_STATION_) || (mode == _HW_STATE_NOLINK_)) {
 			if (!rtw_mi_get_ap_num(padapter) && !rtw_mi_get_mesh_num(padapter)) {
 				StopTxBeacon(padapter);
-#ifdef CONFIG_PCI_HCI
-				UpdateInterruptMask8723DE(padapter, 0, 0, RT_BCN_INT_MASKS, 0);
-#else /* !CONFIG_PCI_HCI */
 #ifdef CONFIG_INTERRUPT_BASED_TXBCN
 
 #ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT
@@ -4202,7 +4009,6 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 #endif /* CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR */
 
 #endif /* CONFIG_INTERRUPT_BASED_TXBCN */
-#endif /* !CONFIG_PCI_HCI */
 			}
 
 			/* disable atim wnd */
@@ -4211,9 +4017,6 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 			ResumeTxBeacon(padapter);
 			rtw_write8(padapter, REG_BCN_CTRL_1, DIS_TSF_UDT | EN_BCN_FUNCTION | DIS_BCNQ_SUB);
 		} else if (mode == _HW_STATE_AP_) {
-#ifdef CONFIG_PCI_HCI
-			UpdateInterruptMask8723DE(padapter, RT_BCN_INT_MASKS, 0, 0, 0);
-#else /* !CONFIG_PCI_HCI */
 #ifdef CONFIG_INTERRUPT_BASED_TXBCN
 
 #ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT
@@ -4225,7 +4028,6 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 #endif /* CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR */
 
 #endif /* CONFIG_INTERRUPT_BASED_TXBCN */
-#endif /* !CONFIG_PCI_HCI */
 
 			ResumeTxBeacon(padapter);
 
@@ -4300,9 +4102,6 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 			{
 #endif /* CONFIG_CONCURRENT_MODE */
 				StopTxBeacon(padapter);
-#ifdef CONFIG_PCI_HCI
-				UpdateInterruptMask8723DE(padapter, 0, 0, RT_BCN_INT_MASKS, 0);
-#else /* !CONFIG_PCI_HCI */
 #ifdef CONFIG_INTERRUPT_BASED_TXBCN
 #ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT
 				rtw_write8(padapter, REG_DRVERLYINT, 0x05); /* restore early int time to 5ms */
@@ -4314,7 +4113,6 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 #endif /* CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR */
 
 #endif /* CONFIG_INTERRUPT_BASED_TXBCN */
-#endif /* !CONFIG_PCI_HCI */
 			}
 
 			/* disable atim wnd */
@@ -4324,9 +4122,6 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 			ResumeTxBeacon(padapter);
 			rtw_write8(padapter, REG_BCN_CTRL, DIS_TSF_UDT | EN_BCN_FUNCTION | DIS_BCNQ_SUB);
 		} else if (mode == _HW_STATE_AP_) {
-#ifdef CONFIG_PCI_HCI
-			UpdateInterruptMask8723DE(padapter, RT_BCN_INT_MASKS, 0, 0, 0);
-#else /* !CONFIG_PCI_HCI */
 #ifdef CONFIG_INTERRUPT_BASED_TXBCN
 #ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT
 			UpdateInterruptMask8723DU(padapter, _TRUE , IMR_BCNDMAINT0_8723D, 0);
@@ -4337,7 +4132,6 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 #endif /* CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR */
 
 #endif /* CONFIG_INTERRUPT_BASED_TXBCN */
-#endif
 
 			ResumeTxBeacon(padapter);
 
@@ -5379,36 +5173,10 @@ void Hal_DetectWoWMode(PADAPTER pAdapter)
 
 void rtl8723d_start_thread(_adapter *padapter)
 {
-#if (defined CONFIG_SDIO_HCI) || (defined CONFIG_GSPI_HCI)
-#ifndef CONFIG_SDIO_TX_TASKLET
-	struct xmit_priv *xmitpriv = &padapter->xmitpriv;
-
-	if (xmitpriv->SdioXmitThread == NULL) {
-		RTW_INFO(FUNC_ADPT_FMT " start RTWHALXT\n", FUNC_ADPT_ARG(padapter));
-		xmitpriv->SdioXmitThread = kthread_run(rtl8723ds_xmit_thread, padapter, "RTWHALXT");
-		if (IS_ERR(xmitpriv->SdioXmitThread)) {
-			RTW_ERR("%s: start rtl8723ds_xmit_thread FAIL!!\n", __func__);
-			xmitpriv->SdioXmitThread = NULL;
-		}
-	}
-#endif
-#endif
 }
 
 void rtl8723d_stop_thread(_adapter *padapter)
 {
-#if (defined CONFIG_SDIO_HCI) || (defined CONFIG_GSPI_HCI)
-#ifndef CONFIG_SDIO_TX_TASKLET
-	struct xmit_priv *xmitpriv = &padapter->xmitpriv;
-
-	/* stop xmit_buf_thread */
-	if (xmitpriv->SdioXmitThread) {
-		_rtw_up_sema(&xmitpriv->SdioXmitSema);
-		rtw_thread_stop(xmitpriv->SdioXmitThread);
-		xmitpriv->SdioXmitThread = NULL;
-	}
-#endif
-#endif
 }
 
 #if defined(CONFIG_CHECK_BT_HANG) && defined(CONFIG_BT_COEXIST)

@@ -195,19 +195,9 @@ int rtw_halmac_p2pps(struct dvobj_priv *dvobj, PHAL_P2P_PS_PARA pp2p_ps_para);
 int rtw_halmac_iqk(struct dvobj_priv *d, u8 clear, u8 segment);
 int rtw_halmac_cfg_phy_para(struct dvobj_priv *d, struct rtw_phy_parameter *para);
 
-#ifdef CONFIG_SDIO_HCI
-int rtw_halmac_query_tx_page_num(struct dvobj_priv *);
-int rtw_halmac_get_tx_queue_page_num(struct dvobj_priv *, u8 queue, u32 *page);
-u32 rtw_halmac_sdio_get_tx_addr(struct dvobj_priv *, u8 *desc, u32 size);
-int rtw_halmac_sdio_tx_allowed(struct dvobj_priv *, u8 *buf, u32 size);
-u32 rtw_halmac_sdio_get_rx_addr(struct dvobj_priv *, u8 *seq);
-#endif /* CONFIG_SDIO_HCI */
-
-#ifdef CONFIG_USB_HCI
 u8 rtw_halmac_usb_get_bulkout_id(struct dvobj_priv *, u8 *buf, u32 size);
 int rtw_halmac_usb_get_txagg_desc_num(struct dvobj_priv *d, u8 *num);
 u8 rtw_halmac_switch_usb_mode(struct dvobj_priv *d, enum RTW_USB_SPEED usb_mode);
-#endif /* CONFIG_USB_HCI */
 
 #ifdef CONFIG_SUPPORT_TRX_SHARED
 void dump_trx_share_mode(void *sel, _adapter *adapter);

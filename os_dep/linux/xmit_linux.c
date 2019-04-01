@@ -123,7 +123,6 @@ int rtw_os_xmit_resource_alloc(_adapter *padapter, struct xmit_buf *pxmitbuf, u3
 	}
 
 	if (flag) {
-#ifdef CONFIG_USB_HCI
 		int i;
 		for (i = 0; i < 8; i++) {
 			pxmitbuf->pxmit_urb[i] = usb_alloc_urb(0, GFP_KERNEL);
@@ -132,7 +131,6 @@ int rtw_os_xmit_resource_alloc(_adapter *padapter, struct xmit_buf *pxmitbuf, u3
 				return _FAIL;
 			}
 		}
-#endif
 	}
 
 	return _SUCCESS;
@@ -141,7 +139,6 @@ int rtw_os_xmit_resource_alloc(_adapter *padapter, struct xmit_buf *pxmitbuf, u3
 void rtw_os_xmit_resource_free(_adapter *padapter, struct xmit_buf *pxmitbuf, u32 free_sz, u8 flag)
 {
 	if (flag) {
-#ifdef CONFIG_USB_HCI
 		int i;
 
 		for (i = 0; i < 8; i++) {
@@ -150,7 +147,6 @@ void rtw_os_xmit_resource_free(_adapter *padapter, struct xmit_buf *pxmitbuf, u3
 				usb_free_urb(pxmitbuf->pxmit_urb[i]);
 			}
 		}
-#endif
 	}
 
 	if (free_sz > 0) {
@@ -275,17 +271,6 @@ void rtw_os_xmit_complete(_adapter *padapter, struct xmit_frame *pxframe)
 
 void rtw_os_xmit_schedule(_adapter *padapter)
 {
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
-	_adapter *pri_adapter = GET_PRIMARY_ADAPTER(padapter);
-
-	if (!padapter)
-		return;
-
-	if (_rtw_queue_empty(&padapter->xmitpriv.pending_xmitbuf_queue) == _FALSE)
-		_rtw_up_sema(&pri_adapter->xmitpriv.xmit_sema);
-
-
-#else
 	_irqL  irqL;
 	struct xmit_priv *pxmitpriv;
 
@@ -300,14 +285,6 @@ void rtw_os_xmit_schedule(_adapter *padapter)
 		tasklet_hi_schedule(&pxmitpriv->xmit_tasklet);
 
 	_exit_critical_bh(&pxmitpriv->lock, &irqL);
-	
-#if defined(CONFIG_PCI_HCI) && defined(CONFIG_XMIT_THREAD_MODE)
-	if (_rtw_queue_empty(&padapter->xmitpriv.pending_xmitbuf_queue) == _FALSE)
-		_rtw_up_sema(&padapter->xmitpriv.xmit_sema);
-#endif
-	
-
-#endif
 }
 
 static bool rtw_check_xmit_resource(_adapter *padapter, _pkt *pkt)

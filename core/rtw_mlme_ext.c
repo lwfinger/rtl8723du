@@ -10274,11 +10274,7 @@ static int issue_action_ba(_adapter *padapter, unsigned char *raddr, unsigned ch
 			} while (pmlmeinfo->dialogToken == 0);
 			pframe = rtw_set_fixed_ie(pframe, 1, &(pmlmeinfo->dialogToken), &(pattrib->pktlen));
 
-#if defined(CONFIG_RTL8188E) && defined(CONFIG_SDIO_HCI)
-			BA_para_set = (0x0802 | ((tid & 0xf) << 2)); /* immediate ack & 16 buffer size */
-#else
 			BA_para_set = (0x1002 | ((tid & 0xf) << 2)); /* immediate ack & 64 buffer size */
-#endif
 
 #ifdef CONFIG_TX_AMSDU
 			if (padapter->tx_amsdu >= 1) /* TX AMSDU  enabled */
@@ -10928,36 +10924,7 @@ unsigned int send_beacon(_adapter *padapter)
 	u8	bxmitok = _FALSE;
 	int	issue = 0;
 	int poll = 0;
-#if defined(CONFIG_PCI_HCI) && defined(RTL8814AE_SW_BCN)
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-#endif
 
-#ifdef CONFIG_PCI_HCI
-	/* bypass TX BCN queue because op ch is switching/waiting */
-	if (check_fwstate(&padapter->mlmepriv, WIFI_OP_CH_SWITCHING)
-		|| IS_CH_WAITING(adapter_to_rfctl(padapter))
-	)
-		return _SUCCESS;
-
-	/* RTW_INFO("%s\n", __FUNCTION__); */
-
-	rtw_hal_set_hwreg(padapter, HW_VAR_BCN_VALID, NULL);
-
-	/* 8192EE Port select for Beacon DL */
-	rtw_hal_set_hwreg(padapter, HW_VAR_DL_BCN_SEL, NULL);
-
-	issue_beacon(padapter, 0);
-
-#ifdef RTL8814AE_SW_BCN
-	if (pHalData->bCorrectBCN != 0)
-		RTW_INFO("%s, line%d, Warnning, pHalData->bCorrectBCN != 0\n", __func__, __LINE__);
-	pHalData->bCorrectBCN = 1;
-#endif
-
-	return _SUCCESS;
-#endif
-
-#if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 	systime start = rtw_get_current_time();
 
 	/* bypass TX BCN queue because op ch is switching/waiting */
@@ -11000,9 +10967,6 @@ unsigned int send_beacon(_adapter *padapter)
 
 		return _SUCCESS;
 	}
-
-#endif
-
 }
 
 /****************************************************************************
@@ -15849,9 +15813,7 @@ u8 chk_bmc_sleepq_hdl(_adapter *padapter, unsigned char *pbuf)
 		return H2C_SUCCESS;
 
 	if ((rtw_tim_map_is_set(padapter, pstapriv->tim_bitmap, 0)) && (psta_bmc->sleepq_len > 0)) {
-#ifndef CONFIG_PCI_HCI
 		rtw_msleep_os(10);/* 10ms, ATIM(HIQ) Windows */
-#endif
 		/* _enter_critical_bh(&psta_bmc->sleep_q.lock, &irqL); */
 		_enter_critical_bh(&pxmitpriv->lock, &irqL);
 

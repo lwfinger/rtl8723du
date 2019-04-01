@@ -137,10 +137,6 @@ enum rt_spinlock_type {
 #elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
 	#include "../typedef.h"
 
-	#ifdef CONFIG_PCI_HCI
-		#define DEV_BUS_TYPE		RT_PCI_INTERFACE
-	#endif
-
 	#if (defined(TESTCHIP_SUPPORT))
 		#define	PHYDM_TESTCHIP_SUPPORT 1
 	#else
@@ -196,15 +192,7 @@ enum rt_spinlock_type {
 #elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	#include <drv_types.h>
 
-	#ifdef CONFIG_USB_HCI
-		#define DEV_BUS_TYPE	RT_USB_INTERFACE
-	#elif defined(CONFIG_PCI_HCI)
-		#define DEV_BUS_TYPE	RT_PCI_INTERFACE
-	#elif defined(CONFIG_SDIO_HCI)
-		#define DEV_BUS_TYPE	RT_SDIO_INTERFACE
-	#elif defined(CONFIG_GSPI_HCI)
-		#define DEV_BUS_TYPE	RT_SDIO_INTERFACE
-	#endif
+	#define DEV_BUS_TYPE	RT_USB_INTERFACE
 
 
 	#if defined(CONFIG_LITTLE_ENDIAN)

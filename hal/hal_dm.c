@@ -21,22 +21,6 @@ enum odm_board_type_e boardType(u8 InterfaceSel)
 {
 	enum odm_board_type_e        board	= ODM_BOARD_DEFAULT;
 
-#ifdef CONFIG_PCI_HCI
-	INTERFACE_SELECT_PCIE   pcie	= (INTERFACE_SELECT_PCIE)InterfaceSel;
-	switch (pcie) {
-	case INTF_SEL0_SOLO_MINICARD:
-		board |= ODM_BOARD_MINICARD;
-		break;
-	case INTF_SEL1_BT_COMBO_MINICARD:
-		board |= ODM_BOARD_BT;
-		board |= ODM_BOARD_MINICARD;
-		break;
-	default:
-		board = ODM_BOARD_DEFAULT;
-		break;
-	}
-
-#elif defined(CONFIG_USB_HCI)
 	INTERFACE_SELECT_USB    usb	= (INTERFACE_SELECT_USB)InterfaceSel;
 	switch (usb) {
 	case INTF_SEL1_USB_High_Power:
@@ -58,10 +42,6 @@ enum odm_board_type_e boardType(u8 InterfaceSel)
 		board = ODM_BOARD_DEFAULT;
 		break;
 	}
-
-#endif
-	/* RTW_INFO("===> boardType(): (pHalData->InterfaceSel, pDM_Odm->BoardType) = (%d, %d)\n", InterfaceSel, board); */
-
 	return board;
 }
 
@@ -326,9 +306,7 @@ void Init_ODM_ComInfo(_adapter *adapter)
 	odm_cmn_info_hook(pDM_Odm, ODM_CMNINFO_IS1ANTENNA, &pHalData->EEPROMBluetoothAntNum);
 	odm_cmn_info_hook(pDM_Odm, ODM_CMNINFO_RFDEFAULTPATH, &pHalData->ant_path);
 #endif /*CONFIG_RTL8723B*/
-#ifdef CONFIG_USB_HCI
 	odm_cmn_info_hook(pDM_Odm, ODM_CMNINFO_HUBUSBMODE, &(dvobj->usb_speed));
-#endif
 
 	/*halrf info hook*/
 #ifdef CONFIG_MP_INCLUDED

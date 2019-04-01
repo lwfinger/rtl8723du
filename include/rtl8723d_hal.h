@@ -300,14 +300,6 @@ void Hal_ReadRFGainOffset(PADAPTER pAdapter, u8 *hwinfo, BOOLEAN AutoLoadFail);
 	void check_bt_status_work(void *data);
 #endif
 
-#ifdef CONFIG_USB_HCI
 	void rtl8723d_cal_txdesc_chksum(struct tx_desc *ptxdesc);
-#endif
-
-#ifdef CONFIG_PCI_HCI
-	BOOLEAN	InterruptRecognized8723DE(PADAPTER Adapter);
-	VOID	UpdateInterruptMask8723DE(PADAPTER Adapter, u32 AddMSR, u32 AddMSR1, u32 RemoveMSR, u32 RemoveMSR1);
-	u16 get_txbd_rw_reg(u16 ff_hwaddr);
-#endif
 
 #endif

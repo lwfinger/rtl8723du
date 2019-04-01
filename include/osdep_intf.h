@@ -42,8 +42,6 @@ struct intf_priv {
 
 	_mutex ioctl_mutex;
 
-
-#ifdef CONFIG_USB_HCI
 	/* when in USB, IO is through interrupt in/out endpoints */
 	struct usb_device	*udev;
 	PURB	piorw_urb;
@@ -53,7 +51,6 @@ struct intf_priv {
 	_timer	io_timer;
 	u8 bio_irp_timeout;
 	u8 bio_timer_cancel;
-#endif
 };
 
 #ifdef CONFIG_R871X_TEST

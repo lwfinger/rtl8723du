@@ -125,13 +125,9 @@ sint _rtw_init_recv_priv(struct recv_priv *precvpriv, _adapter *padapter)
 
 	}
 
-#ifdef CONFIG_USB_HCI
-
 	ATOMIC_SET(&(precvpriv->rx_pending_cnt), 1);
 
 	_rtw_init_sema(&precvpriv->allrxreturnevt, 0);
-
-#endif
 
 	res = rtw_hal_init_recv_priv(padapter);
 
@@ -411,20 +407,12 @@ sint rtw_enqueue_recvbuf_to_head(struct recv_buf *precvbuf, _queue *queue)
 sint rtw_enqueue_recvbuf(struct recv_buf *precvbuf, _queue *queue)
 {
 	_irqL irqL;
-#ifdef CONFIG_SDIO_HCI
-	_enter_critical_bh(&queue->lock, &irqL);
-#else
 	_enter_critical_ex(&queue->lock, &irqL);
-#endif/*#ifdef CONFIG_SDIO_HCI*/
 
 	rtw_list_delete(&precvbuf->list);
 
 	rtw_list_insert_tail(&precvbuf->list, get_list_head(queue));
-#ifdef CONFIG_SDIO_HCI
-	_exit_critical_bh(&queue->lock, &irqL);
-#else
 	_exit_critical_ex(&queue->lock, &irqL);
-#endif/*#ifdef CONFIG_SDIO_HCI*/
 	return _SUCCESS;
 
 }
@@ -435,11 +423,7 @@ struct recv_buf *rtw_dequeue_recvbuf(_queue *queue)
 	struct recv_buf *precvbuf;
 	_list	*plist, *phead;
 
-#ifdef CONFIG_SDIO_HCI
-	_enter_critical_bh(&queue->lock, &irqL);
-#else
 	_enter_critical_ex(&queue->lock, &irqL);
-#endif/*#ifdef CONFIG_SDIO_HCI*/
 
 	if (_rtw_queue_empty(queue) == _TRUE)
 		precvbuf = NULL;
@@ -454,11 +438,7 @@ struct recv_buf *rtw_dequeue_recvbuf(_queue *queue)
 
 	}
 
-#ifdef CONFIG_SDIO_HCI
-	_exit_critical_bh(&queue->lock, &irqL);
-#else
 	_exit_critical_ex(&queue->lock, &irqL);
-#endif/*#ifdef CONFIG_SDIO_HCI*/
 
 	return precvbuf;
 
@@ -2556,12 +2536,6 @@ union recv_frame *recvframe_defrag(_adapter *adapter, _queue *defrag_q)
 
 		return NULL;
 	}
-
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
-#ifndef CONFIG_SDIO_RX_COPY
-	recvframe_expand_pkt(adapter, prframe);
-#endif
-#endif
 
 	curfragnum++;
 

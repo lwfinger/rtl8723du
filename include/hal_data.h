@@ -22,13 +22,6 @@
 	#include <hal_btcoex.h>
 #endif
 
-#ifdef CONFIG_SDIO_HCI
-	#include <hal_sdio.h>
-#endif
-#ifdef CONFIG_GSPI_HCI
-	#include <hal_gspi.h>
-#endif
-
 #if defined(CONFIG_RTW_ACS) || defined(CONFIG_BACKGROUND_NOISE_MONITOR)
 #include "../hal/hal_dm_acs.h"
 #endif
@@ -403,15 +396,9 @@ typedef struct hal_com_data {
 
 	u16	EEPROMVID;
 	u16	EEPROMSVID;
-#ifdef CONFIG_USB_HCI
 	u8	EEPROMUsbSwitch;
 	u16	EEPROMPID;
 	u16	EEPROMSDID;
-#endif
-#ifdef CONFIG_PCI_HCI
-	u16	EEPROMDID;
-	u16	EEPROMSMID;
-#endif
 
 	u8	EEPROMCustomerID;
 	u8	EEPROMSubCustomerID;
@@ -567,45 +554,6 @@ typedef struct hal_com_data {
 	u8 rxagg_dma_timeout;
 #endif /* RTW_RX_AGGREGATION */
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
-	/*  */
-	/* For SDIO Interface HAL related */
-	/*  */
-
-	/*  */
-	/* SDIO ISR Related */
-	/*
-	*	u32			IntrMask[1];
-	*	u32			IntrMaskToSet[1];
-	*	LOG_INTERRUPT		InterruptLog; */
-	u32			sdio_himr;
-	u32			sdio_hisr;
-#ifndef RTW_HALMAC
-	/*  */
-	/* SDIO Tx FIFO related. */
-	/*  */
-	/* HIQ, MID, LOW, PUB free pages; padapter->xmitpriv.free_txpg */
-	u8			SdioTxFIFOFreePage[SDIO_TX_FREE_PG_QUEUE];
-	_lock		SdioTxFIFOFreePageLock;
-	u8			SdioTxOQTMaxFreeSpace;
-	u8			SdioTxOQTFreeSpace;
-#else /* RTW_HALMAC */
-	u16			SdioTxOQTFreeSpace;
-#endif /* RTW_HALMAC */
-
-	/*  */
-	/* SDIO Rx FIFO related. */
-	/*  */
-	u8			SdioRxFIFOCnt;
-	u16			SdioRxFIFOSize;
-
-#ifndef RTW_HALMAC
-	u32			sdio_tx_max_len[SDIO_MAX_TX_QUEUE];/* H, N, L, used for sdio tx aggregation max length per queue */
-#endif /* !RTW_HALMAC */
-#endif /* CONFIG_SDIO_HCI */
-
-#ifdef CONFIG_USB_HCI
-
 	/* 2010/12/10 MH Add for USB aggreation mode dynamic shceme. */
 	BOOLEAN		UsbRxHighSpeedMode;
 	BOOLEAN		UsbTxVeryHighSpeedMode;
@@ -628,37 +576,6 @@ typedef struct hal_com_data {
 	u8			rxagg_usb_size;
 	u8			rxagg_usb_timeout;
 #endif/* CONFIG_USB_RX_AGGREGATION */
-#endif /* CONFIG_USB_HCI */
-
-
-#ifdef CONFIG_PCI_HCI
-	/*  */
-	/* EEPROM setting. */
-	/*  */
-	u32			TransmitConfig;
-	u32			IntrMaskToSet[2];
-	u32			IntArray[4];
-	u32			IntrMask[4];
-	u32			SysIntArray[1];
-	u32			SysIntrMask[1];
-	u32			IntrMaskReg[2];
-	u32			IntrMaskDefault[4];
-
-	BOOLEAN		bL1OffSupport;
-	BOOLEAN	bSupportBackDoor;
-	u32			pci_backdoor_ctrl;
-
-	u8			bDefaultAntenna;
-
-	u8			bInterruptMigration;
-	u8			bDisableTxInt;
-
-	u16			RxTag;
-#ifdef CONFIG_PCI_DYNAMIC_ASPM
-	BOOLEAN		bAspmL1LastIdle;
-#endif
-#endif /* CONFIG_PCI_HCI */
-
 
 #ifdef DBG_CONFIG_ERROR_DETECT
 	struct sreset_priv srestpriv;
@@ -668,15 +585,6 @@ typedef struct hal_com_data {
 	/* For bluetooth co-existance */
 	BT_COEXIST		bt_coexist;
 #endif /* CONFIG_BT_COEXIST */
-
-#if defined(CONFIG_RTL8723B) || defined(CONFIG_RTL8703B) \
-	|| defined(CONFIG_RTL8188F) || defined(CONFIG_RTL8723D)
-#ifndef CONFIG_PCI_HCI	/* mutual exclusive with PCI -- so they're SDIO and GSPI */
-	/* Interrupt relatd register information. */
-	u32			SysIntrStatus;
-	u32			SysIntrMask;
-#endif
-#endif /*endif CONFIG_RTL8723B	*/
 
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
 	char	para_file_buf[MAX_PARA_FILE_BUF_LEN];
@@ -713,9 +621,6 @@ typedef struct hal_com_data {
 	BOOLEAN				bCCKinCH14;
 	BB_INIT_REGISTER	RegForRecover[5];
 
-#if defined(CONFIG_PCI_HCI) && defined(RTL8814AE_SW_BCN)
-	BOOLEAN bCorrectBCN;
-#endif
 	u32 RxGainOffset[4]; /*{2G, 5G_Low, 5G_Middle, G_High}*/
 	u8 BackUp_IG_REG_4_Chnl_Section[4]; /*{A,B,C,D}*/
 

@@ -4316,7 +4316,6 @@ void rtw_joinbss_reset(_adapter *padapter)
 
 	phtpriv->ampdu_enable = _FALSE;/* reset to disabled */
 
-#if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI)
 	/* TH=1 => means that invalidate usb rx aggregation */
 	/* TH=0 => means that validate usb rx aggregation, use init value. */
 	if (phtpriv->ht_option) {
@@ -4329,12 +4328,8 @@ void rtw_joinbss_reset(_adapter *padapter)
 		threshold = 1;
 		rtw_hal_set_hwreg(padapter, HW_VAR_RXDMA_AGG_PG_TH, (u8 *)(&threshold));
 	}
-#endif/* #if defined( CONFIG_USB_HCI) || defined (CONFIG_SDIO_HCI) */
-
 #endif/* #ifdef CONFIG_80211N_HT */
-
 }
-
 
 #ifdef CONFIG_80211N_HT
 void	rtw_ht_use_default_setting(_adapter *padapter)
@@ -4557,19 +4552,6 @@ unsigned int rtw_restructure_ht_ie(_adapter *padapter, u8 *in_ie, u8 *out_ie, ui
 			ht_capie.cap_info = ht_capie.cap_info | IEEE80211_HT_CAP_MAX_AMSDU;
 		}
 	}
-	/*
-	AMPDU_para [1:0]:Max AMPDU Len => 0:8k , 1:16k, 2:32k, 3:64k
-	AMPDU_para [4:2]:Min MPDU Start Spacing
-	*/
-
-	/*
-	#if defined(CONFIG_RTL8188E) && defined(CONFIG_SDIO_HCI)
-	ht_capie.ampdu_params_info = 2;
-	#else
-	ht_capie.ampdu_params_info = (IEEE80211_HT_CAP_AMPDU_FACTOR&0x03);
-	#endif
-	*/
-
 	if (padapter->driver_rx_ampdu_factor != 0xFF)
 		max_rx_ampdu_factor = (HT_CAP_AMPDU_FACTOR)padapter->driver_rx_ampdu_factor;
 	else

@@ -64,7 +64,6 @@ static void dm_CheckPbcGPIO(_adapter *padapter)
 	if (!padapter->registrypriv.hw_wps_pbc)
 		return;
 
-#ifdef CONFIG_USB_HCI
 	tmp1byte = rtw_read8(padapter, GPIO_IO_SEL);
 	tmp1byte |= (HAL_8192C_HW_GPIO_WPS_BIT);
 	rtw_write8(padapter, GPIO_IO_SEL, tmp1byte);	/* enable GPIO[2] as output mode */
@@ -83,16 +82,6 @@ static void dm_CheckPbcGPIO(_adapter *padapter)
 
 	if (tmp1byte & HAL_8192C_HW_GPIO_WPS_BIT)
 		bPbcPressed = _TRUE;
-#else
-	tmp1byte = rtw_read8(padapter, GPIO_IN);
-
-	if (tmp1byte == 0xff || padapter->init_adpt_in_progress)
-		return;
-
-	if ((tmp1byte & HAL_8192C_HW_GPIO_WPS_BIT) == 0)
-		bPbcPressed = _TRUE;
-#endif
-
 	if (_TRUE == bPbcPressed) {
 		/* Here we only set bPbcPressed to true */
 		/* After trigger PBC, the variable will be set to false */
@@ -101,88 +90,6 @@ static void dm_CheckPbcGPIO(_adapter *padapter)
 	}
 }
 #endif /* #ifdef CONFIG_SUPPORT_HW_WPS_PBC */
-
-
-#ifdef CONFIG_PCI_HCI
-/*
- *	Description:
- *		Perform interrupt migration dynamically to reduce CPU utilization.
- *
- *	Assumption:
- *		1. Do not enable migration under WIFI test.
- *
- *	Created by Roger, 2010.03.05.
- *   */
-VOID
-dm_InterruptMigration(
-	IN	PADAPTER	Adapter
-)
-{
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
-	struct mlme_priv	*pmlmepriv = &(Adapter->mlmepriv);
-	BOOLEAN			bCurrentIntMt, bCurrentACIntDisable;
-	BOOLEAN			IntMtToSet = _FALSE;
-	BOOLEAN			ACIntToSet = _FALSE;
-
-
-	/* Retrieve current interrupt migration and Tx four ACs IMR settings first. */
-	bCurrentIntMt = pHalData->bInterruptMigration;
-	bCurrentACIntDisable = pHalData->bDisableTxInt;
-
-	/* */
-	/* <Roger_Notes> Currently we use busy traffic for reference instead of RxIntOK counts to prevent non-linear Rx statistics */
-	/* when interrupt migration is set before. 2010.03.05. */
-	/* */
-	if (!Adapter->registrypriv.wifi_spec &&
-	    (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE) &&
-	    pmlmepriv->LinkDetectInfo.bHigherBusyTraffic) {
-		IntMtToSet = _TRUE;
-
-		/* To check whether we should disable Tx interrupt or not. */
-		if (pmlmepriv->LinkDetectInfo.bHigherBusyRxTraffic)
-			ACIntToSet = _TRUE;
-	}
-
-	/* Update current settings. */
-	if (bCurrentIntMt != IntMtToSet) {
-		RTW_INFO("%s(): Update interrupt migration(%d)\n", __FUNCTION__, IntMtToSet);
-		if (IntMtToSet) {
-			/* */
-			/* <Roger_Notes> Set interrupt migration timer and corresponging Tx/Rx counter. */
-			/* timer 25ns*0xfa0=100us for 0xf packets. */
-			/* 2010.03.05. */
-			/* */
-			rtw_write32(Adapter, REG_INT_MIG_8723D, 0xff000fa0);/* 0x306:Rx, 0x307:Tx */
-			pHalData->bInterruptMigration = IntMtToSet;
-		} else {
-			/* Reset all interrupt migration settings. */
-			rtw_write32(Adapter, REG_INT_MIG_8723D, 0);
-			pHalData->bInterruptMigration = IntMtToSet;
-		}
-	}
-
-	/*if( bCurrentACIntDisable != ACIntToSet ){
-		RTW_INFO("%s(): Update AC interrupt(%d)\n",__FUNCTION__,ACIntToSet);
-		if(ACIntToSet)
-		{
-
-
-
-
-
-			UpdateInterruptMask8192CE( Adapter, 0, RT_AC_INT_MASKS );
-			pHalData->bDisableTxInt = ACIntToSet;
-		}
-		else
-		{
-			UpdateInterruptMask8192CE( Adapter, RT_AC_INT_MASKS, 0 );
-			pHalData->bDisableTxInt = ACIntToSet;
-		}
-	}*/
-
-}
-
-#endif
 
 /*
  * Initialize GPIO setting registers
@@ -230,9 +137,7 @@ rtl8723d_InitHalDm(
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
 
-#ifdef CONFIG_USB_HCI
 	dm_InitGPIOSetting(Adapter);
-#endif
 	odm_dm_init(pDM_Odm);
 
 }
@@ -277,15 +182,6 @@ rtl8723d_HalDmWatchDog(
 		/* Dynamically switch RTS/CTS protection. */
 		/* */
 		/* dm_CheckProtection(Adapter); */
-
-#ifdef CONFIG_PCI_HCI
-		/* 20100630 Joseph: Disable Interrupt Migration mechanism temporarily because it degrades Rx throughput. */
-		/* Tx Migration settings. */
-		/* dm_InterruptMigration(Adapter); */
-
-		/* if(Adapter->HalFunc.TxCheckStuckHandler(Adapter)) */
-		/*	PlatformScheduleWorkItem(&(GET_HAL_DATA(Adapter)->HalResetWorkItem)); */
-#endif
 	}
 
 #ifdef CONFIG_DISABLE_ODM
