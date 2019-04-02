@@ -377,7 +377,6 @@ phydm_c2h_ra_report_handler(
 	}
 
 	/*trigger power training*/
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 
 	rate_order = phydm_rate_order_compute(p_dm, rate_idx);
 
@@ -387,8 +386,6 @@ phydm_c2h_ra_report_handler(
 		halrf_update_pwr_track(p_dm, rate_idx);
 		p_ra_table->power_tracking_flag = 0;
 	}
-
-#endif
 }
 
 void
@@ -414,163 +411,6 @@ phydm_modify_RA_PCR_threshold(
 	PHYDM_DBG(p_dm, DBG_RA, ("Set RA_threshold_offset = (( %s%d ))\n", ((RA_threshold_offset == 0) ? " " : ((RA_offset_direction) ? "+" : "-")), RA_threshold_offset));
 }
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-
-void
-odm_refresh_rate_adaptive_mask_mp(
-	void		*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT				*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_					*p_ra_table = &p_dm->dm_ra_table;
-	struct _ADAPTER				*p_adapter	 =  p_dm->adapter;
-	struct _ADAPTER				*p_target_adapter = NULL;
-	HAL_DATA_TYPE			*p_hal_data = GET_HAL_DATA(p_adapter);
-	PMGNT_INFO				p_mgnt_info = GetDefaultMgntInfo(p_adapter);
-	struct _ADAPTER			*p_loop_adapter = GetDefaultAdapter(p_adapter);
-	PMGNT_INFO					p_loop_mgnt_info = &(p_loop_adapter->MgntInfo);
-	HAL_DATA_TYPE				*p_loop_hal_data = GET_HAL_DATA(p_loop_adapter);
-	
-	u32		i;
-	struct sta_info *p_entry;
-	u8		ratr_state_new;
-
-	PHYDM_DBG(p_dm, DBG_RA_MASK, ("%s ======>\n", __func__));
-
-	if (p_adapter->bDriverStopped) {
-		PHYDM_DBG(p_dm, DBG_RA_MASK, ("driver is going to unload\n"));
-		return;
-	}
-
-	if (!p_hal_data->bUseRAMask) {
-		PHYDM_DBG(p_dm, DBG_RA_MASK, ("driver does not control rate adaptive mask\n"));
-		return;
-	}
-
-	/* if default port is connected, update RA table for default port (infrastructure mode only) */
-	/* Need to consider other ports for P2P cases*/
-
-	while(p_loop_adapter){
-
-		p_loop_mgnt_info = &(p_loop_adapter->MgntInfo);
-		p_loop_hal_data = GET_HAL_DATA(p_loop_adapter);
-	
-		if (p_loop_mgnt_info->mAssoc && (!ACTING_AS_AP(p_loop_adapter))) {
-			odm_refresh_ldpc_rts_mp(p_loop_adapter, p_dm, p_loop_mgnt_info->mMacId, p_loop_mgnt_info->IOTPeer, p_loop_hal_data->UndecoratedSmoothedPWDB);
-		/*PHYDM_DBG(p_dm, DBG_RA_MASK, ("Infrasture mode\n"));*/
-
-			ratr_state_new = phydm_rssi_lv_dec(p_dm, p_loop_hal_data->UndecoratedSmoothedPWDB, p_loop_mgnt_info->Ratr_State);
-
-			if ((p_loop_mgnt_info->Ratr_State != ratr_state_new) || (p_ra_table->up_ramask_cnt >= FORCED_UPDATE_RAMASK_PERIOD)) {
-
-				p_ra_table->up_ramask_cnt = 0;
-				PHYDM_PRINT_ADDR(p_dm, DBG_RA_MASK, ("Target AP addr :"), p_loop_mgnt_info->Bssid);
-				PHYDM_DBG(p_dm, DBG_RA_MASK, ("Update RA Level: ((%x)) -> ((%x)),  RSSI = ((%d))\n\n",
-					p_mgnt_info->Ratr_State, ratr_state_new, p_loop_hal_data->UndecoratedSmoothedPWDB));
-
-				p_loop_mgnt_info->Ratr_State = ratr_state_new;
-				p_adapter->HalFunc.UpdateHalRAMaskHandler(p_loop_adapter, p_loop_mgnt_info->mMacId, NULL, ratr_state_new);
-			} else {
-				PHYDM_DBG(p_dm, DBG_RA_MASK, ("Stay in RA level  = (( %d ))\n\n", ratr_state_new));
-				/**/
-			}
-		}
-
-		p_loop_adapter = GetNextExtAdapter(p_loop_adapter);
-	}
-
-	/*  */
-	/* The following part configure AP/VWifi/IBSS rate adaptive mask. */
-	/*  */
-
-	if (p_mgnt_info->mIbss)	/* Target: AP/IBSS peer. */
-		p_target_adapter = GetDefaultAdapter(p_adapter);
-	else
-		p_target_adapter = GetFirstAPAdapter(p_adapter);
-
-	/* if extension port (softap) is started, updaet RA table for more than one clients associate */
-	if (p_target_adapter != NULL) {
-		for (i = 0; i < ODM_ASSOCIATE_ENTRY_NUM; i++) {
-
-			p_entry = AsocEntry_EnumStation(p_target_adapter, i);
-
-			if (is_sta_active((&GET_STA_INFO(p_entry)))) {
-
-				odm_refresh_ldpc_rts_mp(p_target_adapter, p_dm, GET_STA_INFO(p_entry).mac_id, p_entry->IOTPeer, GET_STA_INFO(p_entry).rssi_stat.rssi);
-
-				ratr_state_new = phydm_rssi_lv_dec(p_dm, GET_STA_INFO(p_entry).rssi_stat.rssi, GET_STA_INFO(p_entry).ra_info.rssi_level);
-
-				if ((GET_STA_INFO(p_entry).ra_info.rssi_level != ratr_state_new) || (p_ra_table->up_ramask_cnt >= FORCED_UPDATE_RAMASK_PERIOD)) {
-
-					p_ra_table->up_ramask_cnt = 0;
-					PHYDM_PRINT_ADDR(p_dm, DBG_RA_MASK, ("Target AP addr :"), GET_STA_INFO(p_entry).mac_addr);
-					PHYDM_DBG(p_dm, DBG_RA_MASK, ("Update Tx RA Level: ((%x)) -> ((%x)),  RSSI = ((%d))\n",
-						GET_STA_INFO(p_entry).ra_info.rssi_level, ratr_state_new,  GET_STA_INFO(p_entry).rssi_stat.rssi));
-
-					GET_STA_INFO(p_entry).ra_info.rssi_level = ratr_state_new;
-					p_adapter->HalFunc.UpdateHalRAMaskHandler(p_target_adapter, GET_STA_INFO(p_entry).mac_id, p_entry, ratr_state_new);
-				} else {
-					PHYDM_DBG(p_dm, DBG_RA_MASK, ("Stay in RA level  = (( %d ))\n\n", ratr_state_new));
-					/**/
-				}
-
-			}
-		}
-	}
-}
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-
-void
-odm_refresh_rate_adaptive_mask_ap(
-	void	*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_			*p_ra_table = &p_dm->dm_ra_table;
-	struct rtl8192cd_priv *priv = p_dm->priv;
-	struct aid_obj *aidarray;
-	u32		i;
-	struct sta_info *p_entry;
-	struct cmn_sta_info	*p_sta;
-	u8		ratr_state_new;
-
-	if (priv->up_time % 2)
-		return;
-
-	for (i = 0; i < ODM_ASSOCIATE_ENTRY_NUM; i++) {
-		p_entry = p_dm->p_odm_sta_info[i];
-		p_sta = p_dm->p_phydm_sta_info[i];
-
-		if (is_sta_active(p_sta)) {
-
-			#if defined(UNIVERSAL_REPEATER) || defined(MBSSID)
-			aidarray = container_of(p_entry, struct aid_obj, station);
-			priv = aidarray->priv;
-			#endif
-
-			if (!priv->pmib->dot11StationConfigEntry.autoRate)
-				continue;
-
-			ratr_state_new = phydm_rssi_lv_dec(p_dm, (u32)p_sta->rssi_stat.rssi, p_sta->ra_info.rssi_level);
-
-			if ((p_sta->ra_info.rssi_level != ratr_state_new) || (p_ra_table->up_ramask_cnt >= FORCED_UPDATE_RAMASK_PERIOD)) {
-
-				p_ra_table->up_ramask_cnt = 0;
-				PHYDM_PRINT_ADDR(p_dm, DBG_RA_MASK, ("Target AP addr :"), p_sta->mac_addr);
-				PHYDM_DBG(p_dm, DBG_RA_MASK, ("Update Tx RA Level: ((%x)) -> ((%x)),  RSSI = ((%d))\n", p_sta->ra_info.rssi_level, ratr_state_new, p_sta->rssi_stat.rssi));
-
-				p_sta->ra_info.rssi_level = ratr_state_new;
-				phydm_gen_ramask_h2c_AP(p_dm, priv, p_entry, p_sta->ra_info.rssi_level);
-			} else {
-				PHYDM_DBG(p_dm, DBG_RA_MASK, ("Stay in RA level  = (( %d ))\n\n", ratr_state_new));
-				/**/
-			}
-		}
-	}
-}
-#endif
-
 void
 phydm_rate_adaptive_mask_init(
 	void	*p_dm_void
@@ -578,19 +418,6 @@ phydm_rate_adaptive_mask_init(
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _rate_adaptive_table_	*p_ra_t = &p_dm->dm_ra_table;
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PMGNT_INFO		p_mgnt_info = &p_dm->adapter->MgntInfo;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_dm->adapter);
-
-	p_mgnt_info->Ratr_State = DM_RATR_STA_INIT;
-
-	if (p_mgnt_info->DM_Type == dm_type_by_driver)
-		p_hal_data->bUseRAMask = true;
-	else
-		p_hal_data->bUseRAMask = false;
-
-#endif
 
 	p_ra_t->ldpc_thres = 35;
 	p_ra_t->up_ramask_cnt = 0;
@@ -619,21 +446,7 @@ phydm_refresh_rate_adaptive_mask(
 	p_ra_t->up_ramask_cnt++;
 	/*p_ra_t->up_ramask_cnt_tmp++;*/
 	
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-
-	odm_refresh_rate_adaptive_mask_mp(p_dm);
-
-#elif (DM_ODM_SUPPORT_TYPE & ODM_AP)
-
-	odm_refresh_rate_adaptive_mask_ap(p_dm);
-
-#else /*(DM_ODM_SUPPORT_TYPE == ODM_CE)*/
-
 	phydm_ra_mask_watchdog(p_dm);
-
-#endif
-	
 }
 
 void
@@ -1081,7 +894,7 @@ phydm_ra_registed(
 	PHYDM_DBG(p_dm, DBG_RA, ("MACID=%d\n", p_sta->mac_id));
 
 
-	#if (RTL8188E_SUPPORT == 1) && (RATE_ADAPTIVE_SUPPORT == 1)
+	#if (RATE_ADAPTIVE_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8188E)
 		phydm_get_rate_id_88e(p_dm, macid);
 	else
@@ -1106,7 +919,7 @@ phydm_ra_registed(
 	if (p_ra_t->record_ra_info)
 		p_ra_t->record_ra_info(p_dm, macid, p_sta, ra_mask);
 
-	#if (RTL8188E_SUPPORT == 1) && (RATE_ADAPTIVE_SUPPORT == 1)
+	#if (RATE_ADAPTIVE_SUPPORT == 1)
 	if (p_dm->support_ic_type == ODM_RTL8188E)
 		/*Driver RA*/
 		odm_ra_update_rate_info_8188e(p_dm, macid, p_ra->rate_id, (u32)ra_mask, p_ra->is_support_sgi);
@@ -1187,31 +1000,6 @@ phydm_ra_mask_watchdog(
 
 		if (p_ra->disable_ra)
 			continue;
-
-
-		/*to be modified*/
-		#if ((RTL8812A_SUPPORT == 1) || (RTL8821A_SUPPORT == 1))
-		if ((p_dm->support_ic_type == ODM_RTL8812) ||
-			((p_dm->support_ic_type == ODM_RTL8821) && (p_dm->cut_version == ODM_CUT_A))
-			) {
-			
-			if (p_sta->rssi_stat.rssi < p_ra_t->ldpc_thres) {
-				
-				#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
-				set_ra_ldpc_8812(p_sta, true);		/*LDPC TX enable*/
-				#endif
-				PHYDM_DBG(p_dm, DBG_RA_MASK, ("RSSI=%d, ldpc_en =TRUE\n", p_sta->rssi_stat.rssi));
-				
-			} else if (p_sta->rssi_stat.rssi > (p_ra_t->ldpc_thres + 3)) {
-
-				#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
-				set_ra_ldpc_8812(p_sta, false);	/*LDPC TX disable*/
-				#endif
-				PHYDM_DBG(p_dm, DBG_RA_MASK, ("RSSI=%d, ldpc_en =FALSE\n", p_sta->rssi_stat.rssi));
-			}	
-		}
-		#endif
-
 		rssi_lv_new = phydm_rssi_lv_dec(p_dm, (u32)p_sta->rssi_stat.rssi, p_ra->rssi_level);
 
 		if ((p_ra->rssi_level != rssi_lv_new) || 
@@ -1227,7 +1015,7 @@ phydm_ra_mask_watchdog(
 			if (p_ra_t->record_ra_info)
 				p_ra_t->record_ra_info(p_dm, macid, p_sta, ra_mask);
 
-			#if (RTL8188E_SUPPORT == 1) && (RATE_ADAPTIVE_SUPPORT == 1)
+			#if (RATE_ADAPTIVE_SUPPORT == 1)
 			if (p_dm->support_ic_type == ODM_RTL8188E)
 				/*Driver RA*/
 				odm_ra_update_rate_info_8188e(p_dm, macid, p_ra->rate_id, (u32)ra_mask, p_ra->is_support_sgi);
@@ -1641,10 +1429,6 @@ phydm_ra_info_watchdog(
 	#endif
 	phydm_ra_dynamic_retry_count(p_dm);
 	phydm_refresh_rate_adaptive_mask(p_dm);
-
-	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	odm_refresh_basic_rate_mask(p_dm);
-	#endif
 }
 
 void
@@ -1659,15 +1443,6 @@ phydm_ra_info_init(
 	p_ra_table->highest_client_tx_order = 0;
 	p_ra_table->RA_threshold_offset = 0;
 	p_ra_table->RA_offset_direction = 0;
-	
-#if (RTL8822B_SUPPORT == 1)
-	if (p_dm->support_ic_type == ODM_RTL8822B) {
-		u32	ret_value;
-
-		ret_value = odm_get_bb_reg(p_dm, 0x4c8, MASKBYTE2);
-		odm_set_bb_reg(p_dm, 0x4cc, MASKBYTE3, (ret_value - 1));
-	}
-#endif
 	
 	#ifdef CONFIG_RA_DYNAMIC_RTY_LIMIT
 	phydm_ra_dynamic_retry_limit_init(p_dm);
@@ -1778,119 +1553,6 @@ odm_find_rts_rate(
 	return rts_ini_rate;
 
 }
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-
-void
-odm_refresh_basic_rate_mask(
-	void	*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _ADAPTER		*adapter	 =  p_dm->adapter;
-	static u8		stage = 0;
-	u8			cur_stage = 0;
-	OCTET_STRING	os_rate_set;
-	PMGNT_INFO		p_mgnt_info = GetDefaultMgntInfo(adapter);
-	u8			rate_set[5] = {MGN_1M, MGN_2M, MGN_5_5M, MGN_11M, MGN_6M};
-
-	if (p_dm->support_ic_type != ODM_RTL8812 && p_dm->support_ic_type != ODM_RTL8821)
-		return;
-
-	if (p_dm->is_linked == false)	/* unlink Default port information */
-		cur_stage = 0;
-	else if (p_dm->rssi_min < 40)	/* link RSSI  < 40% */
-		cur_stage = 1;
-	else if (p_dm->rssi_min > 45)	/* link RSSI > 45% */
-		cur_stage = 3;
-	else
-		cur_stage = 2;					/* link  25% <= RSSI <= 30% */
-
-	if (cur_stage != stage) {
-		if (cur_stage == 1) {
-			FillOctetString(os_rate_set, rate_set, 5);
-			FilterSupportRate(p_mgnt_info->mBrates, &os_rate_set, false);
-			phydm_set_hw_reg_handler_interface(p_dm, HW_VAR_BASIC_RATE, (u8 *)&os_rate_set);
-		} else if (cur_stage == 3 && (stage == 1 || stage == 2))
-			phydm_set_hw_reg_handler_interface(p_dm, HW_VAR_BASIC_RATE, (u8 *)(&p_mgnt_info->mBrates));
-	}
-
-	stage = cur_stage;
-}
-
-void
-odm_refresh_ldpc_rts_mp(
-	struct _ADAPTER			*p_adapter,
-	struct PHY_DM_STRUCT			*p_dm,
-	u8				m_mac_id,
-	u8				iot_peer,
-	s32				undecorated_smoothed_pwdb
-)
-{
-	boolean					is_ctl_ldpc = false;
-	struct _rate_adaptive_table_	*p_ra_t = &p_dm->dm_ra_table;
-
-	if (p_dm->support_ic_type != ODM_RTL8821 && p_dm->support_ic_type != ODM_RTL8812)
-		return;
-
-	if ((p_dm->support_ic_type == ODM_RTL8821) && (p_dm->cut_version == ODM_CUT_A))
-		is_ctl_ldpc = true;
-	else if (p_dm->support_ic_type == ODM_RTL8812 &&
-		 iot_peer == HT_IOT_PEER_REALTEK_JAGUAR_CCUTAP)
-		is_ctl_ldpc = true;
-
-	if (is_ctl_ldpc) {
-		if (undecorated_smoothed_pwdb < (p_ra_t->ldpc_thres - 5))
-			MgntSet_TX_LDPC(p_adapter, m_mac_id, true);
-		else if (undecorated_smoothed_pwdb > p_ra_t->ldpc_thres)
-			MgntSet_TX_LDPC(p_adapter, m_mac_id, false);
-	}
-}
-
-void
-odm_rate_adaptive_state_ap_init(
-	void		*PADAPTER_VOID,
-	struct cmn_sta_info*p_entry
-)
-{
-	struct _ADAPTER		*adapter = (struct _ADAPTER *)PADAPTER_VOID;
-	p_entry->ra_info.rssi_level = DM_RATR_STA_INIT;
-}
-
-#elif (DM_ODM_SUPPORT_TYPE & ODM_AP)
-
-void
-phydm_gen_ramask_h2c_AP(
-	void			*p_dm_void,
-	struct rtl8192cd_priv *priv,
-	struct sta_info *p_entry,
-	u8			rssi_level
-)
-{
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-
-	if (p_dm->support_ic_type == ODM_RTL8812) {
-
-		#if (RTL8812A_SUPPORT == 1)
-		UpdateHalRAMask8812(priv, p_entry, rssi_level);
-		/**/
-		#endif
-	} else if (p_dm->support_ic_type == ODM_RTL8188E) {
-
-		#if (RTL8188E_SUPPORT == 1)
-		#ifdef TXREPORT
-		add_RATid(priv, p_entry);
-		/**/
-		#endif
-		#endif
-	} else {
-		#ifdef CONFIG_WLAN_HAL
-		GET_HAL_INTERFACE(priv)->UpdateHalRAMaskHandler(priv, p_entry, rssi_level);
-		#endif
-	} 
-}
-
-#endif
 
 #if (defined(CONFIG_RA_DYNAMIC_RTY_LIMIT))
 
@@ -2147,13 +1809,8 @@ phydm_ra_print_msg(
 
 	PHYDM_DBG(p_dm, DBG_RA, (" |rate index| |Current-value| |Default-value| |Modify?|\n"));
 	for (i = 0 ; i <= (p_ra_table->rate_length); i++) {
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
-		PHYDM_DBG(p_dm, DBG_RA, ("     [ %d ]  %20d  %25d  %20s\n", i, value[i], value_default[i], ((modify_note[i] == 1) ? "V" : " .  ")));
-#else
 		PHYDM_DBG(p_dm, DBG_RA, ("     [ %d ]  %10d  %14d  %14s\n", i, value[i], value_default[i], ((modify_note[i] == 1) ? "V" : " .  ")));
-#endif
 	}
-
 }
 
 void

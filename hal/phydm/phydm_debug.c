@@ -1161,11 +1161,9 @@ phydm_basic_dbg_message
 		}
 	#endif
 
-	#if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
 		/*STBC or LDPC pkt*/
 		if (p_dm->support_ic_type & ODM_IC_PHY_STATUE_NEW_TYPE)
 			PHYDM_DBG(p_dm, ODM_COMP_COMMON, ("Coding: LDPC=((%s)), STBC=((%s))\n", (p_dm->phy_dbg_info.is_ldpc_pkt) ? "Y" : "N", (p_dm->phy_dbg_info.is_stbc_pkt) ? "Y" : "N"));
-	#endif
 	} else
 		PHYDM_DBG(p_dm, ODM_COMP_COMMON, ("No Link !!!\n"));
 
@@ -2407,15 +2405,8 @@ phydm_cmd_parser(
 		break;
 
 	case PHYDM_LA_MODE:
-
-		#if (PHYDM_LA_MODE_SUPPORT == 1)
-		phydm_lamode_trigger_setting(p_dm, &input[0], &used, output, &out_len, input_num);
-		#else
 		PHYDM_SNPRINTF((output + used, out_len - used, "This IC doesn't support LA mode\n"));
-		#endif
-
 		break;
-
 	case PHYDM_DUMP_REG:
 	{
 		u8	type = 0;

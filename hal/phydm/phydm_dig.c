@@ -208,11 +208,9 @@ odm_write_dig(
 			phydm_set_big_jump_step(p_dm, current_igi);
 		#endif
 
-		#if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
 		/* Set IGI value of CCK for new CCK AGC */
 		if (p_dm->cck_new_agc && (p_dm->support_ic_type & ODM_IC_PHY_STATUE_NEW_TYPE))
 			odm_set_bb_reg(p_dm, 0xa0c, 0x3f00, (current_igi >> 1));
-		#endif
 
 		/*Add by YuChen for USB IO too slow issue*/
 		if (p_dm->support_ic_type &

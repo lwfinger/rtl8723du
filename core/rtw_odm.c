@@ -266,7 +266,6 @@ void rtw_odm_parse_rx_phy_status_chinfo(union recv_frame *rframe, u8 *phys)
 #define DBG_RX_PHYSTATUS_CHINFO 0
 #endif
 
-#if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
 	_adapter *adapter = rframe->u.hdr.adapter;
 	struct PHY_DM_STRUCT *phydm = adapter_to_phydm(adapter);
 	struct rx_pkt_attrib *attrib = &rframe->u.hdr.attrib;
@@ -448,7 +447,5 @@ type1_end:
 			}
 		}
 	}
-#endif /* (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1) */
-
 }
 

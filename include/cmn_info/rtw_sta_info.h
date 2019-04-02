@@ -212,14 +212,12 @@ struct phydm_phyinfo_struct {
 	u8		signal_strength;				/* in 0-100 index. */
 	s8		rx_pwr[4];					/* per-path's pwdb */
 	s8		rx_snr[4];					/* per-path's SNR	*/
-/*ODM_PHY_STATUS_NEW_TYPE_SUPPORT*/
 	u8		rx_count:2;					/* RX path counter---*/
 	u8		band_width:2;
 	u8		rxsc:4;						/* sub-channel---*/
 	u8		channel;						/* channel number---*/
 	u8		is_mu_packet:1;				/* is MU packet or not---boolean*/
 	u8		is_beamformed:1;				/* BF packet---boolean*/
-/*ODM_PHY_STATUS_NEW_TYPE_SUPPORT*/
 };
 
 struct phydm_perpkt_info_struct {

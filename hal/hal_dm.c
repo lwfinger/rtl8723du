@@ -59,30 +59,11 @@ void rtw_hal_update_iqk_fw_offload_cap(_adapter *adapter)
 	RTW_INFO("IQK FW offload:%s\n", hal->RegIQKFWOffload ? "enable" : "disable");
 }
 
-#if ((RTL8822B_SUPPORT == 1) || (RTL8821C_SUPPORT == 1) || (RTL8814B_SUPPORT == 1))
-void rtw_phydm_iqk_trigger(_adapter *adapter)
-{
-	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(adapter);
-	u8 clear = _FALSE;
-	u8 segment = _FALSE;
-	u8 rfk_forbidden = _FALSE;
-
-	/*segment = _rtw_phydm_iqk_segment_chk(adapter);*/
-	halrf_cmn_info_set(p_dm_odm, HALRF_CMNINFO_RFK_FORBIDDEN, rfk_forbidden);
-	halrf_cmn_info_set(p_dm_odm, HALRF_CMNINFO_IQK_SEGMENT, segment);
-	halrf_segment_iqk_trigger(p_dm_odm, clear, segment);
-}
-#endif
-
 void rtw_phydm_iqk_trigger_dbg(_adapter *adapter, bool recovery, bool clear, bool segment)
 {
 	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(adapter);
 
-#if ((RTL8822B_SUPPORT == 1) || (RTL8821C_SUPPORT == 1) || (RTL8814B_SUPPORT == 1))
-		halrf_segment_iqk_trigger(p_dm_odm, clear, segment);
-#else
-		halrf_iqk_trigger(p_dm_odm, recovery);
-#endif
+	halrf_iqk_trigger(p_dm_odm, recovery);
 }
 void rtw_phydm_lck_trigger(_adapter *adapter)
 {
@@ -1010,13 +991,6 @@ static u8 _rtw_phydm_rfk_condition_check(_adapter *adapter)
 
 	return rst;
 }
-#if ((RTL8822B_SUPPORT == 1) || (RTL8821C_SUPPORT == 1) || (RTL8814B_SUPPORT == 1))
-static u8 _rtw_phydm_iqk_segment_chk(_adapter *adapter)
-{
-	return _TRUE;
-}
-#endif
-
 /*check the tx low rate while unlinked to any AP;for pwr tracking */
 static u8 _rtw_phydm_pwr_tracking_rate_check(_adapter *adapter)
 {
@@ -1090,11 +1064,6 @@ void rtw_phydm_watchdog(_adapter *adapter)
 	if (bLinked == _TRUE) {
 		rfk_forbidden = (_rtw_phydm_rfk_condition_check(adapter) == _TRUE) ? _FALSE : _TRUE;
 		halrf_cmn_info_set(&pHalData->odmpriv, HALRF_CMNINFO_RFK_FORBIDDEN, rfk_forbidden);
-
-		#if ((RTL8822B_SUPPORT == 1) || (RTL8821C_SUPPORT == 1) || (RTL8814B_SUPPORT == 1))
-		segment_iqk = _rtw_phydm_iqk_segment_chk(adapter);
-		halrf_cmn_info_set(&pHalData->odmpriv, HALRF_CMNINFO_IQK_SEGMENT, segment_iqk);
-		#endif
 	} else {
 		tx_unlinked_low_rate = _rtw_phydm_pwr_tracking_rate_check(adapter);
 		halrf_cmn_info_set(&pHalData->odmpriv, HALRF_CMNINFO_RATE_INDEX, tx_unlinked_low_rate);

@@ -108,13 +108,6 @@ phydm_stop_cck_pd_th(
 	if (!(p_dm->support_ability & (ODM_BB_CCK_PD | ODM_BB_FA_CNT))) {
 		
 		PHYDM_DBG(p_dm, DBG_CCKPD, ("Not Support\n"));
-
-		#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-		#ifdef MCR_WIRELESS_EXTEND
-		phydm_write_cck_cca_th(p_dm, 0x43);
-		#endif
-		#endif
-		
 		return true;
 	}
 
@@ -123,14 +116,7 @@ phydm_stop_cck_pd_th(
 		PHYDM_DBG(p_dm, DBG_CCKPD, ("Return: Pause CCKPD in LV=%d\n", p_dm->pause_lv_table.lv_cckpd));
 		return true;
 	}
-
-	#if 0/*(DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))*/
-	if (p_dm->ext_lna)
-		return true;
-	#endif
-
 	return false;
-	
 }
 
 void
@@ -144,8 +130,6 @@ phydm_cckpd(
 	u8	cur_cck_cca_th= p_cckpd_t->cur_cck_cca_thres;
 
 	if (p_dm->is_linked) {
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-
 		/*Add hp_hw_id condition due to 22B LPS power consumption issue and [PCIE-1596]*/
 		if (p_dm->hp_hw_id && (p_dm->traffic_load == TRAFFIC_ULTRA_LOW))
 			cur_cck_cca_th = 0x40;
@@ -165,18 +149,6 @@ phydm_cckpd(
 			else
 				cur_cck_cca_th = 0x83;
 		}
-		
-#else	/*ODM_AP*/
-		if (p_dig_t->cur_ig_value > 0x32)
-			cur_cck_cca_th = 0xed;
-		else if (p_dig_t->cur_ig_value > 0x2a)
-			cur_cck_cca_th = 0xdd;
-		else if (p_dig_t->cur_ig_value > 0x24)
-			cur_cck_cca_th = 0xcd;
-		else 
-			cur_cck_cca_th = 0x83;
-		
-#endif
 	} else {
 	
 		if (p_cckpd_t->cck_fa_ma > 1000)

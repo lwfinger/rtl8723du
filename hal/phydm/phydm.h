@@ -47,21 +47,13 @@
 #include "phydm_noisemonitor.h"
 #include "phydm_api.h"
 #include "phydm_pow_train.h"
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))
-	#include "phydm_beamforming.h"
-#endif
+#include "phydm_beamforming.h"
 
 /*HALRF header*/
 #include "halrf/halrf_iqk.h"
 #include "halrf/halrf.h"
 #include "halrf/halrf_powertracking.h"
-#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	#include "halrf/halphyrf_ap.h"
-#elif(DM_ODM_SUPPORT_TYPE & (ODM_CE))
-	#include "halrf/halphyrf_ce.h"
-#elif (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
-	#include "halrf/halphyrf_win.h"
-#endif
+#include "halrf/halphyrf_ce.h"
 
 extern const u16 phy_rate_table[28];
 
@@ -80,11 +72,7 @@ extern const u16 phy_rate_table[28];
 #define MAX_2(_x_, _y_)	(((_x_)>(_y_))? (_x_) : (_y_))
 #define MIN_2(_x_, _y_)	(((_x_)<(_y_))? (_x_) : (_y_))
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	#define PHYDM_WATCH_DOG_PERIOD	1 /*second*/
-#else
-	#define PHYDM_WATCH_DOG_PERIOD	2 /*second*/
-#endif
+#define PHYDM_WATCH_DOG_PERIOD	2 /*second*/
 
 /*============================================================*/
 /*structure and define*/
@@ -169,7 +157,6 @@ struct _odm_phy_dbg_info_ {
 	u32		num_qry_phy_status;
 	u32		num_qry_phy_status_cck;
 	u32		num_qry_phy_status_ofdm;
-#if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
 	u32		num_qry_mu_pkt;
 	u32		num_qry_bf_pkt;
 	u32		num_qry_mu_vht_pkt[40];
@@ -177,7 +164,6 @@ struct _odm_phy_dbg_info_ {
 	boolean	is_stbc_pkt;
 	u8		num_of_ppdu[4];
 	u8		gid_num[4];
-#endif
 	u8		num_qry_beacon_pkt;
 	/* Others */
 	s32		rx_evm[4];
@@ -771,9 +757,7 @@ struct	phydm_iot_center {
 	struct cmn_sta_info	*p_phydm_sta_info[ODM_ASSOCIATE_ENTRY_NUM];
 	u8			phydm_macid_table[ODM_ASSOCIATE_ENTRY_NUM];
 
-#if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
 	s32			accumulate_pwdb[ODM_ASSOCIATE_ENTRY_NUM];
-#endif
 
 #if (RATE_ADAPTIVE_SUPPORT == 1)
 	u16			currmin_rpt_time;
@@ -798,10 +782,6 @@ struct	phydm_iot_center {
 	u32			n_iqk_cnt;
 	u32			n_iqk_ok_cnt;
 	u32			n_iqk_fail_cnt;
-
-#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	boolean		config_bbrf;
-#endif
 	boolean		is_disable_power_training;
 	boolean		is_bt_continuous_turn;
 	u8			dynamic_tx_high_power_lvl;
@@ -832,20 +812,6 @@ struct	phydm_iot_center {
 #endif
 	struct timer_list	sbdcnt_timer;
 
-
-/*=== PHYDM Workitem ======================================= (start)*/
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-#if USE_WORKITEM
-	RT_WORK_ITEM	path_div_switch_workitem;
-	RT_WORK_ITEM	cck_path_diversity_workitem;
-	RT_WORK_ITEM	fast_ant_training_workitem;
-	RT_WORK_ITEM	ra_rpt_workitem;
-	RT_WORK_ITEM	sbdcnt_workitem;
-#endif
-#endif
-
-
 /*=== PHYDM Structure ======================================== (start)*/
 	struct	phydm_func_poiner			phydm_func_handler;
 	struct	phydm_iot_center				iot_table;
@@ -867,10 +833,6 @@ struct	phydm_iot_center {
 #endif
 
 #if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-	#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	struct _BF_DIV_COEX_					dm_bdc_table;
-	#endif
-
 	#if (defined(CONFIG_HL_SMART_ANTENNA))
 	struct smt_ant_honbo					dm_sat_table;
 	#endif
@@ -904,16 +866,9 @@ struct	phydm_iot_center {
 	struct _hal_rf_						rf_table; 		/*for HALRF function*/
 	struct odm_rf_calibration_structure		rf_calibrate_info;
 	struct odm_power_trim_data			power_trim_data;	
-#if (RTL8822B_SUPPORT == 1)
-	struct drp_rtl8822b_struct			phydm_rtl8822b;
-#endif
 
 #ifdef CONFIG_PSD_TOOL
 	struct _PHYDM_PSD_					dm_psd_table;
-#endif
-
-#if (PHYDM_LA_MODE_SUPPORT == 1)
-	struct _RT_ADCSMP					adcsmp;
 #endif
 
 #ifdef CONFIG_DYNAMIC_RX_PATH
@@ -921,10 +876,6 @@ struct	phydm_iot_center {
 #endif
 
 	struct _IQK_INFORMATION				IQK_info;
-
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	struct _path_div_parameter_define_		path_iqk;
-#endif
 
 #if (defined(CONFIG_PATH_DIVERSITY))
 	struct _ODM_PATH_DIVERSITY_			dm_path_div;
@@ -934,10 +885,8 @@ struct	phydm_iot_center {
 	struct _ANT_DETECTED_INFO			ant_detected_info;	/* Antenna detected information for RSSI tool*/
 #endif
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 #if (BEAMFORMING_SUPPORT == 1)
 	struct _RT_BEAMFORMING_INFO 		beamforming_info;
-#endif
 #endif
 #ifdef PHYDM_AUTO_DEGBUG
 	struct	phydm_auto_dbg_struc			auto_dbg_table;
@@ -1005,7 +954,6 @@ enum odm_fw_config_type {
 };
 
 /*status code*/
-#if (DM_ODM_SUPPORT_TYPE != ODM_WIN)
 enum rt_status {
 	RT_STATUS_SUCCESS,
 	RT_STATUS_FAILURE,
@@ -1016,8 +964,6 @@ enum rt_status {
 	RT_STATUS_NOT_SUPPORT,
 	RT_STATUS_OS_API_FAILED,
 };
-#endif	/*end of enum rt_status definition*/
-
 
 /*===========================================================*/
 /*AGC RX High Power mode*/
@@ -1146,18 +1092,6 @@ phydm_cmn_info_query(
 	enum phydm_info_query_e	info_type
 );
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-void
-odm_init_all_threads(
-	struct PHY_DM_STRUCT	*p_dm
-);
-
-void
-odm_stop_all_threads(
-	struct PHY_DM_STRUCT	*p_dm
-);
-#endif
-
 void
 odm_init_all_timers(
 	struct PHY_DM_STRUCT	*p_dm
@@ -1174,33 +1108,17 @@ odm_release_all_timers(
 );
 
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-void odm_init_all_work_items(struct PHY_DM_STRUCT	*p_dm);
-void odm_free_all_work_items(struct PHY_DM_STRUCT	*p_dm);
-
-/*2012/01/12 MH Check afapter status. Temp fix BSOD.*/
-
-#define	HAL_ADAPTER_STS_CHK(p_dm) do {\
-		if (p_dm->adapter == NULL) { \
-			\
-			return;\
-		} \
-	} while (0)
-
-#endif	/*#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)*/
-
 void *
 phydm_get_structure(
 	struct PHY_DM_STRUCT		*p_dm,
 	u8			structure_type
 );
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN) || (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	/*===========================================================*/
 	/* The following is for compile only*/
 	/*===========================================================*/
 
-	#if (DM_ODM_SUPPORT_TYPE & ODM_CE) && defined(DM_ODM_CE_MAC80211)
+	#if defined(DM_ODM_CE_MAC80211)
 		#define IS_HARDWARE_TYPE_8188E(_adapter)		false
 		#define IS_HARDWARE_TYPE_8188F(_adapter)		false
 		#define IS_HARDWARE_TYPE_8703B(_adapter)		false
@@ -1230,11 +1148,8 @@ phydm_get_structure(
 
 
 	/* *********************************************************** */
-#endif
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	void odm_dtc(struct PHY_DM_STRUCT *p_dm);
-#endif
 
 void
 phydm_dc_cancellation(

@@ -49,45 +49,7 @@ phydm_config_ofdm_tx_path(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#if ((RTL8192E_SUPPORT == 1) || (RTL8812A_SUPPORT == 1))
-	u8	ofdm_tx_path = 0x33;
-#endif
 
-#if (RTL8192E_SUPPORT == 1)
-	if (p_dm->support_ic_type & (ODM_RTL8192E)) {
-
-		if (path == BB_PATH_A) {
-			odm_set_bb_reg(p_dm, 0x90c, MASKDWORD, 0x81121111);
-			/**/
-		} else if (path == BB_PATH_B) {
-			odm_set_bb_reg(p_dm, 0x90c, MASKDWORD, 0x82221222);
-			/**/
-		} else  if (path == BB_PATH_AB) {
-			odm_set_bb_reg(p_dm, 0x90c, MASKDWORD, 0x83321333);
-			/**/
-		}
-
-
-	}
-#endif
-
-#if (RTL8812A_SUPPORT == 1)
-	if (p_dm->support_ic_type & (ODM_RTL8812)) {
-
-		if (path == BB_PATH_A) {
-			ofdm_tx_path = 0x11;
-			/**/
-		} else if (path == BB_PATH_B) {
-			ofdm_tx_path = 0x22;
-			/**/
-		} else  if (path == BB_PATH_AB) {
-			ofdm_tx_path = 0x33;
-			/**/
-		}
-
-		odm_set_bb_reg(p_dm, 0x80c, 0xff00, ofdm_tx_path);
-	}
-#endif
 }
 
 void
@@ -96,44 +58,6 @@ phydm_config_ofdm_rx_path(
 	u32			path
 )
 {
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	u8	ofdm_rx_path = 0;
-
-
-	if (p_dm->support_ic_type & (ODM_RTL8192E)) {
-#if (RTL8192E_SUPPORT == 1)
-		if (path == BB_PATH_A) {
-			ofdm_rx_path = 1;
-			/**/
-		} else if (path == BB_PATH_B) {
-			ofdm_rx_path = 2;
-			/**/
-		} else  if (path == BB_PATH_AB) {
-			ofdm_rx_path = 3;
-			/**/
-		}
-
-		odm_set_bb_reg(p_dm, 0xC04, 0xff, (((ofdm_rx_path) << 4) | ofdm_rx_path));
-		odm_set_bb_reg(p_dm, 0xD04, 0xf, ofdm_rx_path);
-#endif
-	}
-#if (RTL8812A_SUPPORT || RTL8822B_SUPPORT)
-	else if (p_dm->support_ic_type & (ODM_RTL8812 | ODM_RTL8822B)) {
-
-		if (path == BB_PATH_A) {
-			ofdm_rx_path = 1;
-			/**/
-		} else if (path == BB_PATH_B) {
-			ofdm_rx_path = 2;
-			/**/
-		} else  if (path == BB_PATH_AB) {
-			ofdm_rx_path = 3;
-			/**/
-		}
-
-		odm_set_bb_reg(p_dm, 0x808, MASKBYTE0, ((ofdm_rx_path << 4) | ofdm_rx_path));
-	}
-#endif
 }
 
 void
@@ -379,27 +303,6 @@ phydm_set_ext_switch(
 	u32		*_out_len
 )
 {
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	u32			ext_ant_switch =  dm_value[0];
-
-#if (RTL8821A_SUPPORT == 1) || (RTL8881A_SUPPORT == 1)
-	if (p_dm->support_ic_type & (ODM_RTL8821 | ODM_RTL8881A)) {
-
-		/*Output Pin Settings*/
-		odm_set_mac_reg(p_dm, 0x4C, BIT(23), 0); /*select DPDT_P and DPDT_N as output pin*/
-		odm_set_mac_reg(p_dm, 0x4C, BIT(24), 1); /*by WLAN control*/
-
-		odm_set_bb_reg(p_dm, 0xCB4, 0xFF, 77); /*DPDT_N = 1b'0*/  /*DPDT_P = 1b'0*/
-
-		if (ext_ant_switch == MAIN_ANT) {
-			odm_set_bb_reg(p_dm, 0xCB4, (BIT(29) | BIT(28)), 1);
-			PHYDM_DBG(p_dm, ODM_COMP_API, ("***8821A set ant switch = 2b'01 (Main)\n"));
-		} else if (ext_ant_switch == AUX_ANT) {
-			odm_set_bb_reg(p_dm, 0xCB4, BIT(29) | BIT(28), 2);
-			PHYDM_DBG(p_dm, ODM_COMP_API, ("***8821A set ant switch = 2b'10 (Aux)\n"));
-		}
-	}
-#endif
 }
 
 void
@@ -936,50 +839,6 @@ phydm_api_set_txagc(
 	boolean		ret = false;
 	u8	i;
 
-#if ((RTL8822B_SUPPORT == 1) || (RTL8821C_SUPPORT == 1))
-	if (p_dm->support_ic_type & (ODM_RTL8822B | ODM_RTL8821C)) {
-		if (is_single_rate) {
-			
-			#if (RTL8822B_SUPPORT == 1)
-			if (p_dm->support_ic_type == ODM_RTL8822B)
-				ret = phydm_write_txagc_1byte_8822b(p_dm, power_index, path, hw_rate);
-			#endif
-			
-			#if (RTL8821C_SUPPORT == 1)
-			if (p_dm->support_ic_type == ODM_RTL8821C)
-				ret = phydm_write_txagc_1byte_8821c(p_dm, power_index, path, hw_rate);
-			#endif
-			
-			#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-			set_current_tx_agc(p_dm->priv, path, hw_rate, (u8)power_index);
-			#endif
-
-		} else {
-
-			#if (RTL8822B_SUPPORT == 1)
-			if (p_dm->support_ic_type == ODM_RTL8822B)
-				ret = config_phydm_write_txagc_8822b(p_dm, power_index, path, hw_rate);
-			#endif
-			
-			#if (RTL8821C_SUPPORT == 1)
-			if (p_dm->support_ic_type == ODM_RTL8821C)
-				ret = config_phydm_write_txagc_8821c(p_dm, power_index, path, hw_rate);
-			#endif
-			
-			#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-			for (i = 0; i < 4; i++)
-				set_current_tx_agc(p_dm->priv, path, (hw_rate + i), (u8)power_index);
-			#endif
-		}
-	}
-#endif
-
-
-#if (RTL8197F_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8197F)
-		ret = config_phydm_write_txagc_8197f(p_dm, power_index, path, hw_rate);
-#endif
-
 	return ret;
 }
 
@@ -993,24 +852,8 @@ phydm_api_get_txagc(
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8	ret = 0;
 
-#if (RTL8822B_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8822B)
-		ret = config_phydm_read_txagc_8822b(p_dm, path, hw_rate);
-#endif
-
-#if (RTL8197F_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8197F)
-		ret = config_phydm_read_txagc_8197f(p_dm, path, hw_rate);
-#endif
-
-#if (RTL8821C_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8821C)
-		ret = config_phydm_read_txagc_8821c(p_dm, path, hw_rate);
-#endif
-
 	return ret;
 }
-
 
 boolean
 phydm_api_switch_bw_channel(
@@ -1022,21 +865,6 @@ phydm_api_switch_bw_channel(
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;	
 	boolean		ret = false;
-
-#if (RTL8822B_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8822B)
-		ret = config_phydm_switch_channel_bw_8822b(p_dm, central_ch, primary_ch_idx, bandwidth);
-#endif
-
-#if (RTL8197F_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8197F)
-		ret = config_phydm_switch_channel_bw_8197f(p_dm, central_ch, primary_ch_idx, bandwidth);
-#endif
-
-#if (RTL8821C_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8821C)
-		ret = config_phydm_switch_channel_bw_8821c(p_dm, central_ch, primary_ch_idx, bandwidth);
-#endif
 
 	return ret;
 }
@@ -1052,134 +880,6 @@ phydm_api_trx_mode(
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	boolean		ret = false;
 
-#if (RTL8822B_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8822B)
-		ret = config_phydm_trx_mode_8822b(p_dm, tx_path, rx_path, is_tx2_path);
-#endif
-
-#if (RTL8197F_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8197F)
-		ret = config_phydm_trx_mode_8197f(p_dm, tx_path, rx_path, is_tx2_path);
-#endif
-
 	return ret;
 }
 #endif
-
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-void
-phydm_normal_driver_rx_sniffer(
-	struct PHY_DM_STRUCT			*p_dm,
-	u8				*p_desc,
-	PRT_RFD_STATUS		p_rt_rfd_status,
-	u8				*p_drv_info,
-	u8				phy_status
-)
-{
-#if (defined(CONFIG_PHYDM_RX_SNIFFER_PARSING))
-	u32		*p_msg;
-	u16		seq_num;
-	struct phydm_fat_struct		*p_dm_fat_table = &p_dm->dm_fat_table;
-
-	if (p_rt_rfd_status->packet_report_type != NORMAL_RX)
-		return;
-
-	if (!p_dm->is_linked) {
-		if (p_rt_rfd_status->is_hw_error)
-			return;
-	}
-
-	if (!(p_dm_fat_table->fat_state == FAT_TRAINING_STATE))
-		return;
-
-	if (phy_status == true) {
-
-		if ((p_dm->rx_pkt_type == type_block_ack) || (p_dm->rx_pkt_type == type_rts) || (p_dm->rx_pkt_type == type_cts))
-			seq_num = 0;
-		else
-			seq_num = p_rt_rfd_status->seq_num;
-
-		PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, ("%04d , %01s, rate=0x%02x, L=%04d , %s , %s",
-				seq_num,
-				/*p_rt_rfd_status->mac_id,*/
-			((p_rt_rfd_status->is_crc) ? "C" : (p_rt_rfd_status->is_ampdu) ? "A" : "_"),
-				p_rt_rfd_status->data_rate,
-				p_rt_rfd_status->length,
-			((p_rt_rfd_status->band_width == 0) ? "20M" : ((p_rt_rfd_status->band_width == 1) ? "40M" : "80M")),
-				((p_rt_rfd_status->is_ldpc) ? "LDP" : "BCC")));
-
-		if (p_dm->rx_pkt_type == type_asoc_req) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "AS_REQ"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_asoc_rsp) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "AS_RSP"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_probe_req) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "PR_REQ"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_probe_rsp) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "PR_RSP"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_deauth) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "DEAUTH"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_beacon) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "BEACON"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_block_ack_req) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "BA_REQ"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_rts) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "__RTS_"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_cts) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "__CTS_"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_ack) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "__ACK_"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_block_ack) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "__BA__"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_data) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "_DATA_"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_data_ack) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "Data_Ack"));
-			/**/
-		} else if (p_dm->rx_pkt_type == type_qos_data) {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [%s]", "QoS_Data"));
-			/**/
-		} else {
-			PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [0x%x]", p_dm->rx_pkt_type));
-			/**/
-		}
-
-		PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , [RSSI=%d,%d,%d,%d ]",
-				p_dm->RSSI_A,
-				p_dm->RSSI_B,
-				p_dm->RSSI_C,
-				p_dm->RSSI_D));
-
-		p_msg = (u32 *)p_drv_info;
-
-		PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, (" , P-STS[28:0]=%08x-%08x-%08x-%08x-%08x-%08x-%08x\n",
-			p_msg[6], p_msg[5], p_msg[4], p_msg[3], p_msg[2], p_msg[1], p_msg[1]));
-	} else {
-
-		PHYDM_DBG_F(p_dm, ODM_COMP_SNIFFER, ("%04d , %01s, rate=0x%02x, L=%04d , %s , %s\n",
-				p_rt_rfd_status->seq_num,
-				/*p_rt_rfd_status->mac_id,*/
-			((p_rt_rfd_status->is_crc) ? "C" : (p_rt_rfd_status->is_ampdu) ? "A" : "_"),
-				p_rt_rfd_status->data_rate,
-				p_rt_rfd_status->length,
-			((p_rt_rfd_status->band_width == 0) ? "20M" : ((p_rt_rfd_status->band_width == 1) ? "40M" : "80M")),
-				((p_rt_rfd_status->is_ldpc) ? "LDP" : "BCC")));
-	}
-
-
-#endif
-}
-#endif
-

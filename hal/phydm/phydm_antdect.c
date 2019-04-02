@@ -20,7 +20,6 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-/* #if( DM_ODM_SUPPORT_TYPE & (ODM_WIN |ODM_CE)) */
 #if (defined(CONFIG_ANT_DETECTION))
 
 /* IS_ANT_DETECT_SUPPORT_SINGLE_TONE(adapter)
@@ -810,24 +809,4 @@ odm_sw_ant_detect_init(
 	void		*p_dm_void
 )
 {
-#if (defined(CONFIG_ANT_DETECTION))
-#if (RTL8723B_SUPPORT == 1)
-
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _sw_antenna_switch_		*p_dm_swat_table = &p_dm->dm_swat_table;
-
-	if (p_dm->support_ic_type != ODM_RTL8723B)
-		return;
-
-	/* p_dm_swat_table->pre_antenna = MAIN_ANT; */
-	/* p_dm_swat_table->cur_antenna = MAIN_ANT; */
-	p_dm_swat_table->swas_no_link_state = 0;
-	p_dm_swat_table->pre_aux_fail_detec = false;
-	p_dm_swat_table->swas_no_link_bk_reg948 = 0xff;
-
-	#ifdef CONFIG_PSD_TOOL
-	phydm_psd_init(p_dm);
-	#endif
-#endif
-#endif
 }

@@ -39,20 +39,7 @@
 #define	RA_RETRY_LIMIT_LOW	4
 #define	RA_RETRY_LIMIT_HIGH	32
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	#define		RA_FIRST_MACID	1
-#elif (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	#define	RA_FIRST_MACID	0
-	#define	WIN_DEFAULT_PORT_MACID	0
-	#define	WIN_BT_PORT_MACID	2
-#else /*if (DM_ODM_SUPPORT_TYPE == ODM_CE)*/
-	#define		RA_FIRST_MACID	0
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-#define AP_InitRateAdaptiveState		odm_rate_adaptive_state_ap_init
-#endif
-
+#define		RA_FIRST_MACID	0
 
 #define		DM_RATR_STA_INIT			0
 #define		DM_RATR_STA_HIGH			1
@@ -138,7 +125,6 @@ struct _odm_ra_info_ {
 	u8 ra_waiting_counter;
 	u8 ra_pending_counter;
 	u8 ra_drop_after_down;
-#if 1 /* POWER_TRAINING_ACTIVE == 1 */ /* For compile  pass only~! */
 	u8 pt_active;  /* on or off */
 	u8 pt_try_state;  /* 0 trying state, 1 for decision state */
 	u8 pt_stage;  /* 0~6 */
@@ -148,26 +134,11 @@ struct _odm_ra_info_ {
 	u8 pt_mode_ss;  /* decide whitch rate should do PT */
 	u8 ra_stage;  /* StageRA, decide how many times RA will be done between PT */
 	u8 pt_smooth_factor;
-#endif
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP) &&	((DEV_BUS_TYPE == RT_USB_INTERFACE) || (DEV_BUS_TYPE == RT_SDIO_INTERFACE))
-	u8 rate_down_counter;
-	u8 rate_up_counter;
-	u8 rate_direction;
-	u8 bounding_type;
-	u8 bounding_counter;
-	u8 bounding_learning_time;
-	u8 rate_down_start_time;
-#endif
 };
 #endif
 
-
 struct _rate_adaptive_table_ {
 	u8		firstconnect;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	boolean		PT_collision_pre;
-#endif
-
 #if (defined(CONFIG_RA_DBG_CMD))
 	boolean		is_ra_dbg_init;
 
@@ -389,46 +360,6 @@ phydm_ra_mask_watchdog(
 );
 
 #endif
-
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-
-void
-odm_refresh_basic_rate_mask(
-	void		*p_dm_void
-);
-
-void
-odm_update_init_rate_work_item_callback(
-	void	*p_context
-);
-
-void
-odm_refresh_ldpc_rts_mp(
-	struct _ADAPTER			*p_adapter,
-	struct PHY_DM_STRUCT			*p_dm,
-	u8				m_mac_id,
-	u8				iot_peer,
-	s32				undecorated_smoothed_pwdb
-);
-
-void
-odm_rate_adaptive_state_ap_init(
-	void			*PADAPTER_VOID,
-	struct cmn_sta_info	*p_entry
-);
-
-#elif (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-
-void
-phydm_gen_ramask_h2c_AP(
-	void			*p_dm_void,
-	struct rtl8192cd_priv *priv,
-	struct sta_info *p_entry,
-	u8			rssi_level
-);
-
-#endif/*#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))*/
 
 
 #if (defined(CONFIG_RA_DYNAMIC_RATE_ID))

@@ -16,8 +16,6 @@
 #include "mp_precomp.h"
 #include "../phydm_precomp.h"
 
-#if (RTL8723D_SUPPORT == 1)
-
 void
 odm_config_rf_reg_8723d(
 	struct PHY_DM_STRUCT				*p_dm,
@@ -116,11 +114,7 @@ odm_config_bb_phy_reg_pg_8723d(
 		ODM_delay_ms(50);
 #endif
 	else {
-#if (DM_ODM_SUPPORT_TYPE & ODM_CE)
 		phy_store_tx_power_by_rate(p_dm->adapter, band, rf_path, tx_num, addr, bitmask, data);
-#elif (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-		PHY_StoreTxPowerByRate(p_dm->adapter, band, rf_path, tx_num, addr, bitmask, data);
-#endif
 	}
 	PHYDM_DBG(p_dm, ODM_COMP_INIT, ("===> odm_config_bb_with_header_file: [PHY_REG] %08X %08X %08X\n", addr, bitmask, data));
 }
@@ -170,13 +164,6 @@ odm_config_bb_txpwr_lmt_8723d(
 	u8		*power_limit
 )
 {
-#if (DM_ODM_SUPPORT_TYPE & ODM_CE)
 	phy_set_tx_power_limit(p_dm, regulation, band,
 		       bandwidth, rate_section, rf_path, channel, power_limit);
-#elif (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	PHY_SetTxPowerLimit(p_dm, regulation, band,
-		       bandwidth, rate_section, rf_path, channel, power_limit);
-#endif
 }
-
-#endif

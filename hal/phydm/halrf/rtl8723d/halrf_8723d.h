@@ -79,29 +79,9 @@ phy_lc_calibrate_8723d(
 
 
 void phy_set_rf_path_switch_8723d(
-#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	struct PHY_DM_STRUCT		*p_dm,
-#else
 	struct _ADAPTER	*p_adapter,
-#endif
 	boolean		is_main
 );
-
-#if 0
-/*
- * AP calibrate
- *   */
-void
-phy_ap_calibrate_8723d(
-#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	struct PHY_DM_STRUCT		*p_dm,
-#else
-	struct _ADAPTER	*p_adapter,
-#endif
-	s8		delta);
-void
-phy_digital_predistortion_8723d(struct _ADAPTER	*p_adapter);
-#endif
 
 void
 _phy_save_adda_registers_8723d(

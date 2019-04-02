@@ -73,8 +73,5 @@ enum phy_cnt {
 	CRC32_ERROR_CCK,
 };
 u32 rtw_phydm_get_phy_cnt(_adapter *adapter, enum phy_cnt cnt);
-#if ((RTL8822B_SUPPORT == 1) || (RTL8821C_SUPPORT == 1) || (RTL8814B_SUPPORT == 1))
-void rtw_phydm_iqk_trigger(_adapter *adapter);
-#endif
 
 #endif /* __HAL_DM_H__ */
