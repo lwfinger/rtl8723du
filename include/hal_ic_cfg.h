@@ -41,69 +41,16 @@
 #ifdef CONFIG_MULTIDRV
 #endif
 
-#ifdef CONFIG_RTL8188E
-	#undef RTL8188E_SUPPORT
-	#undef RATE_ADAPTIVE_SUPPORT
-	#undef POWER_TRAINING_ACTIVE
-
-	#define RTL8188E_SUPPORT				1
-	#define RATE_ADAPTIVE_SUPPORT			1
-	#define POWER_TRAINING_ACTIVE			1
+#undef RTL8723D_SUPPORT
+#define RTL8723D_SUPPORT				1
+#ifndef CONFIG_FW_C2H_PKT
+	#define CONFIG_FW_C2H_PKT
 #endif
-
-#ifdef CONFIG_RTL8192E
-	#undef RTL8192E_SUPPORT
-	#define RTL8192E_SUPPORT				1
-	#ifndef CONFIG_FW_C2H_PKT
-		#define CONFIG_FW_C2H_PKT
-	#endif
+#ifndef CONFIG_RTW_MAC_HIDDEN_RPT
+	#define CONFIG_RTW_MAC_HIDDEN_RPT
 #endif
-
-#ifdef CONFIG_RTL8723B
-	#undef RTL8723B_SUPPORT
-	#define RTL8723B_SUPPORT				1
-	#ifndef CONFIG_FW_C2H_PKT
-		#define CONFIG_FW_C2H_PKT
-	#endif
-#endif
-
-#ifdef CONFIG_RTL8723D
-	#undef RTL8723D_SUPPORT
-	#define RTL8723D_SUPPORT				1
-	#ifndef CONFIG_FW_C2H_PKT
-		#define CONFIG_FW_C2H_PKT
-	#endif
-	#ifndef CONFIG_RTW_MAC_HIDDEN_RPT
-		#define CONFIG_RTW_MAC_HIDDEN_RPT
-	#endif
-	#ifndef CONFIG_RTW_CUSTOMER_STR
-		#define CONFIG_RTW_CUSTOMER_STR
-	#endif
-#endif
-
-#ifdef CONFIG_RTL8703B
-	#undef RTL8703B_SUPPORT
-	#define RTL8703B_SUPPORT				1
-	#ifndef CONFIG_FW_C2H_PKT
-		#define CONFIG_FW_C2H_PKT
-	#endif
-	#ifndef CONFIG_RTW_MAC_HIDDEN_RPT
-		#define CONFIG_RTW_MAC_HIDDEN_RPT
-	#endif
-#endif
-
-#ifdef CONFIG_RTL8188F
-	#undef RTL8188F_SUPPORT
-	#define RTL8188F_SUPPORT				1
-	#ifndef CONFIG_FW_C2H_PKT
-		#define CONFIG_FW_C2H_PKT
-	#endif
-	#ifndef CONFIG_RTW_MAC_HIDDEN_RPT
-		#define CONFIG_RTW_MAC_HIDDEN_RPT
-	#endif
-	#ifndef CONFIG_RTW_CUSTOMER_STR
-		#define CONFIG_RTW_CUSTOMER_STR
-	#endif
+#ifndef CONFIG_RTW_CUSTOMER_STR
+	#define CONFIG_RTW_CUSTOMER_STR
 #endif
 
 #endif /*__HAL_IC_CFG_H__*/

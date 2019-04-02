@@ -238,41 +238,6 @@ const struct map_t pg_txpwr_def_info =
 			0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE)
 	);
 
-#ifdef CONFIG_RTL8188E
-static const struct map_t rtl8188e_pg_txpwr_def_info =
-	MAP_ENT(0xB8, 1, 0xFF
-		, MAPSEG_ARRAY_ENT(0x10, 12,
-			0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x24)
-	);
-#endif
-
-#ifdef CONFIG_RTL8188F
-static const struct map_t rtl8188f_pg_txpwr_def_info =
-	MAP_ENT(0xB8, 1, 0xFF
-		, MAPSEG_ARRAY_ENT(0x10, 12,
-			0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x27, 0x27, 0x27, 0x27, 0x27, 0x24)
-	);
-#endif
-
-#ifdef CONFIG_RTL8723B
-static const struct map_t rtl8723b_pg_txpwr_def_info =
-	MAP_ENT(0xB8, 2, 0xFF
-		, MAPSEG_ARRAY_ENT(0x10, 12,
-			0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0xE0)
-		, MAPSEG_ARRAY_ENT(0x3A, 12,
-			0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0xE0)
-	);
-#endif
-
-#ifdef CONFIG_RTL8703B
-static const struct map_t rtl8703b_pg_txpwr_def_info =
-	MAP_ENT(0xB8, 1, 0xFF
-		, MAPSEG_ARRAY_ENT(0x10, 12,
-			0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x02)
-	);
-#endif
-
-#ifdef CONFIG_RTL8723D
 static const struct map_t rtl8723d_pg_txpwr_def_info =
 	MAP_ENT(0xB8, 2, 0xFF
 		, MAPSEG_ARRAY_ENT(0x10, 12,
@@ -280,17 +245,6 @@ static const struct map_t rtl8723d_pg_txpwr_def_info =
 		, MAPSEG_ARRAY_ENT(0x3A, 12,
 			0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x21, 0x21, 0x21, 0x21, 0x21, 0x02)
 	);
-#endif
-
-#ifdef CONFIG_RTL8192E
-static const struct map_t rtl8192e_pg_txpwr_def_info =
-	MAP_ENT(0xB8, 2, 0xFF
-		, MAPSEG_ARRAY_ENT(0x10, 14,
-			0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x24, 0xEE, 0xEE)
-		, MAPSEG_ARRAY_ENT(0x3A, 14,
-			0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x24, 0xEE, 0xEE)
-	);
-#endif
 
 const struct map_t *hal_pg_txpwr_def_info(_adapter *adapter)
 {
@@ -300,36 +254,9 @@ const struct map_t *hal_pg_txpwr_def_info(_adapter *adapter)
 	interface_type = rtw_get_intf_type(adapter);
 
 	switch (rtw_get_chip_type(adapter)) {
-#ifdef CONFIG_RTL8723B
-	case RTL8723B:
-		map = &rtl8723b_pg_txpwr_def_info;
-		break;
-#endif
-#ifdef CONFIG_RTL8703B
-	case RTL8703B:
-		map = &rtl8703b_pg_txpwr_def_info;
-		break;
-#endif
-#ifdef CONFIG_RTL8723D
 	case RTL8723D:
 		map = &rtl8723d_pg_txpwr_def_info;
 		break;
-#endif
-#ifdef CONFIG_RTL8188E
-	case RTL8188E:
-		map = &rtl8188e_pg_txpwr_def_info;
-		break;
-#endif
-#ifdef CONFIG_RTL8188F
-	case RTL8188F:
-		map = &rtl8188f_pg_txpwr_def_info;
-		break;
-#endif
-#ifdef CONFIG_RTL8192E
-	case RTL8192E:
-		map = &rtl8192e_pg_txpwr_def_info;
-		break;
-#endif
 	}
 
 	if (map == NULL) {

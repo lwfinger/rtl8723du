@@ -24,10 +24,6 @@
 #define DRV_NAME "rtl8723du"
 #endif
 
-#ifndef CONFIG_RTL8723D
-#define CONFIG_RTL8723D
-#endif
-
 /*
  * Wi-Fi Functions Configure
  */

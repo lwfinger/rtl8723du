@@ -23,30 +23,7 @@ void usb_c2h_hisr_hdl(_adapter *adapter, u8 *buf);
 
 u8 rtw_set_hal_ops(_adapter *padapter);
 
-#ifdef CONFIG_RTL8188E
-void rtl8188eu_set_hal_ops(_adapter *padapter);
-#endif
-
-#ifdef CONFIG_RTL8192E
-void rtl8192eu_set_hal_ops(_adapter *padapter);
-#endif
-
-
-#ifdef CONFIG_RTL8723B
-void rtl8723bu_set_hal_ops(_adapter *padapter);
-#endif
-
-#ifdef CONFIG_RTL8188F
-void rtl8188fu_set_hal_ops(_adapter *padapter);
-#endif
-
-#ifdef CONFIG_RTL8703B
-void rtl8703bu_set_hal_ops(_adapter *padapter);
-#endif
-
-#ifdef CONFIG_RTL8723D
 void rtl8723du_set_hal_ops(_adapter *padapter);
-#endif
 
 #ifdef CONFIG_INTEL_PROXIM
 extern _adapter  *rtw_usb_get_sw_pointer(void);

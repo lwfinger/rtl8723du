@@ -124,13 +124,6 @@ void hal_btcoex_wifionly_scan_notify(PADAPTER padapter)
 
 void hal_btcoex_wifionly_hw_config(PADAPTER padapter)
 {
-	struct wifi_only_cfg *pwifionlycfg = &GLBtCoexistWifiOnly;
-
-	if (IS_HARDWARE_TYPE_8723B(padapter)) {
-#ifdef CONFIG_RTL8723B
-		ex_hal8723b_wifi_only_hw_config(pwifionlycfg);
-#endif
-	}
 }
 
 void hal_btcoex_wifionly_initlizevariables(PADAPTER padapter)

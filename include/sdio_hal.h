@@ -18,28 +18,6 @@
 void sd_int_dpc(PADAPTER padapter);
 u8 rtw_set_hal_ops(_adapter *padapter);
 
-#ifdef CONFIG_RTL8188E
-void rtl8188es_set_hal_ops(PADAPTER padapter);
-#endif
-
-#ifdef CONFIG_RTL8723B
-void rtl8723bs_set_hal_ops(PADAPTER padapter);
-#endif
-
-#ifdef CONFIG_RTL8192E
-void rtl8192es_set_hal_ops(PADAPTER padapter);
-#endif
-
-#ifdef CONFIG_RTL8703B
-void rtl8703bs_set_hal_ops(PADAPTER padapter);
-#endif
-
-#ifdef CONFIG_RTL8723D
 void rtl8723ds_set_hal_ops(PADAPTER padapter);
-#endif
-
-#ifdef CONFIG_RTL8188F
-void rtl8188fs_set_hal_ops(PADAPTER padapter);
-#endif
 
 #endif /* __SDIO_HAL_H__ */

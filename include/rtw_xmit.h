@@ -49,10 +49,10 @@
 	#define NR_XMIT_EXTBUFF	(32)
 #endif
 
-#if defined(CONFIG_RTL8723D) && defined(CONFIG_LPS_POFF)
+#if defined(CONFIG_LPS_POFF)
 	#define MAX_CMDBUF_SZ	(128*70) /*(8960)*/
 #else
-	#define MAX_CMDBUF_SZ	(5120)	/* (4096) */
+	#define MAX_CMDBUF_SZ   (5120)  /* (4096) */
 #endif
 
 #define MAX_NUMBLKS		(1)
@@ -126,11 +126,7 @@
 
 /* For Buffer Descriptor ring architecture */
 #if defined(BUF_DESC_ARCH) || defined(CONFIG_TRX_BD_ARCH)
-	#if defined(CONFIG_RTL8192E)
-		#define TX_BUFFER_SEG_NUM	1 /* 0:2 seg, 1: 4 seg, 2: 8 seg. */
-	#else
-		#define TX_BUFFER_SEG_NUM	1 /* 0:2 seg, 1: 4 seg, 2: 8 seg. */
-	#endif
+	#define TX_BUFFER_SEG_NUM	1 /* 0:2 seg, 1: 4 seg, 2: 8 seg. */
 #endif
 
 #define TXDESC_SIZE 40

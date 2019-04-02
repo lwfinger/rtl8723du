@@ -117,24 +117,7 @@ typedef enum _RX_AGG_MODE {
 #endif /* RTW_RX_AGGREGATION */
 
 /* E-Fuse */
-#ifdef CONFIG_RTL8188E
-	#define EFUSE_MAP_SIZE	512
-#endif
-#ifdef CONFIG_RTL8192E
-	#define EFUSE_MAP_SIZE	512
-#endif
-#ifdef CONFIG_RTL8723B
-	#define EFUSE_MAP_SIZE	512
-#endif
-#ifdef CONFIG_RTL8703B
-	#define EFUSE_MAP_SIZE	512
-#endif
-#ifdef CONFIG_RTL8723D
-	#define EFUSE_MAP_SIZE	512
-#endif
-#ifdef CONFIG_RTL8188F
-	#define EFUSE_MAP_SIZE	512
-#endif
+#define EFUSE_MAP_SIZE	512
 
 #define EFUSE_MAX_SIZE	512
 /* end of E-Fuse */
@@ -151,16 +134,8 @@ typedef enum _RX_AGG_MODE {
 #define Mac_DropPacket		0xA0000000
 
 #ifdef CONFIG_RF_POWER_TRIM
-#if defined(CONFIG_RTL8723B)
-	#define REG_RF_BB_GAIN_OFFSET	0x7f
-	#define RF_GAIN_OFFSET_MASK		0xfffff
-#elif defined(CONFIG_RTL8188E)
-	#define REG_RF_BB_GAIN_OFFSET	0x55
-	#define RF_GAIN_OFFSET_MASK		0xfffff
-#else
-	#define REG_RF_BB_GAIN_OFFSET	0x55
-	#define RF_GAIN_OFFSET_MASK		0xfffff
-#endif /* CONFIG_RTL8723B */
+#define REG_RF_BB_GAIN_OFFSET	0x55
+#define RF_GAIN_OFFSET_MASK		0xfffff
 #endif /*CONFIG_RF_POWER_TRIM*/
 
 /* For store initial value of BB register */
@@ -422,11 +397,8 @@ typedef struct hal_com_data {
 	struct kfree_data_t kfree_data;
 #endif /*CONFIG_RF_POWER_TRIM*/
 
-#if defined(CONFIG_RTL8723B) || defined(CONFIG_RTL8703B) || \
-	defined(CONFIG_RTL8723D)
-	u8	adjuseVoltageVal;
-	u8	need_restore;
-#endif
+	u8      adjuseVoltageVal;
+	u8      need_restore;
 	u8	EfuseUsedPercentage;
 	u16	EfuseUsedBytes;
 	EFUSE_HAL	EfuseHal;

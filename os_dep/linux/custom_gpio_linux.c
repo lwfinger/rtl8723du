@@ -22,11 +22,6 @@
 
 #if !(defined ANDROID_2X)
 
-#ifdef CONFIG_RTL8188E
-#include <mach/regulator.h>
-#include <linux/regulator/consumer.h>
-#endif /* CONFIG_RTL8188E */
-
 #ifndef GPIO_WIFI_POWER
 #define GPIO_WIFI_POWER -1
 #endif /* !GPIO_WIFI_POWER */
@@ -93,21 +88,8 @@ void rtw_wifi_gpio_wlan_ctrl(int onoff)
 
 #include <mach/ldo.h>
 
-#ifdef CONFIG_RTL8188E
-extern int sprd_3rdparty_gpio_wifi_power;
-#endif
-extern int sprd_3rdparty_gpio_wifi_pwd;
-#if  defined(CONFIG_RTL8723B)
-extern int sprd_3rdparty_gpio_bt_reset;
-#endif
-
 int rtw_wifi_gpio_init(void)
 {
-#if defined(CONFIG_RTL8723B)
-	if (sprd_3rdparty_gpio_bt_reset > 0)
-		gpio_direction_output(sprd_3rdparty_gpio_bt_reset, 1);
-#endif
-
 	return 0;
 }
 
@@ -145,57 +127,19 @@ void rtw_wifi_gpio_wlan_ctrl(int onoff)
 		break;
 
 	case WLAN_POWER_OFF:
-#ifdef CONFIG_RTL8188E
-#ifdef CONFIG_WIF1_LDO
-		RTW_INFO("%s: turn off VDD-WIFI0 1.2V\n", __FUNCTION__);
-		LDO_TurnOffLDO(LDO_LDO_WIF1);
-#endif /* CONFIG_WIF1_LDO */
-
-		RTW_INFO("%s: turn off VDD-WIFI0 3.3V\n", __FUNCTION__);
-		LDO_TurnOffLDO(LDO_LDO_WIF0);
-
-		RTW_INFO("%s: call customer specific GPIO(%d) to turn off wifi power\n",
-			 __FUNCTION__, sprd_3rdparty_gpio_wifi_power);
-		if (sprd_3rdparty_gpio_wifi_power != 65535)
-			gpio_set_value(sprd_3rdparty_gpio_wifi_power, 0);
-#endif
 		break;
 
 	case WLAN_POWER_ON:
-#ifdef CONFIG_RTL8188E
-		RTW_INFO("%s: call customer specific GPIO(%d) to turn on wifi power\n",
-			 __FUNCTION__, sprd_3rdparty_gpio_wifi_power);
-		if (sprd_3rdparty_gpio_wifi_power != 65535)
-			gpio_set_value(sprd_3rdparty_gpio_wifi_power, 1);
-
-		RTW_INFO("%s: turn on VDD-WIFI0 3.3V\n", __FUNCTION__);
-		LDO_TurnOnLDO(LDO_LDO_WIF0);
-		LDO_SetVoltLevel(LDO_LDO_WIF0, LDO_VOLT_LEVEL1);
-
-#ifdef CONFIG_WIF1_LDO
-		RTW_INFO("%s: turn on VDD-WIFI1 1.2V\n", __func__);
-		LDO_TurnOnLDO(LDO_LDO_WIF1);
-		LDO_SetVoltLevel(LDO_LDO_WIF1, LDO_VOLT_LEVEL3);
-#endif /* CONFIG_WIF1_LDO */
-#endif
 		break;
 
 	case WLAN_BT_PWDN_OFF:
 		RTW_INFO("%s: call customer specific GPIO to set bt power down pin to 0\n",
 			 __FUNCTION__);
-#if defined(CONFIG_RTL8723B)
-		if (sprd_3rdparty_gpio_bt_reset > 0)
-			gpio_set_value(sprd_3rdparty_gpio_bt_reset, 0);
-#endif
 		break;
 
 	case WLAN_BT_PWDN_ON:
 		RTW_INFO("%s: callc customer specific GPIO to set bt power down pin to 1\n",
 			 __FUNCTION__);
-#if defined(CONFIG_RTL8723B)
-		if (sprd_3rdparty_gpio_bt_reset > 0)
-			gpio_set_value(sprd_3rdparty_gpio_bt_reset, 1);
-#endif
 		break;
 	}
 }

@@ -16,38 +16,6 @@
 #define __PCI_OPS_H_
 
 
-#ifdef CONFIG_RTL8188E
-	u32	rtl8188ee_init_desc_ring(_adapter *padapter);
-	u32	rtl8188ee_free_desc_ring(_adapter *padapter);
-	void	rtl8188ee_reset_desc_ring(_adapter *padapter);
-	int	rtl8188ee_interrupt(PADAPTER Adapter);
-	void	rtl8188ee_xmit_tasklet(void *priv);
-	void	rtl8188ee_recv_tasklet(void *priv);
-	void	rtl8188ee_prepare_bcn_tasklet(void *priv);
-	void	rtl8188ee_set_intf_ops(struct _io_ops	*pops);
-#endif
-
-#ifdef CONFIG_RTL8192E
-	u32	rtl8192ee_init_desc_ring(_adapter *padapter);
-	u32	rtl8192ee_free_desc_ring(_adapter *padapter);
-	void	rtl8192ee_reset_desc_ring(_adapter *padapter);
-	void	rtl8192ee_recv_tasklet(void *priv);
-	void	rtl8192ee_prepare_bcn_tasklet(void *priv);
-	int	rtl8192ee_interrupt(PADAPTER Adapter);
-	void	rtl8192ee_set_intf_ops(struct _io_ops	*pops);
-#endif
-
-#ifdef CONFIG_RTL8723B
-	u32	rtl8723be_init_desc_ring(_adapter *padapter);
-	u32	rtl8723be_free_desc_ring(_adapter *padapter);
-	void	rtl8723be_reset_desc_ring(_adapter *padapter);
-	int	rtl8723be_interrupt(PADAPTER Adapter);
-	void	rtl8723be_recv_tasklet(void *priv);
-	void	rtl8723be_prepare_bcn_tasklet(void *priv);
-	void	rtl8723be_set_intf_ops(struct _io_ops	*pops);
-#endif
-
-#ifdef CONFIG_RTL8723D
 	u32	rtl8723de_init_desc_ring(_adapter *padapter);
 	u32	rtl8723de_free_desc_ring(_adapter *padapter);
 	void	rtl8723de_reset_desc_ring(_adapter *padapter);
@@ -56,6 +24,5 @@
 	void	rtl8723de_prepare_bcn_tasklet(void *priv);
 	void	rtl8723de_set_intf_ops(struct _io_ops	*pops);
 	u8 check_tx_desc_resource(_adapter *padapter, int prio);
-#endif
 
 #endif

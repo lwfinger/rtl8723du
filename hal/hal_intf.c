@@ -739,9 +739,6 @@ exit:
 }
 #endif /* CONFIG_FW_C2H_PKT */
 
-#if defined(CONFIG_MP_INCLUDED) && defined(CONFIG_RTL8723B)
-#include <rtw_bt_mp.h> /* for MPTBT_FwC2hBtMpCtrl */
-#endif
 s32 c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 {
 	u8 sub_id = 0;
@@ -757,9 +754,6 @@ s32 c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 		rtw_btcoex_BtInfoNotify(adapter, plen, payload);
 		break;
 	case C2H_BT_MP_INFO:
-		#if defined(CONFIG_MP_INCLUDED) && defined(CONFIG_RTL8723B)
-		MPTBT_FwC2hBtMpCtrl(adapter, payload, plen);
-		#endif
 		rtw_btcoex_BtMpRptNotify(adapter, plen, payload);
 		break;
 	case C2H_MAILBOX_STATUS:
@@ -1296,7 +1290,7 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 		rtw_hal_error_msg("hal_mac_c2h_handler");
 		ret = _FAIL;
 	}
-#elif !defined(CONFIG_RTL8188E)
+#else
 	if (NULL == padapter->hal_func.c2h_handler) {
 		rtw_hal_error_msg("c2h_handler");
 		ret = _FAIL;

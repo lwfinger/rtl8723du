@@ -18,8 +18,6 @@
 
 #define C2H_MEM_SZ (16*1024)
 
-#ifndef CONFIG_RTL8711FW
-
 #define FREE_CMDOBJ_SZ	128
 
 #define MAX_CMDSZ	1024
@@ -207,10 +205,6 @@ struct mgnt_tx_parm {
 	int wait_ack;
 };
 #endif
-
-#else
-/* #include <ieee80211.h> */
-#endif	/* CONFIG_RTL8711FW */
 
 enum rtw_drvextra_cmd_id {
 	NONE_WK_CID,
