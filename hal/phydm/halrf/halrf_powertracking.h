@@ -23,19 +23,10 @@ odm_check_power_status(
 	void		*p_dm_void
 );
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 void
 halrf_update_pwr_track(
 	void		*p_dm_void,
 	u8		rate
 );
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-void
-halrf_update_init_rate_work_item_callback(
-	void	*p_context
-);
-#endif
 
 #endif

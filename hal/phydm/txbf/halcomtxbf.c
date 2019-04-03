@@ -55,15 +55,6 @@ phydm_beamform_set_sounding_enter(
 	void			*p_dm_void
 )
 {
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
-
-	if (odm_is_work_item_scheduled(&(p_txbf_info->txbf_enter_work_item)) == false)
-		odm_schedule_work_item(&(p_txbf_info->txbf_enter_work_item));
-#else
-	hal_com_txbf_enter_work_item_callback(p_dm);
-#endif
 }
 
 void
@@ -72,14 +63,8 @@ phydm_beamform_set_sounding_leave(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 
-	if (odm_is_work_item_scheduled(&(p_txbf_info->txbf_leave_work_item)) == false)
-		odm_schedule_work_item(&(p_txbf_info->txbf_leave_work_item));
-#else
 	hal_com_txbf_leave_work_item_callback(p_dm);
-#endif
 }
 
 void
@@ -88,14 +73,8 @@ phydm_beamform_set_sounding_rate(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 
-	if (odm_is_work_item_scheduled(&(p_txbf_info->txbf_rate_work_item)) == false)
-		odm_schedule_work_item(&(p_txbf_info->txbf_rate_work_item));
-#else
 	hal_com_txbf_rate_work_item_callback(p_dm);
-#endif
 }
 
 void
@@ -104,14 +83,8 @@ phydm_beamform_set_sounding_status(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 
-	if (odm_is_work_item_scheduled(&(p_txbf_info->txbf_status_work_item)) == false)
-		odm_schedule_work_item(&(p_txbf_info->txbf_status_work_item));
-#else
 	hal_com_txbf_status_work_item_callback(p_dm);
-#endif
 }
 
 void
@@ -120,16 +93,8 @@ phydm_beamform_set_sounding_fw_ndpa(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 
-	if (*p_dm->p_is_fw_dw_rsvd_page_in_progress)
-		odm_set_timer(p_dm, &(p_txbf_info->txbf_fw_ndpa_timer), 5);
-	else
-		odm_schedule_work_item(&(p_txbf_info->txbf_fw_ndpa_work_item));
-#else
 	hal_com_txbf_fw_ndpa_work_item_callback(p_dm);
-#endif
 }
 
 void
@@ -138,18 +103,9 @@ phydm_beamform_set_sounding_clk(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
-
-	if (odm_is_work_item_scheduled(&(p_txbf_info->txbf_clk_work_item)) == false)
-		odm_schedule_work_item(&(p_txbf_info->txbf_clk_work_item));
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	struct _ADAPTER	*padapter = p_dm->adapter;
 
 	rtw_run_in_thread_cmd(padapter, hal_com_txbf_clk_work_item_callback, p_dm);
-#else
-	hal_com_txbf_clk_work_item_callback(p_dm);
-#endif
 }
 
 void
@@ -158,14 +114,8 @@ phydm_beamform_set_reset_tx_path(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 
-	if (odm_is_work_item_scheduled(&(p_txbf_info->txbf_reset_tx_path_work_item)) == false)
-		odm_schedule_work_item(&(p_txbf_info->txbf_reset_tx_path_work_item));
-#else
 	hal_com_txbf_reset_tx_path_work_item_callback(p_dm);
-#endif
 }
 
 void
@@ -174,31 +124,16 @@ phydm_beamform_set_get_tx_rate(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 
-	if (odm_is_work_item_scheduled(&(p_txbf_info->txbf_get_tx_rate_work_item)) == false)
-		odm_schedule_work_item(&(p_txbf_info->txbf_get_tx_rate_work_item));
-#else
 	hal_com_txbf_get_tx_rate_work_item_callback(p_dm);
-#endif
 }
 
 void
 hal_com_txbf_enter_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 )
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#endif
 	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 	u8			idx = p_txbf_info->txbf_idx;
 
@@ -216,19 +151,10 @@ hal_com_txbf_enter_work_item_callback(
 
 void
 hal_com_txbf_leave_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 )
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#endif
 	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 
 	u8			idx = p_txbf_info->txbf_idx;
@@ -248,19 +174,10 @@ hal_com_txbf_leave_work_item_callback(
 
 void
 hal_com_txbf_fw_ndpa_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 )
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#endif
 	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 	u8	idx = p_txbf_info->ndpa_idx;
 
@@ -278,19 +195,10 @@ hal_com_txbf_fw_ndpa_work_item_callback(
 
 void
 hal_com_txbf_clk_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 )
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#endif
 
 	PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] Start!\n", __func__));
 
@@ -302,19 +210,10 @@ hal_com_txbf_clk_work_item_callback(
 
 void
 hal_com_txbf_rate_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 )
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#endif
 	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 	u8			BW = p_txbf_info->BW;
 	u8			rate = p_txbf_info->rate;
@@ -330,48 +229,13 @@ hal_com_txbf_rate_work_item_callback(
 
 }
 
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-void
-hal_com_txbf_fw_ndpa_timer_callback(
-	struct timer_list		*p_timer
-)
-{
-
-	struct _ADAPTER		*adapter = (struct _ADAPTER *)p_timer->Adapter;
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-
-	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
-
-
-	PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] Start!\n", __func__));
-
-	if (*p_dm->p_is_fw_dw_rsvd_page_in_progress)
-		odm_set_timer(p_dm, &(p_txbf_info->txbf_fw_ndpa_timer), 5);
-	else
-		odm_schedule_work_item(&(p_txbf_info->txbf_fw_ndpa_work_item));
-}
-#endif
-
-
 void
 hal_com_txbf_status_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 )
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#endif
 	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
-
 	u8			idx = p_txbf_info->txbf_idx;
 
 	PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] Start!\n", __func__));
@@ -388,19 +252,10 @@ hal_com_txbf_status_work_item_callback(
 
 void
 hal_com_txbf_reset_tx_path_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 )
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#endif
 	struct _HAL_TXBF_INFO	*p_txbf_info = &p_dm->beamforming_info.txbf_info;
 
 	u8			idx = p_txbf_info->txbf_idx;
@@ -412,19 +267,10 @@ hal_com_txbf_reset_tx_path_work_item_callback(
 
 void
 hal_com_txbf_get_tx_rate_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 )
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#endif
 
 	if (p_dm->support_ic_type & ODM_RTL8814A)
 		hal_txbf_8814a_get_tx_rate(p_dm);
@@ -488,63 +334,5 @@ hal_com_txbf_set(
 
 	return true;
 }
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-boolean
-hal_com_txbf_get(
-	struct _ADAPTER		*adapter,
-	u8			get_type,
-	void			*p_out_buf
-)
-{
-	PHAL_DATA_TYPE		p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT			*p_dm = &p_hal_data->DM_OutSrc;
-	boolean			*p_boolean = (boolean *)p_out_buf;
-
-	PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] Start!\n", __func__));
-
-	if (get_type == TXBF_GET_EXPLICIT_BEAMFORMEE) {
-		if (IS_HARDWARE_TYPE_OLDER_THAN_8812A(adapter))
-			*p_boolean = false;
-		else if (/*IS_HARDWARE_TYPE_8822B(adapter)	||*/
-			IS_HARDWARE_TYPE_8821B(adapter)	||
-			IS_HARDWARE_TYPE_8192E(adapter))
-			*p_boolean = true;
-		else
-			*p_boolean = false;
-	} else if (get_type == TXBF_GET_EXPLICIT_BEAMFORMER) {
-		if (IS_HARDWARE_TYPE_OLDER_THAN_8812A(adapter))
-			*p_boolean = false;
-		else	if (/*IS_HARDWARE_TYPE_8822B(adapter)	||*/
-			IS_HARDWARE_TYPE_8821B(adapter)	||
-			IS_HARDWARE_TYPE_8192E(adapter))
-			if (p_hal_data->RF_Type == RF_2T2R || p_hal_data->RF_Type == RF_3T3R)
-				*p_boolean = true;
-			else
-				*p_boolean = false;
-		} else
-			*p_boolean = false;
-	} else if (get_type == TXBF_GET_MU_MIMO_STA) {
-#if ((RTL8822B_SUPPORT == 1) || (RTL8821C_SUPPORT == 1))
-		if (IS_HARDWARE_TYPE_8822B(adapter) || IS_HARDWARE_TYPE_8821C(adapter))
-			*p_boolean = true;
-		else
-#endif
-			*p_boolean = false;
-
-
-	} else if (get_type == TXBF_GET_MU_MIMO_AP) {
-#if (RTL8822B_SUPPORT == 1)
-		if (IS_HARDWARE_TYPE_8822B(adapter))
-			*p_boolean = true;
-		else
-#endif
-			*p_boolean = false;
-	}
-
-	return true;
-}
-#endif
-
 
 #endif

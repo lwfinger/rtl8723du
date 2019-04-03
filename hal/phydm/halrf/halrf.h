@@ -18,34 +18,14 @@
 #define _HALRF_H__
 
 /*============================================================*/
-/*include files*/
-/*============================================================*/
-#include "halrf/halrf_psd.h"
-
-
-/*============================================================*/
 /*Definition */
 /*============================================================*/
 /*IQK version*/
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
-#define IQK_VERSION_8188E	"0x14"
-#define IQK_VERSION_8192E	"0x01"
-#define IQK_VERSION_8723B	"0x1e"
-#define IQK_VERSION_8812A	"0x01"
-#define IQK_VERSION_8821A	"0x01"
-#elif (DM_ODM_SUPPORT_TYPE & (ODM_CE))
 #define IQK_VERSION_8188E	"0x01"
 #define IQK_VERSION_8192E	"0x01"
 #define IQK_VERSION_8723B	"0x1e"
 #define IQK_VERSION_8812A	"0x01"
 #define IQK_VERSION_8821A	"0x01"
-#elif (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-#define IQK_VERSION_8188E	"0x01"
-#define IQK_VERSION_8192E	"0x01"
-#define IQK_VERSION_8723B	"0x1e"
-#define IQK_VERSION_8812A	"0x01"
-#define IQK_VERSION_8821A	"0x01"
-#endif
 #define IQK_VERSION_8814A	"0x0f"
 #define IQK_VERSION_8188F	"0x01"
 #define IQK_VERSION_8197F	"0x01"
@@ -165,9 +145,6 @@ struct _hal_rf_ {
 
 	u8		*p_mp_rate_index;
 	u32		p_rate_index;
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	struct	_halrf_psd_data	halrf_psd_data;
-#endif
 };
 
 /*============================================================*/
@@ -180,20 +157,6 @@ void halrf_basic_profile(
 	char			*output,
 	u32			*_out_len
 );
-#if (RTL8822B_SUPPORT == 1 || RTL8821C_SUPPORT == 1)
-void halrf_iqk_info_dump(
-	void *p_dm_void,
-	u32 *_used,
-	char *output,
-	u32 *_out_len
-);
-
-void
-halrf_iqk_hwtx_check(
-	void *p_dm_void,
-	boolean		is_check
-);
-#endif
 
 void
 halrf_support_ability_debug(
@@ -306,10 +269,6 @@ halrf_psd_log2base(
 	IN u32 val
 );
 
-
-#if (RTL8822B_SUPPORT == 1 || RTL8821C_SUPPORT == 1)
-void halrf_iqk_dbg(void	*p_dm_void);
-#endif
 #endif
 
 

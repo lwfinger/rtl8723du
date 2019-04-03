@@ -62,31 +62,8 @@ extern u4Byte GLBtcDbgType[];
 
 #ifdef CONFIG_BT_COEXIST
 
-#ifdef CONFIG_RTL8192E
-#include "halbtc8192e1ant.h"
-#include "halbtc8192e2ant.h"
-#endif
-
-#ifdef CONFIG_RTL8723B
-#include "halbtc8723bwifionly.h"
-#include "halbtc8723b1ant.h"
-#include "halbtc8723b2ant.h"
-#endif
-
-#ifdef CONFIG_RTL8703B
-#include "halbtc8703b1ant.h"
-#endif
-
-#ifdef CONFIG_RTL8723D
 #include "halbtc8723d1ant.h"
 #include "halbtc8723d2ant.h"
-#endif
-
-#else /* CONFIG_BT_COEXIST */
-
-#ifdef CONFIG_RTL8723B
-#include "halbtc8723bwifionly.h"
-#endif
 
 #endif /* CONFIG_BT_COEXIST */
 

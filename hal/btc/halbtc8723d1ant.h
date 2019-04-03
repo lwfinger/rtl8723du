@@ -16,8 +16,6 @@
 
 #if (BT_SUPPORT == 1 && COEX_SUPPORT == 1)
 
-#if (RTL8723D_SUPPORT == 1)
-
 /* *******************************************
  * The following is for 8723D 1ANT BT Co-exist definition
  * ******************************************* */
@@ -425,33 +423,6 @@ void ex_halbtc8723d1ant_antenna_isolation(IN struct btc_coexist *btcoexist,
 void ex_halbtc8723d1ant_psd_scan(IN struct btc_coexist *btcoexist,
 		 IN u32 cent_freq, IN u32 offset, IN u32 span, IN u32 seconds);
 void ex_halbtc8723d1ant_display_ant_detection(IN struct btc_coexist *btcoexist);
-
-#else
-#define	ex_halbtc8723d1ant_power_on_setting(btcoexist)
-#define	ex_halbtc8723d1ant_pre_load_firmware(btcoexist)
-#define	ex_halbtc8723d1ant_init_hw_config(btcoexist, wifi_only)
-#define	ex_halbtc8723d1ant_init_coex_dm(btcoexist)
-#define	ex_halbtc8723d1ant_ips_notify(btcoexist, type)
-#define	ex_halbtc8723d1ant_lps_notify(btcoexist, type)
-#define	ex_halbtc8723d1ant_scan_notify(btcoexist, type)
-#define	ex_halbtc8723d1ant_connect_notify(btcoexist, type)
-#define	ex_halbtc8723d1ant_media_status_notify(btcoexist, type)
-#define	ex_halbtc8723d1ant_specific_packet_notify(btcoexist, type)
-#define	ex_halbtc8723d1ant_bt_info_notify(btcoexist, tmp_buf, length)
-#define ex_halbtc8723d1ant_wl_fwdbginfo_notify(btcoexist, tmp_buf, length)
-#define	ex_halbtc8723d1ant_rx_rate_change_notify(btcoexist, is_data_frame, btc_rate_id)
-#define	ex_halbtc8723d1ant_rf_status_notify(btcoexist, type)
-#define	ex_halbtc8723d1ant_halt_notify(btcoexist)
-#define	ex_halbtc8723d1ant_pnp_notify(btcoexist, pnp_state)
-#define	ex_halbtc8723d1ant_coex_dm_reset(btcoexist)
-#define	ex_halbtc8723d1ant_periodical(btcoexist)
-#define	ex_halbtc8723d1ant_display_coex_info(btcoexist)
-#define	ex_halbtc8723d1ant_set_antenna_notify(btcoexist, type)
-#define	ex_halbtc8723d1ant_antenna_detection(btcoexist, cent_freq, offset, span, seconds)
-#define	ex_halbtc8723d1ant_antenna_isolation(btcoexist, cent_freq, offset, span, seconds)
-#define	ex_halbtc8723d1ant_psd_scan(btcoexist, cent_freq, offset, span, seconds)
-#define	ex_halbtc8723d1ant_display_ant_detection(btcoexist)
-#endif
 
 #endif
 

@@ -18,15 +18,7 @@
 
 #define HALRF_POWRTRACKING_VER	"1.1"
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	#ifdef RTK_AC_SUPPORT
-		#define ODM_IC_11AC_SERIES_SUPPORT		1
-	#else
-		#define ODM_IC_11AC_SERIES_SUPPORT		0
-	#endif
-#else
-	#define ODM_IC_11AC_SERIES_SUPPORT		1
-#endif
+#define ODM_IC_11AC_SERIES_SUPPORT		1
 
 #define		DPK_DELTA_MAPPING_NUM	13
 #define		index_mapping_HP_NUM	15
@@ -100,9 +92,7 @@ static u8 delta_swing_table_idx_2ga_n_8188e[] = {0, 0, 0, 2, 2, 3, 3, 4, 4, 4, 4
 #define	OFDM_TABLE_SIZE_8812	43
 #define	AVG_THERMAL_NUM_8812	4
 
-#if (RTL8814A_SUPPORT == 1 || RTL8822B_SUPPORT == 1 || RTL8821C_SUPPORT == 1)
-	extern u32 tx_scaling_table_jaguar[TXSCALE_TABLE_SIZE];
-	#elif(ODM_IC_11AC_SERIES_SUPPORT)
+#if(ODM_IC_11AC_SERIES_SUPPORT)
 	extern unsigned int ofdm_swing_table_8812[OFDM_TABLE_SIZE_8812];
 #endif
 
@@ -206,11 +196,7 @@ struct odm_rf_calibration_structure {
 
 	u8			bb_swing_idx_ofdm[MAX_RF_PATH];
 	u8			bb_swing_idx_ofdm_current;
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 	u8			bb_swing_idx_ofdm_base[MAX_RF_PATH];
-#else
-	u8			bb_swing_idx_ofdm_base;
-#endif
 	boolean			bb_swing_flag_ofdm;
 	u8			bb_swing_idx_cck;
 	u8			bb_swing_idx_cck_current;
@@ -310,42 +296,9 @@ odm_txpowertracking_check_mp(
 	void		*p_dm_void
 );
 
-
 void
 odm_txpowertracking_check_ce(
 	void		*p_dm_void
 );
-
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
-
-void
-odm_txpowertracking_callback_thermal_meter92c(
-	struct _ADAPTER	*adapter
-);
-
-void
-odm_txpowertracking_callback_rx_gain_thermal_meter92d(
-	struct _ADAPTER	*adapter
-);
-
-void
-odm_txpowertracking_callback_thermal_meter92d(
-	struct _ADAPTER	*adapter
-);
-
-void
-odm_txpowertracking_direct_call92c(
-	struct _ADAPTER		*adapter
-);
-
-void
-odm_txpowertracking_thermal_meter_check(
-	struct _ADAPTER		*adapter
-);
-
-#endif
-
-
 
 #endif

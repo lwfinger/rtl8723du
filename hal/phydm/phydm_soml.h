@@ -53,12 +53,6 @@ struct adaptive_soml {
 	u32			pre_num_vht_bytes[VHT_RATE_IDX];
 	u32			num_vht_bytes_on[VHT_RATE_IDX];
 	u32			num_vht_bytes_off[VHT_RATE_IDX];
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-#if USE_WORKITEM
-	RT_WORK_ITEM	phydm_adaptive_soml_workitem;
-#endif
-#endif
 	struct timer_list		phydm_adaptive_soml_timer;
 };
 
@@ -68,18 +62,6 @@ phydm_soml_on_off(
 	u8		swch
 );
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-void
-phydm_adaptive_soml_callback(
-	struct timer_list		*p_timer
-);
-
-void
-phydm_adaptive_soml_workitem_callback(
-	void		*p_context
-);
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 void
 phydm_adaptive_soml_callback(
 	void		*dm_void
@@ -89,15 +71,6 @@ void
 phydm_adaptive_soml_workitem_callback(
 	void		*context
 );
-
-#else
-
-void
-phydm_adaptive_soml_callback(
-	void		*p_dm_void
-);
-
-#endif
 
 void
 phydm_soml_debug(

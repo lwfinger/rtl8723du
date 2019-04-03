@@ -374,15 +374,7 @@ int _WriteBTFWtoTxPktBuf8723D(
 	struct pkt_attrib	*pattrib;
 	u8			txdesc_offset = TXDESC_OFFSET;
 	u8			val8, RegFwHwTxQCtrl;
-#if (DEV_BUS_TYPE == RT_PCI_INTERFACE)
-	u8			u1bTmp;
-#endif
-
-#if 1/* (DEV_BUS_TYPE == RT_PCI_INTERFACE) */
 	TotalPktLen = FwBufLen;
-#else
-	TotalPktLen = FwBufLen + pHalData->HWDescHeadLength;
-#endif
 
 	if ((TotalPktLen + TXDESC_OFFSET) > MAX_CMDBUF_SZ) {
 		RTW_INFO(" WARNING %s => Total packet len = %d > MAX_CMDBUF_SZ:%d\n"
@@ -398,25 +390,12 @@ int _WriteBTFWtoTxPktBuf8723D(
 
 	_rtw_memset(ReservedPagePacket, 0, TotalPktLen);
 
-#if 1/* (DEV_BUS_TYPE == RT_PCI_INTERFACE) */
 	_rtw_memcpy(ReservedPagePacket, FwbufferPtr, FwBufLen);
-
-#else
-	PlatformMoveMemory(ReservedPagePacket + Adapter->HWDescHeadLength , FwbufferPtr, FwBufLen);
-#endif
 
 	/* --------------------------------------------------------- */
 	/* 1. Pause BCN */
 	/* --------------------------------------------------------- */
 	/* Set REG_CR bit 8. DMA beacon by SW. */
-#if (DEV_BUS_TYPE == RT_PCI_INTERFACE)
-	u1bTmp = PlatformEFIORead1Byte(Adapter, REG_CR + 1);
-	PlatformEFIOWrite1Byte(Adapter,  REG_CR + 1, (u1bTmp | BIT(0)));
-#else
-	/* Remove for temparaily because of the code on v2002 is not sync to MERGE_TMEP for USB/SDIO. */
-	/* De not remove this part on MERGE_TEMP. by tynli. */
-#endif
-
 	/* Disable Hw protection for a time which revserd for Hw sending beacon. */
 	/* Fix download reserved page packet fail that access collision with the protection time. */
 	/* 2010.05.11. Added by tynli. */

@@ -348,8 +348,6 @@ enum phydm_ic_e {
 #define ODM_IC_11AC_1_SERIES		(ODM_RTL8812 | ODM_RTL8821 | ODM_RTL8881A)
 #define ODM_IC_11AC_2_SERIES		(ODM_RTL8814A | ODM_RTL8822B | ODM_RTL8821C)
 
-#define ODM_IC_TXBF_SUPPORT		(ODM_RTL8192E | ODM_RTL8812 | ODM_RTL8821 | ODM_RTL8814A | ODM_RTL8881A | ODM_RTL8822B | ODM_RTL8197F | ODM_RTL8821C)
-
 #define ODM_IC_11N_GAIN_IDX_EDCCA		(ODM_RTL8195A | ODM_RTL8703B | ODM_RTL8188F | ODM_RTL8723D | ODM_RTL8197F | ODM_RTL8710B)
 #define ODM_IC_11AC_GAIN_IDX_EDCCA		(ODM_RTL8814A | ODM_RTL8822B | ODM_RTL8821C)
 #define ODM_IC_GAIN_IDX_EDCCA				(ODM_IC_11N_GAIN_IDX_EDCCA | ODM_IC_11AC_GAIN_IDX_EDCCA)
@@ -385,10 +383,6 @@ enum phydm_ic_e {
 #define PHYDM_COMPILE_ABOVE_1SS
 
 /*==================================================================================================]*/
-
-#if ((RTL8822B_SUPPORT == 1) || (RTL8197F_SUPPORT == 1) || (RTL8821C_SUPPORT == 1))
-#define PHYDM_COMMON_API_SUPPORT
-#endif
 
 /* ODM_CMNINFO_CUT_VER */
 enum odm_cut_version_e {
@@ -426,7 +420,6 @@ enum odm_operation_mode_e {
 };
 
 /* ODM_CMNINFO_WM_MODE */
-#if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
 enum odm_wireless_mode_e {
 	ODM_WM_UNKNOW	= 0x0,
 	ODM_WM_B			= BIT(0),
@@ -437,34 +430,13 @@ enum odm_wireless_mode_e {
 	ODM_WM_AUTO		= BIT(5),
 	ODM_WM_AC		= BIT(6),
 };
-#else
-enum odm_wireless_mode_e {
-	ODM_WM_UNKNOWN	= 0x00,/*0x0*/
-	ODM_WM_A			= BIT(0), /* 0x1*/
-	ODM_WM_B			= BIT(1), /* 0x2*/
-	ODM_WM_G			= BIT(2),/* 0x4*/
-	ODM_WM_AUTO		= BIT(3),/* 0x8*/
-	ODM_WM_N24G		= BIT(4),/* 0x10*/
-	ODM_WM_N5G		= BIT(5),/* 0x20*/
-	ODM_WM_AC_5G		= BIT(6),/* 0x40*/
-	ODM_WM_AC_24G	= BIT(7),/* 0x80*/
-	ODM_WM_AC_ONLY	= BIT(8),/* 0x100*/
-	ODM_WM_MAX		= BIT(11)/* 0x800*/
-
-};
-#endif
 
 /* ODM_CMNINFO_BAND */
 enum odm_band_type_e {
-#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	ODM_BAND_2_4G	= BIT(0),
-	ODM_BAND_5G		= BIT(1),
-#else
 	ODM_BAND_2_4G = 0,
 	ODM_BAND_5G,
 	ODM_BAND_ON_BOTH,
 	ODM_BANDMAX
-#endif
 };
 
 

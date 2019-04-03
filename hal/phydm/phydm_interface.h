@@ -283,45 +283,6 @@ odm_release_spin_lock(
 	enum rt_spinlock_type	type
 );
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-/*
- * ODM MISC-workitem relative API.
- *   */
-void
-odm_initialize_work_item(
-	struct PHY_DM_STRUCT					*p_dm,
-	PRT_WORK_ITEM				p_rt_work_item,
-	RT_WORKITEM_CALL_BACK		rt_work_item_callback,
-	void						*p_context,
-	const char					*sz_id
-);
-
-void
-odm_start_work_item(
-	PRT_WORK_ITEM	p_rt_work_item
-);
-
-void
-odm_stop_work_item(
-	PRT_WORK_ITEM	p_rt_work_item
-);
-
-void
-odm_free_work_item(
-	PRT_WORK_ITEM	p_rt_work_item
-);
-
-void
-odm_schedule_work_item(
-	PRT_WORK_ITEM	p_rt_work_item
-);
-
-boolean
-odm_is_work_item_scheduled(
-	PRT_WORK_ITEM	p_rt_work_item
-);
-#endif
-
 /*
  * ODM Timer relative API.
  *   */
@@ -407,7 +368,7 @@ odm_get_progressing_time(
 	u64			start_time
 );
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE)) && !defined(DM_ODM_CE_MAC80211)
+#ifndef DM_ODM_CE_MAC80211
 
 void
 phydm_set_hw_reg_handler_interface (

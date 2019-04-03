@@ -14,18 +14,8 @@
  *****************************************************************************/
 
 #include "mp_precomp.h"
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	#if RT_PLATFORM==PLATFORM_MACOSX
-	#include "phydm_precomp.h"
-	#else
-	#include "../phydm_precomp.h"
-	#endif
-#else
 #include "../../phydm_precomp.h"
-#endif
 
-
-#if (RTL8723D_SUPPORT == 1)
 
 /*---------------------------Define Local Constant---------------------------*/
 /*IQK*/
@@ -230,33 +220,19 @@ odm_tx_pwr_track_set_pwr_8723d(
 	u8					i = 0;
 
 if (*(p_dm->p_mp_mode) == true) {
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-#if (MP_DRIVER == 1)
-		PMPT_CONTEXT p_mpt_ctx = &(adapter->MptCtx);
-
-		tx_rate = MptToMgntRate(p_mpt_ctx->MptRateIndex);
-#endif
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
 #ifdef CONFIG_MP_INCLUDED
 		PMPT_CONTEXT p_mpt_ctx = &(adapter->mppriv.mpt_ctx);
 
 		tx_rate = mpt_to_mgnt_rate(p_mpt_ctx->mpt_rate_index);
 #endif
-#endif
-#endif
 	} else {
 		u16	rate	 = *(p_dm->p_forced_data_rate);
 
 		if (!rate) { /*auto rate*/
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-			tx_rate = adapter->HalFunc.GetHwRateFromMRateHandler(p_dm->tx_rate);
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
 			if (p_dm->number_linked_client != 0)
 				tx_rate = hw_rate_to_m_rate(p_dm->tx_rate);
 			else
 				tx_rate = p_rf->p_rate_index;
-#endif
 		} else   /*force rate*/
 			tx_rate = (u8)rate;
 	}
@@ -301,8 +277,6 @@ if (*(p_dm->p_mp_mode) == true) {
 		ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("odm_TxPwrTrackSetPwr_8723D CH=%d\n", *(p_dm->p_channel)));
 
 		p_rf_calibrate_info->remnant_ofdm_swing_idx[rf_path] = p_rf_calibrate_info->absolute_ofdm_swing_idx[rf_path];   /* Remnant index equal to aboslute compensate value. */
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 
 #if (MP_DRIVER != 1)
 		p_rf_calibrate_info->modify_tx_agc_flag_path_a = true;
@@ -362,13 +336,6 @@ if (*(p_dm->p_mp_mode) == true) {
 			RT_DISP(FPHY, PHY_TXPWR, ("odm_tx_pwr_track_set_pwr_8723d: OFDM Tx-rf(B) Power = 0x%x\n", tx_agc));
 		}
 #endif
-
-#endif
-#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-		/*phy_rf6052_set_cck_tx_power(p_dm->priv, *(p_dm->p_channel));
-		  phy_rf6052_set_ofdm_tx_power(p_dm->priv, *(p_dm->p_channel));*/
-#endif
-
 	} else if (method == BBSWING) {
 		final_ofdm_swing_index = p_rf_calibrate_info->default_ofdm_index + p_rf_calibrate_info->absolute_ofdm_swing_idx[rf_path];
 		final_cck_swing_index = p_rf_calibrate_info->default_cck_index + p_rf_calibrate_info->absolute_ofdm_swing_idx[rf_path];
@@ -588,33 +555,19 @@ get_delta_swing_table_8723d(
 	u8			channel		 = *p_dm->p_channel;
 
 	if (*(p_dm->p_mp_mode) == true) {
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-#if (MP_DRIVER == 1)
-		PMPT_CONTEXT p_mpt_ctx = &(adapter->MptCtx);
-
-		tx_rate = MptToMgntRate(p_mpt_ctx->MptRateIndex);
-#endif
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
 #ifdef CONFIG_MP_INCLUDED
 		PMPT_CONTEXT p_mpt_ctx = &(adapter->mppriv.mpt_ctx);
 
 		tx_rate = mpt_to_mgnt_rate(p_mpt_ctx->mpt_rate_index);
 #endif
-#endif
-#endif
 	} else {
 		u16	rate	 = *(p_dm->p_forced_data_rate);
 
 		if (!rate) { /*auto rate*/
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-			tx_rate = adapter->HalFunc.GetHwRateFromMRateHandler(p_dm->tx_rate);
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
 			if (p_dm->number_linked_client != 0)
 				tx_rate = hw_rate_to_m_rate(p_dm->tx_rate);
 			else
 				tx_rate = p_rf->p_rate_index;
-#endif
 		} else   /*force rate*/
 			tx_rate = (u8)rate;
 	}
@@ -1432,10 +1385,6 @@ _phy_path_s1_fill_iqk_matrix_8723d(
 			return;
 		}
 		reg = result[final_candidate][2];
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-		if (RTL_ABS(reg, 0x100) >= 16)
-			reg = 0x100;
-#endif
 		odm_set_bb_reg(p_dm, REG_OFDM_0_XA_RX_IQ_IMBALANCE, 0x3FF, reg);
 
 		reg = result[final_candidate][3] & 0x3F;
@@ -1685,12 +1634,7 @@ phy_simularity_compare_8723d(
 	u32		i, j, diff, simularity_bit_map, bound = 0;
 	u8		final_candidate[2] = {0xFF, 0xFF};
 	boolean		is_result = true;
-	/*#if !(DM_ODM_SUPPORT_TYPE & ODM_AP)*/
-	/*	bool		is2T = IS_92C_SERIAL( p_hal_data->version_id);*/
-	/*#else*/
 	boolean		is2T = true;
-	/*#endif*/
-
 	s32 tmp1 = 0, tmp2 = 0;
 
 	if (is2T)
@@ -1876,27 +1820,10 @@ _phy_iq_calibrate_8723d(
 	u32	cnt_iqk_fail = 0;
 	u32 retry_count;
 	
-#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	retry_count = 2;
-#elif (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
-#if MP_DRIVER
-	retry_count = 9;
-#else
-	retry_count = 2;
-#endif
-#elif (DM_ODM_SUPPORT_TYPE & (ODM_CE))
 	if (*(p_dm->p_mp_mode))
 		retry_count = 9;
 	else
 		retry_count = 2;
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-#ifdef MP_TEST
-	if (*(p_dm->p_mp_mode))
-		retry_count = 9;
-#endif
-#endif
 
 	if (t == 0) {
 		_phy_save_adda_registers_8723d(p_dm, ADDA_REG, p_dm->rf_calibrate_info.ADDA_backup, IQK_ADDA_REG_NUM);
@@ -2102,12 +2029,7 @@ phy_iq_calibrate_8723d(
 
 	path_sel_bb_phy_iqk = odm_get_bb_reg(p_dm, 0x948, MASKDWORD);
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_CE | ODM_AP))
-	if (is_recovery)
-#else
-	if (is_recovery && (!p_dm->is_in_hct_test))
-#endif
-	{
+	if (is_recovery) {
 		ODM_RT_TRACE(p_dm, ODM_COMP_INIT, ODM_DBG_LOUD, ("phy_iq_calibrate_8723d: Return due to is_recovery!\n"));
 		_phy_reload_adda_registers_8723d(p_dm, IQK_BB_REG_92C, p_dm->rf_calibrate_info.IQK_BB_backup_recover, 9);
 		return;
@@ -2245,11 +2167,7 @@ phy_iq_calibrate_8723d(
 	regcd4 = odm_get_bb_reg(p_dm, 0xcd4, MASKDWORD);
 	regcd8 = odm_get_bb_reg(p_dm, 0xcd8, MASKDWORD);
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK]0xcd0 = 0x%x 0xcd4 = 0x%x 0xcd8 = 0x%x\n", regcd0, regcd4, regcd8));
-#if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
 	indexforchannel = odm_get_right_chnl_place_for_iqk(*p_dm->p_channel);
-#else
-	indexforchannel = 0;
-#endif
 
 	if (final_candidate < 4) {
 		for (i = 0; i < iqk_matrix_reg_num; i++)
@@ -2279,22 +2197,13 @@ phy_lc_calibrate_8723d(
 }
 
 void _phy_set_rf_path_switch_8723d(
-#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	struct PHY_DM_STRUCT		*p_dm,
-#else
 	struct _ADAPTER	*p_adapter,
-#endif
 	boolean		is_main,
 	boolean		is2T
 )
 {
 	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_adapter);
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->odmpriv;
-#endif
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#endif
 
 	if (is_main)
 		odm_set_mac_reg(p_dm, 0x7C4, MASKLWORD, 0x7700);
@@ -2307,101 +2216,17 @@ void _phy_set_rf_path_switch_8723d(
 }
 
 void phy_set_rf_path_switch_8723d(
-#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	struct PHY_DM_STRUCT		*p_dm,
-#else
 	struct _ADAPTER	*p_adapter,
-#endif
 	boolean		is_main
 )
 {
 	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_adapter);
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->odmpriv;
-#endif
 
 #if DISABLE_BB_RF
 	return;
 #endif
 
-#if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
 	_phy_set_rf_path_switch_8723d(p_adapter, is_main, true);
-#endif
 
 }
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-boolean _phy_query_rf_path_switch_8723d(
-#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	struct PHY_DM_STRUCT		*p_dm,
-#else
-	struct _ADAPTER	*p_adapter,
-#endif
-	boolean		is2T
-)
-{
-#if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_adapter);
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->odmpriv;
-#endif
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#endif
-#endif
-
-
-	if (odm_get_bb_reg(p_dm, 0x7C4, MASKLWORD) == 0x7700)
-		return true;
-	else
-		return false;
-
-}
-
-
-
-
-boolean phy_query_rf_path_switch_8723d(
-#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	struct PHY_DM_STRUCT		*p_dm
-#else
-	struct _ADAPTER	*p_adapter
-#endif
-)
-{
-
-#if DISABLE_BB_RF
-	return true;
-#endif
-
-#if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
-	return _phy_query_rf_path_switch_8723d(p_adapter, false);
-#else
-	return _phy_query_rf_path_switch_8723d(p_dm, false);
-#endif
-
-}
-#endif
-
-
-
-#else
-
-void
-phy_iq_calibrate_8723d(
-	void		*p_dm_void,
-	boolean	is_recovery
-) {}
-void
-phy_lc_calibrate_8723d(
-	void		*p_dm_void
-) {}
-
-void
-odm_tx_pwr_track_set_pwr_8723d(
-	struct PHY_DM_STRUCT			*p_dm,
-	enum pwrtrack_method	method,
-	u8				rf_path,
-	u8				channel_mapped_index
-) {}
-#endif

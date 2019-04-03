@@ -204,10 +204,6 @@ static void rtl8723d_lps_poff_set_tx_bndy(PADAPTER padapter, u8 tx_bndy)
 	u32	val32 = 0;
 	u8	val8  = 0;
 
-#if (DEV_BUS_TYPE == RT_PCI_INTERFACE)
-	numHQ = 0x8;
-	numLQ = 0x8;
-#endif
 	numPubQ = tx_bndy - numHQ - numLQ - numNQ - 1;
 	val8 = _NPQ(numNQ);
 	val32 = _HPQ(numHQ) | _LPQ(numLQ) | _PUBQ(numPubQ) | LD_RQPN;

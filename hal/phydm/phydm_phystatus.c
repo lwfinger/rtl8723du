@@ -221,33 +221,6 @@ phydm_signal_scale_mapping_92c_series(
 )
 {
 	s32 ret_sig = 0;
-#if (DEV_BUS_TYPE == RT_PCI_INTERFACE)
-	if (p_dm->support_interface  == ODM_ITRF_PCIE) {
-		/* step 1. Scale mapping. */
-		if (curr_sig >= 61 && curr_sig <= 100)
-			ret_sig = 90 + ((curr_sig - 60) / 4);
-		else if (curr_sig >= 41 && curr_sig <= 60)
-			ret_sig = 78 + ((curr_sig - 40) / 2);
-		else if (curr_sig >= 31 && curr_sig <= 40)
-			ret_sig = 66 + (curr_sig - 30);
-		else if (curr_sig >= 21 && curr_sig <= 30)
-			ret_sig = 54 + (curr_sig - 20);
-		else if (curr_sig >= 5 && curr_sig <= 20)
-			ret_sig = 42 + (((curr_sig - 5) * 2) / 3);
-		else if (curr_sig == 4)
-			ret_sig = 36;
-		else if (curr_sig == 3)
-			ret_sig = 27;
-		else if (curr_sig == 2)
-			ret_sig = 18;
-		else if (curr_sig == 1)
-			ret_sig = 9;
-		else
-			ret_sig = curr_sig;
-	}
-#endif
-
-#if ((DEV_BUS_TYPE == RT_USB_INTERFACE) || (DEV_BUS_TYPE == RT_SDIO_INTERFACE))
 	if ((p_dm->support_interface  == ODM_ITRF_USB) || (p_dm->support_interface  == ODM_ITRF_SDIO)) {
 		if (curr_sig >= 51 && curr_sig <= 100)
 			ret_sig = 100;
@@ -267,7 +240,6 @@ phydm_signal_scale_mapping_92c_series(
 			ret_sig = curr_sig;
 	}
 
-#endif
 	return ret_sig;
 }
 
@@ -605,13 +577,6 @@ phydm_rx_phy_status92c_series_parsing(
 	}
 
 	/* For 92C/92D HW (Hybrid) Antenna Diversity */
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-	/* For 88E HW Antenna Diversity */
-	p_dm->dm_fat_table.antsel_rx_keep_0 = p_phy_sta_rpt->ant_sel;
-	p_dm->dm_fat_table.antsel_rx_keep_1 = p_phy_sta_rpt->ant_sel_b;
-	p_dm->dm_fat_table.antsel_rx_keep_2 = p_phy_sta_rpt->antsel_rx_keep_2;
-#endif
-
 	if (p_pktinfo->is_packet_match_bssid) {
 		phydm_avg_phystatus_index(p_dm, p_phy_info, p_pktinfo);
 		phydm_rx_statistic_cal(p_dm, p_phy_status, p_pktinfo);
@@ -1119,13 +1084,8 @@ phydm_process_rssi_for_dm(
 	p_dm->rx_rate = p_pktinfo->data_rate;
 
 	/* --------------Statistic for antenna/path diversity------------------ */
-	if (p_dm->support_ability & ODM_BB_ANT_DIV) {
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-		odm_process_rssi_for_ant_div(p_dm, p_phy_info, p_pktinfo);
-#endif
-	}
 #if (defined(CONFIG_PATH_DIVERSITY))
-	else if (p_dm->support_ability & ODM_BB_PATH_DIV)
+	if (p_dm->support_ability & ODM_BB_PATH_DIV)
 		phydm_process_rssi_for_path_div(p_dm, p_phy_info, p_pktinfo);
 #endif
 	/* -----------------Smart Antenna Debug Message------------------ */
@@ -1699,11 +1659,6 @@ phydm_process_rssi_for_dm_new_type(
 
 	if (p_pktinfo->is_packet_beacon)
 		p_dm->phy_dbg_info.num_qry_beacon_pkt++;
-
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-	if (p_dm->support_ability & ODM_BB_ANT_DIV)
-		odm_process_rssi_for_ant_div(p_dm, p_phy_info, p_pktinfo);
-#endif
 
 #ifdef CONFIG_DYNAMIC_RX_PATH
 	phydm_process_phy_status_for_dynamic_rx_path(p_dm, p_phy_info, p_pktinfo);

@@ -31,55 +31,14 @@ phydm_set_crystal_cap(
 	p_cfo_track->crystal_cap = crystal_cap;
 
 	if (p_dm->support_ic_type & (ODM_RTL8188E | ODM_RTL8188F)) {
-		#if (RTL8188E_SUPPORT == 1) || (RTL8188F_SUPPORT == 1)
-		/* write 0x24[22:17] = 0x24[16:11] = crystal_cap */
-		odm_set_bb_reg(p_dm, REG_AFE_XTAL_CTRL, 0x007ff800, (crystal_cap | (crystal_cap << 6)));
-		#endif
 	}
-	#if (RTL8812A_SUPPORT == 1)
-	else if (p_dm->support_ic_type & ODM_RTL8812) {
-	
-		/* write 0x2C[30:25] = 0x2C[24:19] = crystal_cap */
-		odm_set_bb_reg(p_dm, REG_MAC_PHY_CTRL, 0x7FF80000, (crystal_cap | (crystal_cap << 6)));
-		
-	} 
-	#endif
-	#if (RTL8703B_SUPPORT == 1) || (RTL8723B_SUPPORT == 1) || (RTL8192E_SUPPORT == 1) || (RTL8821A_SUPPORT == 1) || (RTL8723D_SUPPORT == 1)
 	else if ((p_dm->support_ic_type & (ODM_RTL8703B | ODM_RTL8723B | ODM_RTL8192E | ODM_RTL8821 | ODM_RTL8723D))) {
 	
 		/* 0x2C[23:18] = 0x2C[17:12] = crystal_cap */
 		odm_set_bb_reg(p_dm, REG_MAC_PHY_CTRL, 0x00FFF000, (crystal_cap | (crystal_cap << 6)));
 		
 	}
-	#endif
-	#if (RTL8814A_SUPPORT == 1)	
-	else if (p_dm->support_ic_type & ODM_RTL8814A) {
-	
-		/* write 0x2C[26:21] = 0x2C[20:15] = crystal_cap */
-		odm_set_bb_reg(p_dm, REG_MAC_PHY_CTRL, 0x07FF8000, (crystal_cap | (crystal_cap << 6)));
-		
-	}
-	#endif
-	#if (RTL8822B_SUPPORT == 1) || (RTL8821C_SUPPORT == 1) || (RTL8197F_SUPPORT == 1)
-	else if (p_dm->support_ic_type & (ODM_RTL8822B | ODM_RTL8821C | ODM_RTL8197F)) {
-	
-		/* write 0x24[30:25] = 0x28[6:1] = crystal_cap */
-		odm_set_bb_reg(p_dm, REG_AFE_XTAL_CTRL, 0x7e000000, crystal_cap);
-		odm_set_bb_reg(p_dm, REG_AFE_PLL_CTRL, 0x7e, crystal_cap);
-		
-	}
-	#endif
-	#if (RTL8710B_SUPPORT == 1)
-	else if (p_dm->support_ic_type & (ODM_RTL8710B)) {
-	
-		#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))		
-		/* write 0x60[29:24] = 0x60[23:18] = crystal_cap */
-		HAL_SetSYSOnReg(p_dm->adapter, REG_SYS_XTAL_CTRL0, 0x3FFC0000, (crystal_cap | (crystal_cap << 6)));
-		#endif
-	}
-	#endif
 	PHYDM_DBG(p_dm, DBG_CFO_TRK, ("Set rystal_cap = 0x%x\n", p_cfo_track->crystal_cap));
-
 }
 
 u8
@@ -90,21 +49,16 @@ odm_get_default_crytaltal_cap(
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8						crystal_cap = 0x20;
 
-#if (DM_ODM_SUPPORT_TYPE & ODM_CE) && defined(DM_ODM_CE_MAC80211)
+#if defined(DM_ODM_CE_MAC80211)
 	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
 	struct rtl_efuse *rtlefuse = rtl_efuse(rtlpriv);
 
 	crystal_cap = rtlefuse->crystalcap;
-#elif (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
+#else
 	struct _ADAPTER					*adapter = p_dm->adapter;
 	HAL_DATA_TYPE				*p_hal_data = GET_HAL_DATA(adapter);
 
 	crystal_cap = p_hal_data->crystal_cap;
-#else
-	struct rtl8192cd_priv	*priv		= p_dm->priv;
-
-	if (priv->pmib->dot11RFEntry.xcap > 0)
-		crystal_cap = priv->pmib->dot11RFEntry.xcap;
 #endif
 
 	crystal_cap = crystal_cap & 0x3f;
@@ -160,10 +114,7 @@ odm_cfo_tracking_reset(
 		PHYDM_DBG(p_dm, DBG_CFO_TRK,
 			("odm_cfo_tracking_reset(): approch default value (0x%x)\n", p_cfo_track->crystal_cap));
 	}
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 	odm_set_atc_status(p_dm, true);
-#endif
 }
 
 void
@@ -179,18 +130,6 @@ phydm_cfo_tracking_init(
 	p_cfo_track->is_adjust = true;
 	PHYDM_DBG(p_dm, DBG_CFO_TRK, ("ODM_CfoTracking_init()=========>\n"));
 	PHYDM_DBG(p_dm, DBG_CFO_TRK, ("ODM_CfoTracking_init(): is_atc_status = %d, crystal_cap = 0x%x\n", p_cfo_track->is_atc_status, p_cfo_track->def_x_cap));
-
-#if RTL8822B_SUPPORT
-	/* Crystal cap. control by WiFi */
-	if (p_dm->support_ic_type & ODM_RTL8822B)
-		odm_set_bb_reg(p_dm, 0x10, 0x40, 0x1);
-#endif
-
-#if RTL8821C_SUPPORT
-	/* Crystal cap. control by WiFi */
-	if (p_dm->support_ic_type & ODM_RTL8821C)
-		odm_set_bb_reg(p_dm, 0x10, 0x40, 0x1);
-#endif
 }
 
 void
@@ -318,7 +257,6 @@ odm_cfo_tracking(
 		PHYDM_DBG(p_dm, DBG_CFO_TRK, ("odm_cfo_tracking(): Crystal cap = 0x%x, Default Crystal cap = 0x%x\n",
 			p_cfo_track->crystal_cap, p_cfo_track->def_x_cap));
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 		if (p_dm->support_ic_type & ODM_IC_11AC_SERIES)
 			return;
 
@@ -330,7 +268,6 @@ odm_cfo_tracking(
 			odm_set_atc_status(p_dm, true);
 			PHYDM_DBG(p_dm, DBG_CFO_TRK, ("odm_cfo_tracking(): Enable ATC!!\n"));
 		}
-#endif
 	}
 }
 
@@ -350,12 +287,7 @@ odm_parsing_cfo(
 	if (!(p_dm->support_ability & ODM_BB_CFO_TRACKING))
 		return;
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-	if (p_pktinfo->is_packet_match_bssid)
-#else
-	if (p_pktinfo->station_id != 0)
-#endif
-	{
+	if (p_pktinfo->is_packet_match_bssid) {
 		if (num_ss > p_dm->num_rf_path) /*For fool proof*/
 			num_ss = p_dm->num_rf_path;
 

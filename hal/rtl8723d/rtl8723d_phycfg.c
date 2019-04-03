@@ -607,17 +607,11 @@ PHY_BBConfig8723D(
 
 	rtw_write8(Adapter, REG_RF_CTRL, RF_EN | RF_RSTB | RF_SDMRSTB);
 
-#if (DEV_BUS_TYPE == RT_USB_INTERFACE)
 	rtw_write8(Adapter, REG_SYS_FUNC_EN, FEN_USBA | FEN_USBD | FEN_BB_GLB_RSTn | FEN_BBRSTB);
-#else
-	rtw_write8(Adapter, REG_SYS_FUNC_EN, FEN_PPLL | FEN_PCIEA | FEN_DIO_PCIE | FEN_BB_GLB_RSTn | FEN_BBRSTB);
-#endif
 
-#if DEV_BUS_TYPE == RT_USB_INTERFACE
 	/* To Fix MAC loopback mode fail. Suggested by SD4 Johnny. 2010.03.23. */
 	PlatformEFIOWrite1Byte(Adapter, REG_LDOHCI12_CTRL, 0x0f);
 	PlatformEFIOWrite1Byte(Adapter, 0x15, 0xe9);
-#endif
 
 	rtw_write8(Adapter, REG_AFE_XTAL_CTRL + 1, 0x80);
 

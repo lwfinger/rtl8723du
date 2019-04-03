@@ -162,40 +162,4 @@ phydm_stop_ck320(
 	u8			enable
 );
 
-#ifdef PHYDM_COMMON_API_SUPPORT
-
-boolean
-phydm_api_set_txagc(
-	void				*p_dm_void,
-	u32				power_index,
-	enum rf_path		path,
-	u8				hw_rate,
-	boolean			is_single_rate
-);
-
-u8
-phydm_api_get_txagc(
-	void				*p_dm_void,
-	enum rf_path		path,
-	u8				hw_rate
-);
-
-boolean
-phydm_api_switch_bw_channel(
-	void					*p_dm_void,
-	u8					central_ch,
-	u8					primary_ch_idx,
-	enum channel_width	bandwidth
-);
-
-boolean
-phydm_api_trx_mode(
-	void				*p_dm_void,
-	enum bb_path	tx_path,
-	enum bb_path	rx_path,
-	boolean			is_tx2_path
-);
-
-#endif
-
 #endif

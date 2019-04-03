@@ -150,12 +150,6 @@ struct _sw_antenna_switch_ {
 	u32		pkt_cnt_sw_ant_div_by_ctrl_frame;
 	boolean		is_sw_ant_div_by_ctrl_frame;
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-#if USE_WORKITEM
-	RT_WORK_ITEM	phydm_sw_antenna_switch_workitem;
-#endif
-#endif
-
 	/* AntDect (Before link Antenna Switch check) need to be moved*/
 	u16		single_ant_counter;
 	u16		dual_ant_counter;
@@ -169,42 +163,7 @@ struct _sw_antenna_switch_ {
 	boolean		rssi_ant_dect_result;
 	u8		ant_5g;
 	u8		ant_2g;
-
-
 };
-
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-struct _BF_DIV_COEX_ {
-	boolean w_bfer_client[ODM_ASSOCIATE_ENTRY_NUM];
-	boolean w_bfee_client[ODM_ASSOCIATE_ENTRY_NUM];
-	u32	MA_rx_TP[ODM_ASSOCIATE_ENTRY_NUM];
-	u32	MA_rx_TP_DIV[ODM_ASSOCIATE_ENTRY_NUM];
-
-	u8  bd_ccoex_type_wbfer;
-	u8 num_txbfee_client;
-	u8 num_txbfer_client;
-	u8 bdc_try_counter;
-	u8 bdc_hold_counter;
-	u8 bdc_mode;
-	u8 bdc_active_mode;
-	u8 BDC_state;
-	u8 bdc_rx_idle_update_counter;
-	u8 num_client;
-	u8 pre_num_client;
-	u8 num_bf_tar;
-	u8 num_div_tar;
-
-	boolean is_all_div_sta_idle;
-	boolean is_all_bf_sta_idle;
-	boolean bdc_try_flag;
-	boolean BF_pass;
-	boolean DIV_pass;
-};
-#endif
-#endif
-
 
 struct phydm_fat_struct {
 	u8	bssid[6];
@@ -275,7 +234,6 @@ struct phydm_fat_struct {
 	u8	pre_antdiv_rssi;
 	u8	pre_antdiv_tp;
 #endif
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 	u32    cck_ctrl_frame_cnt_main;
 	u32    cck_ctrl_frame_cnt_aux;
 	u32    ofdm_ctrl_frame_cnt_main;
@@ -284,7 +242,6 @@ struct phydm_fat_struct {
 	u32	aux_ant_ctrl_frame_sum;
 	u32	main_ant_ctrl_frame_cnt;
 	u32	aux_ant_ctrl_frame_cnt;
-#endif
 	u8	b_fix_tx_ant;
 	boolean	fix_ant_bfee;
 	boolean	enable_ctrl_frame_antdiv;
@@ -365,229 +322,6 @@ odm_tx_by_tx_desc_or_reg(
 	void		*p_dm_void,
 	u8		swch
 );
-
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-
-void
-phydm_antdiv_reset_statistic(
-	void	*p_dm_void,
-	u32	macid
-);
-
-void
-odm_update_rx_idle_ant(
-	void		*p_dm_void,
-	u8		ant
-);
-
-void
-phydm_set_antdiv_val(
-	void			*p_dm_void,
-	u32			*val_buf,
-	u8			val_len
-);
-
-#if (RTL8723B_SUPPORT == 1)
-void
-odm_update_rx_idle_ant_8723b(
-	void			*p_dm_void,
-	u8			ant,
-	u32			default_ant,
-	u32			optional_ant
-);
-#endif
-
-#if (RTL8188F_SUPPORT == 1)
-void
-phydm_update_rx_idle_antenna_8188F(
-	void	*p_dm_void,
-	u32	default_ant
-);
-#endif
-
-#if (RTL8723D_SUPPORT == 1)
-
-void
-phydm_set_tx_ant_pwr_8723d(
-	void			*p_dm_void,
-	u8			ant
-);
-
-void
-odm_update_rx_idle_ant_8723d(
-	void			*p_dm_void,
-	u8			ant,
-	u32			default_ant,
-	u32			optional_ant
-);
-
-#endif
-
-#ifdef CONFIG_S0S1_SW_ANTENNA_DIVERSITY
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-void
-odm_sw_antdiv_callback(
-	struct timer_list		*p_timer
-);
-
-void
-odm_sw_antdiv_workitem_callback(
-	void	*p_context
-);
-
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
-
-void
-odm_sw_antdiv_workitem_callback(
-	void	*p_context
-);
-
-void
-odm_sw_antdiv_callback(
-	void		*function_context
-);
-
-#endif
-
-void
-odm_s0s1_sw_ant_div_by_ctrl_frame(
-	void			*p_dm_void,
-	u8			step
-);
-
-void
-odm_antsel_statistics_of_ctrl_frame(
-	void			*p_dm_void,
-	u8			antsel_tr_mux,
-	u32			rx_pwdb_all
-);
-
-void
-odm_s0s1_sw_ant_div_by_ctrl_frame_process_rssi(
-	void				*p_dm_void,
-	void		*p_phy_info_void,
-	void		*p_pkt_info_void
-);
-
-#endif
-
-#ifdef ODM_EVM_ENHANCE_ANTDIV
-VOID
-phydm_evm_sw_antdiv_init(
-	void		*p_dm_void
-);
-
-void
-odm_evm_fast_ant_training_callback(
-	void		*p_dm_void
-);
-#endif
-
-void
-odm_hw_ant_div(
-	void		*p_dm_void
-);
-
-#if (defined(CONFIG_5G_CG_SMART_ANT_DIVERSITY)) || (defined(CONFIG_2G_CG_SMART_ANT_DIVERSITY))
-void
-odm_fast_ant_training(
-	void		*p_dm_void
-);
-
-void
-odm_fast_ant_training_callback(
-	void		*p_dm_void
-);
-
-void
-odm_fast_ant_training_work_item_callback(
-	void		*p_dm_void
-);
-#endif
-
-void
-odm_ant_div_init(
-	void		*p_dm_void
-);
-
-void
-odm_ant_div(
-	void		*p_dm_void
-);
-
-void
-odm_antsel_statistics(
-	void			*p_dm_void,
-	void			*p_phy_info_void,
-	u8			antsel_tr_mux,
-	u32			mac_id,
-	u32			utility,
-	u8			method,
-	u8			is_cck_rate
-);
-
-void
-odm_process_rssi_for_ant_div(
-	void		*p_dm_void,
-	void		*p_phy_info_void,
-	void		*p_pkt_info_void
-);
-
-
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-void
-odm_set_tx_ant_by_tx_info(
-	void			*p_dm_void,
-	u8			*p_desc,
-	u8			mac_id
-);
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-
-struct tx_desc; /*declared tx_desc here or compile error happened when enabled 8822B*/
-
-void
-odm_set_tx_ant_by_tx_info(
-	struct	rtl8192cd_priv		*priv,
-	struct	tx_desc			*pdesc,
-	unsigned short			aid
-);
-
-#if 1/*def def CONFIG_WLAN_HAL*/
-void
-odm_set_tx_ant_by_tx_info_hal(
-	struct	rtl8192cd_priv		*priv,
-	void	*pdesc_data,
-	u16		aid
-);
-#endif	/*#ifdef CONFIG_WLAN_HAL*/
-#endif
-
-
-void
-odm_ant_div_config(
-	void		*p_dm_void
-);
-
-void
-odm_ant_div_timers(
-	void		*p_dm_void,
-	u8		state
-);
-
-void
-phydm_antdiv_debug(
-	void		*p_dm_void,
-	u32		*const dm_value,
-	u32		*_used,
-	char			*output,
-	u32		*_out_len
-);
-
-#endif /*#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))*/
 
 void
 odm_ant_div_reset(

@@ -184,41 +184,11 @@ phydm_cumitek_smt_rx_default_ant_update(
 
 	/*path-A*/
 	if (p_cumi_smtant_table->rx_default_ant_idx[0] != rx_ant_idx_path_a) {
-		
-		#if (RTL8822B_SUPPORT == 1)
-		if (p_dm->support_ic_type == ODM_RTL8822B) {
-			
-			odm_set_bb_reg(p_dm, 0xc08, BIT(21) | BIT(20) | BIT(19), rx_ant_idx_path_a); /*default RX antenna*/
-			odm_set_mac_reg(p_dm, 0x6d8, BIT(2) | BIT(1) | BIT(0), rx_ant_idx_path_a); /*default response TX antenna*/
-		}
-		#endif
-		
-		#if (RTL8197F_SUPPORT == 1)
-		if (p_dm->support_ic_type == ODM_RTL8197F) {
-
-		}
-		#endif
-
 		p_cumi_smtant_table->rx_default_ant_idx[0] = rx_ant_idx_path_a;
 	}
 
 	/*path-B*/
 	if (p_cumi_smtant_table->rx_default_ant_idx[1] != rx_ant_idx_path_b) {
-		
-		#if (RTL8822B_SUPPORT == 1)
-		if (p_dm->support_ic_type == ODM_RTL8822B) {
-			
-			odm_set_bb_reg(p_dm, 0xe08, BIT(21) | BIT(20) | BIT(19), rx_ant_idx_path_b); /*default antenna*/
-			odm_set_mac_reg(p_dm, 0x6d8, BIT(5) | BIT(4) | BIT(3), rx_ant_idx_path_b); /*default response TX antenna*/
-		}
-		#endif
-		
-		#if (RTL8197F_SUPPORT == 1)
-		if (p_dm->support_ic_type == ODM_RTL8197F) {
-
-		}
-		#endif
-
 		p_cumi_smtant_table->rx_default_ant_idx[1] = rx_ant_idx_path_b;
 	}
 	
@@ -307,140 +277,6 @@ phydm_cumitek_smt_ant_debug(
 #if (defined(CONFIG_HL_SMART_ANTENNA))
 #ifdef CONFIG_HL_SMART_ANTENNA_TYPE2
 
-#if (RTL8822B_SUPPORT == 1)
-void
-phydm_hl_smart_ant_type2_init_8822b(
-	void		*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT				*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct smt_ant_honbo	*pdm_sat_table = &(p_dm->dm_sat_table);
-	struct phydm_fat_struct		*p_dm_fat_table = &p_dm->dm_fat_table;
-	u8	j;
-	u8	rfu_codeword_table_init_2g[SUPPORT_BEAM_SET_PATTERN_NUM][MAX_PATH_NUM_8822B] = {
-			{1, 1},/*0*/
-			{1, 2},
-			{2, 1},
-			{2, 2},
-			{4, 0},
-			{5, 0},
-			{6, 0},
-			{7, 0},
-			{8, 0},/*8*/
-			{9, 0},
-			{0xa, 0},
-			{0xb, 0},
-			{0xc, 0},
-			{0xd, 0},
-			{0xe, 0},
-			{0xf, 0}
-		}; 
-	u8	rfu_codeword_table_init_5g[SUPPORT_BEAM_SET_PATTERN_NUM][MAX_PATH_NUM_8822B] ={
-		#if 1
-			{9, 1},/*0*/
-			{9, 9},
-			{1, 9},
-			{9, 6},
-			{2, 1},
-			{2, 9},
-			{9, 2},
-			{2, 2},/*8*/
-			{6, 1},
-			{6, 9},
-			{2, 9},
-			{2, 2},
-			{6, 2},
-			{6, 6},
-			{2, 6},
-			{1, 1}
-		#else
-			{1, 1},/*0*/
-			{9, 1},
-			{9, 9},
-			{1, 9},
-			{1, 2},
-			{9, 2},
-			{9, 6},
-			{1, 6},
-			{2, 1},/*8*/
-			{6, 1},
-			{6, 9},
-			{2, 9},
-			{2, 2},
-			{6, 2},
-			{6, 6},
-			{2, 6}
-		#endif
-		}; 		
-
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("***RTK 8822B SmartAnt_Init: Hong-Bo SmrtAnt Type2]\n"));
-
-	/* ---------------------------------------- */
-	/* GPIO 0-1 for Beam control */
-	/* reg0x66[2:0]=0 */
-	/* reg0x44[25:24] = 0 */
-	/* reg0x44[23:16]  enable_output for P_GPIO[7:0] */
-	/* reg0x44[15:8]  output_value for P_GPIO[7:0] */
-	/* reg0x40[1:0] = 0  GPIO function */
-	/* ------------------------------------------ */
-
-	odm_move_memory(p_dm, pdm_sat_table->rfu_codeword_table_2g, rfu_codeword_table_init_2g, (SUPPORT_BEAM_SET_PATTERN_NUM * MAX_PATH_NUM_8822B));
-	odm_move_memory(p_dm, pdm_sat_table->rfu_codeword_table_5g, rfu_codeword_table_init_5g, (SUPPORT_BEAM_SET_PATTERN_NUM * MAX_PATH_NUM_8822B));
-
-	/*GPIO setting*/
-	odm_set_mac_reg(p_dm, 0x64, (BIT(18) | BIT(17) | BIT(16)), 0);
-	odm_set_mac_reg(p_dm, 0x44, BIT(25) | BIT(24), 0);	/*config P_GPIO[3:2] to data port*/
-	odm_set_mac_reg(p_dm, 0x44, BIT(17) | BIT(16), 0x3);	/*enable_output for P_GPIO[3:2]*/
-	/*odm_set_mac_reg(p_dm, 0x44, BIT(9)|BIT(8), 0);*/ /*P_GPIO[3:2] output value*/
-	odm_set_mac_reg(p_dm, 0x40, BIT(1) | BIT(0), 0);		/*GPIO function*/
-
-	/*Hong_lin smart antenna HW setting*/
-	pdm_sat_table->rfu_protocol_type = 2;
-	pdm_sat_table->rfu_protocol_delay_time = 45;
-	
-	pdm_sat_table->rfu_codeword_total_bit_num  = 16;/*max=32bit*/
-	pdm_sat_table->rfu_each_ant_bit_num = 4;
-	
-	pdm_sat_table->total_beam_set_num = 4;
-	pdm_sat_table->total_beam_set_num_2g = 4;
-	pdm_sat_table->total_beam_set_num_5g = 8;
-
-#if DEV_BUS_TYPE == RT_SDIO_INTERFACE
-	pdm_sat_table->latch_time = 100; /*mu sec*/
-#elif DEV_BUS_TYPE == RT_USB_INTERFACE
-	pdm_sat_table->latch_time = 100; /*mu sec*/
-#endif
-	pdm_sat_table->pkt_skip_statistic_en = 0;
-
-	pdm_sat_table->ant_num = 2;
-	pdm_sat_table->ant_num_total = MAX_PATH_NUM_8822B;
-	pdm_sat_table->first_train_ant = MAIN_ANT;
-
-
-
-	pdm_sat_table->fix_beam_pattern_en  = 0;
-	pdm_sat_table->decision_holding_period = 0;
-
-	/*beam training setting*/
-	pdm_sat_table->pkt_counter = 0;
-	pdm_sat_table->per_beam_training_pkt_num = 10;
-
-	/*set default beam*/
-	pdm_sat_table->fast_training_beam_num = 0;
-	pdm_sat_table->pre_fast_training_beam_num = pdm_sat_table->fast_training_beam_num;
-
-	for (j = 0; j < SUPPORT_BEAM_SET_PATTERN_NUM; j++) {
-		
-		pdm_sat_table->beam_set_avg_rssi_pre[j] = 0;
-		pdm_sat_table->beam_set_train_val_diff[j] = 0;
-		pdm_sat_table->beam_set_train_cnt[j] = 0;
-	}
-	phydm_set_rfu_beam_pattern_type2(p_dm);
-	p_dm_fat_table->fat_state = FAT_BEFORE_LINK_STATE;
-	
-}
-#endif
-
 
 u32
 phydm_construct_hb_rfu_codeword_type2(
@@ -514,46 +350,6 @@ phydm_update_beam_pattern_type2(
 			}
 		}
 		#endif
-		
-		if (p_dm->support_ic_type == ODM_RTL8821) {
-			#if (RTL8821A_SUPPORT == 1)
-			reg44_tmp_p = reg44_ori & (~(BIT(11) | BIT(10))); /*clean bit 10 & 11*/
-			reg44_tmp_p |= ((1 << 11) | (beam_ctrl_signal << 10));
-			reg44_tmp_n = reg44_ori & (~(BIT(11) | BIT(10)));
-
-			/*PHYDM_DBG(p_dm, DBG_ANT_DIV, ("reg44_tmp_p =(( 0x%x )), reg44_tmp_n = (( 0x%x ))\n", reg44_tmp_p, reg44_tmp_n));*/
-			odm_set_mac_reg(p_dm, 0x44, MASKDWORD, reg44_tmp_p);
-			odm_set_mac_reg(p_dm, 0x44, MASKDWORD, reg44_tmp_n);
-			#endif
-		}
-		#if (RTL8822B_SUPPORT == 1)
-		else if (p_dm->support_ic_type == ODM_RTL8822B) {
-
-			if (pdm_sat_table->rfu_protocol_type == 2) {
-
-				reg44_tmp_p = reg44_tmp_p & ~(BIT(8)); /*clean bit 8*/
-				reg44_tmp_p = reg44_tmp_p ^ BIT(9); /*get new clk high/low, exclusive-or*/
-
-	
-				reg44_tmp_p |= (beam_ctrl_signal << 8);
-				
-				odm_set_mac_reg(p_dm, 0x44, MASKDWORD, reg44_tmp_p);
-				ODM_delay_us(pdm_sat_table->rfu_protocol_delay_time);
-				/*PHYDM_DBG(p_dm, DBG_ANT_DIV, ("reg44 =(( 0x%x )), reg44[9:8] = ((%x)), beam_ctrl_signal =((%x))\n", reg44_tmp_p, ((reg44_tmp_p & 0x300)>>8), beam_ctrl_signal));*/
-				
-			} else {
-				reg44_tmp_p = reg44_ori & (~(BIT(9) | BIT(8))); /*clean bit 9 & 8*/
-				reg44_tmp_p |= ((1 << 9) | (beam_ctrl_signal << 8));
-				reg44_tmp_n = reg44_ori & (~(BIT(9) | BIT(8)));
-
-				/*PHYDM_DBG(p_dm, DBG_ANT_DIV, ("reg44_tmp_p =(( 0x%x )), reg44_tmp_n = (( 0x%x ))\n", reg44_tmp_p, reg44_tmp_n)); */
-				odm_set_mac_reg(p_dm, 0x44, MASKDWORD, reg44_tmp_p);
-				ODM_delay_us(10);
-				odm_set_mac_reg(p_dm, 0x44, MASKDWORD, reg44_tmp_n);
-				ODM_delay_us(10);
-			}
-		}
-		#endif
 	}
 }
 
@@ -570,12 +366,8 @@ phydm_update_rx_idle_beam_type2(
 	pdm_sat_table->update_beam_codeword = phydm_construct_hb_rfu_codeword_type2(p_dm, pdm_sat_table->rx_idle_beam_set_idx);
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ Update Rx-Idle-Beam ] BeamSet idx = ((%d))\n", pdm_sat_table->rx_idle_beam_set_idx));
 
-#if DEV_BUS_TYPE == RT_PCI_INTERFACE
-	phydm_update_beam_pattern_type2(p_dm, pdm_sat_table->update_beam_codeword, pdm_sat_table->rfu_codeword_total_bit_num);
-#else
 	odm_schedule_work_item(&pdm_sat_table->hl_smart_antenna_workitem);
 	/*odm_stall_execution(1);*/
-#endif
 
 	pdm_sat_table->pre_codeword = pdm_sat_table->update_beam_codeword;
 }
@@ -661,13 +453,7 @@ phydm_hl_smart_ant_debug_type2(
 			}
 			/*---------------------------------------------------------*/
 
-
-			#if DEV_BUS_TYPE == RT_PCI_INTERFACE
-			phydm_update_beam_pattern_type2(p_dm, pdm_sat_table->update_beam_codeword, pdm_sat_table->rfu_codeword_total_bit_num);
-			#else
 			odm_schedule_work_item(&pdm_sat_table->hl_smart_antenna_workitem);
-			/*odm_stall_execution(1);*/
-			#endif
 		} else if (pdm_sat_table->fix_beam_pattern_en == 0)
 			PHYDM_SNPRINTF((output + used, out_len - used, "[ SmartAnt ] Smart Antenna: Enable\n"));
 
@@ -765,12 +551,7 @@ phydm_set_rfu_beam_pattern_type2(
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Training beam_set index = (( 0x%x ))\n", pdm_sat_table->fast_training_beam_num));
 	pdm_sat_table->update_beam_codeword = phydm_construct_hb_rfu_codeword_type2(p_dm, pdm_sat_table->fast_training_beam_num);
 
-	#if DEV_BUS_TYPE == RT_PCI_INTERFACE
-	phydm_update_beam_pattern_type2(p_dm, pdm_sat_table->update_beam_codeword, pdm_sat_table->rfu_codeword_total_bit_num);
-	#else
 	odm_schedule_work_item(&pdm_sat_table->hl_smart_antenna_workitem);
-	/*odm_stall_execution(1);*/
-	#endif
 }
 
 void
@@ -1056,46 +837,6 @@ phydm_fast_ant_training_hl_smart_antenna_type2(
 
 }
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-
-void
-phydm_beam_switch_workitem_callback(
-	void	*p_context
-)
-{
-	struct _ADAPTER		*p_adapter = (struct _ADAPTER *)p_context;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-	struct smt_ant_honbo			*pdm_sat_table = &(p_dm->dm_sat_table);
-
-#if DEV_BUS_TYPE != RT_PCI_INTERFACE
-	pdm_sat_table->pkt_skip_statistic_en = 1;
-#endif
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ SmartAnt ] Beam Switch Workitem Callback, pkt_skip_statistic_en = (( %d ))\n", pdm_sat_table->pkt_skip_statistic_en));
-
-	phydm_update_beam_pattern_type2(p_dm, pdm_sat_table->update_beam_codeword, pdm_sat_table->rfu_codeword_total_bit_num);
-
-#if DEV_BUS_TYPE != RT_PCI_INTERFACE
-	/*odm_stall_execution(pdm_sat_table->latch_time);*/
-	pdm_sat_table->pkt_skip_statistic_en = 0;
-#endif
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("pkt_skip_statistic_en = (( %d )), latch_time = (( %d ))\n", pdm_sat_table->pkt_skip_statistic_en, pdm_sat_table->latch_time));
-}
-
-void
-phydm_beam_decision_workitem_callback(
-	void	*p_context
-)
-{
-	struct _ADAPTER		*p_adapter = (struct _ADAPTER *)p_context;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ SmartAnt ] Beam decision Workitem Callback\n"));
-	phydm_fast_ant_training_hl_smart_antenna_type2(p_dm);
-}
-#endif
-
 void
 phydm_process_rssi_for_hb_smtant_type2(
 	void		*p_dm_void,
@@ -1191,13 +932,7 @@ phydm_process_rssi_for_hb_smtant_type2(
 
 			p_dm_fat_table->fat_state = FAT_DECISION_STATE;
 
-			#if DEV_BUS_TYPE == RT_PCI_INTERFACE
-			phydm_fast_ant_training_hl_smart_antenna_type2(p_dm); /*go to make decision*/
-			#else
 			odm_schedule_work_item(&pdm_sat_table->hl_smart_antenna_decision_workitem);
-			#endif
-
-
 		} else {
 			beam_tmp = pdm_sat_table->fast_training_beam_num;
 			pdm_sat_table->fast_training_beam_num++;
@@ -1238,11 +973,7 @@ phydm_hl_smart_ant_type1_init_8821a(
 	pdm_sat_table->rfu_each_ant_bit_num = 4;
 	pdm_sat_table->beam_patten_num_each_ant = 4;
 
-#if DEV_BUS_TYPE == RT_SDIO_INTERFACE
 	pdm_sat_table->latch_time = 100; /*mu sec*/
-#elif DEV_BUS_TYPE == RT_USB_INTERFACE
-	pdm_sat_table->latch_time = 100; /*mu sec*/
-#endif
 	pdm_sat_table->pkt_skip_statistic_en = 0;
 
 	pdm_sat_table->ant_num = 1;/*max=8*/
@@ -1396,46 +1127,6 @@ phydm_update_beam_pattern(
 				/**/
 			}
 		}
-
-		if (p_dm->support_ic_type == ODM_RTL8821) {
-			#if (RTL8821A_SUPPORT == 1)
-			reg44_tmp_p = reg44_ori & (~(BIT(11) | BIT(10))); /*clean bit 10 & 11*/
-			reg44_tmp_p |= ((1 << 11) | (beam_ctrl_signal << 10));
-			reg44_tmp_n = reg44_ori & (~(BIT(11) | BIT(10)));
-
-			/*PHYDM_DBG(p_dm, DBG_ANT_DIV, ("reg44_tmp_p =(( 0x%x )), reg44_tmp_n = (( 0x%x ))\n", reg44_tmp_p, reg44_tmp_n));*/
-			odm_set_mac_reg(p_dm, 0x44, MASKDWORD, reg44_tmp_p);
-			odm_set_mac_reg(p_dm, 0x44, MASKDWORD, reg44_tmp_n);
-			#endif
-		}
-		#if (RTL8822B_SUPPORT == 1)
-		else if (p_dm->support_ic_type == ODM_RTL8822B) {
-
-			if (pdm_sat_table->rfu_protocol_type == 2) {
-
-				reg44_tmp_p = reg44_tmp_p & ~(BIT(8)); /*clean bit 8*/
-				reg44_tmp_p = reg44_tmp_p ^ BIT(9); /*get new clk high/low, exclusive-or*/
-
-	
-				reg44_tmp_p |= (beam_ctrl_signal << 8);
-				
-				odm_set_mac_reg(p_dm, 0x44, MASKDWORD, reg44_tmp_p);
-				ODM_delay_us(10);
-				/*PHYDM_DBG(p_dm, DBG_ANT_DIV, ("reg44 =(( 0x%x )), reg44[9:8] = ((%x)), beam_ctrl_signal =((%x))\n", reg44_tmp_p, ((reg44_tmp_p & 0x300)>>8), beam_ctrl_signal));*/
-				
-			} else {
-				reg44_tmp_p = reg44_ori & (~(BIT(9) | BIT(8))); /*clean bit 9 & 8*/
-				reg44_tmp_p |= ((1 << 9) | (beam_ctrl_signal << 8));
-				reg44_tmp_n = reg44_ori & (~(BIT(9) | BIT(8)));
-
-				/*PHYDM_DBG(p_dm, DBG_ANT_DIV, ("reg44_tmp_p =(( 0x%x )), reg44_tmp_n = (( 0x%x ))\n", reg44_tmp_p, reg44_tmp_n)); */
-				odm_set_mac_reg(p_dm, 0x44, MASKDWORD, reg44_tmp_p);
-				ODM_delay_us(10);
-				odm_set_mac_reg(p_dm, 0x44, MASKDWORD, reg44_tmp_n);
-				ODM_delay_us(10);
-			}
-		}
-		#endif
 	}
 }
 
@@ -1457,12 +1148,7 @@ phydm_update_rx_idle_beam(
 		/**/
 	}
 
-#if DEV_BUS_TYPE == RT_PCI_INTERFACE
-	phydm_update_beam_pattern(p_dm, pdm_sat_table->update_beam_codeword, pdm_sat_table->rfu_codeword_total_bit_num);
-#else
 	odm_schedule_work_item(&pdm_sat_table->hl_smart_antenna_workitem);
-	/*odm_stall_execution(1);*/
-#endif
 
 	pdm_sat_table->pre_codeword = pdm_sat_table->update_beam_codeword;
 }
@@ -1531,15 +1217,9 @@ phydm_hl_smart_ant_debug(
 			/*---------------------------------------------------------*/
 
 
-#if DEV_BUS_TYPE == RT_PCI_INTERFACE
-			phydm_update_beam_pattern(p_dm, pdm_sat_table->update_beam_codeword, pdm_sat_table->rfu_codeword_total_bit_num);
-#else
 			odm_schedule_work_item(&pdm_sat_table->hl_smart_antenna_workitem);
-			/*odm_stall_execution(1);*/
-#endif
 		} else if (pdm_sat_table->fix_beam_pattern_en == 0)
 			PHYDM_SNPRINTF((output + used, out_len - used, "[ SmartAnt ] Smart Antenna: Enable\n"));
-
 	} else if (dm_value[0] == 2) { /*set latch time*/
 
 		pdm_sat_table->latch_time = dm_value[1];
@@ -1636,12 +1316,7 @@ phydm_set_all_ant_same_beam_num(
 
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ SmartAnt ] Set all ant beam_pattern: codeword = (( 0x%x ))\n", pdm_sat_table->update_beam_codeword));
 
-#if DEV_BUS_TYPE == RT_PCI_INTERFACE
-	phydm_update_beam_pattern(p_dm, pdm_sat_table->update_beam_codeword, pdm_sat_table->rfu_codeword_total_bit_num);
-#else
 	odm_schedule_work_item(&pdm_sat_table->hl_smart_antenna_workitem);
-	/*odm_stall_execution(1);*/
-#endif
 }
 
 void
@@ -1944,47 +1619,6 @@ odm_fast_ant_training_hl_smart_antenna_type1(
 
 }
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-
-void
-phydm_beam_switch_workitem_callback(
-	void	*p_context
-)
-{
-	struct _ADAPTER		*p_adapter = (struct _ADAPTER *)p_context;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-	struct smt_ant_honbo			*pdm_sat_table = &(p_dm->dm_sat_table);
-
-#if DEV_BUS_TYPE != RT_PCI_INTERFACE
-	pdm_sat_table->pkt_skip_statistic_en = 1;
-#endif
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ SmartAnt ] Beam Switch Workitem Callback, pkt_skip_statistic_en = (( %d ))\n", pdm_sat_table->pkt_skip_statistic_en));
-
-	phydm_update_beam_pattern(p_dm, pdm_sat_table->update_beam_codeword, pdm_sat_table->rfu_codeword_total_bit_num);
-
-#if DEV_BUS_TYPE != RT_PCI_INTERFACE
-	/*odm_stall_execution(pdm_sat_table->latch_time);*/
-	pdm_sat_table->pkt_skip_statistic_en = 0;
-#endif
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("pkt_skip_statistic_en = (( %d )), latch_time = (( %d ))\n", pdm_sat_table->pkt_skip_statistic_en, pdm_sat_table->latch_time));
-}
-
-void
-phydm_beam_decision_workitem_callback(
-	void	*p_context
-)
-{
-	struct _ADAPTER		*p_adapter = (struct _ADAPTER *)p_context;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ SmartAnt ] Beam decision Workitem Callback\n"));
-	odm_fast_ant_training_hl_smart_antenna_type1(p_dm);
-}
-#endif
-
-
 #endif /*#ifdef CONFIG_HL_SMART_ANTENNA_TYPE1*/
 
 
@@ -2005,9 +1639,6 @@ phydm_smt_ant_config(
 		p_dm->support_ability |= ODM_BB_SMT_ANT;
 		p_smtant_table->smt_ant_vendor = SMTANT_CUMITEK;
 		p_smtant_table->smt_ant_type = 1;
-		#if (RTL8822B_SUPPORT == 1)
-		p_dm->rfe_type = SMTANT_TMP_RFE_TYPE;
-		#endif
 	#elif (defined(CONFIG_HL_SMART_ANTENNA))
 	
 		p_dm->support_ability |= ODM_BB_SMT_ANT;
@@ -2041,23 +1672,6 @@ phydm_smt_ant_init(
 	
 
 	if (p_smtant_table->smt_ant_vendor == SMTANT_CUMITEK) {
-		
-		#if (defined(CONFIG_CUMITEK_SMART_ANTENNA))
-		#if (RTL8822B_SUPPORT == 1)
-		if (p_dm->support_ic_type == ODM_RTL8822B) {
-			phydm_cumitek_smt_ant_init_8822b(p_dm);
-			/**/
-		}
-		#endif
-		
-		#if (RTL8197F_SUPPORT == 1)
-		if (p_dm->support_ic_type == ODM_RTL8197F) {
-			phydm_cumitek_smt_ant_init_8197f(p_dm);
-			/**/
-		}
-		#endif
-		#endif /*#if (defined(CONFIG_CUMITEK_SMART_ANTENNA))*/
-		
 	} else if (p_smtant_table->smt_ant_vendor == SMTANT_HON_BO) {
 
 		#if (defined(CONFIG_HL_SMART_ANTENNA))

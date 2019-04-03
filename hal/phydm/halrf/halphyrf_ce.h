@@ -17,20 +17,7 @@
 #define __HAL_PHY_RF_H__
 
 #include "halrf/halrf_kfree.h"
-#if (RTL8814A_SUPPORT == 1)
-	#include "halrf/rtl8814a/halrf_iqk_8814a.h"
-#endif
-
-#if (RTL8822B_SUPPORT == 1)
-	#include "halrf/rtl8822b/halrf_iqk_8822b.h"
-#endif
-
-#if (RTL8821C_SUPPORT == 1)
-	#include "halrf/rtl8821c/halrf_iqk_8821c.h"
-#endif
-
 #include "halrf/halrf_powertracking_ce.h"
-
 
 enum spur_cal_method {
 	PLL_RESET,
@@ -85,9 +72,7 @@ odm_clear_txpowertracking_state(
 
 void
 odm_txpowertracking_callback_thermal_meter(
-#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	void					*p_dm_void
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE) && defined(DM_ODM_CE_MAC80211)
+#if defined(DM_ODM_CE_MAC80211)
 	void	*p_dm
 #else
 	struct _ADAPTER	*adapter

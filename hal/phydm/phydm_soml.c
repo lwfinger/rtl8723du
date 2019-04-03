@@ -88,47 +88,6 @@ phydm_soml_on_off(
 	p_dm_soml_table->soml_on_off = swch;
 }
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-void
-phydm_adaptive_soml_callback(
-	struct timer_list		*p_timer
-)
-{
-	struct _ADAPTER		*adapter = (struct _ADAPTER *)p_timer->Adapter;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &(p_hal_data->DM_OutSrc);
-	struct adaptive_soml	*p_dm_soml_table = &(p_dm->dm_soml_table);
-
-#if DEV_BUS_TYPE == RT_PCI_INTERFACE
-#if USE_WORKITEM
-	odm_schedule_work_item(&(p_dm_soml_table->phydm_adaptive_soml_workitem));
-#else
-	{
-		/*dbg_print("phydm_adaptive_soml-phydm_adaptive_soml_callback\n");*/
-		phydm_adsl(p_dm);
-	}
-#endif
-#else
-	odm_schedule_work_item(&(p_dm_soml_table->phydm_adaptive_soml_workitem));
-#endif
-}
-
-void
-phydm_adaptive_soml_workitem_callback(
-	void		*p_context
-)
-{
-#ifdef CONFIG_ADAPTIVE_SOML
-	struct _ADAPTER		*p_adapter = (struct _ADAPTER *)p_context;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_adapter);
-	struct PHY_DM_STRUCT		*p_dm = &(p_hal_data->DM_OutSrc);
-
-	/*dbg_print("phydm_adaptive_soml-phydm_adaptive_soml_workitem_callback\n");*/
-	phydm_adsl(p_dm);
-#endif
-}
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 void
 phydm_adaptive_soml_callback(
 	void	*dm_void
@@ -159,24 +118,6 @@ phydm_adaptive_soml_workitem_callback(
 	/*dbg_print("phydm_adaptive_soml-phydm_adaptive_soml_workitem_callback\n");*/
 	phydm_adsl(dm);
 }
-#else
-
-void
-phydm_adaptive_soml_callback(
-	void		*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-
-	PHYDM_DBG(p_dm, DBG_ADPTV_SOML, ("******SOML_Callback******\n"));
-	phydm_adsl(p_dm);
-
-}
-
-#endif
-
-
-
 
 void
 phydm_soml_debug(
@@ -584,21 +525,5 @@ phydm_init_soft_ml_setting(
 	void		*p_dm_void
 )
 {
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	
-#if (RTL8822B_SUPPORT == 1)
-	if (*(p_dm->p_mp_mode) == false) {
-		if (p_dm->support_ic_type & ODM_RTL8822B)
-			/*odm_set_bb_reg(p_dm, 0x19a8, MASKDWORD, 0xd10a0000);*/
-			phydm_somlrxhp_setting(p_dm, true);
-			p_dm->bsomlenabled = true;
-	}
-#endif
-#if (RTL8821C_SUPPORT == 1)
-	if (*(p_dm->p_mp_mode) == false) {
-		if (p_dm->support_ic_type & ODM_RTL8821C)
-			odm_set_bb_reg(p_dm, 0x19a8, BIT(31)|BIT(30)|BIT(29)|BIT(28), 0xd);
-	}
-#endif
 }
 

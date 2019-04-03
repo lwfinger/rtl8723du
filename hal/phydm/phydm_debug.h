@@ -90,25 +90,16 @@
 
 #define	config_phydm_read_txagc_check(data)		(data != INVALID_TXAGC_DATA)
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	#define	dbg_print				DbgPrint
-	#define	dcmd_printf				DCMD_Printf
-	#define	dcmd_scanf				DCMD_Scanf
-	#define RT_PRINTK				dbg_print
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE) && defined(DM_ODM_CE_MAC80211)
+#if defined(DM_ODM_CE_MAC80211)
 	#define dbg_print(args...)
 	#define RT_PRINTK(fmt, args...)	\
 			RT_TRACE(((struct rtl_priv *)p_dm->adapter),	\
 				 COMP_PHYDM, DBG_DMESG, fmt, ## args)
 	#define	RT_DISP(dbgtype, dbgflag, printstr)
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
+#else
 	#define dbg_print	printk
 	#define RT_PRINTK(fmt, args...)	dbg_print(fmt, ## args)
 	#define	RT_DISP(dbgtype, dbgflag, printstr)
-#else
-	#define dbg_print	panic_printk
-	/*#define RT_PRINTK(fmt, args...)	dbg_print("%s(): " fmt, __FUNCTION__, ## args);*/
-	#define RT_PRINTK(args...)	dbg_print(args)
 #endif
 
 #ifndef ASSERT
@@ -183,29 +174,7 @@
 #define	BB_DBGPORT_PRIORITY_1	1	/*Watch dog function*/
 #define	BB_DBGPORT_RELEASE		0	/*Init value (the lowest priority)*/
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-#define	PHYDM_DBGPRINT		0
-#define	PHYDM_SSCANF(x, y, z)	dcmd_scanf(x, y, z)
-#define	PHYDM_VAST_INFO_SNPRINTF	PHYDM_SNPRINTF
-#if (PHYDM_DBGPRINT == 1)
-#define	PHYDM_SNPRINTF(msg)	\
-	do {\
-		rsprintf msg;\
-		dbg_print(output);\
-	} while (0)
-#else
-#define	PHYDM_SNPRINTF(msg)	\
-	do {\
-		rsprintf msg;\
-		dcmd_printf(output);\
-	} while (0)
-#endif
-#else
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE) || defined(__OSK__)
 	#define	PHYDM_DBGPRINT		0
-#else
-	#define	PHYDM_DBGPRINT		1
-#endif
 #define	MAX_ARGC				20
 #define	MAX_ARGV				16
 #define	DCMD_DECIMAL			"%d"
@@ -232,7 +201,6 @@
 		if (out_len > used)\
 			used += snprintf msg;\
 	} while (0)
-#endif
 #endif
 
 void
@@ -297,7 +265,7 @@ phydm_basic_profile(
 	char		*output,
 	u32		*_out_len
 );
-#if (DM_ODM_SUPPORT_TYPE & (ODM_CE | ODM_AP))
+
 s32
 phydm_cmd(
 	struct PHY_DM_STRUCT	*p_dm,
@@ -307,7 +275,7 @@ phydm_cmd(
 	char		*output,
 	u32		out_len
 );
-#endif
+
 void
 phydm_cmd_parser(
 	struct PHY_DM_STRUCT	*p_dm,
@@ -317,20 +285,6 @@ phydm_cmd_parser(
 	char		*output,
 	u32		out_len
 );
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-void phydm_sbd_check(
-	struct	PHY_DM_STRUCT	*p_dm
-);
-
-void phydm_sbd_callback(
-	struct timer_list		*p_timer
-);
-
-void phydm_sbd_workitem_callback(
-	void	*p_context
-);
-#endif
 
 void
 phydm_fw_trace_en_h2c(

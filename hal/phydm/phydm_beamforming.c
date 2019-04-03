@@ -16,12 +16,6 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	#if WPP_SOFTWARE_TRACE
-		#include "phydm_beamforming.tmh"
-	#endif
-#endif
-
 #if (BEAMFORMING_SUPPORT == 1)
 
 struct _RT_BEAMFORM_STAINFO *
@@ -35,44 +29,6 @@ phydm_sta_info_init(
 	struct sta_info					*p_sta = p_dm->p_odm_sta_info[sta_idx];
 	struct cmn_sta_info				*p_cmn_sta = p_dm->p_phydm_sta_info[sta_idx];
 	struct _ADAPTER					*adapter = p_dm->adapter;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PMGNT_INFO					p_MgntInfo = &adapter->MgntInfo;
-	PRT_HIGH_THROUGHPUT		p_ht_info = GET_HT_INFO(p_MgntInfo);
-	PRT_VERY_HIGH_THROUGHPUT	p_vht_info = GET_VHT_INFO(p_MgntInfo);
-	u1Byte						iotpeer = 0;
-
-	iotpeer = p_MgntInfo->IOTPeer;
-	odm_move_memory(p_dm, p_entry->my_mac_addr, adapter->CurrentAddress, 6);
-
-	p_entry->ht_beamform_cap = p_ht_info->HtBeamformCap;
-	p_entry->vht_beamform_cap = p_vht_info->VhtBeamformCap;
-	
-	/*IBSS, AP mode*/
-	if (sta_idx != 0) {
-		p_entry->aid = p_cmn_sta->aid;
-		p_entry->ra = p_cmn_sta->mac_addr;
-		p_entry->mac_id = p_cmn_sta->mac_id;
-		p_entry->wireless_mode = p_sta->WirelessMode;
-		p_entry->bw = p_cmn_sta->bw_mode;
-		p_entry->cur_beamform = p_cmn_sta->bf_info.ht_beamform_cap;
-	} else {/*client mode*/
-		p_entry->aid = p_MgntInfo->mAId;
-		p_entry->ra = p_MgntInfo->Bssid;
-		p_entry->mac_id = p_MgntInfo->mMacId;
-		p_entry->wireless_mode = p_MgntInfo->dot11CurrentWirelessMode;
-		p_entry->bw = p_MgntInfo->dot11CurrentChannelBandWidth;
-		p_entry->cur_beamform = p_ht_info->HtCurBeamform;
-	}
-
-	if ((p_entry->wireless_mode & WIRELESS_MODE_AC_5G) || (p_entry->wireless_mode & WIRELESS_MODE_AC_24G)) {
-		if (sta_idx != 0)
-			p_entry->cur_beamform_vht = p_cmn_sta->bf_info.vht_beamform_cap;
-		else
-			p_entry->cur_beamform_vht = p_vht_info->VhtCurBeamform;
-	}
-
-	PHYDM_DBG(p_dm, DBG_TXBF, ("p_sta->wireless_mode = 0x%x, staidx = %d\n", p_sta->WirelessMode, sta_idx));
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 
 	if (!is_sta_active(p_cmn_sta)) {
 		PHYDM_DBG(p_dm, DBG_TXBF, ("%s => sta_info(mac_id:%d) failed\n", __func__, sta_idx));
@@ -100,10 +56,8 @@ phydm_sta_info_init(
 	}
 #endif
 	PHYDM_DBG(p_dm, DBG_TXBF, ("p_sta->wireless_mode = 0x%x, staidx = %d\n", p_sta->wireless_mode, sta_idx));
-#endif
 	PHYDM_DBG(p_dm, DBG_TXBF, ("p_entry->cur_beamform = 0x%x, p_entry->cur_beamform_vht = 0x%x\n", p_entry->cur_beamform, p_entry->cur_beamform_vht));
 	return p_entry;
-
 }
 void phydm_sta_info_update(
 	struct PHY_DM_STRUCT			*p_dm,
@@ -1553,20 +1507,12 @@ phydm_beamforming_end_sw(
 
 void
 beamforming_timer_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	void			*p_dm_void
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	void            *p_context
-#endif
 )
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	struct _ADAPTER					*adapter = (struct _ADAPTER *)p_context;
 	PHAL_DATA_TYPE				p_hal_data = GET_HAL_DATA(adapter);
 	struct PHY_DM_STRUCT					*p_dm = &p_hal_data->odmpriv;
-#endif
 	boolean						ret = false;
 	struct _RT_BEAMFORMING_INFO		*p_beam_info = &(p_dm->beamforming_info);
 	struct _RT_BEAMFORMEE_ENTRY		*p_entry = &(p_beam_info->beamformee_entry[p_beam_info->beamformee_cur_idx]);
@@ -1610,31 +1556,16 @@ beamforming_timer_callback(
 
 void
 beamforming_sw_timer_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct timer_list		*p_timer
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	void *function_context
-#endif
 )
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter = (struct _ADAPTER *)p_timer->Adapter;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-
-	PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] Start!\n", __func__));
-	beamforming_timer_callback(p_dm);
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)function_context;
 	struct _ADAPTER	*adapter = p_dm->adapter;
 
 	if (adapter->net_closed == true)
 		return;
 	rtw_run_in_thread_cmd(adapter, beamforming_timer_callback, adapter);
-#endif
-
 }
-
 
 void
 phydm_beamforming_init(
@@ -1644,16 +1575,6 @@ phydm_beamforming_init(
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _RT_BEAMFORMING_INFO		*p_beam_info = &p_dm->beamforming_info;
 	struct _RT_BEAMFORMING_OID_INFO	*p_beam_oid_info = &(p_beam_info->beamforming_oid_info);
-	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter = p_dm->adapter;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
-	
-	#ifdef BEAMFORMING_VERSION_1
-	if (p_hal_data->beamforming_version != BEAMFORMING_VERSION_1) {
-		return;
-	}
-	#endif
-	#endif
 
 	p_beam_oid_info->sound_oid_mode = SOUNDING_STOP_OID_TIMER;
 	PHYDM_DBG(p_dm, DBG_TXBF, ("%s mode (%d)\n", __func__, p_beam_oid_info->sound_oid_mode));
@@ -1669,12 +1590,8 @@ phydm_beamforming_init(
 	p_beam_info->apply_v_matrix = true;
 	p_beam_info->snding3ss = false;
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	p_beam_info->source_adapter = p_dm->adapter;
-#endif
 	hal_com_txbf_beamform_init(p_dm);
 }
-
 
 boolean
 phydm_acting_determine(
@@ -1684,28 +1601,15 @@ phydm_acting_determine(
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	boolean		ret = false;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER	*adapter = p_dm->beamforming_info.source_adapter;
-#else
 	struct _ADAPTER	*adapter = p_dm->adapter;
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	if (type == phydm_acting_as_ap)
-		ret = ACTING_AS_AP(adapter);
-	else if (type == phydm_acting_as_ibss)
-		ret = ACTING_AS_IBSS(adapter);
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
 	struct mlme_priv			*pmlmepriv = &(adapter->mlmepriv);
 
 	if (type == phydm_acting_as_ap)
 		ret = check_fwstate(pmlmepriv, WIFI_AP_STATE);
 	else if (type == phydm_acting_as_ibss)
 		ret = check_fwstate(pmlmepriv, WIFI_ADHOC_STATE) || check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE);
-#endif
 
 	return ret;
-
 }
 
 void
@@ -1906,9 +1810,6 @@ phydm_get_beamform_cap(
 	u8                                       macid;
 	u8                                       ht_curbeamformcap = 0;
 	u16                                      vht_curbeamformcap = 0;
-
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	PMGNT_INFO                              p_MgntInfo = &adapter->MgntInfo;
 	PRT_VERY_HIGH_THROUGHPUT                p_vht_info = GET_VHT_INFO(p_MgntInfo);
 	PRT_HIGH_THROUGHPUT                     p_ht_info  = GET_HT_INFO(p_MgntInfo);
@@ -1939,11 +1840,8 @@ phydm_get_beamform_cap(
 	if (TEST_FLAG(vht_curbeamformcap, BEAMFORMING_VHT_MU_MIMO_AP_ENABLE))
 		beamform_cap = (enum beamforming_cap)(beamform_cap | (BEAMFORMEE_CAP_VHT_MU | BEAMFORMEE_CAP));
 	#endif
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 
-
-		for (macid = 0; macid < ODM_ASSOCIATE_ENTRY_NUM; macid++) {
-
+	for (macid = 0; macid < ODM_ASSOCIATE_ENTRY_NUM; macid++) {
 		p_sta = p_dm->p_phydm_sta_info[macid];
 
 		if (!is_sta_active(p_sta))
@@ -1973,13 +1871,10 @@ phydm_get_beamform_cap(
 		if (TEST_FLAG(vht_curbeamformcap, BEAMFORMING_VHT_MU_MIMO_AP_ENABLE))
 			beamform_cap = (enum beamforming_cap)(beamform_cap | (BEAMFORMEE_CAP_VHT_MU | BEAMFORMEE_CAP));
 	#endif
-}
+	}
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[%s] CE ht_curcap = %d ; vht_curcap = %d\n", __func__, ht_curbeamformcap, vht_curbeamformcap));
 
-#endif
-
-return beamform_cap;
-
+	return beamform_cap;
 }
 
 #endif

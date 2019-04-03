@@ -30,19 +30,7 @@
 #define	ODM_ENDIAN_BIG	0
 #define	ODM_ENDIAN_LITTLE	1
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&((GET_HAL_DATA(__padapter))->DM_OutSrc)))
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
-	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&((GET_HAL_DATA(__padapter))->odmpriv)))
-#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&(__padapter->pshare->_dmODM)))
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE != ODM_WIN)
-	#define	RT_PCI_INTERFACE				1
-	#define	RT_USB_INTERFACE				2
-	#define	RT_SDIO_INTERFACE				3
-#endif
+#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&((GET_HAL_DATA(__padapter))->odmpriv)))
 
 enum hal_status {
 	HAL_STATUS_SUCCESS,
@@ -54,8 +42,6 @@ enum hal_status {
 	RT_STATUS_NOT_SUPPORT,
 	RT_STATUS_OS_API_FAILED,*/
 };
-
-#if (DM_ODM_SUPPORT_TYPE != ODM_WIN)
 
 #define		VISTA_USB_RX_REVISE			0
 
@@ -109,48 +95,9 @@ enum rt_spinlock_type {
 	RT_LAST_SPINLOCK,
 };
 
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	#define sta_info 	_RT_WLAN_STA
-	#define	__func__		__FUNCTION__
-	#define	PHYDM_TESTCHIP_SUPPORT	TESTCHIP_SUPPORT
-	#define MASKH3BYTES			0xffffff00
-	#define SUCCESS	0
-	#define FAIL	(-1)
-
-	#define	u8 		u1Byte
-	#define	s8 		s1Byte
-
-	#define	u16		u2Byte
-	#define	s16		s2Byte
-
-	#define	u32 	u4Byte
-	#define	s32 		s4Byte
-
-	#define	u64		u8Byte
-	#define	s64		s8Byte
-
-	#define	timer_list	_RT_TIMER
-	
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	#include "../typedef.h"
-
-	#if (defined(TESTCHIP_SUPPORT))
-		#define	PHYDM_TESTCHIP_SUPPORT 1
-	#else
-		#define	PHYDM_TESTCHIP_SUPPORT 0
-	#endif
-
-	#define	sta_info stat_info
-	#define	boolean	bool
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE) && defined(DM_ODM_CE_MAC80211)
+#if defined(DM_ODM_CE_MAC80211)
 
 	#include <asm/byteorder.h>
-
-	#define DEV_BUS_TYPE	RT_PCI_INTERFACE
 
 	#if defined(__LITTLE_ENDIAN)
 		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_LITTLE
@@ -189,11 +136,8 @@ enum rt_spinlock_type {
 	#define sta_info	rtl_sta_info
 	#define	boolean		bool
 
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
+#else
 	#include <drv_types.h>
-
-	#define DEV_BUS_TYPE	RT_USB_INTERFACE
-
 
 	#if defined(CONFIG_LITTLE_ENDIAN)
 		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_LITTLE

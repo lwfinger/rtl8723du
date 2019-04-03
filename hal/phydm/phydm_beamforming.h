@@ -27,33 +27,19 @@
 
 #if (BEAMFORMING_SUPPORT == 1)
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-
-#define eq_mac_addr(a,b)						( ((a)[0]==(b)[0] && (a)[1]==(b)[1] && (a)[2]==(b)[2] && (a)[3]==(b)[3] && (a)[4]==(b)[4] && (a)[5]==(b)[5]) ? 1:0 )
-#define cp_mac_addr(des,src)					((des)[0]=(src)[0],(des)[1]=(src)[1],(des)[2]=(src)[2],(des)[3]=(src)[3],(des)[4]=(src)[4],(des)[5]=(src)[5])
-
-#endif
-
 #define MAX_BEAMFORMEE_SU	2
 #define MAX_BEAMFORMER_SU	2
-#if (RTL8822B_SUPPORT == 1)
-	#define MAX_BEAMFORMEE_MU	6
-	#define MAX_BEAMFORMER_MU	1
-#else
-	#define MAX_BEAMFORMEE_MU	0
-	#define MAX_BEAMFORMER_MU	0
-#endif
+#define MAX_BEAMFORMEE_MU	0
+#define MAX_BEAMFORMER_MU	0
 
 #define BEAMFORMEE_ENTRY_NUM		(MAX_BEAMFORMEE_SU + MAX_BEAMFORMEE_MU)
 #define BEAMFORMER_ENTRY_NUM		(MAX_BEAMFORMER_SU + MAX_BEAMFORMER_MU)
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
-	/*for different naming between WIN and CE*/
-	#define BEACON_QUEUE	BCN_QUEUE_INX
-	#define NORMAL_QUEUE	MGT_QUEUE_INX
-	#define RT_DISABLE_FUNC RTW_DISABLE_FUNC
-	#define RT_ENABLE_FUNC RTW_ENABLE_FUNC
-#endif
+/*for different naming between WIN and CE*/
+#define BEACON_QUEUE	BCN_QUEUE_INX
+#define NORMAL_QUEUE	MGT_QUEUE_INX
+#define RT_DISABLE_FUNC RTW_DISABLE_FUNC
+#define RT_ENABLE_FUNC RTW_ENABLE_FUNC
 
 enum beamforming_entry_state {
 	BEAMFORMING_ENTRY_STATE_UNINITIALIZE,
@@ -214,9 +200,6 @@ struct _RT_BEAMFORMING_INFO {
 	boolean					dbg_disable_mu_tx;
 	boolean					apply_v_matrix;
 	boolean					snding3ss;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER				*source_adapter;
-#endif
 	/* Control register */
 	u32					reg_mu_tx_ctrl;		/* For USB/SDIO interfaces aync I/O */
 	u8					tx_bf_data_rate;
@@ -347,11 +330,7 @@ phydm_beamforming_watchdog(
 
 void
 beamforming_sw_timer_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct timer_list		*p_timer
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	void *function_context
-#endif
 );
 
 boolean

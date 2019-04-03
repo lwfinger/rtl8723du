@@ -469,17 +469,6 @@ phydm_rate_to_num_ss(
 	u8			data_rate
 );
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-void
-phydm_normal_driver_rx_sniffer(
-	struct PHY_DM_STRUCT			*p_dm,
-	u8				*p_desc,
-	PRT_RFD_STATUS		p_rt_rfd_status,
-	u8				*p_drv_info,
-	u8				phy_status
-);
-#endif
-
 s32
 phydm_signal_scale_mapping(
 	struct PHY_DM_STRUCT *p_dm,

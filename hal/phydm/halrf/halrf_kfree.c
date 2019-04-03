@@ -713,16 +713,6 @@ phydm_get_thermal_trim_offset(
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	struct _ADAPTER		*adapter = p_dm->adapter;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
-	PEFUSE_HAL		pEfuseHal = &(p_hal_data->EfuseHal);
-	u1Byte			eFuseContent[DCMD_EFUSE_MAX_SECTION_NUM * EFUSE_MAX_WORD_UNIT * 2];
-
-	if (HAL_MAC_Dump_EFUSE(&GET_HAL_MAC_INFO(adapter), EFUSE_WIFI, eFuseContent, pEfuseHal->PhysicalLen_WiFi, HAL_MAC_EFUSE_PHYSICAL, HAL_MAC_EFUSE_PARSE_DRV) != RT_STATUS_SUCCESS)
-		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] dump efuse fail !!!\n"));
-#endif
-
 	if (p_dm->support_ic_type & ODM_RTL8821C)
 		phydm_get_thermal_trim_offset_8821c(p_dm_void);
 	else if (p_dm->support_ic_type & ODM_RTL8822B)
@@ -739,16 +729,6 @@ phydm_get_power_trim_offset(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	struct _ADAPTER		*adapter = p_dm->adapter;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
-	PEFUSE_HAL		pEfuseHal = &(p_hal_data->EfuseHal);
-	u1Byte			eFuseContent[DCMD_EFUSE_MAX_SECTION_NUM * EFUSE_MAX_WORD_UNIT * 2];
-
-	if (HAL_MAC_Dump_EFUSE(&GET_HAL_MAC_INFO(adapter), EFUSE_WIFI, eFuseContent, pEfuseHal->PhysicalLen_WiFi, HAL_MAC_EFUSE_PHYSICAL, HAL_MAC_EFUSE_PARSE_DRV) != RT_STATUS_SUCCESS)
-		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] dump efuse fail !!!\n"));
-#endif
 
 	if (p_dm->support_ic_type & ODM_RTL8821C)
 		phydm_get_power_trim_offset_8821c(p_dm_void);
@@ -767,21 +747,9 @@ phydm_get_pa_bias_offset(
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	struct _ADAPTER		*adapter = p_dm->adapter;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
-	PEFUSE_HAL		pEfuseHal = &(p_hal_data->EfuseHal);
-	u1Byte			eFuseContent[DCMD_EFUSE_MAX_SECTION_NUM * EFUSE_MAX_WORD_UNIT * 2];
-
-	if (HAL_MAC_Dump_EFUSE(&GET_HAL_MAC_INFO(adapter), EFUSE_WIFI, eFuseContent, pEfuseHal->PhysicalLen_WiFi, HAL_MAC_EFUSE_PHYSICAL, HAL_MAC_EFUSE_PARSE_DRV) != RT_STATUS_SUCCESS)
-		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] dump efuse fail !!!\n"));
-#endif
-
 	if (p_dm->support_ic_type & ODM_RTL8822B)
 		phydm_get_pa_bias_offset_8822b(p_dm_void);
 }
-
-
 
 s8
 phydm_get_thermal_offset(

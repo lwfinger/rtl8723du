@@ -58,19 +58,7 @@ struct _HAL_TXBF_INFO {
 	u8				ndpa_idx;
 	u8				BW;
 	u8				rate;
-
 	struct timer_list			txbf_fw_ndpa_timer;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	RT_WORK_ITEM		txbf_enter_work_item;
-	RT_WORK_ITEM		txbf_leave_work_item;
-	RT_WORK_ITEM		txbf_fw_ndpa_work_item;
-	RT_WORK_ITEM		txbf_clk_work_item;
-	RT_WORK_ITEM		txbf_status_work_item;
-	RT_WORK_ITEM		txbf_rate_work_item;
-	RT_WORK_ITEM		txbf_reset_tx_path_work_item;
-	RT_WORK_ITEM		txbf_get_tx_rate_work_item;
-#endif
-
 };
 
 #if (BEAMFORMING_SUPPORT == 1)
@@ -87,65 +75,37 @@ hal_com_txbf_config_gtab(
 
 void
 hal_com_txbf_enter_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 );
 
 void
 hal_com_txbf_leave_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 );
 
 void
 hal_com_txbf_fw_ndpa_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 );
 
 void
 hal_com_txbf_clk_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 );
 
 void
 hal_com_txbf_reset_tx_path_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 );
 
 void
 hal_com_txbf_get_tx_rate_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 );
 
 void
 hal_com_txbf_rate_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 );
 
 void
@@ -155,11 +115,7 @@ hal_com_txbf_fw_ndpa_timer_callback(
 
 void
 hal_com_txbf_status_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 );
 
 boolean

@@ -22,16 +22,6 @@
 #define pwdb_upper_bound	7
 #define dfir_loss	7
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
-enum phydm_regulation_type {
-	REGULATION_FCC		= 0,
-	REGULATION_MKK		= 1,
-	REGULATION_ETSI		= 2,
-	REGULATION_WW		= 3,
-	MAX_REGULATION_NUM	= 4
-};
-#endif
-
 enum phydm_adapinfo_e {
 	PHYDM_ADAPINFO_CARRIER_SENSE_ENABLE = 0,
 	PHYDM_ADAPINFO_DCBACKOFF,
@@ -80,10 +70,6 @@ struct phydm_adaptivity_struct {
 	s8			backup_l2h;
 	s8			backup_h2l;
 	boolean			is_stop_edcca;
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	RT_WORK_ITEM	phydm_pause_edcca_work_item;
-	RT_WORK_ITEM	phydm_resume_edcca_work_item;
-#endif
 	u32			adaptivity_dbg_port; /*N:0x208, AC:0x209*/
 	u8			debug_mode;
 	s8			th_l2h_ini_debug;
@@ -157,20 +143,12 @@ phydm_set_edcca_threshold_api(
 
 void
 phydm_pause_edcca_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 );
 
 void
 phydm_resume_edcca_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
 	void			*p_dm_void
-#endif
 );
 
 void

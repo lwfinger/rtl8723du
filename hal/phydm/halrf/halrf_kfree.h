@@ -21,18 +21,8 @@
 
 #define	KFREE_BAND_NUM		6
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_AP))
-
-#define	BB_GAIN_NUM		6
 #define KFREE_FLAG_ON				BIT(0)
 #define KFREE_FLAG_THERMAL_K_ON		BIT(1)
-
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE) && defined(DM_ODM_CE_MAC80211)
-#define KFREE_FLAG_ON				BIT(0)
-#define KFREE_FLAG_THERMAL_K_ON		BIT(1)
-#endif
 
 #define KFREE_FLAG_ON_2G				BIT(2)
 #define KFREE_FLAG_ON_5G				BIT(3)
