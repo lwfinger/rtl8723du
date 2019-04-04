@@ -62,7 +62,6 @@ CONFIG_RTW_DEBUG = y
 # please refer to "How_to_set_driver_debug_log_level.doc" to set the available level.
 CONFIG_RTW_LOG_LEVEL = 2
 ######################## Wake On Lan ##########################
-CONFIG_WOWLAN = n
 CONFIG_WAKEUP_TYPE = 0x7 #bit2: deauth, bit1: unicast, bit0: magic pkt.
 CONFIG_WAKEUP_GPIO_IDX = default
 CONFIG_HIGH_ACTIVE = n
@@ -307,13 +306,6 @@ endif
 
 ifeq ($(CONFIG_80211W), y)
 EXTRA_CFLAGS += -DCONFIG_IEEE80211W
-endif
-
-ifeq ($(CONFIG_WOWLAN), y)
-EXTRA_CFLAGS += -DCONFIG_WOWLAN -DRTW_WAKEUP_EVENT=$(CONFIG_WAKEUP_TYPE)
-ifeq ($(CONFIG_SDIO_HCI), y)
-EXTRA_CFLAGS += -DCONFIG_RTW_SDIO_PM_KEEP_POWER
-endif
 endif
 
 ifeq ($(CONFIG_PNO_SUPPORT), y)
