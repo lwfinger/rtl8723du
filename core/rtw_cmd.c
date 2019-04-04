@@ -2981,62 +2981,6 @@ exit:
 
 #endif
 
-#ifdef CONFIG_ANTENNA_DIVERSITY
-void antenna_select_wk_hdl(_adapter *padapter, u8 antenna)
-{
-	rtw_hal_set_odm_var(padapter, HAL_ODM_ANTDIV_SELECT, &antenna, _TRUE);
-}
-
-u8 rtw_antenna_select_cmd(_adapter *padapter, u8 antenna, u8 enqueue)
-{
-	struct cmd_obj		*ph2c;
-	struct drvextra_cmd_parm	*pdrvextra_cmd_parm;
-	struct cmd_priv	*pcmdpriv = &padapter->cmdpriv;
-	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
-	u8	bSupportAntDiv = _FALSE;
-	u8	res = _SUCCESS;
-	int	i;
-
-	rtw_hal_get_def_var(padapter, HAL_DEF_IS_SUPPORT_ANT_DIV, &(bSupportAntDiv));
-	if (_FALSE == bSupportAntDiv)
-		return _FAIL;
-
-	for (i = 0; i < dvobj->iface_nums; i++) {
-		if (rtw_linked_check(dvobj->padapters[i]))
-			return _FAIL;
-	}
-
-	if (_TRUE == enqueue) {
-		ph2c = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-		if (ph2c == NULL) {
-			res = _FAIL;
-			goto exit;
-		}
-
-		pdrvextra_cmd_parm = (struct drvextra_cmd_parm *)rtw_zmalloc(sizeof(struct drvextra_cmd_parm));
-		if (pdrvextra_cmd_parm == NULL) {
-			rtw_mfree((unsigned char *)ph2c, sizeof(struct cmd_obj));
-			res = _FAIL;
-			goto exit;
-		}
-
-		pdrvextra_cmd_parm->ec_id = ANT_SELECT_WK_CID;
-		pdrvextra_cmd_parm->type = antenna;
-		pdrvextra_cmd_parm->size = 0;
-		pdrvextra_cmd_parm->pbuf = NULL;
-		init_h2fwcmd_w_parm_no_rsp(ph2c, pdrvextra_cmd_parm, GEN_CMD_CODE(_Set_Drv_Extra));
-
-		res = rtw_enqueue_cmd(pcmdpriv, ph2c);
-	} else
-		antenna_select_wk_hdl(padapter, antenna);
-exit:
-
-
-	return res;
-
-}
-#endif
-
 void rtw_dm_ra_mask_hdl(_adapter *padapter, struct sta_info *psta)
 {
 	if (psta)
@@ -4597,11 +4541,6 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapter, unsigned char *pbuf)
 #if (RATE_ADAPTIVE_SUPPORT == 1)
 	case RTP_TIMER_CFG_WK_CID:
 		rpt_timer_setting_wk_hdl(padapter, pdrvextra_cmd->type);
-		break;
-#endif
-#ifdef CONFIG_ANTENNA_DIVERSITY
-	case ANT_SELECT_WK_CID:
-		antenna_select_wk_hdl(padapter, pdrvextra_cmd->type);
 		break;
 #endif
 #ifdef CONFIG_P2P_PS

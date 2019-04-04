@@ -322,9 +322,6 @@ struct ss_res {
 	systime backop_time; /* the start time of backop */
 	u16 backop_ms;
 #endif
-#if defined(CONFIG_ANTENNA_DIVERSITY) || defined(DBG_SCAN_SW_ANTDIV_BL)
-	u8 is_sw_antdiv_bl_scan;
-#endif
 	u8 ssid_num;
 	u8 ch_num;
 	NDIS_802_11_SSID ssid[RTW_SSID_SCAN_AMOUNT];

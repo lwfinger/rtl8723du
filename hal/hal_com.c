@@ -6624,43 +6624,6 @@ void hw_var_set_opmode_mbid(_adapter *Adapter, u8 mode)
 }
 #endif
 
-#ifdef CONFIG_ANTENNA_DIVERSITY
-u8	rtw_hal_antdiv_before_linked(_adapter *padapter)
-{
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-	u8 cur_ant, change_ant;
-
-	if (!pHalData->AntDivCfg)
-		return _FALSE;
-
-	if (pHalData->sw_antdiv_bl_state == 0) {
-		pHalData->sw_antdiv_bl_state = 1;
-
-		rtw_hal_get_odm_var(padapter, HAL_ODM_ANTDIV_SELECT, &cur_ant, NULL);
-		change_ant = (cur_ant == MAIN_ANT) ? AUX_ANT : MAIN_ANT;
-
-		return rtw_antenna_select_cmd(padapter, change_ant, _FALSE);
-	}
-
-	pHalData->sw_antdiv_bl_state = 0;
-	return _FALSE;
-}
-
-void	rtw_hal_antdiv_rssi_compared(_adapter *padapter, WLAN_BSSID_EX *dst, WLAN_BSSID_EX *src)
-{
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-
-	if (pHalData->AntDivCfg) {
-		/*RTW_INFO("update_network=> org-RSSI(%d), new-RSSI(%d)\n", dst->Rssi, src->Rssi);*/
-		/*select optimum_antenna for before linked =>For antenna diversity*/
-		if (dst->Rssi >=  src->Rssi) {/*keep org parameter*/
-			src->Rssi = dst->Rssi;
-			src->PhyInfo.Optimum_antenna = dst->PhyInfo.Optimum_antenna;
-		}
-	}
-}
-#endif
-
 #ifdef CONFIG_PHY_CAPABILITY_QUERY
 void rtw_dump_phy_cap_by_phydmapi(void *sel, _adapter *adapter)
 {

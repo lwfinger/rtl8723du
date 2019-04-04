@@ -386,24 +386,6 @@ static void phy_switch_rf_path_set(PADAPTER padapter , u8 *prf_set_State) {
 }
 
 
-#ifdef CONFIG_ANTENNA_DIVERSITY
-u8 rtw_mp_set_antdiv(PADAPTER padapter, BOOLEAN bMain)
-{
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-	u8 cur_ant, change_ant;
-
-	if (!pHalData->AntDivCfg)
-		return _FALSE;
-	/*rtw_hal_get_odm_var(padapter, HAL_ODM_ANTDIV_SELECT, &cur_ant, NULL);*/
-	change_ant = (bMain == MAIN_ANT) ? MAIN_ANT : AUX_ANT;
-
-	RTW_INFO("%s: config %s\n", __func__, (bMain == MAIN_ANT) ? "MAIN_ANT" : "AUX_ANT");
-	rtw_antenna_select_cmd(padapter, change_ant, _FALSE);
-
-	return _TRUE;
-}
-#endif
-
 s32
 MPT_InitializeAdapter(
 	IN	PADAPTER			pAdapter,

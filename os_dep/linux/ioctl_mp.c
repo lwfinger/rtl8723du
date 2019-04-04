@@ -1255,14 +1255,6 @@ int rtw_mp_SetRFPath(struct net_device *dev,
 	bTurnoff = strncmp(input, "0", 3); /* strncmp TRUE is 0*/
 
 	_rtw_memset(extra, 0, wrqu->length);
-#ifdef CONFIG_ANTENNA_DIVERSITY
-	if (bMain == 0)
-		ret = rtw_mp_set_antdiv(padapter, _TRUE);
-	else
-		ret = rtw_mp_set_antdiv(padapter, _FALSE);
-	if (ret == _FALSE)
-		RTW_INFO("%s:ANTENNA_DIVERSITY FAIL\n", __func__);
-#endif
 
 	if (bMain == 0) {
 		MP_PHY_SetRFPathSwitch(padapter, _TRUE);

@@ -109,8 +109,6 @@
 /*
  * Hareware/Firmware Related Configure
  */
-/* #define CONFIG_ANTENNA_DIVERSITY	 */ /* Set from Makefile */
-/* #define SUPPORT_HW_RFOFF_DETECTED */
 
 #define CONFIG_RTW_LED
 #ifdef CONFIG_RTW_LED
@@ -271,12 +269,6 @@
 #ifdef CONFIG_TX_EARLY_MODE
 #define RTL8723C_EARLY_MODE_PKT_NUM_10	0
 #endif
-
-
-#ifdef CONFIG_ANTENNA_DIVERSITY
-	#define CONFIG_HW_ANTENNA_DIVERSITY
-#endif
-
 
 /*
  * Debug Related Configure

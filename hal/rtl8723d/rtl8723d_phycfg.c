@@ -844,19 +844,8 @@ PHY_SetTxPowerLevel8723D(
 	u8				cur_antenna;
 	enum rf_path		RFPath = RF_PATH_A;
 
-#ifdef CONFIG_ANTENNA_DIVERSITY
-	rtw_hal_get_odm_var(Adapter, HAL_ODM_ANTDIV_SELECT, &cur_antenna, NULL);
-
-	if (pHalData->AntDivCfg)  /* antenna diversity Enable */
-		RFPath = ((cur_antenna == MAIN_ANT) ? RF_PATH_A : RF_PATH_B);
-	else   /* antenna diversity disable */
-#endif
-		RFPath = pHalData->ant_path;
-
-
-
+	RFPath = pHalData->ant_path;
 	phy_set_tx_power_level_by_path(Adapter, Channel, RFPath);
-
 }
 
 VOID

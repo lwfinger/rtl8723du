@@ -624,19 +624,6 @@ void SetHalODMVar(
 #endif
 	}
 		break;
-
-#ifdef CONFIG_ANTENNA_DIVERSITY
-	case HAL_ODM_ANTDIV_SELECT: {
-		u8	antenna = (*(u8 *)pValue1);
-		HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
-		/*switch antenna*/
-		odm_update_rx_idle_ant(&pHalData->odmpriv, antenna);
-		/*RTW_INFO("==> HAL_ODM_ANTDIV_SELECT, Ant_(%s)\n", (antenna == MAIN_ANT) ? "MAIN_ANT" : "AUX_ANT");*/
-
-	}
-		break;
-#endif
-
 	default:
 		break;
 	}
@@ -651,13 +638,6 @@ void GetHalODMVar(
 	struct PHY_DM_STRUCT *podmpriv = adapter_to_phydm(Adapter);
 
 	switch (eVariable) {
-#ifdef CONFIG_ANTENNA_DIVERSITY
-	case HAL_ODM_ANTDIV_SELECT: {
-		struct phydm_fat_struct	*pDM_FatTable = &podmpriv->dm_fat_table;
-		*((u8 *)pValue1) = pDM_FatTable->rx_idle_ant;
-	}
-		break;
-#endif
 	case HAL_ODM_INITIAL_GAIN:
 		*((u8 *)pValue1) = rtw_phydm_get_cur_igi(Adapter);
 		break;

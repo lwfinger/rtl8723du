@@ -3362,38 +3362,6 @@ Hal_EfuseParseAntennaDiversity_8723D(
 	IN	BOOLEAN			AutoLoadFail
 )
 {
-#ifdef CONFIG_ANTENNA_DIVERSITY
-	PHAL_DATA_TYPE		pHalData = GET_HAL_DATA(pAdapter);
-	struct registry_priv	*registry_par = &pAdapter->registrypriv;
-	u8				get_efuse_div_type;
-
-	if (pHalData->EEPROMBluetoothAntNum == Ant_x1)
-		pHalData->AntDivCfg = 0;
-	else {
-		if (registry_par->antdiv_cfg == 2) /* 0:OFF , 1:ON, 2:By EFUSE */
-			pHalData->AntDivCfg = 1;
-		else
-			pHalData->AntDivCfg = registry_par->antdiv_cfg;
-	}
-
-	pHalData->TRxAntDivType = S0S1_TRX_HW_ANTDIV; /* it's the only diversity-type for 8723D*/
-	pHalData->with_extenal_ant_switch = ((hwinfo[EEPROM_RF_BT_SETTING_8723D] & BIT7) >> 7);
-
-	if (pHalData->AntDivCfg != 0) {
-
-		get_efuse_div_type = hwinfo[EEPROM_RFE_OPTION_8723D];
-
-		if (get_efuse_div_type == 0x11) {
-			pHalData->b_fix_tx_ant = NO_FIX_TX_ANT;
-		} else if (get_efuse_div_type == 0x13) {
-			pHalData->b_fix_tx_ant = FIX_TX_AT_MAIN;/* RX diversity only*/
-		} else
-			pHalData->AntDivCfg = FALSE;
-	}
-
-	RTW_INFO("%s: AntDivCfg=%d, AntDivType=%d\n",
-		 __FUNCTION__, pHalData->AntDivCfg, pHalData->TRxAntDivType);
-#endif
 }
 
 VOID
@@ -3857,11 +3825,6 @@ static void rtl8723d_fill_default_txdesc(
 	/* 2010.06.23. Added by tynli. */
 	if (!pattrib->qos_en)
 		SET_TX_DESC_HWSEQ_EN_8723D(pbuf, 1);
-
-#ifdef CONFIG_ANTENNA_DIVERSITY
-	if (!bmcst && pattrib->psta)
-		odm_set_tx_ant_by_tx_info(adapter_to_phydm(padapter), pbuf, pattrib->psta->cmn.mac_id);
-#endif
 }
 
 /*

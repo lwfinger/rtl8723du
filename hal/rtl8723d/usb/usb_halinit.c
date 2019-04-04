@@ -2096,11 +2096,7 @@ GetHalDefVar8723du(
 
 	switch (eVariable) {
 	case HAL_DEF_IS_SUPPORT_ANT_DIV:
-#ifdef CONFIG_ANTENNA_DIVERSITY
-		*((u8 *)pValue) = _FALSE;
-#endif
 		break;
-
 	case HAL_DEF_DRVINFO_SZ:
 		*((u32 *)pValue) = DRVINFO_SZ;
 		break;
