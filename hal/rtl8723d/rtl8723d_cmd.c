@@ -229,12 +229,6 @@ void rtl8723d_set_FwPwrMode_cmd(PADAPTER padapter, u8 psmode)
 #endif /* CONFIG_P2P */
 	u8 allQueueUAPSD = 0;
 
-#ifdef CONFIG_PLATFORM_INTEL_BYT
-	if (psmode == PS_MODE_DTIM)
-		psmode = PS_MODE_MAX;
-#endif /* CONFIG_PLATFORM_INTEL_BYT */
-
-
 	if (pwrpriv->dtim > 0)
 		RTW_INFO("%s(): FW LPS mode = %d, SmartPS=%d, dtim=%d\n", __func__, psmode, pwrpriv->smart_ps, pwrpriv->dtim);
 	else
