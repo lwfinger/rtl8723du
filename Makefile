@@ -26,7 +26,6 @@ CONFIG_USB_HCI = y
 ########################## Features ###########################
 CONFIG_MP_INCLUDED = y
 CONFIG_POWER_SAVING = y
-CONFIG_USB_AUTOSUSPEND = n
 CONFIG_HW_PWRP_DETECTION = n
 CONFIG_WIFI_TEST = n
 CONFIG_BT_COEXIST = y
@@ -173,12 +172,6 @@ endif
 endif
 
 ########### END OF PATH  #################################
-
-ifeq ($(CONFIG_USB_HCI), y)
-ifeq ($(CONFIG_USB_AUTOSUSPEND), y)
-EXTRA_CFLAGS += -DCONFIG_USB_AUTOSUSPEND
-endif
-endif
 
 ifeq ($(CONFIG_MP_INCLUDED), y)
 #MODULE_NAME := $(MODULE_NAME)_mp
