@@ -26,10 +26,6 @@
 /*For FW API*/
 #define	__iram_odm_func__
 
-/*Deifne HW endian support*/
-#define	ODM_ENDIAN_BIG	0
-#define	ODM_ENDIAN_LITTLE	1
-
 #define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&((GET_HAL_DATA(__padapter))->odmpriv)))
 
 enum hal_status {
@@ -99,14 +95,6 @@ enum rt_spinlock_type {
 
 	#include <asm/byteorder.h>
 
-	#if defined(__LITTLE_ENDIAN)
-		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_LITTLE
-	#elif defined(__BIG_ENDIAN)
-		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_BIG
-	#else
-		#error
-	#endif
-
 	/* define useless flag to avoid compile warning */
 	#define	USE_WORKITEM 0
 	#define	FOR_BRAZIL_PRETEST 0
@@ -138,12 +126,6 @@ enum rt_spinlock_type {
 
 #else
 	#include <drv_types.h>
-
-	#if defined(CONFIG_LITTLE_ENDIAN)
-		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_LITTLE
-	#elif defined (CONFIG_BIG_ENDIAN)
-		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_BIG
-	#endif
 
 	#define	boolean	bool
 
