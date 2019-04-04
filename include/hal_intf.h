@@ -131,7 +131,7 @@ typedef enum _HW_VARIABLES {
 	HW_VAR_HCI_SUS_STATE,
 	/* The valid upper nav range for the HW updating, if the true value is larger than the upper range, the HW won't update it. */
 	/* Unit in microsecond. 0 means disable this function. */
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+#if defined(CONFIG_WOWLAN)
 	HW_VAR_WOWLAN,
 	HW_VAR_WAKEUP_REASON,
 #endif
@@ -383,7 +383,7 @@ struct hal_ops {
 	s32 (*fw_mem_dl)(_adapter *adapter, enum fw_mem mem);
 #endif
 
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+#if defined(CONFIG_WOWLAN)
 	void (*clear_interrupt)(_adapter *padapter);
 #endif
 	u8(*hal_get_tx_buff_rsvd_page_num)(_adapter *adapter, bool wowlan);
@@ -695,7 +695,7 @@ u8 rtw_hal_get_txbuff_rsvd_page_num(_adapter *adapter, bool wowlan);
 void rtw_hal_fw_correct_bcn(_adapter *padapter);
 s32 rtw_hal_fw_dl(_adapter *padapter, u8 wowlan);
 
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+#if defined(CONFIG_WOWLAN)
 	void rtw_hal_clear_interrupt(_adapter *padapter);
 #endif
 

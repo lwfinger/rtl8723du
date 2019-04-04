@@ -606,12 +606,12 @@ void rtw_set_rpwm(PADAPTER padapter, u8 pslv)
 #ifdef CONFIG_DETECT_CPWM_BY_POLLING
 		rtw_cpwm_polling(padapter, cpwm_orig);
 		#else
-		#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN) || defined(CONFIG_P2P_WOWLAN)
+		#if defined(CONFIG_WOWLAN) || defined(CONFIG_P2P_WOWLAN)
 		if (pwrpriv->wowlan_mode == _TRUE ||
 			pwrpriv->wowlan_ap_mode == _TRUE ||
 			pwrpriv->wowlan_p2p_mode == _TRUE)
 				rtw_cpwm_polling(padapter, cpwm_orig);
-		#endif /*#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN) || defined(CONFIG_P2P_WOWLAN)*/
+		#endif /*#if defined(CONFIG_WOWLAN) || defined(CONFIG_P2P_WOWLAN)*/
 		#endif /*#ifdef CONFIG_DETECT_CPWM_BY_POLLING*/
 	} else
 #endif /* CONFIG_LPS_LCLK */
@@ -633,7 +633,7 @@ u8 PS_RDY_CHECK(_adapter *padapter)
 #endif /* CONFIG_IOCTL_CFG80211 */
 #endif /* CONFIG_P2P */
 
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+#if defined(CONFIG_WOWLAN)
 	if (_TRUE == pwrpriv->bInSuspend && pwrpriv->wowlan_mode)
 		return _TRUE;
 	else if (_TRUE == pwrpriv->bInSuspend && pwrpriv->wowlan_ap_mode)
@@ -896,7 +896,7 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 			pwrpriv->pwr_mode = ps_mode;
 			rtw_set_rpwm(padapter, PS_STATE_S4);
 
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN) || defined(CONFIG_P2P_WOWLAN)
+#if defined(CONFIG_WOWLAN) || defined(CONFIG_P2P_WOWLAN)
 			if (pwrpriv->wowlan_mode == _TRUE ||
 			    pwrpriv->wowlan_ap_mode == _TRUE ||
 			    pwrpriv->wowlan_p2p_mode == _TRUE) {

@@ -19,11 +19,6 @@
 #define _FW_HEADER_8723D_H
 
 #ifdef LOAD_FW_HEADER_FROM_DRIVER
-#if defined(CONFIG_AP_WOWLAN)
-extern u8 array_mp_8723d_fw_ap[24140];
-extern u32 array_length_mp_8723d_fw_ap;
-#endif
-
 extern u8 array_mp_8723d_fw_nic[27828];
 extern u32 array_length_mp_8723d_fw_nic;
 #ifdef CONFIG_WOWLAN

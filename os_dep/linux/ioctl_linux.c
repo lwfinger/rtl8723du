@@ -7888,50 +7888,6 @@ _rtw_wowlan_set_pattern_exit:
 }
 #endif /* CONFIG_WOWLAN */
 
-#ifdef CONFIG_AP_WOWLAN
-static int rtw_ap_wowlan_ctrl(struct net_device *dev,
-			      struct iw_request_info *info,
-			      union iwreq_data *wrqu, char *extra)
-{
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct wowlan_ioctl_param poidparam;
-	struct pwrctrl_priv *pwrctrlpriv = adapter_to_pwrctl(padapter);
-	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
-	struct sta_info	*psta = NULL;
-	int ret = 0;
-	systime start_time = rtw_get_current_time();
-	poidparam.subcode = 0;
-
-	RTW_INFO("+rtw_ap_wowlan_ctrl: %s\n", extra);
-
-	if (!check_fwstate(pmlmepriv, WIFI_AP_STATE)) {
-		RTW_INFO("[%s] It is not AP mode!!\n", __func__);
-		goto _rtw_ap_wowlan_ctrl_exit_free;
-	}
-
-	if (_rtw_memcmp(extra, "enable", 6)) {
-
-		pwrctrlpriv->wowlan_ap_mode = _TRUE;
-
-		rtw_suspend_common(padapter);
-	} else if (_rtw_memcmp(extra, "disable", 7)) {
-		RTW_ENABLE_FUNC(padapter, DF_RX_BIT);
-		RTW_ENABLE_FUNC(padapter, DF_TX_BIT);
-		rtw_resume_common(padapter);
-	} else {
-		RTW_INFO("[%s] Invalid Parameter.\n", __func__);
-		goto _rtw_ap_wowlan_ctrl_exit_free;
-	}
-	/* mutex_lock(&ioctl_mutex); */
-_rtw_ap_wowlan_ctrl_exit_free:
-	RTW_INFO("-rtw_ap_wowlan_ctrl( subcode = %d)\n", poidparam.subcode);
-	RTW_PRINT("%s in %d ms\n", __func__,
-		  rtw_get_passing_time_ms(start_time));
-_rtw_ap_wowlan_ctrl_exit:
-	return ret;
-}
-#endif /* CONFIG_AP_WOWLAN */
-
 static int rtw_pm_set(struct net_device *dev,
 		      struct iw_request_info *info,
 		      union iwreq_data *wrqu, char *extra)
@@ -9941,12 +9897,6 @@ static int rtw_priv_set(struct net_device *dev,
 		rtw_wowlan_set_pattern(dev, info, wdata, extra);
 		break;
 #endif
-#ifdef CONFIG_AP_WOWLAN
-	case MP_AP_WOW_ENABLE:
-		RTW_INFO("set case MP_AP_WOW_ENABLE: %s\n", extra);
-		rtw_ap_wowlan_ctrl(dev, info, wdata, extra);
-		break;
-#endif
 #ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
 	case VENDOR_IE_SET:
 		RTW_INFO("set case VENDOR_IE_SET\n");
@@ -11727,9 +11677,6 @@ static const struct iw_priv_args rtw_private_args[] = {
 #ifdef CONFIG_WOWLAN
 	{ MP_WOW_ENABLE , IW_PRIV_TYPE_CHAR | 1024, 0, "wow_mode" },
 	{ MP_WOW_SET_PATTERN , IW_PRIV_TYPE_CHAR | 1024, 0, "wow_set_pattern" },
-#endif
-#ifdef CONFIG_AP_WOWLAN
-	{ MP_AP_WOW_ENABLE , IW_PRIV_TYPE_CHAR | 1024, 0, "ap_wow_mode" }, /* set  */
 #endif
 #ifdef CONFIG_SDIO_INDIRECT_ACCESS
 	{ MP_SD_IREAD, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "sd_iread" },

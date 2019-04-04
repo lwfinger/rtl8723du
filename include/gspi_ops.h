@@ -151,7 +151,7 @@ extern void EnableInterrupt8723ASdio(PADAPTER padapter);
 extern void DisableInterrupt8723ASdio(PADAPTER padapter);
 extern void spi_int_hdl(PADAPTER padapter);
 extern u8 HalQueryTxBufferStatus8723ASdio(PADAPTER padapter);
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+#if defined(CONFIG_WOWLAN)
 	extern u8 RecvOnePkt(PADAPTER padapter);
 #endif /* CONFIG_WOWLAN */
 

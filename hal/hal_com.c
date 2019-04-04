@@ -3670,7 +3670,7 @@ void rtw_dump_fifo(void *sel, _adapter *adapter, u8 fifo_sel, u32 fifo_addr, u32
 }
 #endif
 
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+#if defined(CONFIG_WOWLAN)
 
 static void rtw_hal_force_enable_rxdma(_adapter *adapter)
 {
@@ -3742,7 +3742,7 @@ static u8 rtw_hal_pause_rx_dma(_adapter *adapter)
 	return ret;
 }
 
-#endif /* CONFIG_WOWLAN || CONFIG_AP_WOWLAN */
+#endif /* CONFIG_WOWLAN */
 
 #ifdef CONFIG_WOWLAN
 /*
@@ -4417,224 +4417,6 @@ void rtw_hal_set_fw_wow_related_cmd(_adapter *padapter, u8 enable)
 	}
 }
 #endif /* CONFIG_WOWLAN */
-
-#ifdef CONFIG_AP_WOWLAN
-static u8 rtw_hal_set_ap_wowlan_ctrl_cmd(_adapter *adapter, u8 enable)
-{
-	struct security_priv *psecpriv = &adapter->securitypriv;
-	struct pwrctrl_priv *ppwrpriv = adapter_to_pwrctl(adapter);
-	struct hal_ops *pHalFunc = &adapter->hal_func;
-
-	u8 u1H2CAPWoWlanCtrlParm[H2C_AP_WOW_GPIO_CTRL_LEN] = {0};
-	u8 gpionum = 0, gpio_dur = 0;
-	u8 gpio_pulse = enable;
-	u8 sdio_wakeup_enable = 1;
-	u8 gpio_high_active = 0;
-	u8 ret = _FAIL;
-
-	RTW_DBG("%s(): enable=%d\n", __func__, enable);
-
-	SET_H2CCMD_AP_WOW_GPIO_CTRL_INDEX(u1H2CAPWoWlanCtrlParm,
-					  gpionum);
-	SET_H2CCMD_AP_WOW_GPIO_CTRL_PLUS(u1H2CAPWoWlanCtrlParm,
-					 gpio_pulse);
-	SET_H2CCMD_AP_WOW_GPIO_CTRL_HIGH_ACTIVE(u1H2CAPWoWlanCtrlParm,
-						gpio_high_active);
-	SET_H2CCMD_AP_WOW_GPIO_CTRL_EN(u1H2CAPWoWlanCtrlParm,
-				       enable);
-	SET_H2CCMD_AP_WOW_GPIO_CTRL_DURATION(u1H2CAPWoWlanCtrlParm,
-					     gpio_dur);
-
-	ret = rtw_hal_fill_h2c_cmd(adapter,
-				   H2C_AP_WOW_GPIO_CTRL,
-				   H2C_AP_WOW_GPIO_CTRL_LEN,
-				   u1H2CAPWoWlanCtrlParm);
-
-	return ret;
-}
-
-static u8 rtw_hal_set_ap_offload_ctrl_cmd(_adapter *adapter, u8 enable)
-{
-	struct hal_ops *pHalFunc = &adapter->hal_func;
-	u8 u1H2CAPOffloadCtrlParm[H2C_WOWLAN_LEN] = {0};
-	u8 ret = _FAIL;
-
-	RTW_DBG("%s(): bFuncEn=%d\n", __func__, enable);
-
-	SET_H2CCMD_AP_WOWLAN_EN(u1H2CAPOffloadCtrlParm, enable);
-
-	ret = rtw_hal_fill_h2c_cmd(adapter,
-				   H2C_AP_OFFLOAD,
-				   H2C_AP_OFFLOAD_LEN,
-				   u1H2CAPOffloadCtrlParm);
-
-	return ret;
-}
-
-static u8 rtw_hal_set_ap_ps_cmd(_adapter *adapter, u8 enable)
-{
-	struct hal_ops *pHalFunc = &adapter->hal_func;
-	u8 ap_ps_parm[H2C_AP_PS_LEN] = {0};
-	u8 ret = _FAIL;
-
-	RTW_DBG("%s(): enable=%d\n" , __func__ , enable);
-
-	SET_H2CCMD_AP_WOW_PS_EN(ap_ps_parm, enable);
-	SET_H2CCMD_AP_WOW_PS_32K_EN(ap_ps_parm, enable);
-	SET_H2CCMD_AP_WOW_PS_RF(ap_ps_parm, enable);
-
-	if (enable)
-		SET_H2CCMD_AP_WOW_PS_DURATION(ap_ps_parm, 0x32);
-	else
-		SET_H2CCMD_AP_WOW_PS_DURATION(ap_ps_parm, 0x0);
-
-	ret = rtw_hal_fill_h2c_cmd(adapter, H2C_SAP_PS_,
-				   H2C_AP_PS_LEN, ap_ps_parm);
-
-	return ret;
-}
-
-static void rtw_hal_set_ap_rsvdpage_loc_cmd(PADAPTER padapter,
-		PRSVDPAGE_LOC rsvdpageloc)
-{
-	struct hal_ops *pHalFunc = &padapter->hal_func;
-	u8 rsvdparm[H2C_AOAC_RSVDPAGE_LOC_LEN] = {0};
-	u8 ret = _FAIL, header = 0;
-
-	if (pHalFunc->fill_h2c_cmd == NULL) {
-		RTW_ERR("%s: Please hook fill_h2c_cmd first!\n", __func__);
-		return;
-	}
-
-	header = rtw_read8(padapter, REG_BCNQ_BDNY);
-
-	RTW_INFO("%s: beacon: %d, probeRsp: %d, header:0x%02x\n", __func__,
-		 rsvdpageloc->LocApOffloadBCN,
-		 rsvdpageloc->LocProbeRsp,
-		 header);
-
-	SET_H2CCMD_AP_WOWLAN_RSVDPAGE_LOC_BCN(rsvdparm,
-				      rsvdpageloc->LocApOffloadBCN + header);
-
-	ret = rtw_hal_fill_h2c_cmd(padapter, H2C_BCN_RSVDPAGE,
-				   H2C_BCN_RSVDPAGE_LEN, rsvdparm);
-
-	if (ret == _FAIL)
-		RTW_WARN("%s: H2C_BCN_RSVDPAGE cmd fail\n", __func__);
-
-	rtw_msleep_os(10);
-
-	_rtw_memset(&rsvdparm, 0, sizeof(rsvdparm));
-
-	SET_H2CCMD_AP_WOWLAN_RSVDPAGE_LOC_ProbeRsp(rsvdparm,
-			rsvdpageloc->LocProbeRsp + header);
-
-	ret = rtw_hal_fill_h2c_cmd(padapter, H2C_PROBERSP_RSVDPAGE,
-				   H2C_PROBERSP_RSVDPAGE_LEN, rsvdparm);
-
-	if (ret == _FAIL)
-		RTW_WARN("%s: H2C_PROBERSP_RSVDPAGE cmd fail\n", __func__);
-
-	rtw_msleep_os(10);
-}
-
-static void rtw_hal_set_fw_ap_wow_related_cmd(_adapter *padapter, u8 enable)
-{
-	rtw_hal_set_ap_offload_ctrl_cmd(padapter, enable);
-	rtw_hal_set_ap_wowlan_ctrl_cmd(padapter, enable);
-	rtw_hal_set_ap_ps_cmd(padapter, enable);
-}
-
-static void rtw_hal_ap_wow_enable(_adapter *padapter)
-{
-	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(padapter);
-	struct security_priv *psecuritypriv = &padapter->securitypriv;
-	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
-	struct hal_ops *pHalFunc = &padapter->hal_func;
-	struct sta_info *psta = NULL;
-	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
-#ifdef DBG_CHECK_FW_PS_STATE
-	struct dvobj_priv *psdpriv = padapter->dvobj;
-	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
-#endif /*DBG_CHECK_FW_PS_STATE*/
-	int res;
-	u16 media_status_rpt;
-
-	RTW_INFO("%s, WOWLAN_AP_ENABLE\n", __func__);
-#ifdef DBG_CHECK_FW_PS_STATE
-	if (rtw_fw_ps_state(padapter) == _FAIL) {
-		pdbgpriv->dbg_enwow_dload_fw_fail_cnt++;
-		RTW_WARN("wowlan enable no leave 32k\n");
-	}
-#endif /*DBG_CHECK_FW_PS_STATE*/
-
-	/* 1. Download WOWLAN FW*/
-	rtw_hal_fw_dl(padapter, _TRUE);
-
-	media_status_rpt = RT_MEDIA_CONNECT;
-	rtw_hal_set_hwreg(padapter, HW_VAR_H2C_FW_JOINBSSRPT,
-			  (u8 *)&media_status_rpt);
-
-	issue_beacon(padapter, 0);
-
-	rtw_msleep_os(2);
-	/* RX DMA stop */
-	res = rtw_hal_pause_rx_dma(padapter);
-	if (res == _FAIL)
-		RTW_WARN("[WARNING] pause RX DMA fail\n");
-
-	/* 5. Set Enable WOWLAN H2C command. */
-	RTW_DBG("Set Enable AP WOWLan cmd\n");
-	rtw_hal_set_fw_ap_wow_related_cmd(padapter, 1);
-
-	rtw_write8(padapter, REG_MCUTST_WOWLAN, 0);
-	rtw_mi_intf_stop(padapter);
-	/* Invoid SE0 reset signal during suspending*/
-	rtw_write8(padapter, REG_RSV_CTRL, 0x20);
-	if (IS_8188F(pHalData->version_id) == FALSE)
-		rtw_write8(padapter, REG_RSV_CTRL, 0x60);
-}
-
-static void rtw_hal_ap_wow_disable(_adapter *padapter)
-{
-	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(padapter);
-	struct hal_ops *pHalFunc = &padapter->hal_func;
-#ifdef DBG_CHECK_FW_PS_STATE
-	struct dvobj_priv *psdpriv = padapter->dvobj;
-	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
-#endif /*DBG_CHECK_FW_PS_STATE*/
-	u16 media_status_rpt;
-	u8 val8;
-
-	RTW_INFO("%s, WOWLAN_AP_DISABLE\n", __func__);
-	/* 1. Read wakeup reason*/
-	pwrctl->wowlan_wake_reason = rtw_read8(padapter, REG_MCUTST_WOWLAN);
-
-	RTW_INFO("%s: wakeup_reason: 0x%02x\n", __func__,
-		  pwrctl->wowlan_wake_reason);
-
-	rtw_hal_set_fw_ap_wow_related_cmd(padapter, 0);
-
-	rtw_msleep_os(2);
-#ifdef DBG_CHECK_FW_PS_STATE
-	if (rtw_fw_ps_state(padapter) == _FAIL) {
-		pdbgpriv->dbg_diswow_dload_fw_fail_cnt++;
-		RTW_WARN("wowlan enable no leave 32k\n");
-	}
-#endif /*DBG_CHECK_FW_PS_STATE*/
-
-	rtw_hal_force_enable_rxdma(padapter);
-
-	rtw_hal_fw_dl(padapter, _FALSE);
-
-	media_status_rpt = RT_MEDIA_CONNECT;
-
-	rtw_hal_set_hwreg(padapter, HW_VAR_H2C_FW_JOINBSSRPT,
-			  (u8 *)&media_status_rpt);
-
-	issue_beacon(padapter, 0);
-}
-#endif /*CONFIG_AP_WOWLAN*/
 
 #ifdef CONFIG_P2P_WOWLAN
 static int update_hidden_ssid(u8 *ies, u32 ies_len, u8 hidden_ssid_mode)
@@ -9020,10 +8802,6 @@ download_page:
 			pwrctl->wowlan_in_resume == _FALSE)
 			rtw_hal_set_FwAoacRsvdPage_cmd(adapter, &RsvdPageLoc);
 #endif /* CONFIG_WOWLAN */
-#ifdef CONFIG_AP_WOWLAN
-		if (pwrctl->wowlan_ap_mode == _TRUE)
-			rtw_hal_set_ap_rsvdpage_loc_cmd(adapter, &RsvdPageLoc);
-#endif /* CONFIG_AP_WOWLAN */
 	} else if (pwrctl->wowlan_pno_enable) {
 #ifdef CONFIG_PNO_SUPPORT
 		rtw_hal_set_FwAoacRsvdPage_cmd(adapter, &RsvdPageLoc);
@@ -9484,7 +9262,7 @@ u8 SetHwReg(_adapter *adapter, u8 variable, u8 *val)
 			rtw_write8(adapter, rCCK0_DSPParameter2, 0x00);
 		}
 		break;
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+#if defined(CONFIG_WOWLAN)
 	case HW_VAR_WOWLAN: {
 		struct wowlan_ioctl_param *poidparam;
 
@@ -9501,20 +9279,12 @@ u8 SetHwReg(_adapter *adapter, u8 variable, u8 *val)
 			rtw_hal_wow_disable(adapter);
 			break;
 #endif /*CONFIG_WOWLAN*/
-#ifdef CONFIG_AP_WOWLAN
-		case WOWLAN_AP_ENABLE:
-			rtw_hal_ap_wow_enable(adapter);
-			break;
-		case WOWLAN_AP_DISABLE:
-			rtw_hal_ap_wow_disable(adapter);
-			break;
-#endif /*CONFIG_AP_WOWLAN*/
 		default:
 			break;
 		}
 	}
 		break;
-#endif /*defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)*/
+#endif /*defined(CONFIG_WOWLAN) */
 
 	case HW_VAR_MLME_SITESURVEY:
 		hw_var_set_mlme_sitesurvey(adapter, variable, val);

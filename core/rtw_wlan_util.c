@@ -17,7 +17,7 @@
 #include <drv_types.h>
 #include <hal_data.h>
 
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+#if defined(CONFIG_WOWLAN)
 	#include <linux/inetdevice.h>
 	#define ETH_TYPE_OFFSET	12
 	#define PROTOCOL_OFFSET	23

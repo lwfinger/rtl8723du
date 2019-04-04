@@ -820,14 +820,6 @@ s32 rtl8723d_FirmwareDownload(PADAPTER padapter, BOOLEAN  bUsedWoWLANFw)
 			}
 	#endif /* CONFIG_WOWLAN */
 
-	#ifdef CONFIG_AP_WOWLAN
-			if (pwrpriv->wowlan_ap_mode) {
-				pFirmware->szFwBuffer = array_mp_8723d_fw_ap;
-				pFirmware->ulFwLength = array_length_mp_8723d_fw_ap;
-				RTW_INFO(" ===> %s fw: %s, size: %d\n",
-					 __FUNCTION__, "AP_WoWLAN", pFirmware->ulFwLength);
-			}
-	#endif /* CONFIG_AP_WOWLAN */
 		} else {
 			pFirmware->szFwBuffer = array_mp_8723d_fw_nic;
 			pFirmware->ulFwLength = array_length_mp_8723d_fw_nic;

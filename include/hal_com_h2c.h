@@ -178,7 +178,7 @@ enum h2c_cmd {
 #define cpIpAddr(des, src)					((des)[0] = (src)[0], (des)[1] = (src)[1], (des)[2] = (src)[2], (des)[3] = (src)[3])
 
 
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+#if defined(CONFIG_WOWLAN)
 /*
 * ARP packet
 *
@@ -582,7 +582,7 @@ typedef struct _RSVDPAGE_LOC {
 #endif
 void dump_TX_FIFO(PADAPTER padapter, u8 page_num, u16 page_size);
 u8 rtw_hal_set_fw_media_status_cmd(_adapter *adapter, u8 mstatus, u8 macid);
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+#if defined(CONFIG_WOWLAN)
 	/* WOW command function */
 	void rtw_hal_set_fw_wow_related_cmd(_adapter *padapter, u8 enable);
 	#ifdef CONFIG_P2P_WOWLAN

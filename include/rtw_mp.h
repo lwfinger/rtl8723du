@@ -293,9 +293,6 @@ enum {
 	MP_WOW_ENABLE,
 	MP_WOW_SET_PATTERN,
 #endif
-#ifdef CONFIG_AP_WOWLAN
-	MP_AP_WOW_ENABLE,
-#endif
 	MP_SD_IREAD,
 	MP_SD_IWRITE,
 };
