@@ -926,10 +926,6 @@ struct dvobj_priv {
 	_mutex setch_mutex;
 	_mutex setbw_mutex;
 	_mutex rf_read_reg_mutex;
-#ifdef CONFIG_SDIO_INDIRECT_ACCESS
-	_mutex sd_indirect_access_mutex;
-#endif
-
 	unsigned char	oper_channel; /* saved channel info when call set_channel_bw */
 	unsigned char	oper_bwmode;
 	unsigned char	oper_ch_offset;/* PRIME_CHNL_OFFSET */
