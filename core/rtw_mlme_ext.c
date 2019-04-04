@@ -12136,17 +12136,6 @@ bool rtw_port_switch_chk(_adapter *adapter)
 		ADPT_ARG(if_port1), if_port1_mlmeinfo->state, rtw_p2p_state(&if_port1->wdinfo), rtw_p2p_chk_state(&if_port1->wdinfo, P2P_STATE_NONE));
 #endif /* DBG_RUNTIME_PORT_SWITCH */
 
-#ifdef CONFIG_WOWLAN
-	/* WOWLAN interface(primary, for now) should be port0 */
-	if (pwrctl->wowlan_mode == _TRUE) {
-		if (!is_primary_adapter(if_port0)) {
-			RTW_INFO("%s "ADPT_FMT" enable WOWLAN\n", __func__, ADPT_ARG(if_port1));
-			switch_needed = _TRUE;
-		}
-		goto exit;
-	}
-#endif /* CONFIG_WOWLAN */
-
 	/* AP/Mesh should use port0 for ctl frame's ack */
 	if ((if_port1_mlmeinfo->state & 0x03) == WIFI_FW_AP_STATE) {
 		RTW_INFO("%s "ADPT_FMT" is AP/GO/Mesh\n", __func__, ADPT_ARG(if_port1));

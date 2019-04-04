@@ -7742,151 +7742,9 @@ FREE_EXT:
 	rtw_vmfree(ext_dbg, len);
 	#endif
 
-	/* RTW_INFO("rtw_wx_set_priv: (SIOCSIWPRIV) %s ret=%d\n",  */
-	/*		dev->name, ret); */
-
 	return ret;
 
 }
-#ifdef CONFIG_WOWLAN
-static int rtw_wowlan_ctrl(struct net_device *dev,
-			   struct iw_request_info *info,
-			   union iwreq_data *wrqu, char *extra)
-{
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct wowlan_ioctl_param poidparam;
-	struct pwrctrl_priv *pwrctrlpriv = adapter_to_pwrctl(padapter);
-	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
-	struct sta_info	*psta = NULL;
-	int ret = 0;
-	systime start_time = rtw_get_current_time();
-	poidparam.subcode = 0;
-
-	RTW_INFO("+rtw_wowlan_ctrl: %s\n", extra);
-
-	if (!check_fwstate(pmlmepriv, _FW_LINKED) &&
-	    check_fwstate(pmlmepriv, WIFI_STATION_STATE)) {
-#ifdef CONFIG_PNO_SUPPORT
-		pwrctrlpriv->wowlan_pno_enable = _TRUE;
-#else
-		RTW_INFO("[%s] WARNING: Please Connect With AP First!!\n", __func__);
-		goto _rtw_wowlan_ctrl_exit_free;
-#endif /* CONFIG_PNO_SUPPORT */
-	}
-
-	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY))
-		rtw_scan_abort(padapter);
-
-	if (_rtw_memcmp(extra, "enable", 6))
-
-
-		rtw_suspend_common(padapter);
-
-	else if (_rtw_memcmp(extra, "disable", 7)) {
-		RTW_ENABLE_FUNC(padapter, DF_RX_BIT);
-		RTW_ENABLE_FUNC(padapter, DF_TX_BIT);
-		rtw_resume_common(padapter);
-
-#ifdef CONFIG_PNO_SUPPORT
-		pwrctrlpriv->wowlan_pno_enable = _FALSE;
-#endif /* CONFIG_PNO_SUPPORT */
-
-	} else {
-		RTW_INFO("[%s] Invalid Parameter.\n", __func__);
-		goto _rtw_wowlan_ctrl_exit_free;
-	}
-	/* mutex_lock(&ioctl_mutex); */
-_rtw_wowlan_ctrl_exit_free:
-	RTW_INFO("-rtw_wowlan_ctrl( subcode = %d)\n", poidparam.subcode);
-	RTW_PRINT("%s in %d ms\n", __func__,
-		  rtw_get_passing_time_ms(start_time));
-_rtw_wowlan_ctrl_exit:
-	return ret;
-}
-
-/*
- * IP filter This pattern if for a frame containing a ip packet:
- * AA:AA:AA:AA:AA:AA:BB:BB:BB:BB:BB:BB:CC:CC:DD:-:-:-:-:-:-:-:-:EE:-:-:FF:FF:FF:FF:GG:GG:GG:GG:HH:HH:II:II
- *
- * A: Ethernet destination address
- * B: Ethernet source address
- * C: Ethernet protocol type
- * D: IP header VER+Hlen, use: 0x45 (4 is for ver 4, 5 is for len 20)
- * E: IP protocol
- * F: IP source address ( 192.168.0.4: C0:A8:00:2C )
- * G: IP destination address ( 192.168.0.4: C0:A8:00:2C )
- * H: Source port (1024: 04:00)
- * I: Destination port (1024: 04:00)
- */
-
-static int rtw_wowlan_set_pattern(struct net_device *dev,
-				  struct iw_request_info *info,
-				  union iwreq_data *wrqu, char *extra)
-{
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
-	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
-	struct wowlan_ioctl_param poidparam;
-	int ret = 0, len = 0, i = 0;
-	systime start_time = rtw_get_current_time();
-	u8 input[wrqu->data.length];
-	u8 index = 0;
-
-	poidparam.subcode = 0;
-
-	if (!check_fwstate(pmlmepriv, _FW_LINKED) &&
-	    check_fwstate(pmlmepriv, WIFI_STATION_STATE)) {
-		ret = -EFAULT;
-		RTW_INFO("Please Connect With AP First!!\n");
-		goto _rtw_wowlan_set_pattern_exit;
-	}
-
-	if (wrqu->data.length <= 0) {
-		ret = -EFAULT;
-		RTW_INFO("ERROR: parameter length <= 0\n");
-		goto _rtw_wowlan_set_pattern_exit;
-	} else {
-		/* set pattern */
-		if (copy_from_user(input,
-				   wrqu->data.pointer, wrqu->data.length))
-			return -EFAULT;
-		/* leave PS first */
-		rtw_ps_deny(padapter, PS_DENY_IOCTL);
-		LeaveAllPowerSaveModeDirect(padapter);
-		if (strncmp(input, "pattern=", 8) == 0) {
-			if (pwrpriv->wowlan_pattern_idx >= MAX_WKFM_CAM_NUM) {
-				RTW_INFO("WARNING: priv-pattern is full(idx: %d)\n",
-					 pwrpriv->wowlan_pattern_idx);
-				RTW_INFO("WARNING: please clean priv-pattern first\n");
-				ret = -EINVAL;
-				goto _rtw_wowlan_set_pattern_exit;
-			} else {
-				index = pwrpriv->wowlan_pattern_idx;
-				ret = rtw_wowlan_parser_pattern_cmd(input,
-					    pwrpriv->patterns[index].content,
-					    &pwrpriv->patterns[index].len,
-					    pwrpriv->patterns[index].mask);
-
-				if (ret == _TRUE)
-					pwrpriv->wowlan_pattern_idx++;
-			}
-		} else if (strncmp(input, "clean", 5) == 0) {
-			poidparam.subcode = WOWLAN_PATTERN_CLEAN;
-			rtw_hal_set_hwreg(padapter,
-					  HW_VAR_WOWLAN, (u8 *)&poidparam);
-		} else if (strncmp(input, "show", 4) == 0) {
-			rtw_wow_pattern_cam_dump(padapter);
-			rtw_wow_pattern_sw_dump(padapter);
-		} else {
-			RTW_INFO("ERROR: incorrect parameter!\n");
-			ret = -EINVAL;
-		}
-		rtw_ps_deny_cancel(padapter, PS_DENY_IOCTL);
-	}
-_rtw_wowlan_set_pattern_exit:
-	return ret;
-}
-#endif /* CONFIG_WOWLAN */
 
 static int rtw_pm_set(struct net_device *dev,
 		      struct iw_request_info *info,
@@ -9886,17 +9744,6 @@ static int rtw_priv_set(struct net_device *dev,
 	}
 
 	switch (subcmd) {
-#ifdef CONFIG_WOWLAN
-	case MP_WOW_ENABLE:
-		RTW_INFO("set case MP_WOW_ENABLE: %s\n", extra);
-
-		rtw_wowlan_ctrl(dev, info, wdata, extra);
-		break;
-	case MP_WOW_SET_PATTERN:
-		RTW_INFO("set case MP_WOW_SET_PATTERN: %s\n", extra);
-		rtw_wowlan_set_pattern(dev, info, wdata, extra);
-		break;
-#endif
 #ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
 	case VENDOR_IE_SET:
 		RTW_INFO("set case VENDOR_IE_SET\n");
@@ -11673,10 +11520,6 @@ static const struct iw_priv_args rtw_private_args[] = {
 #ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
 	{ VENDOR_IE_SET, IW_PRIV_TYPE_CHAR | 1024 , 0 , "vendor_ie_set" },
 	{ VENDOR_IE_GET, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "vendor_ie_get" },
-#endif
-#ifdef CONFIG_WOWLAN
-	{ MP_WOW_ENABLE , IW_PRIV_TYPE_CHAR | 1024, 0, "wow_mode" },
-	{ MP_WOW_SET_PATTERN , IW_PRIV_TYPE_CHAR | 1024, 0, "wow_set_pattern" },
 #endif
 #ifdef CONFIG_SDIO_INDIRECT_ACCESS
 	{ MP_SD_IREAD, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "sd_iread" },

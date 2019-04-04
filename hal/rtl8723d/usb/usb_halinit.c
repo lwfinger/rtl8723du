@@ -16,11 +16,6 @@
 #define _USB_HALINIT_C_
 
 #include <rtl8723d_hal.h>
-#ifdef CONFIG_WOWLAN
-	#include "hal_com_h2c.h"
-#endif
-
-
 
 static void _dbg_dump_macreg(PADAPTER padapter)
 {
@@ -966,33 +961,6 @@ u32 rtl8723du_hal_init(PADAPTER padapter)
 		/* state which is set before sleep under wowlan mode. 2012.01.04. by tynli. */
 		RTW_INFO(" MAC has not been powered on yet.\n");
 	}
-
-#ifdef CONFIG_WOWLAN
-	if (rtw_read8(padapter, REG_MCUFWDL) & BIT(7) &&
-	    (pwrctrlpriv->wowlan_wake_reason & FW_DECISION_DISCONNECT)) {
-		u8 reg_val = 0;
-
-		RTW_INFO("+Reset Entry+\n");
-		rtw_write8(padapter, REG_MCUFWDL, 0x00);
-		_8051Reset8723(padapter);
-		/* reset BB */
-		reg_val = rtw_read8(padapter, REG_SYS_FUNC_EN);
-		reg_val &= ~(BIT(0) | BIT(1));
-		rtw_write8(padapter, REG_SYS_FUNC_EN, reg_val);
-		/* reset RF */
-		rtw_write8(padapter, REG_RF_CTRL, 0);
-		/* reset TRX path */
-		rtw_write16(padapter, REG_CR, 0);
-		/* reset MAC, Digital Core */
-		reg_val = rtw_read8(padapter, REG_SYS_FUNC_EN + 1);
-		reg_val &= ~(BIT(4) | BIT(7));
-		rtw_write8(padapter, REG_SYS_FUNC_EN + 1, reg_val);
-		reg_val = rtw_read8(padapter, REG_SYS_FUNC_EN + 1);
-		reg_val |= BIT(4) | BIT(7);
-		rtw_write8(padapter, REG_SYS_FUNC_EN + 1, reg_val);
-		RTW_INFO("-Reset Entry-\n");
-	}
-#endif /* CONFIG_WOWLAN */
 
 	status = rtw_hal_power_on(padapter);
 	if (status == _FAIL) {

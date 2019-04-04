@@ -68,9 +68,6 @@ void rtw_dev_unload(PADAPTER padapter);
 
 u32 rtw_start_drv_threads(_adapter *padapter);
 void rtw_stop_drv_threads(_adapter *padapter);
-#if defined(CONFIG_WOWLAN)
-void rtw_cancel_dynamic_chk_timer(_adapter *padapter);
-#endif
 void rtw_cancel_all_timer(_adapter *padapter);
 
 uint loadparam(_adapter *adapter);

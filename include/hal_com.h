@@ -590,38 +590,6 @@ void rtw_hal_construct_beacon(_adapter *padapter, u8 *pframe, u32 *pLength);
 void rtw_hal_construct_NullFunctionData(PADAPTER, u8 *pframe, u32 *pLength,
 				u8 *StaAddr, u8 bQoS, u8 AC, u8 bEosp, u8 bForcePowerSave);
 
-#ifdef CONFIG_WOWLAN
-struct rtl_wow_pattern {
-	u16	crc;
-	u8	type;
-	u32	mask[4];
-};
-void rtw_wow_pattern_cam_dump(_adapter *adapter);
-
-#ifdef CONFIG_WOW_PATTERN_HW_CAM
-void rtw_wow_pattern_read_cam_ent(_adapter *adapter, u8 id, struct  rtl_wow_pattern *context);
-void rtw_dump_wow_pattern(void *sel, struct rtl_wow_pattern *pwow_pattern, u8 idx);
-#endif
-
-struct rtw_ndp_info {
-	u8 enable:1;
-	u8 check_remote_ip:1; /* Need to Check Sender IP or not */
-	u8 rsvd:6;
-	u8 num_of_target_ip; /* Number of Check IP which NA query IP */
-	u8 target_link_addr[6]; /* DUT's MAC address */
-	u8 remote_ipv6_addr[16]; /* Just respond IP */
-	u8 target_ipv6_addr[16]; /* target IP */
-};
-#define REMOTE_INFO_CTRL_SET_VALD_EN(target, _value) \
-	SET_BITS_TO_LE_4BYTE(target + 0, 0, 8, _value)
-#define REMOTE_INFO_CTRL_SET_PTK_EN(target, _value) \
-	SET_BITS_TO_LE_4BYTE(target + 1, 0, 1, _value)
-#define REMOTE_INFO_CTRL_SET_GTK_EN(target, _value) \
-	SET_BITS_TO_LE_4BYTE(target + 1, 1, 1, _value)
-#define REMOTE_INFO_CTRL_SET_GTK_IDX(target, _value) \
-	SET_BITS_TO_LE_4BYTE(target + 2, 0, 8, _value)
-#endif /*CONFIG_WOWLAN*/
-
 void rtw_dump_phy_cap(void *sel, _adapter *adapter);
 void rtw_dump_rsvd_page(void *sel, _adapter *adapter, u8 page_offset, u8 page_num);
 #ifdef CONFIG_SUPPORT_FIFO_DUMP

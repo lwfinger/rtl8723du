@@ -181,10 +181,6 @@ void rtl8723d_set_BcnEarly_C2H_Rpt_cmd(PADAPTER padapter, u8 enable);
 #endif
 #endif
 
-#ifdef CONFIG_P2P_WOWLAN
-	void rtl8723d_set_p2p_wowlan_offload_cmd(PADAPTER padapter);
-#endif
-
 s32 FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer);
 u8 GetTxBufferRsvdPageNum8723D(_adapter *padapter, bool wowlan);
 #endif

@@ -289,10 +289,6 @@ enum {
 	VENDOR_IE_SET ,
 	VENDOR_IE_GET ,
 #endif
-#ifdef CONFIG_WOWLAN
-	MP_WOW_ENABLE,
-	MP_WOW_SET_PATTERN,
-#endif
 	MP_SD_IREAD,
 	MP_SD_IWRITE,
 };

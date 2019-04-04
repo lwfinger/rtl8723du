@@ -142,16 +142,6 @@ struct P2P_PS_CTWPeriod_t {
 	u8 CTWPeriod;	/* TU */
 };
 
-#ifdef CONFIG_P2P_WOWLAN
-
-struct P2P_WoWlan_Offload_t {
-	u8 Disconnect_Wkup_Drv:1;
-	u8 role:2;
-	u8 Wps_Config[2];
-};
-
-#endif /* CONFIG_P2P_WOWLAN */
-
 extern u32 rtw_enqueue_cmd(struct cmd_priv *pcmdpriv, struct cmd_obj *obj);
 extern struct cmd_obj *rtw_dequeue_cmd(struct cmd_priv *pcmdpriv);
 extern void rtw_free_cmd_obj(struct cmd_obj *pcmd);

@@ -421,20 +421,6 @@ int proc_get_tx_logs(struct seq_file *m, void *v);
 int proc_get_int_logs(struct seq_file *m, void *v);
 #endif
 
-#ifdef CONFIG_WOWLAN
-int proc_get_pattern_info(struct seq_file *m, void *v);
-ssize_t proc_set_pattern_info(struct file *file, const char __user *buffer,
-		size_t count, loff_t *pos, void *data);
-int proc_get_wakeup_event(struct seq_file *m, void *v);
-ssize_t proc_set_wakeup_event(struct file *file, const char __user *buffer,
-		size_t count, loff_t *pos, void *data);
-int proc_get_wakeup_reason(struct seq_file *m, void *v);
-#endif
-
-#ifdef CONFIG_P2P_WOWLAN
-int proc_get_p2p_wowlan_info(struct seq_file *m, void *v);
-#endif /* CONFIG_P2P_WOWLAN */
-
 int proc_get_new_bcn_max(struct seq_file *m, void *v);
 ssize_t proc_set_new_bcn_max(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 

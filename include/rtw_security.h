@@ -481,8 +481,4 @@ int tdls_verify_mic(u8 *kck, u8 trans_seq,
 void rtw_sec_restore_wep_key(_adapter *adapter);
 u8 rtw_handle_tkip_countermeasure(_adapter *adapter, const char *caller);
 
-#ifdef CONFIG_WOWLAN
-u16 rtw_calc_crc(u8  *pdata, int length);
-#endif /*CONFIG_WOWLAN*/
-
 #endif /* __RTL871X_SECURITY_H_ */

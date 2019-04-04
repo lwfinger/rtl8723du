@@ -721,10 +721,6 @@ s32 rtl8723d_FirmwareDownload(PADAPTER padapter, BOOLEAN  bUsedWoWLANFw)
 	u8			*FwImage;
 	u32			FwImageLen;
 	u8			*pFwImageFileName;
-#ifdef CONFIG_WOWLAN
-	u8			*FwImageWoWLAN;
-	u32			FwImageWoWLANLen;
-#endif
 	u8			*pucMappedFile = NULL;
 	PRT_FIRMWARE_8723D	pFirmware = NULL;
 	PRT_8723D_FIRMWARE_HDR		pFwHdr = NULL;
@@ -776,14 +772,7 @@ s32 rtl8723d_FirmwareDownload(PADAPTER padapter, BOOLEAN  bUsedWoWLANFw)
 #endif /* CONFIG_BT_COEXIST */
 
 #ifdef CONFIG_FILE_FWIMG
-#ifdef CONFIG_WOWLAN
-	if (bUsedWoWLANFw)
-		fwfilepath = rtw_fw_wow_file_path;
-	else
-#endif /* CONFIG_WOWLAN */
-	{
-		fwfilepath = rtw_fw_file_path;
-	}
+	fwfilepath = rtw_fw_file_path;
 #endif /* CONFIG_FILE_FWIMG */
 
 #ifdef CONFIG_FILE_FWIMG
@@ -811,15 +800,6 @@ s32 rtl8723d_FirmwareDownload(PADAPTER padapter, BOOLEAN  bUsedWoWLANFw)
 
 	case FW_SOURCE_HEADER_FILE:
 		if (bUsedWoWLANFw) {
-	#ifdef CONFIG_WOWLAN
-			if (pwrpriv->wowlan_mode) {
-				pFirmware->szFwBuffer = array_mp_8723d_fw_wowlan;
-				pFirmware->ulFwLength = array_length_mp_8723d_fw_wowlan;
-				RTW_INFO(" ===> %s fw: %s, size: %d\n",
-					 __FUNCTION__, "WoWLAN", pFirmware->ulFwLength);
-			}
-	#endif /* CONFIG_WOWLAN */
-
 		} else {
 			pFirmware->szFwBuffer = array_mp_8723d_fw_nic;
 			pFirmware->ulFwLength = array_length_mp_8723d_fw_nic;
@@ -4926,19 +4906,6 @@ void GetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 		val16 = rtw_read16(padapter, REG_TXPKT_EMPTY);
 		*val = (val16 & BIT(8)) ? _TRUE : _FALSE;
 		break;
-#ifdef CONFIG_WOWLAN
-	case HW_VAR_RPWM_TOG:
-		*val = rtw_read8(padapter, SDIO_LOCAL_BASE | SDIO_REG_HRPWM1) & BIT(7);
-		break;
-	case HW_VAR_WAKEUP_REASON:
-		*val = rtw_read8(padapter, REG_WOWLAN_WAKE_REASON);
-		if (*val == 0xEA)
-			*val = 0;
-		break;
-	case HW_VAR_SYS_CLKR:
-		*val = rtw_read8(padapter, REG_SYS_CLKR);
-		break;
-#endif
 	case HW_VAR_DUMP_MAC_QUEUE_INFO:
 		dump_mac_qinfo_8723d(val, padapter);
 		break;
@@ -5133,14 +5100,6 @@ u8 GetHalDefVar8723D(PADAPTER padapter, HAL_DEF_VARIABLE variable, void *pval)
 
 	return bResult;
 }
-
-#ifdef CONFIG_WOWLAN
-void Hal_DetectWoWMode(PADAPTER pAdapter)
-{
-	adapter_to_pwrctl(pAdapter)->bSupportRemoteWakeup = _TRUE;
-	RTW_INFO("%s\n", __func__);
-}
-#endif /* CONFIG_WOWLAN */
 
 void rtl8723d_start_thread(_adapter *padapter)
 {

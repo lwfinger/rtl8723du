@@ -55,22 +55,16 @@ static void rtw_dev_shutdown(struct device *dev)
 			if (adapter) {
 				if (!rtw_is_surprise_removed(adapter)) {
 					struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(adapter);
-					#ifdef CONFIG_WOWLAN
-					if (pwrctl->wowlan_mode == _TRUE)
-						RTW_PRINT("%s wowlan_mode ==_TRUE do not run rtw_hal_deinit()\n", __FUNCTION__);
-					else
+
+					#ifdef CONFIG_BT_COEXIST
+					#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
+					if (GET_HAL_DATA(adapter)->EEPROMBluetoothCoexist)
+						rtw_btcoex_close_socket(adapter);
 					#endif
-					{
-						#ifdef CONFIG_BT_COEXIST
-						#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-						if (GET_HAL_DATA(adapter)->EEPROMBluetoothCoexist)
-							rtw_btcoex_close_socket(adapter);
-						#endif
-						rtw_btcoex_HaltNotify(adapter);
-						#endif
-						rtw_hal_deinit(adapter);
-						rtw_set_surprise_removed(adapter);
-					}
+					rtw_btcoex_HaltNotify(adapter);
+					#endif
+					rtw_hal_deinit(adapter);
+					rtw_set_surprise_removed(adapter);
 				}
 			}
 			ATOMIC_SET(&dvobj->continual_io_error, MAX_CONTINUAL_IO_ERR + 1);
@@ -1103,13 +1097,6 @@ static void rtw_usb_primary_adapter_deinit(_adapter *padapter)
 		#endif
 	}
 #endif
-
-	/*rtw_cancel_all_timer(if1);*/
-
-#ifdef CONFIG_WOWLAN
-	pwrctl->wowlan_mode = _FALSE;
-#endif /* CONFIG_WOWLAN */
-
 	rtw_dev_unload(padapter);
 
 	RTW_INFO("+r871xu_dev_remove, hw_init_completed=%d\n", rtw_get_hw_init_completed(padapter));

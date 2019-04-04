@@ -605,13 +605,6 @@ void rtw_set_rpwm(PADAPTER padapter, u8 pslv)
 	if (rpwm & PS_ACK) {
 #ifdef CONFIG_DETECT_CPWM_BY_POLLING
 		rtw_cpwm_polling(padapter, cpwm_orig);
-		#else
-		#if defined(CONFIG_WOWLAN) || defined(CONFIG_P2P_WOWLAN)
-		if (pwrpriv->wowlan_mode == _TRUE ||
-			pwrpriv->wowlan_ap_mode == _TRUE ||
-			pwrpriv->wowlan_p2p_mode == _TRUE)
-				rtw_cpwm_polling(padapter, cpwm_orig);
-		#endif /*#if defined(CONFIG_WOWLAN) || defined(CONFIG_P2P_WOWLAN)*/
 		#endif /*#ifdef CONFIG_DETECT_CPWM_BY_POLLING*/
 	} else
 #endif /* CONFIG_LPS_LCLK */
@@ -633,17 +626,8 @@ u8 PS_RDY_CHECK(_adapter *padapter)
 #endif /* CONFIG_IOCTL_CFG80211 */
 #endif /* CONFIG_P2P */
 
-#if defined(CONFIG_WOWLAN)
-	if (_TRUE == pwrpriv->bInSuspend && pwrpriv->wowlan_mode)
-		return _TRUE;
-	else if (_TRUE == pwrpriv->bInSuspend && pwrpriv->wowlan_ap_mode)
-		return _TRUE;
-	else if (_TRUE == pwrpriv->bInSuspend)
-		return _FALSE;
-#else
 	if (_TRUE == pwrpriv->bInSuspend)
 		return _FALSE;
-#endif
 
 	delta_ms = rtw_get_passing_time_ms(pwrpriv->DelayLPSLastTimeStamp);
 	if (delta_ms < LPS_DELAY_MS)
@@ -896,31 +880,6 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 			pwrpriv->pwr_mode = ps_mode;
 			rtw_set_rpwm(padapter, PS_STATE_S4);
 
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_P2P_WOWLAN)
-			if (pwrpriv->wowlan_mode == _TRUE ||
-			    pwrpriv->wowlan_ap_mode == _TRUE ||
-			    pwrpriv->wowlan_p2p_mode == _TRUE) {
-				systime start_time;
-				u32 delay_ms;
-				u8 val8;
-				delay_ms = 20;
-				start_time = rtw_get_current_time();
-				do {
-					rtw_hal_get_hwreg(padapter, HW_VAR_SYS_CLKR, &val8);
-					if (!(val8 & BIT(4))) { /* 0x08 bit4 =1 --> in 32k, bit4 = 0 --> leave 32k */
-						pwrpriv->cpwm = PS_STATE_S4;
-						break;
-					}
-					if (rtw_get_passing_time_ms(start_time) > delay_ms) {
-						RTW_INFO("%s: Wait for FW 32K leave more than %u ms!!!\n",
-							__FUNCTION__, delay_ms);
-						pdbgpriv->dbg_wow_leave_ps_fail_cnt++;
-						break;
-					}
-					rtw_usleep_os(100);
-				} while (1);
-			}
-#endif
 #ifdef CONFIG_LPS_PG
 			if (pwrpriv->lps_level == LPS_PG) {
 				lps_pg_hdl_id = LPS_PG_REDLEMEM;
@@ -953,9 +912,6 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 		    || ((rtw_btcoex_IsBtControlLps(padapter) == _TRUE)
 			&& (rtw_btcoex_IsLpsOn(padapter) == _TRUE))
 #endif
-#ifdef CONFIG_P2P_WOWLAN
-		    || (_TRUE == pwrpriv->wowlan_p2p_mode)
-#endif /* CONFIG_P2P_WOWLAN */
 		   ) {
 			u8 pslv;
 
@@ -2133,33 +2089,10 @@ void rtw_init_pwrctrl_priv(PADAPTER padapter)
 	rtw_register_early_suspend(pwrctrlpriv);
 #endif /* CONFIG_HAS_EARLYSUSPEND || CONFIG_ANDROID_POWER */
 
-#ifdef CONFIG_WOWLAN
-
-	if (registry_par->wakeup_event & BIT(1))
-		pwrctrlpriv->default_patterns_en = _TRUE;
-	else
-		pwrctrlpriv->default_patterns_en = _FALSE;
-
-	rtw_wow_pattern_sw_reset(padapter);
-#ifdef CONFIG_PNO_SUPPORT
-	pwrctrlpriv->pno_inited = _FALSE;
-	pwrctrlpriv->pnlo_info = NULL;
-	pwrctrlpriv->pscan_info = NULL;
-	pwrctrlpriv->pno_ssid_list = NULL;
-#endif /* CONFIG_PNO_SUPPORT */
-#ifdef CONFIG_WOW_PATTERN_HW_CAM
-	_rtw_mutex_init(&pwrctrlpriv->wowlan_pattern_cam_mutex);
-#endif
-	pwrctrlpriv->wowlan_aoac_rpt_loc = 0;
-#endif /* CONFIG_WOWLAN */
-
 #ifdef CONFIG_LPS_POFF
 	rtw_hal_set_hwreg(padapter, HW_VAR_LPS_POFF_INIT, 0);
 #endif
-
-
 }
-
 
 void rtw_free_pwrctrl_priv(PADAPTER adapter)
 {
@@ -2192,23 +2125,6 @@ void rtw_free_pwrctrl_priv(PADAPTER adapter)
 	_cancel_workitem_sync(&pwrctrlpriv->rpwmtimeoutwi);
 	#endif
 #endif /* CONFIG_LPS_LCLK */
-
-#ifdef CONFIG_WOWLAN
-#ifdef CONFIG_PNO_SUPPORT
-	if (pwrctrlpriv->pnlo_info != NULL)
-		printk("****** pnlo_info memory leak********\n");
-
-	if (pwrctrlpriv->pscan_info != NULL)
-		printk("****** pscan_info memory leak********\n");
-
-	if (pwrctrlpriv->pno_ssid_list != NULL)
-		printk("****** pno_ssid_list memory leak********\n");
-#endif
-#ifdef CONFIG_WOW_PATTERN_HW_CAM
-	_rtw_mutex_free(&pwrctrlpriv->wowlan_pattern_cam_mutex);
-#endif
-
-#endif /* CONFIG_WOWLAN */
 
 #if defined(CONFIG_HAS_EARLYSUSPEND) || defined(CONFIG_ANDROID_POWER)
 	rtw_unregister_early_suspend(pwrctrlpriv);

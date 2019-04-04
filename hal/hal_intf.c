@@ -346,12 +346,6 @@ s32 rtw_hal_fw_mem_dl(_adapter *padapter, enum fw_mem mem)
 }
 #endif
 
-#if defined(CONFIG_WOWLAN)
-void rtw_hal_clear_interrupt(_adapter *padapter)
-{
-}
-#endif
-
 u32	rtw_hal_inirp_init(_adapter *padapter)
 {
 	if (is_primary_adapter(padapter))
@@ -1273,7 +1267,7 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 	}
 #endif
 
-#if defined(CONFIG_LPS) || defined(CONFIG_WOWLAN)
+#if defined(CONFIG_LPS)
 	if (NULL == padapter->hal_func.fill_fake_txdesc) {
 		rtw_hal_error_msg("fill_fake_txdesc");
 		ret = _FAIL;

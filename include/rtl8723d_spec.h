@@ -237,10 +237,6 @@
 #define REG_FAST_EDCA_CTRL_8723D		0x0460
 #define REG_RD_RESP_PKT_TH_8723D		0x0463
 #define REG_DATA_SC_8723D				0x0483
-#ifdef CONFIG_WOWLAN
-	#define REG_TXPKTBUF_IV_LOW             0x0484
-	#define REG_TXPKTBUF_IV_HIGH            0x0488
-#endif
 #define REG_TXRPT_START_OFFSET		0x04AC
 #define REG_POWER_STAGE1_8723D		0x04B4
 #define REG_POWER_STAGE2_8723D		0x04B8
@@ -412,12 +408,6 @@
 
 #define BIT_USB_RXDMA_AGG_EN	BIT(31)
 #define RXDMA_AGG_MODE_EN		BIT(1)
-
-#ifdef CONFIG_WOWLAN
-	#define RXPKT_RELEASE_POLL		BIT(16)
-	#define RXDMA_IDLE				BIT(17)
-	#define RW_RELEASE_EN			BIT(18)
-#endif
 
 /* 2 HSISR
  * interrupt mask which needs to clear */

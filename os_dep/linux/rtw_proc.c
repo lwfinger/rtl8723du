@@ -765,48 +765,6 @@ static ssize_t proc_set_turboedca_ctrl(struct file *file, const char __user *buf
 	}
 	return count;
 }
-#ifdef CONFIG_WOWLAN
-static int proc_get_wow_lps_ctrl(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(padapter);
-
-	if (pwrctl)
-		RTW_PRINT_SEL(m, "WOW lps :%s\n", (pwrctl->wowlan_dis_lps) ? "Disable" : "Enable");
-
-	return 0;
-}
-
-static ssize_t proc_set_wow_lps_ctrl(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(padapter);
-
-	char tmp[32] = {0};
-	int mode = 0, num = 0;
-
-	if (count < 1)
-		return -EFAULT;
-
-	if (count > sizeof(tmp))
-		return -EFAULT;
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-
-		num	= sscanf(tmp, "%d ", &mode);
-
-		if (num != 1) {
-			RTW_INFO("argument number is wrong\n");
-			return -EFAULT;
-		}
-		pwrctl->wowlan_dis_lps = mode;
-		RTW_INFO("WOW lps :%s\n", (pwrctl->wowlan_dis_lps) ? "Disable" : "Enable");
-	}
-	return count;
-}
-#endif
 
 static int proc_get_mac_qinfo(struct seq_file *m, void *v)
 {
@@ -2718,20 +2676,6 @@ const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("lck", proc_get_lck_info, proc_set_lck),
 #endif
 
-#ifdef CONFIG_WOWLAN
-	RTW_PROC_HDL_SSEQ("wow_pattern_info", proc_get_pattern_info, proc_set_pattern_info),
-	RTW_PROC_HDL_SSEQ("wow_wakeup_event", proc_get_wakeup_event,
-			  proc_set_wakeup_event),
-	RTW_PROC_HDL_SSEQ("wowlan_last_wake_reason", proc_get_wakeup_reason, NULL),
-#ifdef CONFIG_WOW_PATTERN_HW_CAM
-	RTW_PROC_HDL_SSEQ("wow_pattern_cam", proc_dump_pattern_cam, NULL),
-#endif
-	RTW_PROC_HDL_SSEQ("dis_wow_lps", proc_get_wow_lps_ctrl, proc_set_wow_lps_ctrl),
-#endif
-
-#ifdef CONFIG_P2P_WOWLAN
-	RTW_PROC_HDL_SSEQ("p2p_wowlan_info", proc_get_p2p_wowlan_info, NULL),
-#endif
 	RTW_PROC_HDL_SSEQ("country_code", proc_get_country_code, proc_set_country_code),
 	RTW_PROC_HDL_SSEQ("chan_plan", proc_get_chan_plan, proc_set_chan_plan),
 #if CONFIG_RTW_MACADDR_ACL

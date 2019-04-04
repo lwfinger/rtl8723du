@@ -177,45 +177,8 @@ static void rtl8723d_set_FwRsvdPage_cmd(PADAPTER padapter, PRSVDPAGE_LOC rsvdpag
 
 static void rtl8723d_set_FwAoacRsvdPage_cmd(PADAPTER padapter, PRSVDPAGE_LOC rsvdpageloc)
 {
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
-	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
-	u8	res = 0, count = 0;
-#ifdef CONFIG_WOWLAN
-	u8 u1H2CAoacRsvdPageParm[H2C_AOAC_RSVDPAGE_LOC_LEN] = {0};
-
-	RTW_INFO("8723DAOACRsvdPageLoc: RWC=%d ArpRsp=%d NbrAdv=%d GtkRsp=%d GtkInfo=%d ProbeReq=%d NetworkList=%d\n",
-		 rsvdpageloc->LocRemoteCtrlInfo, rsvdpageloc->LocArpRsp,
-		 rsvdpageloc->LocNbrAdv, rsvdpageloc->LocGTKRsp,
-		 rsvdpageloc->LocGTKInfo, rsvdpageloc->LocProbeReq,
-		 rsvdpageloc->LocNetList);
-
-	if (check_fwstate(pmlmepriv, _FW_LINKED)) {
-		SET_H2CCMD_AOAC_RSVDPAGE_LOC_REMOTE_WAKE_CTRL_INFO(u1H2CAoacRsvdPageParm, rsvdpageloc->LocRemoteCtrlInfo);
-		SET_H2CCMD_AOAC_RSVDPAGE_LOC_ARP_RSP(u1H2CAoacRsvdPageParm, rsvdpageloc->LocArpRsp);
-		/* SET_H2CCMD_AOAC_RSVDPAGE_LOC_NEIGHBOR_ADV(u1H2CAoacRsvdPageParm, rsvdpageloc->LocNbrAdv); */
-		SET_H2CCMD_AOAC_RSVDPAGE_LOC_GTK_RSP(u1H2CAoacRsvdPageParm, rsvdpageloc->LocGTKRsp);
-		SET_H2CCMD_AOAC_RSVDPAGE_LOC_GTK_INFO(u1H2CAoacRsvdPageParm, rsvdpageloc->LocGTKInfo);
-#ifdef CONFIG_GTK_OL
-		SET_H2CCMD_AOAC_RSVDPAGE_LOC_GTK_EXT_MEM(u1H2CAoacRsvdPageParm, rsvdpageloc->LocGTKEXTMEM);
-#endif /* CONFIG_GTK_OL */
-		RTW_DBG_DUMP("u1H2CAoacRsvdPageParm:",
-			     u1H2CAoacRsvdPageParm, H2C_AOAC_RSVDPAGE_LOC_LEN);
-
-		FillH2CCmd8723D(padapter, H2C_8723D_AOAC_RSVD_PAGE, H2C_AOAC_RSVDPAGE_LOC_LEN, u1H2CAoacRsvdPageParm);
-	} else {
-#ifdef CONFIG_PNO_SUPPORT
-		if (!pwrpriv->wowlan_in_resume) {
-			RTW_INFO("NLO_INFO=%d\n", rsvdpageloc->LocPNOInfo);
-			_rtw_memset(&u1H2CAoacRsvdPageParm, 0, sizeof(u1H2CAoacRsvdPageParm));
-			SET_H2CCMD_AOAC_RSVDPAGE_LOC_NLO_INFO(u1H2CAoacRsvdPageParm, rsvdpageloc->LocPNOInfo);
-			FillH2CCmd8723D(padapter, H2C_AOAC_RSVDPAGE3, H2C_AOAC_RSVDPAGE_LOC_LEN, u1H2CAoacRsvdPageParm);
-			rtw_msleep_os(10);
-		}
-#endif
-	}
-
-#endif /* CONFIG_WOWLAN */
 }
+
 void rtl8723d_set_FwPwrMode_cmd(PADAPTER padapter, u8 psmode)
 {
 	int i;
