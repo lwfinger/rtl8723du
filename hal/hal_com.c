@@ -3480,112 +3480,6 @@ void rtw_hal_set_FwRsvdPage_cmd(PADAPTER padapter, PRSVDPAGE_LOC rsvdpageloc)
 
 }
 
-#ifdef CONFIG_GPIO_WAKEUP
-void rtw_hal_switch_gpio_wl_ctrl(_adapter *padapter, u8 index, u8 enable)
-{
-	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
-
-	if (IS_8723D_SERIES(pHalData->version_id) || IS_8822B_SERIES(pHalData->version_id))
-		rtw_hal_set_hwreg(padapter, HW_SET_GPIO_WL_CTRL, (u8 *)(&enable));
-	/*
-	* Switch GPIO_13, GPIO_14 to wlan control, or pull GPIO_13,14 MUST fail.
-	* It happended at 8723B/8192E/8821A. New IC will check multi function GPIO,
-	* and implement HAL function.
-	* TODO: GPIO_8 multi function?
-	*/
-
-	rtw_hal_set_hwreg(padapter, HW_SET_GPIO_WL_CTRL, (u8 *)(&enable));
-}
-
-void rtw_hal_set_output_gpio(_adapter *padapter, u8 index, u8 outputval)
-{
-	if (index <= 7) {
-		/* config GPIO mode */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL + 3,
-			rtw_read8(padapter, REG_GPIO_PIN_CTRL + 3) & ~BIT(index));
-
-		/* config GPIO Sel */
-		/* 0: input */
-		/* 1: output */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL + 2,
-			rtw_read8(padapter, REG_GPIO_PIN_CTRL + 2) | BIT(index));
-
-		/* set output value */
-		if (outputval) {
-			rtw_write8(padapter, REG_GPIO_PIN_CTRL + 1,
-				rtw_read8(padapter, REG_GPIO_PIN_CTRL + 1) | BIT(index));
-		} else {
-			rtw_write8(padapter, REG_GPIO_PIN_CTRL + 1,
-				rtw_read8(padapter, REG_GPIO_PIN_CTRL + 1) & ~BIT(index));
-		}
-	} else if (index <= 15) {
-		/* 88C Series: */
-		/* index: 11~8 transform to 3~0 */
-		/* 8723 Series: */
-		/* index: 12~8 transform to 4~0 */
-
-		index -= 8;
-
-		/* config GPIO mode */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL_2 + 3,
-			rtw_read8(padapter, REG_GPIO_PIN_CTRL_2 + 3) & ~BIT(index));
-
-		/* config GPIO Sel */
-		/* 0: input */
-		/* 1: output */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL_2 + 2,
-			rtw_read8(padapter, REG_GPIO_PIN_CTRL_2 + 2) | BIT(index));
-
-		/* set output value */
-		if (outputval) {
-			rtw_write8(padapter, REG_GPIO_PIN_CTRL_2 + 1,
-				rtw_read8(padapter, REG_GPIO_PIN_CTRL_2 + 1) | BIT(index));
-		} else {
-			rtw_write8(padapter, REG_GPIO_PIN_CTRL_2 + 1,
-				rtw_read8(padapter, REG_GPIO_PIN_CTRL_2 + 1) & ~BIT(index));
-		}
-	} else {
-		RTW_INFO("%s: invalid GPIO%d=%d\n",
-			 __FUNCTION__, index, outputval);
-	}
-}
-void rtw_hal_set_input_gpio(_adapter *padapter, u8 index)
-{
-	if (index <= 7) {
-		/* config GPIO mode */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL + 3,
-			rtw_read8(padapter, REG_GPIO_PIN_CTRL + 3) & ~BIT(index));
-
-		/* config GPIO Sel */
-		/* 0: input */
-		/* 1: output */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL + 2,
-			rtw_read8(padapter, REG_GPIO_PIN_CTRL + 2) & ~BIT(index));
-
-	} else if (index <= 15) {
-		/* 88C Series: */
-		/* index: 11~8 transform to 3~0 */
-		/* 8723 Series: */
-		/* index: 12~8 transform to 4~0 */
-
-		index -= 8;
-
-		/* config GPIO mode */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL_2 + 3,
-			rtw_read8(padapter, REG_GPIO_PIN_CTRL_2 + 3) & ~BIT(index));
-
-		/* config GPIO Sel */
-		/* 0: input */
-		/* 1: output */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL_2 + 2,
-			rtw_read8(padapter, REG_GPIO_PIN_CTRL_2 + 2) & ~BIT(index));
-	} else
-		RTW_INFO("%s: invalid GPIO%d\n", __func__, index);
-
-}
-
-#endif
-
 void rtw_hal_set_FwAoacRsvdPage_cmd(PADAPTER padapter, PRSVDPAGE_LOC rsvdpageloc)
 {
 	struct	hal_ops *pHalFunc = &padapter->hal_func;
@@ -4261,12 +4155,6 @@ static u8 rtw_hal_set_wowlan_ctrl_cmd(_adapter *adapter, u8 enable, u8 change_un
 	u8 dis_uphy = 0, dis_uphy_unit = 0, dis_uphy_time = 0;
 #endif /* CONFIG_DIS_UPHY */
 
-#ifdef CONFIG_GPIO_WAKEUP
-	gpio_high_active = ppwrpriv->is_high_active;
-	gpionum = WAKEUP_GPIO_IDX;
-	sdio_wakeup_enable = 0;
-#endif /* CONFIG_GPIO_WAKEUP */
-
 	if (!ppwrpriv->wowlan_pno_enable &&
 	    registry_par->wakeup_event & BIT(0))
 		magic_pkt = enable;
@@ -4317,11 +4205,6 @@ static u8 rtw_hal_set_wowlan_ctrl_cmd(_adapter *adapter, u8 enable, u8 change_un
 
 	SET_H2CCMD_WOWLAN_GPIO_PULSE_EN(u1H2CWoWlanCtrlParm, gpio_pulse_en);
 	SET_H2CCMD_WOWLAN_GPIO_PULSE_COUNT(u1H2CWoWlanCtrlParm, gpio_pulse_cnt);
-
-#ifdef CONFIG_WAKEUP_GPIO_INPUT_MODE
-	if (enable)
-		SET_H2CCMD_WOWLAN_GPIO_INPUT_EN(u1H2CWoWlanCtrlParm, 1);
-#endif
 
 #ifdef CONFIG_DIS_UPHY
 	if (enable) {
@@ -4549,12 +4432,6 @@ static u8 rtw_hal_set_ap_wowlan_ctrl_cmd(_adapter *adapter, u8 enable)
 	u8 gpio_high_active = 0;
 	u8 ret = _FAIL;
 
-#ifdef CONFIG_GPIO_WAKEUP
-	gpio_high_active = ppwrpriv->is_high_active;
-	gpionum = WAKEUP_GPIO_IDX;
-	sdio_wakeup_enable = 0;
-#endif /*CONFIG_GPIO_WAKEUP*/
-
 	RTW_DBG("%s(): enable=%d\n", __func__, enable);
 
 	SET_H2CCMD_AP_WOW_GPIO_CTRL_INDEX(u1H2CAPWoWlanCtrlParm,
@@ -4706,9 +4583,6 @@ static void rtw_hal_ap_wow_enable(_adapter *padapter)
 	if (res == _FAIL)
 		RTW_WARN("[WARNING] pause RX DMA fail\n");
 
-#ifdef CONFIG_GPIO_WAKEUP
-	rtw_hal_switch_gpio_wl_ctrl(padapter, WAKEUP_GPIO_IDX, _TRUE);
-#endif
 	/* 5. Set Enable WOWLAN H2C command. */
 	RTW_DBG("Set Enable AP WOWLan cmd\n");
 	rtw_hal_set_fw_ap_wow_related_cmd(padapter, 1);
@@ -4753,20 +4627,6 @@ static void rtw_hal_ap_wow_disable(_adapter *padapter)
 
 	rtw_hal_fw_dl(padapter, _FALSE);
 
-#ifdef CONFIG_GPIO_WAKEUP
-	#ifdef CONFIG_WAKEUP_GPIO_INPUT_MODE
-	if (pwrctl->is_high_active == 0)
-		rtw_hal_set_input_gpio(padapter, WAKEUP_GPIO_IDX);
-	else
-		rtw_hal_set_output_gpio(padapter, WAKEUP_GPIO_IDX, 0);
-	#else
-	val8 = (pwrctl->is_high_active == 0) ? 1 : 0;
-	RTW_INFO("%s: Set Wake GPIO to default(%d).\n", __func__, val8);
-	rtw_hal_set_output_gpio(padapter, WAKEUP_GPIO_IDX, val8);
-
-	rtw_hal_switch_gpio_wl_ctrl(padapter, WAKEUP_GPIO_IDX, _FALSE);
-	#endif/*CONFIG_WAKEUP_GPIO_INPUT_MODE*/
-#endif
 	media_status_rpt = RT_MEDIA_CONNECT;
 
 	rtw_hal_set_hwreg(padapter, HW_VAR_H2C_FW_JOINBSSRPT,
@@ -8359,9 +8219,6 @@ static void rtw_hal_wow_enable(_adapter *adapter)
 		}
 	}
 
-#ifdef CONFIG_GPIO_WAKEUP
-	rtw_hal_switch_gpio_wl_ctrl(adapter, WAKEUP_GPIO_IDX, _TRUE);
-#endif
 	/* Set WOWLAN H2C command. */
 	rtw_hal_set_fw_wow_related_cmd(adapter, 1);
 
@@ -8510,22 +8367,6 @@ static void rtw_hal_wow_disable(_adapter *adapter)
 
 	rtw_hal_fw_dl(adapter, _FALSE);
 
-#ifdef CONFIG_GPIO_WAKEUP
-
-#ifdef CONFIG_WAKEUP_GPIO_INPUT_MODE
-	if (pwrctl->is_high_active == 0)
-		rtw_hal_set_input_gpio(adapter, WAKEUP_GPIO_IDX);
-	else
-		rtw_hal_set_output_gpio(adapter, WAKEUP_GPIO_IDX, 0);
-#else
-	val8 = (pwrctl->is_high_active == 0) ? 1 : 0;
-	RTW_INFO("%s: Set Wake GPIO to default(%d).\n", __func__, val8);
-
-	rtw_hal_set_output_gpio(adapter, WAKEUP_GPIO_IDX, val8);
-	rtw_hal_switch_gpio_wl_ctrl(adapter, WAKEUP_GPIO_IDX, _FALSE);
-#endif
-
-#endif
 	if ((pwrctl->wowlan_wake_reason != FW_DECISION_DISCONNECT) &&
 	    (pwrctl->wowlan_wake_reason != RX_PAIRWISEKEY) &&
 	    (pwrctl->wowlan_wake_reason != RX_DISASSOC) &&
@@ -10937,204 +10778,6 @@ void dump_TX_FIFO(_adapter *padapter, u8 page_num, u16 page_size)
 		printk(" %08x %08x\n", rtw_read32(padapter, 0x144), rtw_read32(padapter, 0x148));
 	}
 }
-
-#ifdef CONFIG_GPIO_API
-u8 rtw_hal_get_gpio(_adapter *adapter, u8 gpio_num)
-{
-	u8 value = 0;
-	u8 direction = 0;
-	u32 gpio_pin_input_val = REG_GPIO_PIN_CTRL;
-	u32 gpio_pin_output_val = REG_GPIO_PIN_CTRL + 1;
-	u32 gpio_pin_output_en = REG_GPIO_PIN_CTRL + 2;
-	u8 gpio_num_to_set = gpio_num;
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapter);
-
-	if (rtw_hal_gpio_func_check(adapter, gpio_num) == _FAIL)
-		return value;
-
-	rtw_ps_deny(adapter, PS_DENY_IOCTL);
-
-	RTW_INFO("rf_pwrstate=0x%02x\n", pwrpriv->rf_pwrstate);
-	LeaveAllPowerSaveModeDirect(adapter);
-
-	if (gpio_num > 7) {
-		gpio_pin_input_val = REG_GPIO_PIN_CTRL_2;
-		gpio_pin_output_val = REG_GPIO_PIN_CTRL_2 + 1;
-		gpio_pin_output_en = REG_GPIO_PIN_CTRL_2 + 2;
-		gpio_num_to_set = gpio_num - 8;
-	}
-
-	/* Read GPIO Direction */
-	direction = (rtw_read8(adapter, gpio_pin_output_en) & BIT(gpio_num_to_set)) >> gpio_num_to_set;
-
-	/* According the direction to read register value */
-	if (direction)
-		value =  (rtw_read8(adapter, gpio_pin_output_val) & BIT(gpio_num_to_set)) >> gpio_num_to_set;
-	else
-		value =  (rtw_read8(adapter, gpio_pin_input_val) & BIT(gpio_num_to_set)) >> gpio_num_to_set;
-
-	rtw_ps_deny_cancel(adapter, PS_DENY_IOCTL);
-	RTW_INFO("%s direction=%d value=%d\n", __FUNCTION__, direction, value);
-
-	return value;
-}
-
-int  rtw_hal_set_gpio_output_value(_adapter *adapter, u8 gpio_num, bool isHigh)
-{
-	u8 direction = 0;
-	u8 res = -1;
-	u32 gpio_pin_output_val = REG_GPIO_PIN_CTRL + 1;
-	u32 gpio_pin_output_en = REG_GPIO_PIN_CTRL + 2;
-	u8 gpio_num_to_set = gpio_num;
-
-	if (rtw_hal_gpio_func_check(adapter, gpio_num) == _FAIL)
-		return -1;
-
-	rtw_ps_deny(adapter, PS_DENY_IOCTL);
-
-	LeaveAllPowerSaveModeDirect(adapter);
-
-	if (gpio_num > 7) {
-		gpio_pin_output_val = REG_GPIO_PIN_CTRL_2 + 1;
-		gpio_pin_output_en = REG_GPIO_PIN_CTRL_2 + 2;
-		gpio_num_to_set = gpio_num - 8;
-	}
-
-	/* Read GPIO direction */
-	direction = (rtw_read8(adapter, gpio_pin_output_en) & BIT(gpio_num_to_set)) >> gpio_num_to_set;
-
-	/* If GPIO is output direction, setting value. */
-	if (direction) {
-		if (isHigh)
-			rtw_write8(adapter, gpio_pin_output_val, rtw_read8(adapter, gpio_pin_output_val) | BIT(gpio_num_to_set));
-		else
-			rtw_write8(adapter, gpio_pin_output_val, rtw_read8(adapter, gpio_pin_output_val) & ~BIT(gpio_num_to_set));
-
-		RTW_INFO("%s Set gpio %x[%d]=%d\n", __FUNCTION__, REG_GPIO_PIN_CTRL + 1, gpio_num, isHigh);
-		res = 0;
-	} else {
-		RTW_INFO("%s The gpio is input,not be set!\n", __FUNCTION__);
-		res = -1;
-	}
-
-	rtw_ps_deny_cancel(adapter, PS_DENY_IOCTL);
-	return res;
-}
-
-int rtw_hal_config_gpio(_adapter *adapter, u8 gpio_num, bool isOutput)
-{
-	u32 gpio_ctrl_reg_to_set = REG_GPIO_PIN_CTRL + 2;
-	u8 gpio_num_to_set = gpio_num;
-
-	if (rtw_hal_gpio_func_check(adapter, gpio_num) == _FAIL)
-		return -1;
-
-	RTW_INFO("%s gpio_num =%d direction=%d\n", __FUNCTION__, gpio_num, isOutput);
-
-	rtw_ps_deny(adapter, PS_DENY_IOCTL);
-
-	LeaveAllPowerSaveModeDirect(adapter);
-
-	rtw_hal_gpio_multi_func_reset(adapter, gpio_num);
-
-	if (gpio_num > 7) {
-		gpio_ctrl_reg_to_set = REG_GPIO_PIN_CTRL_2 + 2;
-		gpio_num_to_set = gpio_num - 8;
-	}
-
-	if (isOutput)
-		rtw_write8(adapter, gpio_ctrl_reg_to_set, rtw_read8(adapter, gpio_ctrl_reg_to_set) | BIT(gpio_num_to_set));
-	else
-		rtw_write8(adapter, gpio_ctrl_reg_to_set, rtw_read8(adapter, gpio_ctrl_reg_to_set) & ~BIT(gpio_num_to_set));
-
-	rtw_ps_deny_cancel(adapter, PS_DENY_IOCTL);
-
-	return 0;
-}
-int rtw_hal_register_gpio_interrupt(_adapter *adapter, int gpio_num, void(*callback)(u8 level))
-{
-	u8 value;
-	u8 direction;
-	PHAL_DATA_TYPE phal = GET_HAL_DATA(adapter);
-
-	if (IS_HARDWARE_TYPE_8188E(adapter)) {
-		if (gpio_num > 7 || gpio_num < 4) {
-			RTW_PRINT("%s The gpio number does not included 4~7.\n", __FUNCTION__);
-			return -1;
-		}
-	}
-
-	rtw_ps_deny(adapter, PS_DENY_IOCTL);
-
-	LeaveAllPowerSaveModeDirect(adapter);
-
-	/* Read GPIO direction */
-	direction = (rtw_read8(adapter, REG_GPIO_PIN_CTRL + 2) & BIT(gpio_num)) >> gpio_num;
-	if (direction) {
-		RTW_PRINT("%s Can't register output gpio as interrupt.\n", __FUNCTION__);
-		return -1;
-	}
-
-	/* Config GPIO Mode */
-	rtw_write8(adapter, REG_GPIO_PIN_CTRL + 3, rtw_read8(adapter, REG_GPIO_PIN_CTRL + 3) | BIT(gpio_num));
-
-	/* Register GPIO interrupt handler*/
-	adapter->gpiointpriv.callback[gpio_num] = callback;
-
-	/* Set GPIO interrupt mode, 0:positive edge, 1:negative edge */
-	value = rtw_read8(adapter, REG_GPIO_PIN_CTRL) & BIT(gpio_num);
-	adapter->gpiointpriv.interrupt_mode = rtw_read8(adapter, REG_HSIMR + 2) ^ value;
-	rtw_write8(adapter, REG_GPIO_INTM, adapter->gpiointpriv.interrupt_mode);
-
-	/* Enable GPIO interrupt */
-	adapter->gpiointpriv.interrupt_enable_mask = rtw_read8(adapter, REG_HSIMR + 2) | BIT(gpio_num);
-	rtw_write8(adapter, REG_HSIMR + 2, adapter->gpiointpriv.interrupt_enable_mask);
-
-	rtw_hal_update_hisr_hsisr_ind(adapter, 1);
-
-	rtw_ps_deny_cancel(adapter, PS_DENY_IOCTL);
-
-	return 0;
-}
-int rtw_hal_disable_gpio_interrupt(_adapter *adapter, int gpio_num)
-{
-	u8 value;
-	u8 direction;
-	PHAL_DATA_TYPE phal = GET_HAL_DATA(adapter);
-
-	if (IS_HARDWARE_TYPE_8188E(adapter)) {
-		if (gpio_num > 7 || gpio_num < 4) {
-			RTW_INFO("%s The gpio number does not included 4~7.\n", __FUNCTION__);
-			return -1;
-		}
-	}
-
-	rtw_ps_deny(adapter, PS_DENY_IOCTL);
-
-	LeaveAllPowerSaveModeDirect(adapter);
-
-	/* Config GPIO Mode */
-	rtw_write8(adapter, REG_GPIO_PIN_CTRL + 3, rtw_read8(adapter, REG_GPIO_PIN_CTRL + 3) & ~BIT(gpio_num));
-
-	/* Unregister GPIO interrupt handler*/
-	adapter->gpiointpriv.callback[gpio_num] = NULL;
-
-	/* Reset GPIO interrupt mode, 0:positive edge, 1:negative edge */
-	adapter->gpiointpriv.interrupt_mode = rtw_read8(adapter, REG_GPIO_INTM) & ~BIT(gpio_num);
-	rtw_write8(adapter, REG_GPIO_INTM, 0x00);
-
-	/* Disable GPIO interrupt */
-	adapter->gpiointpriv.interrupt_enable_mask = rtw_read8(adapter, REG_HSIMR + 2) & ~BIT(gpio_num);
-	rtw_write8(adapter, REG_HSIMR + 2, adapter->gpiointpriv.interrupt_enable_mask);
-
-	if (!adapter->gpiointpriv.interrupt_enable_mask)
-		rtw_hal_update_hisr_hsisr_ind(adapter, 0);
-
-	rtw_ps_deny_cancel(adapter, PS_DENY_IOCTL);
-
-	return 0;
-}
-#endif
 
 s8 rtw_hal_ch_sw_iqk_info_search(_adapter *padapter, u8 central_chnl, u8 bw_mode)
 {

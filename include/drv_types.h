@@ -1264,14 +1264,6 @@ struct _ADAPTER {
 	u8	bDriverIsGoingToUnload;
 	u8	init_adpt_in_progress;
 	u8	bHaltInProgress;
-#ifdef CONFIG_GPIO_API
-	u8	pre_gpio_pin;
-	struct gpio_int_priv {
-		u8 interrupt_mode;
-		u8 interrupt_enable_mask;
-		void (*callback[8])(u8 level);
-	} gpiointpriv;
-#endif
 	_thread_hdl_ cmdThread;
 #ifdef CONFIG_EVENT_THREAD_MODE
 	_thread_hdl_ evtThread;

@@ -64,7 +64,6 @@ CONFIG_RTW_LOG_LEVEL = 2
 ######################## Wake On Lan ##########################
 CONFIG_WOWLAN = n
 CONFIG_WAKEUP_TYPE = 0x7 #bit2: deauth, bit1: unicast, bit0: magic pkt.
-CONFIG_GPIO_WAKEUP = n
 CONFIG_WAKEUP_GPIO_IDX = default
 CONFIG_HIGH_ACTIVE = n
 CONFIG_PNO_SUPPORT = n
@@ -332,14 +331,7 @@ EXTRA_CFLAGS += -DCONFIG_PNO_SET_DEBUG
 endif
 endif
 
-ifeq ($(CONFIG_GPIO_WAKEUP), y)
-EXTRA_CFLAGS += -DCONFIG_GPIO_WAKEUP
-ifeq ($(CONFIG_HIGH_ACTIVE), y)
-EXTRA_CFLAGS += -DHIGH_ACTIVE=1
-else
 EXTRA_CFLAGS += -DHIGH_ACTIVE=0
-endif
-endif
 
 ifneq ($(CONFIG_WAKEUP_GPIO_IDX), default)
 EXTRA_CFLAGS += -DWAKEUP_GPIO_IDX=$(CONFIG_WAKEUP_GPIO_IDX)

@@ -283,9 +283,6 @@ void rtl8723d_stop_thread(_adapter *padapter);
 	void rtl8723ds_hal_check_bt_hang(_adapter *adapter);
 #endif
 
-#ifdef CONFIG_GPIO_WAKEUP
-	void HalSetOutPutGPIO(PADAPTER padapter, u8 index, u8 OutPutValue);
-#endif
 #ifdef CONFIG_MP_INCLUDED
 int FirmwareDownloadBT(IN PADAPTER Adapter, PRT_MP_FIRMWARE pFirmware);
 #endif

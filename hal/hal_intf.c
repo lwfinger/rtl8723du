@@ -1046,30 +1046,6 @@ u8 rtw_hal_get_txbuff_rsvd_page_num(_adapter *adapter, bool wowlan)
 	return num;
 }
 
-#ifdef CONFIG_GPIO_API
-void rtw_hal_update_hisr_hsisr_ind(_adapter *padapter, u32 flag)
-{
-	if (padapter->hal_func.update_hisr_hsisr_ind)
-		padapter->hal_func.update_hisr_hsisr_ind(padapter, flag);
-}
-
-int rtw_hal_gpio_func_check(_adapter *padapter, u8 gpio_num)
-{
-	int ret = _SUCCESS;
-
-	if (padapter->hal_func.hal_gpio_func_check)
-		ret = padapter->hal_func.hal_gpio_func_check(padapter, gpio_num);
-
-	return ret;
-}
-
-void rtw_hal_gpio_multi_func_reset(_adapter *padapter, u8 gpio_num)
-{
-	if (padapter->hal_func.hal_gpio_multi_func_reset)
-		padapter->hal_func.hal_gpio_multi_func_reset(padapter, gpio_num);
-}
-#endif
-
 void rtw_hal_fw_correct_bcn(_adapter *padapter)
 {
 	if (padapter->hal_func.fw_correct_bcn)

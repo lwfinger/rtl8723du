@@ -13,10 +13,6 @@
  *
  *****************************************************************************/
 
-#ifdef CONFIG_GPIO_WAKEUP
-#include <linux/gpio.h>
-#endif
-
 #include <drv_types.h>
 
 #if defined(RTW_ENABLE_WIFI_CONTROL_FUNC)
@@ -31,11 +27,6 @@
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0))
 #define strnicmp	strncasecmp
 #endif /* Linux kernel >= 4.0.0 */
-
-#ifdef CONFIG_GPIO_WAKEUP
-#include <linux/interrupt.h>
-#include <linux/irq.h>
-#endif
 
 #include "rtw_version.h"
 
@@ -1046,20 +1037,6 @@ static int wifi_probe(struct platform_device *pdev)
 	else
 		wifi_wake_gpio = wifi_irqres->start;
 
-#ifdef CONFIG_GPIO_WAKEUP
-	RTW_INFO("%s: gpio:%d wifi_wake_gpio:%d\n", __func__,
-	       (int)wifi_irqres->start, wifi_wake_gpio);
-
-	if (wifi_wake_gpio > 0) {
-		gpio_request(wifi_wake_gpio, "oob_irq");
-		gpio_direction_input(wifi_wake_gpio);
-		oob_irq = gpio_to_irq(wifi_wake_gpio);
-		RTW_INFO("%s oob_irq:%d\n", __func__, oob_irq);
-	} else if (wifi_irqres) {
-		oob_irq = wifi_irqres->start;
-		RTW_INFO("%s oob_irq:%d\n", __func__, oob_irq);
-	}
-#endif
 	wifi_control_data = wifi_ctrl;
 
 	wifi_set_power(1, 0);	/* Power On */
@@ -1139,9 +1116,3 @@ static void wifi_del_dev(void)
 	platform_driver_unregister(&wifi_device_legacy);
 }
 #endif /* defined(RTW_ENABLE_WIFI_CONTROL_FUNC) */
-
-#ifdef CONFIG_GPIO_WAKEUP
-void wifi_free_gpio(unsigned int gpio)
-{
-}
-#endif /* CONFIG_GPIO_WAKEUP */

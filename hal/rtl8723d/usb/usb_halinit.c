@@ -123,65 +123,6 @@ void rtl8723du_interface_configure(
 			  pdvobjpriv->RtNumInPipes, pdvobjpriv->RtNumOutPipes);
 }
 
-#ifdef CONFIG_GPIO_WAKEUP
-/*
- * we set it high under init and fw will
- * give us Low Pulse when host wake up
- */
-void HostWakeUpGpioClear(PADAPTER padapter)
-{
-	u32 value32;
-
-	value32 = rtw_read32(padapter, REG_GPIO_PIN_CTRL_2);
-
-	/* set GPIO 12 1 */
-	value32 |= BIT(12); /*4+8 */
-	/* GPIO 12 out put */
-	value32 |= BIT(20); /*4+16 */
-
-	rtw_write32(padapter, REG_GPIO_PIN_CTRL_2, value32);
-} /* HostWakeUpGpioClear */
-
-void HalSetOutPutGPIO(PADAPTER padapter, u8 index, u8 OutPutValue)
-{
-	if (index <= 7) {
-		/* config GPIO mode */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL + 3, rtw_read8(padapter, REG_GPIO_PIN_CTRL + 3) & ~BIT(index));
-
-		/* config GPIO Sel */
-		/* 0: input */
-		/* 1: output */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL + 2, rtw_read8(padapter, REG_GPIO_PIN_CTRL + 2) | BIT(index));
-
-		/* set output value */
-		if (OutPutValue)
-			rtw_write8(padapter, REG_GPIO_PIN_CTRL + 1, rtw_read8(padapter, REG_GPIO_PIN_CTRL + 1) | BIT(index));
-		else
-			rtw_write8(padapter, REG_GPIO_PIN_CTRL + 1, rtw_read8(padapter, REG_GPIO_PIN_CTRL + 1) & ~BIT(index));
-	} else {
-		/* 88C Series: */
-		/* index: 11~8 transform to 3~0 */
-		/* 8723 Series: */
-		/* index: 12~8 transform to 4~0 */
-		index -= 8;
-
-		/* config GPIO mode */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL_2 + 3, rtw_read8(padapter, REG_GPIO_PIN_CTRL_2 + 3) & ~BIT(index));
-
-		/* config GPIO Sel */
-		/* 0: input */
-		/* 1: output */
-		rtw_write8(padapter, REG_GPIO_PIN_CTRL_2 + 2, rtw_read8(padapter, REG_GPIO_PIN_CTRL_2 + 2) | BIT(index));
-
-		/* set output value */
-		if (OutPutValue)
-			rtw_write8(padapter, REG_GPIO_PIN_CTRL_2 + 1, rtw_read8(padapter, REG_GPIO_PIN_CTRL_2 + 1) | BIT(index));
-		else
-			rtw_write8(padapter, REG_GPIO_PIN_CTRL_2 + 1, rtw_read8(padapter, REG_GPIO_PIN_CTRL_2 + 1) & ~BIT(index));
-	}
-}
-#endif
-
 static u32 _InitPowerOn_8723du(PADAPTER padapter)
 {
 	u32 status = _SUCCESS;
@@ -2143,50 +2084,9 @@ u8 SetHwReg8723du(PADAPTER padapter, u8 variable, u8 *val)
 	case HW_VAR_SET_RPWM:
 		rtw_write8(padapter, REG_USB_HRPWM, *val);
 		break;
-
 	case HW_VAR_TRIGGER_GPIO_0:
 		rtl8723du_trigger_gpio_0(padapter);
 		break;
-#ifdef CONFIG_GPIO_WAKEUP
-	case HW_SET_GPIO_WL_CTRL: {
-		u8 enable = *val;
-		u8 value = 0;
-
-		if (WAKEUP_GPIO_IDX != 6)
-			break;
-
-		value = rtw_read8(padapter, REG_GPIO_MUXCFG);
-
-		if (enable && (value & BIT(3))) {
-			value &= ~BIT(3);
-			rtw_write8(padapter, REG_GPIO_MUXCFG, value);
-		} else if (enable == _FALSE) {
-			RTW_INFO("%s: keep WLAN ctrl\n", __func__);
-		}
-		/*0x66 bit4*/
-		value = rtw_read8(padapter, REG_PAD_CTRL_1 + 2);
-		if (enable && (value & BIT(4))) {
-			value &= ~BIT(4);
-			rtw_write8(padapter, REG_PAD_CTRL_1 + 2, value);
-		} else if (enable == _FALSE) {
-			value |= BIT(4);
-			rtw_write8(padapter, REG_PAD_CTRL_1 + 2, value);
-		}
-
-		/*0x66 bit8*/
-		value = rtw_read8(padapter, REG_PAD_CTRL_1 + 3);
-		if (enable && (value & BIT(0))) {
-			value &= ~BIT(0);
-			rtw_write8(padapter, REG_PAD_CTRL_1 + 3, value);
-		} else if (enable == _FALSE) {
-			value |= BIT(0);
-			rtw_write8(padapter, REG_PAD_CTRL_1 + 3, value);
-		}
-
-		RTW_INFO("%s: HW_SET_GPIO_WL_CTRL\n", __func__);
-	}
-		break;
-#endif
 	default:
 		ret = SetHwReg8723D(padapter, variable, val);
 		break;

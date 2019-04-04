@@ -497,98 +497,6 @@ exit:
 }
 #endif /* CONFIG_RTW_CUSTOMER_STR */
 
-/* gpio setting */
-#ifdef CONFIG_GPIO_API
-static ssize_t proc_set_config_gpio(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	char tmp[32] = {0};
-	int num = 0, gpio_pin = 0, gpio_mode = 0; /* gpio_mode:0 input  1:output; */
-
-	if (count < 2)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-		num	= sscanf(tmp, "%d %d", &gpio_pin, &gpio_mode);
-		RTW_INFO("num=%d gpio_pin=%d mode=%d\n", num, gpio_pin, gpio_mode);
-		padapter->pre_gpio_pin = gpio_pin;
-
-		if (gpio_mode == 0 || gpio_mode == 1)
-			rtw_hal_config_gpio(padapter, gpio_pin, gpio_mode);
-	}
-	return count;
-
-}
-static ssize_t proc_set_gpio_output_value(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	char tmp[32] = {0};
-	int num = 0, gpio_pin = 0, pin_mode = 0; /* pin_mode: 1 high         0:low */
-
-	if (count < 2)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-		num	= sscanf(tmp, "%d %d", &gpio_pin, &pin_mode);
-		RTW_INFO("num=%d gpio_pin=%d pin_high=%d\n", num, gpio_pin, pin_mode);
-		padapter->pre_gpio_pin = gpio_pin;
-
-		if (pin_mode == 0 || pin_mode == 1)
-			rtw_hal_set_gpio_output_value(padapter, gpio_pin, pin_mode);
-	}
-	return count;
-}
-static int proc_get_gpio(struct seq_file *m, void *v)
-{
-	u8 gpioreturnvalue = 0;
-	struct net_device *dev = m->private;
-
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	if (!padapter)
-		return -EFAULT;
-	gpioreturnvalue = rtw_hal_get_gpio(padapter, padapter->pre_gpio_pin);
-	RTW_PRINT_SEL(m, "get_gpio %d:%d\n", padapter->pre_gpio_pin, gpioreturnvalue);
-
-	return 0;
-
-}
-static ssize_t proc_set_gpio(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	char tmp[32] = {0};
-	int num = 0, gpio_pin = 0;
-
-	if (count < 1)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-		num	= sscanf(tmp, "%d", &gpio_pin);
-		RTW_INFO("num=%d gpio_pin=%d\n", num, gpio_pin);
-		padapter->pre_gpio_pin = gpio_pin;
-
-	}
-	return count;
-}
-#endif
-
 static ssize_t proc_set_rx_info_msg(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 
@@ -2799,12 +2707,6 @@ const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("tx_info_msg", proc_get_tx_info_msg, NULL),
 	RTW_PROC_HDL_SSEQ("rx_info_msg", proc_get_rx_info_msg, proc_set_rx_info_msg),
 
-#ifdef CONFIG_GPIO_API
-	RTW_PROC_HDL_SSEQ("gpio_info", proc_get_gpio, proc_set_gpio),
-	RTW_PROC_HDL_SSEQ("gpio_set_output_value", NULL, proc_set_gpio_output_value),
-	RTW_PROC_HDL_SSEQ("gpio_set_direction", NULL, proc_set_config_gpio),
-#endif
-
 #ifdef CONFIG_DBG_COUNTER
 	RTW_PROC_HDL_SSEQ("rx_logs", proc_get_rx_logs, NULL),
 	RTW_PROC_HDL_SSEQ("tx_logs", proc_get_tx_logs, NULL),
@@ -2827,9 +2729,6 @@ const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("dis_wow_lps", proc_get_wow_lps_ctrl, proc_set_wow_lps_ctrl),
 #endif
 
-#ifdef CONFIG_GPIO_WAKEUP
-	RTW_PROC_HDL_SSEQ("wowlan_gpio_info", proc_get_wowlan_gpio_info, proc_set_wowlan_gpio_info),
-#endif
 #ifdef CONFIG_P2P_WOWLAN
 	RTW_PROC_HDL_SSEQ("p2p_wowlan_info", proc_get_p2p_wowlan_info, NULL),
 #endif

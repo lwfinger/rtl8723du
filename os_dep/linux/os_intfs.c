@@ -3718,14 +3718,6 @@ void rtw_dev_unload(PADAPTER padapter)
 	if (padapter->bup == _TRUE) {
 		RTW_INFO("==> "FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(padapter));
 
-#ifdef CONFIG_WOWLAN
-#ifdef CONFIG_GPIO_WAKEUP
-		/*default wake up pin change to BT*/
-		RTW_INFO("%s:default wake up pin change to BT\n", __FUNCTION__);
-		rtw_hal_switch_gpio_wl_ctrl(padapter, WAKEUP_GPIO_IDX, _FALSE);
-#endif /* CONFIG_GPIO_WAKEUP */
-#endif /* CONFIG_WOWLAN */
-
 		rtw_set_drv_stopped(padapter);
 #ifdef CONFIG_XMIT_ACK
 		if (padapter->xmitpriv.ack_tx)
@@ -4552,45 +4544,6 @@ int rtw_resume_common(_adapter *padapter)
 
 	return ret;
 }
-
-#ifdef CONFIG_GPIO_API
-u8 rtw_get_gpio(struct net_device *netdev, u8 gpio_num)
-{
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(netdev);
-	return rtw_hal_get_gpio(adapter, gpio_num);
-}
-EXPORT_SYMBOL(rtw_get_gpio);
-
-int  rtw_set_gpio_output_value(struct net_device *netdev, u8 gpio_num, bool isHigh)
-{
-	u8 direction = 0;
-	u8 res = -1;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(netdev);
-	return rtw_hal_set_gpio_output_value(adapter, gpio_num, isHigh);
-}
-EXPORT_SYMBOL(rtw_set_gpio_output_value);
-
-int rtw_config_gpio(struct net_device *netdev, u8 gpio_num, bool isOutput)
-{
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(netdev);
-	return rtw_hal_config_gpio(adapter, gpio_num, isOutput);
-}
-EXPORT_SYMBOL(rtw_config_gpio);
-int rtw_register_gpio_interrupt(struct net_device *netdev, int gpio_num, void(*callback)(u8 level))
-{
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(netdev);
-	return rtw_hal_register_gpio_interrupt(adapter, gpio_num, callback);
-}
-EXPORT_SYMBOL(rtw_register_gpio_interrupt);
-
-int rtw_disable_gpio_interrupt(struct net_device *netdev, int gpio_num)
-{
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(netdev);
-	return rtw_hal_disable_gpio_interrupt(adapter, gpio_num);
-}
-EXPORT_SYMBOL(rtw_disable_gpio_interrupt);
-
-#endif /* #ifdef CONFIG_GPIO_API */
 
 #ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
 

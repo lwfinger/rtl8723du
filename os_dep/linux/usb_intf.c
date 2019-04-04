@@ -56,12 +56,6 @@ static void rtw_dev_shutdown(struct device *dev)
 				if (!rtw_is_surprise_removed(adapter)) {
 					struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(adapter);
 					#ifdef CONFIG_WOWLAN
-					#ifdef CONFIG_GPIO_WAKEUP
-					/*default wake up pin change to BT*/
-					RTW_INFO("%s:default wake up pin change to BT\n", __FUNCTION__);
-					rtw_hal_switch_gpio_wl_ctrl(adapter, WAKEUP_GPIO_IDX, _FALSE);
-					#endif /* CONFIG_GPIO_WAKEUP */
-
 					if (pwrctl->wowlan_mode == _TRUE)
 						RTW_PRINT("%s wowlan_mode ==_TRUE do not run rtw_hal_deinit()\n", __FUNCTION__);
 					else

@@ -394,9 +394,6 @@ struct pwrctrl_priv {
 	u8		wowlan_pno_enable;
 	u8		wowlan_in_resume;
 
-#ifdef CONFIG_GPIO_WAKEUP
-	u8		is_high_active;
-#endif /* CONFIG_GPIO_WAKEUP */
 #ifdef CONFIG_WOWLAN
 	bool		default_patterns_en;
 #ifdef CONFIG_IPV6

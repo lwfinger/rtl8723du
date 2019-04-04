@@ -529,23 +529,9 @@ int rtw_hal_reset_tsf(_adapter *adapter, u8 reset_port);
 s32 rtw_hal_set_wifi_port_id_cmd(_adapter *adapter);
 #endif
 
-#ifdef CONFIG_GPIO_API
-	u8 rtw_hal_get_gpio(_adapter *adapter, u8 gpio_num);
-	int rtw_hal_set_gpio_output_value(_adapter *adapter, u8 gpio_num, bool isHigh);
-	int rtw_hal_config_gpio(_adapter *adapter, u8 gpio_num, bool isOutput);
-	int rtw_hal_register_gpio_interrupt(_adapter *adapter, int gpio_num, void(*callback)(u8 level));
-	int rtw_hal_disable_gpio_interrupt(_adapter *adapter, int gpio_num);
-#endif
-
 s8 rtw_hal_ch_sw_iqk_info_search(_adapter *padapter, u8 central_chnl, u8 bw_mode);
 void rtw_hal_ch_sw_iqk_info_backup(_adapter *adapter);
 void rtw_hal_ch_sw_iqk_info_restore(_adapter *padapter, u8 ch_sw_use_case);
-
-#ifdef CONFIG_GPIO_WAKEUP
-	void rtw_hal_switch_gpio_wl_ctrl(_adapter *padapter, u8 index, u8 enable);
-	void rtw_hal_set_output_gpio(_adapter *padapter, u8 index, u8 outputval);
-	void rtw_hal_set_input_gpio(_adapter *padapter, u8 index);
-#endif
 
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
 	extern char *rtw_phy_file_path;

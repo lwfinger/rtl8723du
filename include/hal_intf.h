@@ -136,9 +136,6 @@ typedef enum _HW_VARIABLES {
 	HW_VAR_WAKEUP_REASON,
 #endif
 	HW_VAR_RPWM_TOG,
-#ifdef CONFIG_GPIO_WAKEUP
-	HW_SET_GPIO_WL_CTRL,
-#endif
 	HW_VAR_SYS_CLKR,
 	HW_VAR_NAV_UPPER,
 	HW_VAR_RPT_TIMER_SETTING,
@@ -390,11 +387,6 @@ struct hal_ops {
 	void (*clear_interrupt)(_adapter *padapter);
 #endif
 	u8(*hal_get_tx_buff_rsvd_page_num)(_adapter *adapter, bool wowlan);
-#ifdef CONFIG_GPIO_API
-	void (*update_hisr_hsisr_ind)(PADAPTER padapter, u32 flag);
-	int (*hal_gpio_func_check)(_adapter *padapter, u8 gpio_num);
-	void (*hal_gpio_multi_func_reset)(_adapter *padapter, u8 gpio_num);
-#endif
 	void (*fw_correct_bcn)(PADAPTER padapter);
 
 #ifdef RTW_HALMAC
@@ -699,12 +691,6 @@ s32 rtw_hal_fill_h2c_cmd(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBu
 void rtw_hal_fill_fake_txdesc(_adapter *padapter, u8 *pDesc, u32 BufferLen,
 			      u8 IsPsPoll, u8 IsBTQosNull, u8 bDataFrame);
 u8 rtw_hal_get_txbuff_rsvd_page_num(_adapter *adapter, bool wowlan);
-
-#ifdef CONFIG_GPIO_API
-void rtw_hal_update_hisr_hsisr_ind(_adapter *padapter, u32 flag);
-int rtw_hal_gpio_func_check(_adapter *padapter, u8 gpio_num);
-void rtw_hal_gpio_multi_func_reset(_adapter *padapter, u8 gpio_num);
-#endif
 
 void rtw_hal_fw_correct_bcn(_adapter *padapter);
 s32 rtw_hal_fw_dl(_adapter *padapter, u8 wowlan);

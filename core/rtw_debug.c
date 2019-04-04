@@ -115,10 +115,6 @@ void dump_drv_cfg(void *sel)
 
 #ifdef CONFIG_WOWLAN
 	RTW_PRINT_SEL(sel, "CONFIG_WOWLAN - ");
-
-#ifdef CONFIG_GPIO_WAKEUP
-	RTW_PRINT_SEL(sel, "CONFIG_GPIO_WAKEUP - WAKEUP_GPIO_IDX:%d\n", WAKEUP_GPIO_IDX);
-#endif
 #endif
 
 #ifdef CONFIG_TDLS
@@ -3942,71 +3938,6 @@ int proc_get_wakeup_reason(struct seq_file *m, void *v)
 	return 0;
 }
 #endif /*CONFIG_WOWLAN*/
-
-#ifdef CONFIG_GPIO_WAKEUP
-int proc_get_wowlan_gpio_info(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
-	u8 val = pwrpriv->is_high_active;
-
-	RTW_PRINT_SEL(m, "wakeup_gpio_idx: %d\n", WAKEUP_GPIO_IDX);
-	RTW_PRINT_SEL(m, "high_active: %d\n", val);
-
-	return 0;
-}
-
-ssize_t proc_set_wowlan_gpio_info(struct file *file, const char __user *buffer,
-				  size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
-	char tmp[32] = {0};
-	int num = 0;
-	u32 is_high_active = 0;
-	u8 val8 = 0;
-
-	if (count < 1)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-
-		num = sscanf(tmp, "%u", &is_high_active);
-
-		is_high_active = is_high_active == 0 ? 0 : 1;
-
-		pwrpriv->is_high_active = is_high_active;
-
-		rtw_ps_deny(padapter, PS_DENY_IOCTL);
-		LeaveAllPowerSaveModeDirect(padapter);
-
-		#ifdef CONFIG_WAKEUP_GPIO_INPUT_MODE
-		if (pwrpriv->is_high_active == 0)
-			rtw_hal_set_input_gpio(padapter, WAKEUP_GPIO_IDX);
-		else
-			rtw_hal_set_output_gpio(padapter, WAKEUP_GPIO_IDX, 0);
-		#else
-		val8 = (pwrpriv->is_high_active == 0) ? 1 : 0;
-		rtw_hal_set_output_gpio(padapter, WAKEUP_GPIO_IDX, val8);
-		#endif
-		rtw_ps_deny_cancel(padapter, PS_DENY_IOCTL);
-
-		RTW_INFO("set %s %d\n", "gpio_high_active",
-			 pwrpriv->is_high_active);
-		RTW_INFO("%s: set GPIO_%d %d as default.\n",
-			 __func__, WAKEUP_GPIO_IDX, val8);
-	}
-
-	return count;
-}
-#endif /* CONFIG_GPIO_WAKEUP */
 
 #ifdef CONFIG_P2P_WOWLAN
 int proc_get_p2p_wowlan_info(struct seq_file *m, void *v)
