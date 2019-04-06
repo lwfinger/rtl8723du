@@ -197,10 +197,10 @@ typedef enum _RT_MEDIA_STATUS {
 } RT_MEDIA_STATUS;
 
 #define MAX_DLFW_PAGE_SIZE			4096	/* @ page : 4k bytes */
-typedef enum _FIRMWARE_SOURCE {
+enum firmware_source {
 	FW_SOURCE_IMG_FILE = 0,
 	FW_SOURCE_HEADER_FILE = 1,		/* from header file */
-} FIRMWARE_SOURCE, *PFIRMWARE_SOURCE;
+};
 
 typedef enum _CH_SW_USE_CASE {
 	CH_SW_USE_CASE_TDLS		= 0,

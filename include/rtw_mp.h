@@ -384,18 +384,15 @@ struct bb_reg_param {
 	u32 value;
 };
 
-typedef struct _MP_FIRMWARE {
-	FIRMWARE_SOURCE eFWSource;
+struct rt_mp_firmware {
+	enum firmware_source eFWSource;
 #ifdef CONFIG_EMBEDDED_FWIMG
 	u8		*szFwBuffer;
 #else
 	u8			szFwBuffer[0x8000];
 #endif
 	u32		ulFwLength;
-} RT_MP_FIRMWARE, *PRT_MP_FIRMWARE;
-
-
-
+};
 
 /* *********************************************************************** */
 

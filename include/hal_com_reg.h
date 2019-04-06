@@ -1613,7 +1613,6 @@ Current IOREG MAP
 /* I/O bus domain address mapping */
 #define SDIO_LOCAL_BASE		0x10250000
 #define WLAN_IOREG_BASE		0x10260000
-#define FIRMWARE_FIFO_BASE	0x10270000
 #define TX_HIQ_BASE				0x10310000
 #define TX_MIQ_BASE				0x10320000
 #define TX_LOQ_BASE				0x10330000

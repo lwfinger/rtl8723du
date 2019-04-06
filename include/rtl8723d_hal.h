@@ -41,21 +41,21 @@
 #define IS_FW_HEADER_EXIST_8723D(_pFwHdr)\
 	((le16_to_cpu(_pFwHdr->Signature) & 0xFFF0) == 0x23D0)
 
-typedef struct _RT_FIRMWARE {
-	FIRMWARE_SOURCE	eFWSource;
+struct rt_firmware {
+	enum firmware_source	eFWSource;
 #ifdef CONFIG_EMBEDDED_FWIMG
 	u8			*szFwBuffer;
 #else
 	u8			szFwBuffer[FW_8723D_SIZE];
 #endif
 	u32			ulFwLength;
-} RT_FIRMWARE_8723D, *PRT_FIRMWARE_8723D;
+};
 
 /*
  * This structure must be cared byte-ordering
  *
  * Added by tynli. 2009.12.04. */
-typedef struct _RT_8723D_FIRMWARE_HDR {
+struct rt_8723d_firmware_hdr {
 	/* 8-byte alinment required */
 
 	/* --- LONG WORD 0 ---- */
@@ -80,7 +80,7 @@ typedef struct _RT_8723D_FIRMWARE_HDR {
 	/* --- LONG WORD 3 ---- */
 	u32		Rsvd4;
 	u32		Rsvd5;
-} RT_8723D_FIRMWARE_HDR, *PRT_8723D_FIRMWARE_HDR;
+};
 
 #define DRIVER_EARLY_INT_TIME_8723D		0x05
 #define BCN_DMA_ATIME_INT_TIME_8723D		0x02
@@ -269,7 +269,7 @@ void rtl8723d_stop_thread(_adapter *padapter);
 #endif
 
 #ifdef CONFIG_MP_INCLUDED
-int FirmwareDownloadBT(IN PADAPTER Adapter, PRT_MP_FIRMWARE pFirmware);
+int FirmwareDownloadBT(IN PADAPTER Adapter, struct rt_mp_firmware *pFirmware);
 #endif
 void CCX_FwC2HTxRpt_8723d(PADAPTER padapter, u8 *pdata, u8 len);
 

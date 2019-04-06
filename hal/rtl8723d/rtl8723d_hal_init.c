@@ -594,7 +594,7 @@ _CheckWLANFwPatchBTFwReady(
 	return ret;
 }
 
-int ReservedPage_Compare(PADAPTER Adapter, PRT_MP_FIRMWARE pFirmware, u32 BTPatchSize)
+int ReservedPage_Compare(PADAPTER Adapter, struct rt_mp_firmware *pFirmware, u32 BTPatchSize)
 {
 	u8 temp, ret, lastBTsz;
 	u32 u1bTmp = 0, address_start = 0, count = 0, i = 0;
@@ -689,7 +689,7 @@ int ReservedPage_Compare(PADAPTER Adapter, PRT_MP_FIRMWARE pFirmware, u32 BTPatc
  * 32 bytes description of part4. Using this method, we can put the whole bt firmware to 0x30 and only
  * has 32 bytes descrption at the head of part 1.
 */
-s32 FirmwareDownloadBT(PADAPTER padapter, PRT_MP_FIRMWARE pFirmware)
+s32 FirmwareDownloadBT(PADAPTER padapter, struct rt_mp_firmware *pFirmware)
 {
 	s32 rtStatus;
 	u8 *pBTFirmwareBuf;
@@ -722,8 +722,8 @@ s32 rtl8723d_FirmwareDownload(PADAPTER padapter, BOOLEAN  bUsedWoWLANFw)
 	u32			FwImageLen;
 	u8			*pFwImageFileName;
 	u8			*pucMappedFile = NULL;
-	PRT_FIRMWARE_8723D	pFirmware = NULL;
-	PRT_8723D_FIRMWARE_HDR		pFwHdr = NULL;
+	struct rt_firmware	*pFirmware = NULL;
+	struct rt_8723d_firmware_hdr *pFwHdr = NULL;
 	u8			*pFirmwareBuf;
 	u32			FirmwareLen;
 #ifdef CONFIG_FILE_FWIMG
@@ -742,7 +742,7 @@ s32 rtl8723d_FirmwareDownload(PADAPTER padapter, BOOLEAN  bUsedWoWLANFw)
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
 
 
-	pFirmware = (PRT_FIRMWARE_8723D)rtw_zmalloc(sizeof(RT_FIRMWARE_8723D));
+	pFirmware = rtw_zmalloc(sizeof(struct rt_firmware));
 
 	if (!pFirmware) {
 		rtStatus = _FAIL;
@@ -819,7 +819,7 @@ s32 rtl8723d_FirmwareDownload(PADAPTER padapter, BOOLEAN  bUsedWoWLANFw)
 	FirmwareLen = pFirmware->ulFwLength;
 
 	/* To Check Fw header. Added by tynli. 2009.12.04. */
-	pFwHdr = (PRT_8723D_FIRMWARE_HDR)pFirmwareBuf;
+	pFwHdr = (struct rt_8723d_firmware_hdr *)pFirmwareBuf;
 
 	pHalData->firmware_version =  le16_to_cpu(pFwHdr->Version);
 	pHalData->firmware_sub_version = le16_to_cpu(pFwHdr->Subversion);
@@ -967,7 +967,7 @@ DLFW_FAIL:
 
 exit:
 	if (pFirmware)
-		rtw_mfree((u8 *)pFirmware, sizeof(RT_FIRMWARE_8723D));
+		rtw_mfree((u8 *)pFirmware, sizeof(struct rt_firmware));
 
 	rtl8723d_InitializeFirmwareVars(padapter);
 
