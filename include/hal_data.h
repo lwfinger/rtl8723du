@@ -172,11 +172,6 @@ typedef struct _BB_INIT_REGISTER {
 struct kfree_data_t {
 	u8 flag;
 	s8 bb_gain[BB_GAIN_NUM][RF_PATH_MAX];
-
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	s8 pa_bias_5g[RF_PATH_MAX];
-	s8 pad_bias_5g[RF_PATH_MAX];
-#endif
 	s8 thermal;
 };
 
@@ -283,13 +278,6 @@ struct txpwr_lmt_ent {
 		[TXPWR_LMT_RS_NUM_2G]
 		[CENTER_CH_2G_NUM]
 		[MAX_TX_COUNT];
-
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	s8 lmt_5g[MAX_5G_BANDWIDTH_NUM]
-		[TXPWR_LMT_RS_NUM_5G]
-		[CENTER_CH_5G_ALL_NUM]
-		[MAX_TX_COUNT];
-#endif
 
 	char regd_name[0];
 };
@@ -411,16 +399,6 @@ typedef struct hal_com_data {
 	s8	OFDM_24G_Diff[MAX_RF_PATH][MAX_TX_COUNT];
 	s8	BW20_24G_Diff[MAX_RF_PATH][MAX_TX_COUNT];
 	s8	BW40_24G_Diff[MAX_RF_PATH][MAX_TX_COUNT];
-
-	/* 5G TX power info for target TX power*/
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	u8	Index5G_BW40_Base[MAX_RF_PATH][CENTER_CH_5G_ALL_NUM];
-	u8	Index5G_BW80_Base[MAX_RF_PATH][CENTER_CH_5G_80M_NUM];
-	s8	OFDM_5G_Diff[MAX_RF_PATH][MAX_TX_COUNT];
-	s8	BW20_5G_Diff[MAX_RF_PATH][MAX_TX_COUNT];
-	s8	BW40_5G_Diff[MAX_RF_PATH][MAX_TX_COUNT];
-	s8	BW80_5G_Diff[MAX_RF_PATH][MAX_TX_COUNT];
-#endif
 
 	u8 txpwr_by_rate_undefined_band_path[TX_PWR_BY_RATE_NUM_BAND]
 		[TX_PWR_BY_RATE_NUM_RF];

@@ -324,9 +324,6 @@ struct registry_priv {
 
 	u8 target_tx_pwr_valid;
 	s8 target_tx_pwr_2g[RF_PATH_MAX][RATE_SECTION_NUM];
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	s8 target_tx_pwr_5g[RF_PATH_MAX][RATE_SECTION_NUM - 1];
-#endif
 
 	s8	TxBBSwing_2G;
 	s8	TxBBSwing_5G;
@@ -829,10 +826,6 @@ struct rf_ctl_t {
 	const char *regd_name;
 
 	u8 txpwr_lmt_2g_cck_ofdm_state;
-	#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	u8 txpwr_lmt_5g_cck_ofdm_state;
-	u8 txpwr_lmt_5g_20_40_ref;
-	#endif
 #endif
 
 #ifdef CONFIG_DFS_MASTER

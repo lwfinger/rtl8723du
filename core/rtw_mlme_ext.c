@@ -233,71 +233,6 @@ static struct ch_list_t RTW_ChannelPlan2G[] = {
 	/* 9, RTW_RD_2G_IC1 */		CH_LIST_ENT(13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13),
 };
 
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-static struct ch_list_t RTW_ChannelPlan5G[] = {
-	/* 0, RTW_RD_5G_NULL */		CH_LIST_ENT(0),
-	/* 1, RTW_RD_5G_ETSI1 */		CH_LIST_ENT(19, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140),
-	/* 2, RTW_RD_5G_ETSI2 */		CH_LIST_ENT(24, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 3, RTW_RD_5G_ETSI3 */		CH_LIST_ENT(22, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 149, 153, 157, 161, 165),
-	/* 4, RTW_RD_5G_FCC1 */		CH_LIST_ENT(24, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 5, RTW_RD_5G_FCC2 */		CH_LIST_ENT(9, 36, 40, 44, 48, 149, 153, 157, 161, 165),
-	/* 6, RTW_RD_5G_FCC3 */		CH_LIST_ENT(13, 36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161, 165),
-	/* 7, RTW_RD_5G_FCC4 */		CH_LIST_ENT(12, 36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161),
-	/* 8, RTW_RD_5G_FCC5 */		CH_LIST_ENT(5, 149, 153, 157, 161, 165),
-	/* 9, RTW_RD_5G_FCC6 */		CH_LIST_ENT(8, 36, 40, 44, 48, 52, 56, 60, 64),
-	/* 10, RTW_RD_5G_FCC7 */	CH_LIST_ENT(21, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 11, RTW_RD_5G_IC1 */		CH_LIST_ENT(21, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 12, RTW_RD_5G_KCC1 */	CH_LIST_ENT(19, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 149, 153, 157, 161),
-	/* 13, RTW_RD_5G_MKK1 */	CH_LIST_ENT(19, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140),
-	/* 14, RTW_RD_5G_MKK2 */	CH_LIST_ENT(8, 36, 40, 44, 48, 52, 56, 60, 64),
-	/* 15, RTW_RD_5G_MKK3 */	CH_LIST_ENT(11, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140),
-	/* 16, RTW_RD_5G_NCC1 */	CH_LIST_ENT(16, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 17, RTW_RD_5G_NCC2 */	CH_LIST_ENT(8, 56, 60, 64, 149, 153, 157, 161, 165),
-	/* 18, RTW_RD_5G_NCC3 */	CH_LIST_ENT(5, 149, 153, 157, 161, 165),
-	/* 19, RTW_RD_5G_ETSI4 */	CH_LIST_ENT(4, 36, 40, 44, 48),
-	/* 20, RTW_RD_5G_ETSI5 */	CH_LIST_ENT(21, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 21, RTW_RD_5G_FCC8 */	CH_LIST_ENT(4, 149, 153, 157, 161),
-	/* 22, RTW_RD_5G_ETSI6 */	CH_LIST_ENT(8, 36, 40, 44, 48, 52, 56, 60, 64),
-	/* 23, RTW_RD_5G_ETSI7 */	CH_LIST_ENT(13, 36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161, 165),
-	/* 24, RTW_RD_5G_ETSI8 */	CH_LIST_ENT(9, 36, 40, 44, 48, 149, 153, 157, 161, 165),
-	/* 25, RTW_RD_5G_ETSI9 */	CH_LIST_ENT(11, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140),
-	/* 26, RTW_RD_5G_ETSI10 */	CH_LIST_ENT(5, 149, 153, 157, 161, 165),
-	/* 27, RTW_RD_5G_ETSI11 */	CH_LIST_ENT(16, 36, 40, 44, 48, 52, 56, 60, 64, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 28, RTW_RD_5G_NCC4 */	CH_LIST_ENT(17, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 29, RTW_RD_5G_ETSI12 */	CH_LIST_ENT(4, 149, 153, 157, 161),
-	/* 30, RTW_RD_5G_FCC9 */	CH_LIST_ENT(21, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 31, RTW_RD_5G_ETSI13 */	CH_LIST_ENT(16, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140),
-	/* 32, RTW_RD_5G_FCC10 */	CH_LIST_ENT(20, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161),
-	/* 33, RTW_RD_5G_MKK4 */	CH_LIST_ENT(4, 36, 40, 44, 48),
-	/* 34, RTW_RD_5G_ETSI14 */	CH_LIST_ENT(11, 36, 40, 44, 48, 52, 56, 60, 64, 132, 136, 140),
-	/* 35, RTW_RD_5G_FCC11 */	CH_LIST_ENT(25, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 149, 153, 157, 161, 165),
-	/* 36, RTW_RD_5G_ETSI15 */	CH_LIST_ENT(21, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 149, 153, 157, 161, 165),
-	/* 37, RTW_RD_5G_MKK5 */	CH_LIST_ENT(24, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 38, RTW_RD_5G_ETSI16 */	CH_LIST_ENT(24, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 39, RTW_RD_5G_ETSI17 */	CH_LIST_ENT(24, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 40, RTW_RD_5G_FCC12*/	CH_LIST_ENT(24, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 41, RTW_RD_5G_FCC13 */	CH_LIST_ENT(24, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 42, RTW_RD_5G_FCC14 */	CH_LIST_ENT(21, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 43, RTW_RD_5G_FCC15 */	CH_LIST_ENT(13, 36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161, 165),
-	/* 44, RTW_RD_5G_FCC16 */	CH_LIST_ENT(13, 36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161, 165),
-	/* 45, RTW_RD_5G_ETSI18 */	CH_LIST_ENT(9, 36, 40, 44, 48, 149, 153, 157, 161, 165),
-	/* 46, RTW_RD_5G_ETSI19 */	CH_LIST_ENT(24, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 47, RTW_RD_5G_FCC17 */	CH_LIST_ENT(16, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140),
-	/* 48, RTW_RD_5G_ETSI20 */	CH_LIST_ENT(9, 52, 56, 60, 64, 149, 153, 157, 161, 165),
-	/* 49, RTW_RD_5G_IC2 */		CH_LIST_ENT(22, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 144, 149, 153, 157, 161, 165),
-	/* 50, RTW_RD_5G_ETSI21 */	CH_LIST_ENT(13, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165),
-	/* 51, RTW_RD_5G_FCC18 */	CH_LIST_ENT(8, 100, 104, 108, 112, 116, 132, 136, 140),
-	/* 52, RTW_RD_5G_WORLD */	CH_LIST_ENT(25, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 149, 153, 157, 161, 165),
-	/* 53, RTW_RD_5G_CHILE1 */	CH_LIST_ENT(25, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 149, 153, 157, 161, 165),
-	/* 54, RTW_RD_5G_ACMA1 */	CH_LIST_ENT(21, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140, 149, 153, 157, 161, 165),
-
-	/* === Below are driver defined for legacy channel plan compatible, NO static index assigned ==== */
-	/* RTW_RD_5G_OLD_FCC1 */	CH_LIST_ENT(20, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 136, 140, 149, 153, 157, 161, 165),
-	/* RTW_RD_5G_OLD_NCC1 */	CH_LIST_ENT(15, 56, 60, 64, 100, 104, 108, 112, 116, 136, 140, 149, 153, 157, 161, 165),
-	/* RTW_RD_5G_OLD_KCC1 */	CH_LIST_ENT(20, 36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 149, 153, 157, 161, 165),
-};
-#endif /* CONFIG_IEEE80211_BAND_5GHZ */
-
 static RT_CHANNEL_PLAN_MAP	RTW_ChannelPlanMap[RTW_CHPLAN_MAX] = {
 	/* ===== 0x00 ~ 0x1F, legacy channel plan ===== */
 	CHPLAN_ENT(RTW_RD_2G_FCC1,		RTW_RD_5G_KCC1,		TXPWR_LMT_FCC),		/* 0x00, RTW_CHPLAN_FCC */
@@ -438,11 +373,7 @@ bool rtw_chplan_is_empty(u8 id)
 	else
 		chplan_map = &RTW_ChannelPlanMap[id];
 
-	if (chplan_map->Index2G == RTW_RD_2G_NULL
-		#ifdef CONFIG_IEEE80211_BAND_5GHZ
-		&& chplan_map->Index5G == RTW_RD_5G_NULL
-		#endif
-	)
+	if (chplan_map->Index2G == RTW_RD_2G_NULL)
 		return _TRUE;
 
 	return _FALSE;
@@ -616,49 +547,6 @@ static u8 init_channel_set(_adapter *padapter, u8 ChannelPlan, RT_CHANNEL_INFO *
 			chanset_size++;
 		}
 	}
-
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	if (b5GBand) {
-		if (ChannelPlan == RTW_CHPLAN_REALTEK_DEFINE)
-			Index5G = RTW_CHANNEL_PLAN_MAP_REALTEK_DEFINE.Index5G;
-		else
-			Index5G = RTW_ChannelPlanMap[ChannelPlan].Index5G;
-
-		for (index = 0; index < CH_LIST_LEN(RTW_ChannelPlan5G[Index5G]); index++) {
-			if (rtw_regsty_is_excl_chs(regsty, CH_LIST_CH(RTW_ChannelPlan5G[Index5G], index)) == _TRUE)
-				continue;
-			#ifndef CONFIG_DFS
-			if (rtw_is_dfs_ch(CH_LIST_CH(RTW_ChannelPlan5G[Index5G], index)))
-				continue;
-			#endif
-
-			if (chanset_size >= MAX_CHANNEL_NUM) {
-				RTW_WARN("chset size can't exceed MAX_CHANNEL_NUM(%u)\n", MAX_CHANNEL_NUM);
-				break;
-			}
-
-			channel_set[chanset_size].ChannelNum = CH_LIST_CH(RTW_ChannelPlan5G[Index5G], index);
-
-			if ((ChannelPlan == RTW_CHPLAN_WORLD_WIDE_5G) /* all channels passive */
-				|| (rtw_is_5g_band1(channel_set[chanset_size].ChannelNum)
-					&& rtw_rd_5g_band1_passive(Index5G)) /* band1 passive */
-				|| (rtw_is_5g_band4(channel_set[chanset_size].ChannelNum)
-					&& rtw_rd_5g_band4_passive(Index5G)) /* band4 passive */
-				|| (rtw_is_dfs_ch(channel_set[chanset_size].ChannelNum)) /* DFS channel(band2, 3) passive */
-			)
-				channel_set[chanset_size].ScanType = SCAN_PASSIVE;
-			else
-				channel_set[chanset_size].ScanType = SCAN_ACTIVE;
-
-			chanset_size++;
-		}
-	}
-
-	#ifdef CONFIG_DFS_MASTER
-	for (i = 0; i < chanset_size; i++)
-		channel_set[i].non_ocp_end_time = rtw_get_current_time();
-	#endif
-#endif /* CONFIG_IEEE80211_BAND_5GHZ */
 
 	if (chanset_size)
 		RTW_INFO(FUNC_ADPT_FMT" ChannelPlan ID:0x%02x, ch num:%d\n"
@@ -1267,15 +1155,6 @@ void dump_chplan_test(void *sel)
 				RTW_PRINT_SEL(sel, "invalid ch:%u at (%d,%d)\n", CH_LIST_CH(RTW_ChannelPlan2G[i], j), i, j);
 		}
 	}
-
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	for (i = 0; i < RTW_RD_5G_MAX; i++) {
-		for (j = 0; j < CH_LIST_LEN(RTW_ChannelPlan5G[i]); j++) {
-			if (rtw_ch2freq(CH_LIST_CH(RTW_ChannelPlan5G[i], j)) == 0)
-				RTW_PRINT_SEL(sel, "invalid ch:%u at (%d,%d)\n", CH_LIST_CH(RTW_ChannelPlan5G[i], j), i, j);
-		}
-	}
-#endif
 }
 
 void dump_chset(void *sel, RT_CHANNEL_INFO *ch_set)

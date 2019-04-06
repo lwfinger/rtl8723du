@@ -206,17 +206,10 @@ struct ch_list_t {
 
 typedef struct _RT_CHANNEL_PLAN_MAP {
 	u8 Index2G;
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	u8 Index5G;
-#endif
 	u8 regd; /* value of REGULATION_TXPWR_LMT */
 } RT_CHANNEL_PLAN_MAP, *PRT_CHANNEL_PLAN_MAP;
 
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-#define CHPLAN_ENT(i2g, i5g, regd) {i2g, i5g, regd}
-#else
 #define CHPLAN_ENT(i2g, i5g, regd) {i2g, regd}
-#endif
 
 enum Associated_AP {
 	atherosAP	= 0,

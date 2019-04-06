@@ -249,11 +249,6 @@ int rtw_dev_get_feature_set(struct net_device *dev)
 
 	feature_set |= WIFI_FEATURE_INFRA;
 
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	if (is_supported_5g(adapter_to_regsty(adapter)->wireless_mode))
-		feature_set |= WIFI_FEATURE_INFRA_5G;
-#endif
-
 	feature_set |= WIFI_FEATURE_P2P;
 	feature_set |= WIFI_FEATURE_SOFT_AP;
 

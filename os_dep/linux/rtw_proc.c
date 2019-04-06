@@ -1426,7 +1426,6 @@ static int proc_get_tx_bw_mode(struct seq_file *m, void *v)
 
 	RTW_PRINT_SEL(m, "0x%02x\n", adapter->driver_tx_bw_mode);
 	RTW_PRINT_SEL(m, "2.4G:%s\n", ch_width_str(ADAPTER_TX_BW_2G(adapter)));
-	RTW_PRINT_SEL(m, "5G:%s\n", ch_width_str(ADAPTER_TX_BW_5G(adapter)));
 
 	return 0;
 }
@@ -1458,9 +1457,7 @@ static ssize_t proc_set_tx_bw_mode(struct file *file, const char __user *buffer,
 			goto exit;
 
 		if ((MLME_STATE(adapter) & WIFI_ASOC_STATE)
-			&& ((mlmeext->cur_channel <= 14 && BW_MODE_2G(bw_mode) != ADAPTER_TX_BW_2G(adapter))
-				|| (mlmeext->cur_channel >= 36 && BW_MODE_5G(bw_mode) != ADAPTER_TX_BW_5G(adapter)))
-		) {
+			&& ((mlmeext->cur_channel <= 14 && BW_MODE_2G(bw_mode) != ADAPTER_TX_BW_2G(adapter)))) {
 			/* RA mask update needed */
 			update = _TRUE;
 		}
@@ -1490,11 +1487,6 @@ static int proc_get_hal_txpwr_info(struct seq_file *m, void *v)
 
 	if (hal_is_band_support(adapter, BAND_ON_2_4G))
 		dump_hal_txpwr_info_2g(m, adapter, hal_spec->rfpath_num_2g, hal_spec->max_tx_cnt);
-
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	if (hal_is_band_support(adapter, BAND_ON_5G))
-		dump_hal_txpwr_info_5g(m, adapter, hal_spec->rfpath_num_5g, hal_spec->max_tx_cnt);
-#endif
 
 	return 0;
 }
@@ -1742,18 +1734,6 @@ static ssize_t proc_set_kfree_bb_gain(struct file *file, const char __user *buff
 		}
 		if (strcmp("2G", ch_band_Group) == 0)
 			chidx = BB_GAIN_2G;
-#ifdef CONFIG_IEEE80211_BAND_5GHZ
-		else if (strcmp("5GLB1", ch_band_Group) == 0)
-			chidx = BB_GAIN_5GLB1;
-		else if (strcmp("5GLB2", ch_band_Group) == 0)
-			chidx = BB_GAIN_5GLB2;
-		else if (strcmp("5GMB1", ch_band_Group) == 0)
-			chidx = BB_GAIN_5GMB1;
-		else if (strcmp("5GMB2", ch_band_Group) == 0)
-			chidx = BB_GAIN_5GMB2;
-		else if (strcmp("5GHB", ch_band_Group) == 0)
-			chidx = BB_GAIN_5GHB;
-#endif /*CONFIG_IEEE80211_BAND_5GHZ*/
 		else {
 			RTW_INFO("Error Head Format, channel Group select\n,Please input:\t 2G , 5GLB1 , 5GLB2 , 5GMB1 , 5GMB2 , 5GHB\n");
 			return count;

@@ -365,7 +365,6 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 26)) && (LINUX_VERSION_CODE < KERNEL_VERSION(4, 7, 0))
 #define NL80211_BAND_2GHZ IEEE80211_BAND_2GHZ
-#define NL80211_BAND_5GHZ IEEE80211_BAND_5GHZ
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
 #define NL80211_BAND_60GHZ IEEE80211_BAND_60GHZ
 #endif
@@ -374,7 +373,7 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 
 
 #define rtw_band_to_nl80211_band(band) \
 	(band == BAND_ON_2_4G) ? NL80211_BAND_2GHZ : \
-	(band == BAND_ON_5G) ? NL80211_BAND_5GHZ : NUM_NL80211_BANDS
+	NUM_NL80211_BANDS
 
 #include "rtw_cfgvendor.h"
 

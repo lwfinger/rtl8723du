@@ -2421,24 +2421,6 @@ u8 traffic_status_watchdog(_adapter *padapter, u8 from_timer)
 				bHigherBusyTxTraffic = _TRUE;
 		}
 
-#ifdef CONFIG_TRAFFIC_PROTECT
-#define TX_ACTIVE_TH 10
-#define RX_ACTIVE_TH 20
-#define TRAFFIC_PROTECT_PERIOD_MS 4500
-
-		if (link_detect->NumTxOkInPeriod > TX_ACTIVE_TH
-		    || link_detect->NumRxUnicastOkInPeriod > RX_ACTIVE_TH) {
-
-			RTW_INFO(FUNC_ADPT_FMT" acqiure wake_lock for %u ms(tx:%d,rx_unicast:%d)\n",
-				 FUNC_ADPT_ARG(padapter),
-				 TRAFFIC_PROTECT_PERIOD_MS,
-				 link_detect->NumTxOkInPeriod,
-				 link_detect->NumRxUnicastOkInPeriod);
-
-			rtw_lock_traffic_suspend_timeout(TRAFFIC_PROTECT_PERIOD_MS);
-		}
-#endif
-
 #ifdef CONFIG_TDLS
 #ifdef CONFIG_TDLS_AUTOSETUP
 		/* TDLS_WATCHDOG_PERIOD * 2sec, periodically send */
