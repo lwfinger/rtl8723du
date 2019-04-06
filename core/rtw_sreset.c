@@ -114,14 +114,9 @@ void sreset_restore_security_station(_adapter *padapter)
 	{
 		u8 val8;
 
-		if (pmlmeinfo->auth_algo == dot11AuthAlgrthm_8021X) {
+		if (pmlmeinfo->auth_algo == dot11AuthAlgrthm_8021X)
 			val8 = 0xcc;
-#ifdef CONFIG_WAPI_SUPPORT
-		} else if (padapter->wapiInfo.bWapiEnable && pmlmeinfo->auth_algo == dot11AuthAlgrthm_WAPI) {
-			/* Disable TxUseDefaultKey, RxUseDefaultKey, RxBroadcastUseDefaultKey. */
-			val8 = 0x4c;
-#endif
-		} else
+		else
 			val8 = 0xcf;
 		rtw_hal_set_hwreg(padapter, HW_VAR_SEC_CFG, (u8 *)(&val8));
 	}

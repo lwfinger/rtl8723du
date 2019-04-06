@@ -68,9 +68,6 @@ enum rt_spinlock_type {
 
 	rt_bt_data_spinlock = 25,
 
-	RT_WAPI_OPTION_SPINLOCK = 26,
-	RT_WAPI_RX_SPINLOCK = 27,
-
 	/* add for 92D CCK control issue */
 	RT_CCK_PAGEA_SPINLOCK = 28,
 	RT_BUFFER_SPINLOCK = 29,

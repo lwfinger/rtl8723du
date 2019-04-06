@@ -1278,19 +1278,4 @@ struct rtw_regulatory {
 };
 #endif
 
-#ifdef CONFIG_WAPI_SUPPORT
-#ifndef IW_AUTH_WAPI_VERSION_1
-#define IW_AUTH_WAPI_VERSION_1		0x00000008
-#endif
-#ifndef IW_AUTH_KEY_MGMT_WAPI_PSK
-#define IW_AUTH_KEY_MGMT_WAPI_PSK	0x04
-#endif
-#ifndef IW_AUTH_WAPI_ENABLED
-#define IW_AUTH_WAPI_ENABLED		0x20
-#endif
-#ifndef IW_ENCODE_ALG_SM4
-#define IW_ENCODE_ALG_SM4			0x20
-#endif
-#endif
-
 #endif /* _WIFI_H_ */

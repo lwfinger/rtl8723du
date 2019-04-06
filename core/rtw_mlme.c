@@ -1625,15 +1625,6 @@ void rtw_indicate_disconnect(_adapter *padapter, u16 reason, u8 locally_generate
 	if (rtw_to_roam(padapter) > 0)
 		_clr_fwstate_(pmlmepriv, _FW_LINKED);
 
-#ifdef CONFIG_WAPI_SUPPORT
-	psta = rtw_get_stainfo(pstapriv, cur_network->MacAddress);
-	if (check_fwstate(pmlmepriv, WIFI_STATION_STATE))
-		rtw_wapi_return_one_sta_info(padapter, psta->cmn.mac_addr);
-	else if (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE) ||
-		 check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE))
-		rtw_wapi_return_all_sta_info(padapter);
-#endif
-
 	if (check_fwstate(&padapter->mlmepriv, _FW_LINKED)
 	    || (rtw_to_roam(padapter) <= 0)
 	   ) {
@@ -4850,10 +4841,6 @@ void _rtw_roaming(_adapter *padapter, struct wlan_network *tgt_network)
 		_rtw_memcpy(&pmlmepriv->assoc_ssid, &cur_network->network.Ssid, sizeof(NDIS_802_11_SSID));
 
 		pmlmepriv->assoc_by_bssid = _FALSE;
-
-#ifdef CONFIG_WAPI_SUPPORT
-		rtw_wapi_return_all_sta_info(padapter);
-#endif
 
 		while (1) {
 			do_join_r = rtw_do_join(padapter);

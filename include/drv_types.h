@@ -111,10 +111,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 	#include <rtw_tdls.h>
 #endif /* CONFIG_TDLS */
 
-#ifdef CONFIG_WAPI_SUPPORT
-	#include <rtw_wapi.h>
-#endif /* CONFIG_WAPI_SUPPORT */
-
 #ifdef CONFIG_MP_INCLUDED
 	#include <rtw_mp.h>
 #endif /* CONFIG_MP_INCLUDED */
@@ -1217,11 +1213,6 @@ struct _ADAPTER {
 #ifdef CONFIG_TDLS
 	struct tdls_info	tdlsinfo;
 #endif /* CONFIG_TDLS */
-
-#ifdef CONFIG_WAPI_SUPPORT
-	u8	WapiSupport;
-	RT_WAPI_T	wapiInfo;
-#endif
 
 #ifdef CONFIG_RTW_REPEATER_SON
 	u8	rtw_rson_scanstage;

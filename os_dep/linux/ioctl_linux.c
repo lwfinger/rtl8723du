@@ -653,42 +653,6 @@ static inline char *iwe_stream_wapi_process(_adapter *padapter,
 		struct iw_request_info *info, struct wlan_network *pnetwork,
 		char *start, char *stop, struct iw_event *iwe)
 {
-#ifdef CONFIG_WAPI_SUPPORT
-	char *p;
-
-	if (pnetwork->network.Reserved[0] != BSS_TYPE_PROB_REQ) { /* Probe Request */
-		sint out_len_wapi = 0;
-		/* here use static for stack size */
-		static u8 buf_wapi[MAX_WAPI_IE_LEN * 2] = {0};
-		static u8 wapi_ie[MAX_WAPI_IE_LEN] = {0};
-		u16 wapi_len = 0;
-		u16  i;
-
-		out_len_wapi = rtw_get_wapi_ie(pnetwork->network.IEs , pnetwork->network.IELength, wapi_ie, &wapi_len);
-
-		RTW_INFO("rtw_wx_get_scan: %s ", pnetwork->network.Ssid.Ssid);
-		RTW_INFO("rtw_wx_get_scan: ssid = %d ", wapi_len);
-
-
-		if (wapi_len > 0) {
-			p = buf_wapi;
-			/* _rtw_memset(buf_wapi, 0, MAX_WAPI_IE_LEN*2); */
-			p += sprintf(p, "wapi_ie=");
-			for (i = 0; i < wapi_len; i++)
-				p += sprintf(p, "%02x", wapi_ie[i]);
-
-			_rtw_memset(iwe, 0, sizeof(*iwe));
-			iwe->cmd = IWEVCUSTOM;
-			iwe->u.data.length = strlen(buf_wapi);
-			start = iwe_stream_add_point(info, start, stop, iwe, buf_wapi);
-
-			_rtw_memset(iwe, 0, sizeof(*iwe));
-			iwe->cmd = IWEVGENIE;
-			iwe->u.data.length = wapi_len;
-			start = iwe_stream_add_point(info, start, stop, iwe, wapi_ie);
-		}
-	}
-#endif/* #ifdef CONFIG_WAPI_SUPPORT */
 	return start;
 }
 
@@ -893,13 +857,8 @@ static int wpa_set_encryption(struct net_device *dev, struct ieee_param *param, 
 			goto exit;
 		}
 	} else {
-#ifdef CONFIG_WAPI_SUPPORT
-		if (strcmp(param->u.crypt.alg, "SMS4"))
-#endif
-		{
-			ret = -EINVAL;
-			goto exit;
-		}
+		ret = -EINVAL;
+		goto exit;
 	}
 
 	if (strcmp(param->u.crypt.alg, "WEP") == 0) {
@@ -1024,13 +983,7 @@ static int wpa_set_encryption(struct net_device *dev, struct ieee_param *param, 
 		}
 	}
 
-#ifdef CONFIG_WAPI_SUPPORT
-	if (strcmp(param->u.crypt.alg, "SMS4") == 0)
-		rtw_wapi_set_set_encryption(padapter, param);
-#endif
-
 exit:
-
 
 	return ret;
 }
@@ -2827,45 +2780,14 @@ static int rtw_wx_set_auth(struct net_device *dev,
 	int ret = 0;
 
 	switch (param->flags & IW_AUTH_INDEX) {
-
 	case IW_AUTH_WPA_VERSION:
-#ifdef CONFIG_WAPI_SUPPORT
-#ifndef CONFIG_IOCTL_CFG80211
-		padapter->wapiInfo.bWapiEnable = false;
-		if (value == IW_AUTH_WAPI_VERSION_1) {
-			padapter->wapiInfo.bWapiEnable = true;
-			psecuritypriv->dot11PrivacyAlgrthm = _SMS4_;
-			psecuritypriv->dot118021XGrpPrivacy = _SMS4_;
-			psecuritypriv->dot11AuthAlgrthm = dot11AuthAlgrthm_WAPI;
-			pmlmeinfo->auth_algo = psecuritypriv->dot11AuthAlgrthm;
-			padapter->wapiInfo.extra_prefix_len = WAPI_EXT_LEN;
-			padapter->wapiInfo.extra_postfix_len = SMS4_MIC_LEN;
-		}
-#endif
-#endif
 		break;
 	case IW_AUTH_CIPHER_PAIRWISE:
-
 		break;
 	case IW_AUTH_CIPHER_GROUP:
-
 		break;
 	case IW_AUTH_KEY_MGMT:
-#ifdef CONFIG_WAPI_SUPPORT
-#ifndef CONFIG_IOCTL_CFG80211
-		RTW_INFO("rtw_wx_set_auth: IW_AUTH_KEY_MGMT case\n");
-		if (value == IW_AUTH_KEY_MGMT_WAPI_PSK)
-			padapter->wapiInfo.bWapiPSK = true;
-		else
-			padapter->wapiInfo.bWapiPSK = false;
-		RTW_INFO("rtw_wx_set_auth: IW_AUTH_KEY_MGMT bwapipsk %d\n", padapter->wapiInfo.bWapiPSK);
-#endif
-#endif
-		/*
-		 *  ??? does not use these parameters
-		 */
 		break;
-
 	case IW_AUTH_TKIP_COUNTERMEASURES: {
 		if (param->value) {
 			/* wpa_supplicant is enabling the tkip countermeasure. */
@@ -2943,21 +2865,11 @@ static int rtw_wx_set_auth(struct net_device *dev,
 	case IW_AUTH_PRIVACY_INVOKED:
 		/* ieee->privacy_invoked = param->value; */
 		break;
-
-#ifdef CONFIG_WAPI_SUPPORT
-#ifndef CONFIG_IOCTL_CFG80211
-	case IW_AUTH_WAPI_ENABLED:
-		break;
-#endif
-#endif
-
 	default:
 		return -EOPNOTSUPP;
-
 	}
 
 	return ret;
-
 }
 
 static int rtw_wx_set_enc_ext(struct net_device *dev,
@@ -3002,15 +2914,6 @@ static int rtw_wx_set_enc_ext(struct net_device *dev,
 		alg_name = "BIP";
 		break;
 #endif /* CONFIG_IEEE80211W */
-#ifdef CONFIG_WAPI_SUPPORT
-#ifndef CONFIG_IOCTL_CFG80211
-	case IW_ENCODE_ALG_SM4:
-		alg_name = "SMS4";
-		_rtw_memcpy(param->sta_addr, pext->addr.sa_data, ETH_ALEN);
-		RTW_INFO("rtw_wx_set_enc_ext: SMS4 case\n");
-		break;
-#endif
-#endif
 	default:
 		ret = -1;
 		goto exit;
@@ -3034,16 +2937,8 @@ static int rtw_wx_set_enc_ext(struct net_device *dev,
 
 	param->u.crypt.idx = (pencoding->flags & 0x00FF) - 1 ;
 
-	if (pext->ext_flags & IW_ENCODE_EXT_RX_SEQ_VALID) {
-#ifdef CONFIG_WAPI_SUPPORT
-#ifndef CONFIG_IOCTL_CFG80211
-		if (pext->alg == IW_ENCODE_ALG_SM4)
-			_rtw_memcpy(param->u.crypt.seq, pext->rx_seq, 16);
-		else
-#endif /* CONFIG_IOCTL_CFG80211 */
-#endif /* CONFIG_WAPI_SUPPORT */
-			_rtw_memcpy(param->u.crypt.seq, pext->rx_seq, 8);
-	}
+	if (pext->ext_flags & IW_ENCODE_EXT_RX_SEQ_VALID)
+		_rtw_memcpy(param->u.crypt.seq, pext->rx_seq, 8);
 
 	if (pext->key_len) {
 		param->u.crypt.key_len = pext->key_len;
