@@ -161,8 +161,8 @@ struct session_tracker {
 	_list list; /* session_tracker_queue */
 	u32 local_naddr;
 	u16 local_port;
-	u32 remote_naddr;
 	u16 remote_port;
+	u32 remote_naddr;
 	systime set_time;
 	u8 status;
 };
@@ -177,8 +177,8 @@ struct st_cmd_parm {
 	struct sta_info *sta;
 	u32 local_naddr; /* TODO: IPV6 */
 	u16 local_port;
-	u32 remote_naddr; /* TODO: IPV6 */
 	u16 remote_port;
+	u32 remote_naddr; /* TODO: IPV6 */
 };
 
 typedef bool (*st_match_rule)(_adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port);

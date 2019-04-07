@@ -201,7 +201,7 @@ void sreset_restore_network_station(_adapter *padapter)
 
 	mlmeext_joinbss_event_callback(padapter, 1);
 	/* restore Sequence No. */
-	rtw_hal_set_hwreg(padapter, HW_VAR_RESTORE_HW_SEQ, 0);
+	rtw_hal_set_hwreg(padapter, HW_VAR_RESTORE_HW_SEQ, NULL);
 
 	sreset_restore_security_station(padapter);
 }

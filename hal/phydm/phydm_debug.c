@@ -2699,7 +2699,7 @@ phydm_fw_trace_handler_8051(
 	int i = 0;
 	u8	extend_c2h_sub_id = 0, extend_c2h_dbg_len = 0, extend_c2h_dbg_seq = 0;
 	u8	fw_debug_trace[128];
-	u8	*extend_c2h_dbg_content = 0;
+	u8	*extend_c2h_dbg_content = NULL;
 
 	if (cmd_len > 127)
 		return;

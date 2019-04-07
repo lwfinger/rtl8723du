@@ -47,7 +47,7 @@ enum {
 
 #define RTW_DBG_EXPR(EXPR) do {} while (0)
 
-#define RTW_DBGDUMP 0 /* 'stream' for _dbgdump */
+#define RTW_DBGDUMP NULL /* 'stream' for _dbgdump */
 
 /* don't use these 3 APIs anymore, will be removed later */
 #define RT_TRACE(_Comp, _Level, Fmt) do {} while (0)
@@ -221,7 +221,7 @@ extern uint rtw_drv_log_level;
 
 void dump_drv_version(void *sel);
 void dump_log_level(void *sel);
-void dump_drv_cfg(void *sel);
+void dump_drv_cfg(struct seq_file *sel);
 
 void mac_reg_dump(void *sel, _adapter *adapter);
 void bb_reg_dump(void *sel, _adapter *adapter);

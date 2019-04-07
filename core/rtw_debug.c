@@ -18,7 +18,7 @@
 #include <hal_data.h>
 
 #ifdef CONFIG_RTW_DEBUG
-const char *rtw_log_level_str[] = {
+static const char *rtw_log_level_str[] = {
 	"_DRV_NONE_ = 0",
 	"_DRV_ALWAYS_ = 1",
 	"_DRV_ERR_ = 2",
@@ -45,7 +45,7 @@ void dump_drv_version(void *sel)
 	RTW_PRINT_SEL(sel, "build time: %s %s\n", __DATE__, __TIME__);
 }
 
-void dump_drv_cfg(void *sel)
+void dump_drv_cfg(struct seq_file *sel)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 24))
 	char *kernel_version = utsname()->release;

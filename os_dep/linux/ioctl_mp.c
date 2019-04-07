@@ -873,7 +873,7 @@ int rtw_mp_arx(struct net_device *dev,
 	int bStartRx = 0, bStopRx = 0, bQueryPhy = 0, bQueryMac = 0, bSetBssid = 0;
 	int bmac_filter = 0, bfilter_init = 0, bmon = 0, bSmpCfg = 0, bloopbk = 0;
 	u8 input[129];
-	char *pch, *ptmp, *token, *tmp[2] = {0x00, 0x00};
+	char *pch, *ptmp, *token, *tmp[2] = {NULL, NULL};
 	u32 i = 0, ii = 0, jj = 0, kk = 0, cnts = 0, ret;
 	PADAPTER padapter = rtw_netdev_priv(dev);
 	struct mp_priv *pmppriv = &padapter->mppriv;
