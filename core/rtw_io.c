@@ -60,15 +60,14 @@ u8 _rtw_read8(_adapter *adapter, u32 addr)
 
 u16 _rtw_read16(_adapter *adapter, u32 addr)
 {
-	u16 r_val;
-	/* struct	io_queue  	*pio_queue = (struct io_queue *)adapter->pio_queue; */
+	__le16 r_val;
 	struct io_priv *pio_priv = &adapter->iopriv;
 	struct	intf_hdl		*pintfhdl = &(pio_priv->intf);
-	u16(*_read16)(struct intf_hdl *pintfhdl, u32 addr);
+	__le16(*_read16)(struct intf_hdl *pintfhdl, u32 addr);
 	_read16 = pintfhdl->io_ops._read16;
 
 	r_val = _read16(pintfhdl, addr);
-	return rtw_le16_to_cpu(r_val);
+	return le16_to_cpu(r_val);
 }
 
 u32 _rtw_read32(_adapter *adapter, u32 addr)

@@ -4383,9 +4383,9 @@ static void session_tracker_cmd_hdl(_adapter *adapter, struct st_cmd_parm *parm)
 	} else if (cmd == ST_CMD_ADD || cmd == ST_CMD_DEL) {
 		struct st_ctl_t *st_ctl;
 		u32 local_naddr = parm->local_naddr;
-		u16 local_port = parm->local_port;
+		__be16 local_port = cpu_to_be16(parm->local_port);
 		u32 remote_naddr = parm->remote_naddr;
-		u16 remote_port = parm->remote_port;
+		__be16 remote_port = cpu_to_be16(parm->remote_port);
 		struct session_tracker *st = NULL;
 		_irqL irqL;
 		_list *plist, *phead;

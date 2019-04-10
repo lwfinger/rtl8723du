@@ -160,8 +160,8 @@ struct	stainfo_stats	{
 struct session_tracker {
 	_list list; /* session_tracker_queue */
 	u32 local_naddr;
-	u16 local_port;
-	u16 remote_port;
+	__be16 local_port;
+	__be16 remote_port;
 	u32 remote_naddr;
 	systime set_time;
 	u8 status;

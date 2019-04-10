@@ -21,7 +21,7 @@
 #include <hal_data.h>
 
 
-struct mlme_handler mlme_sta_tbl[] = {
+static struct mlme_handler mlme_sta_tbl[] = {
 	{WIFI_ASSOCREQ,		"OnAssocReq",	&OnAssocReq},
 	{WIFI_ASSOCRSP,		"OnAssocRsp",	&OnAssocRsp},
 	{WIFI_REASSOCREQ,	"OnReAssocReq",	&OnAssocReq},
@@ -67,7 +67,7 @@ struct mlme_handler mlme_ap_tbl[] = {
 };
 #endif
 
-struct action_handler OnAction_tbl[] = {
+static struct action_handler OnAction_tbl[] = {
 	{RTW_WLAN_CATEGORY_SPECTRUM_MGMT,	 "ACTION_SPECTRUM_MGMT", on_action_spct},
 	{RTW_WLAN_CATEGORY_QOS, "ACTION_QOS", &OnAction_qos},
 	{RTW_WLAN_CATEGORY_DLS, "ACTION_DLS", &OnAction_dls},
@@ -91,8 +91,7 @@ struct action_handler OnAction_tbl[] = {
 	{RTW_WLAN_CATEGORY_P2P, "ACTION_P2P", &OnAction_p2p},
 };
 
-
-u8	null_addr[ETH_ALEN] = {0, 0, 0, 0, 0, 0};
+static u8	null_addr[ETH_ALEN] = {0, 0, 0, 0, 0, 0};
 
 /**************************************************
 OUI definitions for the vendor specific IE
@@ -379,7 +378,7 @@ bool rtw_chplan_is_empty(u8 id)
 	return _FALSE;
 }
 
-bool rtw_regsty_is_excl_chs(struct registry_priv *regsty, u8 ch)
+static bool rtw_regsty_is_excl_chs(struct registry_priv *regsty, u8 ch)
 {
 	int i;
 
@@ -1427,7 +1426,7 @@ static void init_mlme_ext_priv_value(_adapter *padapter)
 	pmlmeext->action_public_dialog_token = 0xff;
 }
 
-void init_mlme_ext_timer(_adapter *padapter)
+static void init_mlme_ext_timer(_adapter *padapter)
 {
 	struct	mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
 
@@ -1662,7 +1661,7 @@ void mgt_dispatcher(_adapter *padapter, union recv_frame *precv_frame)
 }
 
 #ifdef CONFIG_P2P
-u32 p2p_listen_state_process(_adapter *padapter, unsigned char *da)
+static u32 p2p_listen_state_process(_adapter *padapter, unsigned char *da)
 {
 	bool response = _TRUE;
 
@@ -3261,7 +3260,7 @@ unsigned int OnAtim(_adapter *padapter, union recv_frame *precv_frame)
 	return _SUCCESS;
 }
 
-unsigned int on_action_spct_ch_switch(_adapter *padapter, struct sta_info *psta, u8 *ies, uint ies_len)
+static unsigned int on_action_spct_ch_switch(_adapter *padapter, struct sta_info *psta, u8 *ies, uint ies_len)
 {
 	unsigned int ret = _FAIL;
 	struct mlme_ext_priv *mlmeext = &padapter->mlmeextpriv;
@@ -4286,7 +4285,7 @@ void issue_p2p_GO_request(_adapter *padapter, u8 *raddr)
 }
 
 
-void issue_p2p_GO_response(_adapter *padapter, u8 *raddr, u8 *frame_body, uint len, u8 result)
+static void issue_p2p_GO_response(_adapter *padapter, u8 *raddr, u8 *frame_body, uint len, u8 result)
 {
 	struct p2p_channels *ch_list = &(adapter_to_rfctl(padapter)->channel_list);
 	unsigned char category = RTW_WLAN_CATEGORY_PUBLIC;
@@ -4705,7 +4704,7 @@ void issue_p2p_GO_response(_adapter *padapter, u8 *raddr, u8 *frame_body, uint l
 
 }
 
-void issue_p2p_GO_confirm(_adapter *padapter, u8 *raddr, u8 result)
+static void issue_p2p_GO_confirm(_adapter *padapter, u8 *raddr, u8 result)
 {
 
 	unsigned char category = RTW_WLAN_CATEGORY_PUBLIC;

@@ -30,7 +30,7 @@ enum {
 	SIGNAL_STAT_CALC_PROFILE_MAX
 };
 
-u8 signal_stat_calc_profile[SIGNAL_STAT_CALC_PROFILE_MAX][2] = {
+static u8 signal_stat_calc_profile[SIGNAL_STAT_CALC_PROFILE_MAX][2] = {
 	{4, 1},	/* Profile 0 => pre_stat : curr_stat = 4 : 1 */
 	{3, 7}	/* Profile 1 => pre_stat : curr_stat = 3 : 7 */
 };
@@ -672,7 +672,7 @@ union recv_frame *portctrl(_adapter *adapter, union recv_frame *precv_frame)
 	u16	ether_type = 0;
 	u16  eapol_type = 0x888e;/* for Funia BD's WPA issue  */
 	struct rx_pkt_attrib *pattrib;
-
+	__be16 be_tmp;
 
 	pstapriv = &adapter->stapriv;
 
@@ -697,8 +697,8 @@ union recv_frame *portctrl(_adapter *adapter, union recv_frame *precv_frame)
 
 			/* get ether_type */
 			ptr = ptr + pfhdr->attrib.hdrlen + pfhdr->attrib.iv_len + LLC_HEADER_SIZE;
-			_rtw_memcpy(&ether_type, ptr, 2);
-			ether_type = ntohs((unsigned short)ether_type);
+			_rtw_memcpy(&be_tmp, ptr, 2);
+			ether_type = ntohs((__be16)be_tmp);
 
 			if (ether_type == eapol_type)
 				prtnframe = precv_frame;
@@ -728,7 +728,7 @@ union recv_frame *portctrl(_adapter *adapter, union recv_frame *precv_frame)
 
 }
 
-sint recv_decache(union recv_frame *precv_frame, u8 bretry)
+static sint recv_decache(union recv_frame *precv_frame, u8 bretry)
 {
 	struct sta_info *sta = precv_frame->u.hdr.psta;
 	struct stainfo_rxcache *prxcache = &sta->sta_recvpriv.rxcache;
@@ -3230,7 +3230,7 @@ static void recv_set_iseq_after_mpdu_process(union recv_frame *rframe, u16 seq_n
 }
 
 #ifdef CONFIG_MP_INCLUDED
-int validate_mp_recv_frame(_adapter *adapter, union recv_frame *precv_frame)
+static int validate_mp_recv_frame(_adapter *adapter, union recv_frame *precv_frame)
 {
 	int ret = _SUCCESS;
 	u8 *ptr = precv_frame->u.hdr.rx_data;
@@ -3241,24 +3241,6 @@ int validate_mp_recv_frame(_adapter *adapter, union recv_frame *precv_frame)
 
 	pmptx = &pmppriv->tx;
 
-#if 0
-	if (1) {
-		u8 bDumpRxPkt;
-		type =  GetFrameType(ptr);
-		subtype = get_frame_sub_type(ptr); /* bit(7)~bit(2)	 */
-
-		rtw_hal_get_def_var(adapter, HAL_DEF_DBG_DUMP_RXPKT, &(bDumpRxPkt));
-		if (bDumpRxPkt == 1) { /* dump all rx packets */
-			int i;
-			RTW_INFO("############ type:0x%02x subtype:0x%02x #################\n", type, subtype);
-
-			for (i = 0; i < 64; i = i + 8)
-				RTW_INFO("%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:\n", *(ptr + i),
-					*(ptr + i + 1), *(ptr + i + 2) , *(ptr + i + 3) , *(ptr + i + 4), *(ptr + i + 5), *(ptr + i + 6), *(ptr + i + 7));
-			RTW_INFO("#############################\n");
-		}
-	}
-#endif
 	if (pmppriv->bloopback) {
 		if (_rtw_memcmp(ptr + 24, pmptx->buf + 24, precv_frame->u.hdr.len - 24) == _FALSE) {
 			RTW_INFO("Compare payload content Fail !!!\n");
@@ -3367,7 +3349,7 @@ static sint MPwlanhdr_to_ethhdr(union recv_frame *precvframe)
 }
 
 
-int mp_recv_frame(_adapter *padapter, union recv_frame *rframe)
+static int mp_recv_frame(_adapter *padapter, union recv_frame *rframe)
 {
 	int ret = _SUCCESS;
 	struct rx_pkt_attrib *pattrib = &rframe->u.hdr.attrib;
@@ -3556,7 +3538,7 @@ static sint fill_radiotap_hdr(_adapter *padapter, union recv_frame *precvframe, 
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
 
 	u16 tmp_16bit = 0;
-
+	__le16 le_tmp;
 	u8 data_rate[] = {
 		2, 4, 11, 22, /* CCK */
 		12, 18, 24, 36, 48, 72, 93, 108, /* OFDM */
@@ -3582,21 +3564,18 @@ static sint fill_radiotap_hdr(_adapter *padapter, union recv_frame *precvframe, 
 
 	/* tsft */
 	if (pattrib->tsfl) {
-		u64 tmp_64bit;
+		__le64 tmp_64bit;
 
-		rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_TSFT);
+		rtap_hdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_TSFT);
 		tmp_64bit = cpu_to_le64(pattrib->tsfl);
 		memcpy(&hdr_buf[rt_len], &tmp_64bit, 8);
 		rt_len += 8;
 	}
 
 	/* flags */
-	rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_FLAGS);
+	rtap_hdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_FLAGS);
 	if (0)
 		hdr_buf[rt_len] |= IEEE80211_RADIOTAP_F_CFP;
-
-	if (0)
-		hdr_buf[rt_len] |= IEEE80211_RADIOTAP_F_SHORTPRE;
 
 	if ((pattrib->encrypt == 1) || (pattrib->encrypt == 5))
 		hdr_buf[rt_len] |= IEEE80211_RADIOTAP_F_WEP;
@@ -3622,7 +3601,7 @@ static sint fill_radiotap_hdr(_adapter *padapter, union recv_frame *precvframe, 
 
 	/* rate */
 	if (pattrib->data_rate < 12) {
-		rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_RATE);
+		rtap_hdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_RATE);
 		if (pattrib->data_rate < 4) {
 			/* CCK */
 			hdr_buf[rt_len] = data_rate[pattrib->data_rate];
@@ -3635,65 +3614,49 @@ static sint fill_radiotap_hdr(_adapter *padapter, union recv_frame *precvframe, 
 
 	/* channel */
 	tmp_16bit = 0;
-	rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_CHANNEL);
+	rtap_hdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_CHANNEL);
 	tmp_16bit = CHAN2FREQ(rtw_get_oper_ch(padapter));
 	/*tmp_16bit = CHAN2FREQ(pHalData->current_channel);*/
 	memcpy(&hdr_buf[rt_len], &tmp_16bit, 2);
 	rt_len += 2;
 
 	/* channel flags */
-	tmp_16bit = 0;
+	le_tmp = 0;
 	if (pHalData->current_band_type == 0)
-		tmp_16bit |= cpu_to_le16(IEEE80211_CHAN_2GHZ);
+		le_tmp |= cpu_to_le16(IEEE80211_CHAN_2GHZ);
 	else
-		tmp_16bit |= cpu_to_le16(IEEE80211_CHAN_5GHZ);
+		le_tmp |= cpu_to_le16(IEEE80211_CHAN_5GHZ);
 
 	if (pattrib->data_rate < 12) {
 		if (pattrib->data_rate < 4) {
 			/* CCK */
-			tmp_16bit |= cpu_to_le16(IEEE80211_CHAN_CCK);
+			le_tmp |= cpu_to_le16(IEEE80211_CHAN_CCK);
 		} else {
 			/* OFDM */
-			tmp_16bit |= cpu_to_le16(IEEE80211_CHAN_OFDM);
+			le_tmp |= cpu_to_le16(IEEE80211_CHAN_OFDM);
 		}
 	} else
-		tmp_16bit |= cpu_to_le16(IEEE80211_CHAN_DYN);
-	memcpy(&hdr_buf[rt_len], &tmp_16bit, 2);
+		le_tmp |= cpu_to_le16(IEEE80211_CHAN_DYN);
+	memcpy(&hdr_buf[rt_len], &le_tmp, 2);
 	rt_len += 2;
 
 	/* dBm Antenna Signal */
-	rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_DBM_ANTSIGNAL);
+	rtap_hdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_DBM_ANTSIGNAL);
 	hdr_buf[rt_len] = pattrib->phy_info.recv_signal_power;
 	rt_len += 1;
 
-#if 0
-	/* dBm Antenna Noise */
-	rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_DBM_ANTNOISE);
-	hdr_buf[rt_len] = 0;
-	rt_len += 1;
-
-	/* Signal Quality */
-	rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_LOCK_QUALITY);
-	hdr_buf[rt_len] = pattrib->phy_info.signal_quality;
-	rt_len += 1;
-#endif
-
 	/* Antenna */
-	rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_ANTENNA);
+	rtap_hdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_ANTENNA);
 	hdr_buf[rt_len] = 0; /* pHalData->rf_type; */
 	rt_len += 1;
 
 	/* RX flags */
-	rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_RX_FLAGS);
-#if 0
-	tmp_16bit = cpu_to_le16(0);
-	memcpy(ptr, &tmp_16bit, 1);
-#endif
+	rtap_hdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_RX_FLAGS);
 	rt_len += 2;
 
 	/* MCS information */
 	if (pattrib->data_rate >= 12 && pattrib->data_rate < 44) {
-		rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_MCS);
+		rtap_hdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_MCS);
 		/* known, flag */
 		hdr_buf[rt_len] |= BIT1; /* MCS index known */
 
@@ -3718,7 +3681,7 @@ static sint fill_radiotap_hdr(_adapter *padapter, union recv_frame *precvframe, 
 
 	/* VHT */
 	if (pattrib->data_rate >= 44 && pattrib->data_rate < 84) {
-		rtap_hdr->it_present |= (1 << IEEE80211_RADIOTAP_VHT);
+		rtap_hdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_VHT);
 
 		/* known 16 bit, flag 8 bit */
 		tmp_16bit = 0;
@@ -3807,7 +3770,7 @@ static sint fill_radiotap_hdr(_adapter *padapter, union recv_frame *precvframe, 
 
 }
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 24))
-int recv_frame_monitor(_adapter *padapter, union recv_frame *rframe)
+static int recv_frame_monitor(_adapter *padapter, union recv_frame *rframe)
 {
 	int ret = _SUCCESS;
 	struct rx_pkt_attrib *pattrib = &rframe->u.hdr.attrib;
@@ -3854,7 +3817,7 @@ exit:
 	return ret;
 }
 #endif
-int recv_func_prehandle(_adapter *padapter, union recv_frame *rframe)
+static int recv_func_prehandle(_adapter *padapter, union recv_frame *rframe)
 {
 	int ret = _SUCCESS;
 	struct rx_pkt_attrib *pattrib = &rframe->u.hdr.attrib;
@@ -3890,7 +3853,7 @@ exit:
 }
 
 /*#define DBG_RX_BMC_FRAME*/
-int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
+static int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
 {
 	int ret = _SUCCESS;
 	union recv_frame *orig_prframe = prframe;
@@ -3920,21 +3883,6 @@ int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
 #ifdef DBG_RX_BMC_FRAME
 	if (IS_MCAST(pattrib->ra))
 		RTW_INFO("%s =>"ADPT_FMT" Rx BC/MC from "MAC_FMT"\n", __func__, ADPT_ARG(padapter), MAC_ARG(pattrib->ta));
-#endif
-
-#if 0
-	if (padapter->adapter_type == PRIMARY_ADAPTER) {
-		RTW_INFO("+++\n");
-		{
-			int i;
-			u8	*ptr = get_recvframe_data(prframe);
-			for (i = 0; i < 140; i = i + 8)
-				RTW_INFO("%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:", *(ptr + i),
-					*(ptr + i + 1), *(ptr + i + 2) , *(ptr + i + 3) , *(ptr + i + 4), *(ptr + i + 5), *(ptr + i + 6), *(ptr + i + 7));
-
-		}
-		RTW_INFO("---\n");
-	}
 #endif
 
 #ifdef CONFIG_TDLS
@@ -3997,7 +3945,7 @@ _recv_data_drop:
 	return ret;
 }
 
-int recv_func(_adapter *padapter, union recv_frame *rframe)
+static int recv_func(_adapter *padapter, union recv_frame *rframe)
 {
 	int ret;
 	struct rx_pkt_attrib *prxattrib = &rframe->u.hdr.attrib;
@@ -4310,7 +4258,7 @@ static void rx_process_link_qual(_adapter *padapter, union recv_frame *prframe)
 #endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
 }
 
-void rx_process_phy_info(_adapter *padapter, union recv_frame *rframe)
+static void rx_process_phy_info(_adapter *padapter, union recv_frame *rframe)
 {
 	/* Check RSSI */
 	rx_process_rssi(padapter, rframe);

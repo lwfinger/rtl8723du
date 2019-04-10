@@ -16,14 +16,14 @@
 
 #include <drv_types.h>
 
-bool test_st_match_rule(_adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port)
+static bool test_st_match_rule(_adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port)
 {
-	if (ntohs(*((u16 *)local_port)) == 5001 || ntohs(*((u16 *)remote_port)) == 5001)
+	if (ntohs(*((__be16 *)local_port)) == 5001 || ntohs(*((__be16 *)remote_port)) == 5001)
 		return _TRUE;
 	return _FALSE;
 }
 
-struct st_register test_st_reg = {
+static struct st_register test_st_reg = {
 	.s_proto = 0x06,
 	.rule = test_st_match_rule,
 };
@@ -509,11 +509,8 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 
 	pfree_sta_queue = &pstapriv->free_sta_queue;
 
-	/* _enter_critical_bh(&(pfree_sta_queue->lock), &irqL); */
 	_enter_critical_bh(&(pstapriv->sta_hash_lock), &irqL2);
 	if (_rtw_queue_empty(pfree_sta_queue) == _TRUE) {
-		/* _exit_critical_bh(&(pfree_sta_queue->lock), &irqL); */
-		_exit_critical_bh(&(pstapriv->sta_hash_lock), &irqL2);
 		psta = NULL;
 	} else {
 		psta = LIST_CONTAINOR(get_next(&pfree_sta_queue->queue), struct sta_info, list);
@@ -529,20 +526,15 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 
 		index = wifi_mac_hash(hwaddr);
 
-
 		if (index >= NUM_STA) {
 			psta = NULL;
 			goto exit;
 		}
 		phash_list = &(pstapriv->sta_hash[index]);
 
-		/* _enter_critical_bh(&(pstapriv->sta_hash_lock), &irqL2); */
-
 		rtw_list_insert_tail(&psta->hash_list, phash_list);
 
 		pstapriv->asoc_sta_count++;
-
-		/* _exit_critical_bh(&(pstapriv->sta_hash_lock), &irqL2); */
 
 		/* Commented by Albert 2009/08/13
 		 * For the SMC router, the sequence number of first packet of WPS handshake will be 0.
@@ -602,17 +594,14 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 		psta->RxMgmtFrameSeqNum = 0xffff;
 
 		rtw_alloc_macid(pstapriv->padapter, psta);
-
 	}
 
 exit:
 
 	_exit_critical_bh(&(pstapriv->sta_hash_lock), &irqL2);
 
-
 	if (psta)
 		rtw_mi_update_iface_status(&(pstapriv->padapter->mlmepriv), 0);
-
 	return psta;
 }
 

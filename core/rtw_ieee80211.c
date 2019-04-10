@@ -1478,7 +1478,7 @@ void dump_ht_cap_ie_content(void *sel, const u8 *buf, u32 buf_len)
 		      , HT_SUP_MCS_SET_ARG(HT_CAP_ELE_SUP_MCS_SET(buf)));
 }
 
-void dump_ht_cap_ie(void *sel, const u8 *ie, u32 ie_len)
+static void dump_ht_cap_ie(void *sel, const u8 *ie, u32 ie_len)
 {
 	const u8 *pos = ie;
 	u16 id;
@@ -1501,7 +1501,7 @@ const char *const _ht_sc_offset_str[] = {
 	"SCB",
 };
 
-void dump_ht_op_ie_content(void *sel, const u8 *buf, u32 buf_len)
+static void dump_ht_op_ie_content(void *sel, const u8 *buf, u32 buf_len)
 {
 	if (buf_len != HT_OP_IE_LEN) {
 		RTW_PRINT_SEL(sel, "Invalid HT operation IE len:%d != %d\n", buf_len, HT_OP_IE_LEN);
@@ -1515,7 +1515,7 @@ void dump_ht_op_ie_content(void *sel, const u8 *buf, u32 buf_len)
 	);
 }
 
-void dump_ht_op_ie(void *sel, const u8 *ie, u32 ie_len)
+static void dump_ht_op_ie(void *sel, const u8 *ie, u32 ie_len)
 {
 	const u8 *pos = ie;
 	u16 id;
@@ -2560,7 +2560,7 @@ int ieee80211_get_hdrlen(u16 fc)
 	return hdrlen;
 }
 
-int rtw_get_cipher_info(struct wlan_network *pnetwork)
+static int rtw_get_cipher_info(struct wlan_network *pnetwork)
 {
 	u32 wpa_ielen;
 	unsigned char *pbuf;
@@ -2603,9 +2603,10 @@ void rtw_get_bcn_info(struct wlan_network *pnetwork)
 	struct rtw_ieee80211_ht_cap *pht_cap = NULL;
 	unsigned int		len;
 	unsigned char		*p;
+	__le16 le_tmp;
 
-	_rtw_memcpy((u8 *)&cap, rtw_get_capability_from_ie(pnetwork->network.IEs), 2);
-	cap = le16_to_cpu(cap);
+	_rtw_memcpy((u8 *)&le_tmp, rtw_get_capability_from_ie(pnetwork->network.IEs), 2);
+	cap = le16_to_cpu(le_tmp);
 	if (cap & WLAN_CAPABILITY_PRIVACY) {
 		bencrypt = 1;
 		pnetwork->network.Privacy = 1;

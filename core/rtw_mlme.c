@@ -20,7 +20,7 @@ extern void indicate_wx_scan_complete_event(_adapter *padapter);
 extern u8 rtw_do_join(_adapter *padapter);
 
 
-void rtw_init_mlme_timer(_adapter *padapter)
+static void rtw_init_mlme_timer(_adapter *padapter)
 {
 	struct	mlme_priv *pmlmepriv = &padapter->mlmepriv;
 
@@ -54,7 +54,7 @@ void rtw_init_mlme_timer(_adapter *padapter)
 #endif
 }
 
-sint	_rtw_init_mlme_priv(_adapter *padapter)
+static sint	_rtw_init_mlme_priv(_adapter *padapter)
 {
 	sint	i;
 	u8	*pbuf;
@@ -306,7 +306,7 @@ exit:
 }
 #endif /* defined(CONFIG_WFD) && defined(CONFIG_IOCTL_CFG80211) */
 
-void _rtw_free_mlme_priv(struct mlme_priv *pmlmepriv)
+static void _rtw_free_mlme_priv(struct mlme_priv *pmlmepriv)
 {
 	if (NULL == pmlmepriv) {
 		rtw_warn_on(1);
@@ -324,7 +324,7 @@ exit:
 	return;
 }
 
-sint	_rtw_enqueue_network(_queue *queue, struct wlan_network *pnetwork)
+static sint	_rtw_enqueue_network(_queue *queue, struct wlan_network *pnetwork)
 {
 	_irqL irqL;
 
@@ -585,7 +585,7 @@ u8 *rtw_get_capability_from_ie(u8 *ie)
 
 u16 rtw_get_capability(WLAN_BSSID_EX *bss)
 {
-	u16	val;
+	__le16	val;
 
 	_rtw_memcpy((u8 *)&val, rtw_get_capability_from_ie(bss->IEs), 2);
 
@@ -700,18 +700,16 @@ inline int is_same_ess(WLAN_BSSID_EX *a, WLAN_BSSID_EX *b)
 int is_same_network(WLAN_BSSID_EX *src, WLAN_BSSID_EX *dst, u8 feature)
 {
 	u16 s_cap, d_cap;
-
+	__le16 le_tmp;
 
 	if (rtw_bug_check(dst, src, &s_cap, &d_cap) == _FALSE)
 		return _FALSE;
 
-	_rtw_memcpy((u8 *)&s_cap, rtw_get_capability_from_ie(src->IEs), 2);
-	_rtw_memcpy((u8 *)&d_cap, rtw_get_capability_from_ie(dst->IEs), 2);
+	_rtw_memcpy((u8 *)&le_tmp, rtw_get_capability_from_ie(src->IEs), 2);
+	s_cap = le16_to_cpu(le_tmp);
 
-
-	s_cap = le16_to_cpu(s_cap);
-	d_cap = le16_to_cpu(d_cap);
-
+	_rtw_memcpy((u8 *)&le_tmp, rtw_get_capability_from_ie(dst->IEs), 2);
+	d_cap = le16_to_cpu(le_tmp);
 
 #ifdef CONFIG_P2P
 	if ((feature == 1) && /* 1: P2P supported */
@@ -1446,7 +1444,7 @@ static void free_scanqueue(struct	mlme_priv *pmlmepriv)
 
 }
 
-void rtw_reset_rx_info(_adapter *adapter)
+static void rtw_reset_rx_info(_adapter *adapter)
 {
 	struct recv_priv  *precvpriv = &adapter->recvpriv;
 
@@ -2005,7 +2003,7 @@ void rtw_joinbss_event_prehandle(_adapter *adapter, u8 *pbuf)
 
 	pnetwork->network.Length = get_WLAN_BSSID_EX_sz(&pnetwork->network);
 	if (pnetwork->network.Length > sizeof(WLAN_BSSID_EX)) {
-		goto ignore_joinbss_callback;
+		return;
 	}
 
 	_enter_critical_bh(&pmlmepriv->lock, &irqL);
@@ -2040,7 +2038,6 @@ void rtw_joinbss_event_prehandle(_adapter *adapter, u8 *pbuf)
 							ptarget_wlan->fixed = _TRUE;
 					}
 				}
-
 			} else {
 				ptarget_wlan = _rtw_find_same_network(&pmlmepriv->scanned_queue, pnetwork);
 				if (check_fwstate(pmlmepriv, WIFI_STATION_STATE) == _TRUE) {
@@ -2054,7 +2051,6 @@ void rtw_joinbss_event_prehandle(_adapter *adapter, u8 *pbuf)
 				rtw_joinbss_update_network(adapter, ptarget_wlan, pnetwork);
 			else {
 				RTW_PRINT("Can't find ptarget_wlan when joinbss_event callback\n");
-				_exit_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 				goto ignore_joinbss_callback;
 			}
 
@@ -2064,7 +2060,6 @@ void rtw_joinbss_event_prehandle(_adapter *adapter, u8 *pbuf)
 				ptarget_sta = rtw_joinbss_update_stainfo(adapter, pnetwork);
 				if (ptarget_sta == NULL) {
 					RTW_ERR("Can't update stainfo when joinbss_event callback\n");
-					_exit_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 					goto ignore_joinbss_callback;
 				}
 			}
@@ -2077,10 +2072,7 @@ void rtw_joinbss_event_prehandle(_adapter *adapter, u8 *pbuf)
 
 			/* s5. Cancle assoc_timer					 */
 			_cancel_timer_ex(&pmlmepriv->assoc_timer);
-
-
 		} else {
-			_exit_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 			goto ignore_joinbss_callback;
 		}
 
@@ -2123,8 +2115,11 @@ void rtw_joinbss_event_prehandle(_adapter *adapter, u8 *pbuf)
 		}
 #endif
 	}
+	_exit_critical_bh(&pmlmepriv->lock, &irqL);
+	return;
 
 ignore_joinbss_callback:
+	_exit_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 	_exit_critical_bh(&pmlmepriv->lock, &irqL);
 }
 
@@ -3402,7 +3397,7 @@ int rtw_select_roaming_candidate(struct mlme_priv *mlme)
 
 	if (mlme->cur_network_scanned == NULL) {
 		rtw_warn_on(1);
-		goto exit;
+		return ret;
 	}
 
 	_enter_critical_bh(&(mlme->scanned_queue.lock), &irqL);
@@ -3421,15 +3416,7 @@ int rtw_select_roaming_candidate(struct mlme_priv *mlme)
 
 		mlme->pscanned = get_next(mlme->pscanned);
 
-		if (0)
-			RTW_INFO("%s("MAC_FMT", ch%u) rssi:%d\n"
-				 , pnetwork->network.Ssid.Ssid
-				 , MAC_ARG(pnetwork->network.MacAddress)
-				 , pnetwork->network.Configuration.DSConfig
-				 , (int)pnetwork->network.Rssi);
-
 		rtw_check_roaming_candidate(mlme, &candidate, pnetwork);
-
 	}
 
 	if (candidate == NULL) {
@@ -4984,9 +4971,9 @@ static bool wfd_st_match_rule(_adapter *adapter, u8 *local_naddr, u8 *local_port
 {
 	struct wifi_display_info *wfdinfo = &adapter->wfd_info;
 
-	if (ntohs(*((u16 *)local_port)) == wfdinfo->rtsp_ctrlport
-	    || ntohs(*((u16 *)local_port)) == wfdinfo->tdls_rtsp_ctrlport
-	    || ntohs(*((u16 *)remote_port)) == wfdinfo->peer_rtsp_ctrlport)
+	if (ntohs(*((__be16 *)local_port)) == wfdinfo->rtsp_ctrlport
+	    || ntohs(*((__be16 *)local_port)) == wfdinfo->tdls_rtsp_ctrlport
+	    || ntohs(*((__be16 *)remote_port)) == wfdinfo->peer_rtsp_ctrlport)
 		return _TRUE;
 	return _FALSE;
 }
