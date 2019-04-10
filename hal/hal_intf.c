@@ -644,15 +644,6 @@ bool rtw_hal_sreset_inprogress(_adapter *padapter)
 }
 #endif /* DBG_CONFIG_ERROR_DETECT */
 
-#ifdef CONFIG_IOL
-int rtw_hal_iol_cmd(ADAPTER *adapter, struct xmit_frame *xmit_frame, u32 max_waiting_ms, u32 bndy_cnt)
-{
-	if (adapter->hal_func.IOL_exec_cmds_sync)
-		return adapter->hal_func.IOL_exec_cmds_sync(adapter, xmit_frame, max_waiting_ms, bndy_cnt);
-	return _FAIL;
-}
-#endif
-
 #ifdef CONFIG_XMIT_THREAD_MODE
 s32 rtw_hal_xmit_thread_handler(_adapter *padapter)
 {

@@ -119,10 +119,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 	#include <rtw_br_ext.h>
 #endif /* CONFIG_BR_EXT */
 
-#ifdef CONFIG_IOL
-	#include <rtw_iol.h>
-#endif /* CONFIG_IOL */
-
 #include <ip.h>
 #include <if_ether.h>
 #include <ethernet.h>
@@ -294,10 +290,6 @@ struct registry_priv {
 
 #ifdef CONFIG_LAYER2_ROAMING
 	u8	max_roaming_times; /* the max number driver will try to roaming */
-#endif
-
-#ifdef CONFIG_IOL
-	u8 fw_iol; /* enable iol without other concern */
 #endif
 
 #ifdef CONFIG_80211D
