@@ -1485,4 +1485,21 @@ int rtw_suspend_free_assoc_resource(_adapter *padapter);
 #include <usb_ops.h>
 #include <usb_hal.h>
 
+extern char *rtw_initmac;
+#ifdef CONFIG_80211N_HT
+extern int rtw_ht_enable;
+extern int rtw_bw_mode;
+extern int rtw_ampdu_enable;/* for enable tx_ampdu */
+#endif
+#ifdef CONFIG_TX_MCAST2UNI
+extern int rtw_mc2u_disable;
+#endif
+#ifdef CONFIG_BR_EXT
+void netdev_br_init(struct net_device *netdev);
+#endif
+#ifdef CONFIG_GLOBAL_UI_PID
+extern int ui_pid[3];
+#endif
+
+
 #endif /* __DRV_TYPES_H__ */

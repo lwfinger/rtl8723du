@@ -21,7 +21,7 @@
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 void rtw_signal_stat_timer_hdl(struct timer_list *t);
 #else
-void rtw_signal_stat_timer_hdl(RTW_TIMER_HDL_ARGS);
+void rtw_signal_stat_timer_hdl(void *FunctionContext);
 #endif
 
 enum {
@@ -4051,7 +4051,7 @@ _recv_entry_drop:
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 void rtw_signal_stat_timer_hdl(struct timer_list *t)
 #else
-void rtw_signal_stat_timer_hdl(RTW_TIMER_HDL_ARGS)
+void rtw_signal_stat_timer_hdl(void *FunctionContext)
 #endif
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)

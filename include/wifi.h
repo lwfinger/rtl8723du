@@ -904,7 +904,7 @@ typedef enum _HT_CAP_AMPDU_DENSITY {
  * According to IEEE802.11n spec size varies from 8K to 64K (in powers of 2)
  */
 #define IEEE80211_MIN_AMPDU_BUF 0x8
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 0)
+#ifndef IEEE80211_MAX_AMPDU_BUF
 #define IEEE80211_MAX_AMPDU_BUF 0x40
 #endif
 

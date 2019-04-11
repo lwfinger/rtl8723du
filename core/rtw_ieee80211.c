@@ -1407,7 +1407,6 @@ func_exit:
 	return res;
 }
 
-extern char *rtw_initmac;
 /**
  * rtw_macaddr_cfg - Decide the mac address used
  * @out: buf to store mac address decided

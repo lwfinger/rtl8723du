@@ -23,20 +23,7 @@
 	#include <linux/if_pppox.h>
 #endif
 
-#if 1	/* rtw_wifi_driver */
 	#include <drv_types.h>
-#else	/* rtw_wifi_driver */
-	#include "./8192cd_cfg.h"
-
-	#ifndef __KERNEL__
-		#include "./sys-support.h"
-	#endif
-
-	#include "./8192cd.h"
-	#include "./8192cd_headers.h"
-	#include "./8192cd_br_ext.h"
-	#include "./8192cd_debug.h"
-#endif /* rtw_wifi_driver */
 
 #ifdef CL_IPV6_PASS
 	#ifdef __KERNEL__
@@ -813,7 +800,6 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 						/* forward unknow IP packet to upper TCP/IP */
 						RTW_INFO("NAT25: Replace DA with BR's MAC\n");
 						if ((*(u32 *)priv->br_mac) == 0 && (*(u16 *)(priv->br_mac + 4)) == 0) {
-							void netdev_br_init(struct net_device *netdev);
 							printk("Re-init netdev_br_init() due to br_mac==0!\n");
 							netdev_br_init(priv->pnetdev);
 						}

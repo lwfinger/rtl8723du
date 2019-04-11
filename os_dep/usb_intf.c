@@ -22,8 +22,6 @@
 
 #ifdef CONFIG_80211N_HT
 extern int rtw_ht_enable;
-extern int rtw_bw_mode;
-extern int rtw_ampdu_enable;/* for enable tx_ampdu */
 #endif
 
 #ifdef CONFIG_GLOBAL_UI_PID
@@ -140,7 +138,7 @@ static struct usb_device_id rtw_usb_id_tbl[] = {
 
 MODULE_DEVICE_TABLE(usb, rtw_usb_id_tbl);
 
-int const rtw_usb_id_len = sizeof(rtw_usb_id_tbl) / sizeof(struct usb_device_id);
+static int const rtw_usb_id_len = sizeof(rtw_usb_id_tbl) / sizeof(struct usb_device_id);
 
 static struct specific_device_id specific_device_id_tbl[] = {
 	{.idVendor = USB_VENDER_ID_REALTEK, .idProduct = 0x8177, .flags = SPEC_DEV_ID_DISABLE_HT}, /* 8188cu 1*1 dongole, (b/g mode only) */
@@ -161,7 +159,7 @@ struct rtw_usb_drv {
 	u8 hw_type;
 };
 
-struct rtw_usb_drv usb_drv = {
+static struct rtw_usb_drv usb_drv = {
 	.usbdrv.name = (char *)DRV_NAME,
 	.usbdrv.probe = rtw_drv_init,
 	.usbdrv.disconnect = rtw_dev_remove,
@@ -686,7 +684,7 @@ exit:
 	return ret;
 }
 
-int rtw_resume_process(_adapter *padapter)
+static int rtw_resume_process(_adapter *padapter)
 {
 	int ret, pm_cnt = 0;
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
@@ -938,9 +936,9 @@ extern void rtd2885_wlan_netlink_sendMsg(char *action_string, char *name);
  *        We accept the new device by returning 0.
 */
 
-_adapter  *rtw_sw_export = NULL;
+static _adapter  *rtw_sw_export = NULL;
 
-_adapter *rtw_usb_primary_adapter_init(struct dvobj_priv *dvobj,
+static _adapter *rtw_usb_primary_adapter_init(struct dvobj_priv *dvobj,
 	struct usb_interface *pusb_intf)
 {
 	_adapter *padapter = NULL;
