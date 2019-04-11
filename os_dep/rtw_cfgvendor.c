@@ -19,22 +19,6 @@
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT)
 
-/*
-#include <linux/kernel.h>
-#include <linux/if_arp.h>
-#include <asm/uaccess.h>
-
-#include <linux/kernel.h>
-#include <linux/kthread.h>
-#include <linux/netdevice.h>
-#include <linux/sched.h>
-#include <linux/etherdevice.h>
-#include <linux/wireless.h>
-#include <linux/ieee80211.h>
-#include <linux/wait.h>
-#include <net/cfg80211.h>
-*/
-
 #include <net/rtnetlink.h>
 
 #ifdef DBG_MEM_ALLOC

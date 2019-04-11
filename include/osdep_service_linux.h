@@ -43,7 +43,6 @@
 #include <linux/sem.h>
 #include <linux/sched.h>
 #include <linux/etherdevice.h>
-#include <linux/wireless.h>
 #include <net/iw_handler.h>
 #include <net/addrconf.h>
 #include <linux/if_arp.h>
