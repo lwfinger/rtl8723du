@@ -23,7 +23,7 @@
 /*<YuChen, 150720> Add for KFree Feature Requested by RF David.*/
 /*This is a phydm API*/
 
-void
+static void
 phydm_set_kfree_to_rf_8814a(
 	void		*p_dm_void,
 	u8		e_rf_path,
@@ -113,12 +113,7 @@ phydm_set_kfree_to_rf_8814a(
 
 }
 
-
-
-//
-//
-//
-void
+static void
 phydm_get_thermal_trim_offset_8821c(
 	void	*p_dm_void
 )
@@ -148,7 +143,7 @@ phydm_get_thermal_trim_offset_8821c(
 
 
 
-void
+static void
 phydm_get_power_trim_offset_8821c(
 	void	*p_dm_void
 )
@@ -185,7 +180,7 @@ phydm_get_power_trim_offset_8821c(
 
 
 
-void
+static void
 phydm_set_kfree_to_rf_8821c(
 	void		*p_dm_void,
 	u8		e_rf_path,
@@ -225,7 +220,7 @@ phydm_set_kfree_to_rf_8821c(
 
 
 
-void
+static void
 phydm_clear_kfree_to_rf_8821c(
 	void		*p_dm_void,
 	u8		e_rf_path,
@@ -259,7 +254,7 @@ phydm_clear_kfree_to_rf_8821c(
 		));
 }
 
-void
+static void
 phydm_get_thermal_trim_offset_8822b(
 	void	*p_dm_void
 )
@@ -309,7 +304,7 @@ phydm_get_thermal_trim_offset_8822b(
 
 
 
-void
+static void
 phydm_get_power_trim_offset_8822b(
 	void	*p_dm_void
 )
@@ -397,7 +392,7 @@ phydm_get_power_trim_offset_8822b(
 
 
 
-void
+static void
 phydm_set_pa_bias_to_rf_8822b(
 	void		*p_dm_void,
 	u8		e_rf_path,
@@ -457,7 +452,7 @@ phydm_set_pa_bias_to_rf_8822b(
 
 
 
-void
+static void
 phydm_get_pa_bias_offset_8822b(
 	void	*p_dm_void
 )
@@ -500,7 +495,7 @@ phydm_get_pa_bias_offset_8822b(
 
 
 
-void
+static void
 phydm_set_kfree_to_rf_8822b(
 	void		*p_dm_void,
 	u8		e_rf_path,
@@ -527,7 +522,7 @@ phydm_set_kfree_to_rf_8822b(
 
 
 
-void
+static void
 phydm_clear_kfree_to_rf_8822b(
 	void		*p_dm_void,
 	u8		e_rf_path,
@@ -558,7 +553,7 @@ phydm_clear_kfree_to_rf_8822b(
 		));
 }
 
-void
+static void
 phydm_get_thermal_trim_offset_8710b(
 void	*p_dm_void)
 {
@@ -586,7 +581,7 @@ void	*p_dm_void)
 
 }
 
-void
+static void
 phydm_get_power_trim_offset_8710b(
 	void	*p_dm_void
 )
@@ -616,7 +611,8 @@ phydm_get_power_trim_offset_8710b(
 		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8710b power_trim_data->bb_gain[0][0]=0x%X\n",  p_power_trim_info->bb_gain[0][0]));
 
 }
-void
+
+static void
 phydm_set_kfree_to_rf_8710b(
 	void		*p_dm_void,
 	u8		e_rf_path,
@@ -636,7 +632,7 @@ phydm_set_kfree_to_rf_8710b(
 		));
 }
 
-void
+static void
 phydm_clear_kfree_to_rf_8710b(
 	void		*p_dm_void,
 	u8		e_rf_path,
@@ -658,7 +654,7 @@ phydm_clear_kfree_to_rf_8710b(
 
 
 
-void
+static void
 phydm_set_kfree_to_rf(
 	void		*p_dm_void,
 	u8		e_rf_path,

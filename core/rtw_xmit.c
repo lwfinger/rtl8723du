@@ -483,7 +483,7 @@ exit:
 		*r_bmp_vht = bmp_vht;
 }
 
-void rtw_get_shared_macid_tx_rate_bmp_by_bw(struct dvobj_priv *dvobj, u8 bw, u16 *r_bmp_cck_ofdm, u32 *r_bmp_ht, u32 *r_bmp_vht)
+static void rtw_get_shared_macid_tx_rate_bmp_by_bw(struct dvobj_priv *dvobj, u8 bw, u16 *r_bmp_cck_ofdm, u32 *r_bmp_ht, u32 *r_bmp_vht)
 {
 	struct macid_ctl_t *macid_ctl = dvobj_to_macidctl(dvobj);
 	u16 bmp_cck_ofdm = 0;
@@ -1639,7 +1639,7 @@ s32 rtw_make_wlanhdr(_adapter *padapter , u8 *hdr, struct pkt_attrib *pattrib)
 	struct qos_priv *pqospriv = &pmlmepriv->qospriv;
 	u8 qos_option = _FALSE;
 	sint res = _SUCCESS;
-	u16 *fctrl = &pwlanhdr->frame_ctl;
+	__le16 *fctrl = &pwlanhdr->frame_ctl;
 
 	/* struct sta_info *psta; */
 
@@ -1956,7 +1956,7 @@ s32 rtw_make_tdls_wlanhdr(_adapter *padapter , u8 *hdr, struct pkt_attrib *pattr
 	u8 tdls_seq = 0, baddr[ETH_ALEN] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 	sint res = _SUCCESS;
-	u16 *fctrl = &pwlanhdr->frame_ctl;
+	__le16 *fctrl = &pwlanhdr->frame_ctl;
 
 
 	_rtw_memset(hdr, 0, WLANHDR_OFFSET);
@@ -2927,7 +2927,7 @@ s32 rtw_put_snap(u8 *data, u16 h_proto)
 	snap->oui[1] = oui[1];
 	snap->oui[2] = oui[2];
 
-	*(u16 *)(data + SNAP_SIZE) = htons(h_proto);
+	*(__be16 *)(data + SNAP_SIZE) = htons(h_proto);
 
 
 	return SNAP_SIZE + sizeof(u16);
@@ -3223,7 +3223,7 @@ s32 rtw_free_xmitbuf(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf)
 	return _SUCCESS;
 }
 
-void rtw_init_xmitframe(struct xmit_frame *pxframe)
+static void rtw_init_xmitframe(struct xmit_frame *pxframe)
 {
 	if (pxframe !=  NULL) { /* default value setting */
 		pxframe->buf_addr = NULL;
@@ -3506,7 +3506,7 @@ static struct xmit_frame *get_one_xmitframe(struct xmit_priv *pxmitpriv, struct 
 	return pxmitframe;
 }
 
-struct xmit_frame *rtw_get_xframe(struct xmit_priv *pxmitpriv, int *num_frame)
+static struct xmit_frame *rtw_get_xframe(struct xmit_priv *pxmitpriv, int *num_frame)
 {
 	_irqL irqL0;
 	_list *sta_plist, *sta_phead;
@@ -3827,14 +3827,13 @@ void rtw_init_hwxmits(struct hw_xmit *phwxmit, sint entry)
 }
 
 #ifdef CONFIG_BR_EXT
-int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
+static int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 {
 	struct sk_buff *skb = *pskb;
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
 	_irqL irqL;
 	/* if(check_fwstate(pmlmepriv, WIFI_STATION_STATE|WIFI_ADHOC_STATE) == _TRUE) */
 	{
-		void dhcp_flag_bcast(_adapter *priv, struct sk_buff *skb);
 		int res, is_vlan_tag = 0, i, do_nat25 = 1;
 		unsigned short vlan_hdr = 0;
 		void *br_port = NULL;
@@ -3852,8 +3851,8 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 		if (!(skb->data[0] & 1) &&
 		    br_port &&
 		    memcmp(skb->data + MACADDRLEN, padapter->br_mac, MACADDRLEN) &&
-		    *((unsigned short *)(skb->data + MACADDRLEN * 2)) != __constant_htons(ETH_P_8021Q) &&
-		    *((unsigned short *)(skb->data + MACADDRLEN * 2)) == __constant_htons(ETH_P_IP) &&
+		    *((__be16 *)(skb->data + MACADDRLEN * 2)) != __constant_htons(ETH_P_8021Q) &&
+		    *((__be16 *)(skb->data + MACADDRLEN * 2)) == __constant_htons(ETH_P_IP) &&
 		    !memcmp(padapter->scdb_mac, skb->data + MACADDRLEN, MACADDRLEN) && padapter->scdb_entry) {
 			memcpy(skb->data + MACADDRLEN, GET_MY_HWADDR(padapter), MACADDRLEN);
 			padapter->scdb_entry->ageing_timer = jiffies;
@@ -3864,7 +3863,7 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 			/*			if (priv->dev->br_port &&
 			 *				 !memcmp(skb->data+MACADDRLEN, priv->br_mac, MACADDRLEN)) { */
 #if 1
-			if (*((unsigned short *)(skb->data + MACADDRLEN * 2)) == __constant_htons(ETH_P_8021Q)) {
+			if (*((__be16 *)(skb->data + MACADDRLEN * 2)) == __constant_htons(ETH_P_8021Q)) {
 				is_vlan_tag = 1;
 				vlan_hdr = *((unsigned short *)(skb->data + MACADDRLEN * 2 + 2));
 				for (i = 0; i < 6; i++)
@@ -3873,13 +3872,11 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 			}
 			/* if SA == br_mac && skb== IP  => copy SIP to br_ip ?? why */
 			if (!memcmp(skb->data + MACADDRLEN, padapter->br_mac, MACADDRLEN) &&
-			    (*((unsigned short *)(skb->data + MACADDRLEN * 2)) == __constant_htons(ETH_P_IP)))
+			    (*((__be16 *)(skb->data + MACADDRLEN * 2)) == __constant_htons(ETH_P_IP)))
 				memcpy(padapter->br_ip, skb->data + WLAN_ETHHDR_LEN + 12, 4);
 
-			if (*((unsigned short *)(skb->data + MACADDRLEN * 2)) == __constant_htons(ETH_P_IP)) {
+			if (*((__be16 *)(skb->data + MACADDRLEN * 2)) == __constant_htons(ETH_P_IP)) {
 				if (memcmp(padapter->scdb_mac, skb->data + MACADDRLEN, MACADDRLEN)) {
-					void *scdb_findEntry(_adapter *priv, unsigned char *macAddr, unsigned char *ipAddr);
-
 					padapter->scdb_entry = (struct nat25_network_db_entry *)scdb_findEntry(padapter,
 						skb->data + MACADDRLEN, skb->data + WLAN_ETHHDR_LEN + 12);
 					if (padapter->scdb_entry != NULL) {
@@ -3901,7 +3898,6 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 			_exit_critical_bh(&padapter->br_ext_lock, &irqL);
 #endif /* 1 */
 			if (do_nat25) {
-				int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method);
 				if (nat25_db_handle(padapter, skb, NAT25_CHECK) == 0) {
 					struct sk_buff *newskb;
 
@@ -3909,7 +3905,7 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 						skb_push(skb, 4);
 						for (i = 0; i < 6; i++)
 							*((unsigned short *)(skb->data + i * 2)) = *((unsigned short *)(skb->data + 4 + i * 2));
-						*((unsigned short *)(skb->data + MACADDRLEN * 2)) = __constant_htons(ETH_P_8021Q);
+						*((__be16 *)(skb->data + MACADDRLEN * 2)) = __constant_htons(ETH_P_8021Q);
 						*((unsigned short *)(skb->data + MACADDRLEN * 2 + 2)) = vlan_hdr;
 					}
 
@@ -3970,7 +3966,7 @@ int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 				skb_push(skb, 4);
 				for (i = 0; i < 6; i++)
 					*((unsigned short *)(skb->data + i * 2)) = *((unsigned short *)(skb->data + 4 + i * 2));
-				*((unsigned short *)(skb->data + MACADDRLEN * 2)) = __constant_htons(ETH_P_8021Q);
+				*((__be16 *)(skb->data + MACADDRLEN * 2)) = __constant_htons(ETH_P_8021Q);
 				*((unsigned short *)(skb->data + MACADDRLEN * 2 + 2)) = vlan_hdr;
 			}
 		}
@@ -5463,7 +5459,7 @@ int rtw_sctx_wait(struct submit_ctx *sctx, const char *msg)
 	return ret;
 }
 
-bool rtw_sctx_chk_waring_status(int status)
+static bool rtw_sctx_chk_waring_status(int status)
 {
 	switch (status) {
 	case RTW_SCTX_DONE_UNKNOWN:

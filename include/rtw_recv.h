@@ -129,7 +129,7 @@ struct rx_pkt_attrib	{
 	u8	priority;
 	u8	pw_save;
 	u8	mdata;
-	__be16	seq_num;
+	u16	seq_num;
 	u8	frag_num;
 	u8	mfrag;
 	u8	order;

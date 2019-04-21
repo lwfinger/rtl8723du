@@ -2023,7 +2023,7 @@ u8 rtw_reset_drv_sw(_adapter *padapter)
 	if (is_primary_adapter(padapter))
 		rtw_hal_sreset_reset_value(padapter);
 #endif
-	pwrctrlpriv->pwr_state_check_cnts = 0;
+	padapter->pwr_state_check_cnts = 0;
 
 	/* mlmeextpriv */
 	mlmeext_set_scan_state(&padapter->mlmeextpriv, SCAN_DISABLE);
@@ -2200,11 +2200,7 @@ void rtw_cancel_all_timer(_adapter *padapter)
 	/* cancel sw led timer */
 	rtw_hal_sw_led_deinit(padapter);
 #endif
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-	_cancel_timer_ex(&(adapter_to_pwrctl(padapter)->pwr_state_check_timer));
-#else
 	_cancel_timer_ex(&padapter->pwr_state_check_timer);
-#endif
 
 #ifdef CONFIG_TX_AMSDU
 	_cancel_timer_ex(&padapter->xmitpriv.amsdu_bk_timer);
@@ -2989,11 +2985,7 @@ int _netdev_open(struct net_device *pnetdev)
 	_set_timer(&adapter_to_dvobj(padapter)->dynamic_chk_timer, 2000);
 
 #ifndef CONFIG_IPS_CHECK_IN_WD
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-	rtw_set_pwr_state_check_timer(pwrctrlpriv);
-#else
 	rtw_set_pwr_state_check_timer(padapter);
-#endif
 #endif
 
 	/* rtw_netif_carrier_on(pnetdev); */ /* call this func when rtw_joinbss_event_callback return success */
@@ -3111,11 +3103,7 @@ static int  ips_netdrv_open(_adapter *padapter)
 #endif /* !RTW_HALMAC */
 
 #ifndef CONFIG_IPS_CHECK_IN_WD
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-	rtw_set_pwr_state_check_timer(adapter_to_pwrctl(padapter));
-#else
 	rtw_set_pwr_state_check_timer(padapter);
-#endif
 #endif
 	_set_timer(&adapter_to_dvobj(padapter)->dynamic_chk_timer, 2000);
 

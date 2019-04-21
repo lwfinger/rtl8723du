@@ -1544,8 +1544,6 @@ void rtw_free_assoc_resources(_adapter *adapter, int lock_scanned_queue)
 	adapter->securitypriv.key_mask = 0;
 
 	rtw_reset_rx_info(adapter);
-
-
 }
 
 /*
@@ -1670,11 +1668,7 @@ inline void rtw_indicate_scan_done(_adapter *padapter, bool aborted)
 #ifdef CONFIG_IPS_CHECK_IN_WD
 		_set_timer(&adapter_to_dvobj(padapter)->dynamic_chk_timer, 1);
 #else /* !CONFIG_IPS_CHECK_IN_WD */
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-		_rtw_set_pwr_state_check_timer(pwrpriv, 1);
-#else
 		_rtw_set_pwr_state_check_timer(padapter, 1);
-#endif
 #endif /* !CONFIG_IPS_CHECK_IN_WD */
 	}
 #endif /* CONFIG_IPS */
@@ -3109,7 +3103,6 @@ void rtw_iface_dynamic_check_timer_handlder(_adapter *adapter)
 #endif /* (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35)) */
 		&& (check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_ADHOC_STATE) == _TRUE)) {
 		/* expire NAT2.5 entry */
-		void nat25_db_expire(_adapter *priv);
 		nat25_db_expire(adapter);
 
 		if (adapter->pppoe_connection_in_progress > 0)
@@ -4340,10 +4333,10 @@ unsigned int rtw_restructure_ht_ie(_adapter *padapter, u8 *in_ie, u8 *out_ie, ui
 
 	_rtw_memset(&ht_capie, 0, sizeof(struct rtw_ieee80211_ht_cap));
 
-	ht_capie.cap_info = IEEE80211_HT_CAP_DSSSCCK40;
+	ht_capie.cap_info = cpu_to_le16(IEEE80211_HT_CAP_DSSSCCK40);
 
 	if (phtpriv->sgi_20m)
-		ht_capie.cap_info |= IEEE80211_HT_CAP_SGI_20;
+		ht_capie.cap_info |= cpu_to_le16(IEEE80211_HT_CAP_SGI_20);
 
 	/* Get HT BW */
 	if (in_ie == NULL) {
@@ -4386,23 +4379,23 @@ unsigned int rtw_restructure_ht_ie(_adapter *padapter, u8 *in_ie, u8 *out_ie, ui
 	}
 
 	if ((cbw40_enable == 1) && (operation_bw == CHANNEL_WIDTH_40)) {
-		ht_capie.cap_info |= IEEE80211_HT_CAP_SUP_WIDTH;
+		ht_capie.cap_info |= cpu_to_le16(IEEE80211_HT_CAP_SUP_WIDTH);
 		if (phtpriv->sgi_40m)
-			ht_capie.cap_info |= IEEE80211_HT_CAP_SGI_40;
+			ht_capie.cap_info |= cpu_to_le16(IEEE80211_HT_CAP_SGI_40);
 	}
 
 	/* todo: disable SM power save mode */
-	ht_capie.cap_info |= IEEE80211_HT_CAP_SM_PS;
+	ht_capie.cap_info |= cpu_to_le16(IEEE80211_HT_CAP_SM_PS);
 
 	/* RX LDPC */
 	if (TEST_FLAG(phtpriv->ldpc_cap, LDPC_HT_ENABLE_RX)) {
-		ht_capie.cap_info |= IEEE80211_HT_CAP_LDPC_CODING;
+		ht_capie.cap_info |= cpu_to_le16(IEEE80211_HT_CAP_LDPC_CODING);
 		RTW_INFO("[HT] Declare supporting RX LDPC\n");
 	}
 
 	/* TX STBC */
 	if (TEST_FLAG(phtpriv->stbc_cap, STBC_HT_ENABLE_TX)) {
-		ht_capie.cap_info |= IEEE80211_HT_CAP_TX_STBC;
+		ht_capie.cap_info |= cpu_to_le16(IEEE80211_HT_CAP_TX_STBC);
 		RTW_INFO("[HT] Declare supporting TX STBC\n");
 	}
 
@@ -4453,7 +4446,7 @@ unsigned int rtw_restructure_ht_ie(_adapter *padapter, u8 *in_ie, u8 *out_ie, ui
 		rtw_hal_get_def_var(padapter, HAL_DEF_MAX_RECVBUF_SZ, &max_recvbuf_sz);
 		if (max_recvbuf_sz - rx_packet_offset >= (8191 - 256)) {
 			RTW_INFO("%s IEEE80211_HT_CAP_MAX_AMSDU is set\n", __FUNCTION__);
-			ht_capie.cap_info = ht_capie.cap_info | IEEE80211_HT_CAP_MAX_AMSDU;
+			ht_capie.cap_info |= cpu_to_le16(IEEE80211_HT_CAP_MAX_AMSDU);
 		}
 	}
 	if (padapter->driver_rx_ampdu_factor != 0xFF)

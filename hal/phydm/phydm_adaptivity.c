@@ -19,7 +19,7 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-void
+static void
 phydm_dig_up_bound_lmt_en(
 	void			*p_dm_void
 )
@@ -52,7 +52,7 @@ phydm_dig_up_bound_lmt_en(
 	PHYDM_DBG(p_dm, DBG_ADPTVTY, ("IGI_lmt_cnt = %d\n", p_adaptivity->igi_up_bound_lmt_cnt));
 }
 
-void
+static void
 phydm_check_adaptivity(
 	void			*p_dm_void
 )
@@ -83,7 +83,7 @@ phydm_set_edcca_threshold(
 		odm_set_bb_reg(p_dm, REG_FPGA0_XB_LSSI_READ_BACK, MASKLWORD, (u16)((u8)L2H | (u8)H2L << 8));
 }
 
-void
+static void
 phydm_set_lna(
 	void				*p_dm_void,
 	enum phydm_set_lna	type
@@ -346,7 +346,7 @@ phydm_search_pwdb_lower_bound(
 	phydm_set_edcca_threshold(p_dm, 0x7f, 0x7f);				/*resume to no link state*/
 }
 
-boolean
+static boolean
 phydm_re_search_condition(
 	void				*p_dm_void
 )

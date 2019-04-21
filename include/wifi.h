@@ -349,7 +349,7 @@ enum WIFI_REG_DOMAIN {
 #define SetSeqNum(pbuf, num) \
 	do {    \
 		*(__le16 *)((SIZE_PTR)(pbuf) + 22) = \
-			((*(__le16 *)((SIZE_PTR)(pbuf) + 22)) & le16_to_cpu((unsigned short)0x000F)) | \
+			((*(__le16 *)((SIZE_PTR)(pbuf) + 22)) & cpu_to_le16((unsigned short)0x000F)) | \
 			cpu_to_le16((unsigned short)(0xfff0 & (num << 4))); \
 	} while (0)
 
@@ -761,11 +761,11 @@ struct rtw_ieee80211_bar {
 */
 
 struct rtw_ieee80211_ht_cap {
-	unsigned short	cap_info;
+	__le16	cap_info;
 	unsigned char	ampdu_params_info;
 	unsigned char	supp_mcs_set[16];
-	unsigned short	extended_ht_cap_info;
-	unsigned int		tx_BF_cap_info;
+	__le16	extended_ht_cap_info;
+	__le32	tx_BF_cap_info;
 	unsigned char	       antenna_selection_info;
 } __attribute__((packed));
 

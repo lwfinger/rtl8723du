@@ -769,6 +769,7 @@ void rtw_init_timer(_timer *ptimer, void *padapter, void *pfunc, void *ctx)
 	_adapter *adapter = (_adapter *)padapter;
 
 	_init_timer(ptimer, adapter->pnetdev, pfunc, ctx);
+}
 #endif
 
 /*

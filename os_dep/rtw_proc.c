@@ -178,7 +178,7 @@ static int proc_get_halmac_info(struct seq_file *m, void *v)
 * rtw_drv_proc:
 * init/deinit when register/unregister driver
 */
-const struct rtw_proc_hdl drv_proc_hdls[] = {
+static const struct rtw_proc_hdl drv_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("ver_info", proc_get_drv_version, NULL),
 	RTW_PROC_HDL_SSEQ("log_level", proc_get_log_level, proc_set_log_level),
 	RTW_PROC_HDL_SSEQ("drv_cfg", proc_get_drv_cfg, NULL),
@@ -193,7 +193,7 @@ const struct rtw_proc_hdl drv_proc_hdls[] = {
 #endif /* RTW_HALMAC */
 };
 
-const int drv_proc_hdls_num = sizeof(drv_proc_hdls) / sizeof(struct rtw_proc_hdl);
+static const int drv_proc_hdls_num = sizeof(drv_proc_hdls) / sizeof(struct rtw_proc_hdl);
 
 static int rtw_drv_proc_open(struct inode *inode, struct file *file)
 {
@@ -411,7 +411,7 @@ static int proc_get_rf_reg_dump(struct seq_file *m, void *v)
 }
 
 #ifdef CONFIG_AP_MODE
-int proc_get_aid_status(struct seq_file *m, void *v)
+static int proc_get_aid_status(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
@@ -421,7 +421,7 @@ int proc_get_aid_status(struct seq_file *m, void *v)
 	return 0;
 }
 
-ssize_t proc_set_aid_status(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
+static ssize_t proc_set_aid_status(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
@@ -880,7 +880,7 @@ static int proc_get_macaddr_acl(struct seq_file *m, void *v)
 	return 0;
 }
 
-ssize_t proc_set_macaddr_acl(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
+static ssize_t proc_set_macaddr_acl(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
@@ -1134,7 +1134,7 @@ exit:
 #endif /* CONFIG_DFS_MASTER */
 
 #ifdef CONFIG_80211N_HT
-int proc_get_rx_ampdu_size_limit(struct seq_file *m, void *v)
+static int proc_get_rx_ampdu_size_limit(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
@@ -1144,7 +1144,7 @@ int proc_get_rx_ampdu_size_limit(struct seq_file *m, void *v)
 	return 0;
 }
 
-ssize_t proc_set_rx_ampdu_size_limit(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
+static ssize_t proc_set_rx_ampdu_size_limit(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
@@ -1827,7 +1827,7 @@ static ssize_t proc_set_tx_gain_offset(struct file *file, const char __user *buf
 #endif /* CONFIG_RF_POWER_TRIM */
 
 #ifdef CONFIG_BT_COEXIST
-ssize_t proc_set_btinfo_evt(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
+static ssize_t proc_set_btinfo_evt(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
@@ -1954,7 +1954,7 @@ static int btreg_parse_str(char const *input, u8 *type, u16 *addr, u16 *val)
 	return 0;
 }
 
-int proc_get_btreg_read(struct seq_file *m, void *v)
+static int proc_get_btreg_read(struct seq_file *m, void *v)
 {
 	struct net_device *dev;
 	PADAPTER padapter;
@@ -1977,7 +1977,7 @@ int proc_get_btreg_read(struct seq_file *m, void *v)
 	return 0;
 }
 
-ssize_t proc_set_btreg_read(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
+static ssize_t proc_set_btreg_read(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
 	PADAPTER padapter;
@@ -2028,7 +2028,7 @@ exit:
 	return count;
 }
 
-int proc_get_btreg_write(struct seq_file *m, void *v)
+static int proc_get_btreg_write(struct seq_file *m, void *v)
 {
 	struct net_device *dev;
 	PADAPTER padapter;
@@ -2055,7 +2055,7 @@ int proc_get_btreg_write(struct seq_file *m, void *v)
 	return 0;
 }
 
-ssize_t proc_set_btreg_write(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
+static ssize_t proc_set_btreg_write(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
 	PADAPTER padapter;
@@ -2123,7 +2123,7 @@ int proc_get_mbid_cam_cache(struct seq_file *m, void *v)
 }
 #endif /* CONFIG_MBSSID_CAM */
 
-int proc_get_mac_addr(struct seq_file *m, void *v)
+static int proc_get_mac_addr(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
@@ -2472,7 +2472,7 @@ static ssize_t proc_set_napi_th(struct file *file, const char __user *buffer, si
 #endif /* CONFIG_RTW_NAPI_DYNAMIC */
 
 
-ssize_t proc_set_dynamic_agg_enable(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
+static ssize_t proc_set_dynamic_agg_enable(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
@@ -2524,7 +2524,7 @@ static int proc_get_dynamic_agg_enable(struct seq_file *m, void *v)
 * rtw_adapter_proc:
 * init/deinit when register/unregister net_device
 */
-const struct rtw_proc_hdl adapter_proc_hdls[] = {
+static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 #if RTW_SEQ_FILE_TEST
 	RTW_PROC_HDL_SEQ("seq_file_test", &seq_file_test, NULL),
 #endif
@@ -2768,7 +2768,7 @@ const struct rtw_proc_hdl adapter_proc_hdls[] = {
 
 };
 
-const int adapter_proc_hdls_num = sizeof(adapter_proc_hdls) / sizeof(struct rtw_proc_hdl);
+static const int adapter_proc_hdls_num = sizeof(adapter_proc_hdls) / sizeof(struct rtw_proc_hdl);
 
 static int rtw_adapter_proc_open(struct inode *inode, struct file *file)
 {
@@ -2867,7 +2867,7 @@ ssize_t proc_set_odm_adaptivity(struct file *file, const char __user *buffer, si
 static char *phydm_msg = NULL;
 #define PHYDM_MSG_LEN	80*24
 
-int proc_get_phydm_cmd(struct seq_file *m, void *v)
+static int proc_get_phydm_cmd(struct seq_file *m, void *v)
 {
 	struct net_device *netdev;
 	PADAPTER padapter;
@@ -2894,7 +2894,7 @@ int proc_get_phydm_cmd(struct seq_file *m, void *v)
 	return 0;
 }
 
-ssize_t proc_set_phydm_cmd(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
+static ssize_t proc_set_phydm_cmd(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *netdev;
 	PADAPTER padapter;
@@ -2935,12 +2935,12 @@ ssize_t proc_set_phydm_cmd(struct file *file, const char __user *buffer, size_t 
 * rtw_odm_proc:
 * init/deinit when register/unregister net_device, along with rtw_adapter_proc
 */
-const struct rtw_proc_hdl odm_proc_hdls[] = {
+static const struct rtw_proc_hdl odm_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("adaptivity", proc_get_odm_adaptivity, proc_set_odm_adaptivity),
 	RTW_PROC_HDL_SSEQ("cmd", proc_get_phydm_cmd, proc_set_phydm_cmd),
 };
 
-const int odm_proc_hdls_num = sizeof(odm_proc_hdls) / sizeof(struct rtw_proc_hdl);
+static const int odm_proc_hdls_num = sizeof(odm_proc_hdls) / sizeof(struct rtw_proc_hdl);
 
 static int rtw_odm_proc_open(struct inode *inode, struct file *file)
 {
@@ -2994,7 +2994,7 @@ static const struct file_operations rtw_odm_proc_sseq_fops = {
 	.write = rtw_odm_proc_write,
 };
 
-struct proc_dir_entry *rtw_odm_proc_init(struct net_device *dev)
+static struct proc_dir_entry *rtw_odm_proc_init(struct net_device *dev)
 {
 	struct proc_dir_entry *dir_odm = NULL;
 	struct proc_dir_entry *entry = NULL;
@@ -3037,7 +3037,7 @@ exit:
 	return dir_odm;
 }
 
-void rtw_odm_proc_deinit(_adapter	*adapter)
+static void rtw_odm_proc_deinit(_adapter	*adapter)
 {
 	struct proc_dir_entry *dir_odm = NULL;
 	int i;

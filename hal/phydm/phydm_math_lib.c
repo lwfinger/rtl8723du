@@ -20,7 +20,7 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-const u16 db_invert_table[12][8] = {
+static const u16 db_invert_table[12][8] = {
 	{	1,		1,		1,		2,		2,		2,		2,		3},
 	{	3,		3,		4,		4,		4,		5,		6,		6},
 	{	7,		8,		9,		10,		11,		13,		14,		16},

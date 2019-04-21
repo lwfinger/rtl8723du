@@ -225,7 +225,7 @@ halrf_cmn_info_get(
 	return	return_value;
 }
 
-void
+static void
 halrf_supportability_init_mp(
 	void		*p_dm_void
 )

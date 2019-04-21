@@ -38,7 +38,7 @@ u8 center_ch_2g_40m[CENTER_CH_2G_40M_NUM] = {
 	11,
 };
 
-u8 op_chs_of_cch_2g_40m[CENTER_CH_2G_40M_NUM][2] = {
+static u8 op_chs_of_cch_2g_40m[CENTER_CH_2G_40M_NUM][2] = {
 	{1, 5}, /* 3 */
 	{2, 6}, /* 4 */
 	{3, 7}, /* 5 */
@@ -128,7 +128,7 @@ u8 center_ch_5g_20m_40m[CENTER_CH_5G_20M_NUM + CENTER_CH_5G_40M_NUM] = {
 /* G13 */173, 175, 177
 };
 
-u8 op_chs_of_cch_5g_40m[CENTER_CH_5G_40M_NUM][2] = {
+static u8 op_chs_of_cch_5g_40m[CENTER_CH_5G_40M_NUM][2] = {
 	{36, 40}, /* 38 */
 	{44, 48}, /* 46 */
 	{52, 56}, /* 54 */
@@ -155,7 +155,7 @@ u8 center_ch_5g_80m[CENTER_CH_5G_80M_NUM] = {
 /* G12 ~ G13*/171
 };
 
-u8 op_chs_of_cch_5g_80m[CENTER_CH_5G_80M_NUM][4] = {
+static u8 op_chs_of_cch_5g_80m[CENTER_CH_5G_80M_NUM][4] = {
 	{36, 40, 44, 48}, /* 42 */
 	{52, 56, 60, 64}, /* 58 */
 	{100, 104, 108, 112}, /* 106 */
@@ -165,13 +165,13 @@ u8 op_chs_of_cch_5g_80m[CENTER_CH_5G_80M_NUM][4] = {
 	{165, 169, 173, 177}, /* 171 */
 };
 
-u8 center_ch_5g_160m[CENTER_CH_5G_160M_NUM] = {
+static u8 center_ch_5g_160m[CENTER_CH_5G_160M_NUM] = {
 /* G00 ~ G03*/50,
 /* G04 ~ G07*/114,
 /* G10 ~ G13*/163
 };
 
-u8 op_chs_of_cch_5g_160m[CENTER_CH_5G_160M_NUM][8] = {
+static u8 op_chs_of_cch_5g_160m[CENTER_CH_5G_160M_NUM][8] = {
 	{36, 40, 44, 48, 52, 56, 60, 64}, /* 50 */
 	{100, 104, 108, 112, 116, 120, 124, 128}, /* 114 */
 	{149, 153, 157, 161, 165, 169, 173, 177}, /* 163 */
@@ -182,12 +182,12 @@ struct center_chs_ent_t {
 	u8 *chs;
 };
 
-struct center_chs_ent_t center_chs_2g_by_bw[] = {
+static struct center_chs_ent_t center_chs_2g_by_bw[] = {
 	{CENTER_CH_2G_NUM, center_ch_2g},
 	{CENTER_CH_2G_40M_NUM, center_ch_2g_40m},
 };
 
-struct center_chs_ent_t center_chs_5g_by_bw[] = {
+static struct center_chs_ent_t center_chs_5g_by_bw[] = {
 	{CENTER_CH_5G_20M_NUM, center_ch_5g_20m},
 	{CENTER_CH_5G_40M_NUM, center_ch_5g_40m},
 	{CENTER_CH_5G_80M_NUM, center_ch_5g_80m},
@@ -252,12 +252,12 @@ struct op_chs_ent_t {
 	u8 *chs;
 };
 
-struct op_chs_ent_t op_chs_of_cch_2g_by_bw[] = {
+static struct op_chs_ent_t op_chs_of_cch_2g_by_bw[] = {
 	{1, center_ch_2g},
 	{2, (u8 *)op_chs_of_cch_2g_40m},
 };
 
-struct op_chs_ent_t op_chs_of_cch_5g_by_bw[] = {
+static struct op_chs_ent_t op_chs_of_cch_5g_by_bw[] = {
 	{1, center_ch_5g_20m},
 	{2, (u8 *)op_chs_of_cch_5g_40m},
 	{4, (u8 *)op_chs_of_cch_5g_80m},
@@ -1622,7 +1622,7 @@ int rtw_ch_to_bb_gain_sel(int ch)
 	return sel;
 }
 
-s8 rtw_rf_get_kfree_tx_gain_offset(_adapter *padapter, u8 path, u8 ch)
+static s8 rtw_rf_get_kfree_tx_gain_offset(_adapter *padapter, u8 path, u8 ch)
 {
 	s8 kfree_offset = 0;
 

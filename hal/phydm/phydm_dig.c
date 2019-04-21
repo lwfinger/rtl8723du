@@ -20,7 +20,7 @@
 #include "phydm_precomp.h"
 
 
-boolean
+static boolean
 phydm_dig_go_up_check(
 	void		*p_dm_void
 )
@@ -89,7 +89,7 @@ phydm_dig_go_up_check(
 	return ret;
 }
 
-void
+static void
 odm_fa_threshold_check(
 	void			*p_dm_void,
 	boolean			is_dfs_band,
@@ -144,7 +144,7 @@ odm_fa_threshold_check(
 
 }
 
-void
+static void
 phydm_set_big_jump_step(
 	void			*p_dm_void,
 	u8			current_igi
@@ -356,7 +356,7 @@ odm_pause_dig(
 
 }
 
-boolean
+static boolean
 odm_dig_abort(
 	void			*p_dm_void
 )
@@ -421,7 +421,7 @@ phydm_dig_init(
 #endif
 }
 
-boolean
+static boolean
 phydm_dig_performance_mode_decision(
 	struct PHY_DM_STRUCT		*p_dm
 )
@@ -447,7 +447,7 @@ phydm_dig_performance_mode_decision(
 	return is_performance;
 }
 
-void
+static void
 phydm_dig_abs_boundary_decision(
 	struct PHY_DM_STRUCT		*p_dm,
 	boolean	is_performance,
@@ -506,7 +506,7 @@ phydm_dig_abs_boundary_decision(
 
 }
 
-void
+static void
 phydm_dig_dym_boundary_decision(
 	struct PHY_DM_STRUCT		*p_dm,
 	boolean	is_performance
@@ -559,7 +559,7 @@ phydm_dig_dym_boundary_decision(
 		p_dig_t->rx_gain_range_max, p_dig_t->rx_gain_range_min));
 }
 
-void
+static void
 phydm_dig_abnormal_case(
 	struct PHY_DM_STRUCT		*p_dm,
 	u8	current_igi,
@@ -593,7 +593,7 @@ phydm_dig_abnormal_case(
 
 }
 
-u8
+static u8
 phydm_dig_current_igi_by_fa_th(
 	struct PHY_DM_STRUCT		*p_dm,
 	u8			current_igi,
@@ -617,7 +617,7 @@ phydm_dig_current_igi_by_fa_th(
 
 }
 
-u8
+static u8
 phydm_dig_igi_start_value(
 	struct PHY_DM_STRUCT		*p_dm,
 	boolean	is_performance,
@@ -879,7 +879,7 @@ phydm_dig_by_rssi_lps(
 /* 3============================================================
  * 3 FASLE ALARM CHECK
  * 3============================================================ */
-void
+static void
 phydm_false_alarm_counter_reg_reset(
 	void					*p_dm_void
 )
@@ -950,7 +950,7 @@ phydm_false_alarm_counter_reg_reset(
 #endif	/* #if (ODM_IC_11AC_SERIES_SUPPORT == 1) */
 }
 
-void
+static void
 phydm_false_alarm_counter_reg_hold(
 	void					*p_dm_void
 )

@@ -44,8 +44,8 @@ phydm_get_psd_data(
 	return psd_report;
 }
 
-u8		psd_result_cali_tone_8821[7]= {21, 28, 33, 93, 98, 105, 127};
-u8		psd_result_cali_val_8821[7] = {67,69,71,72,71,69,67};	
+static u8		psd_result_cali_tone_8821[7]= {21, 28, 33, 93, 98, 105, 127};
+static u8		psd_result_cali_val_8821[7] = {67,69,71,72,71,69,67};	
 
 void
 phydm_psd(

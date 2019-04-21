@@ -1145,10 +1145,9 @@ struct tsf_info {
 #define ADAPTER_TX_BW_5G(adapter) BW_MODE_5G((adapter)->driver_tx_bw_mode)
 
 struct _ADAPTER {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 	_timer	pwr_state_check_timer;
 	int	pwr_state_check_interval;
-#endif
+	u8 pwr_state_check_cnts;
 	int	DriverState;/* for disable driver using module, use dongle to replace module. */
 	int	pid[3];/* process id from UI, 0:wps, 1:hostapd, 2:dhcpcd */
 	int	bDongle;/* build-in module or external dongle */
@@ -1480,6 +1479,16 @@ int rtw_dev_pno_set(struct net_device *net, pno_ssid_t *ssid, int num,
 #endif /* CONFIG_PNO_SUPPORT */
 
 int rtw_suspend_free_assoc_resource(_adapter *padapter);
+int rtw_change_ifname(_adapter *padapter, const char *ifname);
+void nat25_db_expire(_adapter *priv);
+void *scdb_findEntry(_adapter *priv, unsigned char *macAddr, unsigned char *ipAddr);
+void dhcp_flag_bcast(_adapter *priv, struct sk_buff *skb);
+void rtw_indicate_wx_assoc_event(_adapter *padapter);
+void rtw_indicate_wx_disassoc_event(_adapter *padapter);
+void indicate_wx_scan_complete_event(_adapter *padapter);
+int nat25_handle_frame(_adapter *priv, struct sk_buff *skb);
+int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method);
+
 /* HCI Related header file */
 #include <usb_osintf.h>
 #include <usb_ops.h>

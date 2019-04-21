@@ -3760,8 +3760,6 @@ ssize_t proc_set_sreset(struct file *file, const char __user *buffer, size_t cou
 
 int proc_get_new_bcn_max(struct seq_file *m, void *v)
 {
-	extern int new_bcn_max;
-
 	RTW_PRINT_SEL(m, "%d", new_bcn_max);
 	return 0;
 }

@@ -1853,7 +1853,7 @@ void rtw_hal_update_sta_wset(_adapter *adapter, struct sta_info *psta)
 	psta->cmn.support_wireless_set = w_set;
 }
 
-void rtw_hal_update_sta_mimo_type(_adapter *adapter, struct sta_info *psta)
+static void rtw_hal_update_sta_mimo_type(_adapter *adapter, struct sta_info *psta)
 {
 	s8 tx_nss, rx_nss;
 
@@ -1882,24 +1882,10 @@ void rtw_hal_update_sta_mimo_type(_adapter *adapter, struct sta_info *psta)
 			psta->cmn.mac_id, tx_nss, rx_nss);
 }
 
-void rtw_hal_update_sta_smps_cap(_adapter *adapter, struct sta_info *psta)
+static void rtw_hal_update_sta_smps_cap(_adapter *adapter, struct sta_info *psta)
 {
 	/*Spatial Multiplexing Power Save*/
-#if 0
-	if (check_fwstate(&adapter->mlmepriv, WIFI_AP_STATE) == _TRUE) {
-		#ifdef CONFIG_80211N_HT
-		if (psta->htpriv.ht_option) {
-			if (psta->htpriv.smps_cap == 0)
-				psta->cmn.sm_ps = SM_PS_STATIC;
-			else if (psta->htpriv.smps_cap == 1)
-				psta->cmn.sm_ps = SM_PS_DYNAMIC;
-			else
-				psta->cmn.sm_ps = SM_PS_DISABLE;
-		}
-		#endif /* CONFIG_80211N_HT */
-	} else
-#endif
-		psta->cmn.sm_ps = SM_PS_DISABLE;
+	psta->cmn.sm_ps = SM_PS_DISABLE;
 
 	RTW_INFO("STA - MAC_ID:%d, SM_PS %d\n",
 			psta->cmn.mac_id, psta->cmn.sm_ps);
@@ -1907,10 +1893,9 @@ void rtw_hal_update_sta_smps_cap(_adapter *adapter, struct sta_info *psta)
 
 u8 rtw_get_mgntframe_raid(_adapter *adapter, unsigned char network_type)
 {
-
 	u8 raid;
-	if (IS_NEW_GENERATION_IC(adapter)) {
 
+	if (IS_NEW_GENERATION_IC(adapter)) {
 		raid = (network_type & WIRELESS_11B)	? RATEID_IDX_B
 		       : RATEID_IDX_G;
 	} else {
@@ -1920,7 +1905,7 @@ u8 rtw_get_mgntframe_raid(_adapter *adapter, unsigned char network_type)
 	return raid;
 }
 
-void rtw_hal_update_sta_rate_mask(PADAPTER padapter, struct sta_info *psta)
+static void rtw_hal_update_sta_rate_mask(PADAPTER padapter, struct sta_info *psta)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(padapter);
 	u8 i, rf_type, tx_nss;
@@ -3427,7 +3412,7 @@ inline s32 rtw_hal_set_FwMediaStatusRpt_range_cmd(_adapter *adapter, bool opmode
 	return rtw_hal_set_FwMediaStatusRpt_cmd(adapter, opmode, miracast, miracast_sink, role, macid, 1, macid_end);
 }
 
-void rtw_hal_set_FwRsvdPage_cmd(PADAPTER padapter, PRSVDPAGE_LOC rsvdpageloc)
+static void rtw_hal_set_FwRsvdPage_cmd(PADAPTER padapter, PRSVDPAGE_LOC rsvdpageloc)
 {
 	struct	hal_ops *pHalFunc = &padapter->hal_func;
 	u8	u1H2CRsvdPageParm[H2C_RSVDPAGE_LOC_LEN] = {0};
@@ -3451,7 +3436,7 @@ void rtw_hal_set_FwRsvdPage_cmd(PADAPTER padapter, PRSVDPAGE_LOC rsvdpageloc)
 
 }
 
-void rtw_hal_set_FwAoacRsvdPage_cmd(PADAPTER padapter, PRSVDPAGE_LOC rsvdpageloc)
+static void rtw_hal_set_FwAoacRsvdPage_cmd(PADAPTER padapter, PRSVDPAGE_LOC rsvdpageloc)
 {
 }
 
@@ -3578,8 +3563,8 @@ void rtw_hal_construct_beacon(_adapter *padapter,
 				     u8 *pframe, u32 *pLength)
 {
 	struct rtw_ieee80211_hdr	*pwlanhdr;
-	u16					*fctrl;
-	u32					rate_len, pktlen;
+	__le16 *fctrl;
+	u32 rate_len, pktlen;
 	struct mlme_ext_priv	*pmlmeext = &(padapter->mlmeextpriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	WLAN_BSSID_EX		*cur_network = &(pmlmeinfo->network);
@@ -3676,8 +3661,8 @@ static void rtw_hal_construct_PSPoll(_adapter *padapter,
 				     u8 *pframe, u32 *pLength)
 {
 	struct rtw_ieee80211_hdr	*pwlanhdr;
-	u16					*fctrl;
-	u32					pktlen;
+	__le16 *fctrl;
+	u32 pktlen;
 	struct mlme_ext_priv	*pmlmeext = &(padapter->mlmeextpriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
@@ -3714,8 +3699,8 @@ void rtw_hal_construct_NullFunctionData(
 	u8		bForcePowerSave)
 {
 	struct rtw_ieee80211_hdr	*pwlanhdr;
-	u16						*fctrl;
-	u32						pktlen;
+	__le16 *fctrl;
+	u32 pktlen;
 	struct mlme_priv		*pmlmepriv = &padapter->mlmepriv;
 	struct wlan_network		*cur_network = &pmlmepriv->cur_network;
 	struct mlme_ext_priv	*pmlmeext = &(padapter->mlmeextpriv);
@@ -3779,13 +3764,13 @@ void rtw_hal_construct_NullFunctionData(
 	*pLength = pktlen;
 }
 
-void rtw_hal_construct_ProbeRsp(_adapter *padapter, u8 *pframe, u32 *pLength,
+static void rtw_hal_construct_ProbeRsp(_adapter *padapter, u8 *pframe, u32 *pLength,
 				u8 *StaAddr, BOOLEAN bHideSSID)
 {
 	struct rtw_ieee80211_hdr	*pwlanhdr;
-	u16					*fctrl;
-	u8					*mac, *bssid;
-	u32					pktlen;
+	__le16 *fctrl;
+	u8 *mac, *bssid;
+	u32 pktlen;
 	struct mlme_ext_priv	*pmlmeext = &(padapter->mlmeextpriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	WLAN_BSSID_EX  *cur_network = &(pmlmeinfo->network);
@@ -5755,7 +5740,7 @@ exit:
 }
 
 #ifdef CONFIG_RF_POWER_TRIM
-u32 Array_kfreemap[] = {
+static u32 Array_kfreemap[] = {
 	0x08, 0xe,
 	0x06, 0xc,
 	0x04, 0xa,
@@ -6675,7 +6660,7 @@ void rtw_dump_phy_cap_by_phydmapi(void *sel, _adapter *adapter)
 	#endif
 }
 #else
-void rtw_dump_phy_cap_by_hal(void *sel, _adapter *adapter)
+static void rtw_dump_phy_cap_by_hal(void *sel, _adapter *adapter)
 {
 	u8 phy_cap = _FALSE;
 

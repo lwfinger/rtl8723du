@@ -345,7 +345,7 @@ void rtl8723d_FirmwareSelfReset(PADAPTER padapter)
 #endif /* CONFIG_FILE_FWIMG */
 
 #ifdef CONFIG_MP_INCLUDED
-int _WriteBTFWtoTxPktBuf8723D(
+static int _WriteBTFWtoTxPktBuf8723D(
 	IN		PADAPTER		Adapter,
 	IN		PVOID			buffer,
 	IN		u4Byte			FwBufLen,
@@ -499,7 +499,7 @@ exit:
  * Description: Determine the contents of H2C BT_FW_PATCH Command sent to FW.
  * 2011.10.20 by tynli
  *   */
-void
+static void
 SetFwBTFwPatchCmd(
 	IN PADAPTER	Adapter,
 	IN u16		FwSize
@@ -522,7 +522,7 @@ SetFwBTFwPatchCmd(
 
 }
 
-void
+static void
 SetFwBTPwrCmd(
 	IN PADAPTER	Adapter,
 	IN u1Byte	PwrIdx
@@ -541,7 +541,7 @@ SetFwBTPwrCmd(
  *
  * 2011.10.20. by tynli.
  *   */
-int
+static int
 _CheckWLANFwPatchBTFwReady(
 	PADAPTER Adapter,
 	BOOLEAN bRecover
@@ -594,7 +594,7 @@ _CheckWLANFwPatchBTFwReady(
 	return ret;
 }
 
-int ReservedPage_Compare(PADAPTER Adapter, struct rt_mp_firmware *pFirmware, u32 BTPatchSize)
+static int ReservedPage_Compare(PADAPTER Adapter, struct rt_mp_firmware *pFirmware, u32 BTPatchSize)
 {
 	u8 temp, ret, lastBTsz;
 	u32 u1bTmp = 0, address_start = 0, count = 0, i = 0;
@@ -2484,7 +2484,7 @@ static void rtl8723d_SetBeaconRelatedRegisters(PADAPTER padapter)
 	rtw_write8(padapter, bcn_ctrl_reg, val8);
 }
 
-void hal_notch_filter_8723d(_adapter *adapter, bool enable)
+static void hal_notch_filter_8723d(_adapter *adapter, bool enable)
 {
 	if (enable) {
 		RTW_INFO("Enable notch filter\n");
@@ -2495,7 +2495,7 @@ void hal_notch_filter_8723d(_adapter *adapter, bool enable)
 	}
 }
 
-u8 rtl8723d_MRateIdxToARFRId(PADAPTER padapter, u8 rate_idx)
+static u8 rtl8723d_MRateIdxToARFRId(PADAPTER padapter, u8 rate_idx)
 {
 	u8 ret = 0;
 	enum rf_type rftype = (enum rf_type)GET_RF_TYPE(padapter);
@@ -2769,7 +2769,7 @@ s32 rtl8723d_InitLLTTable(PADAPTER padapter)
 	return ret;
 }
 
-void _DisableGPIO(PADAPTER	padapter)
+static void _DisableGPIO(PADAPTER	padapter)
 {
 	/***************************************
 	j. GPIO_PIN_CTRL 0x44[31:0]=0x000
@@ -2805,7 +2805,7 @@ void _DisableGPIO(PADAPTER	padapter)
 
 } /* end of _DisableGPIO() */
 
-void _DisableRFAFEAndResetBB8723D(PADAPTER padapter)
+static void _DisableRFAFEAndResetBB8723D(PADAPTER padapter)
 {
 	/**************************************
 	a.	TXPAUSE 0x522[7:0] = 0xFF
@@ -2836,12 +2836,12 @@ void _DisableRFAFEAndResetBB8723D(PADAPTER padapter)
 
 }
 
-void _DisableRFAFEAndResetBB(PADAPTER padapter)
+static void _DisableRFAFEAndResetBB(PADAPTER padapter)
 {
 	_DisableRFAFEAndResetBB8723D(padapter);
 }
 
-void _ResetDigitalProcedure1_8723D(PADAPTER padapter, BOOLEAN bWithoutHWSM)
+static void _ResetDigitalProcedure1_8723D(PADAPTER padapter, BOOLEAN bWithoutHWSM)
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
 
@@ -2938,12 +2938,12 @@ void _ResetDigitalProcedure1_8723D(PADAPTER padapter, BOOLEAN bWithoutHWSM)
 
 }
 
-void _ResetDigitalProcedure1(PADAPTER padapter, BOOLEAN bWithoutHWSM)
+static void _ResetDigitalProcedure1(PADAPTER padapter, BOOLEAN bWithoutHWSM)
 {
 	_ResetDigitalProcedure1_8723D(padapter, bWithoutHWSM);
 }
 
-void _ResetDigitalProcedure2(PADAPTER padapter)
+static void _ResetDigitalProcedure2(PADAPTER padapter)
 {
 	/* HAL_DATA_TYPE		*pHalData	= GET_HAL_DATA(padapter);
 	*****************************
@@ -2957,7 +2957,7 @@ void _ResetDigitalProcedure2(PADAPTER padapter)
 	rtw_write8(padapter, REG_SYS_ISO_CTRL + 1, 0x82); /* modify to 0x82 by Scott. */
 }
 
-void _DisableAnalog(PADAPTER padapter, BOOLEAN bWithoutHWSM)
+static void _DisableAnalog(PADAPTER padapter, BOOLEAN bWithoutHWSM)
 {
 	HAL_DATA_TYPE	*pHalData	= GET_HAL_DATA(padapter);
 	u16 value16 = 0;
@@ -3105,7 +3105,7 @@ Hal_EfuseParseIDCode(
 
 
 	/* Checl 0x8129 again for making sure autoload status!! */
-	EEPROMId = le16_to_cpu(*((u16 *)hwinfo));
+	EEPROMId = le16_to_cpu(*((__le16 *)hwinfo));
 	if (EEPROMId != RTL_EEPROM_ID) {
 		RTW_INFO("EEPROM ID(%#x) is invalid!!\n", EEPROMId);
 		pHalData->bautoload_fail_flag = _TRUE;
@@ -4274,7 +4274,7 @@ void CCX_FwC2HTxRpt_8723d(PADAPTER padapter, u8 *pdata, u8 len)
 #endif
 }
 
-s32 c2h_handler_8723d(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
+static s32 c2h_handler_8723d(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 {
 	s32 ret = _SUCCESS;
 
@@ -4730,7 +4730,7 @@ struct bcn_qinfo_8723d {
 	u16 pkt_num:8;
 };
 
-void dump_qinfo_8723d(void *sel, struct qinfo_8723d *info, const char *tag)
+static void dump_qinfo_8723d(void *sel, struct qinfo_8723d *info, const char *tag)
 {
 	/* if (info->pkt_num) */
 	RTW_PRINT_SEL(sel, "%shead:0x%02x, tail:0x%02x, pkt_num:%u, macid:%u, ac:%u\n"
@@ -4738,14 +4738,14 @@ void dump_qinfo_8723d(void *sel, struct qinfo_8723d *info, const char *tag)
 		info->pkt_num, info->macid, info->ac);
 }
 
-void dump_bcn_qinfo_8723d(void *sel, struct bcn_qinfo_8723d *info, const char *tag)
+static void dump_bcn_qinfo_8723d(void *sel, struct bcn_qinfo_8723d *info, const char *tag)
 {
 	/* if (info->pkt_num) */
 	RTW_PRINT_SEL(sel, "%shead:0x%02x, pkt_num:%u\n"
 		      , tag ? tag : "", info->head, info->pkt_num);
 }
 
-void dump_mac_qinfo_8723d(void *sel, _adapter *adapter)
+static void dump_mac_qinfo_8723d(void *sel, _adapter *adapter)
 {
 	u32 q0_info;
 	u32 q1_info;
@@ -4894,7 +4894,7 @@ u8 SetHalDefVar8723D(PADAPTER padapter, HAL_DEF_VARIABLE variable, void *pval)
 	return bResult;
 }
 
-void hal_ra_info_dump(_adapter *padapter , void *sel)
+static void hal_ra_info_dump(_adapter *padapter , void *sel)
 {
 	int i;
 	u8 mac_id;

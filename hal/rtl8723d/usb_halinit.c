@@ -84,7 +84,7 @@ static BOOLEAN HalUsbSetQueuePipeMapping8723DUsb(
 	return result;
 }
 
-void rtl8723du_interface_configure(
+static void rtl8723du_interface_configure(
 	PADAPTER padapter
 )
 {
@@ -293,7 +293,7 @@ static void _InitTRxBufferBoundary(PADAPTER padapter)
 }
 
 
-void
+static void
 _InitTransferPageSize_8723du(
 	PADAPTER padapter
 )
@@ -892,7 +892,7 @@ HwSuspendModeEnable(
 
 }   /* HwSuspendModeEnable */
 
-rt_rf_power_state RfOnOffDetect(IN PADAPTER padapter)
+static rt_rf_power_state RfOnOffDetect(IN PADAPTER padapter)
 {
 	/* HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter); */
 	u8 val8;
@@ -911,7 +911,7 @@ rt_rf_power_state RfOnOffDetect(IN PADAPTER padapter)
 	return rfpowerstate;
 }   /* HalDetectPwrDownMode */
 
-void _InitBBRegBackup_8723du(PADAPTER padapter)
+static void _InitBBRegBackup_8723du(PADAPTER padapter)
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
 
@@ -932,7 +932,7 @@ void _InitBBRegBackup_8723du(PADAPTER padapter)
 			       pHalData->RegForRecover[2].offset, bMaskDWord);
 }
 
-u32 rtl8723du_hal_init(PADAPTER padapter)
+static u32 rtl8723du_hal_init(PADAPTER padapter)
 {
 	u8 value8 = 0, u1bRegCR;
 	u32 status = _SUCCESS;
@@ -1614,7 +1614,7 @@ static void rtl8723du_hw_power_down(PADAPTER padapter)
  * Description: RTL8723e card disable power sequence v003 which suggested by Scott.
  * First created by tynli. 2011.01.28.
  */
-void
+static void
 CardDisableRTL8723du(
 	PADAPTER padapter
 )
@@ -1656,7 +1656,7 @@ CardDisableRTL8723du(
 }
 
 
-u32 rtl8723du_hal_deinit(PADAPTER padapter)
+static u32 rtl8723du_hal_deinit(PADAPTER padapter)
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
 	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(padapter);
@@ -1694,7 +1694,7 @@ u32 rtl8723du_hal_deinit(PADAPTER padapter)
 }
 
 
-unsigned int rtl8723du_inirp_init(PADAPTER padapter)
+static unsigned int rtl8723du_inirp_init(PADAPTER padapter)
 {
 	u8 i;
 	struct recv_buf *precvbuf;
@@ -1748,7 +1748,7 @@ exit:
 
 }
 
-unsigned int rtl8723du_inirp_deinit(PADAPTER padapter)
+static unsigned int rtl8723du_inirp_deinit(PADAPTER padapter)
 {
 #ifdef CONFIG_USB_INTERRUPT_IN_PIPE
 	u32(*_read_interrupt)(struct intf_hdl *pintfhdl, u32 addr);
@@ -1979,7 +1979,7 @@ _ReadRFType(IN PADAPTER padapter)
  * Assumption:
  *    PASSIVE_LEVEL
  */
-void
+static void
 hal_EfuseCellSel(IN PADAPTER padapter)
 {
 	u32 value32;
@@ -2031,7 +2031,7 @@ static void rtl8723du_trigger_gpio_0(PADAPTER padapter)
  * If variable not handled here,
  * some variables will be processed in SetHwReg8723A()
  */
-u8 SetHwReg8723du(PADAPTER padapter, u8 variable, u8 *val)
+static u8 SetHwReg8723du(PADAPTER padapter, u8 variable, u8 *val)
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
 	u8 ret = _SUCCESS;
@@ -2067,7 +2067,7 @@ u8 SetHwReg8723du(PADAPTER padapter, u8 variable, u8 *val)
  * If variable not handled here,
  * some variables will be processed in GetHwReg8723A()
  */
-void GetHwReg8723du(PADAPTER padapter, u8 variable, u8 *val)
+static void GetHwReg8723du(PADAPTER padapter, u8 variable, u8 *val)
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
 
@@ -2084,7 +2084,7 @@ void GetHwReg8723du(PADAPTER padapter, u8 variable, u8 *val)
  * Description:
  * Query setting of specified variable.
  */
-u8
+static u8
 GetHalDefVar8723du(
 	IN PADAPTER padapter,
 	IN HAL_DEF_VARIABLE eVariable,
@@ -2124,7 +2124,7 @@ GetHalDefVar8723du(
  * Description:
  * Change default setting of specified variable.
  */
-u8
+static u8
 SetHalDefVar8723du(
 	IN PADAPTER padapter,
 	IN HAL_DEF_VARIABLE eVariable,
@@ -2143,7 +2143,7 @@ SetHalDefVar8723du(
 	return bResult;
 }
 
-void _update_response_rate(PADAPTER padapter, unsigned int mask)
+static void _update_response_rate(PADAPTER padapter, unsigned int mask)
 {
 	u8 RateIndex = 0;
 	/* Set RRSR rate table. */

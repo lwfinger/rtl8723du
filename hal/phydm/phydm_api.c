@@ -42,7 +42,7 @@ phydm_init_trx_antenna_setting(
 	}
 }
 
-void
+static void
 phydm_config_ofdm_tx_path(
 	void			*p_dm_void,
 	u32			path
@@ -305,7 +305,7 @@ phydm_set_ext_switch(
 {
 }
 
-void
+static void
 phydm_csi_mask_enable(
 	void		*p_dm_void,
 	u32		enable
@@ -329,7 +329,7 @@ phydm_csi_mask_enable(
 
 }
 
-void
+static void
 phydm_clean_all_csi_mask(
 	void		*p_dm_void
 )
@@ -356,7 +356,7 @@ phydm_clean_all_csi_mask(
 	}
 }
 
-void
+static void
 phydm_set_csi_mask_reg(
 	void		*p_dm_void,
 	u32		tone_idx_tmp,
@@ -419,7 +419,7 @@ phydm_set_csi_mask_reg(
 	PHYDM_DBG(p_dm, ODM_COMP_API, ("New Mask tone idx[%d]:  Reg0x%x = ((0x%x))\n", (tone_idx_tmp + tone_num_shift), target_reg, reg_tmp_value));
 }
 
-void
+static void
 phydm_set_nbi_reg(
 	void		*p_dm_void,
 	u32		tone_idx_tmp,
@@ -518,7 +518,7 @@ phydm_nbi_enable(
 	}
 }
 
-u8
+static u8
 phydm_calculate_fc(
 	void		*p_dm_void,
 	u32		channel,
@@ -597,8 +597,7 @@ phydm_calculate_fc(
 	return PHYDM_SET_SUCCESS;
 }
 
-
-u8
+static u8
 phydm_calculate_intf_distance(
 	void		*p_dm_void,
 	u32		bw,

@@ -38,7 +38,7 @@
  * Description:
  * Turn on LED according to LedPin specified.
  */
-void
+static void
 SwLedOn_8723DU(
 	PADAPTER padapter,
 	PLED_USB pLed
@@ -58,7 +58,7 @@ SwLedOn_8723DU(
  * Description:
  * Turn off LED according to LedPin specified.
  */
-void
+static void
 SwLedOff_8723DU(
 	PADAPTER padapter,
 	PLED_USB pLed

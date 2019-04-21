@@ -103,7 +103,7 @@ phydm_bb_dbg_port_header_sel(
 	}
 }
 
-void
+static void
 phydm_bb_dbg_port_clock_en(
 	void			*p_dm_void,
 	u8			enable
@@ -183,7 +183,7 @@ phydm_get_bb_dbg_port_value(
 
 #ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 
-void
+static void
 phydm_bb_debug_info_n_series(
 	void			*p_dm_void,
 	u32			*_used,
@@ -354,7 +354,7 @@ phydm_bb_debug_info_n_series(
 }
 
 
-void
+static void
 phydm_bb_debug_info(
 	void			*p_dm_void,
 	u32			*_used,
@@ -1245,7 +1245,7 @@ phydm_fw_trace_en_h2c(
 	odm_fill_h2c_cmd(p_dm, PHYDM_H2C_FW_TRACE_EN, cmd_length, h2c_parameter);
 }
 
-void
+static void
 phydm_get_per_path_txagc(
 	void			*p_dm_void,
 	u8			path,
@@ -1265,7 +1265,7 @@ phydm_get_per_path_txagc(
 }
 
 
-void
+static void
 phydm_get_txagc(
 	void			*p_dm_void,
 	u32			*_used,
@@ -1298,7 +1298,7 @@ phydm_get_txagc(
 
 }
 
-void
+static void
 phydm_set_txagc(
 	void			*p_dm_void,
 	u32			*const dm_value,
@@ -1319,7 +1319,7 @@ phydm_set_txagc(
 	*_out_len = out_len;
 }
 
-void
+static void
 phydm_debug_trace(
 	void		*p_dm_void,
 	u32		*const dm_value,
@@ -1392,7 +1392,7 @@ phydm_debug_trace(
 	*_out_len = out_len;
 }
 
-void
+static void
 phydm_fw_debug_trace(
 	void		*p_dm_void,
 	u32		*const dm_value,
@@ -1444,7 +1444,7 @@ phydm_fw_debug_trace(
 	}
 }
 
-void
+static void
 phydm_dump_bb_reg(
 	void			*p_dm_void,
 	u32			*_used,
@@ -1492,7 +1492,7 @@ phydm_dump_bb_reg(
 	*_out_len = out_len;
 }
 
-void
+static void
 phydm_dump_all_reg(
 	void			*p_dm_void,
 	u32			*_used,
@@ -1544,7 +1544,7 @@ phydm_dump_all_reg(
 	*_out_len = out_len;
 }
 
-void
+static void
 phydm_enable_big_jump(
 	struct PHY_DM_STRUCT	*p_dm,
 	boolean		state
@@ -1552,7 +1552,7 @@ phydm_enable_big_jump(
 {
 }
 
-void
+static void
 phydm_api_adjust(
 	void		*p_dm_void,
 	char		input[][16],
@@ -1578,7 +1578,7 @@ phydm_api_adjust(
 	*_out_len = out_len;
 }
 
-void
+static void
 phydm_parameter_adjust(
 	void		*p_dm_void,
 	char		input[][16],
@@ -1668,7 +1668,7 @@ enum PHYDM_CMD_ID {
 	PHYDM_PAUSE_FUNC
 };
 
-struct _PHYDM_COMMAND phy_dm_ary[] = {
+static struct _PHYDM_COMMAND phy_dm_ary[] = {
 	{"-h", PHYDM_HELP},		/*do not move this element to other position*/
 	{"demo", PHYDM_DEMO},	/*do not move this element to other position*/
 	{"dig", PHYDM_DIG},	

@@ -359,11 +359,6 @@ struct pwrctrl_priv {
 	u8		wowlan_pno_enable;
 	u8		wowlan_in_resume;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-	_timer	pwr_state_check_timer;
-	int		pwr_state_check_interval;
-#endif
-	u8		pwr_state_check_cnts;
 
 
 	rt_rf_power_state	rf_pwrstate;/* cur power state, only for IPS */
@@ -431,8 +426,8 @@ struct pwrctrl_priv {
 		_set_timer(&(pwrctl)->pwr_state_check_timer, (ms)); \
 	} while (0)
 
-#define rtw_set_pwr_state_check_timer(pwrctl) \
-	_rtw_set_pwr_state_check_timer((pwrctl), (pwrctl)->pwr_state_check_interval)
+#define rtw_set_pwr_state_check_timer(__padapt) \
+	_rtw_set_pwr_state_check_timer((__padapt), (__padapt)->pwr_state_check_interval)
 
 extern void rtw_init_pwrctrl_priv(_adapter *adapter);
 extern void rtw_free_pwrctrl_priv(_adapter *adapter);

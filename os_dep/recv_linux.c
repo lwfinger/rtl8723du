@@ -438,8 +438,6 @@ void rtw_os_recv_indicate_pkt(_adapter *padapter, _pkt *pkt, union recv_frame *r
 			#endif
 
 			if (br_port) {
-				int nat25_handle_frame(_adapter *priv, struct sk_buff *skb);
-
 				if (nat25_handle_frame(padapter, pkt) == -1) {
 					/* priv->ext_stats.rx_data_drops++; */
 					/* DEBUG_ERR("RX DROP: nat25_handle_frame fail!\n"); */

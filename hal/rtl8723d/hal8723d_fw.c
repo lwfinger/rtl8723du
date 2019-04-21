@@ -18,6 +18,7 @@
 #include "drv_types.h"
 
 #ifdef LOAD_FW_HEADER_FROM_DRIVER
+#include "hal8723d_fw.h"
 
 u8 array_mp_8723d_fw_nic[] = {
 0xD1, 0x23, 0x10, 0x00, 0x29, 0x00, 0x00, 0x00,

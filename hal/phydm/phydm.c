@@ -28,7 +28,7 @@ const u16 phy_rate_table[] = {	/*20M*/
 	13, 26, 39, 52, 78, 104, 117, 130		/*MCS8~15*/
 };
 
-void
+static void
 phydm_traffic_load_decision(
 	void	*p_dm_void
 )
@@ -102,7 +102,7 @@ phydm_traffic_load_decision(
 		
 }
 
-void
+static void
 phydm_init_cck_setting(
 	struct PHY_DM_STRUCT		*p_dm
 )
@@ -133,14 +133,14 @@ phydm_init_cck_setting(
 
 }
 
-void
+static void
 phydm_init_hw_info_by_rfe(
 	struct PHY_DM_STRUCT		*p_dm
 )
 {
 }
 
-void
+static void
 phydm_common_info_self_init(
 	struct PHY_DM_STRUCT		*p_dm
 )
@@ -193,7 +193,7 @@ phydm_common_info_self_init(
 
 }
 
-void
+static void
 phydm_cmn_sta_info_update(
 	void	*p_dm_void,
 	u8	macid
@@ -223,7 +223,7 @@ phydm_cmn_sta_info_update(
 
 }
 
-void
+static void
 phydm_common_info_self_update(
 	struct PHY_DM_STRUCT		*p_dm
 )
@@ -284,7 +284,7 @@ phydm_common_info_self_update(
 
 }
 
-void
+static void
 phydm_common_info_self_reset(
 	struct PHY_DM_STRUCT		*p_dm
 )
@@ -324,14 +324,14 @@ phydm_get_structure(
 	return	p_struct;
 }
 
-void
+static void
 phydm_hw_setting(
 	struct PHY_DM_STRUCT		*p_dm
 )
 {
 }
 
-u64
+static u64
 phydm_supportability_init_ce(
 	void		*p_dm_void
 )
@@ -441,7 +441,7 @@ phydm_fwoffload_ability_clear(
 
 }
 
-void
+static void
 phydm_supportability_init(
 	void		*p_dm_void
 )
@@ -460,7 +460,7 @@ phydm_supportability_init(
 	PHYDM_DBG(p_dm, ODM_COMP_INIT, ("IC = ((0x%x)), Supportability Init = ((0x%llx))\n", p_dm->support_ic_type, p_dm->support_ability));
 }
 
-void
+static void
 phydm_rfe_init(
 	void			*p_dm_void
 )
@@ -888,7 +888,7 @@ phydm_pause_func_console(
 	*_out_len = out_len;
 }
 
-u8
+static u8
 phydm_stop_dm_watchdog_check(
 	void					*p_dm_void
 )

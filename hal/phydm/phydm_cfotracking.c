@@ -41,7 +41,7 @@ phydm_set_crystal_cap(
 	PHYDM_DBG(p_dm, DBG_CFO_TRK, ("Set rystal_cap = 0x%x\n", p_cfo_track->crystal_cap));
 }
 
-u8
+static u8
 odm_get_default_crytaltal_cap(
 	void					*p_dm_void
 )
@@ -66,7 +66,7 @@ odm_get_default_crytaltal_cap(
 	return crystal_cap;
 }
 
-void
+static void
 odm_set_atc_status(
 	void					*p_dm_void,
 	boolean					atc_status
@@ -82,7 +82,7 @@ odm_set_atc_status(
 	p_cfo_track->is_atc_status = atc_status;
 }
 
-boolean
+static boolean
 odm_get_atc_status(
 	void					*p_dm_void
 )

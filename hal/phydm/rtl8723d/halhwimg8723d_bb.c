@@ -119,7 +119,7 @@ check_negative(
 *                           agc_tab.TXT
 ******************************************************************************/
 
-u32 array_mp_8723d_agc_tab[] = {
+static u32 array_mp_8723d_agc_tab[] = {
 		0xC78, 0xFE000101,
 		0xC78, 0xFD010101,
 		0xC78, 0xFC020101,
@@ -573,7 +573,7 @@ odm_get_version_mp_8723d_agc_tab(void)
 *                           phy_reg.TXT
 ******************************************************************************/
 
-u32 array_mp_8723d_phy_reg[] = {
+static u32 array_mp_8723d_phy_reg[] = {
 		0x800, 0x80046C00,
 		0x804, 0x00000003,
 		0x808, 0x0000FC00,
@@ -864,7 +864,7 @@ odm_get_version_mp_8723d_phy_reg(void)
 *                           phy_reg_pg.TXT
 ******************************************************************************/
 
-u32 array_mp_8723d_phy_reg_pg[] = {
+static u32 array_mp_8723d_phy_reg_pg[] = {
 	0, 0, 0, 0x00000e08, 0x0000ff00, 0x00003200,
 	0, 0, 0, 0x0000086c, 0xffffff00, 0x32323200,
 	0, 0, 0, 0x00000e00, 0xffffffff, 0x32343434,

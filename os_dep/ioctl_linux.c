@@ -54,7 +54,7 @@ extern u8 str_2char2num(u8 hch, u8 lch);
 extern void macstr2num(u8 *dst, u8 *src);
 extern u8 convert_ip_addr(u8 hch, u8 mch, u8 lch);
 
-u32 rtw_rates[] = {1000000, 2000000, 5500000, 11000000,
+static u32 rtw_rates[] = {1000000, 2000000, 5500000, 11000000,
 	6000000, 9000000, 12000000, 18000000, 24000000, 36000000, 48000000, 54000000};
 
 static const char *const iw_operation_mode[] = {
@@ -186,7 +186,6 @@ void indicate_wx_scan_complete_event(_adapter *padapter)
 	wireless_send_event(padapter->pnetdev, SIOCGIWSCAN, &wrqu, NULL);
 #endif
 }
-
 
 void rtw_indicate_wx_assoc_event(_adapter *padapter)
 {
@@ -744,8 +743,9 @@ static char *translate_scan(_adapter *padapter,
 {
 	struct iw_event iwe;
 	u16 cap = 0;
-	_rtw_memset(&iwe, 0, sizeof(iwe));
+	__le16 le_tmp;
 
+	_rtw_memset(&iwe, 0, sizeof(iwe));
 	if (_FALSE == search_p2p_wfd_ie(padapter, info, pnetwork, start, stop))
 		return start;
 
@@ -755,8 +755,8 @@ static char *translate_scan(_adapter *padapter,
 	if (pnetwork->network.Reserved[0] == BSS_TYPE_PROB_REQ) /* Probe Request */
 		cap = 0;
 	else {
-		_rtw_memcpy((u8 *)&cap, rtw_get_capability_from_ie(pnetwork->network.IEs), 2);
-		cap = le16_to_cpu(cap);
+		_rtw_memcpy((u8 *)&le_tmp, rtw_get_capability_from_ie(pnetwork->network.IEs), 2);
+		cap = le16_to_cpu(le_tmp);
 	}
 
 	start = iwe_stream_mode_process(padapter, info, pnetwork, start, stop, &iwe, cap);
@@ -5559,7 +5559,6 @@ static int rtw_cta_test_start(struct net_device *dev,
 	return ret;
 }
 
-extern int rtw_change_ifname(_adapter *padapter, const char *ifname);
 static int rtw_rereg_nd_name(struct net_device *dev,
 			     struct iw_request_info *info,
 			     union iwreq_data *wrqu, char *extra)

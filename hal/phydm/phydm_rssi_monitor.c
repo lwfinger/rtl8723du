@@ -23,7 +23,7 @@
 #ifdef PHYDM_SUPPORT_RSSI_MONITOR
 
 #ifdef PHYDM_3RD_REFORM_RSSI_MONOTOR
-void
+static void
 phydm_rssi_monitor_h2c(
 	void	*p_dm_void,
 	u8	macid
@@ -79,7 +79,7 @@ phydm_rssi_monitor_h2c(
 	odm_fill_h2c_cmd(p_dm, ODM_H2C_RSSI_REPORT, H2C_MAX_LENGTH, h2c_val);
 }
 
-void
+static void
 phydm_calculate_rssi_min_max(
 	void		*p_dm_void
 )

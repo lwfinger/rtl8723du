@@ -22,7 +22,7 @@
  
 #ifdef PHYDM_SUPPORT_CCKPD
 
-void
+static void
 phydm_write_cck_cca_th_new_cs_ratio(
 	void			*p_dm_void,
 	u8			cca_th,
@@ -52,7 +52,7 @@ phydm_write_cck_cca_th_new_cs_ratio(
 	
 }
 
-void
+static void
 phydm_write_cck_cca_th(
 	void			*p_dm_void,
 	u8			cca_th
@@ -98,7 +98,7 @@ phydm_set_cckpd_val(
 
 }
 
-boolean
+static boolean
 phydm_stop_cck_pd_th(
 	void		*p_dm_void
 )
@@ -119,7 +119,7 @@ phydm_stop_cck_pd_th(
 	return false;
 }
 
-void
+static void
 phydm_cckpd(
 	void			*p_dm_void
 )
@@ -162,7 +162,7 @@ phydm_cckpd(
 
 }
 
-void
+static void
 phydm_cckpd_new_cs_ratio(
 	void			*p_dm_void
 )

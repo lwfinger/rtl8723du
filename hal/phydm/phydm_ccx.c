@@ -341,7 +341,7 @@ phydm_c2h_clm_report_handler(
 	
 }
 
-void
+static void
 phydm_clm_h2c(
 	void	*p_dm_void,
 	u16	obs_time,
@@ -697,7 +697,7 @@ phydm_get_nhm_result(
 			ccx_info->nhm_result[2], ccx_info->nhm_result[1], ccx_info->nhm_result[0]));
 }
 
-boolean
+static boolean
 phydm_check_nhm_rdy(
 	void		*p_dm_void
 )
@@ -731,7 +731,7 @@ phydm_check_nhm_rdy(
 	return is_ready;
 }
 
-void
+static void
 phydm_store_nhm_setting(
 	void		*p_dm_void
 )
@@ -772,7 +772,7 @@ phydm_clm_setting(
 
 }
 
-void
+static void
 phydm_clm_hw_restart(
 	void			*p_dm_void
 )
@@ -813,7 +813,7 @@ phydm_clm_trigger(
 	}
 }
 
-boolean
+static boolean
 phydm_check_clm_rdy(
 	void			*p_dm_void
 )
@@ -859,7 +859,7 @@ phydm_get_clm_result(
 	PHYDM_DBG(p_dm, DBG_ENV_MNTR, ("CLM result = %d *4 us\n", ccx_info->clm_result));
 }
 
-void
+static void
 phydm_set_nhm_th_by_igi(
 	void			*p_dm_void,
 	u8				igi
@@ -1053,7 +1053,7 @@ phydm_ccx_monitor(
 	phydm_ccx_monitor_trigger(p_dm, 262);	/*monitor 262ms*/
 }
 
-void
+static void
 phydm_nhm_init(
 	void			*p_dm_void
 )
@@ -1073,7 +1073,7 @@ phydm_nhm_init(
 	phydm_nhm_setting(p_dm, SET_NHM_SETTING);
 }
 
-void
+static void
 phydm_clm_init(
 	void			*p_dm_void
 )

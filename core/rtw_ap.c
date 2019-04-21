@@ -831,7 +831,7 @@ _exit:
 }
 #endif
 
-void rtw_init_bmc_sta_tx_rate(_adapter *padapter, struct sta_info *psta)
+static void rtw_init_bmc_sta_tx_rate(_adapter *padapter, struct sta_info *psta)
 {
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
 	struct mlme_ext_priv *pmlmeext = &(padapter->mlmeextpriv);
@@ -1984,19 +1984,19 @@ int rtw_check_beacon_data(_adapter *padapter, u8 *pbuf,  int len)
 
 		/* Update HT Capabilities Info field */
 		if (pmlmepriv->htpriv.sgi_20m == _FALSE)
-			pht_cap->cap_info &= ~(IEEE80211_HT_CAP_SGI_20);
+			pht_cap->cap_info &= cpu_to_le16(~(IEEE80211_HT_CAP_SGI_20));
 
 		if (pmlmepriv->htpriv.sgi_40m == _FALSE)
-			pht_cap->cap_info &= ~(IEEE80211_HT_CAP_SGI_40);
+			pht_cap->cap_info &= cpu_to_le16(~(IEEE80211_HT_CAP_SGI_40));
 
 		if (!TEST_FLAG(pmlmepriv->htpriv.ldpc_cap, LDPC_HT_ENABLE_RX))
-			pht_cap->cap_info &= ~(IEEE80211_HT_CAP_LDPC_CODING);
+			pht_cap->cap_info &= ~cpu_to_le16((IEEE80211_HT_CAP_LDPC_CODING));
 
 		if (!TEST_FLAG(pmlmepriv->htpriv.stbc_cap, STBC_HT_ENABLE_TX))
-			pht_cap->cap_info &= ~(IEEE80211_HT_CAP_TX_STBC);
+			pht_cap->cap_info &= cpu_to_le16(~(IEEE80211_HT_CAP_TX_STBC));
 
 		if (!TEST_FLAG(pmlmepriv->htpriv.stbc_cap, STBC_HT_ENABLE_RX))
-			pht_cap->cap_info &= ~(IEEE80211_HT_CAP_RX_STBC_3R);
+			pht_cap->cap_info &= cpu_to_le16(~(IEEE80211_HT_CAP_RX_STBC_3R));
 
 		/* Update A-MPDU Parameters field */
 		pht_cap->ampdu_params_info &= ~(IEEE80211_HT_CAP_AMPDU_FACTOR | IEEE80211_HT_CAP_AMPDU_DENSITY);
@@ -2205,7 +2205,7 @@ int rtw_check_beacon_data(_adapter *padapter, u8 *pbuf,  int len)
 }
 
 #if CONFIG_RTW_MACADDR_ACL
-void rtw_macaddr_acl_init(_adapter *adapter)
+static void rtw_macaddr_acl_init(_adapter *adapter)
 {
 	struct sta_priv *stapriv = &adapter->stapriv;
 	struct wlan_acl_pool *acl = &stapriv->acl_list;
@@ -2500,7 +2500,7 @@ int rtw_ap_set_wep_key(_adapter *padapter, u8 *key, u8 keylen, int keyid, u8 set
 	return rtw_ap_set_key(padapter, key, alg, keyid, set_tx);
 }
 
-u8 rtw_ap_bmc_frames_hdl(_adapter *padapter)
+static u8 rtw_ap_bmc_frames_hdl(_adapter *padapter)
 {
 #define HIQ_XMIT_COUNTS (6)
 	_irqL irqL;
@@ -2781,7 +2781,7 @@ static void update_bcn_htinfo_ie(_adapter *padapter)
 		}
 
 		/* to update  ht_op_mode*/
-		*(u16 *)(pht_info->infos + 1) = cpu_to_le16(pmlmepriv->ht_op_mode);
+		*(__le16 *)(pht_info->infos + 1) = cpu_to_le16(pmlmepriv->ht_op_mode);
 
 	}
 
@@ -3116,7 +3116,7 @@ int rtw_ht_operation_update(_adapter *padapter)
 	if (pmlmepriv->num_sta_no_ht /*||
 	    (pmlmepriv->ht_op_mode & HT_INFO_OPERATION_MODE_NON_GF_DEVS_PRESENT)*/)
 		new_op_mode = OP_MODE_MIXED;
-	else if ((phtpriv_ap->ht_cap.cap_info & IEEE80211_HT_CAP_SUP_WIDTH)
+	else if ((phtpriv_ap->ht_cap.cap_info & cpu_to_le16(IEEE80211_HT_CAP_SUP_WIDTH))
 		 && pmlmepriv->num_sta_ht_20mhz)
 		new_op_mode = OP_MODE_20MHZ_HT_STA_ASSOCED;
 	else if (ATOMIC_READ(&pmlmepriv->olbc_ht))
@@ -3615,7 +3615,7 @@ void sta_info_update(_adapter *padapter, struct sta_info *psta)
 		psta->htpriv.ht_option = _TRUE;
 		psta->qos_option = 1;
 
-		psta->htpriv.smps_cap = (psta->htpriv.ht_cap.cap_info & IEEE80211_HT_CAP_SM_PS) >> 2;
+		psta->htpriv.smps_cap = (psta->htpriv.ht_cap.cap_info & cpu_to_le16(IEEE80211_HT_CAP_SM_PS)) >> 2;
 	} else
 		psta->htpriv.ht_option = _FALSE;
 
@@ -3775,7 +3775,7 @@ void start_ap_mode(_adapter *padapter)
 
 }
 
-void rtw_ap_bcmc_sta_flush(_adapter *padapter)
+static void rtw_ap_bcmc_sta_flush(_adapter *padapter)
 {
 #ifdef CONFIG_CONCURRENT_MODE
 	int cam_id = -1;

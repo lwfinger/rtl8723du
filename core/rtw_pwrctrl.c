@@ -183,7 +183,7 @@ int ips_leave(_adapter *padapter)
 	int rtw_hw_resume(_adapter *padapter);
 #endif
 
-bool rtw_pwr_unassociated_idle(_adapter *adapter)
+static bool rtw_pwr_unassociated_idle(_adapter *adapter)
 {
 	u8 i;
 	_adapter *iface;
@@ -352,7 +352,7 @@ void rtw_ps_processor(_adapter *padapter)
 	if (rtw_pwr_unassociated_idle(padapter) == _FALSE)
 		goto exit;
 
-	if ((pwrpriv->rf_pwrstate == rf_on) && ((pwrpriv->pwr_state_check_cnts % 4) == 0)) {
+	if ((pwrpriv->rf_pwrstate == rf_on) && ((padapter->pwr_state_check_cnts % 4) == 0)) {
 		RTW_INFO("==>%s .fw_state(%x)\n", __FUNCTION__, get_fwstate(pmlmepriv));
 #if defined(CONFIG_BT_COEXIST) && defined (CONFIG_AUTOSUSPEND)
 #else
@@ -392,24 +392,20 @@ void rtw_ps_processor(_adapter *padapter)
 	}
 exit:
 #ifndef CONFIG_IPS_CHECK_IN_WD
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-	rtw_set_pwr_state_check_timer(pwrpriv);
-#else
 	rtw_set_pwr_state_check_timer(padapter);
-#endif
 #endif
 	pwrpriv->ps_processing = _FALSE;
 	return;
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-void pwr_state_check_handler(void *ctx)
+static void pwr_state_check_handler(void *ctx)
 #else
-void pwr_state_check_handler(struct timer_list *t)
+static void pwr_state_check_handler(struct timer_list *t)
 #endif
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-	_adapter *padapter = (_adapter *)FunctionContext;
+	_adapter *padapter = (_adapter *)ctx;
 #else
 	_adapter *padapter = from_timer(padapter, t, pwr_state_check_timer);
 #endif
@@ -614,7 +610,7 @@ void rtw_set_rpwm(PADAPTER padapter, u8 pslv)
 
 }
 
-u8 PS_RDY_CHECK(_adapter *padapter)
+static u8 PS_RDY_CHECK(_adapter *padapter)
 {
 	u32 delta_ms;
 	struct pwrctrl_priv	*pwrpriv = adapter_to_pwrctl(padapter);
@@ -2006,12 +2002,8 @@ void rtw_init_pwrctrl_priv(PADAPTER padapter)
 	pwrctrlpriv->ips_deny_time = rtw_get_current_time();
 	pwrctrlpriv->lps_level = padapter->registrypriv.lps_level;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-	pwrctrlpriv->pwr_state_check_interval = RTW_PWR_STATE_CHK_INTERVAL;
-#else
 	padapter->pwr_state_check_interval = RTW_PWR_STATE_CHK_INTERVAL;
-#endif
-	pwrctrlpriv->pwr_state_check_cnts = 0;
+	padapter->pwr_state_check_cnts = 0;
 	#ifdef CONFIG_AUTOSUSPEND
 	pwrctrlpriv->bInternalAutoSuspend = _FALSE;
 	#endif
@@ -2070,7 +2062,7 @@ void rtw_init_pwrctrl_priv(PADAPTER padapter)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 	timer_setup(&padapter->pwr_state_check_timer, pwr_state_check_handler, 0);
 #else
-	rtw_init_timer(&pwrctrlpriv->pwr_state_check_timer, padapter, pwr_state_check_handler, padapter);
+	rtw_init_timer(&padapter->pwr_state_check_timer, padapter, pwr_state_check_handler, padapter);
 #endif
 
 	pwrctrlpriv->wowlan_mode = _FALSE;

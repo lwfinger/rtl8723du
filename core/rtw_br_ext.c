@@ -739,7 +739,7 @@ static int checkIPMcAndReplace(_adapter *priv, struct sk_buff *skb, unsigned int
 
 int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 {
-	unsigned short protocol;
+	__be16 protocol;
 	unsigned char networkAddr[MAX_NETWORK_ADDR_LEN];
 
 	if (skb == NULL)
@@ -748,7 +748,7 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 	if ((method <= NAT25_MIN) || (method >= NAT25_MAX))
 		return -1;
 
-	protocol = *((unsigned short *)(skb->data + 2 * ETH_ALEN));
+	protocol = *((__be16 *)(skb->data + 2 * ETH_ALEN));
 
 	/*---------------------------------------------------*/
 	/*                 Handle IP frame                  */
@@ -1390,7 +1390,7 @@ int nat25_handle_frame(_adapter *priv, struct sk_buff *skb)
 		int is_vlan_tag = 0, i, retval = 0;
 		unsigned short vlan_hdr = 0;
 
-		if (*((unsigned short *)(skb->data + ETH_ALEN * 2)) == __constant_htons(ETH_P_8021Q)) {
+		if (*((__be16 *)(skb->data + ETH_ALEN * 2)) == __constant_htons(ETH_P_8021Q)) {
 			is_vlan_tag = 1;
 			vlan_hdr = *((unsigned short *)(skb->data + ETH_ALEN * 2 + 2));
 			for (i = 0; i < 6; i++)
@@ -1407,7 +1407,7 @@ int nat25_handle_frame(_adapter *priv, struct sk_buff *skb)
 			 *	corresponding network protocol is NOT support.
 			 */
 			if (!priv->ethBrExtInfo.nat25sc_disable &&
-			    (*((unsigned short *)(skb->data + ETH_ALEN * 2)) == __constant_htons(ETH_P_IP)) &&
+			    (*((__be16 *)(skb->data + ETH_ALEN * 2)) == __constant_htons(ETH_P_IP)) &&
 			    !memcmp(priv->scdb_ip, skb->data + ETH_HLEN + 16, 4)) {
 				memcpy(skb->data, priv->scdb_mac, ETH_ALEN);
 
@@ -1431,7 +1431,7 @@ int nat25_handle_frame(_adapter *priv, struct sk_buff *skb)
 			skb_push(skb, 4);
 			for (i = 0; i < 6; i++)
 				*((unsigned short *)(skb->data + i * 2)) = *((unsigned short *)(skb->data + 4 + i * 2));
-			*((unsigned short *)(skb->data + ETH_ALEN * 2)) = __constant_htons(ETH_P_8021Q);
+			*((__be16 *)(skb->data + ETH_ALEN * 2)) = __constant_htons(ETH_P_8021Q);
 			*((unsigned short *)(skb->data + ETH_ALEN * 2 + 2)) = vlan_hdr;
 		}
 
@@ -1503,7 +1503,7 @@ void dhcp_flag_bcast(_adapter *priv, struct sk_buff *skb)
 		return;
 
 	if (!priv->ethBrExtInfo.dhcp_bcst_disable) {
-		unsigned short protocol = *((unsigned short *)(skb->data + 2 * ETH_ALEN));
+		__be16 protocol = *((__be16 *)(skb->data + 2 * ETH_ALEN));
 
 		if (protocol == __constant_htons(ETH_P_IP)) { /* IP */
 			struct iphdr *iph = (struct iphdr *)(skb->data + ETH_HLEN);
@@ -1536,7 +1536,6 @@ void dhcp_flag_bcast(_adapter *priv, struct sk_buff *skb)
 		}
 	}
 }
-
 
 void *scdb_findEntry(_adapter *priv, unsigned char *macAddr,
 		     unsigned char *ipAddr)

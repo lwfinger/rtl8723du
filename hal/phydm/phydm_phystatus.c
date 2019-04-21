@@ -20,7 +20,7 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-void
+static void
 phydm_rx_statistic_cal(
 	struct PHY_DM_STRUCT				*p_phydm,
 	u8									*p_phy_status,
@@ -81,7 +81,7 @@ phydm_reset_phystatus_statistic(
 	odm_memory_set(p_dm, &(p_dbg_statistic->rssi_cck_sum), 0, sizeof(struct phydm_phystatus_statistic));
 }
 
-void
+static void
 phydm_avg_phystatus_index(
 	struct PHY_DM_STRUCT			*p_dm,
 	struct phydm_phyinfo_struct		*p_phy_info,
@@ -174,7 +174,7 @@ phydm_avg_phystatus_index(
 	}
 }
 
-u8 phydm_get_signal_quality(
+static u8 phydm_get_signal_quality(
 	struct phydm_phyinfo_struct *p_phy_info,
 	struct PHY_DM_STRUCT *p_dm,
 	struct _phy_status_rpt_8192cd *p_phy_sta_rpt
@@ -200,7 +200,7 @@ u8 phydm_get_signal_quality(
 	return result;
 }
 
-u8
+static u8
 phydm_query_rx_pwr_percentage(
 	s8		ant_power
 )
@@ -214,7 +214,7 @@ phydm_query_rx_pwr_percentage(
 }
 
 
-s32
+static s32
 phydm_signal_scale_mapping_92c_series(
 	struct PHY_DM_STRUCT *p_dm,
 	s32 curr_sig
@@ -333,7 +333,7 @@ phydm_cfo(
 	return ret_val;
 }
 
-s8
+static s8
 phydm_cck_rssi_convert(
 	struct PHY_DM_STRUCT	*p_dm,
 	u16		lna_idx,
@@ -405,7 +405,7 @@ phydm_rate_to_num_ss(
 }
 
 #if (ODM_IC_11N_SERIES_SUPPORT == 1)
-void
+static void
 phydm_rx_phy_status92c_series_parsing(
 	struct PHY_DM_STRUCT					*p_dm,
 	struct phydm_phyinfo_struct			*p_phy_info,
@@ -1044,7 +1044,7 @@ phydm_reset_rssi_for_dm(
 	p_sta->rssi_stat.valid_bit = 0;
 }
 
-void
+static void
 phydm_process_rssi_for_dm(
 	struct PHY_DM_STRUCT					*p_dm,
 	struct phydm_phyinfo_struct			*p_phy_info,
@@ -1277,7 +1277,7 @@ phydm_query_is_mu_api(
 
 }
 
-void
+static void
 phydm_reset_phy_info(
 	struct PHY_DM_STRUCT					*p_phydm,
 	struct phydm_phyinfo_struct			*p_phy_info
@@ -1307,7 +1307,7 @@ phydm_reset_phy_info(
 	odm_memory_set(p_phydm, p_phy_info->rx_mimo_evm_dbm, 0, 4);
 }
 
-void
+static void
 phydm_set_per_path_phy_info(
 	u8							rx_path,
 	s8							rx_pwr,
@@ -1350,7 +1350,7 @@ phydm_set_per_path_phy_info(
 	p_phy_info->rx_snr[rx_path] = rx_snr >> 1;
 }
 
-void
+static void
 phydm_set_common_phy_info(
 	s8							rx_power,
 	u8							channel,
@@ -1374,7 +1374,7 @@ phydm_set_common_phy_info(
 	p_phy_info->band_width = bandwidth;											/* bandwidth */
 }
 
-void
+static void
 phydm_get_rx_phy_status_type0(
 	struct PHY_DM_STRUCT		*p_dm,
 	u8							*p_phy_status,
@@ -1443,7 +1443,7 @@ phydm_get_rx_phy_status_type0(
 	p_dm->dm_fat_table.antsel_rx_keep_3 = p_phy_sta_rpt->antidx_d;
 }
 
-void
+static void
 phydm_get_rx_phy_status_type1(
 	struct PHY_DM_STRUCT		*p_dm,
 	u8							*p_phy_status,
@@ -1542,7 +1542,7 @@ phydm_get_rx_phy_status_type1(
 	p_dm->dm_fat_table.antsel_rx_keep_3 = p_phy_sta_rpt->antidx_d;
 }
 
-void
+static void
 phydm_get_rx_phy_status_type2(
 	struct PHY_DM_STRUCT						*p_dm,
 	u8							*p_phy_status,
@@ -1616,23 +1616,14 @@ phydm_get_rx_phy_status_type2(
 				  false, bw, 0, rxsc, p_phy_info);
 }
 
-void
+static void
 phydm_get_rx_phy_status_type5(
 	u8				*p_phy_status
 )
 {
-	/*
-		dbg_print("DW0: 0x%02x%02x%02x%02x\n", *(p_phy_status + 3), *(p_phy_status + 2), *(p_phy_status + 1), *(p_phy_status + 0));
-		dbg_print("DW1: 0x%02x%02x%02x%02x\n", *(p_phy_status + 7), *(p_phy_status + 6), *(p_phy_status + 5), *(p_phy_status + 4));
-		dbg_print("DW2: 0x%02x%02x%02x%02x\n", *(p_phy_status + 11), *(p_phy_status + 10), *(p_phy_status + 9), *(p_phy_status + 8));
-		dbg_print("DW3: 0x%02x%02x%02x%02x\n", *(p_phy_status + 15), *(p_phy_status + 14), *(p_phy_status + 13), *(p_phy_status + 12));
-		dbg_print("DW4: 0x%02x%02x%02x%02x\n", *(p_phy_status + 19), *(p_phy_status + 18), *(p_phy_status + 17), *(p_phy_status + 16));
-		dbg_print("DW5: 0x%02x%02x%02x%02x\n", *(p_phy_status + 23), *(p_phy_status + 22), *(p_phy_status + 21), *(p_phy_status + 20));
-		dbg_print("DW6: 0x%02x%02x%02x%02x\n", *(p_phy_status + 27), *(p_phy_status + 26), *(p_phy_status + 25), *(p_phy_status + 24));
-	*/
 }
 
-void
+static void
 phydm_process_rssi_for_dm_new_type(
 	struct PHY_DM_STRUCT			*p_dm,
 	struct phydm_phyinfo_struct		*p_phy_info,

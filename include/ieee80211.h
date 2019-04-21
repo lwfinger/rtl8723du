@@ -324,7 +324,7 @@ struct sta_data {
 
 struct ieee_ibss_seq {
 	u8 mac[ETH_ALEN];
-	__be16 seq_num;
+	u16 seq_num;
 	u16 frag_num;
 	unsigned long packet_time;
 	_list	list;

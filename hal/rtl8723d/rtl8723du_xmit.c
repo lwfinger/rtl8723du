@@ -75,7 +75,7 @@ void rtl8723du_free_xmit_priv(PADAPTER padapter)
 {
 }
 
-int urb_zero_packet_chk(PADAPTER padapter, int sz)
+static int urb_zero_packet_chk(PADAPTER padapter, int sz)
 {
 	u8 blnSetTxDescOffset;
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
@@ -669,7 +669,7 @@ s32 rtl8723du_hal_xmitframe_enqueue(PADAPTER padapter, struct xmit_frame *pxmitf
 
 void rtl8723d_cal_txdesc_chksum(struct tx_desc *ptxdesc)
 {
-	u16 *usPtr = (u16 *)ptxdesc;
+	__le16 *usPtr = (__le16 *)ptxdesc;
 	u32 count;
 	u32 index;
 	u16 checksum = 0;

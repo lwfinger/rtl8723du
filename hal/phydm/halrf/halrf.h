@@ -177,7 +177,7 @@ halrf_cmn_info_init(
 void
 halrf_cmn_info_hook(
 	void		*p_dm_void,
-	u32		cmn_info,
+	enum halrf_cmninfo_hook_e cmn_info,
 	void		*p_value
 );
 

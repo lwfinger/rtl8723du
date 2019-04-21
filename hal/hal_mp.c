@@ -25,7 +25,7 @@
 #endif /* !RTW_HALMAC */
 
 
-u8 MgntQuery_NssTxRate(u16 Rate)
+static u8 MgntQuery_NssTxRate(u16 Rate)
 {
 	u8	NssNum = RF_TX_NUM_NONIMPLEMENT;
 
@@ -321,7 +321,7 @@ void hal_mpt_SetBandwidth(PADAPTER pAdapter)
 	hal_mpt_SwitchRfSetting(pAdapter);
 }
 
-void mpt_SetTxPower_Old(PADAPTER pAdapter, MPT_TXPWR_DEF Rate, u8 *pTxPower)
+static void mpt_SetTxPower_Old(PADAPTER pAdapter, MPT_TXPWR_DEF Rate, u8 *pTxPower)
 {
 	switch (Rate) {
 	case MPT_CCK: {
@@ -379,7 +379,7 @@ void mpt_SetTxPower_Old(PADAPTER pAdapter, MPT_TXPWR_DEF Rate, u8 *pTxPower)
 	RTW_INFO("<===mpt_SetTxPower_Old()\n");
 }
 
-void
+static void
 mpt_SetTxPower(
 	PADAPTER		pAdapter,
 	MPT_TXPWR_DEF	Rate,
@@ -522,7 +522,7 @@ void hal_mpt_SetDataRate(PADAPTER pAdapter)
 
 #define RF_PATH_AB	22
 
-void mpt_SetRFPath_8723D(PADAPTER pAdapter)
+static void mpt_SetRFPath_8723D(PADAPTER pAdapter)
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
 	u1Byte	p = 0, i = 0;
@@ -559,7 +559,7 @@ void mpt_SetRFPath_8723D(PADAPTER pAdapter)
 	}
 }
 
-VOID mpt_SetRFPath_819X(PADAPTER	pAdapter)
+static VOID mpt_SetRFPath_819X(PADAPTER	pAdapter)
 {
 	HAL_DATA_TYPE			*pHalData	= GET_HAL_DATA(pAdapter);
 	PMPT_CONTEXT		pMptCtx = &(pAdapter->mppriv.mpt_ctx);

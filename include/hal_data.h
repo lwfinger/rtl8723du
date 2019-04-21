@@ -616,6 +616,9 @@ typedef struct hal_com_data HAL_DATA_TYPE, *PHAL_DATA_TYPE;
 #define rtw_is_hw_init_completed(adapter)		(GET_HAL_DATA(adapter)->hw_init_completed == _TRUE)
 #endif
 
+int recvbuf2recvframe(PADAPTER padapter, void *ptr);
+extern int new_bcn_max;
+
 #ifdef RTW_HALMAC
 int rtw_halmac_deinit_adapter(struct dvobj_priv *);
 #endif /* RTW_HALMAC */

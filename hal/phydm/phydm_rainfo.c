@@ -48,7 +48,7 @@ phydm_h2C_debug(
 	*_out_len = out_len;
 }
 
-void
+static void
 phydm_fw_fix_rate(
 	void		*p_dm_void,
 	u8		en, 
@@ -411,7 +411,7 @@ phydm_modify_RA_PCR_threshold(
 	PHYDM_DBG(p_dm, DBG_RA, ("Set RA_threshold_offset = (( %s%d ))\n", ((RA_threshold_offset == 0) ? " " : ((RA_offset_direction) ? "+" : "-")), RA_threshold_offset));
 }
 
-void
+static void
 phydm_rate_adaptive_mask_init(
 	void	*p_dm_void
 )
@@ -554,7 +554,7 @@ phydm_show_sta_info(
 
 #ifdef	PHYDM_3RD_REFORM_RA_MASK
 
-u8
+static u8
 phydm_get_tx_stream_num(
 	void		*p_dm_void,
 	enum 	rf_type	mimo_type
@@ -578,7 +578,7 @@ phydm_get_tx_stream_num(
 	return tx_num;
 }
 
-u64
+static u64
 phydm_get_bb_mod_ra_mask(
 	void		*p_dm_void,
 	u8		macid
@@ -636,7 +636,7 @@ phydm_get_bb_mod_ra_mask(
 			else
 				ra_mask_bitmap &= 0x0ffff005;
 		} else if (tx_stream_num == 3)
-			ra_mask_bitmap &= 0xffffff015;
+			ra_mask_bitmap &= 0xffffff015L;
 	} else if (wireless_mode ==  (WIRELESS_OFDM | WIRELESS_HT)) {		/*N_5G*/
 	
 		if (tx_stream_num == 1) {
@@ -651,7 +651,7 @@ phydm_get_bb_mod_ra_mask(
 			else
 				ra_mask_bitmap &= 0x0ffff010;
 		} else if (tx_stream_num == 3)
-			ra_mask_bitmap &= 0xffffff010;
+			ra_mask_bitmap &= 0xffffff010L;
 	} else if (wireless_mode ==  (WIRELESS_CCK |WIRELESS_OFDM | WIRELESS_VHT)) {
 																	/*AC_2G*/
 		if (tx_stream_num == 1)
@@ -659,23 +659,23 @@ phydm_get_bb_mod_ra_mask(
 		else if (tx_stream_num == 2)
 			ra_mask_bitmap &= 0xfffff015;
 		else if (tx_stream_num == 3)
-			ra_mask_bitmap &= 0x3fffffff010;
+			ra_mask_bitmap &= 0x3fffffff010L;
 		
 
 		if (bw == CHANNEL_WIDTH_20) {/* AC 20MHz doesn't support MCS9 */
-			ra_mask_bitmap &= 0x1ff7fdfffff;
+			ra_mask_bitmap &= 0x1ff7fdfffffL;
 		}
 	} else if (wireless_mode ==  (WIRELESS_OFDM | WIRELESS_VHT)) {		/*AC_5G*/
 	
 		if (tx_stream_num == 1)
-			ra_mask_bitmap &= 0x003ff010;
+			ra_mask_bitmap &= 0x003ff010L;
 		else if (tx_stream_num == 2)
-			ra_mask_bitmap &= 0xfffff010;
+			ra_mask_bitmap &= 0xfffff010L;
 		else  if (tx_stream_num == 3)
-			ra_mask_bitmap &= 0x3fffffff010;
+			ra_mask_bitmap &= 0x3fffffff010L;
 
 		if (bw == CHANNEL_WIDTH_20) /* AC 20MHz doesn't support MCS9 */
-			ra_mask_bitmap &= 0x1ff7fdfffff;
+			ra_mask_bitmap &= 0x1ff7fdfffffL;
 	} else {
 		PHYDM_DBG(p_dm, DBG_RA, ("[Warrning] No RA mask is found\n"));
 		/**/
@@ -706,7 +706,7 @@ phydm_get_bb_mod_ra_mask(
 	return ra_mask_bitmap;
 }
 
-u8
+static u8
 phydm_get_rate_id(
 	void			*p_dm_void,
 	u8			macid
@@ -806,7 +806,7 @@ phydm_get_rate_id(
 	return rate_id_idx;
 }
 
-void
+static void
 phydm_ra_h2c(
 	void	*p_dm_void,
 	u8	macid,
@@ -1377,7 +1377,7 @@ phydm_rate_order_compute(
 
 }
 
-void
+static void
 phydm_ra_common_info_update(
 	void	*p_dm_void
 )

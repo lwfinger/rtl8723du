@@ -31,7 +31,7 @@
 
 #define VALID_CNT				5
 
-void phydm_set_noise_data_sum(struct noise_level *noise_data, u8 max_rf_path)
+static void phydm_set_noise_data_sum(struct noise_level *noise_data, u8 max_rf_path)
 {
 	u8 rf_path;
 
@@ -43,7 +43,7 @@ void phydm_set_noise_data_sum(struct noise_level *noise_data, u8 max_rf_path)
 	}
 }
 
-s16 odm_inband_noise_monitor_n_series(struct PHY_DM_STRUCT	*p_dm, u8 is_pause_dig, u8 igi_value, u32 max_time)
+static s16 odm_inband_noise_monitor_n_series(struct PHY_DM_STRUCT	*p_dm, u8 is_pause_dig, u8 igi_value, u32 max_time)
 {
 	u32				tmp4b;
 	u8				max_rf_path = 0, rf_path;
@@ -132,8 +132,7 @@ s16 odm_inband_noise_monitor_n_series(struct PHY_DM_STRUCT	*p_dm, u8 is_pause_di
 
 }
 
-
-s16
+static s16
 phydm_idle_noise_measurement_ac(
 	struct PHY_DM_STRUCT	*p_dm,
 	u8	is_pause_dig,
@@ -231,8 +230,7 @@ phydm_idle_noise_measurement_ac(
 
 }
 
-
-s16
+static s16
 odm_inband_noise_monitor_ac_series(
 	struct PHY_DM_STRUCT	*p_dm,
 	u8 is_pause_dig,

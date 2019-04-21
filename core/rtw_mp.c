@@ -319,41 +319,8 @@ static VOID PHY_SetRFPathSwitch_default(
 	RTW_INFO("%s\n", __func__);
 }
 
-
-void mpt_InitHWConfig(PADAPTER Adapter)
+static void mpt_InitHWConfig(PADAPTER Adapter)
 {
-	PHAL_DATA_TYPE hal;
-
-	hal = GET_HAL_DATA(Adapter);
-
-	if (IS_HARDWARE_TYPE_8723B(Adapter)) {
-		/* TODO: <20130114, Kordan> The following setting is only for DPDT and Fixed board type. */
-		/* TODO:  A better solution is configure it according EFUSE during the run-time. */
-
-		phy_set_mac_reg(Adapter, 0x64, BIT20, 0x0);		/* 0x66[4]=0		 */
-		phy_set_mac_reg(Adapter, 0x64, BIT24, 0x0);		/* 0x66[8]=0 */
-		phy_set_mac_reg(Adapter, 0x40, BIT4, 0x0);		/* 0x40[4]=0		 */
-		phy_set_mac_reg(Adapter, 0x40, BIT3, 0x1);		/* 0x40[3]=1		 */
-		phy_set_mac_reg(Adapter, 0x4C, BIT24, 0x1);		/* 0x4C[24:23]=10 */
-		phy_set_mac_reg(Adapter, 0x4C, BIT23, 0x0);		/* 0x4C[24:23]=10 */
-		phy_set_bb_reg(Adapter, 0x944, BIT1 | BIT0, 0x3);	/* 0x944[1:0]=11	 */
-		phy_set_bb_reg(Adapter, 0x930, bMaskByte0, 0x77);/* 0x930[7:0]=77	  */
-		phy_set_mac_reg(Adapter, 0x38, BIT11, 0x1);/* 0x38[11]=1 */
-
-		/* TODO: <20130206, Kordan> The default setting is wrong, hard-coded here. */
-		phy_set_mac_reg(Adapter, 0x778, 0x3, 0x3);					/* Turn off hardware PTA control (Asked by Scott) */
-		phy_set_mac_reg(Adapter, 0x64, bMaskDWord, 0x36000000);/* Fix BT S0/S1 */
-		phy_set_mac_reg(Adapter, 0x948, bMaskDWord, 0x0);		/* Fix BT can't Tx */
-
-		/* <20130522, Kordan> Turn off equalizer to improve Rx sensitivity. (Asked by EEChou) */
-		phy_set_bb_reg(Adapter, 0xA00, BIT8, 0x0);			/*0xA01[0] = 0*/
-	} else if (IS_HARDWARE_TYPE_8821(Adapter)) {
-		/* <20131121, VincentL> Add for 8821AU DPDT setting and fix switching antenna issue (Asked by Rock)
-		<20131122, VincentL> Enable for all 8821A/8811AU  (Asked by Alex)*/
-		phy_set_mac_reg(Adapter, 0x4C, BIT23, 0x0);		/*0x4C[23:22]=01*/
-		phy_set_mac_reg(Adapter, 0x4C, BIT22, 0x1);		/*0x4C[23:22]=01*/
-	} else if (IS_HARDWARE_TYPE_8188ES(Adapter))
-		phy_set_mac_reg(Adapter, 0x4C , BIT23, 0);		/*select DPDT_P and DPDT_N as output pin*/
 }
 
 static void PHY_IQCalibrate(PADAPTER padapter, u8 bReCovery)
@@ -373,18 +340,13 @@ static u8 PHY_QueryRFPathSwitch(PADAPTER padapter)
 	return bmain;
 }
 
-static void  PHY_SetRFPathSwitch(PADAPTER padapter , BOOLEAN bMain) {
-
-	if (IS_HARDWARE_TYPE_8723B(padapter)) {
-	} else if (IS_HARDWARE_TYPE_8723D(padapter)) {
-		phy_set_rf_path_switch_8723d(padapter, bMain);
-	}
+static void  PHY_SetRFPathSwitch(PADAPTER padapter , BOOLEAN bMain)
+{
 }
 
-
-static void phy_switch_rf_path_set(PADAPTER padapter , u8 *prf_set_State) {
+static void phy_switch_rf_path_set(PADAPTER padapter , u8 *prf_set_State)
+{
 }
-
 
 s32
 MPT_InitializeAdapter(
@@ -828,7 +790,7 @@ int SetTxPower(PADAPTER pAdapter)
 	return _TRUE;
 }
 
-void SetTxAGCOffset(PADAPTER pAdapter, u32 ulTxAGCOffset)
+static void SetTxAGCOffset(PADAPTER pAdapter, u32 ulTxAGCOffset)
 {
 	u32 TxAGCOffset_B, TxAGCOffset_C, TxAGCOffset_D, tmpAGC;
 
@@ -1015,7 +977,7 @@ void fill_txdesc_for_mp(PADAPTER padapter, u8 *ptxdesc)
 	_rtw_memcpy(ptxdesc, pmp_priv->tx.desc, TXDESC_SIZE);
 }
 
-void fill_tx_desc_8723d(PADAPTER padapter)
+static void fill_tx_desc_8723d(PADAPTER padapter)
 {
 	struct mp_priv *pmp_priv = &padapter->mppriv;
 	struct pkt_attrib *pattrib = &(pmp_priv->tx.attrib);
