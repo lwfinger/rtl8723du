@@ -13,6 +13,9 @@
  *
  *****************************************************************************/
 #ifndef CONFIG_PLATFORM_OPS
+
+#include "platform_ops.h"
+
 /*
  * Return:
  *	0:	power on successfully
@@ -21,7 +24,6 @@
 int platform_wifi_power_on(void)
 {
 	int ret = 0;
-
 
 	return ret;
 }
