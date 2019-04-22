@@ -1,17 +1,6 @@
-/******************************************************************************
- *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+// SPDX-License-Identifier: GPL-2.0
+/* Copyright(c) 2007 - 2017 Realtek Corporation */
+
 #define _RTW_MLME_C_
 
 #include <hal_data.h>
@@ -1468,11 +1457,9 @@ void rtw_free_assoc_resources(_adapter *adapter, int lock_scanned_queue)
 	struct	sta_priv *pstapriv = &adapter->stapriv;
 	struct wlan_network *tgt_network = &pmlmepriv->cur_network;
 
-
 #ifdef CONFIG_TDLS
 	struct tdls_info *ptdlsinfo = &adapter->tdlsinfo;
 #endif /* CONFIG_TDLS */
-
 
 	RTW_INFO("%s-"ADPT_FMT" tgt_network MacAddress=" MAC_FMT" ssid=%s\n",
 		__func__, ADPT_ARG(adapter), MAC_ARG(tgt_network->network.MacAddress), tgt_network->network.Ssid.Ssid);
@@ -1490,21 +1477,15 @@ void rtw_free_assoc_resources(_adapter *adapter, int lock_scanned_queue)
 			rtw_tdls_cmd(adapter, NULL, TDLS_RS_RCR);
 #endif /* CONFIG_TDLS */
 
-		/* _enter_critical_bh(&(pstapriv->sta_hash_lock), &irqL); */
 		rtw_free_stainfo(adapter, psta);
-		/* _exit_critical_bh(&(pstapriv->sta_hash_lock), &irqL); */
-
 	}
-
 	if (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE | WIFI_ADHOC_MASTER_STATE)) {
 		struct sta_info *psta;
 
 		rtw_free_all_stainfo(adapter);
 
 		psta = rtw_get_bcmc_stainfo(adapter);
-		/* _enter_critical_bh(&(pstapriv->sta_hash_lock), &irqL);		 */
 		rtw_free_stainfo(adapter, psta);
-		/* _exit_critical_bh(&(pstapriv->sta_hash_lock), &irqL);		 */
 
 		rtw_init_bcmc_stainfo(adapter);
 	}
@@ -1519,10 +1500,8 @@ void rtw_free_assoc_resources(_adapter *adapter, int lock_scanned_queue)
 		RTW_INFO("free disconnecting network of scanned_queue\n");
 		rtw_free_network_nolock(adapter, pwlan);
 #ifdef CONFIG_P2P
-		if (!rtw_p2p_chk_state(&adapter->wdinfo, P2P_STATE_NONE)) {
+		if (!rtw_p2p_chk_state(&adapter->wdinfo, P2P_STATE_NONE))
 			rtw_mi_set_scan_deny(adapter, 2000);
-			/* rtw_clear_scan_deny(adapter);			 */
-		}
 #endif /* CONFIG_P2P */
 	} else {
 		if (pwlan == NULL)
@@ -1532,12 +1511,9 @@ void rtw_free_assoc_resources(_adapter *adapter, int lock_scanned_queue)
 	}
 
 
-	if ((check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) && (adapter->stapriv.asoc_sta_count == 1))
-	    /*||check_fwstate(pmlmepriv, WIFI_STATION_STATE)*/) {
+	if (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) && (adapter->stapriv.asoc_sta_count == 1))
 		if (pwlan)
 			rtw_free_network_nolock(adapter, pwlan);
-	}
-
 	if (lock_scanned_queue)
 		_exit_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 
@@ -2076,8 +2052,6 @@ void rtw_joinbss_event_prehandle(_adapter *adapter, u8 *pbuf)
 		rtw_reset_securitypriv(adapter);
 		_set_timer(&pmlmepriv->assoc_timer, 1);
 
-		/* rtw_free_assoc_resources(adapter, 1); */
-
 		if ((check_fwstate(pmlmepriv, _FW_UNDER_LINKING)) == _TRUE) {
 			_clr_fwstate_(pmlmepriv, _FW_UNDER_LINKING);
 		}
@@ -2101,7 +2075,6 @@ void rtw_joinbss_event_prehandle(_adapter *adapter, u8 *pbuf)
 #endif
 
 			_set_timer(&pmlmepriv->assoc_timer, 1);
-			/* rtw_free_assoc_resources(adapter, 1); */
 			_clr_fwstate_(pmlmepriv, _FW_UNDER_LINKING);
 
 #ifdef REJOIN
