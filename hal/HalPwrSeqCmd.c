@@ -2,8 +2,6 @@
 /* Copyright(c) 2007 - 2017 Realtek Corporation */
 
 /*++
-Copyright (c) Realtek Semiconductor Corp. All rights reserved.
-
 Module Name:
 	HalPwrSeqCmd.c
 

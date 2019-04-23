@@ -1,25 +1,9 @@
-/******************************************************************************
- *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
-
+/* SPDX-License-Identifier: GPL-2.0 */
+/* Copyright(c) 2007 - 2017 Realtek Corporation */
 
 #ifndef	__ODM_DBG_H__
 #define __ODM_DBG_H__
 
-/*#define DEBUG_VERSION	"1.1"*/  /*2015.07.29 YuChen*/
-/*#define DEBUG_VERSION	"1.2"*/  /*2015.08.28 Dino*/
-/*#define DEBUG_VERSION	"1.3"*/  /*2016.04.28 YuChen*/
 #define DEBUG_VERSION	"1.4"  /*2017.03.13 Dino*/
 
 /* -----------------------------------------------------------------------------
