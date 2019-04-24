@@ -114,7 +114,6 @@ include $(TopDIR)/hal/phydm/phydm.mk
 ########### HAL_RTL8723D #################################
 ifeq ($(CONFIG_RTL8723D), y)
 
-RTL871X = rtl8723d
 ifeq ($(CONFIG_USB_HCI), y)
 MODULE_NAME = 8723du
 MODULE_SUB_NAME = 8723du
@@ -123,26 +122,26 @@ endif
 EXTRA_CFLAGS += -DCONFIG_RTL8723D
 
 _HAL_INTFS_FILES += hal/HalPwrSeqCmd.o \
-					hal/$(RTL871X)/Hal8723DPwrSeq.o\
-					hal/$(RTL871X)/$(RTL871X)_sreset.o
+					hal/Hal8723DPwrSeq.o\
+					hal/rtl8723d_sreset.o
 
-_HAL_INTFS_FILES +=	hal/$(RTL871X)/$(RTL871X)_hal_init.o \
-			hal/$(RTL871X)/$(RTL871X)_phycfg.o \
-			hal/$(RTL871X)/$(RTL871X)_rf6052.o \
-			hal/$(RTL871X)/$(RTL871X)_dm.o \
-			hal/$(RTL871X)/$(RTL871X)_rxdesc.o \
-			hal/$(RTL871X)/$(RTL871X)_cmd.o \
-			hal/$(RTL871X)/hal8723d_fw.o \
-			hal/$(RTL871X)/$(RTL871X)_lps_poff.o
+_HAL_INTFS_FILES +=	hal/rtl8723d_hal_init.o \
+			hal/rtl8723d_phycfg.o \
+			hal/rtl8723d_rf6052.o \
+			hal/rtl8723d_dm.o \
+			hal/rtl8723d_rxdesc.o \
+			hal/rtl8723d_cmd.o \
+			hal/hal8723d_fw.o \
+			hal/rtl8723d_lps_poff.o
 
 
 _HAL_INTFS_FILES +=	\
-			hal/$(RTL871X)/$(HCI_NAME)_halinit.o \
-			hal/$(RTL871X)/rtl$(MODULE_SUB_NAME)_led.o \
-			hal/$(RTL871X)/rtl$(MODULE_SUB_NAME)_xmit.o \
-			hal/$(RTL871X)/rtl$(MODULE_SUB_NAME)_recv.o
+			hal/$(HCI_NAME)_halinit.o \
+			hal/rtl$(MODULE_SUB_NAME)_led.o \
+			hal/rtl$(MODULE_SUB_NAME)_xmit.o \
+			hal/rtl$(MODULE_SUB_NAME)_recv.o
 
-_HAL_INTFS_FILES += hal/$(RTL871X)/$(HCI_NAME)_ops.o
+_HAL_INTFS_FILES += hal/$(HCI_NAME)_ops.o
 
 ifeq ($(CONFIG_USB_HCI), y)
 _HAL_INTFS_FILES +=hal/HalEfuseMask8723D_USB.o
@@ -161,7 +160,7 @@ ifeq ($(CONFIG_AUTOCFG_CP), y)
 ifeq ($(CONFIG_MULTIDRV), y)
 $(shell cp $(TopDIR)/autoconf_multidrv_$(HCI_NAME)_linux.h $(TopDIR)/include/autoconf.h)
 else
-$(shell cp $(TopDIR)/autoconf_$(RTL871X)_$(HCI_NAME)_linux.h $(TopDIR)/include/autoconf.h)
+$(shell cp $(TopDIR)/autoconf_rtl8723d_$(HCI_NAME)_linux.h $(TopDIR)/include/autoconf.h)
 endif
 
 endif
