@@ -145,7 +145,7 @@ _HAL_INTFS_FILES +=	\
 _HAL_INTFS_FILES += hal/$(RTL871X)/$(HCI_NAME)_ops.o
 
 ifeq ($(CONFIG_USB_HCI), y)
-_HAL_INTFS_FILES +=hal/efuse/$(RTL871X)/HalEfuseMask8723D_USB.o
+_HAL_INTFS_FILES +=hal/HalEfuseMask8723D_USB.o
 endif
 ifeq ($(CONFIG_BT_COEXIST), y)
 _BTC_FILES += hal/halbtc8723d1ant.o \

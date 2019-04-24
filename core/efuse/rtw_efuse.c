@@ -6,7 +6,7 @@
 #include <drv_types.h>
 #include <hal_data.h>
 
-#include "../hal/efuse/efuse_mask.h"
+#include "../hal/HalEfuseMask8723D_USB.h"
 
 /*------------------------Define local variable------------------------------*/
 u8	fakeEfuseBank = {0};
