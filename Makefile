@@ -108,7 +108,7 @@ _HAL_INTFS_FILES :=	hal/hal_intf.o \
 EXTRA_CFLAGS += -I$(src)/platform
 _PLATFORM_FILES := platform/platform_ops.o
 
-EXTRA_CFLAGS += -I$(src)/hal/btc
+EXTRA_CFLAGS += -I$(src)/hal
 
 include $(TopDIR)/hal/phydm/phydm.mk
 ########### HAL_RTL8723D #################################
@@ -148,8 +148,8 @@ ifeq ($(CONFIG_USB_HCI), y)
 _HAL_INTFS_FILES +=hal/efuse/$(RTL871X)/HalEfuseMask8723D_USB.o
 endif
 ifeq ($(CONFIG_BT_COEXIST), y)
-_BTC_FILES += hal/btc/halbtc8723d1ant.o \
-				hal/btc/halbtc8723d2ant.o
+_BTC_FILES += hal/halbtc8723d1ant.o \
+				hal/halbtc8723d2ant.o
 endif
 
 endif

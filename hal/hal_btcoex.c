@@ -7,7 +7,7 @@
 
 #include <hal_data.h>
 #include <hal_btcoex.h>
-#include "btc/mp_precomp.h"
+#include "mp_precomp.h"
 
 /* ************************************
  *		Global variables
