@@ -1289,7 +1289,7 @@ static void update_hw_ht_param(_adapter *padapter)
 	/*  */
 	/* Config SM Power Save setting */
 	/*  */
-	pmlmeinfo->SM_PS = (pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info & 0x0C) >> 2;
+	pmlmeinfo->SM_PS = (le16_to_cpu(pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info & 0x0C)) >> 2;
 	if (pmlmeinfo->SM_PS == WLAN_HT_CAP_SM_PS_STATIC) {
 #if 0
 		u8 i;
@@ -2213,7 +2213,7 @@ static void rtw_macaddr_acl_init(_adapter *adapter)
 	_exit_critical_bh(&(acl_node_q->lock), &irqL);
 }
 
-void rtw_macaddr_acl_deinit(_adapter *adapter)
+static void rtw_macaddr_acl_deinit(_adapter *adapter)
 {
 	struct sta_priv *stapriv = &adapter->stapriv;
 	struct wlan_acl_pool *acl = &stapriv->acl_list;
@@ -4405,9 +4405,17 @@ void tx_beacon_handlder(struct dvobj_priv *pdvobj)
 
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+void tx_beacon_timer_handlder(struct timer_list *t)
+#else
 void tx_beacon_timer_handlder(void *ctx)
+#endif
 {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	struct dvobj_priv *pdvobj = from_timer(pdvobj, t, txbcn_timer);
+#else
 	struct dvobj_priv *pdvobj = (struct dvobj_priv *)ctx;
+#endif
 	_adapter *padapter = pdvobj->padapters[0];
 
 	if (padapter)

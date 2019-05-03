@@ -1876,7 +1876,11 @@ struct dvobj_priv *devobj_init(void)
 	pdvobj->inter_bcn_space = DEFAULT_BCN_INTERVAL; /* default value is equal to the default beacon_interval (100ms) */
 	_rtw_init_queue(&pdvobj->ap_if_q);
 #ifdef CONFIG_SWTIMER_BASED_TXBCN
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	timer_setup(&pdvobj->txbcn_timer, tx_beacon_timer_handlder, 0);
+#else
 	rtw_init_timer(&(pdvobj->txbcn_timer), NULL, tx_beacon_timer_handlder, pdvobj);
+#endif
 #endif
 #endif
 
