@@ -4549,8 +4549,7 @@ static int	cfg80211_rtw_dump_station(struct wiphy *wiphy, struct net_device *nde
 		goto exit;
 	}
 	_rtw_memcpy(mac, psta->cmn.mac_addr, ETH_ALEN);
-	sinfo->filled = 0;
-	sinfo->filled |= STATION_INFO_SIGNAL;
+	sinfo->filled = STATION_INFO_SIGNAL;
 	sinfo->signal = translate_percentage_to_dbm(psta->cmn.rssi_stat.rssi);
 
 exit:
