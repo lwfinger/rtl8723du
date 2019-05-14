@@ -4566,7 +4566,7 @@ void rtw_update_ht_cap(_adapter *padapter, u8 *pie, uint ie_len, u8 channel)
 
 	/* update cur_bwmode & cur_ch_offset */
 	if ((cbw40_enable) &&
-	    (pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info & BIT(1)) &&
+	    (pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info & cpu_to_le16(BIT(1))) &&
 	    (pmlmeinfo->HT_info.infos[0] & BIT(2))) {
 		struct hal_spec_t *hal_spec = GET_HAL_SPEC(padapter);
 		int i;
@@ -4623,16 +4623,9 @@ void rtw_update_ht_cap(_adapter *padapter, u8 *pie, uint ie_len, u8 channel)
 	/*  */
 	/* Config SM Power Save setting */
 	/*  */
-	pmlmeinfo->SM_PS = (pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info & 0x0C) >> 2;
-	if (pmlmeinfo->SM_PS == WLAN_HT_CAP_SM_PS_STATIC) {
-#if 0
-		u8 i;
-		/* update the MCS rates */
-		for (i = 0; i < 16; i++)
-			pmlmeinfo->HT_caps.HT_cap_element.MCS_rate[i] &= MCS_rate_1R[i];
-#endif
+	pmlmeinfo->SM_PS = (le16_to_cpu(pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info) & 0x0C) >> 2;
+	if (pmlmeinfo->SM_PS == WLAN_HT_CAP_SM_PS_STATIC)
 		RTW_INFO("%s(): WLAN_HT_CAP_SM_PS_STATIC\n", __FUNCTION__);
-	}
 
 	/*  */
 	/* Config current HT Protection mode. */

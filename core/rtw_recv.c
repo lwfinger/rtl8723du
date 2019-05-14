@@ -723,8 +723,8 @@ static sint recv_decache(union recv_frame *precv_frame, u8 bretry)
 	struct stainfo_rxcache *prxcache = &sta->sta_recvpriv.rxcache;
 
 	sint tid = precv_frame->u.hdr.attrib.priority;
-	__be16 seq_ctrl = ((precv_frame->u.hdr.attrib.seq_num & 0xffff) << 4) |
-		       (precv_frame->u.hdr.attrib.frag_num & 0xf);
+	u16 seq_ctrl = ((le16_to_cpu(precv_frame->u.hdr.attrib.seq_num) & 0xffff) << 4) |
+			(precv_frame->u.hdr.attrib.frag_num & 0xf);
 
 	if (tid > 15)
 		return _FAIL;
@@ -814,13 +814,13 @@ sint recv_bcast_pn_decache(union recv_frame *precv_frame)
 		key_id = CCMPH_2_KEYID(tmp_iv_hdr);
 		pkt_pn = CCMPH_2_PN(tmp_iv_hdr);
 	
-		curr_pn = le64_to_cpu(*(u64*)psecuritypriv->iv_seq[key_id]);
+		curr_pn = le64_to_cpu(*(__le64*)psecuritypriv->iv_seq[key_id]);
 		curr_pn &= 0x0000ffffffffffffL;
 
 		if (!VALID_PN_CHK(pkt_pn, curr_pn))
 			return _FAIL;
 
-		*(u64*)psecuritypriv->iv_seq[key_id] = cpu_to_le64(pkt_pn);
+		*(__le64*)psecuritypriv->iv_seq[key_id] = cpu_to_le64(pkt_pn);
 	}
 
 	return _SUCCESS;
@@ -2159,7 +2159,7 @@ sint validate_recv_frame(_adapter *adapter, union recv_frame *precv_frame)
 	pattrib->to_fr_ds = get_tofr_ds(ptr);
 
 	pattrib->frag_num = GetFragNum(ptr);
-	pattrib->seq_num = GetSequence(ptr);
+	pattrib->seq_num = cpu_to_le16(GetSequence(ptr));
 
 	pattrib->pw_save = GetPwrMgt(ptr);
 	pattrib->mfrag = GetMFrag(ptr);
@@ -2246,7 +2246,7 @@ static sint wlanhdr_to_ethhdr(union recv_frame *precvframe)
 	u8	bsnaphdr;
 	u8	*psnap_type;
 	struct ieee80211_snap_hdr	*psnap;
-
+	__be16 be_tmp;
 	sint ret = _SUCCESS;
 	_adapter			*adapter = precvframe->u.hdr.adapter;
 	struct mlme_priv	*pmlmepriv = &adapter->mlmepriv;
@@ -2278,9 +2278,9 @@ static sint wlanhdr_to_ethhdr(union recv_frame *precvframe)
 	len = precvframe->u.hdr.len - rmv_len;
 
 
-	_rtw_memcpy(&eth_type, ptr + rmv_len, 2);
-	eth_type = ntohs((unsigned short)eth_type); /* pattrib->ether_type */
-	pattrib->eth_type = eth_type;
+	_rtw_memcpy(&be_tmp, ptr + rmv_len, 2);
+	eth_type = ntohs(be_tmp); /* pattrib->ether_type */
+	pattrib->eth_type = cpu_to_le16(eth_type);
 
 
 	if ((check_fwstate(pmlmepriv, WIFI_MP_STATE) == _TRUE)) {
@@ -2485,7 +2485,7 @@ union recv_frame *recvframe_defrag(_adapter *adapter, _queue *defrag_q)
 		/* memcpy */
 		_rtw_memcpy(pfhdr->rx_tail, pnfhdr->rx_data, pnfhdr->len);
 
-		recvframe_put(prframe, pnfhdr->len);
+		recvframe_put(prframe, cpu_to_le16(pnfhdr->len));
 
 		pfhdr->attrib.icv_len = pnfhdr->attrib.icv_len;
 		plist = get_next(plist);
@@ -2868,7 +2868,8 @@ static int enqueue_reorder_recvframe(struct recv_reorder_ctrl *preorder_ctrl, un
 		pnextrframe = LIST_CONTAINOR(plist, union recv_frame, u);
 		pnextattrib = &pnextrframe->u.hdr.attrib;
 
-		if (SN_LESS(pnextattrib->seq_num, pattrib->seq_num))
+		if (SN_LESS(le16_to_cpu(pnextattrib->seq_num),
+			    le16_to_cpu( pattrib->seq_num)))
 			plist = get_next(plist);
 		else if (SN_EQUAL(pnextattrib->seq_num, pattrib->seq_num)) {
 			/* Duplicate entry is found!! Do not insert current entry. */
@@ -2949,8 +2950,8 @@ static int recv_indicatepkts_in_order(_adapter *padapter, struct recv_reorder_ct
 		RTW_INFO("DBG_RX_SEQ "FUNC_ADPT_FMT" tid:%u FORCE indicate_seq:%d, seq_num:%d\n"
 			, FUNC_ADPT_ARG(padapter), preorder_ctrl->tid, preorder_ctrl->indicate_seq, pattrib->seq_num);
 		#endif
-		recv_indicatepkts_pkt_loss_cnt(padapter, preorder_ctrl->indicate_seq, pattrib->seq_num);
-		preorder_ctrl->indicate_seq = pattrib->seq_num;
+		recv_indicatepkts_pkt_loss_cnt(padapter, preorder_ctrl->indicate_seq, le16_to_cpu(pattrib->seq_num));
+		preorder_ctrl->indicate_seq = le16_to_cpu(pattrib->seq_num);
 	}
 
 	/* Prepare indication list and indication. */
@@ -2960,7 +2961,7 @@ static int recv_indicatepkts_in_order(_adapter *padapter, struct recv_reorder_ct
 		prframe = LIST_CONTAINOR(plist, union recv_frame, u);
 		pattrib = &prframe->u.hdr.attrib;
 
-		if (!SN_LESS(preorder_ctrl->indicate_seq, pattrib->seq_num)) {
+		if (!SN_LESS(le16_to_cpu(preorder_ctrl->indicate_seq), le16_to_cpu(pattrib->seq_num))) {
 			plist = get_next(plist);
 			rtw_list_delete(&(prframe->u.hdr.list));
 
@@ -3003,7 +3004,7 @@ static int recv_indicatepkt_reorder(_adapter *padapter, union recv_frame *prfram
 	_enter_critical_bh(&ppending_recvframe_queue->lock, &irql);
 
 	/* s2. check if winstart_b(indicate_seq) needs to been updated */
-	if (!check_indicate_seq(preorder_ctrl, pattrib->seq_num)) {
+	if (!check_indicate_seq(preorder_ctrl, le16_to_cpu(pattrib->seq_num))) {
 		precvpriv->dbg_rx_ampdu_drop_count++;
 		/* pHTInfo->RxReorderDropCounter++; */
 		/* ReturnRFDList(Adapter, pRfd); */
@@ -3185,7 +3186,7 @@ static sint MPwlanhdr_to_ethhdr(union recv_frame *precvframe)
 	u8	bsnaphdr;
 	u8	*psnap_type;
 	u8 mcastheadermac[] = {0x01, 0x00, 0x5e};
-
+	__be16 be_tmp;
 	struct ieee80211_snap_hdr	*psnap;
 
 	sint ret = _SUCCESS;
@@ -3219,9 +3220,9 @@ static sint MPwlanhdr_to_ethhdr(union recv_frame *precvframe)
 	len = precvframe->u.hdr.len - rmv_len;
 
 
-	_rtw_memcpy(&eth_type, ptr + rmv_len, 2);
-	eth_type = ntohs((__be16)eth_type); /* pattrib->ether_type */
-	pattrib->eth_type = eth_type;
+	_rtw_memcpy(&be_tmp, ptr + rmv_len, 2);
+	eth_type = ntohs(be_tmp); /* pattrib->ether_type */
+	pattrib->eth_type = cpu_to_le16(eth_type);
 
 	{
 		ptr = recvframe_pull(precvframe, (rmv_len - sizeof(struct ethhdr) + (bsnaphdr ? 2 : 0)));
@@ -3236,7 +3237,7 @@ static sint MPwlanhdr_to_ethhdr(union recv_frame *precvframe)
 	}
 
 
-	len = htons(pattrib->seq_num);
+	len = le16_to_cpu(pattrib->seq_num);
 	/* RTW_INFO("wlan seq = %d ,seq_num =%x\n",len,pattrib->seq_num); */
 	_rtw_memcpy(ptr + 12, &len, 2);
 	if (adapter->mppriv.bRTWSmbCfg == _TRUE) {
@@ -3288,7 +3289,7 @@ static int mp_recv_frame(_adapter *padapter, union recv_frame *rframe)
 			type =	GetFrameType(ptr);
 			pattrib->to_fr_ds = get_tofr_ds(ptr);
 			pattrib->frag_num = GetFragNum(ptr);
-			pattrib->seq_num = GetSequence(ptr);
+			pattrib->seq_num = cpu_to_le16(GetSequence(ptr));
 			pattrib->pw_save = GetPwrMgt(ptr);
 			pattrib->mfrag = GetMFrag(ptr);
 			pattrib->mdata = GetMData(ptr);
@@ -3806,9 +3807,9 @@ static int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
 		goto _exit_recv_func;
 #endif
 
-	recv_set_iseq_before_mpdu_process(prframe, pattrib->seq_num, __func__);
+	recv_set_iseq_before_mpdu_process(prframe, le16_to_cpu(pattrib->seq_num), __func__);
 	ret = recv_process_mpdu(padapter, prframe);
-	recv_set_iseq_after_mpdu_process(prframe, pattrib->seq_num, __func__);
+	recv_set_iseq_after_mpdu_process(prframe, le16_to_cpu(pattrib->seq_num), __func__);
 	if (ret == _FAIL)
 		goto _recv_data_drop;
 

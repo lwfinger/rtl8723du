@@ -105,8 +105,7 @@ enum {
 */
 #define BIT_LEN_MASK_32(__BitLen) ((u32)(0xFFFFFFFF >> (32 - (__BitLen))))
 #define BIT_LEN_MASK_16(__BitLen) ((u16)(0xFFFF >> (16 - (__BitLen))))
-//#define BIT_LEN_MASK_8(__BitLen) ((0xFF >> (8 - (__BitLen))))
-#define BIT_LEN_MASK_8(__BitLen) ((BIT_LEN_MASK_16(__BitLen) & 0xFF))
+#define BIT_LEN_MASK_8(__BitLen) ((0x0FF >> (8 - (__BitLen))))
 
 /*
 * Continuous bits starting from least significant bit
@@ -154,7 +153,7 @@ enum {
 #define WriteBE1Byte(_ptr, _val)	((*((u8 *)(_ptr))) = ((u8)(_val)))
 
 /*
-* Return 4-byte value in host byte ordering from 4-byte pointer in litten-endian system.
+* Return 4-byte value in host byte ordering from 4-byte pointer in little-endian system.
 */
 #define LE_P4BYTE_TO_HOST_4BYTE(__pStart) (le32_to_cpu(*((__le32 *)(__pStart))))
 #define LE_P2BYTE_TO_HOST_2BYTE(__pStart) (le16_to_cpu(*((__le16 *)(__pStart))))

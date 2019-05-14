@@ -107,7 +107,7 @@ struct rx_raw_rssi {
 #include "cmn_info/rtw_sta_info.h"
 
 struct rx_pkt_attrib	{
-	u16	pkt_len;
+	__le16	pkt_len;
 	u8	physt;
 	u8	drvinfo_sz;
 	u8	shift_sz;
@@ -118,7 +118,7 @@ struct rx_pkt_attrib	{
 	u8	priority;
 	u8	pw_save;
 	u8	mdata;
-	u16	seq_num;
+	__le16	seq_num;
 	u8	frag_num;
 	u8	mfrag;
 	u8	order;
@@ -130,7 +130,7 @@ struct rx_pkt_attrib	{
 	u8	crc_err;
 	u8	icv_err;
 
-	u16	eth_type;
+	__le16	eth_type;
 
 	u8	dst[ETH_ALEN];
 	u8	src[ETH_ALEN];
@@ -149,10 +149,10 @@ struct rx_pkt_attrib	{
 	u8	ldpc;
 	u8	sgi;
 	u8	pkt_rpt_type;
-	u32 tsfl;
-	u32	MacIDValidEntry[2];	/* 64 bits present 64 entry. */
+	__le32 tsfl;
+	__le32	MacIDValidEntry[2];	/* 64 bits present 64 entry. */
 	u8	ppdu_cnt;
-	u32 	free_cnt;		/* free run counter */
+	__le32 	free_cnt;		/* free run counter */
 	struct phydm_phyinfo_struct phy_info;
 };
 
@@ -572,8 +572,9 @@ __inline static u8 *recvframe_pull(union recv_frame *precvframe, sint sz)
 
 }
 
-__inline static u8 *recvframe_put(union recv_frame *precvframe, sint sz)
+__inline static u8 *recvframe_put(union recv_frame *precvframe, __le16 le_sz)
 {
+	s16 sz = le16_to_cpu(le_sz);
 	/* rx_tai += sz; move rx_tail sz bytes  hereafter */
 
 	/* used for append sz bytes from ptr to rx_tail, update rx_tail and return the updated rx_tail to the caller */

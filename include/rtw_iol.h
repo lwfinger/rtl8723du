@@ -18,8 +18,8 @@ int rtw_IOL_append_END_cmd(struct xmit_frame *xmit_frame);
 typedef struct _io_offload_cmd {
 	u8 rsvd0;
 	u8 cmd;
-	u16 address;
-	u32 value;
+	__le16 address;
+	__le32 value;
 } IO_OFFLOAD_CMD, IOL_CMD;
 
 #define IOL_CMD_LLT			0x00

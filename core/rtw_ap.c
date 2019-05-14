@@ -1289,7 +1289,7 @@ static void update_hw_ht_param(_adapter *padapter)
 	/*  */
 	/* Config SM Power Save setting */
 	/*  */
-	pmlmeinfo->SM_PS = (le16_to_cpu(pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info & 0x0C)) >> 2;
+	pmlmeinfo->SM_PS = (le16_to_cpu(pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info) & 0x0C) >> 2;
 	if (pmlmeinfo->SM_PS == WLAN_HT_CAP_SM_PS_STATIC) {
 #if 0
 		u8 i;
@@ -3604,7 +3604,7 @@ void sta_info_update(_adapter *padapter, struct sta_info *psta)
 		psta->htpriv.ht_option = _TRUE;
 		psta->qos_option = 1;
 
-		psta->htpriv.smps_cap = (psta->htpriv.ht_cap.cap_info & cpu_to_le16(IEEE80211_HT_CAP_SM_PS)) >> 2;
+		psta->htpriv.smps_cap = le16_to_cpu(psta->htpriv.ht_cap.cap_info) & IEEE80211_HT_CAP_SM_PS >> 2;
 	} else
 		psta->htpriv.ht_option = _FALSE;
 

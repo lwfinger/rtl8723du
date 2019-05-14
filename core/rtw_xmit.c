@@ -46,7 +46,8 @@ void rtw_init_xmit_block(_adapter *padapter)
 	dvobj->xmit_block = XMIT_BLOCK_NONE;
 
 }
-void rtw_free_xmit_block(_adapter *padapter)
+
+static void rtw_free_xmit_block(_adapter *padapter)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
 

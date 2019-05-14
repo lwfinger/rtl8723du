@@ -1588,7 +1588,7 @@ void WMMOnAssocRsp(_adapter *padapter)
 
 			ECWMin = (pmlmeinfo->WMM_param.ac_param[i].CW & 0x0f);
 			ECWMax = (pmlmeinfo->WMM_param.ac_param[i].CW & 0xf0) >> 4;
-			TXOP = pmlmeinfo->WMM_param.ac_param[i].TXOP_limit;
+			TXOP = le16_to_cpu(pmlmeinfo->WMM_param.ac_param[i].TXOP_limit);
 
 			acParm = AIFS | (ECWMin << 8) | (ECWMax << 12) | (TXOP << 16);
 
@@ -2217,7 +2217,7 @@ int rtw_get_bcn_keys(ADAPTER *Adapter, u8 *pframe, u32 packet_len,
 			return _FALSE;
 
 		pht_cap = (struct rtw_ieee80211_ht_cap *) elems.ht_capabilities;
-		recv_beacon->ht_cap_info = pht_cap->cap_info;
+		recv_beacon->ht_cap_info = le16_to_cpu(pht_cap->cap_info);
 	}
 
 	if (elems.ht_operation) {
@@ -2593,8 +2593,8 @@ void update_beacon_info(_adapter *padapter, u8 *pframe, uint pkt_len, struct sta
 		case _VENDOR_SPECIFIC_IE_:
 			/* to update WMM paramter set while receiving beacon */
 			if (_rtw_memcmp(pIE->data, WMM_PARA_OUI, 6) && pIE->Length == WLAN_WMM_LEN)	/* WMM */
-				(WMM_param_handler(padapter, pIE)) ? report_wmm_edca_update(padapter) : 0;
-
+				if (WMM_param_handler(padapter, pIE))
+					 report_wmm_edca_update(padapter);
 			break;
 
 		case _HT_EXTRA_INFO_IE_:	/* HT info */
@@ -2861,10 +2861,9 @@ int support_short_GI(_adapter *padapter, struct HT_caps_element *pHT_caps, u8 bw
 
 	bit_offset = (bwmode & CHANNEL_WIDTH_40) ? 6 : 5;
 
-	if (pHT_caps->u.HT_cap_element.HT_caps_info & (0x1 << bit_offset))
+	if (pHT_caps->u.HT_cap_element.HT_caps_info & cpu_to_le16((0x1 << bit_offset)))
 		return _SUCCESS;
-	else
-		return _FAIL;
+	return _FAIL;
 }
 
 unsigned char get_highest_rate_idx(u64 mask)
@@ -3240,9 +3239,9 @@ void process_addba_req(_adapter *padapter, u8 *paddba_req, u8 *addr)
 	if (!psta)
 		goto exit;
 
-	start_seq = preq->BA_starting_seqctrl >> 4;
+	start_seq = le16_to_cpu(preq->BA_starting_seqctrl) >> 4;
 
-	param = preq->BA_para_set;
+	param = le16_to_cpu(preq->BA_para_set);
 	tid = (param >> 2) & 0x0f;
 
 
@@ -3289,10 +3288,10 @@ exit:
 void update_TSF(struct mlme_ext_priv *pmlmeext, u8 *pframe, uint len)
 {
 	u8 *pIE;
-	u32 *pbuf;
+	__le32 *pbuf;
 
 	pIE = pframe + sizeof(struct rtw_ieee80211_hdr_3addr);
-	pbuf = (u32 *)pIE;
+	pbuf = (__le32 *)pIE;
 
 	pmlmeext->TSFValue = le32_to_cpu(*(pbuf + 1));
 
@@ -3310,7 +3309,7 @@ void adaptive_early_32k(struct mlme_ext_priv *pmlmeext, u8 *pframe, uint len)
 {
 	int i;
 	u8 *pIE;
-	u32 *pbuf;
+	__le32 *pbuf;
 	u64 tsf = 0;
 	u32 delay_ms;
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
@@ -3319,7 +3318,7 @@ void adaptive_early_32k(struct mlme_ext_priv *pmlmeext, u8 *pframe, uint len)
 	pmlmeext->bcn_cnt++;
 
 	pIE = pframe + sizeof(struct rtw_ieee80211_hdr_3addr);
-	pbuf = (u32 *)pIE;
+	pbuf = (__le32 *)pIE;
 
 	tsf = le32_to_cpu(*(pbuf + 1));
 	tsf = tsf << 32;

@@ -1587,7 +1587,7 @@ void mgt_dispatcher(_adapter *padapter, union recv_frame *precv_frame)
 
 	if (psta) {
 		if (GetRetry(pframe)) {
-			if (precv_frame->u.hdr.attrib.seq_num ==
+			if (le16_to_cpu(precv_frame->u.hdr.attrib.seq_num) ==
 			    psta->RxMgmtFrameSeqNum) {
 				/* drop the duplicate management frame */
 				precvpriv->dbg_rx_dup_mgt_frame_drop_count++;
@@ -1596,7 +1596,7 @@ void mgt_dispatcher(_adapter *padapter, union recv_frame *precv_frame)
 				return;
 			}
 		}
-		psta->RxMgmtFrameSeqNum = precv_frame->u.hdr.attrib.seq_num;
+		psta->RxMgmtFrameSeqNum = le16_to_cpu(precv_frame->u.hdr.attrib.seq_num);
 	}
 
 #ifdef CONFIG_AP_MODE
@@ -6296,7 +6296,7 @@ static s32 rtw_action_public_decache(union recv_frame *rframe, u8 token_offset)
 	_adapter *adapter = rframe->u.hdr.adapter;
 	struct mlme_ext_priv *mlmeext = &(adapter->mlmeextpriv);
 	u8 *frame = rframe->u.hdr.rx_data;
-	u16 seq_ctrl = ((rframe->u.hdr.attrib.seq_num & 0xffff) << 4) | (rframe->u.hdr.attrib.frag_num & 0xf);
+	u16 seq_ctrl = ((le16_to_cpu(rframe->u.hdr.attrib.seq_num) & 0xffff) << 4) | (rframe->u.hdr.attrib.frag_num & 0xf);
 	u8 token = *(rframe->u.hdr.rx_data + sizeof(struct rtw_ieee80211_hdr_3addr) + token_offset);
 
 	if (GetRetry(frame)) {
@@ -8804,8 +8804,8 @@ void issue_asocrsp(_adapter *padapter, unsigned short status, struct sta_info *p
 	struct rtw_ieee80211_hdr	*pwlanhdr;
 	struct pkt_attrib *pattrib;
 	unsigned char	*pbuf, *pframe;
-	unsigned short val, ie_status;
-	__le16 *fctrl;
+	unsigned short val;
+	__le16 *fctrl, ie_status;
 	struct xmit_priv *pxmitpriv = &(padapter->xmitpriv);
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
 	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
@@ -9267,9 +9267,6 @@ void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
 			if (padapter->mlmepriv.htpriv.ht_option == _TRUE) {
 				if (!(is_ap_in_tkip(padapter))) {
 					_rtw_memcpy(&(pmlmeinfo->HT_caps), pIE->data, sizeof(struct HT_caps_element));
-
-					pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info = cpu_to_le16(pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info);
-
 					pframe = rtw_set_ie(pframe, EID_HTCapability, pIE->Length , (u8 *)(&(pmlmeinfo->HT_caps)), &(pattrib->pktlen));
 				}
 			}
@@ -11004,7 +11001,6 @@ u8 collect_bss_info(_adapter *padapter, union recv_frame *precv_frame, WLAN_BSSI
 	}
 
 	_rtw_memcpy(&bssid->Configuration.BeaconPeriod, rtw_get_beacon_interval_from_ie(bssid->IEs), 2);
-	bssid->Configuration.BeaconPeriod = le32_to_cpu(bssid->Configuration.BeaconPeriod);
 
 	val16 = rtw_get_capability((WLAN_BSSID_EX *)bssid);
 
@@ -11032,7 +11028,7 @@ u8 collect_bss_info(_adapter *padapter, union recv_frame *precv_frame, WLAN_BSSI
 			struct HT_caps_element	*pHT_caps;
 			pHT_caps = (struct HT_caps_element *)(p + 2);
 
-			if (pHT_caps->u.HT_cap_element.HT_caps_info & BIT(14))
+			if (pHT_caps->u.HT_cap_element.HT_caps_info & cpu_to_le16(BIT(14)))
 				pmlmepriv->num_FortyMHzIntolerant++;
 		} else
 			pmlmepriv->num_sta_no_ht++;
