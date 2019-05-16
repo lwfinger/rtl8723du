@@ -76,71 +76,253 @@ enum h2c_cmd_8723D {
  * ----------------------------------    H2C CMD CONTENT    --------------------------------------------------
  * ---------------------------------------------------------------------------------------------------------
  * _RSVDPAGE_LOC_CMD_0x00 */
-#define SET_8723D_H2CCMD_RSVDPAGE_LOC_PROBE_RSP(__pH2CCmd, __Value)			SET_BITS_TO_LE_1BYTE(__pH2CCmd, 0, 8, __Value)
-#define SET_8723D_H2CCMD_RSVDPAGE_LOC_PSPOLL(__pH2CCmd, __Value)				SET_BITS_TO_LE_1BYTE((__pH2CCmd)+1, 0, 8, __Value)
-#define SET_8723D_H2CCMD_RSVDPAGE_LOC_NULL_DATA(__pH2CCmd, __Value)			SET_BITS_TO_LE_1BYTE((__pH2CCmd)+2, 0, 8, __Value)
-#define SET_8723D_H2CCMD_RSVDPAGE_LOC_QOS_NULL_DATA(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE((__pH2CCmd)+3, 0, 8, __Value)
-#define SET_8723D_H2CCMD_RSVDPAGE_LOC_BT_QOS_NULL_DATA(__pH2CCmd, __Value)	SET_BITS_TO_LE_1BYTE((__pH2CCmd)+4, 0, 8, __Value)
+static inline void SET_8723D_H2CCMD_RSVDPAGE_LOC_PROBE_RSP(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_RSVDPAGE_LOC_PSPOLL(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_RSVDPAGE_LOC_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_RSVDPAGE_LOC_QOS_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_RSVDPAGE_LOC_BT_QOS_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 4, __Value, GENMASK(7, 0));
+}
 
 /* _PWR_MOD_CMD_0x20 */
-#define SET_8723D_H2CCMD_PWRMODE_PARM_MODE(__pH2CCmd, __Value)				SET_BITS_TO_LE_1BYTE(__pH2CCmd, 0, 8, __Value)
-#define SET_8723D_H2CCMD_PWRMODE_PARM_RLBM(__pH2CCmd, __Value)				SET_BITS_TO_LE_1BYTE((__pH2CCmd)+1, 0, 4, __Value)
-#define SET_8723D_H2CCMD_PWRMODE_PARM_SMART_PS(__pH2CCmd, __Value)			SET_BITS_TO_LE_1BYTE((__pH2CCmd)+1, 4, 4, __Value)
-#define SET_8723D_H2CCMD_PWRMODE_PARM_BCN_PASS_TIME(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE((__pH2CCmd)+2, 0, 8, __Value)
-#define SET_8723D_H2CCMD_PWRMODE_PARM_ALL_QUEUE_UAPSD(__pH2CCmd, __Value)	SET_BITS_TO_LE_1BYTE((__pH2CCmd)+3, 0, 8, __Value)
-#define SET_8723D_H2CCMD_PWRMODE_PARM_BCN_EARLY_C2H_RPT(__pH2CCmd, __Value)	SET_BITS_TO_LE_1BYTE((__pH2CCmd)+3, 2, 1, __Value)
-#define SET_8723D_H2CCMD_PWRMODE_PARM_PWR_STATE(__pH2CCmd, __Value)			SET_BITS_TO_LE_1BYTE((__pH2CCmd)+4, 0, 8, __Value)
-#define SET_8723D_H2CCMD_PWRMODE_PARM_BYTE5(__pH2CCmd, __Value)				SET_BITS_TO_LE_1BYTE((__pH2CCmd)+5, 0, 8, __Value)
+static inline void SET_8723D_H2CCMD_PWRMODE_PARM_MODE(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 0));
+}
 
-#define GET_8723D_H2CCMD_PWRMODE_PARM_MODE(__pH2CCmd)					LE_BITS_TO_1BYTE(__pH2CCmd, 0, 8)
+static inline void SET_8723D_H2CCMD_PWRMODE_PARM_RLBM(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(3, 0));
+}
+
+static inline void SET_8723D_H2CCMD_PWRMODE_PARM_SMART_PS(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 4));
+}
+
+static inline void SET_8723D_H2CCMD_PWRMODE_PARM_BCN_PASS_TIME(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_PWRMODE_PARM_ALL_QUEUE_UAPSD(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_PWRMODE_PARM_BCN_EARLY_C2H_RPT(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 3, __Value, BIT(2));
+}
+
+static inline void SET_8723D_H2CCMD_PWRMODE_PARM_PWR_STATE(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 4, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_PWRMODE_PARM_BYTE5(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 5, __Value, GENMASK(7, 0));
+}
+
+static inline void GET_8723D_H2CCMD_PWRMODE_PARM_MODE(u8 *__pH2CCmd)
+{
+	u8_get_bits(*__pH2CCmd + 0, GENMASK(7, 0));
+}
 
 /* _PS_TUNE_PARAM_CMD_0x21 */
-#define SET_8723D_H2CCMD_PSTUNE_PARM_BCN_TO_LIMIT(__pH2CCmd, __Value)			SET_BITS_TO_LE_1BYTE(__pH2CCmd, 0, 8, __Value)
-#define SET_8723D_H2CCMD_PSTUNE_PARM_DTIM_TIMEOUT(__pH2CCmd, __Value)			SET_BITS_TO_LE_1BYTE(__pH2CCmd+1, 0, 8, __Value)
-#define SET_8723D_H2CCMD_PSTUNE_PARM_ADOPT(__pH2CCmd, __Value)			SET_BITS_TO_LE_1BYTE(__pH2CCmd+2, 0, 1, __Value)
-#define SET_8723D_H2CCMD_PSTUNE_PARM_PS_TIMEOUT(__pH2CCmd, __Value)			SET_BITS_TO_LE_1BYTE(__pH2CCmd+2, 1, 7, __Value)
-#define SET_8723D_H2CCMD_PSTUNE_PARM_DTIM_PERIOD(__pH2CCmd, __Value)			SET_BITS_TO_LE_1BYTE(__pH2CCmd+3, 0, 8, __Value)
+static inline void SET_8723D_H2CCMD_PSTUNE_PARM_BCN_TO_LIMIT(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_PSTUNE_PARM_DTIM_TIMEOUT(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_PSTUNE_PARM_ADOPT(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, BIT(0));
+}
+
+static inline void SET_8723D_H2CCMD_PSTUNE_PARM_PS_TIMEOUT(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(7, 1));
+}
+
+static inline void SET_8723D_H2CCMD_PSTUNE_PARM_DTIM_PERIOD(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
+}
 
 /* _MACID_CFG_CMD_0x40 */
-#define SET_8723D_H2CCMD_MACID_CFG_MACID(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd, 0, 8, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_RAID(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+1, 0, 5, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_SGI_EN(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+1, 7, 1, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_BW(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+2, 0, 2, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_NO_UPDATE(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+2, 3, 1, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_VHT_EN(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+2, 4, 2, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_DISPT(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+2, 6, 1, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_DISRA(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+2, 7, 1, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_RATE_MASK0(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+3, 0, 8, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_RATE_MASK1(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+4, 0, 8, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_RATE_MASK2(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+5, 0, 8, __Value)
-#define SET_8723D_H2CCMD_MACID_CFG_RATE_MASK3(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+6, 0, 8, __Value)
+static inline void SET_8723D_H2CCMD_MACID_CFG_MACID(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_RAID(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(4, 0));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_SGI_EN(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 1, __Value, BIT(7));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_BW(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(1, 0));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_NO_UPDATE(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, BIT(3));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_VHT_EN(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(5, 4));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_DISPT(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, BIT(6));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_DISRA(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, BIT(7));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_RATE_MASK0(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_RATE_MASK1(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 4, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_RATE_MASK2(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 5, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_MACID_CFG_RATE_MASK3(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 6, __Value, GENMASK(7, 0));
+}
 
 /* _RSSI_SETTING_CMD_0x42 */
-#define SET_8723D_H2CCMD_RSSI_SETTING_MACID(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd, 0, 8, __Value)
-#define SET_8723D_H2CCMD_RSSI_SETTING_RSSI(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+2, 0, 7, __Value)
-#define SET_8723D_H2CCMD_RSSI_SETTING_ULDL_STATE(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+3, 0, 8, __Value)
+static inline void SET_8723D_H2CCMD_RSSI_SETTING_MACID(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_RSSI_SETTING_RSSI(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(6, 0));
+}
+
+static inline void SET_8723D_H2CCMD_RSSI_SETTING_ULDL_STATE(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
+}
 
 /* _AP_REQ_TXRPT_CMD_0x43 */
-#define SET_8723D_H2CCMD_APREQRPT_PARM_MACID1(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd, 0, 8, __Value)
-#define SET_8723D_H2CCMD_APREQRPT_PARM_MACID2(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+1, 0, 8, __Value)
+static inline void SET_8723D_H2CCMD_APREQRPT_PARM_MACID1(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_APREQRPT_PARM_MACID2(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
+}
 
 /* _FORCE_BT_TXPWR_CMD_0x62 */
-#define SET_8723D_H2CCMD_BT_PWR_IDX(__pH2CCmd, __Value)							SET_BITS_TO_LE_1BYTE(__pH2CCmd, 0, 8, __Value)
+static inline void SET_8723D_H2CCMD_BT_PWR_IDX(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 0));
+}
 
 /* _FORCE_BT_MP_OPER_CMD_0x67 */
-#define SET_8723D_H2CCMD_BT_MPOPER_VER(__pH2CCmd, __Value)							SET_BITS_TO_LE_1BYTE(__pH2CCmd, 0, 4, __Value)
-#define SET_8723D_H2CCMD_BT_MPOPER_REQNUM(__pH2CCmd, __Value)							SET_BITS_TO_LE_1BYTE(__pH2CCmd, 4, 4, __Value)
-#define SET_8723D_H2CCMD_BT_MPOPER_IDX(__pH2CCmd, __Value)							SET_BITS_TO_LE_1BYTE(__pH2CCmd+1, 0, 8, __Value)
-#define SET_8723D_H2CCMD_BT_MPOPER_PARAM1(__pH2CCmd, __Value)							SET_BITS_TO_LE_1BYTE(__pH2CCmd+2, 0, 8, __Value)
-#define SET_8723D_H2CCMD_BT_MPOPER_PARAM2(__pH2CCmd, __Value)							SET_BITS_TO_LE_1BYTE(__pH2CCmd+3, 0, 8, __Value)
-#define SET_8723D_H2CCMD_BT_MPOPER_PARAM3(__pH2CCmd, __Value)							SET_BITS_TO_LE_1BYTE(__pH2CCmd+4, 0, 8, __Value)
+static inline void SET_8723D_H2CCMD_BT_MPOPER_VER(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(3, 0));
+}
+
+static inline void SET_8723D_H2CCMD_BT_MPOPER_REQNUM(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 4));
+}
+
+static inline void SET_8723D_H2CCMD_BT_MPOPER_IDX(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_BT_MPOPER_PARAM1(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_BT_MPOPER_PARAM2(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_BT_MPOPER_PARAM3(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 4, __Value, GENMASK(7, 0));
+}
 
 /* _BT_FW_PATCH_0x6A */
-#define SET_8723D_H2CCMD_BT_FW_PATCH_SIZE(__pH2CCmd, __Value)					SET_BITS_TO_LE_2BYTE((pu1Byte)(__pH2CCmd), 0, 16, __Value)
-#define SET_8723D_H2CCMD_BT_FW_PATCH_ADDR0(__pH2CCmd, __Value)					SET_BITS_TO_LE_1BYTE((__pH2CCmd)+2, 0, 8, __Value)
-#define SET_8723D_H2CCMD_BT_FW_PATCH_ADDR1(__pH2CCmd, __Value)					SET_BITS_TO_LE_1BYTE((__pH2CCmd)+3, 0, 8, __Value)
-#define SET_8723D_H2CCMD_BT_FW_PATCH_ADDR2(__pH2CCmd, __Value)					SET_BITS_TO_LE_1BYTE((__pH2CCmd)+4, 0, 8, __Value)
-#define SET_8723D_H2CCMD_BT_FW_PATCH_ADDR3(__pH2CCmd, __Value)					SET_BITS_TO_LE_1BYTE((__pH2CCmd)+5, 0, 8, __Value)
+static inline void SET_8723D_H2CCMD_BT_FW_PATCH_SIZE(u8 *__pH2CCmd, u8 __Value)
+{
+	le16p_replace_bits((__le16 *)__pH2CCmd + 0, __Value, GENMASK(15, 0));
+}
+
+static inline void SET_8723D_H2CCMD_BT_FW_PATCH_ADDR0(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_BT_FW_PATCH_ADDR1(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_BT_FW_PATCH_ADDR2(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 4, __Value, GENMASK(7, 0));
+}
+
+static inline void SET_8723D_H2CCMD_BT_FW_PATCH_ADDR3(u8 *__pH2CCmd, u8 __Value)
+{
+	u8p_replace_bits(__pH2CCmd + 5, __Value, GENMASK(7, 0));
+}
 
 /* ---------------------------------------------------------------------------------------------------------
  * -------------------------------------------    Structure    --------------------------------------------------
@@ -172,4 +354,5 @@ void rtl8723d_set_BcnEarly_C2H_Rpt_cmd(PADAPTER padapter, u8 enable);
 
 s32 FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer);
 u8 GetTxBufferRsvdPageNum8723D(_adapter *padapter, bool wowlan);
+
 #endif
