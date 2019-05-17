@@ -762,24 +762,6 @@ phydm_get_txbf_en(
 {
 	boolean txbf_en = false;
 
-#if !defined(DM_ODM_CE_MAC80211)
-
-	#ifdef CONFIG_BEAMFORMING
-	enum beamforming_cap beamform_cap;
-	struct _ADAPTER *adapter = p_dm->adapter;
-	#if (BEAMFORMING_SUPPORT == 1)
-	beamform_cap =
-	phydm_beamforming_get_entry_beam_cap_by_mac_id(p_dm, mac_id);
-	#else/*for drv beamforming*/
-	beamform_cap =
-	beamforming_get_entry_beam_cap_by_mac_id(&adapter->mlmepriv, mac_id);
-	#endif
-	if (beamform_cap & (BEAMFORMER_CAP_HT_EXPLICIT | BEAMFORMER_CAP_VHT_SU))
-		txbf_en = true;
-	else
-		txbf_en = false;
-	#endif /*#ifdef CONFIG_BEAMFORMING*/
-#endif
 	return txbf_en;
 }
 

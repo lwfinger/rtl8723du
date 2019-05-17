@@ -273,20 +273,6 @@ struct pkt_attrib {
 	u8 key_type;
 
 	u8 icmp_pkt;
-
-#ifdef CONFIG_BEAMFORMING
-	u16 txbf_p_aid;/*beamforming Partial_AID*/
-	u16 txbf_g_id;/*beamforming Group ID*/
-
-	/*
-	 * 2'b00: Unicast NDPA
-	 * 2'b01: Broadcast NDPA
-	 * 2'b10: Beamforming Report Poll
-	 * 2'b11: Final Beamforming Report Poll
-	 */
-	u8 bf_pkt_type;
-#endif
-
 };
 
 #ifdef CONFIG_TX_AMSDU

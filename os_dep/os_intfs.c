@@ -351,9 +351,6 @@ module_param(rtw_rx_stbc, int, 0644);
 module_param(rtw_rx_ampdu_amsdu, int, 0644);
 module_param(rtw_tx_ampdu_amsdu, int, 0644);
 
-#ifdef CONFIG_BEAMFORMING
-module_param(rtw_beamform_cap, int, 0644);
-#endif
 module_param(rtw_lowrate_two_xmit, int, 0644);
 
 module_param(rtw_power_mgnt, int, 0644);
@@ -2129,12 +2126,6 @@ u8 rtw_init_drv_sw(_adapter *padapter)
 #ifdef CONFIG_BR_EXT
 	_rtw_spinlock_init(&padapter->br_ext_lock);
 #endif /* CONFIG_BR_EXT */
-
-#ifdef CONFIG_BEAMFORMING
-#ifdef RTW_BEAMFORMING_VERSION_2
-	rtw_bf_init(padapter);
-#endif /* RTW_BEAMFORMING_VERSION_2 */
-#endif /* CONFIG_BEAMFORMING */
 
 #ifdef CONFIG_RTW_REPEATER_SON
 	init_rtw_rson_data(adapter_to_dvobj(padapter));

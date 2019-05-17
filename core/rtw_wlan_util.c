@@ -1851,26 +1851,6 @@ void HT_caps_handler(_adapter *padapter, PNDIS_802_11_VARIABLE_IEs pIE)
 			RTW_INFO("Enable HT Tx STBC !\n");
 		}
 		phtpriv->stbc_cap = cur_stbc_cap;
-
-#ifdef CONFIG_BEAMFORMING
-		/* Config Tx beamforming setting */
-		if (TEST_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMER_ENABLE) &&
-		    GET_HT_CAP_TXBF_EXPLICIT_COMP_STEERING_CAP(pIE->data)) {
-			SET_FLAG(cur_beamform_cap, BEAMFORMING_HT_BEAMFORMER_ENABLE);
-			/* Shift to BEAMFORMING_HT_BEAMFORMEE_CHNL_EST_CAP*/
-			SET_FLAG(cur_beamform_cap, GET_HT_CAP_TXBF_CHNL_ESTIMATION_NUM_ANTENNAS(pIE->data) << 6);
-		}
-
-		if (TEST_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMEE_ENABLE) &&
-		    GET_HT_CAP_TXBF_EXPLICIT_COMP_FEEDBACK_CAP(pIE->data)) {
-			SET_FLAG(cur_beamform_cap, BEAMFORMING_HT_BEAMFORMEE_ENABLE);
-			/* Shift to BEAMFORMING_HT_BEAMFORMER_STEER_NUM*/
-			SET_FLAG(cur_beamform_cap, GET_HT_CAP_TXBF_COMP_STEERING_NUM_ANTENNAS(pIE->data) << 4);
-		}
-		phtpriv->beamform_cap = cur_beamform_cap;
-		if (cur_beamform_cap)
-			RTW_INFO("AP HT Beamforming Cap = 0x%02X\n", cur_beamform_cap);
-#endif /*CONFIG_BEAMFORMING*/
 	} else {
 		/*WIFI_STATION_STATEorI_ADHOC_STATE or WIFI_ADHOC_MASTER_STATE*/
 		/* Config LDPC Coding Capability */
@@ -1886,43 +1866,6 @@ void HT_caps_handler(_adapter *padapter, PNDIS_802_11_VARIABLE_IEs pIE)
 			RTW_INFO("Enable HT Tx STBC!\n");
 		}
 		phtpriv->stbc_cap = cur_stbc_cap;
-
-#ifdef CONFIG_BEAMFORMING
-#ifdef RTW_BEAMFORMING_VERSION_2
-		/* Config beamforming setting */
-		if (TEST_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMEE_ENABLE) &&
-		    GET_HT_CAP_TXBF_EXPLICIT_COMP_STEERING_CAP(pIE->data)) {
-			SET_FLAG(cur_beamform_cap, BEAMFORMING_HT_BEAMFORMEE_ENABLE);
-			/* Shift to BEAMFORMING_HT_BEAMFORMEE_CHNL_EST_CAP*/
-			SET_FLAG(cur_beamform_cap, GET_HT_CAP_TXBF_CHNL_ESTIMATION_NUM_ANTENNAS(pIE->data) << 6);
-		}
-
-		if (TEST_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMER_ENABLE) &&
-		    GET_HT_CAP_TXBF_EXPLICIT_COMP_FEEDBACK_CAP(pIE->data)) {
-			SET_FLAG(cur_beamform_cap, BEAMFORMING_HT_BEAMFORMER_ENABLE);
-			/* Shift to BEAMFORMING_HT_BEAMFORMER_STEER_NUM*/
-			SET_FLAG(cur_beamform_cap, GET_HT_CAP_TXBF_COMP_STEERING_NUM_ANTENNAS(pIE->data) << 4);
-		}
-#else /* !RTW_BEAMFORMING_VERSION_2 */
-		/* Config Tx beamforming setting */
-		if (TEST_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMEE_ENABLE) &&
-		    GET_HT_CAP_TXBF_EXPLICIT_COMP_STEERING_CAP(pIE->data)) {
-			SET_FLAG(cur_beamform_cap, BEAMFORMING_HT_BEAMFORMER_ENABLE);
-			/* Shift to BEAMFORMING_HT_BEAMFORMEE_CHNL_EST_CAP*/
-			SET_FLAG(cur_beamform_cap, GET_HT_CAP_TXBF_CHNL_ESTIMATION_NUM_ANTENNAS(pIE->data) << 6);
-		}
-
-		if (TEST_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMER_ENABLE) &&
-		    GET_HT_CAP_TXBF_EXPLICIT_COMP_FEEDBACK_CAP(pIE->data)) {
-			SET_FLAG(cur_beamform_cap, BEAMFORMING_HT_BEAMFORMEE_ENABLE);
-			/* Shift to BEAMFORMING_HT_BEAMFORMER_STEER_NUM*/
-			SET_FLAG(cur_beamform_cap, GET_HT_CAP_TXBF_COMP_STEERING_NUM_ANTENNAS(pIE->data) << 4);
-		}
-#endif /* !RTW_BEAMFORMING_VERSION_2 */
-		phtpriv->beamform_cap = cur_beamform_cap;
-		if (cur_beamform_cap)
-			RTW_INFO("Client HT Beamforming Cap = 0x%02X\n", cur_beamform_cap);
-#endif /*CONFIG_BEAMFORMING*/
 	}
 }
 

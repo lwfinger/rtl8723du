@@ -7332,10 +7332,6 @@ unsigned int OnAction_ht(_adapter *padapter, union recv_frame *precv_frame)
 #endif /*CONFIG_AP_MODE*/
 		break;
 	case RTW_WLAN_ACTION_HT_COMPRESS_BEAMFORMING:
-#ifdef CONFIG_BEAMFORMING
-		/*RTW_INFO("RTW_WLAN_ACTION_HT_COMPRESS_BEAMFORMING\n");*/
-		rtw_beamforming_get_report_frame(padapter, precv_frame);
-#endif /*CONFIG_BEAMFORMING*/
 		break;
 	default:
 		break;
@@ -7659,26 +7655,11 @@ void update_mgntframe_attrib_addr(_adapter *padapter, struct xmit_frame *pmgntfr
 {
 	u8	*pframe;
 	struct pkt_attrib	*pattrib = &pmgntframe->attrib;
-#if defined(CONFIG_BEAMFORMING)
-	struct sta_info		*sta = NULL;
-#endif
 
 	pframe = (u8 *)(pmgntframe->buf_addr) + TXDESC_OFFSET;
 
 	_rtw_memcpy(pattrib->ra, GetAddr1Ptr(pframe), ETH_ALEN);
 	_rtw_memcpy(pattrib->ta, get_addr2_ptr(pframe), ETH_ALEN);
-
-#if defined(CONFIG_BEAMFORMING)
-	sta = pattrib->psta;
-	if (!sta) {
-		sta = rtw_get_stainfo(&padapter->stapriv, pattrib->ra);
-		pattrib->psta = sta;
-	}
-	#ifdef CONFIG_BEAMFORMING
-	if (sta)
-		update_attrib_txbf_info(padapter, pattrib, sta);
-	#endif
-#endif /* defined(CONFIG_BEAMFORMING) */
 }
 
 void dump_mgntframe(_adapter *padapter, struct xmit_frame *pmgntframe)
@@ -11900,10 +11881,6 @@ void update_sta_info(_adapter *padapter, struct sta_info *psta)
 		psta->htpriv.beamform_cap = pmlmepriv->htpriv.beamform_cap;
 
 		_rtw_memcpy(&psta->htpriv.ht_cap, &pmlmeinfo->HT_caps, sizeof(struct rtw_ieee80211_ht_cap));
-		#ifdef CONFIG_BEAMFORMING
-		psta->htpriv.beamform_cap = pmlmepriv->htpriv.beamform_cap;
-		psta->cmn.bf_info.ht_beamform_cap = pmlmepriv->htpriv.beamform_cap;
-		#endif
 	} else {
 		psta->htpriv.ht_option = _FALSE;
 		psta->htpriv.ampdu_enable = _FALSE;
@@ -12136,11 +12113,6 @@ void mlmeext_joinbss_event_callback(_adapter *padapter, int join_res)
 	#endif
 		rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_CONNECT, 0);
 #endif
-
-#ifdef CONFIG_BEAMFORMING
-	if (psta)
-		beamforming_wk_cmd(padapter, BEAMFORMING_CTRL_ENTER, (u8 *)psta, sizeof(struct sta_info), 0);
-#endif/*CONFIG_BEAMFORMING*/
 
 exit_mlmeext_joinbss_event_callback:
 

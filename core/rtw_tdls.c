@@ -483,20 +483,6 @@ void rtw_tdls_process_ht_cap(_adapter *padapter, struct sta_info *ptdls_sta, u8 
 			RTW_INFO("Enable HT Tx STBC!\n");
 		}
 		ptdls_sta->htpriv.stbc_cap = cur_stbc_cap;
-
-#ifdef CONFIG_BEAMFORMING
-		/* Config Tx beamforming setting */
-		if (TEST_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMEE_ENABLE) &&
-		    GET_HT_CAP_TXBF_EXPLICIT_COMP_STEERING_CAP(data))
-			SET_FLAG(cur_beamform_cap, BEAMFORMING_HT_BEAMFORMER_ENABLE);
-
-		if (TEST_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMER_ENABLE) &&
-		    GET_HT_CAP_TXBF_EXPLICIT_COMP_FEEDBACK_CAP(data))
-			SET_FLAG(cur_beamform_cap, BEAMFORMING_HT_BEAMFORMEE_ENABLE);
-		ptdls_sta->htpriv.beamform_cap = cur_beamform_cap;
-		if (cur_beamform_cap)
-			RTW_INFO("Client HT Beamforming Cap = 0x%02X\n", cur_beamform_cap);
-#endif /* CONFIG_BEAMFORMING */
 	}
 
 }

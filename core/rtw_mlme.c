@@ -1618,11 +1618,6 @@ void rtw_indicate_disconnect(_adapter *padapter, u16 reason, u8 locally_generate
 #ifdef CONFIG_LPS
 	rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_DISCONNECT, 1);
 #endif
-
-#ifdef CONFIG_BEAMFORMING
-	beamforming_wk_cmd(padapter, BEAMFORMING_CTRL_LEAVE, cur_network->MacAddress, ETH_ALEN, 1);
-#endif /*CONFIG_BEAMFORMING*/
-
 }
 
 inline void rtw_indicate_scan_done(_adapter *padapter, bool aborted)
@@ -2278,9 +2273,6 @@ void rtw_stassoc_event_callback(_adapter *adapter, u8 *pbuf)
 #endif /* !CONFIG_IOCTL_CFG80211 */
 #endif /* !CONFIG_AUTO_AP_MODE */
 
-#ifdef CONFIG_BEAMFORMING
-			beamforming_wk_cmd(adapter, BEAMFORMING_CTRL_ENTER, (u8 *)psta, sizeof(struct sta_info), 0);
-#endif/*CONFIG_BEAMFORMING*/
 			if (is_wep_enc(adapter->securitypriv.dot11PrivacyAlgrthm))
 				rtw_ap_wep_pk_setting(adapter, psta);
 		}
@@ -4199,9 +4191,6 @@ void	rtw_ht_use_default_setting(_adapter *padapter)
 	struct ht_priv		*phtpriv = &pmlmepriv->htpriv;
 	struct registry_priv	*pregistrypriv = &padapter->registrypriv;
 	BOOLEAN		bHwLDPCSupport = _FALSE, bHwSTBCSupport = _FALSE;
-#ifdef CONFIG_BEAMFORMING
-	BOOLEAN		bHwSupportBeamformer = _FALSE, bHwSupportBeamformee = _FALSE;
-#endif /* CONFIG_BEAMFORMING */
 
 	if (pregistrypriv->wifi_spec)
 		phtpriv->bss_coexist = 1;
@@ -4243,19 +4232,8 @@ void	rtw_ht_use_default_setting(_adapter *padapter)
 
 	/* Beamforming setting */
 	CLEAR_FLAGS(phtpriv->beamform_cap);
-#ifdef CONFIG_BEAMFORMING
-	rtw_hal_get_def_var(padapter, HAL_DEF_EXPLICIT_BEAMFORMER, (u8 *)&bHwSupportBeamformer);
-	rtw_hal_get_def_var(padapter, HAL_DEF_EXPLICIT_BEAMFORMEE, (u8 *)&bHwSupportBeamformee);
-	if (TEST_FLAG(pregistrypriv->beamform_cap, BIT4) && bHwSupportBeamformer) {
-		SET_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMER_ENABLE);
-		RTW_INFO("[HT] HAL Support Beamformer\n");
-	}
-	if (TEST_FLAG(pregistrypriv->beamform_cap, BIT5) && bHwSupportBeamformee) {
-		SET_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMEE_ENABLE);
-		RTW_INFO("[HT] HAL Support Beamformee\n");
-	}
-#endif /* CONFIG_BEAMFORMING */
 }
+
 void rtw_build_wmm_ie_ht(_adapter *padapter, u8 *out_ie, uint *pout_len)
 {
 	unsigned char WMM_IE[] = {0x00, 0x50, 0xf2, 0x02, 0x00, 0x01, 0x00};
@@ -4432,32 +4410,6 @@ unsigned int rtw_restructure_ht_ie(_adapter *padapter, u8 *in_ie, u8 *out_ie, ui
 		} else
 			ht_capie.ampdu_params_info |= (IEEE80211_HT_CAP_AMPDU_DENSITY & 0x00);
 	}
-#ifdef CONFIG_BEAMFORMING
-	ht_capie.tx_BF_cap_info = 0;
-
-	/* HT Beamformer*/
-	if (TEST_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMER_ENABLE)) {
-		/* Transmit NDP Capable */
-		SET_HT_CAP_TXBF_TRANSMIT_NDP_CAP(&ht_capie, 1);
-		/* Explicit Compressed Steering Capable */
-		SET_HT_CAP_TXBF_EXPLICIT_COMP_STEERING_CAP(&ht_capie, 1);
-		/* Compressed Steering Number Antennas */
-		SET_HT_CAP_TXBF_COMP_STEERING_NUM_ANTENNAS(&ht_capie, 1);
-		rtw_hal_get_def_var(padapter, HAL_DEF_BEAMFORMER_CAP, (u8 *)&rf_num);
-		SET_HT_CAP_TXBF_CHNL_ESTIMATION_NUM_ANTENNAS(&ht_capie, rf_num);
-	}
-
-	/* HT Beamformee */
-	if (TEST_FLAG(phtpriv->beamform_cap, BEAMFORMING_HT_BEAMFORMEE_ENABLE)) {
-		/* Receive NDP Capable */
-		SET_HT_CAP_TXBF_RECEIVE_NDP_CAP(&ht_capie, 1);
-		/* Explicit Compressed Beamforming Feedback Capable */
-		SET_HT_CAP_TXBF_EXPLICIT_COMP_FEEDBACK_CAP(&ht_capie, 2);
-
-		rtw_hal_get_def_var(padapter, HAL_DEF_BEAMFORMEE_CAP, (u8 *)&rf_num);
-		SET_HT_CAP_TXBF_COMP_STEERING_NUM_ANTENNAS(&ht_capie, rf_num);
-	}
-#endif/*CONFIG_BEAMFORMING*/
 
 	pframe = rtw_set_ie(out_ie + out_len, _HT_CAPABILITY_IE_,
 		sizeof(struct rtw_ieee80211_ht_cap), (unsigned char *)&ht_capie, pout_len);

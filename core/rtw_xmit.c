@@ -1381,10 +1381,6 @@ static s32 update_attrib(_adapter *padapter, _pkt *pkt, struct pkt_attrib *pattr
 	}
 #endif /* CONFIG_LPS */
 
-#ifdef CONFIG_BEAMFORMING
-	update_attrib_txbf_info(padapter, pattrib, psta);
-#endif
-
 	/* TODO:_lock */
 	if (update_attrib_sec_info(padapter, pattrib, psta) == _FAIL) {
 		DBG_COUNTER(padapter->tx_logs.core_tx_upd_attrib_err_sec);
@@ -1393,8 +1389,6 @@ static s32 update_attrib(_adapter *padapter, _pkt *pkt, struct pkt_attrib *pattr
 	}
 
 	update_attrib_phy_info(padapter, pattrib, psta);
-
-	/* RTW_INFO("%s ==> mac_id(%d)\n",__FUNCTION__,pattrib->mac_id ); */
 
 	pattrib->psta = psta;
 	/* TODO:_unlock */

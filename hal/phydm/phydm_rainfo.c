@@ -450,9 +450,6 @@ phydm_show_sta_info(
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct cmn_sta_info		*p_sta = NULL;
 	struct ra_sta_info			*p_ra = NULL;
-	#ifdef CONFIG_BEAMFORMING
-	struct bf_cmn_info		*p_bf = NULL;
-	#endif
 	char		help[] = "-h";
 	u32		var1[10] = {0};
 	u32		used = *_used;
@@ -486,9 +483,6 @@ phydm_show_sta_info(
 			continue;
 
 		p_ra = &(p_sta->ra_info);
-		#ifdef CONFIG_BEAMFORMING
-		p_bf = &(p_sta->bf_info);
-		#endif
 
 		tatal_sta_num++;
 
@@ -522,14 +516,6 @@ phydm_show_sta_info(
 		/*[TP]*/
 		PHYDM_SNPRINTF((output + used, out_len - used, "TP{TX,RX}={%d, %d}\n", 
 			p_sta->tx_moving_average_tp, p_sta->rx_moving_average_tp));
-
-		#ifdef CONFIG_BEAMFORMING
-		/*[Beamforming]*/
-		PHYDM_SNPRINTF((output + used, out_len - used, "CAP{HT,VHT}={0x%x, 0x%x}\n", 
-			p_bf->ht_beamform_cap, p_bf->vht_beamform_cap));
-		PHYDM_SNPRINTF((output + used, out_len - used, "{p_aid,g_id}={0x%x, 0x%x}\n\n", 
-			p_bf->p_aid, p_bf->g_id));
-		#endif
 	}
 
 	if (tatal_sta_num == 0) {

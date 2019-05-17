@@ -41,13 +41,6 @@ phydm_rssi_monitor_h2c(
 	stbc_en = (p_sta->stbc_en) ? 1 : 0;
 	ldpc_en = (p_sta->ldpc_en) ? 1 : 0;
 
-	#ifdef CONFIG_BEAMFORMING
-	if ((p_sta->bf_info.ht_beamform_cap & BEAMFORMING_HT_BEAMFORMEE_ENABLE) ||
-		(p_sta->bf_info.vht_beamform_cap & BEAMFORMING_VHT_BEAMFORMEE_ENABLE)) {
-		bf_en = 1;
-	}
-	#endif
-
 	if (p_ra_t->RA_threshold_offset != 0) {
 		PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("RA_th_ofst = (( %s%d ))\n",
 			((p_ra_t->RA_offset_direction) ? "+" : "-"), p_ra_t->RA_threshold_offset));

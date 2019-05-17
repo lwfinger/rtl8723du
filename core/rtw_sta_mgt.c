@@ -937,25 +937,11 @@ u32 rtw_init_bcmc_stainfo(_adapter *padapter)
 		res = _FAIL;
 		goto exit;
 	}
-#ifdef CONFIG_BEAMFORMING
-	psta->cmn.bf_info.g_id = 63;
-	psta->cmn.bf_info.p_aid = 0;
-#endif
 
 	ptxservq = &(psta->sta_xmitpriv.be_q);
 
-	/*
-		_enter_critical(&pstapending->lock, &irqL0);
-
-		if (rtw_is_list_empty(&ptxservq->tx_pending))
-			rtw_list_insert_tail(&ptxservq->tx_pending, get_list_head(pstapending));
-
-		_exit_critical(&pstapending->lock, &irqL0);
-	*/
-
 exit:
 	return _SUCCESS;
-
 }
 
 

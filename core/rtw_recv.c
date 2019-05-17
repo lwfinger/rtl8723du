@@ -1616,9 +1616,6 @@ sint validate_recv_ctrl_frame(_adapter *padapter, union recv_frame *precv_frame)
 		}
 #endif /* CONFIG_AP_MODE */
 	} else if (get_frame_sub_type(pframe) == WIFI_NDPA) {
-#ifdef CONFIG_BEAMFORMING
-		rtw_beamforming_get_ndpa_frame(padapter, precv_frame);
-#endif/*CONFIG_BEAMFORMING*/
 	} else if (get_frame_sub_type(pframe) == WIFI_BAR) {
 		rtw_process_bar_frame(padapter, precv_frame);
 	}

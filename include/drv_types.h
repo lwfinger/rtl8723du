@@ -52,10 +52,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 #include <rtw_recv.h>
 #include <rtw_rm.h>
 
-#ifdef CONFIG_BEAMFORMING
-	#include <rtw_beamforming.h>
-#endif
-
 #include <recv_osdep.h>
 #include <rtw_efuse.h>
 #include <rtw_sreset.h>

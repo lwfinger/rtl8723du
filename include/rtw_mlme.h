@@ -782,14 +782,6 @@ struct mlme_priv {
 
 	struct ht_priv	htpriv;
 
-#ifdef CONFIG_BEAMFORMING
-#ifndef RTW_BEAMFORMING_VERSION_2
-#if (BEAMFORMING_SUPPORT == 0)/*for driver beamforming*/
-	struct beamforming_info	beamforming_info;
-#endif
-#endif /* !RTW_BEAMFORMING_VERSION_2 */
-#endif
-
 #ifdef CONFIG_DFS
 	u8	handle_dfs;
 #endif

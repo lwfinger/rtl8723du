@@ -568,14 +568,6 @@ typedef struct hal_com_data {
 #ifdef RTW_HALMAC
 	u8 drv_rsvd_page_number;
 #endif
-
-#ifdef CONFIG_BEAMFORMING
-	u8 backup_snd_ptcl_ctrl;
-#ifdef RTW_BEAMFORMING_VERSION_2
-	struct beamforming_info beamforming_info;
-#endif /* RTW_BEAMFORMING_VERSION_2 */
-#endif /* CONFIG_BEAMFORMING */
-
 	u8 not_xmitframe_fw_dl; /*not use xmitframe to download fw*/
 	u8 phydm_op_mode;
 

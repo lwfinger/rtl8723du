@@ -356,10 +356,6 @@ int proc_get_stbc_cap(struct seq_file *m, void *v);
 ssize_t proc_set_stbc_cap(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 int proc_get_ldpc_cap(struct seq_file *m, void *v);
 ssize_t proc_set_ldpc_cap(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#ifdef CONFIG_BEAMFORMING
-int proc_get_txbf_cap(struct seq_file *m, void *v);
-ssize_t proc_set_txbf_cap(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#endif
 int proc_get_rx_ampdu_factor(struct seq_file *m, void *v);
 ssize_t proc_set_rx_ampdu_factor(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 

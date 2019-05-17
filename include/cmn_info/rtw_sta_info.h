@@ -31,22 +31,6 @@ If you want to change this file please make sure notify all driver teams maintai
 #define STA_DM_CTRL_ACTIVE			BIT(0)
 #define STA_DM_CTRL_CFO_TRACKING	BIT(1)
 
-#ifdef CONFIG_BEAMFORMING
-#define	BEAMFORMING_HT_BEAMFORMER_ENABLE	BIT(0)	/*Declare sta support beamformer*/
-#define	BEAMFORMING_HT_BEAMFORMEE_ENABLE	BIT(1)	/*Declare sta support beamformee*/
-#define	BEAMFORMING_HT_BEAMFORMER_TEST		BIT(2)	/*Transmiting Beamforming no matter the target supports it or not*/
-#define	BEAMFORMING_HT_BEAMFORMER_STEER_NUM		(BIT(4)|BIT(5))		/*Sta Bfer's capability*/
-#define	BEAMFORMING_HT_BEAMFORMEE_CHNL_EST_CAP	(BIT(6)|BIT(7))		/*Sta BFee's capability*/
-
-#define	BEAMFORMING_VHT_BEAMFORMER_ENABLE	BIT(0)	/*Declare sta support beamformer*/
-#define	BEAMFORMING_VHT_BEAMFORMEE_ENABLE	BIT(1)	/*Declare sta support beamformee*/
-#define	BEAMFORMING_VHT_MU_MIMO_AP_ENABLE	BIT(2)	/*Declare sta support MU beamformer*/
-#define	BEAMFORMING_VHT_MU_MIMO_STA_ENABLE	BIT(3)	/*Declare sta support MU beamformer*/
-#define	BEAMFORMING_VHT_BEAMFORMER_TEST		BIT(4)	/*Transmiting Beamforming no matter the target supports it or not*/
-#define	BEAMFORMING_VHT_BEAMFORMER_STS_CAP		(BIT(8)|BIT(9)|BIT(10))		/*Sta BFee's capability*/
-#define	BEAMFORMING_VHT_BEAMFORMEE_SOUND_DIM	(BIT(12)|BIT(13)|BIT(14))	/*Sta Bfer's capability*/
-#endif
-
 #define HT_STBC_EN	BIT(0)
 #define VHT_STBC_EN	BIT(1)
 
@@ -137,14 +121,6 @@ enum wireless_set {
 
 /*--------------------Define Struct-----------------------------------*/
 
-#ifdef CONFIG_BEAMFORMING
-struct bf_cmn_info {
-	u8	ht_beamform_cap;		/*Sta capablity*/
-	u16	vht_beamform_cap;		/*Sta capablity*/
-	u16	p_aid;
-	u8	g_id;
-};
-#endif
 struct rssi_info {
 	s8		rssi;
 	s8		rssi_cck;
@@ -192,9 +168,6 @@ struct cmn_sta_info {
 	u8	stbc_en:2;		/*Driver : really use stbc!!*/
 	u8	ldpc_en:2;
 	enum wireless_set	support_wireless_set;
-#ifdef CONFIG_BEAMFORMING
-	struct bf_cmn_info	bf_info;
-#endif
 	u8	sm_ps:2;
 };
 

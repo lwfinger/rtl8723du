@@ -3825,12 +3825,6 @@ static void rtw_hal_set_lps_pg_info_rsvd_page(_adapter *adapter)
 	RTW_INFO("[LPSPG-INFO] mbss_cam_id:%d\n", cam_id);
 #endif
 
-#ifdef CONFIG_BEAMFORMING  /*&& MU BF*/
-	/*Btye 3 - Max MU rate table Group ID*/
-	LPSPG_RSVD_PAGE_SET_MU_RAID_GID(lps_pg_info, _value);
-	RTW_INFO("[LPSPG-INFO] Max MU rate table Group ID :%d\n", _value);
-#endif
-
 	/*Btye 8 ~15 - used Security CAM entry */
 	sec_cam_num = rtw_get_sec_camid(adapter, 8, psec_cam_id);
 
@@ -3898,10 +3892,6 @@ static u8 rtw_hal_set_lps_pg_info_cmd(_adapter *adapter)
 
 #ifdef CONFIG_TX_SC
 	SET_H2CCMD_LPSPG_TXSC_EN(lpspg_info, 1);	/*TXSC_En*/
-#endif
-
-#ifdef CONFIG_BEAMFORMING  /*&& MU BF*/
-	SET_H2CCMD_LPSPG_MU_RATE_TB_EN(lpspg_info, 1);	/*MURateTable_En*/
 #endif
 
 	SET_H2CCMD_LPSPG_LOC(lpspg_info, pwrpriv->lpspg_rsvd_page_locate);
@@ -4926,51 +4916,6 @@ SetHalDefVar(_adapter *adapter, HAL_DEF_VARIABLE variable, void *value)
 	return bResult;
 }
 
-#ifdef CONFIG_BEAMFORMING
-u8 rtw_hal_query_txbfer_rf_num(_adapter *adapter)
-{
-	struct registry_priv	*pregistrypriv = &adapter->registrypriv;
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
-
-	if ((pregistrypriv->beamformer_rf_num) &&
-	    (IS_HARDWARE_TYPE_8814AE(adapter) ||
-	     IS_HARDWARE_TYPE_8814AU(adapter) ||
-	     IS_HARDWARE_TYPE_8822BU(adapter) ||
-	     IS_HARDWARE_TYPE_8821C(adapter))) {
-		return pregistrypriv->beamformer_rf_num;
-	} else if (IS_HARDWARE_TYPE_8814AE(adapter)) {
-		/*BF cap provided by Yu Chen, Sean, 2015, 01 */
-		if (hal_data->rf_type == RF_3T3R)
-			return 2;
-		else if (hal_data->rf_type == RF_4T4R)
-			return 3;
-		else
-			return 1;
-	} else
-		return 1;
-
-}
-u8 rtw_hal_query_txbfee_rf_num(_adapter *adapter)
-{
-	struct registry_priv		*pregistrypriv = &adapter->registrypriv;
-	struct mlme_ext_priv	*pmlmeext = &adapter->mlmeextpriv;
-	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
-
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
-
-	if ((pregistrypriv->beamformee_rf_num) && (IS_HARDWARE_TYPE_8814AE(adapter) || IS_HARDWARE_TYPE_8814AU(adapter) || IS_HARDWARE_TYPE_8822BU(adapter) || IS_HARDWARE_TYPE_8821C(adapter)))
-		return pregistrypriv->beamformee_rf_num;
-	else if (IS_HARDWARE_TYPE_8814AE(adapter) || IS_HARDWARE_TYPE_8814AU(adapter)) {
-		if (pmlmeinfo->assoc_AP_vendor == HT_IOT_PEER_BROADCOM)
-			return 2;
-		else
-			return 2;/*TODO: May be 3 in the future, by ChenYu. */
-	} else
-		return 1;
-
-}
-#endif
-
 u8
 GetHalDefVar(_adapter *adapter, HAL_DEF_VARIABLE variable, void *value)
 {
@@ -5011,14 +4956,6 @@ GetHalDefVar(_adapter *adapter, HAL_DEF_VARIABLE variable, void *value)
 	case HAL_DEF_VHT_MU_BEAMFORMEE:
 		*(u8 *)value = _FALSE;
 		break;
-#ifdef CONFIG_BEAMFORMING
-	case HAL_DEF_BEAMFORMER_CAP:
-		*(u8 *)value = rtw_hal_query_txbfer_rf_num(adapter);
-		break;
-	case HAL_DEF_BEAMFORMEE_CAP:
-		*(u8 *)value = rtw_hal_query_txbfee_rf_num(adapter);
-		break;
-#endif
 	default:
 		RTW_PRINT("%s: [WARNING] HAL_DEF_VARIABLE(%d) not defined!\n", __FUNCTION__, variable);
 		bResult = _FAIL;
@@ -6624,21 +6561,6 @@ void rtw_dump_phy_cap_by_phydmapi(void *sel, _adapter *adapter)
 	RTW_PRINT_SEL(sel, "[PHY SPEC] VHT LDPC Rx : %s\n", ((phy_spec->ldpc_cap >> 16) & 0xFF) ? "Supported" : "N/A"); /*VHT LDPC Rx [23:16]*/
 	RTW_PRINT_SEL(sel, "[PHY SPEC] HT LDPC Tx : %s\n", ((phy_spec->ldpc_cap >> 8) & 0xFF) ? "Supported" : "N/A"); /*HT LDPC Tx [15:8]*/
 	RTW_PRINT_SEL(sel, "[PHY SPEC] HT LDPC Rx : %s\n\n", (phy_spec->ldpc_cap & 0xFF) ? "Supported" : "N/A"); /*HT LDPC Rx [7:0]*/
-	#ifdef CONFIG_BEAMFORMING
-	RTW_PRINT_SEL(sel, "[PHY SPEC] TxBF Capability : 0x%08x\n", phy_spec->txbf_cap);
-	RTW_PRINT_SEL(sel, "[PHY SPEC] VHT MU Bfer : %s\n", ((phy_spec->txbf_cap >> 28) & 0xF) ? "Supported" : "N/A"); /*VHT MU Bfer [31:28]*/
-	RTW_PRINT_SEL(sel, "[PHY SPEC] VHT MU Bfee : %s\n", ((phy_spec->txbf_cap >> 24) & 0xF) ? "Supported" : "N/A"); /*VHT MU Bfee [27:24]*/
-	RTW_PRINT_SEL(sel, "[PHY SPEC] VHT SU Bfer : %s\n", ((phy_spec->txbf_cap >> 20) & 0xF) ? "Supported" : "N/A"); /*VHT SU Bfer [23:20]*/
-	RTW_PRINT_SEL(sel, "[PHY SPEC] VHT SU Bfee : %s\n", ((phy_spec->txbf_cap >> 16) & 0xF) ? "Supported" : "N/A"); /*VHT SU Bfee [19:16]*/
-	RTW_PRINT_SEL(sel, "[PHY SPEC] HT Bfer : %s\n", ((phy_spec->txbf_cap >> 4) & 0xF)  ? "Supported" : "N/A"); /*HT Bfer [7:4]*/
-	RTW_PRINT_SEL(sel, "[PHY SPEC] HT Bfee : %s\n\n", (phy_spec->txbf_cap & 0xF) ? "Supported" : "N/A"); /*HT Bfee [3:0]*/
-
-	RTW_PRINT_SEL(sel, "[PHY SPEC] TxBF parameter : 0x%08x\n", phy_spec->txbf_param);
-	RTW_PRINT_SEL(sel, "[PHY SPEC] VHT Sounding Dim : %d\n", (phy_spec->txbf_param >> 24) & 0xFF); /*VHT Sounding Dim [31:24]*/
-	RTW_PRINT_SEL(sel, "[PHY SPEC] VHT Steering Ant : %d\n", (phy_spec->txbf_param >> 16) & 0xFF); /*VHT Steering Ant [23:16]*/
-	RTW_PRINT_SEL(sel, "[PHY SPEC] HT Sounding Dim : %d\n", (phy_spec->txbf_param >> 8) & 0xFF); /*HT Sounding Dim [15:8]*/
-	RTW_PRINT_SEL(sel, "[PHY SPEC] HT Steering Ant : %d\n", phy_spec->txbf_param & 0xFF); /*HT Steering Ant [7:0]*/
-	#endif
 }
 #else
 static void rtw_dump_phy_cap_by_hal(void *sel, _adapter *adapter)
@@ -6661,24 +6583,6 @@ static void rtw_dump_phy_cap_by_hal(void *sel, _adapter *adapter)
 	phy_cap = _FALSE;
 	rtw_hal_get_def_var(adapter, HAL_DEF_RX_LDPC, (u8 *)&phy_cap);
 	RTW_PRINT_SEL(sel, "[HAL] LDPC Rx : %s\n\n", (_TRUE == phy_cap) ? "Supported" : "N/A");
-	
-	#ifdef CONFIG_BEAMFORMING
-	phy_cap = _FALSE;
-	rtw_hal_get_def_var(adapter, HAL_DEF_EXPLICIT_BEAMFORMER, (u8 *)&phy_cap);
-	RTW_PRINT_SEL(sel, "[HAL] Beamformer: %s\n", (_TRUE == phy_cap) ? "Supported" : "N/A");
-
-	phy_cap = _FALSE;
-	rtw_hal_get_def_var(adapter, HAL_DEF_EXPLICIT_BEAMFORMEE, (u8 *)&phy_cap);
-	RTW_PRINT_SEL(sel, "[HAL] Beamformee: %s\n", (_TRUE == phy_cap) ? "Supported" : "N/A");
-
-	phy_cap = _FALSE;
-	rtw_hal_get_def_var(adapter, HAL_DEF_VHT_MU_BEAMFORMER, &phy_cap);
-	RTW_PRINT_SEL(sel, "[HAL] VHT MU Beamformer: %s\n", (_TRUE == phy_cap) ? "Supported" : "N/A");
-
-	phy_cap = _FALSE;
-	rtw_hal_get_def_var(adapter, HAL_DEF_VHT_MU_BEAMFORMEE, &phy_cap);
-	RTW_PRINT_SEL(sel, "[HAL] VHT MU Beamformee: %s\n", (_TRUE == phy_cap) ? "Supported" : "N/A");
-	#endif
 }
 #endif
 void rtw_dump_phy_cap(void *sel, _adapter *adapter)
