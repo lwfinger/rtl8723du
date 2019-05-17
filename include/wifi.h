@@ -710,14 +710,10 @@ typedef	enum _ELEMENT_ID {
 				Below is the definition for 802.11n
 ------------------------------------------------------------------------------*/
 
-/* #ifdef CONFIG_80211N_HT */
-
 #define set_order_bit(pbuf)	\
 		do	{	\
 			*(unsigned short *)(pbuf) |= cpu_to_le16(_ORDER_); \
 		} while (0)
-
-
 
 #define GetOrderBit(pbuf)	(((*(unsigned short *)(pbuf)) & le16_to_cpu(_ORDER_)) != 0)
 

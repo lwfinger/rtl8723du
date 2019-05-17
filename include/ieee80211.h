@@ -1649,13 +1649,11 @@ u8 *rtw_get_wps_attr_content(u8 *wps_ie, uint wps_ielen, u16 target_attr_id , u8
 
 void dump_ies(void *sel, const u8 *buf, u32 buf_len);
 
-#ifdef CONFIG_80211N_HT
 #define HT_SC_OFFSET_MAX 4
 extern const char *const _ht_sc_offset_str[];
 #define ht_sc_offset_str(sc) (((sc) >= HT_SC_OFFSET_MAX) ? _ht_sc_offset_str[2] : _ht_sc_offset_str[(sc)])
 
 void dump_ht_cap_ie_content(void *sel, const u8 *buf, u32 buf_len);
-#endif
 
 void dump_wps_ie(void *sel, const u8 *ie, u32 ie_len);
 

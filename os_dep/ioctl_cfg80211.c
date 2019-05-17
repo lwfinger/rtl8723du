@@ -6721,7 +6721,6 @@ int rtw_cfg80211_set_mgnt_wpsp2pie(struct net_device *net, char *buf, int len,
 
 }
 
-#ifdef CONFIG_80211N_HT
 static void rtw_cfg80211_init_ht_capab_ex(_adapter *padapter
 	, struct ieee80211_sta_ht_cap *ht_cap, BAND_TYPE band, u8 rf_type)
 {
@@ -6824,7 +6823,6 @@ static void rtw_cfg80211_init_ht_capab(_adapter *padapter
 			, hal_is_bw_support(padapter, CHANNEL_WIDTH_40) ? ht_cap->cap & IEEE80211_HT_CAP_SGI_40 : ht_cap->cap & IEEE80211_HT_CAP_SGI_20
 			, ht_cap->mcs.rx_mask) / 10);
 }
-#endif /* CONFIG_80211N_HT */
 
 void rtw_cfg80211_init_wdev_data(_adapter *padapter)
 {
@@ -6848,11 +6846,8 @@ void rtw_cfg80211_init_wiphy(_adapter *padapter)
 
 	if (IsSupported24G(padapter->registrypriv.wireless_mode)) {
 		band = wiphy->bands[NL80211_BAND_2GHZ];
-		if (band) {
-			#if defined(CONFIG_80211N_HT)
+		if (band)
 			rtw_cfg80211_init_ht_capab(padapter, &band->ht_cap, BAND_ON_2_4G, rf_type);
-			#endif
-		}
 	}
 	/* init regulary domain */
 	rtw_regd_init(padapter);

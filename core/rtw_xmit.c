@@ -692,10 +692,8 @@ u8 query_ra_short_GI(struct sta_info *psta, u8 bw)
 {
 	u8	sgi = _FALSE, sgi_20m = _FALSE, sgi_40m = _FALSE, sgi_80m = _FALSE;
 
-#ifdef CONFIG_80211N_HT
 	sgi_20m = psta->htpriv.sgi_20m;
 	sgi_40m = psta->htpriv.sgi_40m;
-#endif
 
 	switch (bw) {
 	case CHANNEL_WIDTH_80:
@@ -893,7 +891,6 @@ static void update_attrib_phy_info(_adapter *padapter, struct pkt_attrib *pattri
 	pattrib->ldpc = psta->cmn.ldpc_en;
 	pattrib->stbc = psta->cmn.stbc_en;
 
-#ifdef CONFIG_80211N_HT
 	pattrib->ht_en = psta->htpriv.ht_option;
 	pattrib->ch_offset = psta->htpriv.ch_offset;
 	pattrib->ampdu_en = _FALSE;
@@ -913,7 +910,6 @@ static void update_attrib_phy_info(_adapter *padapter, struct pkt_attrib *pattri
 				pattrib->amsdu_ampdu_en = _FALSE;
 		}
 	}
-#endif /* CONFIG_80211N_HT */
 	/* if(pattrib->ht_en && psta->htpriv.ampdu_enable) */
 	/* { */
 	/*	if(psta->htpriv.agg_enable_bitmap & BIT(pattrib->priority)) */
@@ -925,12 +921,10 @@ static void update_attrib_phy_info(_adapter *padapter, struct pkt_attrib *pattri
 		psta = pattrib->ptdls_sta;
 
 		pattrib->raid = psta->cmn.ra_info.rate_id;
-#ifdef CONFIG_80211N_HT
 		pattrib->bwmode = rtw_get_tx_bw_mode(padapter, psta);
 		pattrib->ht_en = psta->htpriv.ht_option;
 		pattrib->ch_offset = psta->htpriv.ch_offset;
 		pattrib->sgi = query_ra_short_GI(psta, pattrib->bwmode);
-#endif /* CONFIG_80211N_HT */
 	}
 #endif /* CONFIG_TDLS */
 
@@ -1753,14 +1747,6 @@ s32 rtw_make_wlanhdr(_adapter *padapter , u8 *hdr, struct pkt_attrib *pattrib)
 
 				SetSeqNum(hdr, pattrib->seqnum);
 
-#ifdef CONFIG_80211N_HT
-#if 0 /* move into update_attrib_phy_info(). */
-				/* check if enable ampdu */
-				if (pattrib->ht_en && psta->htpriv.ampdu_enable) {
-					if (psta->htpriv.agg_enable_bitmap & BIT(pattrib->priority))
-						pattrib->ampdu_en = _TRUE;
-				}
-#endif
 				/* re-check if enable ampdu by BA_starting_seqctrl */
 				if (pattrib->ampdu_en == _TRUE) {
 					u16 tx_seq;
@@ -1782,16 +1768,11 @@ s32 rtw_make_wlanhdr(_adapter *padapter , u8 *hdr, struct pkt_attrib *pattrib)
 					}
 
 				}
-#endif /* CONFIG_80211N_HT */
 			}
 		}
-
-	} else {
-
 	}
 
 exit:
-
 
 	return res;
 }

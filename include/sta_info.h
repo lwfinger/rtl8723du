@@ -292,60 +292,42 @@ struct sta_info {
 	_timer	pti_timer;
 	u8	TDLS_RSNIE[20];	/* Save peer's RSNIE, used for sending TDLS_SETUP_RSP */
 #endif /* CONFIG_TDLS */
-
 	/* for A-MPDU TX, ADDBA timeout check	 */
 	_timer addba_retry_timer;
-
 	/* for A-MPDU Rx reordering buffer control */
 	struct recv_reorder_ctrl recvreorder_ctrl[TID_NUM];
 	ATOMIC_T continual_no_rx_packet[TID_NUM];
 	/* for A-MPDU Tx */
-	/* unsigned char		ampdu_txen_bitmap; */
 	u16	BA_starting_seqctrl[16];
-
-
-#ifdef CONFIG_80211N_HT
 	struct ht_priv	htpriv;
-#endif
-
 	/* Notes:	 */
 	/* STA_Mode: */
 	/* curr_network(mlme_priv/security_priv/qos/ht) + sta_info: (STA & AP) CAP/INFO	 */
 	/* scan_q: AP CAP/INFO */
-
 	/* AP_Mode: */
 	/* curr_network(mlme_priv/security_priv/qos/ht) : AP CAP/INFO */
 	/* sta_info: (AP & STA) CAP/INFO */
-
 	unsigned int expire_to;
-
 #ifdef CONFIG_AP_MODE
-
 	_list asoc_list;
 	_list auth_list;
-
 	unsigned int auth_seq;
 	unsigned int authalg;
 	unsigned char chg_txt[128];
-
 	u16 capability;
 	int flags;
-
 	int dot8021xalg;/* 0:disable, 1:psk, 2:802.1x */
 	int wpa_psk;/* 0:disable, bit(0): WPA, bit(1):WPA2 */
 	int wpa_group_cipher;
 	int wpa2_group_cipher;
 	int wpa_pairwise_cipher;
 	int wpa2_pairwise_cipher;
-
 	u8 bpairwise_key_installed;
 #ifdef CONFIG_RTW_80211R
 	u8 ft_pairwise_key_installed;
 #endif
-
 #ifdef CONFIG_NATIVEAP_MLME
 	u8 wpa_ie[32];
-
 	u8 nonerp_set;
 	u8 no_short_slot_time_set;
 	u8 no_short_preamble_set;
@@ -354,19 +336,15 @@ struct sta_info {
 	u8 ht_20mhz_set;
 	u8 ht_40mhz_intolerant;
 #endif /* CONFIG_NATIVEAP_MLME */
-
 #ifdef CONFIG_ATMEL_RC_PATCH
 	u8 flag_atmel_rc;
 #endif
-
 	u8 qos_info;
-
 	u8 max_sp_len;
 	u8 uapsd_bk;/* BIT(0): Delivery enabled, BIT(1): Trigger enabled */
 	u8 uapsd_be;
 	u8 uapsd_vi;
 	u8 uapsd_vo;
-
 	u8 has_legacy_ac;
 	unsigned int sleepq_ac_len;
 

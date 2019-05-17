@@ -25,18 +25,14 @@ phydm_sta_info_init(
 	}
 
 	odm_move_memory(p_dm, p_entry->my_mac_addr, adapter_mac_addr(p_sta->padapter), 6);
-	#ifdef CONFIG_80211N_HT
 	p_entry->ht_beamform_cap = p_cmn_sta->bf_info.ht_beamform_cap;
-	#endif
 
 	p_entry->aid = p_cmn_sta->aid;
 	p_entry->ra = p_cmn_sta->mac_addr;
 	p_entry->mac_id = p_cmn_sta->mac_id;
 	p_entry->wireless_mode = p_sta->wireless_mode;
 	p_entry->bw = p_cmn_sta->bw_mode;
-	#ifdef CONFIG_80211N_HT
 	p_entry->cur_beamform = p_cmn_sta->bf_info.ht_beamform_cap;
-	#endif
 #if	ODM_IC_11AC_SERIES_SUPPORT
 	if ((p_entry->wireless_mode & WIRELESS_MODE_AC_5G) || (p_entry->wireless_mode & WIRELESS_MODE_AC_24G)) {
 		p_entry->cur_beamform_vht = p_cmn_sta->bf_info.vht_beamform_cap;

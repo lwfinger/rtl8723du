@@ -2792,7 +2792,7 @@ exit:
 	return ret;
 }
 
-#if defined(CONFIG_80211N_HT) && defined(CONFIG_RECV_REORDERING_CTRL)
+#if defined(CONFIG_RECV_REORDERING_CTRL)
 static int check_indicate_seq(struct recv_reorder_ctrl *preorder_ctrl, u16 seq_num)
 {
 	PADAPTER padapter = preorder_ctrl->padapter;
@@ -3101,11 +3101,11 @@ void rtw_reordering_ctrl_timeout_handler(void *pcontext)
 	_exit_critical_bh(&ppending_recvframe_queue->lock, &irql);
 
 }
-#endif /* defined(CONFIG_80211N_HT) && defined(CONFIG_RECV_REORDERING_CTRL) */
+#endif /* defined(CONFIG_RECV_REORDERING_CTRL) */
 
 static void recv_set_iseq_before_mpdu_process(union recv_frame *rframe, u16 seq_num, const char *caller)
 {
-#if defined(CONFIG_80211N_HT) && defined(CONFIG_RECV_REORDERING_CTRL)
+#if defined(CONFIG_RECV_REORDERING_CTRL)
 	struct recv_reorder_ctrl *reorder_ctrl = rframe->u.hdr.preorder_ctrl;
 
 	if (reorder_ctrl) {
@@ -3121,7 +3121,7 @@ static void recv_set_iseq_before_mpdu_process(union recv_frame *rframe, u16 seq_
 
 static void recv_set_iseq_after_mpdu_process(union recv_frame *rframe, u16 seq_num, const char *caller)
 {
-#if defined(CONFIG_80211N_HT) && defined(CONFIG_RECV_REORDERING_CTRL)
+#if defined(CONFIG_RECV_REORDERING_CTRL)
 	struct recv_reorder_ctrl *reorder_ctrl = rframe->u.hdr.preorder_ctrl;
 
 	if (reorder_ctrl) {
@@ -3797,7 +3797,7 @@ static int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
 
 	count_rx_stats(padapter, prframe, NULL);
 
-#if defined(CONFIG_80211N_HT) && defined(CONFIG_RECV_REORDERING_CTRL)
+#if defined(CONFIG_RECV_REORDERING_CTRL)
 	/* including perform A-MPDU Rx Ordering Buffer Control */
 	ret = recv_indicatepkt_reorder(padapter, prframe);
 	if (ret == _FAIL) {
