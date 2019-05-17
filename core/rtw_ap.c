@@ -657,12 +657,6 @@ void rtw_ap_update_sta_ra_info(_adapter *padapter, struct sta_info *psta)
 
 		if (tx_ra_bitmap & 0xff0)
 			sta_band |= WIRELESS_11A;
-
-		/* 5G band */
-#ifdef CONFIG_80211AC_VHT
-		if (psta->vhtpriv.vht_option)
-			sta_band = WIRELESS_11_5AC;
-#endif
 	} else {
 		if (tx_ra_bitmap & 0xffff000)
 			sta_band |= WIRELESS_11_24N;
@@ -1037,9 +1031,6 @@ void update_sta_info_apmode(_adapter *padapter, struct sta_info *psta)
 	phtpriv_sta->candidate_tid_bitmap = 0x0;/* reset */
 #endif /* CONFIG_80211N_HT */
 
-#ifdef CONFIG_80211AC_VHT
-	update_sta_vht_info_apmode(padapter, psta);
-#endif
 	psta->cmn.ra_info.is_support_sgi = query_ra_short_GI(psta, rtw_get_tx_bw_mode(padapter, psta));
 	update_ldpc_stbc_cap(psta);
 
@@ -1104,10 +1095,6 @@ static void update_ap_info(_adapter *padapter, struct sta_info *psta)
 	phtpriv_ap->candidate_tid_bitmap = 0x0;/* reset */
 
 	_rtw_memcpy(&psta->htpriv, &pmlmepriv->htpriv, sizeof(struct ht_priv));
-
-#ifdef CONFIG_80211AC_VHT
-	_rtw_memcpy(&psta->vhtpriv, &pmlmepriv->vhtpriv, sizeof(struct vht_priv));
-#endif /* CONFIG_80211AC_VHT */
 
 #endif /* CONFIG_80211N_HT */
 
@@ -1495,13 +1482,6 @@ void start_bss_network(_adapter *padapter, struct createbss_parm *parm)
 		update_hw_ht_param(padapter);
 	}
 #endif /* #CONFIG_80211N_HT */
-
-#ifdef CONFIG_80211AC_VHT
-	if (pmlmepriv->vhtpriv.vht_option) {
-		pmlmeinfo->VHT_enable = _TRUE;
-		update_hw_vht_param(padapter);
-	}
-#endif /* CONFIG_80211AC_VHT */
 
 	if (pmlmepriv->cur_network.join_res != _TRUE) { /* setting only at  first time */
 		/* WEP Key will be set before this function, do not clear CAM. */
@@ -2121,30 +2101,6 @@ int rtw_check_beacon_data(_adapter *padapter, u8 *pbuf,  int len)
 		HT_info_handler(padapter, (PNDIS_802_11_VARIABLE_IEs)pHT_info_ie);
 	}
 #endif
-
-#ifdef CONFIG_80211AC_VHT
-
-	/* Parsing VHT CAP IE */
-	p = rtw_get_ie(ie + _BEACON_IE_OFFSET_, EID_VHTCapability, &ie_len, (pbss_network->IELength - _BEACON_IE_OFFSET_));
-	if (p && ie_len > 0)
-		vht_cap = _TRUE;
-	/* Parsing VHT OPERATION IE */
-
-
-	pmlmepriv->vhtpriv.vht_option = _FALSE;
-	/* if channel in 5G band, then add vht ie . */
-	if ((pbss_network->Configuration.DSConfig > 14)
-		&& (pmlmepriv->htpriv.ht_option == _TRUE)
-		&& REGSTY_IS_11AC_ENABLE(pregistrypriv)
-		&& hal_chk_proto_cap(padapter, PROTO_CAP_11AC)
-		&& (!rfctl->country_ent || COUNTRY_CHPLAN_EN_11AC(rfctl->country_ent))
-	) {
-		if (vht_cap == _TRUE)
-			pmlmepriv->vhtpriv.vht_option = _TRUE;
-		else if (REGSTY_IS_11AC_AUTO(pregistrypriv))
-			rtw_vht_ies_attach(padapter, pbss_network);
-	}
-#endif /* CONFIG_80211AC_VHT */
 
 	if(pbss_network->Configuration.DSConfig <= 14 && padapter->registrypriv.wifi_spec == 1) {
 		uint len = 0;
@@ -3612,17 +3568,6 @@ void sta_info_update(_adapter *padapter, struct sta_info *psta)
 		psta->htpriv.ht_option = _FALSE;
 #endif
 
-#ifdef CONFIG_80211AC_VHT
-	/* update 802.11AC vht cap. */
-	if (WLAN_STA_VHT & flags)
-		psta->vhtpriv.vht_option = _TRUE;
-	else
-		psta->vhtpriv.vht_option = _FALSE;
-
-	if (pmlmepriv->vhtpriv.vht_option == _FALSE)
-		psta->vhtpriv.vht_option = _FALSE;
-#endif
-
 	update_sta_info_apmode(padapter, psta);
 }
 
@@ -3873,72 +3818,25 @@ void rtw_ap_update_bss_chbw(_adapter *adapter, WLAN_BSSID_EX *bss, u8 ch, u8 bw,
 {
 #define UPDATE_VHT_CAP 1
 #define UPDATE_HT_CAP 1
-#ifdef CONFIG_80211AC_VHT
-	struct vht_priv *vhtpriv = &adapter->mlmepriv.vhtpriv;
-#endif
-	{
-		u8 *p;
-		int ie_len;
-		u8 old_ch = bss->Configuration.DSConfig;
-		bool change_band = _FALSE;
+	u8 *p;
+	int ie_len;
+	u8 old_ch = bss->Configuration.DSConfig;
+	bool change_band = _FALSE;
 
-		if ((ch <= 14 && old_ch >= 36) || (ch >= 36 && old_ch <= 14))
-			change_band = _TRUE;
+	if ((ch <= 14 && old_ch >= 36) || (ch >= 36 && old_ch <= 14))
+		change_band = _TRUE;
 
-		/* update channel in IE */
-		p = rtw_get_ie((bss->IEs + sizeof(NDIS_802_11_FIXED_IEs)), _DSSET_IE_, &ie_len, (bss->IELength - sizeof(NDIS_802_11_FIXED_IEs)));
-		if (p && ie_len > 0)
-			*(p + 2) = ch;
+	/* update channel in IE */
+	p = rtw_get_ie((bss->IEs + sizeof(NDIS_802_11_FIXED_IEs)), _DSSET_IE_, &ie_len, (bss->IELength - sizeof(NDIS_802_11_FIXED_IEs)));
+	if (p && ie_len > 0)
+		*(p + 2) = ch;
 
-		bss->Configuration.DSConfig = ch;
+	bss->Configuration.DSConfig = ch;
 
-		/* band is changed, update ERP, support rate, ext support rate IE */
-		if (change_band == _TRUE)
-			change_band_update_ie(adapter, bss, ch);
-	}
+	/* band is changed, update ERP, support rate, ext support rate IE */
+	if (change_band == _TRUE)
+		change_band_update_ie(adapter, bss, ch);
 
-#ifdef CONFIG_80211AC_VHT
-	if (vhtpriv->vht_option == _TRUE) {
-		u8 *vht_cap_ie, *vht_op_ie;
-		int vht_cap_ielen, vht_op_ielen;
-		u8	center_freq;
-
-		vht_cap_ie = rtw_get_ie((bss->IEs + sizeof(NDIS_802_11_FIXED_IEs)), EID_VHTCapability, &vht_cap_ielen, (bss->IELength - sizeof(NDIS_802_11_FIXED_IEs)));
-		vht_op_ie = rtw_get_ie((bss->IEs + sizeof(NDIS_802_11_FIXED_IEs)), EID_VHTOperation, &vht_op_ielen, (bss->IELength - sizeof(NDIS_802_11_FIXED_IEs)));
-		center_freq = rtw_get_center_ch(ch, bw, offset);
-
-		/* update vht cap ie */
-		if (vht_cap_ie && vht_cap_ielen) {
-			#if UPDATE_VHT_CAP
-			/* if ((bw == CHANNEL_WIDTH_160 || bw == CHANNEL_WIDTH_80_80) && pvhtpriv->sgi_160m)
-				SET_VHT_CAPABILITY_ELE_SHORT_GI160M(pvht_cap_ie + 2, 1);
-			else */
-				SET_VHT_CAPABILITY_ELE_SHORT_GI160M(vht_cap_ie + 2, 0);
-
-			if (bw >= CHANNEL_WIDTH_80 && vhtpriv->sgi_80m)
-				SET_VHT_CAPABILITY_ELE_SHORT_GI80M(vht_cap_ie + 2, 1);
-			else
-				SET_VHT_CAPABILITY_ELE_SHORT_GI80M(vht_cap_ie + 2, 0);
-			#endif
-		}
-
-		/* update vht op ie */
-		if (vht_op_ie && vht_op_ielen) {
-			if (bw < CHANNEL_WIDTH_80) {
-				SET_VHT_OPERATION_ELE_CHL_WIDTH(vht_op_ie + 2, 0);
-				SET_VHT_OPERATION_ELE_CHL_CENTER_FREQ1(vht_op_ie + 2, 0);
-				SET_VHT_OPERATION_ELE_CHL_CENTER_FREQ2(vht_op_ie + 2, 0);
-			} else if (bw == CHANNEL_WIDTH_80) {
-				SET_VHT_OPERATION_ELE_CHL_WIDTH(vht_op_ie + 2, 1);
-				SET_VHT_OPERATION_ELE_CHL_CENTER_FREQ1(vht_op_ie + 2, center_freq);
-				SET_VHT_OPERATION_ELE_CHL_CENTER_FREQ2(vht_op_ie + 2, 0);
-			} else {
-				RTW_ERR(FUNC_ADPT_FMT" unsupported BW:%u\n", FUNC_ADPT_ARG(adapter), bw);
-				rtw_warn_on(1);
-			}
-		}
-	}
-#endif /* CONFIG_80211AC_VHT */
 #ifdef CONFIG_80211N_HT
 	{
 		struct ht_priv	*htpriv = &adapter->mlmepriv.htpriv;
@@ -4692,23 +4590,6 @@ void rtw_ap_parse_sta_vht_ie(_adapter *adapter, struct sta_info *sta, struct rtw
 	struct mlme_priv *mlme = &adapter->mlmepriv;
 
 	sta->flags &= ~WLAN_STA_VHT;
-
-#ifdef CONFIG_80211AC_VHT
-	if (mlme->vhtpriv.vht_option == _FALSE)
-		goto exit;
-
-	_rtw_memset(&sta->vhtpriv, 0, sizeof(struct vht_priv));
-	if (elems->vht_capabilities && elems->vht_capabilities_len == 12) {
-		sta->flags |= WLAN_STA_VHT;
-		_rtw_memcpy(sta->vhtpriv.vht_cap, elems->vht_capabilities, 12);
-
-		if (elems->vht_op_mode_notify && elems->vht_op_mode_notify_len == 1)
-			_rtw_memcpy(&sta->vhtpriv.vht_op_mode_notify, elems->vht_op_mode_notify, 1);
-		else /* for Frame without Operating Mode notify ie; default: 80M */
-			sta->vhtpriv.vht_op_mode_notify = CHANNEL_WIDTH_80;
-	}
-exit:
-#endif
 
 	return;
 }

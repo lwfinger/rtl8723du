@@ -192,17 +192,6 @@ static int rtw_bfee_rf_number = 0; /*BeamformeeCapRfNum  Rf path number, 0 for a
 
 #endif /* CONFIG_80211N_HT */
 
-#ifdef CONFIG_80211AC_VHT
-int rtw_vht_enable = 1; /* 0:disable, 1:enable, 2:force auto enable */
-module_param(rtw_vht_enable, int, 0644);
-
-int rtw_ampdu_factor = 7;
-
-uint rtw_vht_rx_mcs_map = 0xaaaa;
-module_param(rtw_vht_rx_mcs_map, uint, 0644);
-MODULE_PARM_DESC(rtw_vht_rx_mcs_map, "VHT RX MCS map");
-#endif /* CONFIG_80211AC_VHT */
-
 static int rtw_lowrate_two_xmit = 1;/* Use 2 path Tx to transmit MCS0~7 and legacy mode */
 
 static int rtw_rf_config = RF_TYPE_MAX;
@@ -811,13 +800,6 @@ uint loadparam(_adapter *padapter)
 	rtw_regsty_init_rx_ampdu_sz_limit(registry_par);
 #endif
 
-#ifdef CONFIG_80211AC_VHT
-	registry_par->vht_enable = (u8)rtw_vht_enable;
-	registry_par->ampdu_factor = (u8)rtw_ampdu_factor;
-	registry_par->vht_rx_mcs_map[0] = (u8)(rtw_vht_rx_mcs_map & 0xFF);
-	registry_par->vht_rx_mcs_map[1] = (u8)((rtw_vht_rx_mcs_map & 0xFF00) >> 8);
-#endif
-
 #ifdef CONFIG_TX_EARLY_MODE
 	registry_par->early_mode = (u8)rtw_early_mode;
 #endif
@@ -1119,17 +1101,17 @@ static unsigned int rtw_classify8021d(struct sk_buff *skb)
 	return dscp >> 5;
 }
 
-static u16 rtw_select_queue(struct net_device *dev, struct sk_buff *skb
+static u16 rtw_select_queue(struct net_device *dev, struct sk_buff *skb,
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 2, 0))
-			    ,struct net_device *sb_dev
+			    struct net_device *sb_dev
 #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0))
-			    ,struct net_device *sb_dev
-                            ,select_queue_fallback_t fallback
+			    struct net_device *sb_dev,
+                            select_queue_fallback_t fallback
 #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0))
- 			    ,void *unused
-                             ,select_queue_fallback_t fallback
+ 			    void *unused,
+                            select_queue_fallback_t fallback
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0)
-			, void *accel_priv
+			    void *accel_priv
 #endif
 )
 {

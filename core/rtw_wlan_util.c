@@ -92,11 +92,6 @@ s8 rtw_get_sta_rx_nss(_adapter *adapter, struct sta_info *psta)
 	nss = rtw_min(rf_type_to_rf_rx_cnt(rf_type), hal_spec->rx_nss_num);
 
 #ifdef CONFIG_80211N_HT
-	#ifdef CONFIG_80211AC_VHT
-	if (psta->vhtpriv.vht_option)
-		nss = rtw_min(nss, rtw_vht_mcsmap_to_nss(psta->vhtpriv.vht_mcs_map));
-	else
-	#endif /* CONFIG_80211AC_VHT */
 	if (psta->htpriv.ht_option)
 		nss = rtw_min(nss, rtw_ht_mcsset_to_nss(psta->htpriv.ht_cap.supp_mcs_set));
 #endif /*CONFIG_80211N_HT*/
@@ -121,11 +116,6 @@ s8 rtw_get_sta_tx_nss(_adapter *adapter, struct sta_info *psta)
 	nss = rtw_min(rf_type_to_rf_tx_cnt(rf_type), hal_spec->tx_nss_num);
 
 #ifdef CONFIG_80211N_HT
-	#ifdef CONFIG_80211AC_VHT
-	if (psta->vhtpriv.vht_option)
-		nss = rtw_min(nss, rtw_vht_mcsmap_to_nss(psta->vhtpriv.vht_mcs_map));
-	else
-	#endif /* CONFIG_80211AC_VHT */
 	if (psta->htpriv.ht_option)
 		nss = rtw_min(nss, rtw_ht_mcsset_to_nss(psta->htpriv.ht_cap.supp_mcs_set));
 #endif /*CONFIG_80211N_HT*/
@@ -2106,34 +2096,20 @@ void	update_ldpc_stbc_cap(struct sta_info *psta)
 {
 #ifdef CONFIG_80211N_HT
 
-#ifdef CONFIG_80211AC_VHT
-	if (psta->vhtpriv.vht_option) {
-		if (TEST_FLAG(psta->vhtpriv.ldpc_cap, LDPC_VHT_ENABLE_TX))
-			psta->cmn.ldpc_en = VHT_LDPC_EN;
+	if (psta->htpriv.ht_option) {
+		if (TEST_FLAG(psta->htpriv.ldpc_cap, LDPC_HT_ENABLE_TX))
+			psta->cmn.ldpc_en = HT_LDPC_EN;
 		else
 			psta->cmn.ldpc_en = 0;
 
-		if (TEST_FLAG(psta->vhtpriv.stbc_cap, STBC_VHT_ENABLE_TX))
-			psta->cmn.stbc_en = VHT_STBC_EN;
+		if (TEST_FLAG(psta->htpriv.stbc_cap, STBC_HT_ENABLE_TX))
+			psta->cmn.stbc_en = HT_STBC_EN;
 		else
 			psta->cmn.stbc_en = 0;
-	} else
-#endif /* CONFIG_80211AC_VHT */
-		if (psta->htpriv.ht_option) {
-			if (TEST_FLAG(psta->htpriv.ldpc_cap, LDPC_HT_ENABLE_TX))
-				psta->cmn.ldpc_en = HT_LDPC_EN;
-			else
-				psta->cmn.ldpc_en = 0;
-
-			if (TEST_FLAG(psta->htpriv.stbc_cap, STBC_HT_ENABLE_TX))
-				psta->cmn.stbc_en = HT_STBC_EN;
-			else
-				psta->cmn.stbc_en = 0;
-		} else {
-			psta->cmn.ldpc_en = 0;
-			psta->cmn.stbc_en = 0;
-		}
-
+	} else {
+		psta->cmn.ldpc_en = 0;
+		psta->cmn.stbc_en = 0;
+	}
 #endif /* CONFIG_80211N_HT */
 }
 
@@ -2601,11 +2577,6 @@ void update_beacon_info(_adapter *padapter, u8 *pframe, uint pkt_len, struct sta
 			/* HT_info_handler(padapter, pIE); */
 			bwmode_update_check(padapter, pIE);
 			break;
-#ifdef CONFIG_80211AC_VHT
-		case EID_OpModeNotification:
-			rtw_process_vht_op_mode_notify(padapter, pIE->data, psta);
-			break;
-#endif /* CONFIG_80211AC_VHT */
 		case _ERPINFO_IE_:
 			ERP_IE_handler(padapter, pIE);
 			VCS_update(padapter, psta);
