@@ -195,10 +195,6 @@ static void mp_init_xmit_attrib(struct mp_tx *pmptx, PADAPTER padapter)
 	_rtw_memset(pmptx->desc, 0, TXDESC_SIZE);
 
 	pattrib->ether_type = 0x8712;
-#if 0
-	_rtw_memcpy(pattrib->src, adapter_mac_addr(padapter), ETH_ALEN);
-	_rtw_memcpy(pattrib->ta, pattrib->src, ETH_ALEN);
-#endif
 	_rtw_memset(pattrib->dst, 0xFF, ETH_ALEN);
 
 	/*	pattrib->dhcp_pkt = 0;

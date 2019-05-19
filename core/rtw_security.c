@@ -2059,27 +2059,6 @@ u32	rtw_BIP_verify(_adapter *padapter, u8 *whdr_pos, sint flen
 	if (omac1_aes_128(key, BIP_AAD, ori_len, mic))
 		goto BIP_exit;
 
-#if 0
-	/* management packet content */
-	{
-		int pp;
-		RTW_INFO("pkt: ");
-		for (pp = 0; pp < flen; pp++)
-			printk(" %02x ", whdr_pos[pp]);
-		RTW_INFO("\n");
-		/* BIP AAD + management frame body + MME(MIC is zero) */
-		RTW_INFO("AAD+PKT: ");
-		for (pp = 0; pp < ori_len; pp++)
-			RTW_INFO(" %02x ", BIP_AAD[pp]);
-		RTW_INFO("\n");
-		/* show the MIC result */
-		RTW_INFO("mic: ");
-		for (pp = 0; pp < 16; pp++)
-			RTW_INFO(" %02x ", mic[pp]);
-		RTW_INFO("\n");
-	}
-#endif
-
 	/* MIC field should be last 8 bytes of packet (packet without FCS) */
 	if (_rtw_memcmp(mic, whdr_pos + flen - 8, 8)) {
 		*ipn = pkt_ipn;

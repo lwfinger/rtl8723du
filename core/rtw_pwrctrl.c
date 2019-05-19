@@ -1400,12 +1400,6 @@ void cpwm_int_hdl(
 		goto exit;
 
 	pwrpriv = adapter_to_pwrctl(padapter);
-#if 0
-	if (pwrpriv->cpwm_tog == (preportpwrstate->state & PS_TOGGLE)) {
-		goto exit;
-	}
-#endif
-
 	_enter_pwrlock(&pwrpriv->lock);
 
 #ifdef CONFIG_LPS_RPWM_TIMER

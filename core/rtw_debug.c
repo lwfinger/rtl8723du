@@ -4342,43 +4342,6 @@ int proc_get_efuse_map(struct seq_file *m, void *v)
 
 ssize_t proc_set_efuse_map(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
-#if 0
-	char tmp[256] = {0};
-	u32 addr, cnts;
-	u8 efuse_data;
-
-	int jj, kk;
-
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct pwrctrl_priv *pwrctrlpriv  = adapter_to_pwrctl(padapter);
-	u8 ips_mode = IPS_NUM;
-
-	if (count < 3) {
-		RTW_INFO("argument size is less than 3\n");
-		return -EFAULT;
-	}
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-
-		int num = sscanf(tmp, "%x %d %x", &addr, &cnts, &efuse_data);
-
-		if (num != 3) {
-			RTW_INFO("invalid write_reg parameter!\n");
-			return count;
-		}
-	}
-	ips_mode = pwrctrlpriv->ips_mode;
-	rtw_pm_set_ips(padapter, IPS_NONE);
-	if (rtw_efuse_map_write(padapter, addr, cnts, &efuse_data) == _FAIL)
-		RTW_INFO("WARN - rtw_efuse_map_write error!!\n");
-	rtw_pm_set_ips(padapter, ips_mode);
-#endif
 	return count;
 }
 

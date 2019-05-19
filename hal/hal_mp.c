@@ -654,11 +654,6 @@ static VOID mpt_SetRFPath_819X(PADAPTER	pAdapter)
 	default:
 		break;
 	}
-#if 0
-	/*  r_rx_antenna_ofdm, bit0=A, bit1=B, bit2=C, bit3=D */
-	/*  r_cckrx_enable : CCK default, 0=A, 1=B, 2=C, 3=D */
-	/* r_cckrx_enable_2 : CCK option, 0=A, 1=B, 2=C, 3=D	 */
-#endif
 	switch (ulAntennaRx) {
 	case ANTENNA_A:
 		r_rx_antenna_ofdm		= 0x1;	/* A*/
@@ -779,17 +774,9 @@ u8 hal_mpt_ReadRFThermalMeter(PADAPTER pAdapter)
 
 void hal_mpt_GetThermalMeter(PADAPTER pAdapter, u8 *value)
 {
-#if 0
-	fw_cmd(pAdapter, IOCMD_GET_THERMAL_METER);
-	rtw_msleep_os(1000);
-	fw_cmd_data(pAdapter, value, 1);
-	*value &= 0xFF;
-#else
 	hal_mpt_TriggerRFThermalMeter(pAdapter);
 	rtw_msleep_os(1000);
 	*value = hal_mpt_ReadRFThermalMeter(pAdapter);
-#endif
-
 }
 
 

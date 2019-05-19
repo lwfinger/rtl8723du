@@ -765,19 +765,6 @@ static void update_attrib_vcs_info(_adapter *padapter, struct xmit_frame *pxmitf
 		}
 	} else {
 		while (_TRUE) {
-#if 0 /* Todo */
-			/* check IOT action */
-			if (pHTInfo->IOTAction & HT_IOT_ACT_FORCED_CTS2SELF) {
-				pattrib->vcs_mode = CTS_TO_SELF;
-				pattrib->rts_rate = MGN_24M;
-				break;
-			} else if (pHTInfo->IOTAction & (HT_IOT_ACT_FORCED_RTS | HT_IOT_ACT_PURE_N_MODE)) {
-				pattrib->vcs_mode = RTS_CTS;
-				pattrib->rts_rate = MGN_24M;
-				break;
-			}
-#endif
-
 			/* IOT action */
 			if ((pmlmeinfo->assoc_AP_vendor == HT_IOT_PEER_ATHEROS) && (pattrib->ampdu_en == _TRUE) &&
 			    (padapter->securitypriv.dot11PrivacyAlgrthm == _AES_)) {
@@ -1125,28 +1112,13 @@ u8 rtw_check_tdls_established(_adapter *padapter, struct pkt_attrib *pattrib)
 	pattrib->direct_link = _FALSE;
 	if (padapter->tdlsinfo.link_established == _TRUE) {
 		pattrib->ptdls_sta = rtw_get_stainfo(&padapter->stapriv, pattrib->dst);
-#if 1
 		if ((pattrib->ptdls_sta != NULL) &&
 		    (pattrib->ptdls_sta->tdls_sta_state & TDLS_LINKED_STATE) &&
 		    (pattrib->ether_type != 0x0806)) {
 			pattrib->direct_link = _TRUE;
 			/* RTW_INFO("send ptk to "MAC_FMT" using direct link\n", MAC_ARG(pattrib->dst)); */
 		}
-#else
-		if (pattrib->ptdls_sta != NULL &&
-		    pattrib->ptdls_sta->tdls_sta_state & TDLS_LINKED_STATE) {
-			pattrib->direct_link = _TRUE;
-#if 0
-			RTW_INFO("send ptk to "MAC_FMT" using direct link\n", MAC_ARG(pattrib->dst));
-#endif
-		}
-
-		/* ARP frame may be helped by AP*/
-		if (pattrib->ether_type != 0x0806)
-			pattrib->direct_link = _FALSE;
-#endif
 	}
-
 	return pattrib->direct_link;
 }
 
@@ -3929,21 +3901,6 @@ static int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 				*((unsigned short *)(skb->data + MACADDRLEN * 2 + 2)) = vlan_hdr;
 			}
 		}
-#if 0
-		else {
-			if (*((unsigned short *)(skb->data + MACADDRLEN * 2)) == __constant_htons(ETH_P_8021Q))
-				is_vlan_tag = 1;
-
-			if (is_vlan_tag) {
-				if (ICMPV6_MCAST_MAC(skb->data) && ICMPV6_PROTO1A_VALN(skb->data))
-					memcpy(skb->data + MACADDRLEN, GET_MY_HWADDR(padapter), MACADDRLEN);
-			} else {
-				if (ICMPV6_MCAST_MAC(skb->data) && ICMPV6_PROTO1A(skb->data))
-					memcpy(skb->data + MACADDRLEN, GET_MY_HWADDR(padapter), MACADDRLEN);
-			}
-		}
-#endif /* 0 */
-
 		/* check if SA is equal to our MAC */
 		if (memcmp(skb->data + MACADDRLEN, GET_MY_HWADDR(padapter), MACADDRLEN)) {
 			/* priv->ext_stats.tx_drops++; */

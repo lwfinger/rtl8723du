@@ -130,25 +130,6 @@ static void sreset_restore_network_station(_adapter *padapter)
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	u8 doiqk = _FALSE;
 
-#if 0
-	{
-		/* ======================================================= */
-		/* reset related register of Beacon control */
-
-		/* set MSR to nolink */
-		Set_MSR(padapter, _HW_STATE_NOLINK_);
-		/* reject all data frame */
-		rtw_write16(padapter, REG_RXFLTMAP2, 0x00);
-		/* reset TSF */
-		rtw_write8(padapter, REG_DUAL_TSF_RST, (BIT(0) | BIT(1)));
-
-		/* disable update TSF */
-		SetBcnCtrlReg(padapter, BIT(4), 0);
-
-		/* ======================================================= */
-	}
-#endif
-
 	rtw_setopmode_cmd(padapter, Ndis802_11Infrastructure, RTW_CMDF_DIRECTLY);
 
 	{

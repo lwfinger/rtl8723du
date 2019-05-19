@@ -521,10 +521,6 @@ void	rtw_hal_set_chnl_bw(_adapter *padapter, u8 channel, enum channel_width Band
 	if (rtw_mp_mode_check(padapter) == _FALSE)
 #endif
 	{
-		#if 0
-		if (cch_160 != 0)
-			cch_80 = rtw_get_scch_by_cch_offset(cch_160, CHANNEL_WIDTH_160, Offset80);
-		#endif
 		if (cch_80 != 0)
 			cch_40 = rtw_get_scch_by_cch_offset(cch_80, CHANNEL_WIDTH_80, Offset80);
 		if (cch_40 != 0)

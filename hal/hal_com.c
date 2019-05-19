@@ -2073,18 +2073,7 @@ void rtw_sec_write_cam_ent(_adapter *adapter, u8 id, u16 ctrl, u8 *mac, u8 *key)
 	u8 addr;
 	u32 wdata;
 
-	/* TODO: consider other key length accordingly */
-#if 0
-	switch ((ctrl & 0x1c) >> 2) {
-	case _WEP40_:
-	case _TKIP_:
-	case _AES_:
-	case _WEP104_:
-
-	}
-#else
 	j = 7;
-#endif
 
 	for (; j >= 0; j--) {
 		switch (j) {
@@ -2520,45 +2509,15 @@ void rtw_mbid_cam_restore(_adapter *adapter)
 #ifdef CONFIG_MI_WITH_MBSSID_CAM
 void rtw_hal_set_macaddr_mbid(_adapter *adapter, u8 *mac_addr)
 {
+	/*
+		MBID entry_id = 0~7 ,for IFACE_ID0 ~ IFACE_IDx
+	*/
+	u8 entry_id = rtw_mbid_camid_alloc(adapter, mac_addr);
 
-#if 0 /*TODO - modify for more flexible*/
-	u8 idx = 0;
-
-	if ((check_fwstate(&adapter->mlmepriv, WIFI_STATION_STATE) == _TRUE) &&
-	    (DEV_STA_NUM(adapter_to_dvobj(adapter)) == 1)) {
-		for (idx = 0; idx < 6; idx++)
-			rtw_write8(GET_PRIMARY_ADAPTER(adapter), (REG_MACID + idx), val[idx]);
-	}  else {
-		/*MBID entry_id = 0~7 ,0 for root AP, 1~7 for VAP*/
-		u8 entry_id;
-
-		if ((check_fwstate(&adapter->mlmepriv, WIFI_AP_STATE) == _TRUE) &&
-		    (DEV_AP_NUM(adapter_to_dvobj(adapter)) == 1)) {
-			entry_id = 0;
-			if (rtw_mbid_cam_assign(adapter, val, entry_id)) {
-				RTW_INFO(FUNC_ADPT_FMT" Root AP assigned success\n", FUNC_ADPT_ARG(adapter));
-				write_mbssid_cam(adapter, entry_id, val);
-			}
-		} else {
-			entry_id = rtw_mbid_camid_alloc(adapter, val);
-			if (entry_id != INVALID_CAM_ID)
-				write_mbssid_cam(adapter, entry_id, val);
-		}
+	if (entry_id != INVALID_CAM_ID) {
+		write_mbssid_cam(adapter, entry_id, mac_addr);
+		enable_mbssid_cam(adapter);
 	}
-#else
-	{
-		/*
-			MBID entry_id = 0~7 ,for IFACE_ID0 ~ IFACE_IDx
-		*/
-		u8 entry_id = rtw_mbid_camid_alloc(adapter, mac_addr);
-
-
-		if (entry_id != INVALID_CAM_ID) {
-			write_mbssid_cam(adapter, entry_id, mac_addr);
-			enable_mbssid_cam(adapter);
-		}
-	}
-#endif
 }
 
 void rtw_hal_change_macaddr_mbid(_adapter *adapter, u8 *mac_addr)
@@ -3921,16 +3880,7 @@ u8 rtw_hal_set_lps_pg_info(_adapter *adapter)
 
 void rtw_hal_lps_pg_rssi_lv_decide(_adapter *adapter, struct sta_info *sta)
 {
-#if 0
-	if (sta->cmn.ra_info.rssi_level >= 4)
-		sta->lps_pg_rssi_lv = 3;	/*RSSI High - 1SS_VHT_MCS7*/
-	else if (sta->cmn.ra_info.rssi_level >=  2)
-		sta->lps_pg_rssi_lv = 2;	/*RSSI Middle - 1SS_VHT_MCS3*/
-	else
-		sta->lps_pg_rssi_lv = 1;	/*RSSI Lower - Lowest_rate*/
-#else
 	sta->lps_pg_rssi_lv = 0;
-#endif
 	RTW_INFO("%s mac-id:%d, rssi:%d, rssi_level:%d, lps_pg_rssi_lv:%d\n",
 		__func__, sta->cmn.mac_id, sta->cmn.rssi_stat.rssi, sta->cmn.ra_info.rssi_level, sta->lps_pg_rssi_lv);
 }

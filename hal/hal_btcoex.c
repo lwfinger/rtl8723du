@@ -2034,22 +2034,14 @@ static void halbtcoutsrc_phydm_modify_RA_PCR_threshold(void *pBtcContext, u8 RA_
 {
 	struct btc_coexist *pBtCoexist = (struct btc_coexist *)pBtcContext;
 
-/* switch to #if 0 in case the phydm version does not provide the function */
-#if 1
 	phydm_modify_RA_PCR_threshold(pBtCoexist->odm_priv, RA_offset_direction, RA_threshold_offset);
-#endif
 }
 
 static u32 halbtcoutsrc_phydm_query_PHY_counter(void *pBtcContext, u8 info_type)
 {
 	struct btc_coexist *pBtCoexist = (struct btc_coexist *)pBtcContext;
 
-/* switch to #if 0 in case the phydm version does not provide the function */
-#if 1
 	return phydm_cmn_info_query((struct PHY_DM_STRUCT *)pBtCoexist->odm_priv, (enum phydm_info_query_e)info_type);
-#else
-	return 0;
-#endif
 }
 
 /* ************************************

@@ -217,17 +217,6 @@ odm_cfo_tracking(
 			phydm_set_crystal_cap(p_dm, p_cfo_track->def_x_cap);
 			PHYDM_DBG(p_dm, DBG_CFO_TRK, ("odm_cfo_tracking(): Disable CFO tracking for BT!!\n"));
 		}
-#if 0
-		/* 4 1.6 Big jump */
-		if (p_cfo_track->is_adjust) {
-			if (CFO_ave > CFO_TH_XTAL_LOW)
-				adjust_xtal =  adjust_xtal + ((CFO_ave - CFO_TH_XTAL_LOW) >> 2);
-			else if (CFO_ave < (-CFO_TH_XTAL_LOW))
-				adjust_xtal =  adjust_xtal + ((CFO_TH_XTAL_LOW - CFO_ave) >> 2);
-
-			PHYDM_DBG(p_dm, DBG_CFO_TRK, ("odm_cfo_tracking(): Crystal cap offset = %d\n", adjust_xtal));
-		}
-#endif
 #endif
 		/* 4 1.7 Adjust Crystal Cap. */
 		if (p_cfo_track->is_adjust) {

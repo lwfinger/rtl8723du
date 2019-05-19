@@ -541,10 +541,6 @@ static void rtl8723d_lps_poff_dynamic_file(PADAPTER padapter, u8 index, u8 isGK)
 			plps_poff_info->ConfLenForPTK += ret;
 		else
 			plps_poff_info->ConfLenForGTK += ret;
-
-#if 0
-		RTW_INFO("%s: tgt_wdata: %#08x\n", __func__, tgt_wdata);
-#endif
 	}
 }
 

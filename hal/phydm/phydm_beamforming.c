@@ -352,42 +352,6 @@ beamforming_add_bfer_entry(
 		return NULL;
 }
 
-#if 0
-boolean
-beamforming_remove_entry(
-	struct _ADAPTER			*adapter,
-	u8		*RA,
-	u8		*idx
-)
-{
-	HAL_DATA_TYPE			*p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT				*p_dm = &p_hal_data->DM_OutSrc;
-
-	struct _RT_BEAMFORMER_ENTRY	*p_bfer_entry = phydm_beamforming_get_bfer_entry_by_addr(p_dm, RA, idx);
-	struct _RT_BEAMFORMEE_ENTRY	*p_entry = phydm_beamforming_get_bfee_entry_by_addr(p_dm, RA, idx);
-	boolean ret = false;
-
-	RT_DISP(FBEAM, FBEAM_FUN, ("[Beamforming]@%s Start!\n", __func__));
-	RT_DISP(FBEAM, FBEAM_FUN, ("[Beamforming]@%s, p_bfer_entry=0x%x\n", __func__, p_bfer_entry));
-	RT_DISP(FBEAM, FBEAM_FUN, ("[Beamforming]@%s, p_entry=0x%x\n", __func__, p_entry));
-
-	if (p_entry != NULL) {
-		p_entry->is_used = false;
-		p_entry->beamform_entry_cap = BEAMFORMING_CAP_NONE;
-		/*p_entry->beamform_entry_state = BEAMFORMING_ENTRY_STATE_UNINITIALIZE;*/
-		p_entry->is_beamforming_in_progress = false;
-		ret = true;
-	}
-	if (p_bfer_entry != NULL) {
-		p_bfer_entry->is_used = false;
-		p_bfer_entry->beamform_entry_cap = BEAMFORMING_CAP_NONE;
-		ret = true;
-	}
-	return ret;
-
-}
-#endif
-
 /* Used for beamforming_start_v1 */
 void
 phydm_beamforming_ndpa_rate(
@@ -1627,34 +1591,6 @@ beamforming_leave(
 
 	PHYDM_DBG(p_dm, DBG_TXBF, ("[%s] End!!\n", __func__));
 }
-
-#if 0
-/* Nobody calls this function */
-void
-phydm_beamforming_set_txbf_en(
-	void		*p_dm_void,
-	u8			mac_id,
-	boolean			is_txbf
-)
-{
-	struct PHY_DM_STRUCT				*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	u8					idx = 0;
-	struct _RT_BEAMFORMEE_ENTRY	*p_entry;
-
-	PHYDM_DBG(p_dm, DBG_TXBF, ("%s Start!\n", __func__));
-
-	p_entry = phydm_beamforming_get_entry_by_mac_id(p_dm, mac_id, &idx);
-
-	if (p_entry == NULL)
-		return;
-	else
-		p_entry->is_txbf = is_txbf;
-
-	PHYDM_DBG(p_dm, DBG_TXBF, ("%s mac_id %d TxBF %d\n", __func__, p_entry->mac_id, p_entry->is_txbf));
-
-	phydm_beamforming_notify(p_dm);
-}
-#endif
 
 enum beamforming_cap
 phydm_beamforming_get_beam_cap(

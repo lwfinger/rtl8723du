@@ -252,45 +252,23 @@ phydm_get_thermal_trim_offset_8822b(
 
 	u8 pg_therm = 0xff;
 
-#if 0
-	u32	thermal_trim_enable = 0xff;
+	odm_efuse_one_byte_read(p_dm, PPG_THERMAL_OFFSET, &pg_therm, false);
 
-	odm_efuse_logical_map_read(p_dm, 1, 0xc8, &thermal_trim_enable);
+	if (pg_therm != 0xff) {
+		pg_therm = pg_therm & 0x1f;
+		if ((pg_therm & BIT(0)) == 0)
+			p_power_trim_info->thermal = (-1 * (pg_therm >> 1));
+		else
+			p_power_trim_info->thermal = (pg_therm >> 1);
 
-	ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b 0xc8:0x%2x\n", thermal_trim_enable));
+		p_power_trim_info->flag |= KFREE_FLAG_THERMAL_K_ON;
+	}
 
-	thermal_trim_enable = (thermal_trim_enable & BIT(5)) >> 5;
+	ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b thermal trim flag:0x%02x\n", p_power_trim_info->flag));
 
-	ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b thermal trim Enable:%d\n", thermal_trim_enable));
-
-	if ((p_rf_calibrate_info->reg_rf_kfree_enable == 0 && thermal_trim_enable == 1) ||
-		p_rf_calibrate_info->reg_rf_kfree_enable == 1) {
-#endif
-
-		odm_efuse_one_byte_read(p_dm, PPG_THERMAL_OFFSET, &pg_therm, false);
-
-		if (pg_therm != 0xff) {
-			pg_therm = pg_therm & 0x1f;
-			if ((pg_therm & BIT(0)) == 0)
-				p_power_trim_info->thermal = (-1 * (pg_therm >> 1));
-			else
-				p_power_trim_info->thermal = (pg_therm >> 1);
-
-			p_power_trim_info->flag |= KFREE_FLAG_THERMAL_K_ON;
-		}
-
-		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b thermal trim flag:0x%02x\n", p_power_trim_info->flag));
-
-		if (p_power_trim_info->flag & KFREE_FLAG_THERMAL_K_ON)
-			ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b thermal:%d\n", p_power_trim_info->thermal));
-#if 0
-	} else
-		return;
-#endif
-
+	if (p_power_trim_info->flag & KFREE_FLAG_THERMAL_K_ON)
+		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b thermal:%d\n", p_power_trim_info->thermal));
 }
-
-
 
 static void
 phydm_get_power_trim_offset_8822b(
@@ -303,82 +281,61 @@ phydm_get_power_trim_offset_8822b(
 
 	u8 pg_power = 0xff, i, j;
 
-#if 0
-	u32	power_trim_enable = 0xff;
+	odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_2G_TXAB_OFFSET, &pg_power, false);
 
-	odm_efuse_logical_map_read(p_dm, 1, 0xc8, &power_trim_enable);
-
-	ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b 0xc8:0x%2x\n", power_trim_enable));
-
-	power_trim_enable = (power_trim_enable & BIT(4)) >> 4;
-
-	ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b power trim Enable:%d\n", power_trim_enable));
-
-	if ((p_rf_calibrate_info->reg_rf_kfree_enable == 0 && power_trim_enable == 1) ||
-		p_rf_calibrate_info->reg_rf_kfree_enable == 1) {
-#endif
-
+	if (pg_power != 0xff) {
+		/*Path A*/
 		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_2G_TXAB_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[0][0] = (pg_power & 0xf);
 
-		if (pg_power != 0xff) {
-			/*Path A*/
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_2G_TXAB_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[0][0] = (pg_power & 0xf);
+		/*Path B*/
+		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_2G_TXAB_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[0][1] = ((pg_power & 0xf0) >> 4);
 
-			/*Path B*/
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_2G_TXAB_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[0][1] = ((pg_power & 0xf0) >> 4);
+		p_power_trim_info->flag |= KFREE_FLAG_ON_2G;
+		p_power_trim_info->flag |= KFREE_FLAG_ON;
+	}
 
-			p_power_trim_info->flag |= KFREE_FLAG_ON_2G;
-			p_power_trim_info->flag |= KFREE_FLAG_ON;
-		}
-
+	odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GL1_TXA_OFFSET, &pg_power, false);
+	
+	if (pg_power != 0xff) {
+		/*Path A*/
 		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GL1_TXA_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[1][0] = pg_power;
+		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GL2_TXA_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[2][0] = pg_power;
+		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GM1_TXA_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[3][0] = pg_power;
+		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GM2_TXA_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[4][0] = pg_power;
+		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GH1_TXA_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[5][0] = pg_power;
+
+		/*Path B*/
+		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GL1_TXB_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[1][1] = pg_power;
+		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GL2_TXB_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[2][1] = pg_power;
+		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GM1_TXB_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[3][1] = pg_power;
+		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GM2_TXB_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[4][1] = pg_power;
+		odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GH1_TXB_OFFSET, &pg_power, false);
+		p_power_trim_info->bb_gain[5][1] = pg_power;
 		
-		if (pg_power != 0xff) {
-			/*Path A*/
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GL1_TXA_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[1][0] = pg_power;
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GL2_TXA_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[2][0] = pg_power;
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GM1_TXA_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[3][0] = pg_power;
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GM2_TXA_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[4][0] = pg_power;
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GH1_TXA_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[5][0] = pg_power;
+		p_power_trim_info->flag |= KFREE_FLAG_ON_5G;
+		p_power_trim_info->flag |= KFREE_FLAG_ON;
+	}
 
-			/*Path B*/
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GL1_TXB_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[1][1] = pg_power;
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GL2_TXB_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[2][1] = pg_power;
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GM1_TXB_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[3][1] = pg_power;
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GM2_TXB_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[4][1] = pg_power;
-			odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_5GH1_TXB_OFFSET, &pg_power, false);
-			p_power_trim_info->bb_gain[5][1] = pg_power;
-			
-			p_power_trim_info->flag |= KFREE_FLAG_ON_5G;
-			p_power_trim_info->flag |= KFREE_FLAG_ON;
+	ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b power trim flag:0x%02x\n", p_power_trim_info->flag));
+
+	if (p_power_trim_info->flag & KFREE_FLAG_ON) {
+		for (i = 0; i < KFREE_BAND_NUM; i++) {
+			for (j = 0; j < 2; j++)
+				ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b power_trim_data->bb_gain[%d][%d]=0x%X\n", i, j, p_power_trim_info->bb_gain[i][j]));
 		}
-
-		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b power trim flag:0x%02x\n", p_power_trim_info->flag));
-
-		if (p_power_trim_info->flag & KFREE_FLAG_ON) {
-			for (i = 0; i < KFREE_BAND_NUM; i++) {
-				for (j = 0; j < 2; j++)
-					ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] 8822b power_trim_data->bb_gain[%d][%d]=0x%X\n", i, j, p_power_trim_info->bb_gain[i][j]));
-			}
-		}
-#if 0
-	} else
-		return;
-#endif
+	}
 }
-
-
 
 static void
 phydm_set_pa_bias_to_rf_8822b(

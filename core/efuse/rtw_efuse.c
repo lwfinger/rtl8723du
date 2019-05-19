@@ -2622,14 +2622,6 @@ int retriveAdaptorInfoFile(char *path, u8 *efuse_data)
 			ret = _SUCCESS;
 		else
 			ret = _FAIL;
-
-#if 0
-		if (isAdaptorInfoFileValid())
-			return 0;
-		else
-			return _FAIL;
-#endif
-
 	} else {
 		RTW_INFO("%s NULL pointer\n", __FUNCTION__);
 		ret = _FAIL;

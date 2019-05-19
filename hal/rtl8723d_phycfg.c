@@ -613,40 +613,6 @@ PHY_BBConfig8723D(
 
 	return rtStatus;
 }
-#if 0
-/* Block & Path enable */
-#define		rOFDMCCKEN_Jaguar		0x808 /* OFDM/CCK block enable */
-#define		bOFDMEN_Jaguar			0x20000000
-#define		bCCKEN_Jaguar			0x10000000
-#define		rRxPath_Jaguar			0x808	/* Rx antenna */
-#define		bRxPath_Jaguar			0xff
-#define		rTxPath_Jaguar			0x80c	/* Tx antenna */
-#define		bTxPath_Jaguar			0x0fffffff
-#define		rCCK_RX_Jaguar			0xa04	/* for cck rx path selection */
-#define		bCCK_RX_Jaguar			0x0c000000
-#define		rVhtlen_Use_Lsig_Jaguar	0x8c3	/* Use LSIG for VHT length */
-VOID
-PHY_BB8723D_Config_1T(
-	IN PADAPTER Adapter
-)
-{
-	/* BB OFDM RX Path_A */
-	phy_set_bb_reg(Adapter, rRxPath_Jaguar, bRxPath_Jaguar, 0x11);
-	/* BB OFDM TX Path_A */
-	phy_set_bb_reg(Adapter, rTxPath_Jaguar, bMaskLWord, 0x1111);
-	/* BB CCK R/Rx Path_A */
-	phy_set_bb_reg(Adapter, rCCK_RX_Jaguar, bCCK_RX_Jaguar, 0x0);
-	/* MCS support */
-	phy_set_bb_reg(Adapter, 0x8bc, 0xc0000060, 0x4);
-	/* RF Path_B HSSI OFF */
-	phy_set_bb_reg(Adapter, 0xe00, 0xf, 0x4);
-	/* RF Path_B Power Down */
-	phy_set_bb_reg(Adapter, 0xe90, bMaskDWord, 0);
-	/* ADDA Path_B OFF */
-	phy_set_bb_reg(Adapter, 0xe60, bMaskDWord, 0);
-	phy_set_bb_reg(Adapter, 0xe64, bMaskDWord, 0);
-}
-#endif
 
 int
 PHY_RFConfig8723D(
@@ -843,17 +809,7 @@ PHY_GetTxPowerLevel8723D(
 	OUT s32				*powerlevel
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
-	s32				TxPwrDbm = 13;
-#if 0
-
-	if (pMgntInfo->ClientConfigPwrInDbm != UNSPECIFIED_PWR_DBM)
-		*powerlevel = pMgntInfo->ClientConfigPwrInDbm;
-	else
-		*powerlevel = TxPwrDbm;
-#endif
 }
-
 
 /* <20160217, Jessica> A workaround to eliminate the 2472MHz & 2484MHz spur of 8723D. */
 static VOID
@@ -1180,23 +1136,11 @@ PHY_HandleSwChnlAndSetBW8723D(
 		}
 	}
 
-	if (bSetBandWidth) {
-#if 0
-		if (bInitialzed == _FALSE) {
-			bInitialzed = _TRUE;
-			pHalData->bSetChnlBW = _TRUE;
-		} else if ((pHalData->current_channel_bw != ChnlWidth) || (pHalData->nCur40MhzPrimeSC != ExtChnlOffsetOf40MHz) || (pHalData->CurrentCenterFrequencyIndex1 != CenterFrequencyIndex1))
-			pHalData->bSetChnlBW = _TRUE;
-#else
+	if (bSetBandWidth)
 		pHalData->bSetChnlBW = _TRUE;
-#endif
-	}
 
-	if (!pHalData->bSetChnlBW && !pHalData->bSwChnl) {
-		/* RTW_INFO("<= PHY_HandleSwChnlAndSetBW8812: bSwChnl %d, bSetChnlBW %d\n",pHalData->bSwChnl,pHalData->bSetChnlBW); */
+	if (!pHalData->bSetChnlBW && !pHalData->bSwChnl)
 		return;
-	}
-
 
 	if (pHalData->bSwChnl) {
 		pHalData->current_channel = ChannelNum;
@@ -1206,24 +1150,8 @@ PHY_HandleSwChnlAndSetBW8723D(
 
 	if (pHalData->bSetChnlBW) {
 		pHalData->current_channel_bw = ChnlWidth;
-#if 0
-		if (ExtChnlOffsetOf40MHz == EXTCHNL_OFFSET_LOWER)
-			pHalData->nCur40MhzPrimeSC = HAL_PRIME_CHNL_OFFSET_UPPER;
-		else if (ExtChnlOffsetOf40MHz == EXTCHNL_OFFSET_UPPER)
-			pHalData->nCur40MhzPrimeSC = HAL_PRIME_CHNL_OFFSET_LOWER;
-		else
-			pHalData->nCur40MhzPrimeSC = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
-
-		if (ExtChnlOffsetOf80MHz == EXTCHNL_OFFSET_LOWER)
-			pHalData->nCur80MhzPrimeSC = HAL_PRIME_CHNL_OFFSET_UPPER;
-		else if (ExtChnlOffsetOf80MHz == EXTCHNL_OFFSET_UPPER)
-			pHalData->nCur80MhzPrimeSC = HAL_PRIME_CHNL_OFFSET_LOWER;
-		else
-			pHalData->nCur80MhzPrimeSC = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
-#else
 		pHalData->nCur40MhzPrimeSC = ExtChnlOffsetOf40MHz;
 		pHalData->nCur80MhzPrimeSC = ExtChnlOffsetOf80MHz;
-#endif
 
 		pHalData->CurrentCenterFrequencyIndex1 = CenterFrequencyIndex1;
 	}

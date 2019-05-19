@@ -143,19 +143,6 @@ u8 rtw_do_join(_adapter *padapter)
 			} else {
 				/* can't associate ; reset under-linking			 */
 				_clr_fwstate_(pmlmepriv, _FW_UNDER_LINKING);
-
-#if 0
-				if ((check_fwstate(pmlmepriv, WIFI_STATION_STATE) == _TRUE)) {
-					if (_rtw_memcmp(pmlmepriv->cur_network.network.Ssid.Ssid, pmlmepriv->assoc_ssid.Ssid, pmlmepriv->assoc_ssid.SsidLength)) {
-						/* for funk to do roaming */
-						/* funk will reconnect, but funk will not sitesurvey before reconnect */
-						if (pmlmepriv->sitesurveyctrl.traffic_busy == _FALSE)
-							rtw_sitesurvey_cmd(padapter, &parm);
-					}
-
-				}
-#endif
-
 				/* when set_ssid/set_bssid for rtw_do_join(), but there are no desired bss in scanning queue */
 				/* we try to issue sitesurvey firstly			 */
 				if (pmlmepriv->LinkDetectInfo.bBusyTraffic == _FALSE

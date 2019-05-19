@@ -181,15 +181,6 @@ void rtw_enable_tdls_func(_adapter *padapter)
 {
 	if (rtw_is_tdls_enabled(padapter) == _TRUE)
 		return;
-
-#if 0
-#ifdef CONFIG_MCC_MODE
-	if (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC) == _TRUE) {
-		RTW_INFO("[TDLS] MCC is running, can't enable TDLS !\n");
-		return;
-	}
-#endif
-#endif
 	rtw_set_tdls_enable(padapter, _TRUE);
 }
 
@@ -349,20 +340,6 @@ int issue_nulldata_to_TDLS_peer_STA(_adapter *padapter, unsigned char *da, unsig
 	systime start = rtw_get_current_time();
 	struct mlme_ext_priv	*pmlmeext = &(padapter->mlmeextpriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
-
-#if 0
-	psta = rtw_get_stainfo(&padapter->stapriv, da);
-	if (psta) {
-		if (power_mode)
-			rtw_hal_macid_sleep(padapter, psta->cmn.mac_id);
-		else
-			rtw_hal_macid_wakeup(padapter, psta->cmn.mac_id);
-	} else {
-		RTW_INFO(FUNC_ADPT_FMT ": Can't find sta info for " MAC_FMT ", skip macid %s!!\n",
-			FUNC_ADPT_ARG(padapter), MAC_ARG(da), power_mode ? "sleep" : "wakeup");
-		rtw_warn_on(1);
-	}
-#endif
 
 	do {
 		ret = _issue_nulldata_to_TDLS_peer_STA(padapter, da, power_mode, wait_ms);
@@ -2178,20 +2155,6 @@ int On_TDLS_Teardown(_adapter *padapter, union recv_frame *precv_frame, struct s
 	return _SUCCESS;
 
 }
-
-#if 0
-u8 TDLS_check_ch_state(uint state)
-{
-	if (state & TDLS_CH_SWITCH_ON_STATE &&
-	    state & TDLS_PEER_AT_OFF_STATE) {
-		if (state & TDLS_PEER_SLEEP_STATE)
-			return 2;	/* U-APSD + ch. switch */
-		else
-			return 1;	/* ch. switch */
-	} else
-		return 0;
-}
-#endif
 
 int On_TDLS_Peer_Traffic_Indication(_adapter *padapter, union recv_frame *precv_frame, struct sta_info *ptdls_sta)
 {
