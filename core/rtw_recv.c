@@ -729,18 +729,16 @@ static sint recv_decache(union recv_frame *precv_frame, u8 bretry)
 	if (tid > 15)
 		return _FAIL;
 
-	if (1) { /* if(bretry) */
-		if (seq_ctrl == prxcache->tid_rxseq[tid]) {
-			/* for non-AMPDU case	*/
-			sta->sta_stats.duplicate_cnt++;
+	if (seq_ctrl == prxcache->tid_rxseq[tid]) {
+		/* for non-AMPDU case	*/
+		sta->sta_stats.duplicate_cnt++;
 
-			if (sta->sta_stats.duplicate_cnt % 100 == 0)
-				RTW_INFO("%s: tid=%u seq=%d frag=%d\n", __func__
-					, tid, precv_frame->u.hdr.attrib.seq_num
-					, precv_frame->u.hdr.attrib.frag_num);
+		if (sta->sta_stats.duplicate_cnt % 100 == 0)
+			RTW_INFO("%s: tid=%u seq=%d frag=%d\n", __func__
+				, tid, precv_frame->u.hdr.attrib.seq_num
+				, precv_frame->u.hdr.attrib.frag_num);
 
-			return _FAIL;
-		}
+		return _FAIL;
 	}
 
 	prxcache->tid_rxseq[tid] = seq_ctrl;
@@ -2129,20 +2127,6 @@ sint validate_recv_frame(_adapter *adapter, union recv_frame *precv_frame)
 		ptdlsinfo->collect_pkt_num[ptdlsinfo->cur_channel - 1]++;
 #endif /* CONFIG_TDLS */
 
-#ifdef RTK_DMP_PLATFORM
-	if (0) {
-		RTW_INFO("++\n");
-		{
-			int i;
-			for (i = 0; i < 64; i = i + 8)
-				RTW_INFO("%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:", *(ptr + i),
-					*(ptr + i + 1), *(ptr + i + 2) , *(ptr + i + 3) , *(ptr + i + 4), *(ptr + i + 5), *(ptr + i + 6), *(ptr + i + 7));
-
-		}
-		RTW_INFO("--\n");
-	}
-#endif /* RTK_DMP_PLATFORM */
-
 	/* add version chk */
 	if (ver != 0) {
 		retval = _FAIL;
@@ -3447,8 +3431,6 @@ static sint fill_radiotap_hdr(_adapter *padapter, union recv_frame *precvframe, 
 
 	/* flags */
 	rtap_hdr->it_present |= cpu_to_le32(1 << IEEE80211_RADIOTAP_FLAGS);
-	if (0)
-		hdr_buf[rt_len] |= IEEE80211_RADIOTAP_F_CFP;
 
 	if ((pattrib->encrypt == 1) || (pattrib->encrypt == 5))
 		hdr_buf[rt_len] |= IEEE80211_RADIOTAP_F_WEP;
@@ -3458,10 +3440,6 @@ static sint fill_radiotap_hdr(_adapter *padapter, union recv_frame *precvframe, 
 
 	/* always append FCS */
 	hdr_buf[rt_len] |= IEEE80211_RADIOTAP_F_FCS;
-
-
-	if (0)
-		hdr_buf[rt_len] |= IEEE80211_RADIOTAP_F_DATAPAD;
 
 	if (pattrib->crc_err)
 		hdr_buf[rt_len] |= IEEE80211_RADIOTAP_F_BADFCS;

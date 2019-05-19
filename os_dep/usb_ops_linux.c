@@ -951,8 +951,6 @@ u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
 		#endif
 
 		if (precvbuf->pskb == NULL) {
-			if (0)
-				RTW_INFO("usb_read_port() enqueue precvbuf=%p\n", precvbuf);
 			/* enqueue precvbuf and wait for free skb */
 			rtw_enqueue_recvbuf(precvbuf, &precvpriv->recv_buf_pending_queue);
 			goto exit;

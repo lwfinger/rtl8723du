@@ -1328,8 +1328,6 @@ static s32 update_attrib(_adapter *padapter, _pkt *pkt, struct pkt_attrib *pattr
 				if (pattrib->pktlen > 282) { /* MINIMUM_DHCP_PACKET_SIZE */
 					pattrib->dhcp_pkt = 1;
 					DBG_COUNTER(padapter->tx_logs.core_tx_upd_attrib_dhcp);
-					if (0)
-						RTW_INFO("send DHCP packet\n");
 				}
 			}
 

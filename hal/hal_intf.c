@@ -328,8 +328,7 @@ s32 rtw_hal_fw_mem_dl(_adapter *padapter, enum fw_mem mem)
 
 	if (rst == _FALSE)
 		pdbgpriv->dbg_fw_mem_dl_error_cnt++;
-	if (1)
-		RTW_INFO("%s dbg_fw_mem_dl_error_cnt:%d\n", __func__, pdbgpriv->dbg_fw_mem_dl_error_cnt);
+	RTW_INFO("%s dbg_fw_mem_dl_error_cnt:%d\n", __func__, pdbgpriv->dbg_fw_mem_dl_error_cnt);
 	return rst;
 }
 #endif
@@ -535,11 +534,6 @@ void	rtw_hal_set_chnl_bw(_adapter *padapter, u8 channel, enum channel_width Band
 	pHalData->cch_80 = cch_80;
 	pHalData->cch_40 = cch_40;
 	pHalData->cch_20 = cch_20;
-
-	if (0)
-		RTW_INFO("%s cch:%u, %s, offset40:%u, offset80:%u (%u, %u, %u)\n", __func__
-			, channel, ch_width_str(Bandwidth), Offset40, Offset80
-			, pHalData->cch_80, pHalData->cch_40, pHalData->cch_20);
 
 	padapter->hal_func.set_chnl_bw_handler(padapter, channel, Bandwidth, Offset40, Offset80);
 }

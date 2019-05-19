@@ -4997,17 +4997,12 @@ static int rtw_p2p_set_sa(struct net_device *dev,
 
 	RTW_INFO("[%s] data = %s\n", __FUNCTION__, extra);
 
-	if (0) {
-		RTW_INFO("[%s] WiFi Direct is disable!\n", __FUNCTION__);
-		return ret;
-	} else {
-		if (extra[0] == '0')	/*	Disable the session available. */
-			pwdinfo->session_available = _FALSE;
-		else if (extra[0] == '1')	/*	Enable the session available. */
-			pwdinfo->session_available = _TRUE;
-		else
-			pwdinfo->session_available = _FALSE;
-	}
+	if (extra[0] == '0')	/*	Disable the session available. */
+		pwdinfo->session_available = _FALSE;
+	else if (extra[0] == '1')	/*	Enable the session available. */
+		pwdinfo->session_available = _TRUE;
+	else
+		pwdinfo->session_available = _FALSE;
 	printk("[%s] session available = %d\n", __FUNCTION__, pwdinfo->session_available);
 
 exit:
@@ -6998,21 +6993,10 @@ static int rtw_set_hidden_ssid(struct net_device *dev, struct ieee_param *param,
 		_rtw_memcpy(ssid, ssid_ie + 2, ssid_len);
 		ssid[ssid_len] = 0x0;
 
-		if (0)
-			RTW_INFO(FUNC_ADPT_FMT" ssid:(%s,%d), from ie:(%s,%d), (%s,%d)\n", FUNC_ADPT_ARG(adapter),
-				ssid, ssid_len,
-				pbss_network->Ssid.Ssid, pbss_network->Ssid.SsidLength,
-				pbss_network_ext->Ssid.Ssid, pbss_network_ext->Ssid.SsidLength);
-
 		_rtw_memcpy(pbss_network->Ssid.Ssid, (void *)ssid, ssid_len);
 		pbss_network->Ssid.SsidLength = ssid_len;
 		_rtw_memcpy(pbss_network_ext->Ssid.Ssid, (void *)ssid, ssid_len);
 		pbss_network_ext->Ssid.SsidLength = ssid_len;
-
-		if (0)
-			RTW_INFO(FUNC_ADPT_FMT" after ssid:(%s,%d), (%s,%d)\n", FUNC_ADPT_ARG(adapter),
-				pbss_network->Ssid.Ssid, pbss_network->Ssid.SsidLength,
-				pbss_network_ext->Ssid.Ssid, pbss_network_ext->Ssid.SsidLength);
 	}
 
 	RTW_INFO(FUNC_ADPT_FMT" ignore_broadcast_ssid:%d, %s,%d\n", FUNC_ADPT_ARG(adapter),

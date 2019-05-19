@@ -1189,8 +1189,7 @@ void rtw_restore_mac_addr(_adapter *adapter)
 			rtw_hal_set_hwreg(iface, HW_VAR_MAC_ADDR, adapter_mac_addr(iface));
 	}
 #endif
-	if (1)
-		rtw_hal_dump_macaddr(RTW_DBGDUMP, adapter);
+	rtw_hal_dump_macaddr(RTW_DBGDUMP, adapter);
 }
 
 void rtw_init_hal_com_default_value(PADAPTER Adapter)
@@ -1233,11 +1232,6 @@ s32 c2h_evt_read_88xx(_adapter *adapter, u8 *buf)
 	SET_C2H_ID_88XX(buf, rtw_read8(adapter, REG_C2HEVT_MSG_NORMAL));
 	SET_C2H_SEQ_88XX(buf, rtw_read8(adapter, REG_C2HEVT_CMD_SEQ_88XX));
 	SET_C2H_PLEN_88XX(buf, rtw_read8(adapter, REG_C2HEVT_CMD_LEN_88XX));
-
-	if (0) {
-		RTW_INFO("%s id=0x%02x, seq=%u, plen=%u, trigger=0x%02x\n", __func__
-			, C2H_ID_88XX(buf), C2H_SEQ_88XX(buf), C2H_PLEN_88XX(buf), trigger);
-	}
 
 	/* Read the content */
 	for (i = 0; i < C2H_PLEN_88XX(buf); i++)
@@ -1341,9 +1335,6 @@ void c2h_iqk_offload(_adapter *adapter, u8 *data, u8 len)
 	struct submit_ctx *iqk_sctx = &hal_data->iqk_sctx;
 
 	RTW_INFO("IQK offload finish in %dms\n", rtw_get_passing_time_ms(iqk_sctx->submit_time));
-	if (0)
-		RTW_INFO_DUMP("C2H_IQK_FINISH: ", data, len);
-
 	rtw_sctx_done(&iqk_sctx);
 }
 
@@ -4781,10 +4772,6 @@ u8 SetHwReg(_adapter *adapter, u8 variable, u8 *val)
 			REG_RXFLTMAP1, rtw_read16(adapter, REG_RXFLTMAP1));
 		break;
 	default:
-		if (0)
-			RTW_PRINT(FUNC_ADPT_FMT" variable(%d) not defined!\n",
-				  FUNC_ADPT_ARG(adapter), variable);
-		ret = _FAIL;
 		break;
 	}
 
@@ -4858,9 +4845,6 @@ void GetHwReg(_adapter *adapter, u8 variable, u8 *val)
 		break;
 
 	default:
-		if (0)
-			RTW_PRINT(FUNC_ADPT_FMT" variable(%d) not defined!\n",
-				  FUNC_ADPT_ARG(adapter), variable);
 		break;
 	}
 

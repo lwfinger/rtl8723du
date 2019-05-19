@@ -1109,16 +1109,6 @@ static s16 _rtw_camid_search(_adapter *adapter, u8 *addr, s16 kid, s8 gk)
 			break;
 		}
 	}
-
-	if (0) {
-		if (addr)
-			RTW_INFO(FUNC_ADPT_FMT" addr:"MAC_FMT" kid:%d, gk:%d, return cam_id:%d\n"
-				, FUNC_ADPT_ARG(adapter), MAC_ARG(addr), kid, gk, cam_id);
-		else
-			RTW_INFO(FUNC_ADPT_FMT" addr:%p kid:%d, gk:%d, return cam_id:%d\n"
-				, FUNC_ADPT_ARG(adapter), addr, kid, gk, cam_id);
-	}
-
 	return cam_id;
 }
 
@@ -1225,9 +1215,8 @@ s16 rtw_camid_alloc(_adapter *adapter, struct sta_info *sta, u8 kid, bool *used)
 		u8 *addr = adapter_mac_addr(adapter);
 
 		cam_id = rtw_get_camid(adapter, sta, addr, kid);
-		if (1)
-			RTW_PRINT(FUNC_ADPT_FMT" group key with "MAC_FMT" assigned cam_id:%u\n"
-				, FUNC_ADPT_ARG(adapter), MAC_ARG(addr), cam_id);
+		RTW_PRINT(FUNC_ADPT_FMT" group key with "MAC_FMT" assigned cam_id:%u\n"
+			, FUNC_ADPT_ARG(adapter), MAC_ARG(addr), cam_id);
 #endif
 	} else {
 		/*
@@ -1296,8 +1285,7 @@ inline void rtw_sec_cam_swap(_adapter *adapter, u8 cam_id_a, u8 cam_id_b)
 	_irqL irqL;
 	bool cam_a_used, cam_b_used;
 
-	if (1)
-		RTW_INFO(ADPT_FMT" - sec_cam %d,%d swap\n", ADPT_ARG(adapter), cam_id_a, cam_id_b);
+	RTW_INFO(ADPT_FMT" - sec_cam %d,%d swap\n", ADPT_ARG(adapter), cam_id_a, cam_id_b);
 
 	if (cam_id_a == cam_id_b)
 		return;
@@ -3115,13 +3103,6 @@ ext_rate:
 	if (*rate_num == 0)
 		return _FAIL;
 
-	if (0) {
-		int i;
-
-		for (i = 0; i < *rate_num; i++)
-			RTW_INFO("rate:0x%02x\n", *(rate_set + i));
-	}
-
 	return _SUCCESS;
 }
 
@@ -3667,8 +3648,6 @@ inline void rtw_macid_ctl_set_h2c_msr(struct macid_ctl_t *macid_ctl, u8 id, u8 h
 	}
 
 	macid_ctl->h2c_msr[id] = h2c_msr;
-	if (0)
-		RTW_INFO("macid:%u, h2c_msr:"H2C_MSR_FMT"\n", id, H2C_MSR_ARG(&macid_ctl->h2c_msr[id]));
 }
 
 inline void rtw_macid_ctl_set_bw(struct macid_ctl_t *macid_ctl, u8 id, u8 bw)
@@ -3679,8 +3658,6 @@ inline void rtw_macid_ctl_set_bw(struct macid_ctl_t *macid_ctl, u8 id, u8 bw)
 	}
 
 	macid_ctl->bw[id] = bw;
-	if (0)
-		RTW_INFO("macid:%u, bw:%s\n", id, ch_width_str(macid_ctl->bw[id]));
 }
 
 inline void rtw_macid_ctl_set_vht_en(struct macid_ctl_t *macid_ctl, u8 id, u8 en)
@@ -3691,8 +3668,6 @@ inline void rtw_macid_ctl_set_vht_en(struct macid_ctl_t *macid_ctl, u8 id, u8 en
 	}
 
 	macid_ctl->vht_en[id] = en;
-	if (0)
-		RTW_INFO("macid:%u, vht_en:%u\n", id, macid_ctl->vht_en[id]);
 }
 
 inline void rtw_macid_ctl_set_rate_bmp0(struct macid_ctl_t *macid_ctl, u8 id, u32 bmp)
@@ -3703,8 +3678,6 @@ inline void rtw_macid_ctl_set_rate_bmp0(struct macid_ctl_t *macid_ctl, u8 id, u3
 	}
 
 	macid_ctl->rate_bmp0[id] = bmp;
-	if (0)
-		RTW_INFO("macid:%u, rate_bmp0:0x%08X\n", id, macid_ctl->rate_bmp0[id]);
 }
 
 inline void rtw_macid_ctl_set_rate_bmp1(struct macid_ctl_t *macid_ctl, u8 id, u32 bmp)
@@ -3715,8 +3688,6 @@ inline void rtw_macid_ctl_set_rate_bmp1(struct macid_ctl_t *macid_ctl, u8 id, u3
 	}
 
 	macid_ctl->rate_bmp1[id] = bmp;
-	if (0)
-		RTW_INFO("macid:%u, rate_bmp1:0x%08X\n", id, macid_ctl->rate_bmp1[id]);
 }
 
 inline void rtw_macid_ctl_init_sleep_reg(struct macid_ctl_t *macid_ctl, u16 m0, u16 m1, u16 m2, u16 m3)

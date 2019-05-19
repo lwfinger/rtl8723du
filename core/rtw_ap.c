@@ -1885,11 +1885,6 @@ int rtw_check_beacon_data(_adapter *padapter, u8 *pbuf,  int len)
 		HT_CAP_AMPDU_FACTOR max_rx_ampdu_factor = MAX_AMPDU_FACTOR_64K;
 		struct rtw_ieee80211_ht_cap *pht_cap = (struct rtw_ieee80211_ht_cap *)(p + 2);
 
-		if (0) {
-			RTW_INFO(FUNC_ADPT_FMT" HT_CAP_IE from upper layer:\n", FUNC_ADPT_ARG(padapter));
-			dump_ht_cap_ie_content(RTW_DBGDUMP, p + 2, ie_len);
-		}
-
 		pHT_caps_ie = p;
 
 		ht_cap = _TRUE;
@@ -1958,11 +1953,6 @@ int rtw_check_beacon_data(_adapter *padapter, u8 *pbuf,  int len)
 		}
 
 		_rtw_memcpy(&pmlmepriv->htpriv.ht_cap, p + 2, ie_len);
-
-		if (0) {
-			RTW_INFO(FUNC_ADPT_FMT" HT_CAP_IE driver masked:\n", FUNC_ADPT_ARG(padapter));
-			dump_ht_cap_ie_content(RTW_DBGDUMP, p + 2, ie_len);
-		}
 	}
 
 	/* parsing HT_INFO_IE */
@@ -2815,8 +2805,6 @@ void _update_beacon(_adapter *padapter, u8 ie_id, u8 *oui, u8 tx, const char *ta
 #ifndef CONFIG_INTERRUPT_BASED_TXBCN
 	if (tx) {
 		/* send_beacon(padapter); */ /* send_beacon must execute on TSR level */
-		if (0)
-			RTW_INFO(FUNC_ADPT_FMT" ie_id:%u - %s\n", FUNC_ADPT_ARG(padapter), ie_id, tag);
 		set_tx_beacon_cmd(padapter);
 	}
 #endif /* !CONFIG_INTERRUPT_BASED_TXBCN */
@@ -3979,14 +3967,8 @@ update_bss_chbw:
 	    || mlmeext->cur_ch_offset != dec_offset)
 		changed = _TRUE;
 
-	if (changed == _TRUE && rtw_linked_check(adapter) == _TRUE) {
-#ifdef CONFIG_SPCT_CH_SWITCH
-		if (1)
-			rtw_ap_inform_ch_switch(adapter, dec_ch, dec_offset);
-		else
-#endif
-			rtw_sta_flush(adapter, _FALSE);
-	}
+	if (changed == _TRUE && rtw_linked_check(adapter) == _TRUE)
+		rtw_sta_flush(adapter, _FALSE);
 
 	mlmeext->cur_channel = dec_ch;
 	mlmeext->cur_bwmode = dec_bw;

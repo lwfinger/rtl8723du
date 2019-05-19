@@ -1255,8 +1255,6 @@ u8 rtw_chset_is_chbw_valid(RT_CHANNEL_INFO *ch_set, u8 ch, u8 bw, u8 offset)
 		goto exit;
 
 	for (i = 0; i < op_ch_num; i++) {
-		if (0)
-			RTW_INFO("%u,%u,%u - cch:%u, bw:%u, op_ch:%u\n", ch, bw, offset, cch, bw, *(op_chs + i));
 		if (rtw_chset_search_ch(ch_set, *(op_chs + i)) == -1)
 			break;
 	}
@@ -2046,10 +2044,6 @@ static void rtw_check_legacy_ap(_adapter *padapter, u8 *pframe, u32 len)
 
 		/* for legacy ap */
 		if (elems.ht_capabilities == NULL && elems.ht_capabilities_len == 0) {
-
-			if (0)
-				RTW_INFO("%s: "MAC_FMT" is legacy ap\n", __func__, MAC_ARG(GetAddr3Ptr(pframe)));
-
 			ATOMIC_SET(&pmlmepriv->olbc, _TRUE);
 			ATOMIC_SET(&pmlmepriv->olbc_ht, _TRUE);
 		}
@@ -7375,14 +7369,6 @@ unsigned int OnAction_sa_query(_adapter *padapter, union recv_frame *precv_frame
 	default:
 		break;
 	}
-	if (0) {
-		int pp;
-		printk("pattrib->pktlen = %d =>", pattrib->pkt_len);
-		for (pp = 0; pp < pattrib->pkt_len; pp++)
-			printk(" %02x ", pframe[pp]);
-		printk("\n");
-	}
-
 	return _SUCCESS;
 }
 #endif /* CONFIG_IEEE80211W */
@@ -10641,8 +10627,6 @@ unsigned int send_beacon(_adapter *padapter)
 
 		if (passing_time > 100 || issue > 3)
 			RTW_INFO("%s success, issue:%d, poll:%d, %u ms\n", __FUNCTION__, issue, poll, rtw_get_passing_time_ms(start));
-		else if (0)
-			RTW_INFO("%s success, issue:%d, poll:%d, %u ms\n", __FUNCTION__, issue, poll, rtw_get_passing_time_ms(start));
 
 		rtw_hal_fw_correct_bcn(padapter);
 
@@ -13872,9 +13856,6 @@ static u8 rtw_scan_sparse(_adapter *adapter, struct rtw_ieee80211_channel *ch, u
 		scan_division_num = (ch_num / max_allow_ch) + ((ch_num % max_allow_ch) ? 1 : 0);
 		token = (token + 1) % scan_division_num;
 
-		if (0)
-			RTW_INFO("scan_division_num:%u, token:%u\n", scan_division_num, token);
-
 		for (i = 0; i < ch_num; i++) {
 			if (ch[i].hw_value && (i % scan_division_num) == token
 			   ) {
@@ -13947,10 +13928,6 @@ static int rtw_scan_ch_decision(_adapter *padapter, struct rtw_ieee80211_channel
 	/* acquire channels from in */
 	j = 0;
 	for (i = 0; i < in_num; i++) {
-
-		if (0)
-			RTW_INFO(FUNC_ADPT_FMT" "CHAN_FMT"\n", FUNC_ADPT_ARG(padapter), CHAN_ARG(&in[i]));
-
 		if (!in[i].hw_value || (in[i].flags & RTW_IEEE80211_CHAN_DISABLED))
 			continue;
 		if (rtw_mlme_band_check(padapter, in[i].hw_value) == _FALSE)
@@ -13982,10 +13959,6 @@ static int rtw_scan_ch_decision(_adapter *padapter, struct rtw_ieee80211_channel
 			if (rtw_mlme_band_check(padapter, chan) == _TRUE) {
 				if (rtw_mlme_ignore_chan(padapter, chan) == _TRUE)
 					continue;
-
-				if (0)
-					RTW_INFO(FUNC_ADPT_FMT" ch:%u\n", FUNC_ADPT_ARG(padapter), chan);
-
 				if (j >= out_num) {
 					RTW_PRINT(FUNC_ADPT_FMT" out_num:%u not enough\n",
 						FUNC_ADPT_ARG(padapter), out_num);
@@ -14276,18 +14249,11 @@ static void survey_done_set_ch_bw(_adapter *padapter)
 	u8 cur_ch_offset;
 
 #ifdef CONFIG_MCC_MODE
-	if (!rtw_hal_mcc_change_scan_flag(padapter, &cur_channel, &cur_bwmode, &cur_ch_offset)) {
-		if (0)
-			RTW_INFO(FUNC_ADPT_FMT" back to AP channel - ch:%u, bw:%u, offset:%u\n",
-				FUNC_ADPT_ARG(padapter), cur_channel, cur_bwmode, cur_ch_offset);
+	if (!rtw_hal_mcc_change_scan_flag(padapter, &cur_channel, &cur_bwmode, &cur_ch_offset))
 		goto exit;
-	}
 #endif
 
 	if (rtw_mi_get_ch_setting_union(padapter, &cur_channel, &cur_bwmode, &cur_ch_offset) != 0) {
-		if (0)
-			RTW_INFO(FUNC_ADPT_FMT" back to linked/linking union - ch:%u, bw:%u, offset:%u\n",
-				FUNC_ADPT_ARG(padapter), cur_channel, cur_bwmode, cur_ch_offset);
 	} else {
 #ifdef CONFIG_P2P
 		struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
@@ -14308,9 +14274,6 @@ static void survey_done_set_ch_bw(_adapter *padapter)
 				cur_channel = iface->wdinfo.listen_channel;
 				cur_bwmode = CHANNEL_WIDTH_20;
 				cur_ch_offset = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
-				if (0)
-					RTW_INFO(FUNC_ADPT_FMT" back to "ADPT_FMT"'s listen ch - ch:%u, bw:%u, offset:%u\n",
-						FUNC_ADPT_ARG(padapter), ADPT_ARG(iface), cur_channel, cur_bwmode, cur_ch_offset);
 				break;
 			}
 		}
@@ -14320,9 +14283,6 @@ static void survey_done_set_ch_bw(_adapter *padapter)
 			cur_channel = pmlmeext->cur_channel;
 			cur_bwmode = pmlmeext->cur_bwmode;
 			cur_ch_offset = pmlmeext->cur_ch_offset;
-			if (0)
-				RTW_INFO(FUNC_ADPT_FMT" back to ch:%u, bw:%u, offset:%u\n",
-					FUNC_ADPT_ARG(padapter), cur_channel, cur_bwmode, cur_ch_offset);
 		}
 	}
 exit:
@@ -15724,15 +15684,10 @@ connect_allow_hdl:
 				if (!iface || iface == adapter)
 					continue;
 
-				if ((MLME_IS_AP(iface) || MLME_IS_MESH(iface))
-					&& check_fwstate(mlme, WIFI_ASOC_STATE)
-				) {
-					#ifdef CONFIG_SPCT_CH_SWITCH
-					if (1)
-						rtw_ap_inform_ch_switch(iface, pmlmeext->cur_channel , pmlmeext->cur_ch_offset);
-					else
-					#endif
-						rtw_sta_flush(iface, _FALSE);
+				if ((MLME_IS_AP(iface) ||
+				     MLME_IS_MESH(iface)) &&
+				    check_fwstate(mlme, WIFI_ASOC_STATE)) {
+					rtw_sta_flush(iface, _FALSE);
 
 					rtw_hal_set_hwreg(iface, HW_VAR_CHECK_TXBUF, 0);
 					set_fwstate(mlme, WIFI_OP_CH_SWITCHING);

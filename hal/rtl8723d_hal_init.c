@@ -1273,23 +1273,6 @@ hal_ReadEFuse_WiFi(
 	/* 0xff will be efuse default value instead of 0x00. */
 	_rtw_memset(efuseTbl, 0xFF, EFUSE_MAX_MAP_LEN);
 
-
-#ifdef CONFIG_DEBUG
-	if (0) {
-		for (i = 0; i < 256; i++)
-			/* ReadEFuseByte(padapter, i, &efuseTbl[i], _FALSE); */
-			efuse_OneByteRead(padapter, i, &efuseTbl[i], _FALSE);
-		RTW_INFO("Efuse Content:\n");
-		for (i = 0; i < 256; i++) {
-			if (i % 16 == 0)
-				printk(KERN_ERR"\n");
-			printk(KERN_ERR"%02X ", efuseTbl[i]);
-		}
-		printk(KERN_ERR"\n");
-	}
-#endif
-
-
 	/* switch bank back to bank 0 for later BT and wifi use. */
 	hal_EfuseSwitchToBank(padapter, 0, bPseudoTest);
 

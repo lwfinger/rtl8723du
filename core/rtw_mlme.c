@@ -3229,8 +3229,6 @@ inline void rtw_clear_scan_deny(_adapter *adapter)
 {
 	struct mlme_priv *mlmepriv = &adapter->mlmepriv;
 	ATOMIC_SET(&mlmepriv->set_scan_deny, 0);
-	if (0)
-		RTW_INFO(FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(adapter));
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
@@ -3250,8 +3248,6 @@ void rtw_set_scan_deny_timer_hdl(void *FunctionContext)
 void rtw_set_scan_deny(_adapter *adapter, u32 ms)
 {
 	struct mlme_priv *mlmepriv = &adapter->mlmepriv;
-	if (0)
-		RTW_INFO(FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(adapter));
 	ATOMIC_SET(&mlmepriv->set_scan_deny, 1);
 	_set_timer(&mlmepriv->set_scan_deny_timer, ms);
 }
@@ -3547,13 +3543,6 @@ int rtw_select_and_join_from_scanned_queue(struct mlme_priv *pmlmepriv)
 		}
 
 		pmlmepriv->pscanned = get_next(pmlmepriv->pscanned);
-
-		if (0)
-			RTW_INFO("%s("MAC_FMT", ch%u) rssi:%d\n"
-				 , pnetwork->network.Ssid.Ssid
-				 , MAC_ARG(pnetwork->network.MacAddress)
-				 , pnetwork->network.Configuration.DSConfig
-				 , (int)pnetwork->network.Rssi);
 
 		rtw_check_join_candidate(pmlmepriv, &candidate, pnetwork);
 

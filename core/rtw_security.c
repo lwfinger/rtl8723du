@@ -1984,29 +1984,6 @@ u32	rtw_aes_decrypt(_adapter *padapter, u8 *precvframe)
 				prwskey = &stainfo->dot118021x_UncstKey.skey[0];
 
 			length = ((union recv_frame *)precvframe)->u.hdr.len - prxattrib->hdrlen - prxattrib->iv_len;
-#if 0
-			/*  add for CONFIG_IEEE80211W, debug */
-			if (0)
-				printk("@@@@@@@@@@@@@@@@@@ length=%d, prxattrib->hdrlen=%d, prxattrib->pkt_len=%d\n"
-				       , length, prxattrib->hdrlen, prxattrib->pkt_len);
-			if (0) {
-				int no;
-				/* test print PSK */
-				printk("PSK key below:\n");
-				for (no = 0; no < 16; no++)
-					printk(" %02x ", prwskey[no]);
-				printk("\n");
-			}
-			if (0) {
-				int no;
-				/* test print PSK */
-				printk("frame:\n");
-				for (no = 0; no < prxattrib->pkt_len; no++)
-					printk(" %02x ", pframe[no]);
-				printk("\n");
-			}
-#endif
-
 			res = aes_decipher(prwskey, prxattrib->hdrlen, pframe, length);
 
 			AES_SW_DEC_CNT_INC(psecuritypriv, prxattrib->ra);

@@ -4676,170 +4676,136 @@ static void halbtc8723d2ant_psd_showdata(IN struct btc_coexist *btcoexist)
 		delta_freq_per_point = psd_scan->psd_band_width /
 				       psd_scan->psd_point;
 
-	/* if (psd_scan->is_psd_show_max_only) */
-	if (0) {
-		psd_rep1 = psd_scan->psd_max_value / 100;
-		psd_rep2 = psd_scan->psd_max_value - psd_rep1 * 100;
+	m = psd_scan->psd_start_point;
+	n = psd_scan->psd_start_point;
+	i = 1;
+	j = 1;
 
-		freq = ((psd_scan->real_cent_freq - 20) * 1000000 +
-			psd_scan->psd_max_value_point * delta_freq_per_point);
-		freq1 = freq / 1000000;
-		freq2 = freq / 1000 - freq1 * 1000;
+	while (1) {
+		do {
+			freq = ((psd_scan->real_cent_freq - 20) *
+				1000000 + m *
+				delta_freq_per_point);
+			freq1 = freq / 1000000;
+			freq2 = freq / 1000 - freq1 * 1000;
 
-		if (freq2 < 100)
-			CL_SPRINTF(cli_buf, BT_TMP_BUF_SIZE,
-				   "\r\n Freq = %d.0%d MHz",
-				   freq1, freq2);
-		else
-			CL_SPRINTF(cli_buf, BT_TMP_BUF_SIZE,
-				   "\r\n Freq = %d.%d MHz",
-				   freq1, freq2);
-
-		if (psd_rep2 < 10)
-			CL_SPRINTF(cli_buf, BT_TMP_BUF_SIZE,
-				   ", Value = %d.0%d dB, (%d)\n",
-				   psd_rep1, psd_rep2, psd_scan->psd_max_value);
-		else
-			CL_SPRINTF(cli_buf, BT_TMP_BUF_SIZE,
-				   ", Value = %d.%d dB, (%d)\n",
-				   psd_rep1, psd_rep2, psd_scan->psd_max_value);
-
-		CL_PRINTF(cli_buf);
-	} else {
-		m = psd_scan->psd_start_point;
-		n = psd_scan->psd_start_point;
-		i = 1;
-		j = 1;
-
-		while (1) {
-			do {
-				freq = ((psd_scan->real_cent_freq - 20) *
-					1000000 + m *
-					delta_freq_per_point);
-				freq1 = freq / 1000000;
-				freq2 = freq / 1000 - freq1 * 1000;
-
-				if (i == 1) {
-					if (freq2 == 0)
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "\r\n Freq%6d.000",
-							   freq1);
-					else if (freq2 < 100)
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "\r\n Freq%6d.0%2d",
-							   freq1,
-							   freq2);
-					else
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "\r\n Freq%6d.%3d",
-							   freq1,
-							   freq2);
-				} else if ((i % 8 == 0) ||
-					   (m == psd_scan->psd_stop_point)) {
-					if (freq2 == 0)
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "%6d.000\n", freq1);
-					else if (freq2 < 100)
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "%6d.0%2d\n", freq1,
-							   freq2);
-					else
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "%6d.%3d\n", freq1,
-							   freq2);
-				} else {
-					if (freq2 == 0)
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "%6d.000", freq1);
-					else if (freq2 < 100)
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "%6d.0%2d", freq1,
-							   freq2);
-					else
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "%6d.%3d", freq1,
-							   freq2);
-				}
-
-				i++;
-				m++;
-				CL_PRINTF(cli_buf);
-
-			} while ((i <= 8) && (m <= psd_scan->psd_stop_point));
-
-
-			do {
-				psd_rep1 = psd_scan->psd_report_max_hold[n] /
-					   100;
-				psd_rep2 = psd_scan->psd_report_max_hold[n] -
-					   psd_rep1 *
-					   100;
-
-				if (j == 1) {
-					if (psd_rep2 < 10)
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "\r\n Val %7d.0%d",
-							   psd_rep1,
-							   psd_rep2);
-					else
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "\r\n Val %7d.%d",
-							   psd_rep1,
-							   psd_rep2);
-				} else if ((j % 8 == 0)  ||
-					   (n == psd_scan->psd_stop_point)) {
-					if (psd_rep2 < 10)
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							"%7d.0%d\n", psd_rep1,
-							   psd_rep2);
-					else
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "%7d.%d\n", psd_rep1,
-							   psd_rep2);
-				} else {
-					if (psd_rep2 < 10)
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "%7d.0%d", psd_rep1,
-							   psd_rep2);
-					else
-						CL_SPRINTF(cli_buf,
-							   BT_TMP_BUF_SIZE,
-							   "%7d.%d", psd_rep1,
-							   psd_rep2);
-				}
-
-				j++;
-				n++;
-				CL_PRINTF(cli_buf);
-
-			} while ((j <= 8) && (n <= psd_scan->psd_stop_point));
-
-			if ((m > psd_scan->psd_stop_point) ||
-			    (n > psd_scan->psd_stop_point))
-				break;
-			else {
-				i = 1;
-				j = 1;
+			if (i == 1) {
+				if (freq2 == 0)
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "\r\n Freq%6d.000",
+						   freq1);
+				else if (freq2 < 100)
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "\r\n Freq%6d.0%2d",
+						   freq1,
+						   freq2);
+				else
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "\r\n Freq%6d.%3d",
+						   freq1,
+						   freq2);
+			} else if ((i % 8 == 0) ||
+				   (m == psd_scan->psd_stop_point)) {
+				if (freq2 == 0)
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "%6d.000\n", freq1);
+				else if (freq2 < 100)
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "%6d.0%2d\n", freq1,
+						   freq2);
+				else
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "%6d.%3d\n", freq1,
+						   freq2);
+			} else {
+				if (freq2 == 0)
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "%6d.000", freq1);
+				else if (freq2 < 100)
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "%6d.0%2d", freq1,
+						   freq2);
+				else
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "%6d.%3d", freq1,
+						   freq2);
 			}
 
+			i++;
+			m++;
+			CL_PRINTF(cli_buf);
+
+		} while ((i <= 8) && (m <= psd_scan->psd_stop_point));
+
+
+		do {
+			psd_rep1 = psd_scan->psd_report_max_hold[n] /
+				   100;
+			psd_rep2 = psd_scan->psd_report_max_hold[n] -
+				   psd_rep1 *
+				   100;
+
+			if (j == 1) {
+				if (psd_rep2 < 10)
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "\r\n Val %7d.0%d",
+						   psd_rep1,
+						   psd_rep2);
+				else
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "\r\n Val %7d.%d",
+						   psd_rep1,
+						   psd_rep2);
+			} else if ((j % 8 == 0)  ||
+				   (n == psd_scan->psd_stop_point)) {
+				if (psd_rep2 < 10)
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						"%7d.0%d\n", psd_rep1,
+						   psd_rep2);
+				else
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "%7d.%d\n", psd_rep1,
+						   psd_rep2);
+			} else {
+				if (psd_rep2 < 10)
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "%7d.0%d", psd_rep1,
+						   psd_rep2);
+				else
+					CL_SPRINTF(cli_buf,
+						   BT_TMP_BUF_SIZE,
+						   "%7d.%d", psd_rep1,
+						   psd_rep2);
+			}
+
+			j++;
+			n++;
+			CL_PRINTF(cli_buf);
+
+		} while ((j <= 8) && (n <= psd_scan->psd_stop_point));
+
+		if ((m > psd_scan->psd_stop_point) ||
+		    (n > psd_scan->psd_stop_point))
+			break;
+		else {
+			i = 1;
+			j = 1;
 		}
 	}
-
-
 }
 
 static void halbtc8723d2ant_psd_maxholddata(IN struct btc_coexist *btcoexist,

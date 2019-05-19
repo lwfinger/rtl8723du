@@ -1619,9 +1619,6 @@ PHY_GetTxPowerIndexBase(
 
 	*bIn24G = phy_GetChnlIndex(Channel, &chnlIdx);
 
-	if (0)
-		RTW_INFO("[%s] Channel Index: %d\n", (*bIn24G ? "2.4G" : "5G"), chnlIdx);
-
 	if (*bIn24G) {
 		if (IS_CCK_RATE(Rate)) {
 			/* CCK-nTX */
@@ -2395,14 +2392,6 @@ PHY_GetTxPowerLimit(_adapter *adapter
 
 exit:
 
-	if (0) {
-		if (final_bw != bw && (IS_HT_RATE(rate) || IS_VHT_RATE(rate)))
-			RTW_INFO("%s min_lmt: %s ch%u -> %s ch%u\n"
-				, MGN_RATE_STR(rate)
-				, ch_width_str(bw), cch
-				, ch_width_str(final_bw), final_cch);
-	}
-
 	return min_lmt;
 }
 
@@ -2680,10 +2669,6 @@ phy_set_tx_power_limit(
 	u8 band = 0, bandwidth = 0, tlrs = 0, channel;
 	u8 ntx_idx;
 	s8 powerLimit = 0, prevPowerLimit, channelIndex;
-
-	if (0)
-		RTW_INFO("Index of power limit table [regulation %s][band %s][bw %s][rate section %s][ntx %s][chnl %s][val %s]\n"
-			, Regulation, Band, Bandwidth, RateSection, ntx, Channel, PowerLimit);
 
 	if (GetU1ByteIntegerFromStringInDecimal((char *)Channel, &channel) == _FALSE
 		|| GetS1ByteIntegerFromStringInDecimal((char *)PowerLimit, &powerLimit) == _FALSE

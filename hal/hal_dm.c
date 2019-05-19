@@ -838,26 +838,6 @@ void dump_sta_traffic(void *sel, _adapter *adapter, struct sta_info *psta)
 		, HDATA_RATE((ra_info->curr_tx_rate & 0x7F)), (curr_sgi) ? "S" : "L"
 		, HDATA_RATE((psta->curr_rx_rate & 0x7F)), HDATA_RATE((psta->curr_rx_rate_bmc & 0x7F)), psta->cmn.rssi_stat.rssi
 	);
-
-	if (0) {
-		RTW_PRINT_SEL(sel, "tx_bytes:%llu(%llu - %llu)\n"
-			, psta->sta_stats.tx_bytes - psta->sta_stats.last_tx_bytes
-			, psta->sta_stats.tx_bytes, psta->sta_stats.last_tx_bytes
-		);
-		RTW_PRINT_SEL(sel, "rx_uc_bytes:%llu(%llu - %llu)\n"
-			, sta_rx_uc_bytes(psta) - sta_last_rx_uc_bytes(psta)
-			, sta_rx_uc_bytes(psta), sta_last_rx_uc_bytes(psta)
-		);
-		RTW_PRINT_SEL(sel, "rx_mc_bytes:%llu(%llu - %llu)\n"
-			, psta->sta_stats.rx_mc_bytes - psta->sta_stats.last_rx_mc_bytes
-			, psta->sta_stats.rx_mc_bytes, psta->sta_stats.last_rx_mc_bytes
-		);
-		RTW_PRINT_SEL(sel, "rx_bc_bytes:%llu(%llu - %llu)\n"
-			, psta->sta_stats.rx_bc_bytes - psta->sta_stats.last_rx_bc_bytes
-			, psta->sta_stats.rx_bc_bytes, psta->sta_stats.last_rx_bc_bytes
-		);
-	}
-
 	RTW_PRINT_SEL(sel, "TP {Tx,Rx,Total} = { %d , %d , %d } Mbps\n",
 		(psta->sta_stats.tx_tp_mbytes << 3), (psta->sta_stats.rx_tp_mbytes << 3),
 		(psta->sta_stats.tx_tp_mbytes + psta->sta_stats.rx_tp_mbytes) << 3);
@@ -865,7 +845,6 @@ void dump_sta_traffic(void *sel, _adapter *adapter, struct sta_info *psta)
 	RTW_PRINT_SEL(sel, "Moving-AVG TP {Tx,Rx,Total} = { %d , %d , %d } Mbps\n\n",
 		(psta->cmn.tx_moving_average_tp << 3), (psta->cmn.rx_moving_average_tp << 3),
 		(psta->cmn.tx_moving_average_tp + psta->cmn.rx_moving_average_tp) << 3);
-
 }
 
 void dump_sta_info(void *sel, struct sta_info *psta)

@@ -600,9 +600,6 @@ static int rtw_cfg80211_clear_wps_sr_of_non_target_bss(_adapter *padapter, struc
 		psr = rtw_get_wps_attr_content(wpsie, wpsielen, WPS_ATTR_SELECTED_REGISTRAR, &sr, NULL);
 
 	if (psr && sr) {
-		if (0)
-			RTW_INFO("clear sr of non target bss:%s("MAC_FMT")\n"
-				, pssid->Ssid, MAC_ARG(pnetwork->network.MacAddress));
 		*psr = 0; /* clear sr */
 		ret = 1;
 	}
@@ -667,10 +664,7 @@ struct cfg80211_bss *rtw_cfg80211_inform_bss(_adapter *padapter, struct wlan_net
 	freq = rtw_ch2freq(channel);
 	notify_channel = ieee80211_get_channel(wiphy, freq);
 
-	if (0)
-		notify_timestamp = le64_to_cpu(*(__le64 *)rtw_get_timestampe_from_ie(pnetwork->network.IEs));
-	else
-		notify_timestamp = rtw_get_systime_us();
+	notify_timestamp = rtw_get_systime_us();
 
 	notify_interval = le16_to_cpu(*(__le16 *)rtw_get_beacon_interval_from_ie(pnetwork->network.IEs));
 	notify_capability = le16_to_cpu(*(__le16 *)rtw_get_capability_from_ie(pnetwork->network.IEs));
@@ -813,9 +807,6 @@ void rtw_cfg80211_ibss_indicate_connect(_adapter *padapter)
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0))
 	freq = rtw_ch2freq(cur_network->network.Configuration.DSConfig);
-
-	if (0)
-		RTW_INFO("chan: %d, freq: %d\n", cur_network->network.Configuration.DSConfig, freq);
 #endif
 
 	if (pwdev->iftype != NL80211_IFTYPE_ADHOC)
@@ -4276,20 +4267,10 @@ static int cfg80211_rtw_start_ap(struct wiphy *wiphy, struct net_device *ndev,
 		WLAN_BSSID_EX *pbss_network = &adapter->mlmepriv.cur_network.network;
 		WLAN_BSSID_EX *pbss_network_ext = &adapter->mlmeextpriv.mlmext_info.network;
 
-		if (0)
-			RTW_INFO(FUNC_ADPT_FMT" ssid:(%s,%zu), from ie:(%s,%d)\n", FUNC_ADPT_ARG(adapter),
-				settings->ssid, settings->ssid_len,
-				pbss_network->Ssid.Ssid, pbss_network->Ssid.SsidLength);
-
 		_rtw_memcpy(pbss_network->Ssid.Ssid, (void *)settings->ssid, settings->ssid_len);
 		pbss_network->Ssid.SsidLength = settings->ssid_len;
 		_rtw_memcpy(pbss_network_ext->Ssid.Ssid, (void *)settings->ssid, settings->ssid_len);
 		pbss_network_ext->Ssid.SsidLength = settings->ssid_len;
-
-		if (0)
-			RTW_INFO(FUNC_ADPT_FMT" after ssid:(%s,%d), (%s,%d)\n", FUNC_ADPT_ARG(adapter),
-				pbss_network->Ssid.Ssid, pbss_network->Ssid.SsidLength,
-				pbss_network_ext->Ssid.Ssid, pbss_network_ext->Ssid.SsidLength);
 	}
 
 exit:
@@ -4817,11 +4798,6 @@ void rtw_cfg80211_rx_p2p_action_public(_adapter *adapter, union recv_frame *rfra
 	if (type >= 0) {
 		switch (type) {
 		case P2P_GO_NEGO_CONF:
-			if (0) {
-				RTW_INFO(FUNC_ADPT_FMT" Nego confirm. state=%u, status=%u, iaddr="MAC_FMT"\n"
-					, FUNC_ADPT_ARG(adapter), pwdev_priv->nego_info.state, pwdev_priv->nego_info.status
-					, MAC_ARG(pwdev_priv->nego_info.iface_addr));
-			}
 			if (pwdev_priv->nego_info.state == 2
 				&& pwdev_priv->nego_info.status == 0
 				&& rtw_check_invalid_mac_address(pwdev_priv->nego_info.iface_addr, _FALSE) == _FALSE
@@ -4852,9 +4828,7 @@ void rtw_cfg80211_rx_p2p_action_public(_adapter *adapter, union recv_frame *rfra
 
 indicate:
 	#if defined(RTW_DEDICATED_P2P_DEVICE)
-	if (rtw_cfg80211_redirect_pd_wdev(dvobj_to_wiphy(dvobj), get_ra(frame), &wdev))
-		if (0)
-			RTW_INFO("redirect to pd_wdev:%p\n", wdev);
+	rtw_cfg80211_redirect_pd_wdev(dvobj_to_wiphy(dvobj), get_ra(frame), &wdev);
 	#endif
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
@@ -5533,13 +5507,13 @@ static void cfg80211_rtw_stop_p2p_device(struct wiphy *wiphy, struct wireless_de
 	rtw_p2p_enable(adapter, P2P_ROLE_DISABLE);
 }
 
-inline int rtw_cfg80211_redirect_pd_wdev(struct wiphy *wiphy, u8 *ra, struct wireless_dev **wdev)
+inline int rtw_cfg80211_redirect_pd_wdev(struct wiphy *wiphy, u8 *ra,
+					 struct wireless_dev **wdev)
 {
 	struct wireless_dev *pd_wdev = wiphy_to_pd_wdev(wiphy);
 
-	if (pd_wdev && pd_wdev != *wdev
-		&& _rtw_memcmp(wdev_address(pd_wdev), ra, ETH_ALEN) == _TRUE
-	) {
+	if (pd_wdev && pd_wdev != *wdev &&
+	    _rtw_memcmp(wdev_address(pd_wdev), ra, ETH_ALEN)) {
 		*wdev = pd_wdev;
 		return 1;
 	}
@@ -5970,15 +5944,9 @@ dump:
 	if (is_p2p) {
 		switch (type) {
 		case P2P_GO_NEGO_CONF:
-			if (0) {
-				RTW_INFO(FUNC_ADPT_FMT" Nego confirm. state=%u, status=%u, iaddr="MAC_FMT"\n"
-					, FUNC_ADPT_ARG(padapter), pwdev_priv->nego_info.state, pwdev_priv->nego_info.status
-					, MAC_ARG(pwdev_priv->nego_info.iface_addr));
-			}
-			if (pwdev_priv->nego_info.state == 2
-				&& pwdev_priv->nego_info.status == 0
-				&& rtw_check_invalid_mac_address(pwdev_priv->nego_info.iface_addr, _FALSE) == _FALSE
-			) {
+			if (pwdev_priv->nego_info.state == 2 &&
+			    pwdev_priv->nego_info.status == 0 &&
+			    !rtw_check_invalid_mac_address(pwdev_priv->nego_info.iface_addr, _FALSE)) {
 				_adapter *intended_iface = dvobj_get_adapter_by_addr(dvobj, pwdev_priv->nego_info.iface_addr);
 
 				if (intended_iface) {
