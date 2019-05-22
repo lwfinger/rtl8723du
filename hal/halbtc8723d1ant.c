@@ -1054,7 +1054,6 @@ static void halbtc8723d1ant_bt_auto_report(IN struct btc_coexist *btcoexist,
 static void halbtc8723d1ant_set_fw_low_penalty_ra(IN struct btc_coexist
 		*btcoexist, IN boolean low_penalty_ra)
 {
-#if 1
 	u8			h2c_parameter[6] = {0};
 
 	h2c_parameter[0] = 0x6;	/* op_code, 0x6= Retry_Penalty */
@@ -1069,13 +1068,11 @@ static void halbtc8723d1ant_set_fw_low_penalty_ra(IN struct btc_coexist
 	}
 
 	btcoexist->btc_fill_h2c(btcoexist, 0x69, 6, h2c_parameter);
-#endif
 }
 
 static void halbtc8723d1ant_low_penalty_ra(IN struct btc_coexist *btcoexist,
 			    IN boolean force_exec, IN boolean low_penalty_ra)
 {
-#if 1
 	coex_dm->cur_low_penalty_ra = low_penalty_ra;
 
 	if (!force_exec) {
@@ -1087,9 +1084,6 @@ static void halbtc8723d1ant_low_penalty_ra(IN struct btc_coexist *btcoexist,
 					      coex_dm->cur_low_penalty_ra);
 
 	coex_dm->pre_low_penalty_ra = coex_dm->cur_low_penalty_ra;
-
-#endif
-
 }
 
 static void halbtc8723d1ant_write_score_board(
@@ -3021,7 +3015,6 @@ static void halbtc8723d1ant_action_wifi_connected_bt_acl_busy(IN struct btc_coex
 		   bt_link_info->a2dp_exist) { /* HID+A2DP */
 
 		if (wifi_cckdeadlock_ap) {
-#if 1
 			if (coex_sta->hid_busy_num < 2)
 				halbtc8723d1ant_coex_table_with_type(btcoexist, NORMAL_EXEC, 14);
 			else
@@ -3031,8 +3024,6 @@ static void halbtc8723d1ant_action_wifi_connected_bt_acl_busy(IN struct btc_coex
 				halbtc8723d1ant_ps_tdma(btcoexist, NORMAL_EXEC, TRUE, 24);
 			else
 				halbtc8723d1ant_ps_tdma(btcoexist, NORMAL_EXEC, TRUE, 8);
-#endif
-
 		} else {
 			if (coex_sta->hid_busy_num < 2) /* 2/18 HID */
 				halbtc8723d1ant_coex_table_with_type(btcoexist, NORMAL_EXEC, 3);
@@ -4543,10 +4534,8 @@ static boolean halbtc8723d1ant_psd_antenna_detection(IN struct btc_coexist
 				break;
 			}
 
-#if 1
 			psd_scan->ant_det_psd_scan_peak_val =
 				psd_scan->psd_max_value;
-#endif
 			psd_scan->ant_det_psd_scan_peak_freq =
 				psd_scan->psd_max_value_point;
 			state = 4;

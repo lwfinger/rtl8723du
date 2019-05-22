@@ -8935,7 +8935,6 @@ void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
 
 	/* supported rate & extended supported rate */
 
-#if 1	/* Check if the AP's supported rates are also supported by STA. */
 	get_rate_set(padapter, sta_bssrate, &sta_bssrate_len);
 	/* RTW_INFO("sta_bssrate_len=%d\n", sta_bssrate_len); */
 
@@ -8982,8 +8981,6 @@ void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
 
 	bssrate_len = index;
 	RTW_INFO("bssrate_len = %d\n", bssrate_len);
-
-#endif /* Check if the AP's supported rates are also supported by STA. */
 
 	if ((bssrate_len == 0) && (pmlmeinfo->network.SupportedRates[0] != 0)) {
 		rtw_free_xmitbuf(pxmitpriv, pmgntframe->pxmitbuf);

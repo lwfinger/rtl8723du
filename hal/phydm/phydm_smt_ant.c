@@ -320,7 +320,6 @@ phydm_update_beam_pattern_type2(
 	for (i = 0; i <= (codeword_length - 1); i++) {
 		beam_ctrl_signal = (boolean)((codeword & BIT(i)) >> i);
 		
-		#if 1
 		if (p_dm->debug_components & DBG_ANT_DIV) {
 
 			if (i == (codeword_length - 1)) {
@@ -337,7 +336,6 @@ phydm_update_beam_pattern_type2(
 				/**/
 			}
 		}
-		#endif
 	}
 }
 

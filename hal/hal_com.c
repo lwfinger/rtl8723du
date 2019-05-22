@@ -1130,25 +1130,11 @@ void rtw_hal_dump_macaddr(void *sel, _adapter *adapter)
 #ifdef RTW_HALMAC
 void rtw_hal_hw_port_enable(_adapter *adapter)
 {
-#if 1
 	u8 port_enable = _TRUE;
 
 	rtw_hal_set_hwreg(adapter, HW_VAR_PORT_CFG, &port_enable);
-#else
-	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
-	struct rtw_halmac_bcn_ctrl bcn_ctrl;
-
-	_rtw_memset(&bcn_ctrl, 0, sizeof(struct rtw_halmac_bcn_ctrl));
-	bcn_ctrl.enable_bcn = 1;
-
-	/*rtw_halmac_get_bcn_ctrl(struct dvobj_priv *d, enum _hw_port hwport,
-				struct rtw_halmac_bcn_ctrl *bcn_ctrl)*/
-	if (rtw_halmac_set_bcn_ctrl(dvobj, get_hw_port(adapter), &bcn_ctrl) == -1) {
-		RTW_ERR(ADPT_FMT" - hw port(%d) enable fail!!\n", ADPT_ARG(adapter), get_hw_port(adapter));
-		rtw_warn_on(1);
-	}
-#endif
 }
+
 void rtw_hal_hw_port_disable(_adapter *adapter)
 {
 	u8 port_enable = _FALSE;

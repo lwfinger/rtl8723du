@@ -3318,10 +3318,8 @@ int proc_get_best_channel(struct seq_file *m, void *v)
 				best_channel_5G = rfctl->channel_set[i].ChannelNum;
 			}
 		}
-#if 1 /* debug */
 		RTW_PRINT_SEL(m, "The rx cnt of channel %3d = %d\n",
 			rfctl->channel_set[i].ChannelNum, rfctl->channel_set[i].rx_count);
-#endif
 	}
 
 	RTW_PRINT_SEL(m, "best_channel_5G = %d\n", best_channel_5G);
@@ -5173,7 +5171,6 @@ ssize_t proc_set_lck(struct file *file, const char __user *buffer, size_t count,
 
 #endif /* CONFIG_PROC_DEBUG */
 #define RTW_BUFDUMP_BSIZE		16
-#if 1
 inline void RTW_BUF_DUMP_SEL(uint _loglevel, void *sel, u8 *_titlestring,
 					bool _idx_show, const u8 *_hexdata, int _hexdatalen)
 {
@@ -5203,89 +5200,3 @@ inline void RTW_BUF_DUMP_SEL(uint _loglevel, void *sel, u8 *_titlestring,
 		_RTW_PRINT_SEL(sel, "\n");
 	}
 }
-#else
-inline void _RTW_STR_DUMP_SEL(void *sel, char *str_out)
-{
-	if (sel == RTW_DBGDUMP)
-		_dbgdump("%s\n", str_out);
-	#if defined(_seqdump)
-	else
-		_seqdump(sel, "%s\n", str_out);
-	#endif /*_seqdump*/
-}
-inline void RTW_BUF_DUMP_SEL(uint _loglevel, void *sel, u8 *_titlestring,
-					bool _idx_show, u8 *_hexdata, int _hexdatalen)
-{
-	int __i, len;
-	int __j, idx;
-	int block_num, remain_byte;
-	char str_out[128] = {'\0'};
-	char str_val[32] = {'\0'};
-	char *p = NULL;
-	u8 *ptr = (u8 *)_hexdata;
-
-	if (_loglevel <= rtw_drv_log_level) {
-		/*dump title*/
-		p = &str_out[0];
-		if (_titlestring) {
-			if (sel == RTW_DBGDUMP) {
-				len = snprintf(str_val, sizeof(str_val), "%s", DRIVER_PREFIX);
-				strncpy(p, str_val, len);
-				p += len;
-			}
-			len = snprintf(str_val, sizeof(str_val), "%s", _titlestring);
-			strncpy(p, str_val, len);
-			p += len;
-		}
-		if (p != &str_out[0]) {
-			_RTW_STR_DUMP_SEL(sel, str_out);
-			_rtw_memset(&str_out, '\0', sizeof(str_out));
-		}
-
-		/*dump buffer*/
-		block_num = _hexdatalen / RTW_BUFDUMP_BSIZE;
-		remain_byte = _hexdatalen % RTW_BUFDUMP_BSIZE;
-		for (__i = 0; __i < block_num; __i++) {
-			p = &str_out[0];
-			if (sel == RTW_DBGDUMP) {
-				len = snprintf(str_val, sizeof(str_val), "%s", DRIVER_PREFIX);
-				strncpy(p, str_val, len);
-				p += len;
-			}
-			if (_idx_show) {
-				len = snprintf(str_val, sizeof(str_val), "0x%03X: ", __i * RTW_BUFDUMP_BSIZE);
-				strncpy(p, str_val, len);
-				p += len;
-			}
-			for (__j =0; __j < RTW_BUFDUMP_BSIZE; __j++) {
-				idx = __i * RTW_BUFDUMP_BSIZE + __j;
-				len = snprintf(str_val, sizeof(str_val), "%02X%s", ptr[idx], (((__j + 1) % 4) == 0) ? "  " : " ");
-				strncpy(p, str_val, len);
-				p += len;
-			}
-			_RTW_STR_DUMP_SEL(sel, str_out);
-			_rtw_memset(&str_out, '\0', sizeof(str_out));
-		}
-
-		p = &str_out[0];
-		if ((sel == RTW_DBGDUMP) && remain_byte) {
-			len = snprintf(str_val, sizeof(str_val), "%s", DRIVER_PREFIX);
-			strncpy(p, str_val, len);
-			p += len;
-		}
-		if (_idx_show && remain_byte) {
-			len = snprintf(str_val, sizeof(str_val), "0x%03X: ", block_num * RTW_BUFDUMP_BSIZE);
-			strncpy(p, str_val, len);
-			p += len;
-		}
-		for (__i = 0; __i < remain_byte; __i++) {
-			idx = block_num * RTW_BUFDUMP_BSIZE + __i;
-			len = snprintf(str_val, sizeof(str_val), "%02X%s", ptr[idx], (((__i + 1) % 4) == 0) ? "  " : " ");
-			strncpy(p, str_val, len);
-			p += len;
-		}
-		_RTW_STR_DUMP_SEL(sel, str_out);
-	}
-}
-
-#endif

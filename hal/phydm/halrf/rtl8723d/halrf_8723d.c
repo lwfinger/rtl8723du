@@ -712,11 +712,9 @@ phy_path_s1_iqk_8723d(
 	/*LOK setting  added for 8723D*/
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0xef, 0x10, 0x1);
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x54, 0x1, 0x1);
-#if 1
 
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x1, RFREGOFFSETMASK, 0xe0d);
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x2, RFREGOFFSETMASK, 0x60d);
-#endif
 
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("RF0x1 @S1 TXIQK = 0x%x\n", odm_get_rf_reg(p_dm, RF_PATH_A, 0x1, RFREGOFFSETMASK)));
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("RF0x2 @S1 TXIQK = 0x%x\n", odm_get_rf_reg(p_dm, RF_PATH_A, 0x2, RFREGOFFSETMASK)));
@@ -724,7 +722,6 @@ phy_path_s1_iqk_8723d(
 	/*enter IQK mode*/
 	odm_set_bb_reg(p_dm, REG_FPGA0_IQK, 0xffffff00, 0x808000);
 
-#if 1
 	/*backup path & GNT value */
 	original_path = odm_get_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, MASKDWORD);  /*save 0x70*/
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0038);
@@ -736,7 +733,6 @@ phy_path_s1_iqk_8723d(
 	odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, 0x0000ff00);
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc0020038);	/*0x38[15:8] = 0x77*/
 	odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, BIT(26), 0x1);
-#endif
 
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0054);
 	ODM_delay_ms(1);
@@ -756,12 +752,10 @@ phy_path_s1_iqk_8723d(
 		ktime++;
 	}
 
-#if 1
 	/*Restore GNT_WL/GNT_BT  and path owner*/
 	odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, original_gnt);
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc00f0038);
 	odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, 0xffffffff, original_path);
-#endif
 
 	/*reload RF path*/
 	odm_set_bb_reg(p_dm, 0x948, MASKDWORD, path_sel_bb);
@@ -836,16 +830,13 @@ phy_path_s1_rx_iqk_8723d(
 	/*---------PA/PAD=0----------*/
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0xdf, 0x800, 0x1);
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x56, 0x600, 0x0);
-#if 1
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x1, RFREGOFFSETMASK, 0xe0d);
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x2, RFREGOFFSETMASK, 0x60d);
-#endif
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("RF0x1@ path S1 RXIQK1 = 0x%x\n", odm_get_rf_reg(p_dm, RF_PATH_A, 0x1, RFREGOFFSETMASK)));
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("RF0x2@ path S1 RXIQK1 = 0x%x\n", odm_get_rf_reg(p_dm, RF_PATH_A, 0x2, RFREGOFFSETMASK)));
 
 	/*enter IQK mode*/
 	odm_set_bb_reg(p_dm, REG_FPGA0_IQK, 0xffffff00, 0x808000);
-#if 1
 	/*backup path & GNT value */
 	original_path = odm_get_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, MASKDWORD);  /*save 0x70*/
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0038);
@@ -857,7 +848,6 @@ phy_path_s1_rx_iqk_8723d(
 	odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, 0x0000ff00);
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc0020038);	/*0x38[15:8] = 0x77*/
 	odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, BIT(26), 0x1);
-#endif
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0054);
 	ODM_delay_ms(1);
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK]GNT_BT @S1 RXIQK1 = 0x%x\n", odm_get_bb_reg(p_dm, REG_LTECOEX_READ_DATA, MASKDWORD)));
@@ -894,12 +884,10 @@ phy_path_s1_rx_iqk_8723d(
 		result |= 0x01;
 	else {
 		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("S1 RXIQK STEP1 FAIL\n"));
-#if 1
 		/*Restore GNT_WL/GNT_BT  and path owner*/
 		odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, original_gnt);
 		odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc00f0038);
 		odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, 0xffffffff, original_path);
-#endif
 		/*reload RF path*/
 		odm_set_bb_reg(p_dm, 0x948, MASKDWORD, path_sel_bb);
 		odm_set_bb_reg(p_dm, REG_FPGA0_IQK, 0xffffff00, 0x000000);
@@ -943,7 +931,6 @@ phy_path_s1_rx_iqk_8723d(
 	/*enter IQK mode*/
 	odm_set_bb_reg(p_dm, REG_FPGA0_IQK, 0xffffff00, 0x808000);
 
-#if 1
 	/*backup path & GNT value */
 	original_path = odm_get_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, MASKDWORD);  /*save 0x70*/
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0038);
@@ -955,7 +942,6 @@ phy_path_s1_rx_iqk_8723d(
 	odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, 0x0000ff00);
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc0020038);	/*0x38[15:8] = 0x77*/
 	odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, BIT(26), 0x1);
-#endif
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0054);
 	ODM_delay_ms(1);
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK]GNT_BT @S1 RXIQK2 = 0x%x\n", odm_get_bb_reg(p_dm, REG_LTECOEX_READ_DATA, MASKDWORD)));
@@ -973,12 +959,10 @@ phy_path_s1_rx_iqk_8723d(
 		ktime++;
 	}
 
-#if 1
 	/*Restore GNT_WL/GNT_BT  and path owner*/
 	odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, original_gnt);
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc00f0038);
 	odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, 0xffffffff, original_path);
-#endif
 	/*reload RF path*/
 	odm_set_bb_reg(p_dm, 0x948, MASKDWORD, path_sel_bb);
 
@@ -1058,16 +1042,13 @@ phy_path_s0_iqk_8723d(
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0xee, 0x10, 0x1);
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x64, 0x1, 0x1);
 
-#if 1
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x1, RFREGOFFSETMASK, 0xe6d);
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x2, RFREGOFFSETMASK, 0x66d);
-#endif
 
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("RF0x1 @S0 TXIQK = 0x%x\n", odm_get_rf_reg(p_dm, RF_PATH_A, 0x1, RFREGOFFSETMASK)));
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("RF0x2 @S0 TXIQK = 0x%x\n", odm_get_rf_reg(p_dm, RF_PATH_A, 0x2, RFREGOFFSETMASK)));
 	/*enter IQK mode*/
 	odm_set_bb_reg(p_dm, REG_FPGA0_IQK, 0xffffff00, 0x808000);
-#if 1
 	/*backup path & GNT value */
 	original_path = odm_get_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, MASKDWORD);  /*save 0x70*/
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0038);
@@ -1079,7 +1060,6 @@ phy_path_s0_iqk_8723d(
 	odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, 0x0000ff00);
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc0020038);	/*0x38[15:8] = 0x77*/
 	odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, BIT(26), 0x1);
-#endif
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0054);
 	ODM_delay_ms(1);
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK]GNT_BT @S0 TXIQK = 0x%x\n", odm_get_bb_reg(p_dm, REG_LTECOEX_READ_DATA, MASKDWORD)));
@@ -1097,12 +1077,10 @@ phy_path_s0_iqk_8723d(
 		ODM_delay_ms(1);
 		ktime++;
 	}
-#if 1
 	/*Restore GNT_WL/GNT_BT  and path owner*/
 	odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, original_gnt);
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc00f0038);
 	odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, 0xffffffff, original_path);
-#endif
 	/*reload RF path*/
 	odm_set_bb_reg(p_dm, 0x948, MASKDWORD, path_sel_bb);
 	/*leave IQK mode*/
@@ -1168,17 +1146,14 @@ static u8 phy_path_s0_rx_iqk_8723d(struct PHY_DM_STRUCT *p_dm,
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0xde, 0x800, 0x1);
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x66, 0x600, 0x0);
 
-#if 1
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x1, RFREGOFFSETMASK, 0xe6d);
 	odm_set_rf_reg(p_dm, RF_PATH_A, 0x2, RFREGOFFSETMASK, 0x66d);
-#endif
 
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("RF0x1 @S0 RXIQK1 = 0x%x\n", odm_get_rf_reg(p_dm, RF_PATH_A, 0x1, RFREGOFFSETMASK)));
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("RF0x2 @S0 RXIQK1 = 0x%x\n", odm_get_rf_reg(p_dm, RF_PATH_A, 0x2, RFREGOFFSETMASK)));
 
 	odm_set_bb_reg(p_dm, REG_FPGA0_IQK, 0xffffff00, 0x808000);
 
-#if 1
 	/*backup path & GNT value */
 	original_path = odm_get_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, MASKDWORD);  /*save 0x70*/
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0038);
@@ -1190,7 +1165,6 @@ static u8 phy_path_s0_rx_iqk_8723d(struct PHY_DM_STRUCT *p_dm,
 	odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, 0x0000ff00);
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc0020038);	/*0x38[15:8] = 0x77*/
 	odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, BIT(26), 0x1);
-#endif
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0054);
 	ODM_delay_ms(1);
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK]GNT_BT @S0 RXIQK1 = 0x%x\n", odm_get_bb_reg(p_dm, REG_LTECOEX_READ_DATA, MASKDWORD)));
@@ -1225,12 +1199,10 @@ static u8 phy_path_s0_rx_iqk_8723d(struct PHY_DM_STRUCT *p_dm,
 		result |= 0x01;
 	else {
 		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("S0 RXIQK STEP1 FAIL\n"));
-#if 1
 		/*Restore GNT_WL/GNT_BT  and path owner*/
 		odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, original_gnt);
 		odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc00f0038);
 		odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, 0xffffffff, original_path);
-#endif
 		/*reload RF path*/
 		odm_set_bb_reg(p_dm, 0x948, MASKDWORD, path_sel_bb);
 		odm_set_bb_reg(p_dm, REG_FPGA0_IQK, 0xffffff00, 0x000000);
@@ -1269,7 +1241,6 @@ static u8 phy_path_s0_rx_iqk_8723d(struct PHY_DM_STRUCT *p_dm,
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("RF0x2 @S0 RXIQK2 = 0x%x\n", odm_get_rf_reg(p_dm, RF_PATH_A, 0x2, RFREGOFFSETMASK)));
 	/*enter IQK mode*/
 	odm_set_bb_reg(p_dm, REG_FPGA0_IQK, 0xffffff00, 0x808000);
-#if 1
 	/*backup path & GNT value */
 	original_path = odm_get_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, MASKDWORD);  /*save 0x70*/
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0038);
@@ -1281,7 +1252,6 @@ static u8 phy_path_s0_rx_iqk_8723d(struct PHY_DM_STRUCT *p_dm,
 	odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, 0x0000ff00);
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc0020038);	/*0x38[15:8] = 0x77*/
 	odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, BIT(26), 0x1);
-#endif
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0x800f0054);
 	ODM_delay_ms(1);
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK]GNT_BT @S0 RXIQK2 = 0x%x\n", odm_get_bb_reg(p_dm, REG_LTECOEX_READ_DATA, MASKDWORD)));
@@ -1296,12 +1266,10 @@ static u8 phy_path_s0_rx_iqk_8723d(struct PHY_DM_STRUCT *p_dm,
 		ODM_delay_ms(1);
 		ktime++;
 	}
-#if 1
 	/*Restore GNT_WL/GNT_BT  and path owner*/
 	odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, original_gnt);
 	odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc00f0038);
 	odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, 0xffffffff, original_path);
-#endif
 	/*reload RF path*/
 	odm_set_bb_reg(p_dm, 0x948, MASKDWORD, path_sel_bb);
 
@@ -1839,7 +1807,6 @@ static void _phy_iq_calibrate_8723d(struct PHY_DM_STRUCT *p_dm, s32 result[][8],
 		_phy_path_adda_on_8723d(p_dm, ADDA_REG, false, is2T);
 	}
 
-#if 1
 	for (i = 0 ; i < retry_count ; i++) {
 		path_s1_ok = phy_path_s1_iqk_8723d(p_dm, is2T);
 		if (path_s1_ok == 0x01) {
@@ -1854,8 +1821,6 @@ static void _phy_iq_calibrate_8723d(struct PHY_DM_STRUCT *p_dm, s32 result[][8],
 			cnt_iqk_fail++;
 		}
 	}
-#endif
-#if 1
 	for (i = 0 ; i < retry_count ; i++) {
 		path_s1_ok = phy_path_s1_rx_iqk_8723d(p_dm, is2T);
 		if (path_s1_ok == 0x03) {
@@ -1872,7 +1837,6 @@ static void _phy_iq_calibrate_8723d(struct PHY_DM_STRUCT *p_dm, s32 result[][8],
 	}
 	if (0x00 == path_s1_ok)
 		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("path S1 IQK failed!!\n"));
-#endif
 	if (is2T) {
 		_phy_path_a_stand_by_8723d(p_dm);
 		_phy_path_adda_on_8723d(p_dm, ADDA_REG, false, is2T);
@@ -1881,8 +1845,6 @@ static void _phy_iq_calibrate_8723d(struct PHY_DM_STRUCT *p_dm, s32 result[][8],
 		odm_set_bb_reg(p_dm, REG_TX_IQK, MASKDWORD, 0x01007c00);
 		odm_set_bb_reg(p_dm, REG_RX_IQK, MASKDWORD, 0x01004800);
 
-
-#if 1
 		for (i = 0 ; i < retry_count ; i++) {
 			path_s0_ok = phy_path_s0_iqk_8723d(p_dm);
 			if (path_s0_ok == 0x01) {
@@ -1897,9 +1859,7 @@ static void _phy_iq_calibrate_8723d(struct PHY_DM_STRUCT *p_dm, s32 result[][8],
 				cnt_iqk_fail++;
 			}
 		}
-#endif
 
-#if 1
 		for (i = 0 ; i < retry_count ; i++) {
 			path_s0_ok = phy_path_s0_rx_iqk_8723d(p_dm, is2T);
 			if (path_s0_ok == 0x03) {
@@ -1919,7 +1879,6 @@ static void _phy_iq_calibrate_8723d(struct PHY_DM_STRUCT *p_dm, s32 result[][8],
 
 		if (0x00 == path_s0_ok)
 			ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("path S0 IQK failed!!\n"));
-#endif
 	}
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("IQK:Back to BB mode, load original value!\n"));
 	odm_set_bb_reg(p_dm, REG_FPGA0_IQK, 0xffffff00, 0x000000);
@@ -2003,7 +1962,6 @@ phy_iq_calibrate_8723d(
 	u32 original_path, original_gnt, ori_path_ctrl;
 	u32 iqk_fail_b, iqk_fail_a;
 
-#if 1
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("================ IQK Start ===================\n"));
 
 	iqk_fail_b = p_dm->n_iqk_fail_cnt;
@@ -2041,7 +1999,6 @@ phy_iq_calibrate_8723d(
 	is13simular = false;
 
 	for (i = 0; i < 3; i++) {
-#if 1
 		/*set path control to WL*/
 		ori_path_ctrl = odm_get_mac_reg(p_dm, 0x64, MASKBYTE3);  /*save 0x67*/
 		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK]original 0x67 = 0x%x\n", ori_path_ctrl));
@@ -2057,9 +2014,7 @@ phy_iq_calibrate_8723d(
 		odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, 0x0000ff00);
 		odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc0020038);	/*0x38[15:8] = 0x77*/
 		odm_set_mac_reg(p_dm, REG_LTECOEX_PATH_CONTROL, BIT(26), 0x1);
-#endif
 		_phy_iq_calibrate_8723d(p_dm, result, i, true);
-#if 1
 		/*Restore GNT_WL/GNT_BT  and path owner*/
 		odm_set_bb_reg(p_dm, REG_LTECOEX_WRITE_DATA, MASKDWORD, original_gnt);
 		odm_set_bb_reg(p_dm, REG_LTECOEX_CTRL, MASKDWORD, 0xc00f0038);
@@ -2067,7 +2022,6 @@ phy_iq_calibrate_8723d(
 		/*Restore path control owner*/
 		odm_set_mac_reg(p_dm, 0x64, MASKBYTE3, ori_path_ctrl);
 		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK]restore 0x67 = 0x%x\n", odm_get_mac_reg(p_dm, 0x64, MASKBYTE3)));
-#endif
 		if (i == 1) {
 			is12simular = phy_simularity_compare_8723d(p_dm, result, 0, 1);
 			if (is12simular) {
@@ -2165,7 +2119,6 @@ phy_iq_calibrate_8723d(
 
 	odm_set_bb_reg(p_dm, 0x948, MASKDWORD, path_sel_bb_phy_iqk);
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("IQK finished\n"));
-#endif
 }
 
 

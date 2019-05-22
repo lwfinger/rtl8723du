@@ -691,8 +691,6 @@ void rtl8723d_set_p2p_ps_offload_cmd(_adapter *padapter, u8 p2p_ps_state)
 	struct P2P_PS_Offload_t	*p2p_ps_offload = (struct P2P_PS_Offload_t *)(&pHalData->p2p_ps_offload);
 	u8	i;
 
-
-#if 1
 	switch (p2p_ps_state) {
 	case P2P_PS_DISABLE:
 		RTW_INFO("P2P_PS_DISABLE\n");
@@ -716,16 +714,12 @@ void rtl8723d_set_p2p_ps_offload_cmd(_adapter *padapter, u8 p2p_ps_state)
 				p2p_ps_offload->NoA1_En = 1;
 
 			/* config P2P NoA Descriptor Register */
-			/* RTW_INFO("%s(): noa_duration = %x\n",__FUNCTION__,pwdinfo->noa_duration[i]); */
 			rtw_write32(padapter, REG_NOA_DESC_DURATION, pwdinfo->noa_duration[i]);
 
-			/* RTW_INFO("%s(): noa_interval = %x\n",__FUNCTION__,pwdinfo->noa_interval[i]); */
 			rtw_write32(padapter, REG_NOA_DESC_INTERVAL, pwdinfo->noa_interval[i]);
 
-			/* RTW_INFO("%s(): start_time = %x\n",__FUNCTION__,pwdinfo->noa_start_time[i]); */
 			rtw_write32(padapter, REG_NOA_DESC_START, pwdinfo->noa_start_time[i]);
 
-			/* RTW_INFO("%s(): noa_count = %x\n",__FUNCTION__,pwdinfo->noa_count[i]); */
 			rtw_write8(padapter, REG_NOA_DESC_COUNT, pwdinfo->noa_count[i]);
 		}
 
@@ -756,11 +750,8 @@ void rtl8723d_set_p2p_ps_offload_cmd(_adapter *padapter, u8 p2p_ps_state)
 	default:
 		break;
 	}
-
 	FillH2CCmd8723D(padapter, H2C_8723D_P2P_PS_OFFLOAD, 1, (u8 *)p2p_ps_offload);
-#endif
-
-
 }
+
 #endif /* CONFIG_P2P */
 

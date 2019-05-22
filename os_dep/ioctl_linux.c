@@ -2017,7 +2017,6 @@ static int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
 	}
 #endif /* CONFIG_P2P */
 
-#if 1 /* Wireless Extension use EAGAIN to try */
 	wait_status = _FW_UNDER_SURVEY
 #ifndef CONFIG_ANDROID
 		      | _FW_UNDER_LINKING
@@ -2026,20 +2025,6 @@ static int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
 
 	while (check_fwstate(pmlmepriv, wait_status) == _TRUE)
 		return -EAGAIN;
-#else
-	wait_status = _FW_UNDER_SURVEY
-#ifndef CONFIG_ANDROID
-		      | _FW_UNDER_LINKING
-#endif
-		      ;
-
-	while (check_fwstate(pmlmepriv, wait_status) == _TRUE) {
-		rtw_msleep_os(30);
-		cnt++;
-		if (cnt > wait_for_surveydone)
-			break;
-	}
-#endif
 	_enter_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 
 	phead = get_list_head(queue);
@@ -8676,7 +8661,6 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			printk("\n");
 		}
 		printk("\n");
-#if 1
 		err = -EFAULT;
 		RTW_INFO("%s: rtw_BT_efuse_map_read _rtw_memcmp\n", __FUNCTION__);
 		if ((rtw_BT_efuse_map_read(padapter, 0x00, EFUSE_BT_MAX_MAP_LEN, pEfuseHal->fakeBTEfuseInitMap) == _SUCCESS)) {
@@ -8708,8 +8692,6 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 				goto exit;
 			}
 		}
-#endif
-
 	} else if (strcmp(tmp[0], "wlfk2map") == 0) {
 		*extra = 0;
 
@@ -9985,11 +9967,9 @@ static int rtw_tdls_get_best_ch(struct net_device *dev,
 				best_channel_5G = rfctl->channel_set[i].ChannelNum;
 			}
 		}
-#if 1 /* debug */
 		RTW_INFO("The rx cnt of channel %3d = %d\n",
 			 rfctl->channel_set[i].ChannelNum,
 			 rfctl->channel_set[i].rx_count);
-#endif
 	}
 
 	sprintf(extra, "\nbest_channel_24G = %d\n", best_channel_24G);

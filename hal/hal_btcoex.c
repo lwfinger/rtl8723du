@@ -3301,7 +3301,6 @@ void hal_btcoex_SuspendNotify(PADAPTER padapter, u8 state)
 		EXhalbtcoutsrc_pnp_notify(&GLBtCoexist, BTC_WIFI_PNP_SLEEP);
 		break;
 	case BTCOEX_SUSPEND_STATE_SUSPEND_KEEP_ANT:
-		/* should switch to "#if 1" once all ICs' coex. revision are upgraded to support the KEEP_ANT case */
 		EXhalbtcoutsrc_pnp_notify(&GLBtCoexist, BTC_WIFI_PNP_SLEEP);
 		EXhalbtcoutsrc_pnp_notify(&GLBtCoexist, BTC_WIFI_PNP_SLEEP_KEEP_ANT);
 		break;

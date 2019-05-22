@@ -1547,13 +1547,10 @@ hal_EfuseGetCurrentSize_WiFi(
 
 	count = 0;
 	while (AVAILABLE_EFUSE_ADDR(efuse_addr)) {
-#if 1
 		if (efuse_OneByteRead(padapter, efuse_addr, &efuse_data, bPseudoTest) == _FALSE) {
 			RTW_INFO(KERN_ERR "%s: efuse_OneByteRead Fail! addr=0x%X !!\n", __FUNCTION__, efuse_addr);
 			goto error;
 		}
-#endif
-
 		if (efuse_data == 0xFF)
 			break;
 
@@ -1662,7 +1659,6 @@ hal_EfuseGetCurrentSize_BT(
 		/* only when bank is switched we have to reset the efuse_addr. */
 		if (bank != startBank)
 			efuse_addr = 0;
-#if 1
 
 		while (AVAILABLE_EFUSE_ADDR(efuse_addr)) {
 			if (efuse_OneByteRead(padapter, efuse_addr, &efuse_data, bPseudoTest) == _FALSE) {
@@ -1701,35 +1697,6 @@ hal_EfuseGetCurrentSize_BT(
 			/* read next header */
 			efuse_addr += (word_cnts * 2) + 1;
 		}
-#else
-		while (bContinual &&
-		       efuse_OneByteRead(padapter, efuse_addr , &efuse_data, bPseudoTest) &&
-		       AVAILABLE_EFUSE_ADDR(efuse_addr)) {
-			if (efuse_data != 0xFF) {
-				if ((efuse_data & 0x1F) == 0x0F) {	/* extended header */
-					hoffset = efuse_data;
-					efuse_addr++;
-					efuse_OneByteRead(padapter, efuse_addr , &efuse_data, bPseudoTest);
-					if ((efuse_data & 0x0F) == 0x0F) {
-						efuse_addr++;
-						continue;
-					} else {
-						hoffset = ((hoffset & 0xE0) >> 5) | ((efuse_data & 0xF0) >> 1);
-						hworden = efuse_data & 0x0F;
-					}
-				} else {
-					hoffset = (efuse_data >> 4) & 0x0F;
-					hworden =  efuse_data & 0x0F;
-				}
-				word_cnts = Efuse_CalculateWordCnts(hworden);
-				/* read next header							 */
-				efuse_addr = efuse_addr + (word_cnts * 2) + 1;
-			} else
-				bContinual = _FALSE;
-		}
-#endif
-
-
 		/* Check if we need to check next bank efuse */
 		if (efuse_addr < retU2)
 			break;/* don't need to check next bank. */
@@ -1988,64 +1955,10 @@ hal_EfusePartialWriteCheck(
 		}
 
 		if (efuse_OneByteRead(padapter, startAddr, &efuse_data, bPseudoTest) && (efuse_data != 0xFF)) {
-#if 1
 			bRet = _FALSE;
 			RTW_INFO("%s: Something Wrong! last bytes(%#X=0x%02X) is not 0xFF\n",
 				 __FUNCTION__, startAddr, efuse_data);
 			break;
-#else
-			if (EXT_HEADER(efuse_data)) {
-				cur_header = efuse_data;
-				startAddr++;
-				efuse_OneByteRead(padapter, startAddr, &efuse_data, bPseudoTest);
-				if (ALL_WORDS_DISABLED(efuse_data)) {
-					RTW_INFO("%s: Error condition, all words disabled!", __FUNCTION__);
-					bRet = _FALSE;
-					break;
-				} /*else*/
-				{
-					curPkt.offset = ((cur_header & 0xE0) >> 5) | ((efuse_data & 0xF0) >> 1);
-					curPkt.word_en = efuse_data & 0x0F;
-				}
-			} else {
-				cur_header  =  efuse_data;
-				curPkt.offset = (cur_header >> 4) & 0x0F;
-				curPkt.word_en = cur_header & 0x0F;
-			}
-
-			curPkt.word_cnts = Efuse_CalculateWordCnts(curPkt.word_en);
-			/* if same header is found but no data followed */
-			/* write some part of data followed by the header. */
-			if ((curPkt.offset == pTargetPkt->offset) &&
-			    (hal_EfuseCheckIfDatafollowed(padapter, curPkt.word_cnts, startAddr + 1, bPseudoTest) == _FALSE) &&
-			    wordEnMatched(pTargetPkt, &curPkt, &matched_wden) == _TRUE) {
-				RTW_INFO("%s: Need to partial write data by the previous wrote header\n", __FUNCTION__);
-				/* Here to write partial data */
-				badworden = Efuse_WordEnableDataWrite(padapter, startAddr + 1, matched_wden, pTargetPkt->data, bPseudoTest);
-				if (badworden != 0x0F) {
-					u32	PgWriteSuccess = 0;
-					/* if write fail on some words, write these bad words again */
-					if (efuseType == EFUSE_WIFI)
-						PgWriteSuccess = Efuse_PgPacketWrite(padapter, pTargetPkt->offset, badworden, pTargetPkt->data, bPseudoTest);
-					else
-						PgWriteSuccess = Efuse_PgPacketWrite_BT(padapter, pTargetPkt->offset, badworden, pTargetPkt->data, bPseudoTest);
-
-					if (!PgWriteSuccess) {
-						bRet = _FALSE;	/* write fail, return */
-						break;
-					}
-				}
-				/* partial write ok, update the target packet for later use */
-				for (i = 0; i < 4; i++) {
-					if ((matched_wden & (0x1 << i)) == 0) {	/* this word has been written */
-						pTargetPkt->word_en |= (0x1 << i);	/* disable the word */
-					}
-				}
-				pTargetPkt->word_cnts = Efuse_CalculateWordCnts(pTargetPkt->word_en);
-			}
-			/* read from next header */
-			startAddr = startAddr + (curPkt.word_cnts * 2) + 1;
-#endif
 		} else {
 			/* not used header, 0xff */
 			*pAddr = startAddr;
@@ -2303,12 +2216,8 @@ static void read_chip_version_8723d(PADAPTER padapter)
 		}
 	*/
 
-#if 1
 	dump_chip_info(pHalData->version_id);
-#endif
-
 }
-
 
 void rtl8723d_InitBeaconParameters(PADAPTER padapter)
 {

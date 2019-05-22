@@ -3246,7 +3246,6 @@ static int rtw_check_roaming_candidate(struct mlme_priv *mlme
 		else
 			goto exit;
 	}
-#if 1
 	if (rtw_get_passing_time_ms(competitor->last_scanned) >= mlme->roam_scanr_exp_ms)
 		goto exit;
 
@@ -3262,10 +3261,6 @@ static int rtw_check_roaming_candidate(struct mlme_priv *mlme
 
 	if (*candidate != NULL && (*candidate)->network.Rssi >= competitor->network.Rssi)
 		goto exit;
-#else
-	goto exit;
-#endif
-
 update:
 	*candidate = competitor;
 	updated = _TRUE;
