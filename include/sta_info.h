@@ -348,7 +348,6 @@ struct sta_info {
 	u8 has_legacy_ac;
 	unsigned int sleepq_ac_len;
 
-#ifdef CONFIG_P2P
 	/* p2p priv data */
 	u8 is_p2p_device;
 	u8 p2p_status_code;
@@ -363,11 +362,8 @@ struct sta_info {
 	u8 secdev_types_list[32];/* 32/8 == 4; */
 	u16 dev_name_len;
 	u8 dev_name[32];
-#endif /* CONFIG_P2P */
 
-#ifdef CONFIG_WFD
 	u8 op_wfd_mode;
-#endif
 
 #ifdef CONFIG_TX_MCAST2UNI
 	u8 under_exist_checking;
@@ -504,18 +500,11 @@ struct sta_info {
 #define sta_rx_uc_bytes(sta) (sta->sta_stats.rx_bytes - sta->sta_stats.rx_bc_bytes - sta->sta_stats.rx_mc_bytes)
 #define sta_last_rx_uc_bytes(sta) (sta->sta_stats.last_rx_bytes - sta->sta_stats.last_rx_bc_bytes - sta->sta_stats.last_rx_mc_bytes)
 
-#ifdef CONFIG_WFD
 #define STA_OP_WFD_MODE(sta) (sta)->op_wfd_mode
 #define STA_SET_OP_WFD_MODE(sta, mode) (sta)->op_wfd_mode = (mode)
-#else
-#define STA_OP_WFD_MODE(sta) 0
-#define STA_SET_OP_WFD_MODE(sta, mode) do {} while (0)
-#endif
-
 #define AID_BMP_LEN(max_aid) ((max_aid + 1) / 8 + (((max_aid + 1) % 8) ? 1 : 0))
 
 struct	sta_priv {
-
 	u8 *pallocated_stainfo_buf;
 	u8 *pstainfo_buf;
 	_queue	free_sta_queue;

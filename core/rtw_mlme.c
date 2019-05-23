@@ -182,7 +182,7 @@ void rtw_free_mlme_priv_ie_data(struct mlme_priv *pmlmepriv)
 	rtw_free_mlme_ie_data(&pmlmepriv->p2p_assoc_resp_ie, &pmlmepriv->p2p_assoc_resp_ie_len);
 #endif
 
-#if defined(CONFIG_WFD) && defined(CONFIG_IOCTL_CFG80211)
+#if defined(CONFIG_IOCTL_CFG80211)
 	rtw_free_mlme_ie_data(&pmlmepriv->wfd_beacon_ie, &pmlmepriv->wfd_beacon_ie_len);
 	rtw_free_mlme_ie_data(&pmlmepriv->wfd_probe_req_ie, &pmlmepriv->wfd_probe_req_ie_len);
 	rtw_free_mlme_ie_data(&pmlmepriv->wfd_probe_resp_ie, &pmlmepriv->wfd_probe_resp_ie_len);
@@ -196,7 +196,7 @@ void rtw_free_mlme_priv_ie_data(struct mlme_priv *pmlmepriv)
 #endif
 }
 
-#if defined(CONFIG_WFD) && defined(CONFIG_IOCTL_CFG80211)
+#if defined(CONFIG_IOCTL_CFG80211)
 int rtw_mlme_update_wfd_ie_data(struct mlme_priv *mlme, u8 type, u8 *ie, u32 ie_len)
 {
 	_adapter *adapter = mlme_to_adapter(mlme);
@@ -291,7 +291,7 @@ success:
 exit:
 	return ret;
 }
-#endif /* defined(CONFIG_WFD) && defined(CONFIG_IOCTL_CFG80211) */
+#endif /* defined(CONFIG_IOCTL_CFG80211) */
 
 static void _rtw_free_mlme_priv(struct mlme_priv *pmlmepriv)
 {
@@ -698,12 +698,10 @@ int is_same_network(WLAN_BSSID_EX *src, WLAN_BSSID_EX *dst, u8 feature)
 	_rtw_memcpy((u8 *)&le_tmp, rtw_get_capability_from_ie(dst->IEs), 2);
 	d_cap = le16_to_cpu(le_tmp);
 
-#ifdef CONFIG_P2P
 	if ((feature == 1) && /* 1: P2P supported */
 	    (_rtw_memcmp(src->MacAddress, dst->MacAddress, ETH_ALEN) == _TRUE)
 	   )
 		return _TRUE;
-#endif
 
 	/* Wi-Fi driver doesn't consider the situation of BCN and ProbRsp sent from the same hidden AP, 
 	  * it considers these two packets are sent from different AP. 
@@ -911,9 +909,7 @@ bool rtw_update_scanned_network(_adapter *adapter, WLAN_BSSID_EX *target)
 	ULONG	bssid_ex_sz;
 	struct mlme_priv	*pmlmepriv = &(adapter->mlmepriv);
 	struct mlme_ext_priv	*pmlmeext = &(adapter->mlmeextpriv);
-#ifdef CONFIG_P2P
 	struct wifidirect_info *pwdinfo = &(adapter->wdinfo);
-#endif /* CONFIG_P2P */
 	_queue	*queue	= &(pmlmepriv->scanned_queue);
 	struct wlan_network	*pnetwork = NULL;
 	struct wlan_network	*oldest = NULL;
@@ -925,10 +921,8 @@ bool rtw_update_scanned_network(_adapter *adapter, WLAN_BSSID_EX *target)
 	phead = get_list_head(queue);
 	plist = get_next(phead);
 
-#ifdef CONFIG_P2P
 	if (!rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE))
 		feature = 1; /* p2p enable */
-#endif
 
 	while (1) {
 		if (rtw_end_of_queue_search(phead, plist) == _TRUE)
@@ -938,14 +932,11 @@ bool rtw_update_scanned_network(_adapter *adapter, WLAN_BSSID_EX *target)
 
 		rtw_bug_check(pnetwork, pnetwork, pnetwork, pnetwork);
 
-#ifdef CONFIG_P2P
 		if (!rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE) &&
 		    (_rtw_memcmp(pnetwork->network.MacAddress, target->MacAddress, ETH_ALEN) == _TRUE)) {
 			target_find = 1;
 			break;
 		}
-#endif
-
 		if (is_same_network(&(pnetwork->network), target, feature)) {
 			target_find = 1;
 			break;
@@ -1059,10 +1050,8 @@ void rtw_add_network(_adapter *adapter, WLAN_BSSID_EX *pnetwork)
 
 	/* _enter_critical_bh(&queue->lock, &irqL); */
 
-#if defined(CONFIG_P2P) && defined(CONFIG_P2P_REMOVE_GROUP_INFO)
 	if (adapter->registrypriv.wifi_spec == 0)
 		rtw_bss_ex_del_p2p_attr(pnetwork, P2P_ATTR_GROUP_INFO);
-#endif
 
 	if (!hal_chk_wl_func(adapter, WL_FUNC_MIRACAST))
 		rtw_bss_ex_del_wfd_ie(pnetwork);
@@ -1324,10 +1313,8 @@ void rtw_surveydone_event_callback(_adapter	*adapter, u8 *pbuf)
 
 	_exit_critical_bh(&pmlmepriv->lock, &irqL);
 
-#ifdef CONFIG_P2P_PS
 	if (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE)
 		p2p_ps_wk_cmd(adapter, P2P_PS_SCAN_DONE, 0);
-#endif /* CONFIG_P2P_PS */
 
 	rtw_mi_os_xmit_schedule(adapter);
 
@@ -1459,10 +1446,8 @@ void rtw_free_assoc_resources(_adapter *adapter, int lock_scanned_queue)
 
 		RTW_INFO("free disconnecting network of scanned_queue\n");
 		rtw_free_network_nolock(adapter, pwlan);
-#ifdef CONFIG_P2P
 		if (!rtw_p2p_chk_state(&adapter->wdinfo, P2P_STATE_NONE))
 			rtw_mi_set_scan_deny(adapter, 2000);
-#endif /* CONFIG_P2P */
 	} else {
 		if (pwlan == NULL)
 			RTW_INFO("free disconnecting network of scanned_queue failed due to pwlan== NULL\n\n");
@@ -1573,9 +1558,7 @@ void rtw_indicate_disconnect(_adapter *padapter, u16 reason, u8 locally_generate
 		rtw_clear_scan_deny(padapter);
 	}
 
-#ifdef CONFIG_P2P_PS
 	p2p_ps_wk_cmd(padapter, P2P_PS_DISABLE, 1);
-#endif /* CONFIG_P2P_PS */
 
 #ifdef CONFIG_LPS
 	rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_DISCONNECT, 1);
@@ -2094,7 +2077,6 @@ void rtw_sta_media_status_rpt(_adapter *adapter, struct sta_info *sta, bool conn
 		else if (MLME_IS_MESH(adapter))
 			role = H2C_MSR_ROLE_MESH;
 
-#ifdef CONFIG_WFD
 		if (role == H2C_MSR_ROLE_GC
 			|| role == H2C_MSR_ROLE_GO
 			|| role == H2C_MSR_ROLE_TDLS
@@ -2104,7 +2086,6 @@ void rtw_sta_media_status_rpt(_adapter *adapter, struct sta_info *sta, bool conn
 				|| adapter->wfd_info.peer_rtsp_ctrlport)
 				rtw_wfd_st_switch(sta, 1);
 		}
-#endif
 	}
 
 	rtw_hal_set_FwMediaStatusRpt_single_cmd(adapter
@@ -2919,10 +2900,8 @@ static void rtw_auto_scan_handler(_adapter *padapter)
 
 	rtw_mlme_reset_auto_scan_int(padapter, &reason);
 
-#ifdef CONFIG_P2P
 	if (!rtw_p2p_chk_state(&padapter->wdinfo, P2P_STATE_NONE))
 		goto exit;
-#endif
 
 #ifdef CONFIG_TDLS
 	if (padapter->tdlsinfo.link_established == _TRUE)
@@ -4709,12 +4688,10 @@ u8 rtw_is_adapter_up(_adapter *padapter)
 bool is_miracast_enabled(_adapter *adapter)
 {
 	bool enabled = 0;
-#ifdef CONFIG_WFD
 	struct wifi_display_info *wfdinfo = &adapter->wfd_info;
 
 	enabled = (wfdinfo->stack_wfd_mode & (MIRACAST_SOURCE | MIRACAST_SINK))
 		  || (wfdinfo->op_wfd_mode & (MIRACAST_SOURCE | MIRACAST_SINK));
-#endif
 
 	return enabled;
 }
@@ -4722,11 +4699,9 @@ bool is_miracast_enabled(_adapter *adapter)
 bool rtw_chk_miracast_mode(_adapter *adapter, u8 mode)
 {
 	bool ret = 0;
-#ifdef CONFIG_WFD
 	struct wifi_display_info *wfdinfo = &adapter->wfd_info;
 
 	ret = (wfdinfo->stack_wfd_mode & mode) || (wfdinfo->op_wfd_mode & mode);
-#endif
 
 	return ret;
 }
@@ -4745,7 +4720,6 @@ const char *get_miracast_mode_str(int mode)
 		return "INVALID";
 }
 
-#ifdef CONFIG_WFD
 static bool wfd_st_match_rule(_adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port)
 {
 	struct wifi_display_info *wfdinfo = &adapter->wfd_info;
@@ -4761,14 +4735,11 @@ static struct st_register wfd_st_reg = {
 	.s_proto = 0x06,
 	.rule = wfd_st_match_rule,
 };
-#endif /* CONFIG_WFD */
 
 inline void rtw_wfd_st_switch(struct sta_info *sta, bool on)
 {
-#ifdef CONFIG_WFD
 	if (on)
 		rtw_st_ctl_register(&sta->st_ctl, SESSION_TRACKER_REG_ID_WFD, &wfd_st_reg);
 	else
 		rtw_st_ctl_unregister(&sta->st_ctl, SESSION_TRACKER_REG_ID_WFD);
-#endif
 }

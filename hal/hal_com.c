@@ -3139,7 +3139,6 @@ s32 rtw_set_ps_rsvd_page(_adapter *adapter)
 
 #endif
 
-#ifdef CONFIG_P2P_PS
 #ifdef RTW_HALMAC
 void rtw_set_p2p_ps_offload_cmd(_adapter *adapter, u8 p2p_ps_state)
 {
@@ -3262,7 +3261,6 @@ void rtw_set_p2p_ps_offload_cmd(_adapter *adapter, u8 p2p_ps_state)
 
 }
 #endif /* RTW_HALMAC */
-#endif /* CONFIG_P2P */
 
 /*
 * rtw_hal_set_FwMediaStatusRpt_cmd -

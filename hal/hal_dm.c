@@ -954,11 +954,9 @@ static u8 _rtw_phydm_pwr_tracking_rate_check(_adapter *adapter)
 		iface = dvobj->padapters[i];
 		pmlmeext = &(iface->mlmeextpriv);
 		if ((iface) && rtw_is_adapter_up(iface)) {
-#ifdef CONFIG_P2P
 			if (!rtw_p2p_chk_role(&(iface)->wdinfo, P2P_ROLE_DISABLE))
 				if_tx_rate = IEEE80211_OFDM_RATE_6MB;
 			else
-#endif
 				if_tx_rate = pmlmeext->tx_rate;
 			if(if_tx_rate < tx_rate)
 				tx_rate = if_tx_rate;

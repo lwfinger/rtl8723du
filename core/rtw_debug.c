@@ -323,7 +323,6 @@ void dump_adapters_status(void *sel, struct dvobj_priv *dvobj)
 		, dev_is_drv_stopped(dvobj) ? " DS" : ""
 	);
 
-#ifdef CONFIG_P2P
 #define P2P_INFO_TITLE_FMT	" %-3s %-4s"
 #define P2P_INFO_TITLE_ARG	, "lch", "p2ps"
 #ifdef CONFIG_IOCTL_CFG80211
@@ -334,13 +333,6 @@ void dump_adapters_status(void *sel, struct dvobj_priv *dvobj)
 #define P2P_INFO_VALUE_ARG	, iface->wdinfo.listen_channel, rtw_p2p_state(&iface->wdinfo)
 #endif
 #define P2P_INFO_DASH		"---------"
-#else
-#define P2P_INFO_TITLE_FMT	""
-#define P2P_INFO_TITLE_ARG
-#define P2P_INFO_VALUE_FMT	""
-#define P2P_INFO_VALUE_ARG
-#define P2P_INFO_DASH
-#endif
 
 	RTW_PRINT_SEL(sel, "%-2s %-15s %c %-3s %-3s %-3s %-17s %-4s %-7s"
 		P2P_INFO_TITLE_FMT

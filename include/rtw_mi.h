@@ -32,9 +32,7 @@ struct mi_state {
 	u8 scan_enter_num;	/* WIFI_SITE_MONITOR && !SCAN_DISABLE && !SCAN_BACK_OP */
 	u8 uwps_num;		/* WIFI_UNDER_WPS */
 #ifdef CONFIG_IOCTL_CFG80211
-	#ifdef CONFIG_P2P
 	u8 roch_num;
-	#endif
 	u8 mgmt_tx_num;
 #endif
 
@@ -78,7 +76,7 @@ struct mi_state {
 #define MSTATE_SCAN_ENTER_NUM(_mstate)	((_mstate)->scan_enter_num)
 #define MSTATE_WPS_NUM(_mstate)			((_mstate)->uwps_num)
 
-#if defined(CONFIG_IOCTL_CFG80211) && defined(CONFIG_P2P)
+#if defined(CONFIG_IOCTL_CFG80211)
 #define MSTATE_ROCH_NUM(_mstate)		((_mstate)->roch_num)
 #else
 #define MSTATE_ROCH_NUM(_mstate)		0
@@ -234,12 +232,10 @@ u8 rtw_mi_buddy_tx_beacon_hdl(_adapter *padapter);
 u8 rtw_mi_set_tx_beacon_cmd(_adapter *padapter);
 u8 rtw_mi_buddy_set_tx_beacon_cmd(_adapter *padapter);
 
-#ifdef CONFIG_P2P
 u8 rtw_mi_p2p_chk_state(_adapter *padapter, enum P2P_STATE p2p_state);
 u8 rtw_mi_buddy_p2p_chk_state(_adapter *padapter, enum P2P_STATE p2p_state);
 u8 rtw_mi_stay_in_p2p_mode(_adapter *padapter);
 u8 rtw_mi_buddy_stay_in_p2p_mode(_adapter *padapter);
-#endif
 
 _adapter *rtw_get_iface_by_id(_adapter *padapter, u8 iface_id);
 _adapter *rtw_get_iface_by_macddr(_adapter *padapter, u8 *mac_addr);

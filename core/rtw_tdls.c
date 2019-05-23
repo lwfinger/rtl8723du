@@ -48,10 +48,7 @@ void rtw_reset_tdls_info(_adapter *padapter)
 	ptdlsinfo->watchdog_count = 0;
 	ptdlsinfo->dev_discovered = _FALSE;
 
-#ifdef CONFIG_WFD
 	ptdlsinfo->wfd_info = &padapter->wfd_info;
-#endif
-
 	ptdlsinfo->tdls_sctx = NULL;
 }
 
@@ -1752,12 +1749,10 @@ sint on_tdls_setup_req(_adapter *padapter, union recv_frame *precv_frame, struct
 			else if (rsnie_included == 0 && prx_pkt_attrib->encrypt)
 				txmgmt.status_code = _STATS_INVALID_PARAMETERS_;
 
-#ifdef CONFIG_WFD
 			/* WFD test plan version 0.18.2 test item 5.1.5 */
 			/* SoUT does not use TDLS if AP uses weak security */
 			if (padapter->wdinfo.wfd_tdls_enable && (rsnie_included && prx_pkt_attrib->encrypt != _AES_))
 				txmgmt.status_code = _STATS_SEC_DISABLED_;
-#endif /* CONFIG_WFD */
 		}
 
 		ptdls_sta->tdls_sta_state |= TDLS_INITIATOR_STATE;
@@ -1778,10 +1773,7 @@ sint on_tdls_setup_req(_adapter *padapter, union recv_frame *precv_frame, struct
 		if (ptdlsinfo->sta_cnt == MAX_ALLOWED_TDLS_STA_NUM)
 			ptdlsinfo->sta_maximum = _TRUE;
 
-#ifdef CONFIG_WFD
 		rtw_tdls_process_wfd_ie(ptdlsinfo, ptr + FIXED_IE, parsing_length);
-#endif
-
 	} else
 		goto exit;
 
@@ -1917,9 +1909,7 @@ int On_TDLS_Setup_Rsp(_adapter *padapter, union recv_frame *precv_frame, struct 
 	_rtw_memcpy(ptdls_sta->bssrateset, supportRate, supportRateNum);
 	_rtw_memcpy(ptdls_sta->ANonce, ANonce, 32);
 
-#ifdef CONFIG_WFD
 	rtw_tdls_process_wfd_ie(ptdlsinfo, ptr + FIXED_IE, parsing_length);
-#endif
 
 	if (prx_pkt_attrib->encrypt) {
 		if (verify_ccmp == 1) {
@@ -2427,7 +2417,6 @@ exit:
 }
 #endif /* CONFIG_TDLS_CH_SW */
 
-#ifdef CONFIG_WFD
 void wfd_ie_tdls(_adapter *padapter, u8 *pframe, u32 *pktlen)
 {
 	struct mlme_priv		*pmlmepriv = &padapter->mlmepriv;
@@ -2518,7 +2507,6 @@ void wfd_ie_tdls(_adapter *padapter, u8 *pframe, u32 *pktlen)
 	pframe = rtw_set_ie(pframe, _VENDOR_SPECIFIC_IE_, wfdielen, (unsigned char *) wfdie, pktlen);
 
 }
-#endif /* CONFIG_WFD */
 
 void rtw_build_tdls_setup_req_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pframe, struct tdls_txmgmt *ptxmgmt, struct sta_info *ptdls_sta)
 {
@@ -2576,11 +2564,8 @@ void rtw_build_tdls_setup_req_ies(_adapter *padapter, struct xmit_frame *pxmitfr
 	if ((pregistrypriv->wmm_enable == _TRUE) || (padapter->mlmepriv.htpriv.ht_option == _TRUE))
 		pframe = rtw_tdls_set_qos_cap(pframe, pattrib);
 
-#ifdef CONFIG_WFD
 	if (padapter->wdinfo.wfd_tdls_enable == 1)
 		wfd_ie_tdls(padapter, pframe, &(pattrib->pktlen));
-#endif
-
 }
 
 void rtw_build_tdls_setup_rsp_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pframe, struct tdls_txmgmt *ptxmgmt, struct sta_info *ptdls_sta)
@@ -2658,11 +2643,8 @@ void rtw_build_tdls_setup_rsp_ies(_adapter *padapter, struct xmit_frame *pxmitfr
 	if ((pregistrypriv->wmm_enable == _TRUE) || (padapter->mlmepriv.htpriv.ht_option == _TRUE))
 		pframe = rtw_tdls_set_qos_cap(pframe, pattrib);
 
-#ifdef CONFIG_WFD
 	if (padapter->wdinfo.wfd_tdls_enable)
 		wfd_ie_tdls(padapter, pframe, &(pattrib->pktlen));
-#endif
-
 }
 
 void rtw_build_tdls_setup_cfm_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pframe, struct tdls_txmgmt *ptxmgmt, struct sta_info *ptdls_sta)
@@ -2906,7 +2888,6 @@ void rtw_build_tdls_ch_switch_rsp_ies(_adapter *padapter, struct xmit_frame *pxm
 }
 #endif
 
-#ifdef CONFIG_WFD
 void rtw_build_tunneled_probe_req_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pframe)
 {
 	u8 i;
@@ -2967,7 +2948,6 @@ void rtw_build_tunneled_probe_rsp_ies(_adapter *padapter, struct xmit_frame *pxm
 		}
 	}
 }
-#endif /* CONFIG_WFD */
 
 void _tdls_tpk_timer_hdl(void *FunctionContext)
 {

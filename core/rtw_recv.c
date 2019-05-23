@@ -921,9 +921,7 @@ sint OnTDLS(_adapter *adapter, union recv_frame *precv_frame)
 	sint ret = _SUCCESS;
 	u8 *paction = get_recvframe_data(precv_frame);
 	u8 category_field = 1;
-#ifdef CONFIG_WFD
 	u8 WFA_OUI[3] = { 0x50, 0x6f, 0x9a };
-#endif /* CONFIG_WFD */
 	struct tdls_info *ptdlsinfo = &(adapter->tdlsinfo);
 	u8 *ptr = precv_frame->u.hdr.rx_data;
 	struct sta_priv *pstapriv = &(adapter->stapriv);
@@ -995,7 +993,6 @@ sint OnTDLS(_adapter *adapter, union recv_frame *precv_frame)
 		ret = On_TDLS_Ch_Switch_Rsp(adapter, precv_frame, ptdls_sta);
 		break;
 #endif
-#ifdef CONFIG_WFD
 	/* First byte of WFA OUI */
 	case 0x50:
 		if (_rtw_memcmp(WFA_OUI, paction, 3)) {
@@ -1014,7 +1011,6 @@ sint OnTDLS(_adapter *adapter, union recv_frame *precv_frame)
 			}
 		}
 		break;
-#endif /* CONFIG_WFD */
 	default:
 		RTW_INFO("receive TDLS frame %d but not support\n", *paction);
 		ret = _FAIL;

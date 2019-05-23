@@ -759,10 +759,8 @@ int is_IBSS_empty(_adapter *padapter);
 unsigned char check_assoc_AP(u8 *pframe, uint len);
 
 int WMM_param_handler(_adapter *padapter, PNDIS_802_11_VARIABLE_IEs	pIE);
-#ifdef CONFIG_WFD
 void rtw_process_wfd_ie(_adapter *adapter, u8 *ie, u8 ie_len, const char *tag);
 void rtw_process_wfd_ies(_adapter *adapter, u8 *ies, u8 ies_len, const char *tag);
-#endif
 void WMMOnAssocRsp(_adapter *padapter);
 
 void HT_caps_handler(_adapter *padapter, PNDIS_802_11_VARIABLE_IEs pIE);
@@ -883,7 +881,6 @@ s32 dump_mgntframe_and_wait(_adapter *padapter, struct xmit_frame *pmgntframe, i
 s32 dump_mgntframe_and_wait_ack(_adapter *padapter, struct xmit_frame *pmgntframe);
 s32 dump_mgntframe_and_wait_ack_timeout(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms);
 
-#ifdef CONFIG_P2P
 int get_reg_classes_full_count(struct p2p_channels *channel_list);
 void issue_probersp_p2p(_adapter *padapter, unsigned char *da);
 void issue_p2p_provision_request(_adapter *padapter, u8 *pssid, u8 ussidlen, u8 *pdev_raddr);
@@ -892,7 +889,6 @@ void issue_probereq_p2p(_adapter *padapter, u8 *da);
 int issue_probereq_p2p_ex(_adapter *adapter, u8 *da, int try_cnt, int wait_ms);
 void issue_p2p_invitation_response(_adapter *padapter, u8 *raddr, u8 dialogToken, u8 success);
 void issue_p2p_invitation_request(_adapter *padapter, u8 *raddr);
-#endif /* CONFIG_P2P */
 void issue_beacon(_adapter *padapter, int timeout_ms);
 void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probereq);
 void _issue_assocreq(_adapter *padapter, u8 is_assoc);

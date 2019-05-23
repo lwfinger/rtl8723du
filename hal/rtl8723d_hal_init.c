@@ -3533,12 +3533,10 @@ static void rtl8723d_fill_default_txdesc(
 #endif
 		fill_txdesc_vcs_8723d(padapter, pattrib, pbuf);
 
-#ifdef CONFIG_P2P
 		if (!rtw_p2p_chk_state(&padapter->wdinfo, P2P_STATE_NONE)) {
 			if (pattrib->icmp_pkt == 1 && padapter->registrypriv.wifi_spec == 1)
 				drv_userate = 1;
 		}
-#endif
 
 		if ((pattrib->ether_type != 0x888e) &&
 		    (pattrib->ether_type != 0x0806) &&
@@ -4406,12 +4404,9 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 		rtl8723d_lps_poff_h2c_ctrl(padapter, *val);
 #endif
 		break;
-
-#ifdef CONFIG_P2P
 	case HW_VAR_H2C_FW_P2P_PS_OFFLOAD:
 		rtl8723d_set_p2p_ps_offload_cmd(padapter, *val);
 		break;
-#endif /* CONFIG_P2P */
 #ifdef CONFIG_LPS_POFF
 	case HW_VAR_LPS_POFF_INIT:
 		rtl8723d_lps_poff_init(padapter);

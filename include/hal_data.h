@@ -4,8 +4,6 @@
 #ifndef __HAL_DATA_H__
 #define __HAL_DATA_H__
 
-#if 1/* def  CONFIG_SINGLE_IMG */
-
 #include "../hal/phydm/phydm_precomp.h"
 #ifdef CONFIG_BT_COEXIST
 	#include <hal_btcoex.h>
@@ -467,21 +465,15 @@ typedef struct hal_com_data {
 
 	/* Add for dual MAC  0--Mac0 1--Mac1 */
 	u32	interfaceIndex;
-
-#ifdef CONFIG_P2P
 	u8	p2p_ps_offload;
-#endif
 	/* Auto FSM to Turn On, include clock, isolation, power control for MAC only */
 	u8	bMacPwrCtrlOn;
 	u8 hci_sus_state;
-
 	u8	RegIQKFWOffload;
 	struct submit_ctx	iqk_sctx;
 	u8 ch_switch_offload;
 	struct submit_ctx chsw_sctx;
-
 	RT_AMPDU_BRUST		AMPDUBurstMode; /* 92C maybe not use, but for compile successfully */
-
 	u8	OutEpQueueSel;
 	u8	OutEpNumber;
 
@@ -595,7 +587,6 @@ typedef struct hal_com_data HAL_DATA_TYPE, *PHAL_DATA_TYPE;
 #define is_boot_from_eeprom(adapter)			(GET_HAL_DATA(adapter)->EepromOrEfuse)
 #define rtw_get_hw_init_completed(adapter)		(GET_HAL_DATA(adapter)->hw_init_completed)
 #define rtw_is_hw_init_completed(adapter)		(GET_HAL_DATA(adapter)->hw_init_completed == _TRUE)
-#endif
 
 int recvbuf2recvframe(PADAPTER padapter, void *ptr);
 extern int new_bcn_max;

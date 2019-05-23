@@ -1859,14 +1859,12 @@ int rtw_build_tdls_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pf
 	case TDLS_PEER_TRAFFIC_RESPONSE:
 		rtw_build_tdls_peer_traffic_rsp_ies(padapter, pxmitframe, pframe, ptxmgmt, ptdls_sta);
 		break;
-#ifdef CONFIG_WFD
 	case TUNNELED_PROBE_REQ:
 		rtw_build_tunneled_probe_req_ies(padapter, pxmitframe, pframe);
 		break;
 	case TUNNELED_PROBE_RSP:
 		rtw_build_tunneled_probe_rsp_ies(padapter, pxmitframe, pframe);
 		break;
-#endif /* CONFIG_WFD */
 	default:
 		res = _FAIL;
 		break;

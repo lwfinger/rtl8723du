@@ -77,15 +77,9 @@ void rtw_wfd_st_switch(struct sta_info *sta, bool on);
 #define MLME_IS_MESH(adapter) CHK_MLME_STATE(adapter, WIFI_MESH_STATE)
 #define MLME_IS_MONITOR(adapter) CHK_MLME_STATE(adapter, WIFI_MONITOR_STATE)
 #define MLME_IS_MP(adapter) CHK_MLME_STATE(adapter, WIFI_MP_STATE)
-#ifdef CONFIG_P2P
-	#define MLME_IS_PD(adapter) rtw_p2p_chk_role(&(adapter)->wdinfo, P2P_ROLE_DEVICE)
-	#define MLME_IS_GC(adapter) rtw_p2p_chk_role(&(adapter)->wdinfo, P2P_ROLE_CLIENT)
-	#define MLME_IS_GO(adapter) rtw_p2p_chk_role(&(adapter)->wdinfo, P2P_ROLE_GO)
-#else /* !CONFIG_P2P */
-	#define MLME_IS_PD(adapter) 0
-	#define MLME_IS_GC(adapter) 0
-	#define MLME_IS_GO(adapter) 0
-#endif /* !CONFIG_P2P */
+#define MLME_IS_PD(adapter) rtw_p2p_chk_role(&(adapter)->wdinfo, P2P_ROLE_DEVICE)
+#define MLME_IS_GC(adapter) rtw_p2p_chk_role(&(adapter)->wdinfo, P2P_ROLE_CLIENT)
+#define MLME_IS_GO(adapter) rtw_p2p_chk_role(&(adapter)->wdinfo, P2P_ROLE_GO)
 
 #define MLME_IS_MSRC(adapter) rtw_chk_miracast_mode((adapter), MIRACAST_SOURCE)
 #define MLME_IS_MSINK(adapter) rtw_chk_miracast_mode((adapter), MIRACAST_SINK)
@@ -96,7 +90,7 @@ void rtw_wfd_st_switch(struct sta_info *sta, bool on);
 #define MLME_IS_OPCH_SW(adapter) CHK_MLME_STATE(adapter, WIFI_OP_CH_SWITCHING)
 #define MLME_IS_WPS(adapter) CHK_MLME_STATE(adapter, WIFI_UNDER_WPS)
 
-#if defined(CONFIG_IOCTL_CFG80211) && defined(CONFIG_P2P)
+#if defined(CONFIG_IOCTL_CFG80211)
 #define MLME_IS_ROCH(adapter) (rtw_cfg80211_get_is_roch(adapter) == _TRUE)
 #else
 #define MLME_IS_ROCH(adapter) 0
@@ -244,8 +238,6 @@ struct tx_invite_resp_info {
 	u8					token;	/*	Used to record the dialog token of p2p invitation request frame. */
 };
 
-#ifdef CONFIG_WFD
-
 struct wifi_display_info {
 	u16							wfd_enable;			/*	Eanble/Disable the WFD function. */
 	u16							init_rtsp_ctrlport;	/* init value of rtsp_ctrlport when WFD enable */
@@ -270,7 +262,6 @@ struct wifi_display_info {
 	u8 op_wfd_mode;
 	u8 stack_wfd_mode;
 };
-#endif /* CONFIG_WFD */
 
 struct tx_provdisc_req_info {
 	u16					wps_config_method_request;	/*	Used when sending the provisioning request frame */
@@ -300,12 +291,8 @@ struct group_id_info {
 };
 
 struct scan_limit_info {
-	u8					scan_op_ch_only;			/*	When this flag is set, the driver should just scan the operation channel */
-#ifndef CONFIG_P2P_OP_CHK_SOCIAL_CH
-	u8					operation_ch[2];				/*	Store the operation channel of invitation request frame */
-#else
-	u8					operation_ch[5];				/*	Store additional channel 1,6,11  for Android 4.2 IOT & Nexus 4 */
-#endif /* CONFIG_P2P_OP_CHK_SOCIAL_CH */
+	u8 scan_op_ch_only;		/*	When this flag is set, the driver should just scan the operation channel */
+	u8 operation_ch[5];		/*	Store additional channel 1,6,11  for Android 4.2 IOT & Nexus 4 */
 };
 
 #ifdef CONFIG_IOCTL_CFG80211
@@ -344,9 +331,7 @@ struct wifidirect_info {
 	struct group_id_info		groupid_info;	/*	Store the group id information when doing the group negotiation handshake. */
 	struct scan_limit_info		rx_invitereq_info;	/*	Used for get the limit scan channel from the Invitation procedure */
 	struct scan_limit_info		p2p_info;		/*	Used for get the limit scan channel from the P2P negotiation handshake */
-#ifdef CONFIG_WFD
 	struct wifi_display_info		*wfd_info;
-#endif
 	enum P2P_ROLE			role;
 	enum P2P_STATE			pre_p2p_state;
 	enum P2P_STATE			p2p_state;
@@ -406,7 +391,6 @@ struct wifidirect_info {
 	u16						ext_listen_interval;	/*	The interval to be available with legacy AP (ms) */
 	u16						ext_listen_period;	/*	The time period to be available for P2P listen state (ms) */
 #endif
-#ifdef CONFIG_P2P_PS
 	enum P2P_PS_MODE		p2p_ps_mode; /* indicate p2p ps mode */
 	enum P2P_PS_STATE		p2p_ps_state; /* indicate p2p ps state */
 	u8						noa_index; /* Identifies and instance of Notice of Absence timing. */
@@ -417,7 +401,6 @@ struct wifidirect_info {
 	u32						noa_duration[P2P_MAX_NOA_NUM]; /* Max duration for owner, preferred or min acceptable duration for client. */
 	u32						noa_interval[P2P_MAX_NOA_NUM]; /* Length of interval for owner, preferred or max acceptable interval of client. */
 	u32						noa_start_time[P2P_MAX_NOA_NUM]; /* schedule expressed in terms of the lower 4 bytes of the TSF timer. */
-#endif /* CONFIG_P2P_PS */
 };
 
 struct tdls_ss_record {	/* signal strength record */
@@ -466,10 +449,7 @@ struct tdls_info {
 
 	/* Let wpa_supplicant to setup*/
 	u8					driver_setup;
-#ifdef CONFIG_WFD
 	struct wifi_display_info		*wfd_info;
-#endif
-
 	struct submit_ctx	*tdls_sctx;
 };
 
@@ -889,7 +869,7 @@ struct mlme_priv {
 	u8 ori_offset;
 #endif /* #if defined (CONFIG_AP_MODE) && defined (CONFIG_NATIVEAP_MLME) */
 
-#if defined(CONFIG_WFD) && defined(CONFIG_IOCTL_CFG80211)
+#if defined(CONFIG_IOCTL_CFG80211)
 	u8 *wfd_beacon_ie;
 	u32 wfd_beacon_ie_len;
 
@@ -1188,7 +1168,7 @@ void rtw_free_mlme_priv_ie_data(struct mlme_priv *pmlmepriv);
 #define MLME_ASSOC_REQ_IE		4
 #define MLME_ASSOC_RESP_IE		5
 
-#if defined(CONFIG_WFD) && defined(CONFIG_IOCTL_CFG80211)
+#if defined(CONFIG_IOCTL_CFG80211)
 int rtw_mlme_update_wfd_ie_data(struct mlme_priv *mlme, u8 type, u8 *ie, u32 ie_len);
 #endif
 

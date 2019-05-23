@@ -125,10 +125,8 @@ s32 rtw_tdls_do_ch_sw(_adapter *padapter, struct sta_info *ptdls_sta, u8 chnl_ty
 void rtw_tdls_chsw_oper_done(_adapter *padapter);
 #endif
 
-#ifdef CONFIG_WFD
 int issue_tunneled_probe_req(_adapter *padapter);
 int issue_tunneled_probe_rsp(_adapter *padapter, union recv_frame *precv_frame);
-#endif /* CONFIG_WFD */
 int issue_tdls_dis_req(_adapter *padapter, struct tdls_txmgmt *ptxmgmt);
 int issue_tdls_setup_req(_adapter *padapter, struct tdls_txmgmt *ptxmgmt, int wait_ack);
 int issue_tdls_setup_rsp(_adapter *padapter, struct tdls_txmgmt *ptxmgmt);

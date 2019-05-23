@@ -818,19 +818,15 @@ u8 rtw_sitesurvey_cmd(_adapter *padapter, struct sitesurvey_parm *pparm)
 	struct sitesurvey_parm	*psurveyPara;
 	struct cmd_priv	*pcmdpriv = &padapter->cmdpriv;
 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
-#ifdef CONFIG_P2P
 	struct wifidirect_info *pwdinfo = &(padapter->wdinfo);
-#endif /* CONFIG_P2P */
 
 #ifdef CONFIG_LPS
 	if (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE)
 		rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_SCAN, 1);
 #endif
 
-#ifdef CONFIG_P2P_PS
 	if (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE)
 		p2p_ps_wk_cmd(padapter, P2P_PS_SCAN, 1);
-#endif /* CONFIG_P2P_PS */
 
 	ph2c = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
 	if (ph2c == NULL)
@@ -2940,7 +2936,6 @@ static void free_assoc_resources_hdl(_adapter *padapter)
 	rtw_free_assoc_resources(padapter, 1);
 }
 
-#ifdef CONFIG_P2P
 u8 p2p_protocol_wk_cmd(_adapter *padapter, int intCmdType)
 {
 	struct cmd_obj	*ph2c;
@@ -3079,7 +3074,6 @@ inline u8 p2p_cancel_roch_cmd(_adapter *adapter, u64 cookie, struct wireless_dev
 }
 
 #endif /* CONFIG_IOCTL_CFG80211 */
-#endif /* CONFIG_P2P */
 
 #ifdef CONFIG_IOCTL_CFG80211 
 inline u8 rtw_mgnt_tx_cmd(_adapter *adapter, u8 tx_ch, u8 no_cck, const u8 *buf, size_t len, int wait_ack, u8 flags)
@@ -4242,14 +4236,12 @@ static void session_tracker_chk_for_sta(_adapter *adapter, struct sta_info *sta)
 		if (st->status != ST_STATUS_ESTABLISH)
 			continue;
 
-		#ifdef CONFIG_WFD
 		if (ntohs(st->local_port) == adapter->wfd_info.rtsp_ctrlport)
 			op_wfd_mode |= MIRACAST_SINK;
 		if (ntohs(st->local_port) == adapter->wfd_info.tdls_rtsp_ctrlport)
 			op_wfd_mode |= MIRACAST_SINK;
 		if (ntohs(st->remote_port) == adapter->wfd_info.peer_rtsp_ctrlport)
 			op_wfd_mode |= MIRACAST_SOURCE;
-		#endif
 	}
 
 	_exit_critical_bh(&st_ctl->tracker_q.lock, &irqL);
@@ -4298,9 +4290,7 @@ static void session_tracker_chk_for_adapter(_adapter *adapter)
 
 	_exit_critical_bh(&stapriv->sta_hash_lock, &irqL);
 
-#ifdef CONFIG_WFD
 	adapter->wfd_info.op_wfd_mode = MIRACAST_MODE_REVERSE(op_wfd_mode);
-#endif
 }
 
 static void session_tracker_cmd_hdl(_adapter *adapter, struct st_cmd_parm *parm)
@@ -4438,12 +4428,9 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapter, unsigned char *pbuf)
 		rpt_timer_setting_wk_hdl(padapter, pdrvextra_cmd->type);
 		break;
 #endif
-#ifdef CONFIG_P2P_PS
 	case P2P_PS_WK_CID:
 		p2p_ps_wk_hdl(padapter, pdrvextra_cmd->type);
 		break;
-#endif
-#ifdef CONFIG_P2P
 	case P2P_PROTO_WK_CID:
 		/*
 		* Commented by Albert 2011/07/01
@@ -4451,7 +4438,6 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapter, unsigned char *pbuf)
 		*/
 		ret = p2p_protocol_wk_hdl(padapter, pdrvextra_cmd->type, pdrvextra_cmd->pbuf);
 		break;
-#endif
 #ifdef CONFIG_AP_MODE
 	case CHECK_HIQ_WK_CID:
 		rtw_chk_hi_queue_hdl(padapter);

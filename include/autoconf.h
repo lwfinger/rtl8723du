@@ -48,34 +48,11 @@
 	/* #define CONFIG_AUTO_AP_MODE */
 #endif
 
-#define CONFIG_P2P
-#ifdef CONFIG_P2P
-	/*
-	 * Added by Albert 20110812
-	 * The CONFIG_WFD is for supporting the Wi-Fi display
-	 */
-	#define CONFIG_WFD
-
-	#define CONFIG_P2P_REMOVE_GROUP_INFO
-
-	/* #define CONFIG_DBG_P2P */
-	#define CONFIG_P2P_PS
-	#define CONFIG_P2P_OP_CHK_SOCIAL_CH
-	#define CONFIG_CFG80211_ONECHANNEL_UNDER_CONCURRENT  /* replace CONFIG_P2P_CHK_INVITE_CH_LIST flag */
-	#define CONFIG_P2P_INVITE_IOT
-#endif
-
 /*
  * Added by Kurt 20110511
  */
 #ifdef CONFIG_TDLS
 	#define CONFIG_TDLS_DRIVER_SETUP
-/*
-	#ifndef CONFIG_WFD
-		#define CONFIG_WFD
-	#endif
-	#define CONFIG_TDLS_AUTOSETUP
-*/
 	#define CONFIG_TDLS_AUTOCHECKALIVE
 	#define CONFIG_TDLS_CH_SW		/* Enable "CONFIG_TDLS_CH_SW" by default, however limit it to only work in wifi logo test mode but not in normal mode currently */
 #endif

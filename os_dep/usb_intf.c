@@ -1038,9 +1038,7 @@ static _adapter *rtw_usb_primary_adapter_init(struct dvobj_priv *dvobj,
 	rtw_mbid_camid_alloc(padapter, adapter_mac_addr(padapter));
 #endif
 
-#ifdef CONFIG_P2P
 	rtw_init_wifidirect_addrs(padapter, adapter_mac_addr(padapter), adapter_mac_addr(padapter));
-#endif /* CONFIG_P2P */
 	RTW_INFO("bDriverStopped:%s, bSurpriseRemoved:%s, bup:%d, hw_init_completed:%d\n"
 		 , rtw_is_drv_stopped(padapter) ? "True" : "False"
 		 , rtw_is_surprise_removed(padapter) ? "True" : "False"

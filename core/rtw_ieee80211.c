@@ -1523,13 +1523,8 @@ void dump_ies(void *sel, const u8 *buf, u32 buf_len)
 		dump_ht_cap_ie(sel, pos, len + 2);
 		dump_ht_op_ie(sel, pos, len + 2);
 		dump_wps_ie(sel, pos, len + 2);
-#ifdef CONFIG_P2P
 		dump_p2p_ie(sel, pos, len + 2);
-#ifdef CONFIG_WFD
 		dump_wfd_ie(sel, pos, len + 2);
-#endif
-#endif
-
 		pos += (2 + len);
 	}
 }

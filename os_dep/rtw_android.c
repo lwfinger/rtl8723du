@@ -447,7 +447,6 @@ static int rtw_android_getband(struct net_device *net, char *command, int total_
 	return bytes_written;
 }
 
-#ifdef CONFIG_WFD
 static int rtw_android_set_miracast_mode(struct net_device *net, char *command, int total_len)
 {
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(net);
@@ -463,7 +462,7 @@ static int rtw_android_set_miracast_mode(struct net_device *net, char *command, 
 		goto exit;
 
 	switch (mode) {
-	case 1: /* soruce */
+	case 1: /* source */
 		mode = MIRACAST_SOURCE;
 		break;
 	case 2: /* sink */
@@ -482,7 +481,6 @@ static int rtw_android_set_miracast_mode(struct net_device *net, char *command, 
 exit:
 	return (ret == _SUCCESS) ? 0 : -1;
 }
-#endif /* CONFIG_WFD */
 
 static int get_int_from_command(char *pcmd)
 {
@@ -555,9 +553,7 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 #endif
 	android_wifi_priv_cmd priv_cmd;
 	_adapter	*padapter = (_adapter *) rtw_netdev_priv(net);
-#ifdef CONFIG_WFD
 	struct wifi_display_info		*pwfd_info;
-#endif
 
 	rtw_lock_suspend();
 
@@ -761,8 +757,6 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 	}
 #endif /* CONFIG_IOCTL_CFG80211 */
 
-#ifdef CONFIG_WFD
-
 	case ANDROID_WIFI_CMD_MIRACAST:
 		bytes_written = rtw_android_set_miracast_mode(net, command, priv_cmd.total_len);
 		break;
@@ -809,7 +803,6 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		}
 		break;
 	}
-#endif
 	case ANDROID_WIFI_CMD_CHANGE_DTIM: {
 #ifdef CONFIG_LPS
 		u8 dtim;
@@ -850,13 +843,10 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		break;
 #endif /* CONFIG_GTK_OL		 */
 	case ANDROID_WIFI_CMD_P2P_DISABLE: {
-#ifdef CONFIG_P2P
 		struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
 		u8 channel, ch_offset;
 		u16 bwmode;
-
 		rtw_p2p_enable(padapter, P2P_ROLE_DISABLE);
-#endif /* CONFIG_P2P */
 		break;
 	}
 	case ANDROID_WIFI_CMD_DRIVERVERSION: {

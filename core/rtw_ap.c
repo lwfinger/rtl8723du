@@ -1651,10 +1651,8 @@ int rtw_check_beacon_data(_adapter *padapter, u8 *pbuf,  int len)
 		_rtw_memset(&pbss_network->Ssid, 0, sizeof(NDIS_802_11_SSID));
 		_rtw_memcpy(pbss_network->Ssid.Ssid, (p + 2), ie_len);
 		pbss_network->Ssid.SsidLength = ie_len;
-#ifdef CONFIG_P2P
 		_rtw_memcpy(padapter->wdinfo.p2p_group_ssid, pbss_network->Ssid.Ssid, pbss_network->Ssid.SsidLength);
 		padapter->wdinfo.p2p_group_ssid_len = pbss_network->Ssid.SsidLength;
-#endif
 	}
 
 	/* chnnel */

@@ -151,7 +151,6 @@ extern u32 rtw_init_evt_priv(struct evt_priv *pevtpriv);
 extern void rtw_free_evt_priv(struct evt_priv *pevtpriv);
 extern void rtw_cmd_clr_isr(struct cmd_priv *pcmdpriv);
 extern void rtw_evt_notify_isr(struct evt_priv *pevtpriv);
-#ifdef CONFIG_P2P
 u8 p2p_protocol_wk_cmd(_adapter *padapter, int intCmdType);
 
 #ifdef CONFIG_IOCTL_CFG80211
@@ -172,7 +171,6 @@ u8 p2p_roch_cmd(_adapter *adapter
 u8 p2p_cancel_roch_cmd(_adapter *adapter, u64 cookie, struct wireless_dev *wdev, u8 flags);
 
 #endif /* CONFIG_IOCTL_CFG80211 */
-#endif /* CONFIG_P2P */
 
 #ifdef CONFIG_IOCTL_CFG80211 
 u8 rtw_mgnt_tx_cmd(_adapter *adapter, u8 tx_ch, u8 no_cck, const u8 *buf, size_t len, int wait_ack, u8 flags);
