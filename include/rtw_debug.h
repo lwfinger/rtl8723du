@@ -319,11 +319,6 @@ int proc_get_all_sta_info(struct seq_file *m, void *v);
 int proc_get_malloc_cnt(struct seq_file *m, void *v);
 #endif /* DBG_MEMORY_LEAK */
 
-#ifdef CONFIG_FIND_BEST_CHANNEL
-int proc_get_best_channel(struct seq_file *m, void *v);
-ssize_t proc_set_best_channel(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#endif /* CONFIG_FIND_BEST_CHANNEL */
-
 int proc_get_trx_info_debug(struct seq_file *m, void *v);
 
 int proc_get_rx_signal(struct seq_file *m, void *v);

@@ -1149,10 +1149,6 @@ void dump_chset(void *sel, RT_CHANNEL_INFO *ch_set)
 		RTW_PRINT_SEL(sel, "ch:%3u, freq:%u, scan_type:%d"
 			, ch_set[i].ChannelNum, rtw_ch2freq(ch_set[i].ChannelNum), ch_set[i].ScanType);
 
-#ifdef CONFIG_FIND_BEST_CHANNEL
-		_RTW_PRINT_SEL(sel, ", rx_count:%u", ch_set[i].rx_count);
-#endif
-
 #ifdef CONFIG_DFS_MASTER
 		if (rtw_is_dfs_ch(ch_set[i].ChannelNum)) {
 			if (CH_IS_NON_OCP(&ch_set[i]))

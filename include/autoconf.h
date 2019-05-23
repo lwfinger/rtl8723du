@@ -41,7 +41,6 @@
 	#ifndef CONFIG_NATIVEAP_MLME
 		#define CONFIG_HOSTAPD_MLME
 	#endif
-	/* #define CONFIG_FIND_BEST_CHANNEL */
 	/* #define CONFIG_NO_WIRELESS_HANDLERS */
 	#define CONFIG_TX_MCAST2UNI /* Support IP multicast to unicast */
 

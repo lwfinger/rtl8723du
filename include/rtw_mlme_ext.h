@@ -444,9 +444,6 @@ typedef struct _RT_CHANNEL_INFO {
 	/* u16				ScanPeriod;		 */ /* Listen time in millisecond in this channel. */
 	/* s32				MaxTxPwrDbm;	 */ /* Max allowed tx power. */
 	/* u32				ExInfo;			 */ /* Extended Information for this channel. */
-#ifdef CONFIG_FIND_BEST_CHANNEL
-	u32				rx_count;
-#endif
 #ifdef CONFIG_DFS
 	#ifdef CONFIG_DFS_MASTER
 	systime non_ocp_end_time;

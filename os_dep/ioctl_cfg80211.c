@@ -6660,52 +6660,6 @@ static void cfg80211_rtw_rfkill_poll(struct wiphy *wiphy)
 #define SURVEY_INFO_TIME_TX			SURVEY_INFO_CHANNEL_TIME_TX
 #endif
 
-#ifdef CONFIG_FIND_BEST_CHANNEL
-static void rtw_cfg80211_set_survey_info_with_find_best_channel(struct wiphy *wiphy
-	, struct net_device *netdev, int idx, struct survey_info *info)
-{
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(netdev);
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-	RT_CHANNEL_INFO *ch_set = rfctl->channel_set;
-	u8 ch_num = rfctl->max_chan_nums;
-	u32 total_rx_cnt = 0;
-	int i;
-
-	s8 noise = -50;		/*channel noise in dBm. This and all following fields are optional */
-	u64 time = 100;		/*amount of time in ms the radio was turn on (on the channel)*/
-	u64 time_busy = 0;	/*amount of time the primary channel was sensed busy*/
-
-	info->filled  = SURVEY_INFO_NOISE_DBM
-		#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
-		| SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY
-		#endif
-		;
-
-	for (i = 0; i < ch_num; i++)
-		total_rx_cnt += ch_set[i].rx_count;
-
-	time_busy = ch_set[idx].rx_count * time / total_rx_cnt;
-	noise += ch_set[idx].rx_count * 50 / total_rx_cnt;
-
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
-	#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 0, 0))
-	info->channel_time = time;
-	info->channel_time_busy = time_busy;
-	#else
-	info->time = time;
-	info->time_busy = time_busy;
-	#endif
-#endif
-	info->noise = noise;
-
-	/* reset if final channel is got */
-	if (idx == ch_num - 1) {
-		for (i = 0; i < ch_num; i++)
-			ch_set[i].rx_count = 0;
-	}
-}
-#endif /* CONFIG_FIND_BEST_CHANNEL */
-
 #if defined(CONFIG_RTW_ACS) && defined(CONFIG_BACKGROUND_NOISE_MONITOR)
 static void rtw_cfg80211_set_survey_info_with_clm(PADAPTER padapter, int idx, struct survey_info *pinfo)
 {
@@ -6775,9 +6729,7 @@ int rtw_hostapd_acs_dump_survey(struct wiphy *wiphy, struct net_device *netdev, 
 	if (info->channel->flags == IEEE80211_CHAN_DISABLED)
 		return ret;
 
-#ifdef CONFIG_FIND_BEST_CHANNEL
-	rtw_cfg80211_set_survey_info_with_find_best_channel(wiphy, netdev, idx, info);
-#elif defined(CONFIG_RTW_ACS) && defined(CONFIG_BACKGROUND_NOISE_MONITOR)
+#if defined(CONFIG_RTW_ACS) && defined(CONFIG_BACKGROUND_NOISE_MONITOR)
 	rtw_cfg80211_set_survey_info_with_clm(padapter, idx, info);
 #else
 	RTW_ERR("%s: unknown acs operation!\n", __func__); 

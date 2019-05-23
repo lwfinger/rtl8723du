@@ -331,9 +331,6 @@
 #endif /* CONFIG_USB_RX_AGGREGATION */
 
 #ifdef CONFIG_RTW_HOSTAPD_ACS
-	#ifdef CONFIG_FIND_BEST_CHANNEL
-		#undef CONFIG_FIND_BEST_CHANNEL
-	#endif
 	#ifndef CONFIG_RTW_ACS
 		#define CONFIG_RTW_ACS
 	#endif

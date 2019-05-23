@@ -9838,67 +9838,7 @@ static int rtw_tdls_get_best_ch(struct net_device *dev,
 				struct iw_request_info *info,
 				union iwreq_data *wrqu, char *extra)
 {
-#ifdef CONFIG_FIND_BEST_CHANNEL
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(padapter);
-	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
-	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
-
-	for (i = 0; i < rfctl->max_chan_nums && rfctl->channel_set[i].ChannelNum != 0; i++) {
-		if (rfctl->channel_set[i].ChannelNum == 1)
-			index_24G = i;
-		if (rfctl->channel_set[i].ChannelNum == 36)
-			index_5G = i;
-	}
-
-	for (i = 0; i < rfctl->max_chan_nums && rfctl->channel_set[i].ChannelNum != 0; i++) {
-		/* 2.4G */
-		if (rfctl->channel_set[i].ChannelNum == 6 || rfctl->channel_set[i].ChannelNum == 11) {
-			if (rfctl->channel_set[i].rx_count < rfctl->channel_set[index_24G].rx_count) {
-				index_24G = i;
-				best_channel_24G = rfctl->channel_set[i].ChannelNum;
-			}
-		}
-
-		/* 5G */
-		if (rfctl->channel_set[i].ChannelNum >= 36
-		    && rfctl->channel_set[i].ChannelNum < 140) {
-			/* Find primary channel */
-			if (((rfctl->channel_set[i].ChannelNum - 36) % 8 == 0)
-			    && (rfctl->channel_set[i].rx_count < rfctl->channel_set[index_5G].rx_count)) {
-				index_5G = i;
-				best_channel_5G = rfctl->channel_set[i].ChannelNum;
-			}
-		}
-
-		if (rfctl->channel_set[i].ChannelNum >= 149
-		    && rfctl->channel_set[i].ChannelNum < 165) {
-			/* Find primary channel */
-			if (((rfctl->channel_set[i].ChannelNum - 149) % 8 == 0)
-			    && (rfctl->channel_set[i].rx_count < rfctl->channel_set[index_5G].rx_count)) {
-				index_5G = i;
-				best_channel_5G = rfctl->channel_set[i].ChannelNum;
-			}
-		}
-		RTW_INFO("The rx cnt of channel %3d = %d\n",
-			 rfctl->channel_set[i].ChannelNum,
-			 rfctl->channel_set[i].rx_count);
-	}
-
-	sprintf(extra, "\nbest_channel_24G = %d\n", best_channel_24G);
-	RTW_INFO("best_channel_24G = %d\n", best_channel_24G);
-
-	if (index_5G != 0) {
-		sprintf(extra, "best_channel_5G = %d\n", best_channel_5G);
-		RTW_INFO("best_channel_5G = %d\n", best_channel_5G);
-	}
-
-	wrqu->data.length = strlen(extra);
-
-#endif
-
 	return 0;
-
 }
 
 static int rtw_tdls(struct net_device *dev,
