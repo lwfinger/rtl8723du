@@ -3931,13 +3931,6 @@ int rtw_p2p_check_frames(_adapter *padapter, const u8 *buf, u32 len, u8 tx)
 				struct rtw_wdev_nego_info *nego_info = &pwdev_priv->nego_info;
 
 				if (tx) {
-					#ifdef CONFIG_DRV_ISSUE_PROV_REQ /* IOT FOR S2 */
-					if (pwdev_priv->provdisc_req_issued == _FALSE)
-						rtw_cfg80211_issue_p2p_provision_request(padapter, buf, len);
-					#endif /* CONFIG_DRV_ISSUE_PROV_REQ */
-
-					/* pwdev_priv->provdisc_req_issued = _FALSE; */
-
 					#if defined(CONFIG_CONCURRENT_MODE)
 					if (rtw_mi_check_status(padapter, MI_LINKED) && padapter->registrypriv.full_ch_in_p2p_handshake == 0)
 						rtw_cfg80211_adjust_p2pie_channel(padapter, frame_body, len - sizeof(struct rtw_ieee80211_hdr_3addr));

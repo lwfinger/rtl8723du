@@ -20,8 +20,6 @@
 
 /* #define CONFIG_IOCTL_CFG80211 */		/* Set from Makefile */
 #ifdef CONFIG_IOCTL_CFG80211
-	/* #define CONFIG_DRV_ISSUE_PROV_REQ */ /* IOT FOR S2 */
-
 	#define CONFIG_SET_SCAN_DENY_TIMER
 #endif
 
