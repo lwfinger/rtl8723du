@@ -955,12 +955,6 @@ void rtw_mlme_reset_auto_scan_int(_adapter *adapter, u8 *reason);
 
 struct hostapd_priv {
 	_adapter *padapter;
-
-#ifdef CONFIG_HOSTAPD_MLME
-	struct net_device *pmgnt_netdev;
-	struct usb_anchor anchored;
-#endif
-
 };
 
 extern int hostapd_mode_init(_adapter *padapter);

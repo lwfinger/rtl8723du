@@ -2491,9 +2491,6 @@ void rtw_drv_stop_vir_if(_adapter *padapter)
 #ifdef CONFIG_AP_MODE
 	if (MLME_IS_AP(padapter) || MLME_IS_MESH(padapter)) {
 		free_mlme_ap_info(padapter);
-		#ifdef CONFIG_HOSTAPD_MLME
-		hostapd_mode_unload(padapter);
-		#endif
 	}
 #endif
 

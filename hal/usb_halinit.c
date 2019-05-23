@@ -2208,9 +2208,6 @@ void rtl8723du_set_hal_ops(PADAPTER padapter)
 	pHalFunc->mgnt_xmit = &rtl8723du_mgnt_xmit;
 	pHalFunc->hal_xmitframe_enqueue = &rtl8723du_hal_xmitframe_enqueue;
 
-#ifdef CONFIG_HOSTAPD_MLME
-	pHalFunc->hostap_mgnt_xmit_entry = &rtl8723du_hostap_mgnt_xmit_entry;
-#endif
 	pHalFunc->interface_ps_func = &rtl8723du_ps_func;
 
 #ifdef CONFIG_XMIT_THREAD_MODE

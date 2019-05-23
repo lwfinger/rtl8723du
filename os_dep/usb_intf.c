@@ -1073,9 +1073,6 @@ static void rtw_usb_primary_adapter_deinit(_adapter *padapter)
 #ifdef CONFIG_AP_MODE
 	if (MLME_IS_AP(padapter) || MLME_IS_MESH(padapter)) {
 		free_mlme_ap_info(padapter);
-		#ifdef CONFIG_HOSTAPD_MLME
-		hostapd_mode_unload(padapter);
-		#endif
 	}
 #endif
 	rtw_dev_unload(padapter);
@@ -1168,10 +1165,6 @@ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device
 	/* dev_alloc_name && register_netdev */
 	if (rtw_os_ndevs_init(dvobj) != _SUCCESS)
 		goto free_if_vir;
-
-#ifdef CONFIG_HOSTAPD_MLME
-	hostapd_mode_init(padapter);
-#endif
 
 #ifdef CONFIG_PLATFORM_RTD2880B
 	RTW_INFO("wlan link up\n");

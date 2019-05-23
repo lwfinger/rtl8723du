@@ -15,10 +15,6 @@ extern void rtw_recv_returnpacket(IN _nic_hdl cnxt, IN _pkt *preturnedpkt);
 
 extern int rtw_recv_monitor(_adapter *padapter, union recv_frame *precv_frame);
 
-#ifdef CONFIG_HOSTAPD_MLME
-extern void rtw_hostapd_mlme_rx(_adapter *padapter, union recv_frame *precv_frame);
-#endif
-
 struct sta_info;
 extern void rtw_handle_tkip_mic_err(_adapter *padapter, struct sta_info *sta, u8 bgroup);
 
