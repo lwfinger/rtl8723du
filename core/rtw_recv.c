@@ -2504,11 +2504,6 @@ static int rtw_recv_indicatepkt_check(union recv_frame *rframe, u8 *ehdr_pos, u3
 	}
 #endif
 
-#ifdef CONFIG_AUTO_AP_MODE
-	if (ntohs(ehdr->h_proto) == 0x8899)
-		rtw_auto_ap_rx_msg_dump(adapter, rframe, ehdr_pos);
-#endif
-
 	ret = _SUCCESS;
 
 exit:

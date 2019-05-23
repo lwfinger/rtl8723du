@@ -3542,11 +3542,7 @@ static void rtl8723d_fill_default_txdesc(
 		    (pattrib->ether_type != 0x0806) &&
 		    (pattrib->ether_type != 0x88B4) &&
 		    (pattrib->dhcp_pkt != 1) &&
-		    (drv_userate != 1)
-#ifdef CONFIG_AUTO_AP_MODE
-		    && (pattrib->pctrl != _TRUE)
-#endif
-		   ) {
+		    (drv_userate != 1)) {
 			/* Non EAP & ARP & DHCP type data packet */
 
 			if (pattrib->ampdu_en == _TRUE) {

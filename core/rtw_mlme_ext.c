@@ -1756,110 +1756,6 @@ _continue:
 	}
 #endif
 
-
-#ifdef CONFIG_AUTO_AP_MODE
-	if (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE &&
-	    pmlmepriv->cur_network.join_res == _TRUE) {
-		_irqL	irqL;
-		struct sta_info	*psta;
-		u8 *mac_addr, *peer_addr;
-		struct sta_priv *pstapriv = &padapter->stapriv;
-		u8 RC_OUI[4] = {0x00, 0xE0, 0x4C, 0x0A};
-		/* EID[1] + EID_LEN[1] + RC_OUI[4] + MAC[6] + PairingID[2] + ChannelNum[2] */
-
-		p = rtw_get_ie(pframe + WLAN_HDR_A3_LEN + _PROBEREQ_IE_OFFSET_, _VENDOR_SPECIFIC_IE_, (int *)&ielen,
-			       len - WLAN_HDR_A3_LEN - _PROBEREQ_IE_OFFSET_);
-
-		if (!p || ielen != 14)
-			goto _non_rc_device;
-
-		if (!_rtw_memcmp(p + 2, RC_OUI, sizeof(RC_OUI)))
-			goto _non_rc_device;
-
-		if (!_rtw_memcmp(p + 6, get_sa(pframe), ETH_ALEN)) {
-			RTW_INFO("%s, do rc pairing ("MAC_FMT"), but mac addr mismatch!("MAC_FMT")\n", __FUNCTION__,
-				 MAC_ARG(get_sa(pframe)), MAC_ARG(p + 6));
-
-			goto _non_rc_device;
-		}
-
-		RTW_INFO("%s, got the pairing device("MAC_FMT")\n", __FUNCTION__,  MAC_ARG(get_sa(pframe)));
-
-		/* new a station */
-		psta = rtw_get_stainfo(pstapriv, get_sa(pframe));
-		if (psta == NULL) {
-			/* allocate a new one */
-			RTW_INFO("going to alloc stainfo for rc="MAC_FMT"\n",  MAC_ARG(get_sa(pframe)));
-			psta = rtw_alloc_stainfo(pstapriv, get_sa(pframe));
-			if (psta == NULL) {
-				/* TODO: */
-				RTW_INFO(" Exceed the upper limit of supported clients...\n");
-				return _SUCCESS;
-			}
-
-			_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
-			if (rtw_is_list_empty(&psta->asoc_list)) {
-				psta->expire_to = pstapriv->expire_to;
-				rtw_list_insert_tail(&psta->asoc_list, &pstapriv->asoc_list);
-				pstapriv->asoc_list_cnt++;
-			}
-			_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
-
-			/* generate pairing ID */
-			mac_addr = adapter_mac_addr(padapter);
-			peer_addr = psta->cmn.mac_addr;
-			psta->pid = (u16)(((mac_addr[4] << 8) + mac_addr[5]) + ((peer_addr[4] << 8) + peer_addr[5]));
-
-			/* update peer stainfo */
-			psta->isrc = _TRUE;
-
-			/* AID assignment */
-			if (psta->cmn.aid > 0)
-				RTW_INFO(FUNC_ADPT_FMT" old AID=%d\n", FUNC_ADPT_ARG(padapter), psta->cmn.aid);
-			else {
-				if (!rtw_aid_alloc(padapter, psta)) {
-					RTW_INFO(FUNC_ADPT_FMT" no room for more AIDs\n", FUNC_ADPT_ARG(padapter));
-					return _SUCCESS;
-				}
-				RTW_INFO(FUNC_ADPT_FMT" allocate new AID=%d\n", FUNC_ADPT_ARG(padapter), psta->cmn.aid);
-			}
-
-			psta->qos_option = 1;
-			psta->cmn.bw_mode = CHANNEL_WIDTH_20;
-			psta->ieee8021x_blocked = _FALSE;
-			psta->htpriv.ht_option = _TRUE;
-			psta->htpriv.ampdu_enable = _FALSE;
-			psta->htpriv.sgi_20m = _FALSE;
-			psta->htpriv.sgi_40m = _FALSE;
-			psta->htpriv.ch_offset = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
-			psta->htpriv.agg_enable_bitmap = 0x0;/* reset */
-			psta->htpriv.candidate_tid_bitmap = 0x0;/* reset */
-
-			rtw_hal_set_odm_var(padapter, HAL_ODM_STA_INFO, psta, _TRUE);
-
-			_rtw_memset((void *)&psta->sta_stats, 0, sizeof(struct stainfo_stats));
-
-			_enter_critical_bh(&psta->lock, &irqL);
-			psta->state |= _FW_LINKED;
-			_exit_critical_bh(&psta->lock, &irqL);
-
-			report_add_sta_event(padapter, psta->cmn.mac_addr);
-
-		}
-
-		issue_probersp(padapter, get_sa(pframe), _FALSE);
-
-		return _SUCCESS;
-
-	}
-
-_non_rc_device:
-
-	return _SUCCESS;
-
-#endif /* CONFIG_AUTO_AP_MODE */
-
-
 #ifdef CONFIG_CONCURRENT_MODE
 	if (((pmlmeinfo->state & 0x03) == WIFI_FW_AP_STATE) &&
 	    rtw_mi_buddy_check_fwstate(padapter, _FW_UNDER_LINKING | _FW_UNDER_SURVEY)) {
@@ -8130,43 +8026,10 @@ void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probe
 		pattrib->pktlen += len;
 	}
 
-#ifdef CONFIG_AUTO_AP_MODE
-	{
-		struct sta_info	*psta;
-		struct sta_priv *pstapriv = &padapter->stapriv;
-
-		RTW_INFO("(%s)\n", __FUNCTION__);
-
-		/* check rc station */
-		psta = rtw_get_stainfo(pstapriv, da);
-		if (psta && psta->isrc && psta->pid > 0) {
-			u8 RC_OUI[4] = {0x00, 0xE0, 0x4C, 0x0A};
-			u8 RC_INFO[14] = {0};
-			/* EID[1] + EID_LEN[1] + RC_OUI[4] + MAC[6] + PairingID[2] + ChannelNum[2] */
-			u16 cu_ch = (u16)cur_network->Configuration.DSConfig;
-
-			RTW_INFO("%s, reply rc(pid=0x%x) device "MAC_FMT" in ch=%d\n", __FUNCTION__,
-				 psta->pid, MAC_ARG(psta->cmn.mac_addr), cu_ch);
-
-			/* append vendor specific ie */
-			_rtw_memcpy(RC_INFO, RC_OUI, sizeof(RC_OUI));
-			_rtw_memcpy(&RC_INFO[4], mac, ETH_ALEN);
-			_rtw_memcpy(&RC_INFO[10], (u8 *)&psta->pid, 2);
-			_rtw_memcpy(&RC_INFO[12], (u8 *)&cu_ch, 2);
-
-			pframe = rtw_set_ie(pframe, _VENDOR_SPECIFIC_IE_, sizeof(RC_INFO), RC_INFO, &pattrib->pktlen);
-		}
-	}
-#endif /* CONFIG_AUTO_AP_MODE */
-
-
 	pattrib->last_txcmdsz = pattrib->pktlen;
-
-
 	dump_mgntframe(padapter, pmgntframe);
 
 	return;
-
 }
 
 static int _issue_probereq(_adapter *padapter, NDIS_802_11_SSID *pssid, u8 *da, u8 ch, bool append_wps, int wait_ack)
@@ -13017,135 +12880,6 @@ u8 NULL_hdl(_adapter *padapter, u8 *pbuf)
 	return H2C_SUCCESS;
 }
 
-#ifdef CONFIG_AUTO_AP_MODE
-void rtw_auto_ap_rx_msg_dump(_adapter *padapter, union recv_frame *precv_frame, u8 *ehdr_pos)
-{
-	struct rx_pkt_attrib *pattrib = &precv_frame->u.hdr.attrib;
-	struct sta_info *psta = precv_frame->u.hdr.psta;
-	struct ethhdr *ehdr = (struct ethhdr *)ehdr_pos;
-
-	RTW_INFO("eth rx: got eth_type=0x%x\n", ntohs(ehdr->h_proto));
-
-	if (psta && psta->isrc && psta->pid > 0) {
-		u16 rx_pid;
-
-		rx_pid = *(u16 *)(ehdr_pos + ETH_HLEN);
-
-		RTW_INFO("eth rx(pid=0x%x): sta("MAC_FMT") pid=0x%x\n",
-			 rx_pid, MAC_ARG(psta->cmn.mac_addr), psta->pid);
-
-		if (rx_pid == psta->pid) {
-			int i;
-			u16 len = *(u16 *)(ehdr_pos + ETH_HLEN + 2);
-			/* u16 ctrl_type = *(u16 *)(ehdr_pos + ETH_HLEN + 4); */
-
-			/* RTW_INFO("eth, RC: len=0x%x, ctrl_type=0x%x\n", len, ctrl_type);  */
-			RTW_INFO("eth, RC: len=0x%x\n", len);
-
-			for (i = 0; i < len; i++)
-				RTW_INFO("0x%x\n", *(ehdr_pos + ETH_HLEN + 4 + i));
-			/* RTW_INFO("0x%x\n", *(ehdr_pos + ETH_HLEN + 6 + i)); */
-
-			RTW_INFO("eth, RC-end\n");
-		}
-	}
-
-}
-
-void rtw_start_auto_ap(_adapter *adapter)
-{
-	RTW_INFO("%s\n", __FUNCTION__);
-
-	rtw_set_802_11_infrastructure_mode(adapter, Ndis802_11APMode);
-
-	rtw_setopmode_cmd(adapter, Ndis802_11APMode, RTW_CMDF_WAIT_ACK);
-}
-
-static int rtw_auto_ap_start_beacon(_adapter *adapter)
-{
-	int ret = 0;
-	u8 *pbuf = NULL;
-	uint len;
-	u8	supportRate[16];
-	int	sz = 0, rateLen;
-	u8	*ie;
-	u8	wireless_mode, oper_channel;
-	u8 ssid[3] = {0}; /* hidden ssid */
-	u32 ssid_len = sizeof(ssid);
-	struct mlme_priv *pmlmepriv = &(adapter->mlmepriv);
-
-
-	if (check_fwstate(pmlmepriv, WIFI_AP_STATE) != _TRUE)
-		return -EINVAL;
-
-
-	len = 128;
-	pbuf = rtw_zmalloc(len);
-	if (!pbuf)
-		return -ENOMEM;
-
-
-	/* generate beacon */
-	ie = pbuf;
-
-	/* timestamp will be inserted by hardware */
-	sz += 8;
-	ie += sz;
-
-	/* beacon interval : 2bytes */
-	*(__le16 *)ie = cpu_to_le16((u16)100); /* BCN_INTERVAL=100; */
-	sz += 2;
-	ie += 2;
-
-	/* capability info */
-	*(__le16 *)ie = 0;
-	*(__le16 *)ie |= cpu_to_le16(cap_ESS);
-	*(__le16 *)ie |= cpu_to_le16(cap_ShortPremble);
-	/* *(__le16*)ie |= cpu_to_le16(cap_Privacy); */
-	sz += 2;
-	ie += 2;
-
-	/* SSID */
-	ie = rtw_set_ie(ie, _SSID_IE_, ssid_len, ssid, &sz);
-
-	/* supported rates */
-	wireless_mode = WIRELESS_11BG_24N;
-	rtw_set_supported_rate(supportRate, wireless_mode) ;
-	rateLen = rtw_get_rateset_len(supportRate);
-	if (rateLen > 8)
-		ie = rtw_set_ie(ie, _SUPPORTEDRATES_IE_, 8, supportRate, &sz);
-	else
-		ie = rtw_set_ie(ie, _SUPPORTEDRATES_IE_, rateLen, supportRate, &sz);
-
-
-	/* DS parameter set */
-	if (rtw_mi_check_status(adapter, MI_LINKED))
-		oper_channel = rtw_mi_get_union_chan(adapter);
-	else
-		oper_channel = adapter_to_dvobj(adapter)->oper_channel;
-
-	ie = rtw_set_ie(ie, _DSSET_IE_, 1, &oper_channel, &sz);
-
-	/* ext supported rates */
-	if (rateLen > 8)
-		ie = rtw_set_ie(ie, _EXT_SUPPORTEDRATES_IE_, (rateLen - 8), (supportRate + 8), &sz);
-
-	RTW_INFO("%s, start auto ap beacon sz=%d\n", __FUNCTION__, sz);
-
-	/* lunch ap mode & start to issue beacon */
-	if (rtw_check_beacon_data(adapter, pbuf,  sz) == _SUCCESS) {
-
-	} else
-		ret = -EINVAL;
-
-
-	rtw_mfree(pbuf, len);
-
-	return ret;
-
-}
-#endif/* CONFIG_AUTO_AP_MODE */
-
 u8 setopmode_hdl(_adapter *padapter, u8 *pbuf)
 {
 	u8	type;
@@ -13172,11 +12906,6 @@ u8 setopmode_hdl(_adapter *padapter, u8 *pbuf)
 #endif
 
 	rtw_hal_set_hwreg(padapter, HW_VAR_SET_OPMODE, (u8 *)(&type));
-
-#ifdef CONFIG_AUTO_AP_MODE
-	if (psetop->mode == Ndis802_11APMode)
-		rtw_auto_ap_start_beacon(padapter);
-#endif
 
 	if (rtw_port_switch_chk(padapter) == _TRUE) {
 		rtw_hal_set_hwreg(padapter, HW_VAR_PORT_SWITCH, NULL);

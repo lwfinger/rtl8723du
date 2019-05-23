@@ -372,10 +372,6 @@ void	expire_timeout_chk(_adapter *padapter)
 			continue;
 		RTW_INFO("%s: debug line:%d\n", __func__, __LINE__);
 #endif
-#ifdef CONFIG_AUTO_AP_MODE
-		if (psta->isrc)
-			continue;
-#endif
 		if (chk_sta_is_alive(psta) || !psta->expire_to) {
 			psta->expire_to = pstapriv->expire_to;
 			psta->keep_alive_trycnt = 0;

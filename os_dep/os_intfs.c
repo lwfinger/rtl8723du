@@ -2335,11 +2335,6 @@ int netdev_vir_if_open(struct net_device *pnetdev)
 	ret = _netdev_vir_if_open(pnetdev);
 	_exit_critical_mutex(&(adapter_to_dvobj(padapter)->hw_init_mutex), NULL);
 
-#ifdef CONFIG_AUTO_AP_MODE
-	/* if(padapter->iface_id == 2) */
-	/*	rtw_start_auto_ap(padapter); */
-#endif
-
 	return ret;
 }
 
@@ -3009,12 +3004,6 @@ int netdev_open(struct net_device *pnetdev)
 		ret = _netdev_vir_if_open(pnetdev);
 #endif
 	_exit_critical_mutex(&(adapter_to_dvobj(padapter)->hw_init_mutex), NULL);
-
-
-#ifdef CONFIG_AUTO_AP_MODE
-	if (padapter->iface_id == IFACE_ID2)
-		rtw_start_auto_ap(padapter);
-#endif
 
 	return ret;
 }

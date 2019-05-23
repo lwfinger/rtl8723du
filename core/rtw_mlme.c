@@ -2174,7 +2174,6 @@ void rtw_stassoc_event_callback(_adapter *adapter, u8 *pbuf)
 			rtw_hal_mcc_update_macid_bitmap(adapter, psta->cmn.mac_id, _TRUE);
 #endif /* CONFIG_MCC_MODE */
 
-#ifndef CONFIG_AUTO_AP_MODE
 			ap_sta_info_defer_update(adapter, psta);
 
 			/* report to upper layer */
@@ -2202,7 +2201,6 @@ void rtw_stassoc_event_callback(_adapter *adapter, u8 *pbuf)
 #else /* !CONFIG_IOCTL_CFG80211	 */
 			rtw_indicate_sta_assoc_event(adapter, psta);
 #endif /* !CONFIG_IOCTL_CFG80211 */
-#endif /* !CONFIG_AUTO_AP_MODE */
 
 			if (is_wep_enc(adapter->securitypriv.dot11PrivacyAlgrthm))
 				rtw_ap_wep_pk_setting(adapter, psta);

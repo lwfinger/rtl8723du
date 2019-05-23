@@ -916,12 +916,6 @@ static void update_attrib_phy_info(_adapter *padapter, struct pkt_attrib *pattri
 #endif /* CONFIG_TDLS */
 
 	pattrib->retry_ctrl = _FALSE;
-
-#ifdef CONFIG_AUTO_AP_MODE
-	if (psta->isrc && psta->pid > 0)
-		pattrib->pctrl = _TRUE;
-#endif
-
 }
 
 static s32 update_attrib_sec_info(_adapter *padapter, struct pkt_attrib *pattrib, struct sta_info *psta)
