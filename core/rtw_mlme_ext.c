@@ -1626,24 +1626,12 @@ static u32 p2p_listen_state_process(_adapter *padapter, unsigned char *da)
 
 #ifdef CONFIG_IOCTL_CFG80211
 	if (padapter->wdinfo.driver_interface == DRIVER_CFG80211) {
-		if (rtw_cfg80211_get_is_roch(padapter) == _FALSE
-			|| rtw_get_oper_ch(padapter) != padapter->wdinfo.listen_channel
-			|| adapter_wdev_data(padapter)->p2p_enabled == _FALSE
-			|| padapter->mlmepriv.wps_probe_resp_ie == NULL
-			|| padapter->mlmepriv.p2p_probe_resp_ie == NULL
-		) {
-#ifdef CONFIG_DEBUG_CFG80211
-			RTW_INFO(ADPT_FMT" DON'T issue_probersp_p2p: p2p_enabled:%d, wps_probe_resp_ie:%p, p2p_probe_resp_ie:%p\n"
-				, ADPT_ARG(padapter)
-				, adapter_wdev_data(padapter)->p2p_enabled
-				, padapter->mlmepriv.wps_probe_resp_ie
-				, padapter->mlmepriv.p2p_probe_resp_ie);
-			RTW_INFO(ADPT_FMT" DON'T issue_probersp_p2p: is_ro_ch:%d, op_ch:%d, p2p_listen_channel:%d\n"
-				, ADPT_ARG(padapter)
-				, rtw_cfg80211_get_is_roch(padapter)
-				, rtw_get_oper_ch(padapter)
-				, padapter->wdinfo.listen_channel);
-#endif
+		if (rtw_cfg80211_get_is_roch(padapter) == _FALSE ||
+		    rtw_get_oper_ch(padapter) !=
+				 padapter->wdinfo.listen_channel ||
+		    adapter_wdev_data(padapter)->p2p_enabled == _FALSE ||
+		    padapter->mlmepriv.wps_probe_resp_ie == NULL ||
+		    padapter->mlmepriv.p2p_probe_resp_ie == NULL) {
 			response = _FALSE;
 		}
 	} else
