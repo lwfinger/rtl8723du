@@ -46,9 +46,7 @@ void dump_drv_cfg(struct seq_file *sel)
 	RTW_PRINT_SEL(sel, "------------------------------------------------\n");
 #ifdef CONFIG_IOCTL_CFG80211
 	RTW_PRINT_SEL(sel, "CFG80211\n");
-#ifdef RTW_USE_CFG80211_STA_EVENT
 	RTW_PRINT_SEL(sel, "RTW_USE_CFG80211_STA_EVENT\n");
-#endif
 	#ifdef CONFIG_RADIO_WORK
 	RTW_PRINT_SEL(sel, "CONFIG_RADIO_WORK\n");
 	#endif
