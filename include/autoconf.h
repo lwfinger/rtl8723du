@@ -21,7 +21,6 @@
  * Added by Kurt 20110511
  */
 #ifdef CONFIG_TDLS
-	#define CONFIG_TDLS_AUTOCHECKALIVE
 	#define CONFIG_TDLS_CH_SW		/* Enable "CONFIG_TDLS_CH_SW" by default, however limit it to only work in wifi logo test mode but not in normal mode currently */
 #endif
 

@@ -11982,9 +11982,6 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 			return;
 #endif /* CONFIG_TDLS_CH_SW */
 
-#ifdef CONFIG_TDLS_AUTOCHECKALIVE
-		linked_status_chk_tdls(padapter);
-#endif /* CONFIG_TDLS_AUTOCHECKALIVE */
 #endif /* CONFIG_TDLS */
 
 		psta = rtw_get_stainfo(pstapriv, pmlmeinfo->network.MacAddress);
