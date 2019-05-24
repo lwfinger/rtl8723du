@@ -147,13 +147,8 @@ void rtw_mi_buddy_intf_stop(_adapter *adapter);
 void rtw_mi_suspend_free_assoc_resource(_adapter *adapter);
 void rtw_mi_buddy_suspend_free_assoc_resource(_adapter *adapter);
 
-#ifdef CONFIG_SET_SCAN_DENY_TIMER
 void rtw_mi_set_scan_deny(_adapter *adapter, u32 ms);
 void rtw_mi_buddy_set_scan_deny(_adapter *adapter, u32 ms);
-#else
-#define rtw_mi_set_scan_deny(adapter, ms) do {} while (0)
-#define rtw_mi_buddy_set_scan_deny(adapter, ms) do {} while (0)
-#endif
 
 u8 rtw_mi_is_scan_deny(_adapter *adapter);
 u8 rtw_mi_buddy_is_scan_deny(_adapter *adapter);

@@ -21,9 +21,7 @@ static void rtw_init_mlme_timer(_adapter *padapter)
 	rtw_init_timer(&(pmlmepriv->dfs_master_timer), padapter, rtw_dfs_master_timer_hdl, padapter);
 #endif
 
-#ifdef CONFIG_SET_SCAN_DENY_TIMER
 	rtw_init_timer(&(pmlmepriv->set_scan_deny_timer), padapter, rtw_set_scan_deny_timer_hdl, padapter);
-#endif
 #else
 	timer_setup(&pmlmepriv->assoc_timer, rtw_join_timeout_handler, 0);
 	timer_setup(&pmlmepriv->scan_to_timer, rtw_scan_timeout_handler, 0);
@@ -32,9 +30,7 @@ static void rtw_init_mlme_timer(_adapter *padapter)
 	timer_setup(&pmlmepriv->dfs_master_timer, rtw_dfs_master_timer_hdl, 0);
 #endif
 
-#ifdef CONFIG_SET_SCAN_DENY_TIMER
 	timer_setup(&pmlmepriv->set_scan_deny_timer, rtw_set_scan_deny_timer_hdl, 0);
-#endif
 #endif
 
 #ifdef RTK_DMP_PLATFORM
@@ -3136,7 +3132,6 @@ exit:
 }
 
 
-#ifdef CONFIG_SET_SCAN_DENY_TIMER
 inline bool rtw_is_scan_deny(_adapter *adapter)
 {
 	struct mlme_priv *mlmepriv = &adapter->mlmepriv;
@@ -3169,7 +3164,6 @@ void rtw_set_scan_deny(_adapter *adapter, u32 ms)
 	ATOMIC_SET(&mlmepriv->set_scan_deny, 1);
 	_set_timer(&mlmepriv->set_scan_deny_timer, ms);
 }
-#endif
 
 #ifdef CONFIG_LAYER2_ROAMING
 /*

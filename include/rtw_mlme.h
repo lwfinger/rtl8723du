@@ -740,17 +740,11 @@ struct mlme_priv {
 
 	uint assoc_by_bssid;
 	uint assoc_by_rssi;
-
 	_timer scan_to_timer; /* driver itself handles scan_timeout status. */
 	systime scan_start_time; /* used to evaluate the time spent in scanning */
-
-#ifdef CONFIG_SET_SCAN_DENY_TIMER
 	_timer set_scan_deny_timer;
 	ATOMIC_T set_scan_deny; /* 0: allowed, 1: deny */
-#endif
-
 	struct qos_priv qospriv;
-
 	/* Number of non-HT AP/stations */
 	int num_sta_no_ht;
 
@@ -1138,7 +1132,6 @@ void rtw_dynamic_check_timer_handler(void *ctx);
 #endif
 extern void rtw_iface_dynamic_check_timer_handlder(_adapter *adapter);
 
-#ifdef CONFIG_SET_SCAN_DENY_TIMER
 bool rtw_is_scan_deny(_adapter *adapter);
 void rtw_clear_scan_deny(_adapter *adapter);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
@@ -1147,11 +1140,6 @@ void rtw_set_scan_deny_timer_hdl(struct timer_list *t);
 void rtw_set_scan_deny_timer_hdl(void *FunctionContext);
 #endif
 void rtw_set_scan_deny(_adapter *adapter, u32 ms);
-#else
-#define rtw_is_scan_deny(adapter) _FALSE
-#define rtw_clear_scan_deny(adapter) do {} while (0)
-#define rtw_set_scan_deny(adapter, ms) do {} while (0)
-#endif
 
 void rtw_free_mlme_priv_ie_data(struct mlme_priv *pmlmepriv);
 

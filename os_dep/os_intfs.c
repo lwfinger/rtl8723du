@@ -2162,10 +2162,8 @@ void rtw_cancel_all_timer(_adapter *padapter)
 	_cancel_timer_ex(&padapter->cfg80211_wdinfo.remain_on_ch_timer);
 #endif /* CONFIG_IOCTL_CFG80211 */
 
-#ifdef CONFIG_SET_SCAN_DENY_TIMER
 	_cancel_timer_ex(&padapter->mlmepriv.set_scan_deny_timer);
 	rtw_clear_scan_deny(padapter);
-#endif
 
 #ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	_cancel_timer_ex(&padapter->recvpriv.signal_stat_timer);

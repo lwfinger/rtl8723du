@@ -744,7 +744,6 @@ u8 rtw_mi_buddy_is_scan_deny(_adapter *adapter)
 	return _rtw_mi_process(adapter, _TRUE, NULL, _rtw_mi_is_scan_deny);
 }
 
-#ifdef CONFIG_SET_SCAN_DENY_TIMER
 static u8 _rtw_mi_set_scan_deny(_adapter *adapter, void *data)
 {
 	u32 ms = *(u32 *)data;
@@ -764,7 +763,6 @@ void rtw_mi_buddy_set_scan_deny(_adapter *adapter, u32 ms)
 
 	_rtw_mi_process(adapter, _TRUE, &in_data, _rtw_mi_set_scan_deny);
 }
-#endif /*CONFIG_SET_SCAN_DENY_TIMER*/
 
 static u8 _rtw_mi_beacon_update(_adapter *padapter, void *data)
 {
