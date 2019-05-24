@@ -970,14 +970,6 @@ sint OnTDLS(_adapter *adapter, union recv_frame *precv_frame)
 	case TDLS_PEER_TRAFFIC_RESPONSE:
 		ret = On_TDLS_Peer_Traffic_Rsp(adapter, precv_frame, ptdls_sta);
 		break;
-#ifdef CONFIG_TDLS_CH_SW
-	case TDLS_CHANNEL_SWITCH_REQUEST:
-		ret = On_TDLS_Ch_Switch_Req(adapter, precv_frame, ptdls_sta);
-		break;
-	case TDLS_CHANNEL_SWITCH_RESPONSE:
-		ret = On_TDLS_Ch_Switch_Rsp(adapter, precv_frame, ptdls_sta);
-		break;
-#endif
 	/* First byte of WFA OUI */
 	case 0x50:
 		if (_rtw_memcmp(WFA_OUI, paction, 3)) {
@@ -1078,9 +1070,6 @@ static sint sta2sta_data_frame(
 
 #ifdef CONFIG_TDLS
 	struct tdls_info *ptdlsinfo = &adapter->tdlsinfo;
-#ifdef CONFIG_TDLS_CH_SW
-	struct tdls_ch_switch *pchsw_info = &ptdlsinfo->chsw_info;
-#endif
 	struct sta_info *ptdls_sta = NULL;
 	u8 *psnap_type = ptr + pattrib->hdrlen + pattrib->iv_len + SNAP_SIZE;
 	/* frame body located after [+2]: ether-type, [+1]: payload type */
@@ -1138,17 +1127,6 @@ static sint sta2sta_data_frame(
 					ret = _FAIL;
 					goto exit;
 				}
-
-#ifdef CONFIG_TDLS_CH_SW
-				if (ATOMIC_READ(&pchsw_info->chsw_on) == _TRUE) {
-					if (adapter->mlmeextpriv.cur_channel != rtw_get_oper_ch(adapter)) {
-						pchsw_info->ch_sw_state |= TDLS_PEER_AT_OFF_STATE;
-						if (!(pchsw_info->ch_sw_state & TDLS_CH_SW_INITIATOR_STATE))
-							_cancel_timer_ex(&ptdls_sta->ch_sw_timer);
-						/* On_TDLS_Peer_Traffic_Rsp(adapter, precv_frame); */
-					}
-				}
-#endif
 
 				/* process UAPSD tdls sta */
 				process_pwrbit_data(adapter, precv_frame, ptdls_sta);

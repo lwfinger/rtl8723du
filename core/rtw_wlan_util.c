@@ -565,7 +565,7 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 {
 	u8 center_ch, chnl_offset80 = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
 	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
-#if (defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW)) || defined(CONFIG_MCC_MODE)
+#if defined(CONFIG_MCC_MODE)
 	u8 iqk_info_backup = _FALSE;
 #endif
 
@@ -611,7 +611,7 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 		rtw_set_oper_bw(padapter, bwmode);
 		rtw_set_oper_choffset(padapter, channel_offset);
 
-#if (defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW)) || defined(CONFIG_MCC_MODE)
+#if defined(CONFIG_MCC_MODE)
 		/* To check if we need to backup iqk info after switch chnl & bw */
 		{
 			u8 take_care_iqk, do_iqk;
@@ -625,7 +625,7 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 
 		rtw_hal_set_chnl_bw(padapter, center_ch, bwmode, channel_offset, chnl_offset80); /* set center channel */
 
-#if (defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW)) || defined(CONFIG_MCC_MODE)
+#if defined(CONFIG_MCC_MODE)
 		if (iqk_info_backup == _TRUE)
 			rtw_hal_ch_sw_iqk_info_backup(padapter);
 #endif

@@ -9360,58 +9360,6 @@ static int rtw_tdls_ch_switch(struct net_device *dev,
 {
 	int ret = 0;
 
-#ifdef CONFIG_TDLS
-#ifdef CONFIG_TDLS_CH_SW
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct tdls_ch_switch *pchsw_info = &padapter->tdlsinfo.chsw_info;
-	u8 i, j;
-	struct sta_info *ptdls_sta = NULL;
-	u8 take_care_iqk;
-
-	RTW_INFO("[%s] %s %d\n", __FUNCTION__, extra, wrqu->data.length - 1);
-
-	if (rtw_tdls_is_chsw_allowed(padapter) == _FALSE) {
-		RTW_INFO("TDLS channel switch is not allowed\n");
-		return ret;
-	}
-
-	for (i = 0, j = 0 ; i < ETH_ALEN; i++, j += 3)
-		pchsw_info->addr[i] = key_2char2num(*(extra + j), *(extra + j + 1));
-
-	ptdls_sta = rtw_get_stainfo(&padapter->stapriv, pchsw_info->addr);
-	if (ptdls_sta == NULL)
-		return ret;
-
-	pchsw_info->ch_sw_state |= TDLS_CH_SW_INITIATOR_STATE;
-
-	if (ptdls_sta != NULL) {
-		if (pchsw_info->off_ch_num == 0)
-			pchsw_info->off_ch_num = 11;
-	} else
-		RTW_INFO("TDLS peer not found\n");
-
-	rtw_pm_set_lps(padapter, PS_MODE_ACTIVE);
-
-	rtw_hal_get_hwreg(padapter, HW_VAR_CH_SW_NEED_TO_TAKE_CARE_IQK_INFO, &take_care_iqk);
-	if (take_care_iqk == _TRUE) {
-		u8 central_chnl;
-		u8 bw_mode;
-
-		bw_mode = (pchsw_info->ch_offset) ? CHANNEL_WIDTH_40 : CHANNEL_WIDTH_20;
-		central_chnl = rtw_get_center_ch(pchsw_info->off_ch_num, bw_mode, pchsw_info->ch_offset);
-		if (rtw_hal_ch_sw_iqk_info_search(padapter, central_chnl, bw_mode) >= 0)
-			rtw_tdls_cmd(padapter, ptdls_sta->cmn.mac_addr, TDLS_CH_SW_START);
-		else
-			rtw_tdls_cmd(padapter, ptdls_sta->cmn.mac_addr, TDLS_CH_SW_PREPARE);
-	} else
-		rtw_tdls_cmd(padapter, ptdls_sta->cmn.mac_addr, TDLS_CH_SW_START);
-
-	/* issue_tdls_ch_switch_req(padapter, ptdls_sta); */
-	/* RTW_INFO("issue tdls ch switch req\n"); */
-
-#endif /* CONFIG_TDLS_CH_SW */
-#endif /* CONFIG_TDLS */
-
 	return ret;
 }
 
@@ -9420,51 +9368,6 @@ static int rtw_tdls_ch_switch_off(struct net_device *dev,
 				  union iwreq_data *wrqu, char *extra)
 {
 	int ret = 0;
-
-#ifdef CONFIG_TDLS
-#ifdef CONFIG_TDLS_CH_SW
-
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct tdls_ch_switch *pchsw_info = &padapter->tdlsinfo.chsw_info;
-	u8 i, j, mac_addr[ETH_ALEN];
-	struct sta_info *ptdls_sta = NULL;
-	struct tdls_txmgmt txmgmt;
-
-	_rtw_memset(&txmgmt, 0x00, sizeof(struct tdls_txmgmt));
-
-	RTW_INFO("[%s] %s %d\n", __FUNCTION__, extra, wrqu->data.length - 1);
-
-	if (rtw_tdls_is_chsw_allowed(padapter) == _FALSE) {
-		RTW_INFO("TDLS channel switch is not allowed\n");
-		return ret;
-	}
-
-	if (wrqu->data.length >= 17) {
-		for (i = 0, j = 0 ; i < ETH_ALEN; i++, j += 3)
-			mac_addr[i] = key_2char2num(*(extra + j), *(extra + j + 1));
-		ptdls_sta = rtw_get_stainfo(&padapter->stapriv, mac_addr);
-	}
-
-	if (ptdls_sta == NULL)
-		return ret;
-
-	rtw_tdls_cmd(padapter, ptdls_sta->cmn.mac_addr, TDLS_CH_SW_END_TO_BASE_CHNL);
-
-	pchsw_info->ch_sw_state &= ~(TDLS_CH_SW_INITIATOR_STATE |
-				     TDLS_CH_SWITCH_ON_STATE |
-				     TDLS_PEER_AT_OFF_STATE);
-	_rtw_memset(pchsw_info->addr, 0x00, ETH_ALEN);
-
-	ptdls_sta->ch_switch_time = 0;
-	ptdls_sta->ch_switch_timeout = 0;
-	_cancel_timer_ex(&ptdls_sta->ch_sw_timer);
-	_cancel_timer_ex(&ptdls_sta->delay_timer);
-	_cancel_timer_ex(&ptdls_sta->stay_on_base_chnl_timer);
-	_cancel_timer_ex(&ptdls_sta->ch_sw_monitor_timer);
-
-	rtw_pm_set_lps(padapter, PS_MODE_MAX);
-#endif /* CONFIG_TDLS_CH_SW */
-#endif /* CONFIG_TDLS */
 
 	return ret;
 }
@@ -9475,21 +9378,6 @@ static int rtw_tdls_dump_ch(struct net_device *dev,
 {
 	int ret = 0;
 
-#ifdef CONFIG_TDLS
-#ifdef CONFIG_TDLS_CH_SW
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
-
-	RTW_INFO("[%s] dump_stack:%s\n", __FUNCTION__, extra);
-
-	extra[wrqu->data.length] = 0x00;
-	ptdlsinfo->chsw_info.dump_stack = rtw_atoi(extra);
-
-	return ret;
-
-#endif
-#endif /* CONFIG_TDLS */
-
 	return ret;
 }
 
@@ -9499,21 +9387,6 @@ static int rtw_tdls_off_ch_num(struct net_device *dev,
 {
 	int ret = 0;
 
-#ifdef CONFIG_TDLS
-#ifdef CONFIG_TDLS_CH_SW
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
-
-	RTW_INFO("[%s] off_ch_num:%s\n", __FUNCTION__, extra);
-
-	extra[wrqu->data.length] = 0x00;
-	ptdlsinfo->chsw_info.off_ch_num = rtw_atoi(extra);
-
-	return ret;
-
-#endif
-#endif /* CONFIG_TDLS */
-
 	return ret;
 }
 
@@ -9522,33 +9395,6 @@ static int rtw_tdls_ch_offset(struct net_device *dev,
 			      union iwreq_data *wrqu, char *extra)
 {
 	int ret = 0;
-
-#ifdef CONFIG_TDLS
-#ifdef CONFIG_TDLS_CH_SW
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
-
-	RTW_INFO("[%s] ch_offset:%s\n", __FUNCTION__, extra);
-
-	extra[wrqu->data.length] = 0x00;
-	switch (rtw_atoi(extra)) {
-	case SCA:
-		ptdlsinfo->chsw_info.ch_offset = HAL_PRIME_CHNL_OFFSET_LOWER;
-		break;
-
-	case SCB:
-		ptdlsinfo->chsw_info.ch_offset = HAL_PRIME_CHNL_OFFSET_UPPER;
-		break;
-
-	default:
-		ptdlsinfo->chsw_info.ch_offset = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
-		break;
-	}
-
-	return ret;
-
-#endif
-#endif /* CONFIG_TDLS */
 
 	return ret;
 }
@@ -9751,29 +9597,10 @@ static int rtw_wfd_tdls_status(struct net_device *dev,
 		"sta_cnt:%d\n"
 		"sta_maximum:%d\n"
 		"cur_channel:%d\n"
-		"tdls_enable:%d"
-#ifdef CONFIG_TDLS_CH_SW
-		"ch_sw_state:%08x\n"
-		"chsw_on:%d\n"
-		"off_ch_num:%d\n"
-		"cur_time:%d\n"
-		"ch_offset:%d\n"
-		"delay_swtich_back:%d"
-#endif
-		,
+		"tdls_enable:%d",
 		ptdlsinfo->link_established, ptdlsinfo->sta_cnt,
 		ptdlsinfo->sta_maximum, ptdlsinfo->cur_channel,
-		rtw_is_tdls_enabled(padapter)
-#ifdef CONFIG_TDLS_CH_SW
-		,
-		ptdlsinfo->chsw_info.ch_sw_state,
-		ATOMIC_READ(&padapter->tdlsinfo.chsw_info.chsw_on),
-		ptdlsinfo->chsw_info.off_ch_num,
-		ptdlsinfo->chsw_info.cur_time,
-		ptdlsinfo->chsw_info.ch_offset,
-		ptdlsinfo->chsw_info.delay_switch_back
-#endif
-	       );
+		rtw_is_tdls_enabled(padapter));
 
 	wrqu->data.length = strlen(extra);
 

@@ -414,20 +414,6 @@ struct tdls_temp_mgmt {
 	u8	peer_addr[ETH_ALEN];
 };
 
-#ifdef CONFIG_TDLS_CH_SW
-struct tdls_ch_switch {
-	u32	ch_sw_state;
-	ATOMIC_T	chsw_on;
-	u8	addr[ETH_ALEN];
-	u8	off_ch_num;
-	u8	ch_offset;
-	u32	cur_time;
-	u8	delay_switch_back;
-	u8	dump_stack;
-	struct submit_ctx	chsw_sctx;
-};
-#endif
-
 struct tdls_info {
 	u8					ap_prohibited;
 	u8					ch_switch_prohibited;
@@ -435,10 +421,6 @@ struct tdls_info {
 	u8					sta_cnt;
 	u8					sta_maximum;	/* 1:tdls sta is equal (NUM_STA-1), reach max direct link number; 0: else; */
 	struct tdls_ss_record	ss_record;
-#ifdef CONFIG_TDLS_CH_SW
-	struct tdls_ch_switch	chsw_info;
-#endif
-
 	u8					ch_sensing;
 	u8					cur_channel;
 	u8					collect_pkt_num[MAX_CHANNEL_NUM];

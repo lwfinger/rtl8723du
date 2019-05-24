@@ -278,15 +278,6 @@ struct sta_info {
 	u32	TPK_count;
 	_timer	TPK_timer;
 	struct TDLS_PeerKey	tpk;
-#ifdef CONFIG_TDLS_CH_SW
-	u16	ch_switch_time;
-	u16	ch_switch_timeout;
-	/* u8	option; */
-	_timer	ch_sw_timer;
-	_timer	delay_timer;
-	_timer	stay_on_base_chnl_timer;
-	_timer	ch_sw_monitor_timer;
-#endif
 	_timer handshake_timer;
 	u8 alive_count;
 	_timer	pti_timer;

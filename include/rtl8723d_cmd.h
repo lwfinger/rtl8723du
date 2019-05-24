@@ -344,12 +344,6 @@ void rtl8723d_download_rsvd_page(PADAPTER padapter, u8 mstatus);
 #endif /* CONFIG_BT_COEXIST */
 	void rtl8723d_set_p2p_ps_offload_cmd(PADAPTER padapter, u8 p2p_ps_state);
 
-#ifdef CONFIG_TDLS
-#ifdef CONFIG_TDLS_CH_SW
-void rtl8723d_set_BcnEarly_C2H_Rpt_cmd(PADAPTER padapter, u8 enable);
-#endif
-#endif
-
 s32 FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer);
 u8 GetTxBufferRsvdPageNum8723D(_adapter *padapter, bool wowlan);
 

@@ -933,11 +933,6 @@ static u8 _rtw_phydm_rfk_condition_check(_adapter *adapter)
 		if (!rtw_hal_check_mcc_status(adapter, MCC_STATUS_DOING_MCC))
 			rst = _TRUE;
 	#endif
-
-	#if defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW)
-
-	#endif
-
 	return rst;
 }
 /*check the tx low rate while unlinked to any AP;for pwr tracking */

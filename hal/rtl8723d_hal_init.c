@@ -4571,12 +4571,6 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 			rtl8723d_download_rsvd_page(padapter, RT_MEDIA_CONNECT);
 		}
 		break;
-
-#if defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW)
-	case HW_VAR_TDLS_BCN_EARLY_C2H_RPT:
-		rtl8723d_set_BcnEarly_C2H_Rpt_cmd(padapter, *val);
-		break;
-#endif	
 	default:
 		ret = SetHwReg(padapter, variable, val);
 		break;

@@ -506,11 +506,6 @@ u8 rtw_hal_get_rsvd_page_num(struct _ADAPTER *adapter);
 int rtw_hal_reset_tsf(_adapter *adapter, u8 reset_port);
 #endif
 
-#ifdef CONFIG_TDLS
-	#ifdef CONFIG_TDLS_CH_SW
-		s32 rtw_hal_ch_sw_oper_offload(_adapter *padapter, u8 channel, u8 channel_offset, u16 bwmode);
-	#endif
-#endif
 #if defined(CONFIG_BT_COEXIST) && defined(CONFIG_FW_MULTI_PORT_SUPPORT)
 s32 rtw_hal_set_wifi_port_id_cmd(_adapter *adapter);
 #endif

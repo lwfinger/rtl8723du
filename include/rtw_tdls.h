@@ -101,9 +101,6 @@ void rtw_set_tdls_enable(_adapter *padapter, u8 enable);
 u8 rtw_is_tdls_enabled(_adapter *padapter);
 u8 rtw_is_tdls_sta_existed(_adapter *padapter);
 u8 rtw_tdls_is_setup_allowed(_adapter *padapter);
-#ifdef CONFIG_TDLS_CH_SW
-u8 rtw_tdls_is_chsw_allowed(_adapter *padapter);
-#endif
 
 void rtw_tdls_set_link_established(_adapter *adapter, bool en);
 void rtw_reset_tdls_info(_adapter *padapter);
@@ -118,13 +115,6 @@ void	rtw_cancel_tdls_timer(struct sta_info *psta);
 void rtw_tdls_teardown_pre_hdl(_adapter *padapter, struct sta_info *psta);
 void rtw_tdls_teardown_post_hdl(_adapter *padapter, struct sta_info *psta, u8 enqueue_cmd);
 
-#ifdef CONFIG_TDLS_CH_SW
-void rtw_tdls_set_ch_sw_oper_control(_adapter *padapter, u8 enable);
-void rtw_tdls_ch_sw_back_to_base_chnl(_adapter *padapter);
-s32 rtw_tdls_do_ch_sw(_adapter *padapter, struct sta_info *ptdls_sta, u8 chnl_type, u8 channel, u8 channel_offset, u16 bwmode, u16 ch_switch_time);
-void rtw_tdls_chsw_oper_done(_adapter *padapter);
-#endif
-
 int issue_tunneled_probe_req(_adapter *padapter);
 int issue_tunneled_probe_rsp(_adapter *padapter, union recv_frame *precv_frame);
 int issue_tdls_dis_req(_adapter *padapter, struct tdls_txmgmt *ptxmgmt);
@@ -135,10 +125,6 @@ int issue_tdls_dis_rsp(_adapter *padapter, struct tdls_txmgmt *ptxmgmt, u8 priva
 int issue_tdls_teardown(_adapter *padapter, struct tdls_txmgmt *ptxmgmt, u8 wait_ack);
 int issue_tdls_peer_traffic_rsp(_adapter *padapter, struct sta_info *psta, struct tdls_txmgmt *ptxmgmt);
 int issue_tdls_peer_traffic_indication(_adapter *padapter, struct sta_info *psta);
-#ifdef CONFIG_TDLS_CH_SW
-int issue_tdls_ch_switch_req(_adapter *padapter, struct sta_info *ptdls_sta);
-int issue_tdls_ch_switch_rsp(_adapter *padapter, struct tdls_txmgmt *ptxmgmt, int wait_ack);
-#endif
 sint On_TDLS_Dis_Rsp(_adapter *adapter, union recv_frame *precv_frame);
 sint On_TDLS_Setup_Req(_adapter *adapter, union recv_frame *precv_frame, struct sta_info *ptdls_sta);
 int On_TDLS_Setup_Rsp(_adapter *adapter, union recv_frame *precv_frame, struct sta_info *ptdls_sta);
@@ -147,12 +133,6 @@ int On_TDLS_Dis_Req(_adapter *adapter, union recv_frame *precv_frame);
 int On_TDLS_Teardown(_adapter *adapter, union recv_frame *precv_frame, struct sta_info *ptdls_sta);
 int On_TDLS_Peer_Traffic_Indication(_adapter *adapter, union recv_frame *precv_frame, struct sta_info *ptdls_sta);
 int On_TDLS_Peer_Traffic_Rsp(_adapter *adapter, union recv_frame *precv_frame, struct sta_info *ptdls_sta);
-#ifdef CONFIG_TDLS_CH_SW
-sint On_TDLS_Ch_Switch_Req(_adapter *adapter, union recv_frame *precv_frame, struct sta_info *ptdls_sta);
-sint On_TDLS_Ch_Switch_Rsp(_adapter *adapter, union recv_frame *precv_frame, struct sta_info *ptdls_sta);
-void rtw_build_tdls_ch_switch_req_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pframe, struct tdls_txmgmt *ptxmgmt, struct sta_info *ptdls_sta);
-void rtw_build_tdls_ch_switch_rsp_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pframe, struct tdls_txmgmt *ptxmgmt, struct sta_info *ptdls_sta);
-#endif
 void rtw_build_tdls_setup_req_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pframe, struct tdls_txmgmt *ptxmgmt, struct sta_info *ptdls_sta);
 void rtw_build_tdls_setup_rsp_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pframe, struct tdls_txmgmt *ptxmgmt, struct sta_info *ptdls_sta);
 void rtw_build_tdls_setup_cfm_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pframe, struct tdls_txmgmt *ptxmgmt, struct sta_info *ptdls_sta);

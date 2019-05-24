@@ -1842,14 +1842,6 @@ int rtw_build_tdls_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pf
 	case TDLS_PEER_TRAFFIC_INDICATION:
 		rtw_build_tdls_peer_traffic_indication_ies(padapter, pxmitframe, pframe, ptxmgmt, ptdls_sta);
 		break;
-#ifdef CONFIG_TDLS_CH_SW
-	case TDLS_CHANNEL_SWITCH_REQUEST:
-		rtw_build_tdls_ch_switch_req_ies(padapter, pxmitframe, pframe, ptxmgmt, ptdls_sta);
-		break;
-	case TDLS_CHANNEL_SWITCH_RESPONSE:
-		rtw_build_tdls_ch_switch_rsp_ies(padapter, pxmitframe, pframe, ptxmgmt, ptdls_sta);
-		break;
-#endif
 	case TDLS_PEER_TRAFFIC_RESPONSE:
 		rtw_build_tdls_peer_traffic_rsp_ies(padapter, pxmitframe, pframe, ptxmgmt, ptdls_sta);
 		break;
