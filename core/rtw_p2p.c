@@ -3256,7 +3256,6 @@ u8 roch_stay_in_cur_chan(_adapter *padapter)
 				rst = _TRUE;
 				break;
 			}
-			#ifdef CONFIG_AP_MODE
 			if (MLME_IS_AP(iface) || MLME_IS_MESH(iface)) {
 				if (rtw_ap_sta_linking_state_check(iface) == _TRUE) {
 					RTW_ERR(ADPT_FMT"- SoftAP/Mesh -have sta under linking\n", ADPT_ARG(iface));
@@ -3264,7 +3263,6 @@ u8 roch_stay_in_cur_chan(_adapter *padapter)
 					break;
 				}
 			}
-			#endif
 		}
 	}
 

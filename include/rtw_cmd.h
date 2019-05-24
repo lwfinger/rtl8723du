@@ -947,7 +947,6 @@ u8 rtw_dm_ra_mask_wk_cmd(_adapter *padapter, u8 *psta);
 
 extern u8 rtw_ps_cmd(_adapter *padapter);
 
-#ifdef CONFIG_AP_MODE
 u8 rtw_chk_hi_queue_cmd(_adapter *padapter);
 #ifdef CONFIG_DFS_MASTER
 u8 rtw_dfs_master_cmd(_adapter *adapter, bool enqueue);
@@ -956,7 +955,6 @@ void rtw_dfs_master_enable(_adapter *adapter, u8 ch, u8 bw, u8 offset);
 void rtw_dfs_master_disable(_adapter *adapter, u8 ch, u8 bw, u8 offset, bool by_others);
 void rtw_dfs_master_status_apply(_adapter *adapter, u8 self_action);
 #endif /* CONFIG_DFS_MASTER */
-#endif /* CONFIG_AP_MODE */
 
 #ifdef CONFIG_BT_COEXIST
 u8 rtw_btinfo_cmd(PADAPTER padapter, u8 *pbuf, u16 length);

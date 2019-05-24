@@ -197,8 +197,6 @@ void rtw_report_sec_ie(_adapter *adapter, u8 authmode, u8 *sec_ie)
 
 }
 
-#ifdef CONFIG_AP_MODE
-
 void rtw_indicate_sta_assoc_event(_adapter *padapter, struct sta_info *psta)
 {
 	union iwreq_data wrqu;
@@ -252,5 +250,3 @@ void rtw_indicate_sta_disassoc_event(_adapter *padapter, struct sta_info *psta)
 #endif
 
 }
-
-#endif

@@ -13,7 +13,6 @@
 #define NET80211_TU_TO_US	1024		/* unit:us */
 #define DEFAULT_BCN_INTERVAL 100 /* 100 ms */
 
-#ifdef CONFIG_AP_MODE
 
 #define RTL_IOCTL_HOSTAPD (SIOCIWFIRSTPRIV + 28)
 
@@ -63,47 +62,43 @@ enum {
 #define WLAN_STA_VHT BIT(14)
 #define WLAN_STA_NONERP BIT(31)
 
-#endif
-
 #define IEEE_CMD_SET_WPA_PARAM			1
-#define IEEE_CMD_SET_WPA_IE				2
+#define IEEE_CMD_SET_WPA_IE			2
 #define IEEE_CMD_SET_ENCRYPTION			3
-#define IEEE_CMD_MLME						4
+#define IEEE_CMD_MLME				4
 
-#define IEEE_PARAM_WPA_ENABLED				1
+#define IEEE_PARAM_WPA_ENABLED			1
 #define IEEE_PARAM_TKIP_COUNTERMEASURES		2
-#define IEEE_PARAM_DROP_UNENCRYPTED			3
-#define IEEE_PARAM_PRIVACY_INVOKED			4
-#define IEEE_PARAM_AUTH_ALGS					5
-#define IEEE_PARAM_IEEE_802_1X				6
-#define IEEE_PARAM_WPAX_SELECT				7
+#define IEEE_PARAM_DROP_UNENCRYPTED		3
+#define IEEE_PARAM_PRIVACY_INVOKED		4
+#define IEEE_PARAM_AUTH_ALGS			5
+#define IEEE_PARAM_IEEE_802_1X			6
+#define IEEE_PARAM_WPAX_SELECT			7
 
 #define AUTH_ALG_OPEN_SYSTEM			0x1
 #define AUTH_ALG_SHARED_KEY			0x2
 #define AUTH_ALG_LEAP				0x00000004
 
-#define IEEE_MLME_STA_DEAUTH				1
+#define IEEE_MLME_STA_DEAUTH			1
 #define IEEE_MLME_STA_DISASSOC			2
 
-#define IEEE_CRYPT_ERR_UNKNOWN_ALG			2
-#define IEEE_CRYPT_ERR_UNKNOWN_ADDR			3
-#define IEEE_CRYPT_ERR_CRYPT_INIT_FAILED		4
-#define IEEE_CRYPT_ERR_KEY_SET_FAILED			5
-#define IEEE_CRYPT_ERR_TX_KEY_SET_FAILED		6
+#define IEEE_CRYPT_ERR_UNKNOWN_ALG		2
+#define IEEE_CRYPT_ERR_UNKNOWN_ADDR		3
+#define IEEE_CRYPT_ERR_CRYPT_INIT_FAILED	4
+#define IEEE_CRYPT_ERR_KEY_SET_FAILED		5
+#define IEEE_CRYPT_ERR_TX_KEY_SET_FAILED	6
 #define IEEE_CRYPT_ERR_CARD_CONF_FAILED		7
 
 
 #define	IEEE_CRYPT_ALG_NAME_LEN			16
 
 #define WPA_CIPHER_NONE	BIT(0)
-#define WPA_CIPHER_WEP40	BIT(1)
-#define WPA_CIPHER_WEP104 BIT(2)
-#define WPA_CIPHER_TKIP	BIT(3)
-#define WPA_CIPHER_CCMP	BIT(4)
+#define WPA_CIPHER_WEP40			BIT(1)
+#define WPA_CIPHER_WEP104			BIT(2)
+#define WPA_CIPHER_TKIP				BIT(3)
+#define WPA_CIPHER_CCMP				BIT(4)
 
-
-
-#define WPA_SELECTOR_LEN 4
+#define WPA_SELECTOR_LEN			4
 extern u8 RTW_WPA_OUI_TYPE[] ;
 extern u16 RTW_WPA_VERSION ;
 extern u8 WPA_AUTH_KEY_MGMT_NONE[];
@@ -117,8 +112,8 @@ extern u8 WPA_CIPHER_SUITE_CCMP[];
 extern u8 WPA_CIPHER_SUITE_WEP104[];
 
 
-#define RSN_HEADER_LEN 4
-#define RSN_SELECTOR_LEN 4
+#define RSN_HEADER_LEN				4
+#define RSN_SELECTOR_LEN			4
 
 extern u16 RSN_VERSION_BSD;
 extern u8 RSN_AUTH_KEY_MGMT_UNSPEC_802_1X[];
@@ -243,7 +238,6 @@ typedef struct ieee_param {
 			u16 key_len;
 			u8 key[0];
 		} crypt;
-#ifdef CONFIG_AP_MODE
 		struct {
 			u16 aid;
 			u16 capability;
@@ -255,12 +249,9 @@ typedef struct ieee_param {
 			u8	reserved[2];/* for set max_num_sta */
 			u8	buf[0];
 		} bcn_ie;
-#endif
-
 	} u;
 } ieee_param;
 
-#ifdef CONFIG_AP_MODE
 typedef struct ieee_param_ex {
 	u32 cmd;
 	u8 sta_addr[ETH_ALEN];
@@ -282,8 +273,6 @@ struct sta_data {
 	u64	tx_bytes;
 	u64	tx_drops;
 };
-#endif
-
 
 #if WIRELESS_EXT < 17
 	#define IW_QUAL_QUAL_INVALID   0x10

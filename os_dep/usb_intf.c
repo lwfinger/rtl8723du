@@ -1070,11 +1070,9 @@ static void rtw_usb_primary_adapter_deinit(_adapter *padapter)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		rtw_disassoc_cmd(padapter, 0, RTW_CMDF_DIRECTLY);
 
-#ifdef CONFIG_AP_MODE
 	if (MLME_IS_AP(padapter) || MLME_IS_MESH(padapter)) {
 		free_mlme_ap_info(padapter);
 	}
-#endif
 	rtw_dev_unload(padapter);
 
 	RTW_INFO("+r871xu_dev_remove, hw_init_completed=%d\n", rtw_get_hw_init_completed(padapter));

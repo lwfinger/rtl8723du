@@ -2720,7 +2720,6 @@ void rtw_hal_rcr_set_chk_bssid(_adapter *adapter, u8 self_action)
 		mstate_s.ld_tdls_num = 0;
 		break;
 #endif
-#ifdef CONFIG_AP_MODE
 	case MLME_AP_STARTED:
 		mstate_s.ap_num = 1;
 		break;
@@ -2728,7 +2727,6 @@ void rtw_hal_rcr_set_chk_bssid(_adapter *adapter, u8 self_action)
 		mstate_s.ap_num = 0;
 		mstate_s.ld_ap_num = 0;
 		break;
-#endif
 #ifdef CONFIG_RTW_MESH
 	case MLME_MESH_STARTED:
 		mstate_s.mesh_num = 1;

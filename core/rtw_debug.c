@@ -1571,7 +1571,6 @@ ssize_t proc_set_rate_ctl(struct file *file, const char __user *buffer, size_t c
 	return count;
 }
 
-#ifdef CONFIG_AP_MODE
 int proc_get_bmc_tx_rate(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -1615,8 +1614,6 @@ ssize_t proc_set_bmc_tx_rate(struct file *file, const char __user *buffer, size_
 
 	return count;
 }
-#endif /*CONFIG_AP_MODE*/
-
 
 int proc_get_tx_power_offset(struct seq_file *m, void *v)
 {
@@ -3135,8 +3132,6 @@ ssize_t proc_set_ldpc_cap(struct file *file, const char __user *buffer, size_t c
 	return count;
 }
 
-#ifdef CONFIG_AP_MODE
-
 int proc_get_all_sta_info(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -3224,8 +3219,6 @@ int proc_get_all_sta_info(struct seq_file *m, void *v)
 
 	return 0;
 }
-
-#endif
 
 #ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
 int proc_get_rtkm_info(struct seq_file *m, void *v)

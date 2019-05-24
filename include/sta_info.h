@@ -308,7 +308,6 @@ struct sta_info {
 	/* curr_network(mlme_priv/security_priv/qos/ht) : AP CAP/INFO */
 	/* sta_info: (AP & STA) CAP/INFO */
 	unsigned int expire_to;
-#ifdef CONFIG_AP_MODE
 	_list asoc_list;
 	_list auth_list;
 	unsigned int auth_seq;
@@ -366,8 +365,6 @@ struct sta_info {
 	u8 under_exist_checking;
 
 	u8 keep_alive_trycnt;
-
-#endif /* CONFIG_AP_MODE	 */
 
 #ifdef CONFIG_IOCTL_CFG80211
 	u8 *passoc_req;
@@ -510,7 +507,6 @@ struct	sta_priv {
 
 	u32 adhoc_expire_to;
 
-#ifdef CONFIG_AP_MODE
 	_list asoc_list;
 	_list auth_list;
 	_lock asoc_list_lock;
@@ -543,8 +539,6 @@ struct	sta_priv {
 	#if CONFIG_RTW_PRE_LINK_STA
 	struct pre_link_sta_ctl_t pre_link_sta_ctl;
 	#endif
-
-#endif /* CONFIG_AP_MODE */
 
 #ifdef CONFIG_ATMEL_RC_PATCH
 	u8 atmel_rc_pattern[6];
@@ -586,10 +580,8 @@ extern struct sta_info *rtw_get_stainfo(struct sta_priv *pstapriv, const u8 *hwa
 extern u32 rtw_init_bcmc_stainfo(_adapter *padapter);
 extern struct sta_info *rtw_get_bcmc_stainfo(_adapter *padapter);
 
-#ifdef CONFIG_AP_MODE
 u16 rtw_aid_alloc(_adapter *adapter, struct sta_info *sta);
 void dump_aid_status(void *sel, _adapter *adapter);
-#endif
 
 #if CONFIG_RTW_MACADDR_ACL
 extern u8 rtw_access_ctrl(_adapter *adapter, u8 *mac_addr);

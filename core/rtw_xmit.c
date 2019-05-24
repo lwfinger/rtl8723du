@@ -4127,9 +4127,7 @@ s32 rtw_xmit(_adapter *padapter, _pkt **ppkt)
 {
 	static systime start = 0;
 	static u32 drop_cnt = 0;
-#ifdef CONFIG_AP_MODE
 	_irqL irqL0;
-#endif
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
 	struct xmit_frame *pxmitframe = NULL;
 #ifdef CONFIG_BR_EXT
@@ -4205,7 +4203,6 @@ s32 rtw_xmit(_adapter *padapter, _pkt **ppkt)
 
 	do_queue_select(padapter, &pxmitframe->attrib);
 
-#ifdef CONFIG_AP_MODE
 	_enter_critical_bh(&pxmitpriv->lock, &irqL0);
 	if (xmitframe_enqueue_for_sleeping_sta(padapter, pxmitframe) == _TRUE) {
 		_exit_critical_bh(&pxmitpriv->lock, &irqL0);
@@ -4213,7 +4210,6 @@ s32 rtw_xmit(_adapter *padapter, _pkt **ppkt)
 		return 1;
 	}
 	_exit_critical_bh(&pxmitpriv->lock, &irqL0);
-#endif
 
 	/* pre_xmitframe */
 	if (rtw_hal_xmit(padapter, pxmitframe) == _FALSE)
@@ -4320,8 +4316,6 @@ inline bool xmitframe_hiq_filter(struct xmit_frame *xmitframe)
 
 	return allow;
 }
-
-#if defined(CONFIG_AP_MODE) || defined(CONFIG_TDLS)
 
 sint xmitframe_enqueue_for_sleeping_sta(_adapter *padapter, struct xmit_frame *pxmitframe)
 {
@@ -4861,8 +4855,6 @@ exit:
 
 	return;
 }
-
-#endif /* defined(CONFIG_AP_MODE) || defined(CONFIG_TDLS) */
 
 #ifdef CONFIG_XMIT_THREAD_MODE
 void enqueue_pending_xmitbuf(

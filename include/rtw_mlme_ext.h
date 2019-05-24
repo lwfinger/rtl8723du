@@ -599,9 +599,7 @@ struct mlme_ext_priv {
 	u8 DrvBcnEarly;
 	u8 DrvBcnTimeOut;
 
-#ifdef CONFIG_AP_MODE
 	unsigned char bstart_bss;
-#endif
 
 #ifdef CONFIG_80211D
 	u8 update_channel_plan_by_ap_done;
@@ -849,13 +847,11 @@ void rtw_bmp_clear(u8 *bmp, u8 bmp_len, u8 id);
 bool rtw_bmp_not_empty(const u8 *bmp, u8 bmp_len);
 bool rtw_bmp_not_empty_exclude_bit0(const u8 *bmp, u8 bmp_len);
 
-#ifdef CONFIG_AP_MODE
 bool rtw_tim_map_is_set(_adapter *padapter, const u8 *map, u8 id);
 void rtw_tim_map_set(_adapter *padapter, u8 *map, u8 id);
 void rtw_tim_map_clear(_adapter *padapter, u8 *map, u8 id);
 bool rtw_tim_map_anyone_be_set(_adapter *padapter, const u8 *map);
 bool rtw_tim_map_anyone_be_set_exclude_aid0(_adapter *padapter, const u8 *map);
-#endif /* CONFIG_AP_MODE */
 
 u32 report_join_res(_adapter *padapter, int res);
 void report_survey_event(_adapter *padapter, union recv_frame *precv_frame);

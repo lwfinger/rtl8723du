@@ -185,9 +185,7 @@ struct registry_priv {
 	WLAN_BSSID_EX    dev_network;
 
 	u8 tx_bw_mode;
-#ifdef CONFIG_AP_MODE
 	u8 bmc_tx_rate;
-#endif
 	u8	ht_enable;
 	/* 0: 20 MHz, 1: 40 MHz, 2: 80 MHz, 3: 160MHz */
 	/* 2.4G use bit 0 ~ 3, 5G use bit 4 ~ 7 */
@@ -885,16 +883,12 @@ struct dvobj_priv {
 	u8 iface_nums; /* total number of ifaces used runtime */
 	struct mi_state iface_state;
 
-#ifdef CONFIG_AP_MODE
 	u8 nr_ap_if; /* total interface s number of ap/go mode. */
 	u16 inter_bcn_space; /* unit:ms */
 	_queue	ap_if_q;
 #ifdef CONFIG_RTW_REPEATER_SON
 	struct rtw_rson_struct  rson_data;
 #endif
-
-#endif
-
 	struct macid_ctl_t macid_ctl;
 
 	struct cam_ctl_t cam_ctl;
@@ -1155,9 +1149,7 @@ struct _ADAPTER {
 	struct	mp_priv	mppriv;
 #endif
 
-#ifdef CONFIG_AP_MODE
 	struct	hostapd_priv	*phostapdpriv;
-#endif
 
 #ifdef CONFIG_IOCTL_CFG80211
 	struct cfg80211_wifidirect_info	cfg80211_wdinfo;
@@ -1298,10 +1290,7 @@ struct _ADAPTER {
 #ifdef CONFIG_MAC_LOOPBACK_DRIVER
 	PLOOPBACKDATA ploopback;
 #endif
-#ifdef CONFIG_AP_MODE
 	u8 bmc_tx_rate;
-#endif
-
 	/* for debug purpose */
 	u8 fix_rate;
 	u8 fix_bw;

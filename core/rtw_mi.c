@@ -200,8 +200,6 @@ static void _rtw_mi_status(_adapter *adapter, struct mi_state *mstate, u8 target
 			}
 			if (check_fwstate(&iface->mlmepriv, _FW_UNDER_LINKING) == _TRUE)
 				MSTATE_STA_LG_NUM(mstate)++;
-
-#ifdef CONFIG_AP_MODE
 		} else if (check_fwstate(&iface->mlmepriv, WIFI_AP_STATE) == _TRUE ) {
 			if (check_fwstate(&iface->mlmepriv, _FW_LINKED) == _TRUE) {
 				MSTATE_AP_NUM(mstate)++;
@@ -209,8 +207,6 @@ static void _rtw_mi_status(_adapter *adapter, struct mi_state *mstate, u8 target
 					MSTATE_AP_LD_NUM(mstate)++;
 			} else
 				MSTATE_AP_STARTING_NUM(mstate)++;
-#endif
-
 		} else if (check_fwstate(&iface->mlmepriv, WIFI_ADHOC_STATE | WIFI_ADHOC_MASTER_STATE) == _TRUE
 			&& check_fwstate(&iface->mlmepriv, _FW_LINKED) == _TRUE
 		) {
@@ -274,10 +270,8 @@ inline void rtw_mi_status_merge(struct mi_state *d, struct mi_state *a)
 #ifdef CONFIG_TDLS
 	d->ld_tdls_num += a->ld_tdls_num;
 #endif
-#ifdef CONFIG_AP_MODE
 	d->ap_num += a->ap_num;
 	d->ld_ap_num += a->ld_ap_num;
-#endif
 	d->adhoc_num += a->adhoc_num;
 	d->ld_adhoc_num += a->ld_adhoc_num;
 #ifdef CONFIG_RTW_MESH
@@ -302,11 +296,9 @@ void dump_mi_status(void *sel, struct dvobj_priv *dvobj)
 #ifdef CONFIG_TDLS
 	RTW_PRINT_SEL(sel, "linked_tdls_num:%d\n", DEV_TDLS_LD_NUM(dvobj));
 #endif
-#ifdef CONFIG_AP_MODE
 	RTW_PRINT_SEL(sel, "ap_num:%d\n", DEV_AP_NUM(dvobj));
 	RTW_PRINT_SEL(sel, "starting_ap_num:%d\n", DEV_AP_STARTING_NUM(dvobj));
 	RTW_PRINT_SEL(sel, "linked_ap_num:%d\n", DEV_AP_LD_NUM(dvobj));
-#endif
 	RTW_PRINT_SEL(sel, "adhoc_num:%d\n", DEV_ADHOC_NUM(dvobj));
 	RTW_PRINT_SEL(sel, "linked_adhoc_num:%d\n", DEV_ADHOC_LD_NUM(dvobj));
 #ifdef CONFIG_RTW_MESH

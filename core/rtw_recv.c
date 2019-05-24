@@ -826,7 +826,6 @@ sint recv_bcast_pn_decache(union recv_frame *precv_frame)
 
 static void process_pwrbit_data(_adapter *padapter, union recv_frame *precv_frame, struct sta_info *psta)
 {
-#ifdef CONFIG_AP_MODE
 	unsigned char pwrbit;
 	u8 *ptr = precv_frame->u.hdr.rx_data;
 	struct rx_pkt_attrib *pattrib = &precv_frame->u.hdr.attrib;
@@ -836,27 +835,17 @@ static void process_pwrbit_data(_adapter *padapter, union recv_frame *precv_fram
 
 	if (pwrbit) {
 		if (!(psta->state & WIFI_SLEEP_STATE)) {
-			/* psta->state |= WIFI_SLEEP_STATE; */
-			/* rtw_tim_map_set(padapter, pstapriv->sta_dz_bitmap, BIT(psta->cmn.aid)); */
-
 			stop_sta_xmit(padapter, psta);
-			/* RTW_INFO_DUMP("to sleep, sta_dz_bitmap=", pstapriv->sta_dz_bitmap, pstapriv->aid_bmp_len); */
 		}
 	} else {
 		if (psta->state & WIFI_SLEEP_STATE) {
-			/* psta->state ^= WIFI_SLEEP_STATE; */
-			/* rtw_tim_map_clear(padapter, pstapriv->sta_dz_bitmap, BIT(psta->cmn.aid)); */
-
 			wakeup_sta_to_xmit(padapter, psta);
-			/* RTW_INFO_DUMP("to wakeup, sta_dz_bitmap=", pstapriv->sta_dz_bitmap, pstapriv->aid_bmp_len); */
 		}
 	}
-#endif
 }
 
 static void process_wmmps_data(_adapter *padapter, union recv_frame *precv_frame, struct sta_info *psta)
 {
-#ifdef CONFIG_AP_MODE
 	struct rx_pkt_attrib *pattrib = &precv_frame->u.hdr.attrib;
 	struct sta_priv *pstapriv = &padapter->stapriv;
 
@@ -908,10 +897,6 @@ static void process_wmmps_data(_adapter *padapter, union recv_frame *precv_frame
 		}
 
 	}
-
-
-#endif
-
 }
 
 #ifdef CONFIG_TDLS
@@ -1510,7 +1495,6 @@ sint validate_recv_ctrl_frame(_adapter *padapter, union recv_frame *precv_frame)
 
 	/* only handle ps-poll */
 	if (get_frame_sub_type(pframe) == WIFI_PSPOLL) {
-#ifdef CONFIG_AP_MODE
 		u16 aid;
 		u8 wmmps_ac = 0;
 
@@ -1608,7 +1592,6 @@ sint validate_recv_ctrl_frame(_adapter *padapter, union recv_frame *precv_frame)
 				}
 			}
 		}
-#endif /* CONFIG_AP_MODE */
 	} else if (get_frame_sub_type(pframe) == WIFI_NDPA) {
 	} else if (get_frame_sub_type(pframe) == WIFI_BAR) {
 		rtw_process_bar_frame(padapter, precv_frame);

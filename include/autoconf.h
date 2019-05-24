@@ -17,10 +17,6 @@
  * Wi-Fi Functions Configure
  */
 
-#define CONFIG_AP_MODE
-#ifdef CONFIG_AP_MODE
-#endif
-
 /*
  * Added by Kurt 20110511
  */
@@ -179,7 +175,6 @@
 	#endif
 #endif /* CONFIG_BT_COEXIST */
 
-#ifdef CONFIG_AP_MODE
 	/* #define CONFIG_INTERRUPT_BASED_TXBCN */ /* Tx Beacon when driver BCN_OK ,BCN_ERR interrupt occurs */
 	#if defined(CONFIG_CONCURRENT_MODE) && defined(CONFIG_INTERRUPT_BASED_TXBCN)
 		#undef CONFIG_INTERRUPT_BASED_TXBCN
@@ -188,7 +183,6 @@
 		/* #define CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT */
 		#define CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR
 	#endif
-#endif /* CONFIG_AP_MODE */
 
 #ifdef CONFIG_USE_USB_BUFFER_ALLOC_RX
 

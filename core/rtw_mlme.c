@@ -162,7 +162,6 @@ static void rtw_free_mlme_ie_data(u8 **ppie, u32 *plen)
 
 void rtw_free_mlme_priv_ie_data(struct mlme_priv *pmlmepriv)
 {
-#if defined(CONFIG_AP_MODE)
 	rtw_buf_free(&pmlmepriv->assoc_req, &pmlmepriv->assoc_req_len);
 	rtw_buf_free(&pmlmepriv->assoc_rsp, &pmlmepriv->assoc_rsp_len);
 	rtw_free_mlme_ie_data(&pmlmepriv->wps_beacon_ie, &pmlmepriv->wps_beacon_ie_len);
@@ -176,7 +175,6 @@ void rtw_free_mlme_priv_ie_data(struct mlme_priv *pmlmepriv)
 	rtw_free_mlme_ie_data(&pmlmepriv->p2p_go_probe_resp_ie, &pmlmepriv->p2p_go_probe_resp_ie_len);
 	rtw_free_mlme_ie_data(&pmlmepriv->p2p_assoc_req_ie, &pmlmepriv->p2p_assoc_req_ie_len);
 	rtw_free_mlme_ie_data(&pmlmepriv->p2p_assoc_resp_ie, &pmlmepriv->p2p_assoc_resp_ie_len);
-#endif
 
 #if defined(CONFIG_IOCTL_CFG80211)
 	rtw_free_mlme_ie_data(&pmlmepriv->wfd_beacon_ie, &pmlmepriv->wfd_beacon_ie_len);
@@ -2157,7 +2155,6 @@ void rtw_stassoc_event_callback(_adapter *adapter, u8 *pbuf)
 		return;
 #endif
 
-#if defined(CONFIG_AP_MODE)
 	if (MLME_IS_AP(adapter) || MLME_IS_MESH(adapter)) {
 		psta = rtw_get_stainfo(&adapter->stapriv, pstassoc->macaddr);
 		if (psta) {
@@ -2203,7 +2200,6 @@ void rtw_stassoc_event_callback(_adapter *adapter, u8 *pbuf)
 		}
 		goto exit;
 	}
-#endif /* defined (CONFIG_AP_MODE) */
 
 	/* for AD-HOC mode */
 	psta = rtw_get_stainfo(&adapter->stapriv, pstassoc->macaddr);
@@ -2927,9 +2923,7 @@ static u8 is_drv_in_lps(_adapter *adapter)
 }
 void rtw_iface_dynamic_check_timer_handlder(_adapter *adapter)
 {
-#ifdef CONFIG_AP_MODE
 	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
-#endif /* CONFIG_AP_MODE */
 
 	if (adapter->net_closed == _TRUE)
 		return;
@@ -2952,7 +2946,6 @@ void rtw_iface_dynamic_check_timer_handlder(_adapter *adapter)
 	/* auto site survey */
 	rtw_auto_scan_handler(adapter);
 
-#ifdef CONFIG_AP_MODE
 	if (MLME_IS_AP(adapter)|| MLME_IS_MESH(adapter)) {
 		#ifndef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
 		expire_timeout_chk(adapter);
@@ -2962,7 +2955,6 @@ void rtw_iface_dynamic_check_timer_handlder(_adapter *adapter)
 		rtw_update_bmc_sta_tx_rate(adapter);
 		#endif /*CONFIG_BMC_TX_RATE_SELECT*/
 	}
-#endif /*CONFIG_AP_MODE*/
 
 
 #ifdef CONFIG_BR_EXT

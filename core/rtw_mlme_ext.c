@@ -1454,9 +1454,7 @@ int	init_mlme_ext_priv(_adapter *padapter)
 
 	init_mlme_ext_timer(padapter);
 
-#ifdef CONFIG_AP_MODE
 	init_mlme_ap_info(padapter);
-#endif
 
 	pmlmeext->last_scan_time = 0;
 	pmlmeext->mlmeext_init = _TRUE;
@@ -1526,9 +1524,7 @@ void mgt_dispatcher(_adapter *padapter, union recv_frame *precv_frame)
 {
 	int index;
 	struct mlme_handler *ptable;
-#ifdef CONFIG_AP_MODE
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
-#endif /* CONFIG_AP_MODE */
 	u8 bc_addr[ETH_ALEN] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 	u8 *pframe = precv_frame->u.hdr.rx_data;
 	struct sta_info *psta = rtw_get_stainfo(&padapter->stapriv, get_addr2_ptr(pframe));
@@ -1575,7 +1571,6 @@ void mgt_dispatcher(_adapter *padapter, union recv_frame *precv_frame)
 		psta->RxMgmtFrameSeqNum = le16_to_cpu(precv_frame->u.hdr.attrib.seq_num);
 	}
 
-#ifdef CONFIG_AP_MODE
 	switch (get_frame_sub_type(pframe)) {
 	case WIFI_AUTH:
 		if (MLME_IS_AP(padapter))
@@ -1600,12 +1595,6 @@ void mgt_dispatcher(_adapter *padapter, union recv_frame *precv_frame)
 		_mgt_dispatcher(padapter, ptable, precv_frame);
 		break;
 	}
-#else
-
-	_mgt_dispatcher(padapter, ptable, precv_frame);
-
-#endif
-
 }
 
 static u32 p2p_listen_state_process(_adapter *padapter, unsigned char *da)
@@ -2098,7 +2087,6 @@ _END_ONBEACON_:
 
 unsigned int OnAuth(_adapter *padapter, union recv_frame *precv_frame)
 {
-#ifdef CONFIG_AP_MODE
 	_irqL irqL;
 	unsigned int	auth_mode, seq, ie_len;
 	unsigned char	*sa, *p;
@@ -2113,7 +2101,6 @@ unsigned int OnAuth(_adapter *padapter, union recv_frame *precv_frame)
 	u8 *pframe = precv_frame->u.hdr.rx_data;
 	uint len = precv_frame->u.hdr.len;
 	u8	offset = 0;
-
 
 #ifdef CONFIG_CONCURRENT_MODE
 	if (((pmlmeinfo->state & 0x03) == WIFI_FW_AP_STATE) &&
@@ -2331,9 +2318,7 @@ auth_fail:
 
 	issue_auth(padapter, pstat, (unsigned short)status);
 
-#endif
 	return _FAIL;
-
 }
 
 unsigned int OnAuthClient(_adapter *padapter, union recv_frame *precv_frame)
@@ -2427,7 +2412,6 @@ authclnt_fail:
 
 unsigned int OnAssocReq(_adapter *padapter, union recv_frame *precv_frame)
 {
-#ifdef CONFIG_AP_MODE
 	_irqL irqL;
 	u16 capab_info, listen_interval;
 	struct rtw_ieee802_11_elems elems;
@@ -2688,12 +2672,7 @@ OnAssocReqFail:
 		issue_asocrsp(padapter, status, pstat, WIFI_ASSOCRSP);
 	else
 		issue_asocrsp(padapter, status, pstat, WIFI_REASSOCRSP);
-
-
-#endif /* CONFIG_AP_MODE */
-
 	return _FAIL;
-
 }
 
 #if defined(CONFIG_LAYER2_ROAMING) && defined(CONFIG_RTW_80211K)
@@ -2859,7 +2838,6 @@ unsigned int OnDeAuth(_adapter *padapter, union recv_frame *precv_frame)
 
 	rtw_lock_rx_suspend_timeout(8000);
 
-#ifdef CONFIG_AP_MODE
 	if (MLME_IS_AP(padapter)) {
 		_irqL irqL;
 		struct sta_info *psta;
@@ -2890,9 +2868,7 @@ unsigned int OnDeAuth(_adapter *padapter, union recv_frame *precv_frame)
 
 
 		return _SUCCESS;
-	} else
-#endif
-	{
+	} else {
 		int	ignore_received_deauth = 0;
 
 		/*	Commented by Albert 20130604 */
@@ -2945,7 +2921,6 @@ unsigned int OnDisassoc(_adapter *padapter, union recv_frame *precv_frame)
 
 	rtw_lock_rx_suspend_timeout(8000);
 
-#ifdef CONFIG_AP_MODE
 	if (MLME_IS_AP(padapter)) {
 		_irqL irqL;
 		struct sta_info *psta;
@@ -2975,9 +2950,7 @@ unsigned int OnDisassoc(_adapter *padapter, union recv_frame *precv_frame)
 		}
 
 		return _SUCCESS;
-	} else
-#endif
-	{
+	} else {
 		RTW_PRINT(FUNC_ADPT_FMT" reason=%u, ta=%pM\n"
 			, FUNC_ADPT_ARG(padapter), reason, get_addr2_ptr(pframe));
 
@@ -6433,11 +6406,9 @@ unsigned int on_action_public(_adapter *padapter, union recv_frame *precv_frame)
 	action = frame_body[1];
 	switch (action) {
 	case ACT_PUBLIC_BSSCOEXIST:
-#ifdef CONFIG_AP_MODE
 		/*20/40 BSS Coexistence Management frame is a Public Action frame*/
 		if (check_fwstate(&padapter->mlmepriv, WIFI_AP_STATE) == _TRUE)
 			rtw_process_public_act_bsscoex(padapter, pframe, frame_len);
-#endif /*CONFIG_AP_MODE*/
 		break;
 	case ACT_PUBLIC_VENDOR:
 		ret = on_action_public_vendor(precv_frame);
@@ -7029,10 +7000,8 @@ unsigned int OnAction_ht(_adapter *padapter, union recv_frame *precv_frame)
 	action = frame_body[1];
 	switch (action) {
 	case RTW_WLAN_ACTION_HT_SM_PS:
-#ifdef CONFIG_AP_MODE
 		if (check_fwstate(&padapter->mlmepriv, WIFI_AP_STATE) == _TRUE)
 			rtw_process_ht_action_smps(padapter, get_addr2_ptr(pframe), frame_body[2]);
-#endif /*CONFIG_AP_MODE*/
 		break;
 	case RTW_WLAN_ACTION_HT_COMPRESS_BEAMFORMING:
 		break;
@@ -7496,10 +7465,8 @@ void issue_beacon(_adapter *padapter, int timeout_ms)
 	__le16 *fctrl;
 	unsigned int	rate_len;
 	struct xmit_priv	*pxmitpriv = &(padapter->xmitpriv);
-#if defined(CONFIG_AP_MODE)
 	_irqL irqL;
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
-#endif /* #if defined (CONFIG_AP_MODE) */
 	struct mlme_ext_priv	*pmlmeext = &(padapter->mlmeextpriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	WLAN_BSSID_EX		*cur_network = &(pmlmeinfo->network);
@@ -7517,9 +7484,7 @@ void issue_beacon(_adapter *padapter, int timeout_ms)
 		RTW_INFO("%s, alloc mgnt frame fail\n", __FUNCTION__);
 		return;
 	}
-#if defined(CONFIG_AP_MODE)
 	_enter_critical_bh(&pmlmepriv->bcn_update_lock, &irqL);
-#endif /* #if defined (CONFIG_AP_MODE) */
 
 	/* update attribute */
 	pattrib = &pmgntframe->attrib;
@@ -7759,11 +7724,9 @@ void issue_beacon(_adapter *padapter, int timeout_ms)
 
 _issue_bcn:
 
-#if defined(CONFIG_AP_MODE)
 	pmlmepriv->update_bcn = _FALSE;
 
 	_exit_critical_bh(&pmlmepriv->bcn_update_lock, &irqL);
-#endif /* #if defined (CONFIG_AP_MODE) */
 
 	if ((pattrib->pktlen + TXDESC_SIZE) > 512) {
 		RTW_INFO("beacon frame too large\n");
@@ -7789,11 +7752,9 @@ void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probe
 	__le16 *fctrl;
 	unsigned char					*mac, *bssid;
 	struct xmit_priv	*pxmitpriv = &(padapter->xmitpriv);
-#if defined(CONFIG_AP_MODE)
 	u8 *pwps_ie;
 	uint wps_ielen;
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
-#endif /* #if defined (CONFIG_AP_MODE) */
 	struct mlme_ext_priv	*pmlmeext = &(padapter->mlmeextpriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	WLAN_BSSID_EX		*cur_network = &(pmlmeinfo->network);
@@ -7844,7 +7805,6 @@ void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probe
 	if (cur_network->IELength > MAX_IE_SZ)
 		return;
 
-#if defined(CONFIG_AP_MODE)
 	if ((pmlmeinfo->state & 0x03) == WIFI_FW_AP_STATE) {
 		pwps_ie = rtw_get_wps_ie(cur_network->IEs + _FIXED_IE_LENGTH_, cur_network->IELength - _FIXED_IE_LENGTH_, NULL, &wps_ielen);
 
@@ -7920,10 +7880,7 @@ void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probe
 #ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
 		pattrib->pktlen += rtw_build_vendor_ie(padapter , pframe , WIFI_PROBERESP_VENDOR_IE_BIT);
 #endif
-	} else
-#endif
-	{
-
+	} else {
 		/* timestamp will be inserted by hardware */
 		pframe += 8;
 		pattrib->pktlen += 8;
@@ -8321,7 +8278,6 @@ void issue_auth(_adapter *padapter, struct sta_info *psta, unsigned short status
 
 void issue_asocrsp(_adapter *padapter, unsigned short status, struct sta_info *pstat, int pkt_type)
 {
-#ifdef CONFIG_AP_MODE
 	struct xmit_frame	*pmgntframe;
 	struct rtw_ieee80211_hdr	*pwlanhdr;
 	struct pkt_attrib *pattrib;
@@ -8500,8 +8456,6 @@ void issue_asocrsp(_adapter *padapter, unsigned short status, struct sta_info *p
 	pattrib->last_txcmdsz = pattrib->pktlen;
 
 	dump_mgntframe(padapter, pmgntframe);
-
-#endif
 }
 
 void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
@@ -12920,12 +12874,10 @@ u8 createbss_hdl(_adapter *padapter, u8 *pbuf)
 	u8 ret = H2C_SUCCESS;
 	/* u8	initialgain; */
 
-#ifdef CONFIG_AP_MODE
 	if (pmlmeinfo->state == WIFI_FW_AP_STATE) {
 		start_bss_network(padapter, parm);
 		goto exit;
 	}
-#endif
 
 	/* below is for ad-hoc master */
 	if (parm->adhoc) {
@@ -14690,7 +14642,6 @@ u8 h2c_msg_hdl(_adapter *padapter, unsigned char *pbuf)
 
 u8 chk_bmc_sleepq_hdl(_adapter *padapter, unsigned char *pbuf)
 {
-#ifdef CONFIG_AP_MODE
 	_irqL irqL;
 	struct sta_info *psta_bmc;
 	_list	*xmitframe_plist, *xmitframe_phead;
@@ -14740,8 +14691,6 @@ u8 chk_bmc_sleepq_hdl(_adapter *padapter, unsigned char *pbuf)
 			rtw_chk_hi_queue_cmd(padapter);
 		}
 	}
-#endif
-
 	return H2C_SUCCESS;
 }
 

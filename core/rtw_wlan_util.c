@@ -3445,7 +3445,6 @@ inline bool rtw_bmp_not_empty_exclude_bit0(const u8 *bmp, u8 bmp_len)
 	return 0;
 }
 
-#ifdef CONFIG_AP_MODE
 /* Check the id be set or not in map , if yes , return a none zero value*/
 bool rtw_tim_map_is_set(_adapter *padapter, const u8 *map, u8 id)
 {
@@ -3475,7 +3474,6 @@ bool rtw_tim_map_anyone_be_set_exclude_aid0(_adapter *padapter, const u8 *map)
 {
 	return rtw_bmp_not_empty_exclude_bit0(map, padapter->stapriv.aid_bmp_len);
 }
-#endif /* CONFIG_AP_MODE */
 
 _adapter *dvobj_get_port0_adapter(struct dvobj_priv *dvobj)
 {

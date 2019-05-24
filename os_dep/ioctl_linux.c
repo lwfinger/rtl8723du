@@ -5683,10 +5683,8 @@ static int rtw_dbg_port(struct net_device *dev,
 			int i;
 			_list	*plist, *phead;
 
-#ifdef CONFIG_AP_MODE
 			RTW_INFO_DUMP("sta_dz_bitmap:", pstapriv->sta_dz_bitmap, pstapriv->aid_bmp_len);
 			RTW_INFO_DUMP("tim_bitmap:", pstapriv->tim_bitmap, pstapriv->aid_bmp_len);
-#endif
 			_enter_critical_bh(&pstapriv->sta_hash_lock, &irqL);
 
 			for (i = 0; i < NUM_STA; i++) {
@@ -5710,14 +5708,12 @@ static int rtw_dbg_port(struct net_device *dev,
 						RTW_INFO("ampdu_enable = %d\n", psta->htpriv.ampdu_enable);
 						RTW_INFO("agg_enable_bitmap=%x, candidate_tid_bitmap=%x\n", psta->htpriv.agg_enable_bitmap, psta->htpriv.candidate_tid_bitmap);
 
-#ifdef CONFIG_AP_MODE
 						RTW_INFO("capability=0x%x\n", psta->capability);
 						RTW_INFO("flags=0x%x\n", psta->flags);
 						RTW_INFO("wpa_psk=0x%x\n", psta->wpa_psk);
 						RTW_INFO("wpa2_group_cipher=0x%x\n", psta->wpa2_group_cipher);
 						RTW_INFO("wpa2_pairwise_cipher=0x%x\n", psta->wpa2_pairwise_cipher);
 						RTW_INFO("qos_info=0x%x\n", psta->qos_info);
-#endif
 						RTW_INFO("dot118021XPrivacy=0x%x\n", psta->dot118021XPrivacy);
 
 						sta_rx_reorder_ctl_dump(RTW_DBGDUMP, psta);
@@ -6245,7 +6241,6 @@ out:
 
 }
 
-#ifdef CONFIG_AP_MODE
 static int rtw_set_encryption(struct net_device *dev, struct ieee_param *param, u32 param_len)
 {
 	int ret = 0;
@@ -6548,9 +6543,7 @@ static int rtw_hostapd_sta_flush(struct net_device *dev)
 	RTW_INFO("%s\n", __FUNCTION__);
 
 	flush_all_cam_entry(padapter);	/* clear CAM */
-#ifdef CONFIG_AP_MODE
 	ret = rtw_sta_flush(padapter, _TRUE);
-#endif
 	return ret;
 
 }
@@ -7113,7 +7106,6 @@ out:
 	return ret;
 
 }
-#endif
 
 static int rtw_wx_set_priv(struct net_device *dev,
 			   struct iw_request_info *info,
@@ -11462,7 +11454,6 @@ int rtw_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 	case RTL_IOCTL_WPA_SUPPLICANT:
 		ret = wpa_supplicant_ioctl(dev, &wrq->u.data);
 		break;
-#ifdef CONFIG_AP_MODE
 	case RTL_IOCTL_HOSTAPD:
 		ret = rtw_hostapd_ioctl(dev, &wrq->u.data);
 		break;
@@ -11471,7 +11462,6 @@ int rtw_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 		ret = rtw_wx_set_mode(dev, NULL, &wrq->u, NULL);
 		break;
 #endif
-#endif /* CONFIG_AP_MODE */
 	case SIOCDEVPRIVATE:
 		ret = rtw_ioctl_wext_private(dev, rq);
 		break;

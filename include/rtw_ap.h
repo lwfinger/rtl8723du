@@ -4,13 +4,9 @@
 #ifndef __RTW_AP_H_
 #define __RTW_AP_H_
 
-
-#ifdef CONFIG_AP_MODE
-
 /* external function */
 extern void rtw_indicate_sta_assoc_event(_adapter *padapter, struct sta_info *psta);
 extern void rtw_indicate_sta_disassoc_event(_adapter *padapter, struct sta_info *psta);
-
 
 void init_mlme_ap_info(_adapter *padapter);
 void free_mlme_ap_info(_adapter *padapter);
@@ -83,5 +79,4 @@ void tx_beacon_timer_handlder(void *ctx);
 
 #endif /*CONFIG_SWTIMER_BASED_TXBCN*/
 
-#endif /* end of CONFIG_AP_MODE */
 #endif /*__RTW_AP_H_*/

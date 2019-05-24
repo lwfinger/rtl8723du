@@ -98,12 +98,7 @@
 	#define CONFIG_USB_VENDOR_REQ_MUTEX
 #endif
 
-#if !defined(CONFIG_AP_MODE) && defined(CONFIG_DFS_MASTER)
-	#warning "undef CONFIG_DFS_MASTER because CONFIG_AP_MODE is not defined"
-	#undef CONFIG_DFS_MASTER
-#endif
-
-#if !defined(CONFIG_SCAN_BACKOP) && defined(CONFIG_AP_MODE)
+#if !defined(CONFIG_SCAN_BACKOP)
 #define CONFIG_SCAN_BACKOP
 #endif
 
@@ -297,10 +292,7 @@
 		#endif
 	#endif
 
-	#ifdef CONFIG_AP_MODE
 		#define CONFIG_SWTIMER_BASED_TXBCN
-		/*#define CONFIG_FW_BASED_BCN*/
-	#endif
 #endif
 
 #define MACID_NUM_SW_LIMIT 32

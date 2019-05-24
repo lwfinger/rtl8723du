@@ -782,7 +782,6 @@ struct mlme_priv {
 	u8 ext_capab_ie_data[8];/*currently for ap mode only*/
 	u8 ext_capab_ie_len;
 
-#if defined(CONFIG_AP_MODE)
 	/* Number of associated Non-ERP stations (i.e., stations using 802.11b
 	 * in 802.11g BSS) */
 	int num_sta_non_erp;
@@ -861,7 +860,6 @@ struct mlme_priv {
 	u8 ori_ch;
 	u8 ori_bw;
 	u8 ori_offset;
-#endif /* #if defined (CONFIG_AP_MODE) */
 
 #if defined(CONFIG_IOCTL_CFG80211)
 	u8 *wfd_beacon_ie;
@@ -945,16 +943,12 @@ struct mlme_priv {
 
 void rtw_mlme_reset_auto_scan_int(_adapter *adapter, u8 *reason);
 
-#ifdef CONFIG_AP_MODE
-
 struct hostapd_priv {
 	_adapter *padapter;
 };
 
 extern int hostapd_mode_init(_adapter *padapter);
 extern void hostapd_mode_unload(_adapter *padapter);
-#endif
-
 
 extern void rtw_joinbss_event_prehandle(_adapter *adapter, u8 *pbuf);
 extern void rtw_survey_event_callback(_adapter *adapter, u8 *pbuf);

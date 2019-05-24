@@ -316,9 +316,7 @@ char *rtw_initmac = NULL;  /* temp mac address if users want to use instead of t
 	#endif
 
 #endif
-#ifdef CONFIG_AP_MODE
 static u8 rtw_bmc_tx_rate = MGN_UNKNOWN;
-#endif
 module_param(rtw_pwrtrim_enable, int, 0644);
 module_param(rtw_initmac, charp, 0644);
 module_param(rtw_special_rf_path, int, 0644);
@@ -955,9 +953,7 @@ uint loadparam(_adapter *padapter)
 #ifdef CONFIG_FW_OFFLOAD_PARAM_INIT
 	registry_par->fw_param_init = rtw_fw_param_init;
 #endif
-#ifdef CONFIG_AP_MODE
 	registry_par->bmc_tx_rate = rtw_bmc_tx_rate;
-#endif
 	return status;
 }
 
@@ -1761,9 +1757,7 @@ u8 rtw_init_default_value(_adapter *padapter)
 	padapter->power_offset = 0;
 	padapter->rsvd_page_offset = 0;
 	padapter->rsvd_page_num = 0;
-#ifdef CONFIG_AP_MODE
 	padapter->bmc_tx_rate = pregistrypriv->bmc_tx_rate;
-#endif
 	padapter->driver_tx_bw_mode = pregistrypriv->tx_bw_mode;
 
 	padapter->driver_ampdu_spacing = 0xFF;
@@ -1833,7 +1827,6 @@ struct dvobj_priv *devobj_init(void)
 	rtw_mbid_cam_init(pdvobj);
 #endif
 
-#ifdef CONFIG_AP_MODE
 	pdvobj->nr_ap_if = 0;
 	pdvobj->inter_bcn_space = DEFAULT_BCN_INTERVAL; /* default value is equal to the default beacon_interval (100ms) */
 	_rtw_init_queue(&pdvobj->ap_if_q);
@@ -1842,7 +1835,6 @@ struct dvobj_priv *devobj_init(void)
 	timer_setup(&pdvobj->txbcn_timer, tx_beacon_timer_handlder, 0);
 #else
 	rtw_init_timer(&(pdvobj->txbcn_timer), NULL, tx_beacon_timer_handlder, pdvobj);
-#endif
 #endif
 #endif
 
@@ -2482,11 +2474,9 @@ void rtw_drv_stop_vir_if(_adapter *padapter)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		rtw_disassoc_cmd(padapter, 0, RTW_CMDF_DIRECTLY);
 
-#ifdef CONFIG_AP_MODE
 	if (MLME_IS_AP(padapter) || MLME_IS_MESH(padapter)) {
 		free_mlme_ap_info(padapter);
 	}
-#endif
 
 	if (padapter->bup == _TRUE) {
 		#ifdef CONFIG_XMIT_ACK
@@ -3591,10 +3581,8 @@ int rtw_suspend_free_assoc_resource(_adapter *padapter)
 		/* s2-2.  indicate disconnect to os */
 		rtw_indicate_disconnect(padapter, 0, _FALSE);
 	}
-#ifdef CONFIG_AP_MODE
 	else if (MLME_IS_AP(padapter) || MLME_IS_MESH(padapter))
 		rtw_sta_flush(padapter, _TRUE);
-#endif
 
 	/* s2-3. */
 	rtw_free_assoc_resources(padapter, 1);

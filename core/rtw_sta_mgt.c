@@ -196,7 +196,6 @@ void _rtw_init_stainfo(struct sta_info *psta)
 	_rtw_init_sta_xmit_priv(&psta->sta_xmitpriv);
 	_rtw_init_sta_recv_priv(&psta->sta_recvpriv);
 
-#ifdef CONFIG_AP_MODE
 	_rtw_init_listhead(&psta->asoc_list);
 	_rtw_init_listhead(&psta->auth_list);
 	psta->bpairwise_key_installed = _FALSE;
@@ -204,7 +203,6 @@ void _rtw_init_stainfo(struct sta_info *psta)
 #ifdef CONFIG_RTW_80211R
 	psta->ft_pairwise_key_installed = _FALSE;
 #endif
-#endif /* CONFIG_AP_MODE	 */
 
 	rtw_st_ctl_init(&psta->st_ctl);
 }
@@ -251,7 +249,6 @@ u32	_rtw_init_sta_priv(struct	sta_priv *pstapriv)
 
 	pstapriv->adhoc_expire_to = 4; /* 4 * 2 = 8 sec */
 
-#ifdef CONFIG_AP_MODE
 	pstapriv->max_aid = macid_ctl->num;
 	pstapriv->rr_aid = 0;
 	pstapriv->started_aid = 1;
@@ -288,8 +285,6 @@ u32	_rtw_init_sta_priv(struct	sta_priv *pstapriv)
 #endif
 	pstapriv->max_num_sta = NUM_STA;
 
-#endif
-
 #if CONFIG_RTW_MACADDR_ACL
 	_rtw_init_queue(&(pstapriv->acl_list.acl_node_q));
 #endif
@@ -304,12 +299,10 @@ exit:
 	if (ret != _SUCCESS) {
 		if (pstapriv->pallocated_stainfo_buf)
 			rtw_vmfree(pstapriv->pallocated_stainfo_buf, sizeof(struct sta_info) * NUM_STA + 4);
-		#ifdef CONFIG_AP_MODE
 		if (pstapriv->sta_aid)
 			rtw_mfree(pstapriv->sta_aid, sz);
 		if (pstapriv->sta_dz_bitmap)
 			rtw_mfree(pstapriv->sta_dz_bitmap, pstapriv->aid_bmp_len);
-		#endif
 	}
 
 	return ret;
@@ -405,11 +398,8 @@ void rtw_mfree_sta_priv_lock(struct	sta_priv *pstapriv)
 	_rtw_spinlock_free(&pstapriv->wakeup_q.lock);
 	_rtw_spinlock_free(&pstapriv->sleep_q.lock);
 
-#ifdef CONFIG_AP_MODE
 	_rtw_spinlock_free(&pstapriv->asoc_list_lock);
 	_rtw_spinlock_free(&pstapriv->auth_list_lock);
-#endif
-
 }
 
 u32	_rtw_free_sta_priv(struct	sta_priv *pstapriv)
@@ -455,7 +445,6 @@ u32	_rtw_free_sta_priv(struct	sta_priv *pstapriv)
 
 		if (pstapriv->pallocated_stainfo_buf)
 			rtw_vmfree(pstapriv->pallocated_stainfo_buf, sizeof(struct sta_info) * NUM_STA + 4);
-		#ifdef CONFIG_AP_MODE
 		sz = pstapriv->max_aid * sizeof(struct sta_info *);
 		if (pstapriv->sta_aid)
 			rtw_mfree(pstapriv->sta_aid, sz);
@@ -463,9 +452,7 @@ u32	_rtw_free_sta_priv(struct	sta_priv *pstapriv)
 			rtw_mfree(pstapriv->sta_dz_bitmap, pstapriv->aid_bmp_len);
 		if (pstapriv->tim_bitmap)
 			rtw_mfree(pstapriv->tim_bitmap, pstapriv->aid_bmp_len);
-		#endif
 	}
-
 	return _SUCCESS;
 }
 
@@ -748,13 +735,6 @@ u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta)
 	if (is_pre_link_sta == _FALSE)
 		rtw_release_macid(pstapriv->padapter, psta);
 
-#ifdef CONFIG_AP_MODE
-
-	/*
-		_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL0);
-		rtw_list_delete(&psta->asoc_list);
-		_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL0);
-	*/
 	_enter_critical_bh(&pstapriv->auth_list_lock, &irqL0);
 	if (!rtw_is_list_empty(&psta->auth_list)) {
 		rtw_list_delete(&psta->auth_list);
@@ -790,7 +770,6 @@ u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta)
 	}
 
 	psta->under_exist_checking = 0;
-#endif /* CONFIG_AP_MODE	 */
 
 	rtw_st_ctl_deinit(&psta->st_ctl);
 
@@ -946,7 +925,6 @@ struct sta_info *rtw_get_bcmc_stainfo(_adapter *padapter)
 
 }
 
-#ifdef CONFIG_AP_MODE
 u16 rtw_aid_alloc(_adapter *adapter, struct sta_info *sta)
 {
 	struct sta_priv *stapriv = &adapter->stapriv;
@@ -1000,7 +978,6 @@ void dump_aid_status(void *sel, _adapter *adapter)
 
 	rtw_mfree(aid_bmp, stapriv->aid_bmp_len);
 }
-#endif /* CONFIG_AP_MODE */
 
 #if CONFIG_RTW_MACADDR_ACL
 const char *const _acl_mode_str[] = {

@@ -485,17 +485,13 @@ static NDIS_802_11_NETWORK_INFRASTRUCTURE nl80211_iftype_to_rtw_network_type(enu
 	case NL80211_IFTYPE_STATION:
 		return Ndis802_11Infrastructure;
 
-#ifdef CONFIG_AP_MODE
 	#if ((LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE))
 	case NL80211_IFTYPE_P2P_GO:
 	#endif
 	case NL80211_IFTYPE_AP:
 		return Ndis802_11APMode;
-#endif
-
 	case NL80211_IFTYPE_MONITOR:
 		return Ndis802_11Monitor;
-
 	default:
 		return Ndis802_11InfrastructureMax;
 	}
@@ -513,14 +509,11 @@ static u32 nl80211_iftype_to_rtw_mlme_state(enum nl80211_iftype type)
 	case NL80211_IFTYPE_STATION:
 		return WIFI_STATION_STATE;
 
-#ifdef CONFIG_AP_MODE
 	#if ((LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE))
 	case NL80211_IFTYPE_P2P_GO:
 	#endif
 	case NL80211_IFTYPE_AP:
 		return WIFI_AP_STATE;
-#endif
-
 	case NL80211_IFTYPE_MONITOR:
 		return WIFI_MONITOR_STATE;
 
@@ -1033,7 +1026,6 @@ void rtw_cfg80211_indicate_disconnect(_adapter *padapter, u16 reason, u8 locally
 }
 
 
-#ifdef CONFIG_AP_MODE
 static int rtw_cfg80211_ap_set_encryption(struct net_device *dev, struct ieee_param *param)
 {
 	int ret = 0;
@@ -1241,7 +1233,6 @@ static int rtw_cfg80211_ap_set_encryption(struct net_device *dev, struct ieee_pa
 exit:
 	return ret;
 }
-#endif /* CONFIG_AP_MODE */
 
 static int rtw_cfg80211_set_encryption(struct net_device *dev, struct ieee_param *param)
 {
@@ -1514,12 +1505,10 @@ static int cfg80211_rtw_add_key(struct wiphy *wiphy, struct net_device *ndev
 #endif /* CONFIG_TDLS */
 		ret = rtw_cfg80211_set_encryption(ndev, param);
 	} else if (check_fwstate(pmlmepriv, WIFI_AP_STATE) == _TRUE) {
-#ifdef CONFIG_AP_MODE
 		if (mac_addr)
 			_rtw_memcpy(param->sta_addr, (void *)mac_addr, ETH_ALEN);
 
 		ret = rtw_cfg80211_ap_set_encryption(ndev, param);
-#endif
 	} else if (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE) == _TRUE
 		|| check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) == _TRUE
 	) {
@@ -3433,7 +3422,6 @@ static int cfg80211_rtw_flush_pmksa(struct wiphy *wiphy,
 	return 0;
 }
 
-#ifdef CONFIG_AP_MODE
 void rtw_cfg80211_indicate_sta_assoc(_adapter *padapter, u8 *pmgmt_frame, uint frame_len)
 {
 	s32 freq;
@@ -4199,9 +4187,7 @@ static int	cfg80211_rtw_del_station(struct wiphy *wiphy, struct net_device *ndev
 
 		flush_all_cam_entry(padapter);	/* clear CAM */
 
-#ifdef CONFIG_AP_MODE
 		ret = rtw_sta_flush(padapter, _TRUE);
-#endif
 		return ret;
 	}
 
@@ -4486,7 +4472,6 @@ static int	cfg80211_rtw_assoc(struct wiphy *wiphy, struct net_device *ndev,
 
 	return 0;
 }
-#endif /* CONFIG_AP_MODE */
 
 void rtw_cfg80211_rx_probe_request(_adapter *adapter, union recv_frame *rframe)
 {
@@ -6284,7 +6269,6 @@ static struct ieee80211_iface_limit rtw_limits[] = {
 			| BIT(NL80211_IFTYPE_P2P_CLIENT)
 			#endif
 	},
-	#ifdef CONFIG_AP_MODE
 	{
 		.max = 1,
 		.types = BIT(NL80211_IFTYPE_AP)
@@ -6292,7 +6276,6 @@ static struct ieee80211_iface_limit rtw_limits[] = {
 			| BIT(NL80211_IFTYPE_P2P_GO)
 			#endif
 	},
-	#endif
 };
 
 static struct ieee80211_iface_combination rtw_combinations[] = {
@@ -6326,12 +6309,10 @@ static void rtw_cfg80211_preinit_wiphy(_adapter *adapter, struct wiphy *wiphy)
 
 	wiphy->interface_modes =	BIT(NL80211_IFTYPE_STATION)
 								| BIT(NL80211_IFTYPE_ADHOC)
-#ifdef CONFIG_AP_MODE
 								| BIT(NL80211_IFTYPE_AP)
 								#ifdef CONFIG_WIFI_MONITOR
 								| BIT(NL80211_IFTYPE_MONITOR)
 								#endif
-#endif
 #if ((LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE))
 								| BIT(NL80211_IFTYPE_P2P_CLIENT)
 								| BIT(NL80211_IFTYPE_P2P_GO)
@@ -6339,9 +6320,7 @@ static void rtw_cfg80211_preinit_wiphy(_adapter *adapter, struct wiphy *wiphy)
 								;
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
-#ifdef CONFIG_AP_MODE
 	wiphy->mgmt_stypes = rtw_cfg80211_default_mgmt_stypes;
-#endif /* CONFIG_AP_MODE */
 #endif
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 0, 0))
@@ -6558,7 +6537,6 @@ static struct cfg80211_ops rtw_cfg80211_ops = {
 	.del_pmksa = cfg80211_rtw_del_pmksa,
 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
 
-#ifdef CONFIG_AP_MODE
 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
 
@@ -6586,7 +6564,6 @@ static struct cfg80211_ops rtw_cfg80211_ops = {
 #endif
 	/* .auth = cfg80211_rtw_auth, */
 	/* .assoc = cfg80211_rtw_assoc,	 */
-#endif /* CONFIG_AP_MODE */
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
 	.set_monitor_channel = cfg80211_rtw_set_monitor_channel,

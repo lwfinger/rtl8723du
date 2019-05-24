@@ -134,7 +134,6 @@ struct security_priv {
 	union pn48		dot11wBIPtxpn;			/* PN48 used for BIP xmit. */
 	union pn48		dot11wBIPrxpn;			/* PN48 used for BIP recv. */
 #endif /* CONFIG_IEEE80211W */
-#ifdef CONFIG_AP_MODE
 	/* extend security capabilities for AP_MODE */
 	unsigned int dot8021xalg;/* 0:disable, 1:psk, 2:802.1x */
 	unsigned int wpa_psk;/* 0:disable, bit(0): WPA, bit(1):WPA2 */
@@ -143,7 +142,6 @@ struct security_priv {
 	unsigned int wpa_pairwise_cipher;
 	unsigned int wpa2_pairwise_cipher;
 	u8 mfp_opt;
-#endif
 #ifdef CONFIG_CONCURRENT_MODE
 	u8	dot118021x_bmc_cam_id;
 #endif

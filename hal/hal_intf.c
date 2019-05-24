@@ -191,10 +191,8 @@ static void rtw_hal_init_opmode(_adapter *padapter)
 		networkType = Ndis802_11IBSS;
 	else if (fw_state & WIFI_STATION_STATE)
 		networkType = Ndis802_11Infrastructure;
-#ifdef CONFIG_AP_MODE
 	else if (fw_state & WIFI_AP_STATE)
 		networkType = Ndis802_11APMode;
-#endif
 	else
 		return;
 
@@ -418,7 +416,6 @@ static void rtw_sta_ra_registed(_adapter *padapter, struct sta_info *psta)
 		return;
 	}
 
-#ifdef CONFIG_AP_MODE
 	if (MLME_IS_AP(padapter) || MLME_IS_MESH(padapter)) {
 		if (psta->cmn.aid > padapter->stapriv.max_aid) {
 			RTW_ERR("station aid %d exceed the max number\n", psta->cmn.aid);
@@ -427,7 +424,6 @@ static void rtw_sta_ra_registed(_adapter *padapter, struct sta_info *psta)
 		}
 		rtw_ap_update_sta_ra_info(padapter, psta);
 	}
-#endif
 
 	psta->cmn.ra_info.ra_bw_mode = rtw_get_tx_bw_mode(padapter, psta);
 	/*set correct initial date rate for each mac_id */

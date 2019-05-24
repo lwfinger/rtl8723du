@@ -2541,10 +2541,8 @@ void rtw_iface_dynamic_chk_wk_hdl(_adapter *padapter)
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
 
 	#ifdef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
-	#ifdef CONFIG_AP_MODE
 	if (MLME_IS_AP(padapter) || MLME_IS_MESH(padapter))
 		expire_timeout_chk(padapter);
-	#endif
 	#endif /* CONFIG_ACTIVE_KEEP_ALIVE_CHECK */
 	dynamic_update_bcn_check(padapter);
 
@@ -3190,8 +3188,6 @@ exit:
 
 }
 
-#ifdef CONFIG_AP_MODE
-
 static void rtw_chk_hi_queue_hdl(_adapter *padapter)
 {
 	struct sta_info *psta_bmc;
@@ -3505,13 +3501,11 @@ void rtw_dfs_master_status_apply(_adapter *adapter, u8 self_action)
 		break;
 	case MLME_STA_DISCONNECTED:
 		break;
-#ifdef CONFIG_AP_MODE
 	case MLME_AP_STARTED:
 		MSTATE_AP_NUM(&mstate)++;
 		break;
 	case MLME_AP_STOPPED:
 		break;
-#endif
 #ifdef CONFIG_RTW_MESH
 	case MLME_MESH_STARTED:
 		MSTATE_MESH_NUM(&mstate)++;
@@ -3577,8 +3571,6 @@ apply:
 		rtw_dfs_master_disable(adapter, u_ch, u_bw, u_offset, ld_sta_in_dfs);
 }
 #endif /* CONFIG_DFS_MASTER */
-
-#endif /* CONFIG_AP_MODE */
 
 #ifdef CONFIG_BT_COEXIST
 struct btinfo {
@@ -4438,11 +4430,9 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapter, unsigned char *pbuf)
 		*/
 		ret = p2p_protocol_wk_hdl(padapter, pdrvextra_cmd->type, pdrvextra_cmd->pbuf);
 		break;
-#ifdef CONFIG_AP_MODE
 	case CHECK_HIQ_WK_CID:
 		rtw_chk_hi_queue_hdl(padapter);
 		break;
-#endif
 #ifdef CONFIG_INTEL_WIDI
 	case INTEl_WIDI_WK_CID:
 		intel_widi_wk_hdl(padapter, pdrvextra_cmd->type, pdrvextra_cmd->pbuf);

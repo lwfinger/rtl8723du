@@ -17,11 +17,9 @@ struct mi_state {
 #ifdef CONFIG_TDLS
 	u8 ld_tdls_num;		/* adapter.tdlsinfo.link_established */
 #endif
-#ifdef CONFIG_AP_MODE
 	u8 ap_num;			/* WIFI_AP_STATE && _FW_LINKED */
 	u8 starting_ap_num;	/*WIFI_FW_AP_STATE*/
 	u8 ld_ap_num;		/* WIFI_AP_STATE && _FW_LINKED && asoc_sta_count > 2 */
-#endif
 	u8 adhoc_num;		/* (WIFI_ADHOC_STATE | WIFI_ADHOC_MASTER_STATE) && _FW_LINKED */
 	u8 ld_adhoc_num;	/* (WIFI_ADHOC_STATE | WIFI_ADHOC_MASTER_STATE) && _FW_LINKED && asoc_sta_count > 2 */
 #ifdef CONFIG_RTW_MESH
@@ -51,15 +49,9 @@ struct mi_state {
 #define MSTATE_TDLS_LD_NUM(_mstate)		0
 #endif
 
-#ifdef CONFIG_AP_MODE
 #define MSTATE_AP_NUM(_mstate)			((_mstate)->ap_num)
 #define MSTATE_AP_STARTING_NUM(_mstate)	((_mstate)->starting_ap_num)
 #define MSTATE_AP_LD_NUM(_mstate)		((_mstate)->ld_ap_num)
-#else
-#define MSTATE_AP_NUM(_mstate)			0
-#define MSTATE_AP_STARTING_NUM(_mstate) 0
-#define MSTATE_AP_LD_NUM(_mstate)		0
-#endif
 
 #define MSTATE_ADHOC_NUM(_mstate)		((_mstate)->adhoc_num)
 #define MSTATE_ADHOC_LD_NUM(_mstate)	((_mstate)->ld_adhoc_num)

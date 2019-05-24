@@ -6,8 +6,6 @@
 #include <drv_types.h>
 #include <hal_data.h>
 
-#ifdef CONFIG_AP_MODE
-
 extern unsigned char	RTW_WPA_OUI[];
 extern unsigned char	WMM_OUI[];
 extern unsigned char	WPS_OUI[];
@@ -4284,5 +4282,3 @@ void rtw_ap_parse_sta_vht_ie(_adapter *adapter, struct sta_info *sta, struct rtw
 
 	return;
 }
-#endif /* CONFIG_AP_MODE */
-
