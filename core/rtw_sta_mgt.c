@@ -474,12 +474,10 @@ static void rtw_init_recv_timer(struct recv_reorder_ctrl *preorder_ctrl)
 {
 	_adapter *padapter = preorder_ctrl->padapter;
 
-#if defined(CONFIG_RECV_REORDERING_CTRL)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 	timer_setup(&preorder_ctrl->reordering_ctrl_timer, rtw_reordering_ctrl_timeout_handler, 0);
 #else
 	rtw_init_timer(&(preorder_ctrl->reordering_ctrl_timer), padapter, rtw_reordering_ctrl_timeout_handler, preorder_ctrl);
-#endif
 #endif
 }
 

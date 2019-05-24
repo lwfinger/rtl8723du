@@ -2653,7 +2653,6 @@ exit:
 	return ret;
 }
 
-#if defined(CONFIG_RECV_REORDERING_CTRL)
 static int check_indicate_seq(struct recv_reorder_ctrl *preorder_ctrl, u16 seq_num)
 {
 	PADAPTER padapter = preorder_ctrl->padapter;
@@ -2716,12 +2715,6 @@ static int enqueue_reorder_recvframe(struct recv_reorder_ctrl *preorder_ctrl, un
 	union recv_frame *pnextrframe;
 	struct rx_pkt_attrib *pnextattrib;
 
-	/* DbgPrint("+enqueue_reorder_recvframe()\n"); */
-
-	/* _enter_critical_ex(&ppending_recvframe_queue->lock, &irql); */
-	/* _rtw_spinlock_ex(&ppending_recvframe_queue->lock); */
-
-
 	phead = get_list_head(ppending_recvframe_queue);
 	plist = get_next(phead);
 
@@ -2740,25 +2733,12 @@ static int enqueue_reorder_recvframe(struct recv_reorder_ctrl *preorder_ctrl, un
 			return _FALSE;
 		} else
 			break;
-
-		/* DbgPrint("enqueue_reorder_recvframe():while\n"); */
-
 	}
-
-
-	/* _enter_critical_ex(&ppending_recvframe_queue->lock, &irql); */
-	/* _rtw_spinlock_ex(&ppending_recvframe_queue->lock); */
-
 	rtw_list_delete(&(prframe->u.hdr.list));
 
 	rtw_list_insert_tail(&(prframe->u.hdr.list), plist);
 
-	/* _rtw_spinunlock_ex(&ppending_recvframe_queue->lock); */
-	/* _exit_critical_ex(&ppending_recvframe_queue->lock, &irql); */
-
-
 	return _TRUE;
-
 }
 
 static void recv_indicatepkts_pkt_loss_cnt(_adapter *padapter, u64 prev_seq, u64 current_seq)
@@ -2776,21 +2756,14 @@ static void recv_indicatepkts_pkt_loss_cnt(_adapter *padapter, u64 prev_seq, u64
 
 static int recv_indicatepkts_in_order(_adapter *padapter, struct recv_reorder_ctrl *preorder_ctrl, int bforced)
 {
-	/* _irqL irql; */
 	_list	*phead, *plist;
 	union recv_frame *prframe;
 	struct rx_pkt_attrib *pattrib;
-	/* u8 index = 0; */
 	int bPktInBuf = _FALSE;
 	struct recv_priv *precvpriv = &padapter->recvpriv;
 	_queue *ppending_recvframe_queue = &preorder_ctrl->pending_recvframe_queue;
 
 	DBG_COUNTER(padapter->rx_logs.core_rx_post_indicate_in_oder);
-
-	/* DbgPrint("+recv_indicatepkts_in_order\n"); */
-
-	/* _enter_critical_ex(&ppending_recvframe_queue->lock, &irql); */
-	/* _rtw_spinlock_ex(&ppending_recvframe_queue->lock); */
 
 	phead =	get_list_head(ppending_recvframe_queue);
 	plist = get_next(phead);
@@ -2962,11 +2935,9 @@ void rtw_reordering_ctrl_timeout_handler(void *pcontext)
 	_exit_critical_bh(&ppending_recvframe_queue->lock, &irql);
 
 }
-#endif /* defined(CONFIG_RECV_REORDERING_CTRL) */
 
 static void recv_set_iseq_before_mpdu_process(union recv_frame *rframe, u16 seq_num, const char *caller)
 {
-#if defined(CONFIG_RECV_REORDERING_CTRL)
 	struct recv_reorder_ctrl *reorder_ctrl = rframe->u.hdr.preorder_ctrl;
 
 	if (reorder_ctrl) {
@@ -2977,12 +2948,10 @@ static void recv_set_iseq_before_mpdu_process(union recv_frame *rframe, u16 seq_
 			, reorder_ctrl->tid, reorder_ctrl->indicate_seq, seq_num);
 		#endif
 	}
-#endif
 }
 
 static void recv_set_iseq_after_mpdu_process(union recv_frame *rframe, u16 seq_num, const char *caller)
 {
-#if defined(CONFIG_RECV_REORDERING_CTRL)
 	struct recv_reorder_ctrl *reorder_ctrl = rframe->u.hdr.preorder_ctrl;
 
 	if (reorder_ctrl) {
@@ -2993,7 +2962,6 @@ static void recv_set_iseq_after_mpdu_process(union recv_frame *rframe, u16 seq_n
 			, reorder_ctrl->tid, reorder_ctrl->indicate_seq, seq_num);
 		#endif
 	}
-#endif
 }
 
 #ifdef CONFIG_MP_INCLUDED
@@ -3652,7 +3620,6 @@ static int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
 
 	count_rx_stats(padapter, prframe, NULL);
 
-#if defined(CONFIG_RECV_REORDERING_CTRL)
 	/* including perform A-MPDU Rx Ordering Buffer Control */
 	ret = recv_indicatepkt_reorder(padapter, prframe);
 	if (ret == _FAIL) {
@@ -3660,7 +3627,6 @@ static int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
 		goto _recv_data_drop;
 	} else if (ret == RTW_RX_HANDLED) /* queued OR indicated in order */
 		goto _exit_recv_func;
-#endif
 
 	recv_set_iseq_before_mpdu_process(prframe, le16_to_cpu(pattrib->seq_num), __func__);
 	ret = recv_process_mpdu(padapter, prframe);

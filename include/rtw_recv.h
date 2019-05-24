@@ -478,12 +478,10 @@ sint rtw_enqueue_recvbuf_to_head(struct recv_buf *precvbuf, _queue *queue);
 sint rtw_enqueue_recvbuf(struct recv_buf *precvbuf, _queue *queue);
 struct recv_buf *rtw_dequeue_recvbuf(_queue *queue);
 
-#if defined(CONFIG_RECV_REORDERING_CTRL)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 void rtw_reordering_ctrl_timeout_handler(struct timer_list *t);
 #else
 void rtw_reordering_ctrl_timeout_handler(void *pcontext);
-#endif
 #endif
 
 void rx_query_phy_status(union recv_frame *rframe, u8 *phy_stat);

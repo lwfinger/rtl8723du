@@ -16,7 +16,6 @@
 /*
  * Wi-Fi Functions Configure
  */
-#define CONFIG_RECV_REORDERING_CTRL
 
 /* #define CONFIG_IOCTL_CFG80211 */		/* Set from Makefile */
 #ifdef CONFIG_IOCTL_CFG80211
