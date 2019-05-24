@@ -326,7 +326,6 @@ struct sta_info {
 #ifdef CONFIG_RTW_80211R
 	u8 ft_pairwise_key_installed;
 #endif
-#ifdef CONFIG_NATIVEAP_MLME
 	u8 wpa_ie[32];
 	u8 nonerp_set;
 	u8 no_short_slot_time_set;
@@ -335,7 +334,6 @@ struct sta_info {
 	u8 no_ht_set;
 	u8 ht_20mhz_set;
 	u8 ht_40mhz_intolerant;
-#endif /* CONFIG_NATIVEAP_MLME */
 #ifdef CONFIG_ATMEL_RC_PATCH
 	u8 flag_atmel_rc;
 #endif

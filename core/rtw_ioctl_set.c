@@ -422,9 +422,7 @@ u8 rtw_set_802_11_infrastructure_mode(_adapter *padapter,
 			/* change to other mode from Ndis802_11APMode			 */
 			cur_network->join_res = -1;
 			ap2sta_mode = _TRUE;
-#ifdef CONFIG_NATIVEAP_MLME
 			stop_ap_mode(padapter);
-#endif
 		}
 
 		_enter_critical_bh(&pmlmepriv->lock, &irqL);
@@ -460,13 +458,8 @@ u8 rtw_set_802_11_infrastructure_mode(_adapter *padapter,
 
 		case Ndis802_11APMode:
 			set_fwstate(pmlmepriv, WIFI_AP_STATE);
-#ifdef CONFIG_NATIVEAP_MLME
 			start_ap_mode(padapter);
-			/* rtw_indicate_connect(padapter); */
-#endif
-
 			break;
-
 		case Ndis802_11AutoUnknown:
 		case Ndis802_11InfrastructureMax:
 			break;
@@ -477,13 +470,8 @@ u8 rtw_set_802_11_infrastructure_mode(_adapter *padapter,
 			ret = _FALSE;
 			rtw_warn_on(1);
 		}
-
-		/* SecClearAllKeys(adapter); */
-
-
 		_exit_critical_bh(&pmlmepriv->lock, &irqL);
 	}
-
 	return ret;
 }
 

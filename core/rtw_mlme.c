@@ -162,7 +162,7 @@ static void rtw_free_mlme_ie_data(u8 **ppie, u32 *plen)
 
 void rtw_free_mlme_priv_ie_data(struct mlme_priv *pmlmepriv)
 {
-#if defined(CONFIG_AP_MODE) && defined (CONFIG_NATIVEAP_MLME)
+#if defined(CONFIG_AP_MODE)
 	rtw_buf_free(&pmlmepriv->assoc_req, &pmlmepriv->assoc_req_len);
 	rtw_buf_free(&pmlmepriv->assoc_rsp, &pmlmepriv->assoc_rsp_len);
 	rtw_free_mlme_ie_data(&pmlmepriv->wps_beacon_ie, &pmlmepriv->wps_beacon_ie_len);
@@ -2157,7 +2157,7 @@ void rtw_stassoc_event_callback(_adapter *adapter, u8 *pbuf)
 		return;
 #endif
 
-#if defined(CONFIG_AP_MODE) && defined (CONFIG_NATIVEAP_MLME)
+#if defined(CONFIG_AP_MODE)
 	if (MLME_IS_AP(adapter) || MLME_IS_MESH(adapter)) {
 		psta = rtw_get_stainfo(&adapter->stapriv, pstassoc->macaddr);
 		if (psta) {
@@ -2203,7 +2203,7 @@ void rtw_stassoc_event_callback(_adapter *adapter, u8 *pbuf)
 		}
 		goto exit;
 	}
-#endif /* defined (CONFIG_AP_MODE) && defined (CONFIG_NATIVEAP_MLME) */
+#endif /* defined (CONFIG_AP_MODE) */
 
 	/* for AD-HOC mode */
 	psta = rtw_get_stainfo(&adapter->stapriv, pstassoc->macaddr);

@@ -2327,8 +2327,6 @@ static u8 rtw_ap_bmc_frames_hdl(_adapter *padapter)
 	return H2C_SUCCESS;
 }
 
-#ifdef CONFIG_NATIVEAP_MLME
-
 static void associated_stainfo_update(_adapter *padapter, struct sta_info *psta, u32 sta_info_type)
 {
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
@@ -3532,8 +3530,6 @@ void stop_ap_mode(_adapter *padapter)
 #endif
 
 }
-
-#endif /* CONFIG_NATIVEAP_MLME */
 
 void rtw_ap_update_bss_chbw(_adapter *adapter, WLAN_BSSID_EX *bss, u8 ch, u8 bw, u8 offset)
 {

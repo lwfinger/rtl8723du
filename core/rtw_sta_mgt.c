@@ -777,8 +777,6 @@ u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta)
 
 	psta->has_legacy_ac = 0;
 
-#ifdef CONFIG_NATIVEAP_MLME
-
 	if (pmlmeinfo->state == _HW_STATE_AP_) {
 		rtw_tim_map_clear(padapter, pstapriv->sta_dz_bitmap, psta->cmn.aid);
 		rtw_tim_map_clear(padapter, pstapriv->tim_bitmap, psta->cmn.aid);
@@ -790,8 +788,6 @@ u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta)
 			psta->cmn.aid = 0;
 		}
 	}
-
-#endif /* CONFIG_NATIVEAP_MLME	 */
 
 #ifdef CONFIG_TX_MCAST2UNI
 	psta->under_exist_checking = 0;
