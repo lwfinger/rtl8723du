@@ -789,10 +789,7 @@ u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta)
 		}
 	}
 
-#ifdef CONFIG_TX_MCAST2UNI
 	psta->under_exist_checking = 0;
-#endif /* CONFIG_TX_MCAST2UNI */
-
 #endif /* CONFIG_AP_MODE	 */
 
 	rtw_st_ctl_deinit(&psta->st_ctl);

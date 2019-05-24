@@ -19,7 +19,6 @@
 
 #define CONFIG_AP_MODE
 #ifdef CONFIG_AP_MODE
-	#define CONFIG_TX_MCAST2UNI /* Support IP multicast to unicast */
 #endif
 
 /*

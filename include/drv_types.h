@@ -1460,9 +1460,7 @@ extern char *rtw_initmac;
 extern int rtw_ht_enable;
 extern int rtw_bw_mode;
 extern int rtw_ampdu_enable;/* for enable tx_ampdu */
-#ifdef CONFIG_TX_MCAST2UNI
 extern int rtw_mc2u_disable;
-#endif
 #ifdef CONFIG_BR_EXT
 void netdev_br_init(struct net_device *netdev);
 #endif
