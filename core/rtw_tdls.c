@@ -59,11 +59,7 @@ int rtw_init_tdls_info(_adapter *padapter)
 
 	rtw_reset_tdls_info(padapter);
 
-#ifdef CONFIG_TDLS_DRIVER_SETUP
-	ptdlsinfo->driver_setup = _TRUE;
-#else
 	ptdlsinfo->driver_setup = _FALSE;
-#endif /* CONFIG_TDLS_DRIVER_SETUP */
 
 	_rtw_spinlock_init(&ptdlsinfo->cmd_lock);
 	_rtw_spinlock_init(&ptdlsinfo->hdl_lock);

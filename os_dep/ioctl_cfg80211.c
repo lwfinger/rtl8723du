@@ -6372,10 +6372,8 @@ static void rtw_cfg80211_preinit_wiphy(_adapter *adapter, struct wiphy *wiphy)
 
 #if defined(CONFIG_TDLS) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
 	wiphy->flags |= WIPHY_FLAG_SUPPORTS_TDLS;
-#ifndef CONFIG_TDLS_DRIVER_SETUP
 	wiphy->flags |= WIPHY_FLAG_TDLS_EXTERNAL_SETUP;	/* Driver handles key exchange */
 	wiphy->flags |= NL80211_ATTR_HT_CAPABILITY;
-#endif /* CONFIG_TDLS_DRIVER_SETUP */
 #endif /* CONFIG_TDLS */
 
 	if (regsty->power_mgnt != PS_MODE_ACTIVE)
