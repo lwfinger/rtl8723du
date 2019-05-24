@@ -1542,16 +1542,6 @@ void mgt_dispatcher(_adapter *padapter, union recv_frame *precv_frame)
 
 	index = get_frame_sub_type(pframe) >> 4;
 
-#ifdef CONFIG_TDLS
-	if ((index << 4) == WIFI_ACTION) {
-		/* category==public (4), action==TDLS_DISCOVERY_RESPONSE */
-		if (*(pframe + 24) == RTW_WLAN_CATEGORY_PUBLIC && *(pframe + 25) == TDLS_DISCOVERY_RESPONSE) {
-			RTW_INFO("[TDLS] Recv %s from "MAC_FMT"\n", rtw_tdls_action_txt(TDLS_DISCOVERY_RESPONSE), MAC_ARG(get_addr2_ptr(pframe)));
-			On_TDLS_Dis_Rsp(padapter, precv_frame);
-		}
-	}
-#endif /* CONFIG_TDLS */
-
 	if (index >= (sizeof(mlme_sta_tbl) / sizeof(struct mlme_handler))) {
 		return;
 	}
@@ -1879,10 +1869,6 @@ unsigned int OnBeacon(_adapter *padapter, union recv_frame *precv_frame)
 	int ret = _SUCCESS;
 	u8 *p = NULL;
 	u32 ielen = 0;
-#ifdef CONFIG_TDLS
-	struct sta_info *ptdls_sta;
-	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
-#endif /* CONFIG_TDLS */
 
 	if (validate_beacon_len(pframe, len) == _FALSE)
 		return _SUCCESS;
@@ -2754,15 +2740,6 @@ unsigned int OnAssocRsp(_adapter *padapter, union recv_frame *precv_frame)
 		case _ERPINFO_IE_:
 			ERP_IE_handler(padapter, pIE);
 			break;
-#ifdef CONFIG_TDLS
-		case _EXT_CAP_IE_:
-			if (check_ap_tdls_prohibited(pIE->data, pIE->Length) == _TRUE)
-				padapter->tdlsinfo.ap_prohibited = _TRUE;
-			if (check_ap_tdls_ch_switching_prohibited(pIE->data, pIE->Length) == _TRUE)
-				padapter->tdlsinfo.ch_switch_prohibited = _TRUE;
-			break;
-#endif /* CONFIG_TDLS */
-
 #ifdef CONFIG_RTW_80211K
 		case _EID_RRM_EN_CAP_IE_:
 			RM_IE_handler(padapter, pIE);
@@ -3467,15 +3444,8 @@ unsigned int OnAction_back(_adapter *padapter, union recv_frame *precv_frame)
 
 	category = frame_body[0];
 	if (category == RTW_WLAN_CATEGORY_BACK) { /* representing Block Ack */
-#ifdef CONFIG_TDLS
-		if ((psta->tdls_sta_state & TDLS_LINKED_STATE) &&
-		    (psta->htpriv.ht_option == _TRUE) &&
-		    (psta->htpriv.ampdu_enable == _TRUE))
-			RTW_INFO("Recv [%s] from direc link\n", __FUNCTION__);
-		else
-#endif /* CONFIG_TDLS */
-			if (!pmlmeinfo->HT_enable)
-				return _SUCCESS;
+		if (!pmlmeinfo->HT_enable)
+			return _SUCCESS;
 
 		action = frame_body[1];
 		RTW_INFO("%s, action=%d\n", __FUNCTION__, action);
@@ -11473,14 +11443,6 @@ static void rtw_mlmeext_disconnect(_adapter *padapter)
 	pmlmepriv->LinkDetectInfo.TrafficTransitionCount = 0;
 	pmlmepriv->LinkDetectInfo.LowPowerTransitionCount = 0;
 
-#ifdef CONFIG_TDLS
-	padapter->tdlsinfo.ap_prohibited = _FALSE;
-
-	/* For TDLS channel switch, currently we only allow it to work in wifi logo test mode */
-	if (padapter->registrypriv.wifi_spec == 1)
-		padapter->tdlsinfo.ch_switch_prohibited = _FALSE;
-#endif /* CONFIG_TDLS */
-
 #ifdef CONFIG_WMMPS_STA
 	 if (check_fwstate(pmlmepriv, WIFI_STATION_STATE)) {
 		/* reset currently related uapsd setting when the connection has broken */
@@ -11776,103 +11738,6 @@ static u8 chk_adhoc_peer_is_alive(struct sta_info *psta)
 
 	return ret;
 }
-
-#ifdef CONFIG_TDLS
-u8 chk_tdls_peer_sta_is_alive(_adapter *padapter, struct sta_info *psta)
-{
-	if ((psta->sta_stats.rx_data_pkts == psta->sta_stats.last_rx_data_pkts)
-	    && (psta->sta_stats.rx_tdls_disc_rsp_pkts == psta->sta_stats.last_rx_tdls_disc_rsp_pkts))
-		return _FALSE;
-
-	return _TRUE;
-}
-
-void linked_status_chk_tdls(_adapter *padapter)
-{
-	struct candidate_pool {
-		struct sta_info *psta;
-		u8 addr[ETH_ALEN];
-	};
-	struct sta_priv *pstapriv = &padapter->stapriv;
-	_irqL irqL;
-	u8 ack_chk;
-	struct sta_info *psta;
-	int i, num_teardown = 0, num_checkalive = 0;
-	_list	*plist, *phead;
-	struct tdls_txmgmt txmgmt;
-	struct candidate_pool checkalive[MAX_ALLOWED_TDLS_STA_NUM];
-	struct candidate_pool teardown[MAX_ALLOWED_TDLS_STA_NUM];
-	u8 tdls_sta_max = _FALSE;
-
-#define ALIVE_MIN 2
-#define ALIVE_MAX 5
-
-	_rtw_memset(&txmgmt, 0x00, sizeof(struct tdls_txmgmt));
-	_rtw_memset(checkalive, 0x00, sizeof(checkalive));
-	_rtw_memset(teardown, 0x00, sizeof(teardown));
-
-	if ((padapter->tdlsinfo.link_established == _TRUE)) {
-		_enter_critical_bh(&pstapriv->sta_hash_lock, &irqL);
-		for (i = 0; i < NUM_STA; i++) {
-			phead = &(pstapriv->sta_hash[i]);
-			plist = get_next(phead);
-
-			while ((rtw_end_of_queue_search(phead, plist)) == _FALSE) {
-				psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
-				plist = get_next(plist);
-
-				if (psta->tdls_sta_state & TDLS_LINKED_STATE) {
-					psta->alive_count++;
-					if (psta->alive_count >= ALIVE_MIN) {
-						if (chk_tdls_peer_sta_is_alive(padapter, psta) == _FALSE) {
-							if (psta->alive_count < ALIVE_MAX) {
-								_rtw_memcpy(checkalive[num_checkalive].addr, psta->cmn.mac_addr, ETH_ALEN);
-								checkalive[num_checkalive].psta = psta;
-								num_checkalive++;
-							} else {
-								_rtw_memcpy(teardown[num_teardown].addr, psta->cmn.mac_addr, ETH_ALEN);
-								teardown[num_teardown].psta = psta;
-								num_teardown++;
-							}
-						} else
-							psta->alive_count = 0;
-					}
-					psta->sta_stats.last_rx_data_pkts = psta->sta_stats.rx_data_pkts;
-					psta->sta_stats.last_rx_tdls_disc_rsp_pkts = psta->sta_stats.rx_tdls_disc_rsp_pkts;
-
-					if ((num_checkalive >= MAX_ALLOWED_TDLS_STA_NUM) || (num_teardown >= MAX_ALLOWED_TDLS_STA_NUM)) {
-						tdls_sta_max = _TRUE;
-						break;
-					}
-				}
-			}
-
-			if (tdls_sta_max == _TRUE)
-				break;
-		}
-		_exit_critical_bh(&pstapriv->sta_hash_lock, &irqL);
-
-		if (num_checkalive > 0) {
-			for (i = 0; i < num_checkalive; i++) {
-				_rtw_memcpy(txmgmt.peer, checkalive[i].addr, ETH_ALEN);
-				issue_tdls_dis_req(padapter, &txmgmt);
-				issue_tdls_dis_req(padapter, &txmgmt);
-				issue_tdls_dis_req(padapter, &txmgmt);
-			}
-		}
-
-		if (num_teardown > 0) {
-			for (i = 0; i < num_teardown; i++) {
-				RTW_INFO("[%s %d] Send teardown to "MAC_FMT"\n", __FUNCTION__, __LINE__, MAC_ARG(teardown[i].addr));
-				txmgmt.status_code = _RSON_TDLS_TEAR_TOOFAR_;
-				_rtw_memcpy(txmgmt.peer, teardown[i].addr, ETH_ALEN);
-				issue_tdls_teardown(padapter, &txmgmt, _FALSE);
-			}
-		}
-	}
-
-}
-#endif /* CONFIG_TDLS */
 
 /* from_timer == 1 means driver is in LPS */
 void linked_status_chk(_adapter *padapter, u8 from_timer)
@@ -14413,17 +14278,9 @@ u8 add_ba_hdl(_adapter *padapter, unsigned char *pbuf)
 		/* psta->htpriv.candidate_tid_bitmap |= BIT(pparm->tid); */
 		issue_addba_req(padapter, pparm->addr, (u8)pparm->tid);
 		_set_timer(&psta->addba_retry_timer, ADDBA_TO);
-	}
-#ifdef CONFIG_TDLS
-	else if ((psta->tdls_sta_state & TDLS_LINKED_STATE) &&
-		 (psta->htpriv.ht_option == _TRUE) &&
-		 (psta->htpriv.ampdu_enable == _TRUE)) {
-		issue_addba_req(padapter, pparm->addr, (u8)pparm->tid);
-		_set_timer(&psta->addba_retry_timer, ADDBA_TO);
-	}
-#endif /* CONFIG */
-	else
+	} else {
 		psta->htpriv.candidate_tid_bitmap &= ~BIT(pparm->tid);
+	}
 	return	H2C_SUCCESS;
 }
 
@@ -15099,119 +14956,7 @@ u8 set_csa_hdl(_adapter *padapter, unsigned char *pbuf)
 
 u8 tdls_hdl(_adapter *padapter, unsigned char *pbuf)
 {
-#ifdef CONFIG_TDLS
-	_irqL irqL;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
-	struct TDLSoption_param *TDLSoption;
-	struct sta_info *ptdls_sta = NULL;
-	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
-	struct mlme_ext_info *pmlmeinfo = &pmlmeext->mlmext_info;
-	struct sta_info *ap_sta = rtw_get_stainfo(&padapter->stapriv, get_my_bssid(&(pmlmeinfo->network)));
-	u8 survey_channel, i, min, option;
-	struct tdls_txmgmt txmgmt;
-	u32 setchtime, resp_sleep = 0, wait_time;
-	u8 zaddr[ETH_ALEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-	u8 ret;
-	u8 doiqk;
-	u64 tx_ra_bitmap = 0;
-
-	if (!pbuf)
-		return H2C_PARAMETERS_ERROR;
-
-	TDLSoption = (struct TDLSoption_param *)pbuf;
-	option = TDLSoption->option;
-
-	if (!_rtw_memcmp(TDLSoption->addr, zaddr, ETH_ALEN)) {
-		ptdls_sta = rtw_get_stainfo(&(padapter->stapriv), TDLSoption->addr);
-		if (ptdls_sta == NULL)
-			return H2C_REJECTED;
-	} else {
-		if (!(option == TDLS_RS_RCR))
-			return H2C_REJECTED;
-	}
-
-	/* _enter_critical_bh(&(ptdlsinfo->hdl_lock), &irqL); */
-	/* RTW_INFO("[%s] option:%d\n", __FUNCTION__, option); */
-
-	switch (option) {
-	case TDLS_ESTABLISHED: {
-		/* As long as TDLS handshake success, we should set RCR_CBSSID_DATA bit to 0 */
-		/* So we can receive all kinds of data frames. */
-		u8 sta_band = 0;
-
-		/* leave ALL PS when TDLS is established */
-		rtw_pwr_wakeup(padapter);
-
-		rtw_hal_rcr_set_chk_bssid(padapter, MLME_TDLS_LINKED);
-		RTW_INFO("Created Direct Link with "MAC_FMT"\n", MAC_ARG(ptdls_sta->cmn.mac_addr));
-
-		/* Set TDLS sta rate. */
-		/* Update station supportRate */
-		rtw_hal_update_sta_ra_info(padapter, ptdls_sta);
-		tx_ra_bitmap = ptdls_sta->cmn.ra_info.ramask;
-
-		if (pmlmeext->cur_channel > 14) {
-			if (tx_ra_bitmap & 0xffff000)
-				sta_band |= WIRELESS_11_5N ;
-
-			if (tx_ra_bitmap & 0xff0)
-				sta_band |= WIRELESS_11A;
-		} else {
-			if (tx_ra_bitmap & 0xffff000)
-				sta_band |= WIRELESS_11_24N;
-
-			if (tx_ra_bitmap & 0xff0)
-				sta_band |= WIRELESS_11G;
-
-			if (tx_ra_bitmap & 0x0f)
-				sta_band |= WIRELESS_11B;
-		}
-		ptdls_sta->wireless_mode = sta_band;
-		rtw_hal_update_sta_wset(padapter, ptdls_sta);
-		/* Sta mode */
-		rtw_hal_set_odm_var(padapter, HAL_ODM_STA_INFO, ptdls_sta, _TRUE);
-
-		set_sta_rate(padapter, ptdls_sta);
-		rtw_sta_media_status_rpt(padapter, ptdls_sta, 1);
-		break;
-	}
-	case TDLS_ISSUE_PTI:
-		ptdls_sta->tdls_sta_state |= TDLS_WAIT_PTR_STATE;
-		issue_tdls_peer_traffic_indication(padapter, ptdls_sta);
-		_set_timer(&ptdls_sta->pti_timer, TDLS_PTI_TIME);
-		break;
-	case TDLS_RS_RCR:
-		rtw_hal_rcr_set_chk_bssid(padapter, MLME_TDLS_NOLINK);
-		break;
-	case TDLS_TEARDOWN_STA:
-	case TDLS_TEARDOWN_STA_NO_WAIT:
-		_rtw_memset(&txmgmt, 0x00, sizeof(struct tdls_txmgmt));
-		txmgmt.status_code = _RSON_TDLS_TEAR_UN_RSN_;
-		_rtw_memcpy(txmgmt.peer, ptdls_sta->cmn.mac_addr, ETH_ALEN);
-
-		issue_tdls_teardown(padapter, &txmgmt, (option == TDLS_TEARDOWN_STA) ? _TRUE : _FALSE);
-
-		break;
-	case TDLS_TEARDOWN_STA_LOCALLY:
-	case TDLS_TEARDOWN_STA_LOCALLY_POST:
-		if (option == TDLS_TEARDOWN_STA_LOCALLY)
-			rtw_tdls_teardown_pre_hdl(padapter, ptdls_sta);
-
-		rtw_tdls_teardown_post_hdl(padapter, ptdls_sta, _FALSE);
-
-		if (ptdlsinfo->tdls_sctx != NULL)
-			rtw_sctx_done(&(ptdlsinfo->tdls_sctx));
-		break;
-	}
-
-	/* _exit_critical_bh(&(ptdlsinfo->hdl_lock), &irqL); */
-
-	return H2C_SUCCESS;
-#else
 	return H2C_REJECTED;
-#endif /* CONFIG_TDLS */
-
 }
 
 u8 run_in_thread_hdl(_adapter *padapter, u8 *pbuf)

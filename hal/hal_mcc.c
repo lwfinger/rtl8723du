@@ -2035,16 +2035,6 @@ static void rtw_hal_mcc_stop_posthdl(PADAPTER padapter)
 
 		if (iface->mcc_adapterpriv.role == MCC_ROLE_GO)
 			rtw_hal_mcc_remove_go_p2p_ie(iface);
-
-#ifdef CONFIG_TDLS
-		if (MLME_IS_STA(iface)) {
-			if (iface->mcc_adapterpriv.backup_tdls_en) {
-				rtw_enable_tdls_func(iface);
-				RTW_INFO("%s: Disable MCC, Enable TDLS\n", __func__);
-				iface->mcc_adapterpriv.backup_tdls_en = _FALSE;
-			}
-		}
-#endif /* CONFIG_TDLS */
 	}
 
 	hal = GET_HAL_DATA(padapter);
@@ -2075,16 +2065,6 @@ static void rtw_hal_mcc_start_posthdl(PADAPTER padapter)
 		iface->mcc_adapterpriv.mcc_tx_bytes_from_kernel = 0;
 		iface->mcc_adapterpriv.mcc_last_tx_bytes_from_kernel = 0;
 		iface->mcc_adapterpriv.mcc_tx_bytes_to_port = 0;
-
-#ifdef CONFIG_TDLS
-		if (MLME_IS_STA(iface)) {
-			if (rtw_is_tdls_enabled(iface)) {
-				iface->mcc_adapterpriv.backup_tdls_en = _TRUE;
-				rtw_disable_tdls_func(iface, _TRUE);
-				RTW_INFO("%s: Enable MCC, Disable TDLS\n", __func__);
-			}
-		}
-#endif /* CONFIG_TDLS */
 	}
 
 	hal = GET_HAL_DATA(padapter);

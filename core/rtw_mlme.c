@@ -1398,10 +1398,6 @@ void rtw_free_assoc_resources(_adapter *adapter, int lock_scanned_queue)
 	struct	sta_priv *pstapriv = &adapter->stapriv;
 	struct wlan_network *tgt_network = &pmlmepriv->cur_network;
 
-#ifdef CONFIG_TDLS
-	struct tdls_info *ptdlsinfo = &adapter->tdlsinfo;
-#endif /* CONFIG_TDLS */
-
 	RTW_INFO("%s-"ADPT_FMT" tgt_network MacAddress=" MAC_FMT" ssid=%s\n",
 		__func__, ADPT_ARG(adapter), MAC_ARG(tgt_network->network.MacAddress), tgt_network->network.Ssid.Ssid);
 
@@ -1409,14 +1405,6 @@ void rtw_free_assoc_resources(_adapter *adapter, int lock_scanned_queue)
 		struct sta_info *psta;
 
 		psta = rtw_get_stainfo(&adapter->stapriv, tgt_network->network.MacAddress);
-
-#ifdef CONFIG_TDLS
-		rtw_free_all_tdls_sta(adapter, _TRUE);
-		rtw_reset_tdls_info(adapter);
-
-		if (ptdlsinfo->link_established == _TRUE)
-			rtw_tdls_cmd(adapter, NULL, TDLS_RS_RCR);
-#endif /* CONFIG_TDLS */
 
 		rtw_free_stainfo(adapter, psta);
 	}
@@ -2051,11 +2039,6 @@ void rtw_sta_media_status_rpt(_adapter *adapter, struct sta_info *sta, bool conn
 		miracast_enabled = STA_OP_WFD_MODE(sta) != 0 && is_miracast_enabled(adapter);
 		miracast_sink = miracast_enabled && (STA_OP_WFD_MODE(sta) & MIRACAST_SINK);
 
-#ifdef CONFIG_TDLS
-		if (sta->tdls_sta_state & TDLS_LINKED_STATE)
-			role = H2C_MSR_ROLE_TDLS;
-		else
-#endif
 		if (MLME_IS_STA(adapter)) {
 			if (MLME_IS_GC(adapter))
 				role = H2C_MSR_ROLE_GO;
@@ -2892,11 +2875,6 @@ static void rtw_auto_scan_handler(_adapter *padapter)
 
 	if (!rtw_p2p_chk_state(&padapter->wdinfo, P2P_STATE_NONE))
 		goto exit;
-
-#ifdef CONFIG_TDLS
-	if (padapter->tdlsinfo.link_established == _TRUE)
-		goto exit;
-#endif
 
 	if (pmlmepriv->auto_scan_int_ms == 0
 	    || rtw_get_passing_time_ms(pmlmepriv->scan_start_time) < pmlmepriv->auto_scan_int_ms)
@@ -4424,37 +4402,6 @@ void rtw_update_ht_cap(_adapter *padapter, u8 *pie, uint ie_len, u8 channel)
 	pmlmeinfo->HT_protection = pmlmeinfo->HT_info.infos[1] & 0x3;
 }
 
-#ifdef CONFIG_TDLS
-void rtw_issue_addbareq_cmd_tdls(_adapter *padapter, struct xmit_frame *pxmitframe)
-{
-	struct pkt_attrib *pattrib = &pxmitframe->attrib;
-	struct sta_info *ptdls_sta = NULL;
-	u8 issued;
-	int priority;
-	struct ht_priv	*phtpriv;
-
-	priority = pattrib->priority;
-
-	if (pattrib->direct_link == _TRUE) {
-		ptdls_sta = rtw_get_stainfo(&padapter->stapriv, pattrib->dst);
-		if ((ptdls_sta != NULL) && (ptdls_sta->tdls_sta_state & TDLS_LINKED_STATE)) {
-			phtpriv = &ptdls_sta->htpriv;
-
-			if ((phtpriv->ht_option == _TRUE) && (phtpriv->ampdu_enable == _TRUE)) {
-				issued = (phtpriv->agg_enable_bitmap >> priority) & 0x1;
-				issued |= (phtpriv->candidate_tid_bitmap >> priority) & 0x1;
-
-				if (0 == issued) {
-					RTW_INFO("[%s], p=%d\n", __FUNCTION__, priority);
-					ptdls_sta->htpriv.candidate_tid_bitmap |= BIT((u8)priority);
-					rtw_addbareq_cmd(padapter, (u8)priority, pattrib->dst);
-				}
-			}
-		}
-	}
-}
-#endif /* CONFIG_TDLS */
-
 void rtw_issue_addbareq_cmd(_adapter *padapter, struct xmit_frame *pxmitframe)
 {
 	u8 issued;
@@ -4469,10 +4416,6 @@ void rtw_issue_addbareq_cmd(_adapter *padapter, struct xmit_frame *pxmitframe)
 		return;
 
 	priority = pattrib->priority;
-
-#ifdef CONFIG_TDLS
-	rtw_issue_addbareq_cmd_tdls(padapter, pxmitframe);
-#endif /* CONFIG_TDLS */
 
 	psta = rtw_get_stainfo(&padapter->stapriv, pattrib->ra);
 	if (pattrib->psta != psta) {

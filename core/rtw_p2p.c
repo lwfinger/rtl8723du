@@ -861,41 +861,6 @@ u32 build_probe_resp_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf, u8 tunnel
 		/*	Todo: to add the list of WFD device info descriptor in WFD group. */
 
 	}
-#ifdef CONFIG_CONCURRENT_MODE
-#ifdef CONFIG_TDLS
-	{
-		int i;
-		_adapter *iface = NULL;
-		struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
-
-		for (i = 0; i < dvobj->iface_nums; i++) {
-			iface = dvobj->padapters[i];
-			if ((iface) && rtw_is_adapter_up(iface)) {
-				if (iface == padapter)
-					continue;
-
-				if ((tunneled == 0) && (iface->wdinfo.wfd_tdls_enable == 1)) {
-					/*	Alternative MAC Address ATTR
-						Type:					*/
-					wfdie[wfdielen++] = WFD_ATTR_ALTER_MAC;
-
-					/*	Length:
-						Note: In the WFD specification, the size of length field is 2.*/
-					RTW_PUT_BE16(wfdie + wfdielen,  ETH_ALEN);
-					wfdielen += 2;
-
-					/*	Value:
-						Alternative MAC Address*/
-					_rtw_memcpy(wfdie + wfdielen, adapter_mac_addr(iface), ETH_ALEN);
-					wfdielen += ETH_ALEN;
-				}
-			}
-		}
-	}
-
-#endif /* CONFIG_TDLS*/
-#endif /* CONFIG_CONCURRENT_MODE */
-
 	pbuf = rtw_set_ie(pbuf, _VENDOR_SPECIFIC_IE_, wfdielen, (unsigned char *) wfdie, &len);
 
 exit:
@@ -2571,9 +2536,6 @@ u8 process_p2p_group_negotation_req(struct wifidirect_info *pwdinfo, u8 *pframe,
 	u16		wps_devicepassword_id = 0x0000;
 	uint	wps_devicepassword_id_len = 0;
 	__be16 be_tmp;
-#ifdef CONFIG_TDLS
-	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
-#endif /* CONFIG_TDLS	 */
 	wpsie = rtw_get_wps_ie(pframe + _PUBLIC_ACTION_IE_OFFSET_, len - _PUBLIC_ACTION_IE_OFFSET_, NULL, &wps_ielen);
 	if (wpsie) {
 		/*	Commented by Kurt 20120113 */
@@ -2626,11 +2588,6 @@ u8 process_p2p_group_negotation_req(struct wifidirect_info *pwdinfo, u8 *pframe,
 		/* Check P2P Capability ATTR */
 		if (rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_CAPABILITY, (u8 *)&le_tmp, (uint *)&attr_contentlen)) {
 			cap_attr = le16_to_cpu(le_tmp);
-
-#if defined(CONFIG_TDLS)
-			if (!(cap_attr & P2P_GRPCAP_INTRABSS))
-				ptdlsinfo->ap_prohibited = _TRUE;
-#endif /* defined(CONFIG_TDLS) */
 		}
 
 		if (rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_GO_INTENT , &attr_content, &attr_contentlen)) {
@@ -2742,9 +2699,6 @@ u8 process_p2p_group_negotation_resp(struct wifidirect_info *pwdinfo, u8 *pframe
 	u8 *ies;
 	u32 ies_len;
 	u8 *p2p_ie;
-#ifdef CONFIG_TDLS
-	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
-#endif /* CONFIG_TDLS	 */
 
 	ies = pframe + _PUBLIC_ACTION_IE_OFFSET_;
 	ies_len = len - _PUBLIC_ACTION_IE_OFFSET_;
@@ -2781,12 +2735,7 @@ u8 process_p2p_group_negotation_resp(struct wifidirect_info *pwdinfo, u8 *pframe
 			/* Check P2P Capability ATTR */
 			if (rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_CAPABILITY, (u8 *)&le_tmp, (uint *)&attr_contentlen)) {
 				cap_attr = le16_to_cpu(le_tmp);
-#ifdef CONFIG_TDLS
-				if (!(cap_attr & P2P_GRPCAP_INTRABSS))
-					ptdlsinfo->ap_prohibited = _TRUE;
-#endif /* CONFIG_TDLS */
 			}
-
 			rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_STATUS, &attr_content, &attr_contentlen);
 			if (attr_contentlen == 1) {
 				RTW_INFO("[%s] Status = %d\n", __FUNCTION__, attr_content);

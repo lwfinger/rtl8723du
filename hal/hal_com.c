@@ -2702,14 +2702,6 @@ void rtw_hal_rcr_set_chk_bssid(_adapter *adapter, u8 self_action)
 	case MLME_SCAN_DONE:
 		mstate_s.scan_enter_num = 0;
 		break;
-#ifdef CONFIG_TDLS
-	case MLME_TDLS_LINKED:
-		mstate_s.ld_tdls_num = 1;
-		break;
-	case MLME_TDLS_NOLINK:
-		mstate_s.ld_tdls_num = 0;
-		break;
-#endif
 	case MLME_AP_STARTED:
 		mstate_s.ap_num = 1;
 		break;

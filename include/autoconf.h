@@ -17,12 +17,6 @@
  * Wi-Fi Functions Configure
  */
 
-/*
- * Added by Kurt 20110511
- */
-#ifdef CONFIG_TDLS
-#endif
-
 /* #define CONFIG_CONCURRENT_MODE */   /* Set from Makefile */
 
 #ifdef CONFIG_CONCURRENT_MODE

@@ -38,12 +38,6 @@
 
 #endif
 
-#if defined(CONFIG_MCC_MODE) && defined(CONFIG_TDLS)
-
-	#error "Disable TDLS before enable MCC MODE\n"
-
-#endif
-
 #if defined(CONFIG_RTW_80211R) && !defined(CONFIG_LAYER2_ROAMING)
 
 	#error "Enable CONFIG_LAYER2_ROAMING before enable CONFIG_RTW_80211R\n"

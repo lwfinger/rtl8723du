@@ -454,17 +454,6 @@ void rtw_wep_decrypt(_adapter *padapter, u8  *precvframe);
 u32	rtw_BIP_verify(_adapter *padapter, u8 *whdr_pos, sint flen
 	, const u8 *key, u16 id, u64* ipn);
 #endif
-#ifdef CONFIG_TDLS
-void wpa_tdls_generate_tpk(_adapter *padapter, PVOID sta);
-int wpa_tdls_ftie_mic(u8 *kck, u8 trans_seq,
-			u8 *lnkid, u8 *rsnie, u8 *timeoutie, u8 *ftie,
-			u8 *mic);
-int wpa_tdls_teardown_ftie_mic(u8 *kck, u8 *lnkid, u16 reason,
-			u8 dialog_token, u8 trans_seq, u8 *ftie, u8 *mic);
-int tdls_verify_mic(u8 *kck, u8 trans_seq,
-			u8 *lnkid, u8 *rsnie, u8 *timeoutie, u8 *ftie);
-#endif /* CONFIG_TDLS */
-
 void rtw_sec_restore_wep_key(_adapter *adapter);
 u8 rtw_handle_tkip_countermeasure(_adapter *adapter, const char *caller);
 

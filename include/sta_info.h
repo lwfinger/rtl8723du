@@ -43,10 +43,6 @@ struct pre_link_sta_ctl_t {
 	struct pre_link_sta_node_t node[RTW_PRE_LINK_STA_NUM];
 };
 
-#ifdef CONFIG_TDLS
-#define MAX_ALLOWED_TDLS_STA_NUM	4
-#endif
-
 enum sta_info_update_type {
 	STA_INFO_UPDATE_NONE = 0,
 	STA_INFO_UPDATE_BW = BIT(0),
@@ -102,11 +98,6 @@ struct	stainfo_stats	{
 		u64 last_rx_data_bc_pkts;
 		u64 last_rx_data_mc_pkts;
 	u64 last_rx_data_qos_pkts[TID_NUM]; /* unicast only */
-
-#ifdef CONFIG_TDLS
-	u64 rx_tdls_disc_rsp_pkts;
-	u64 last_rx_tdls_disc_rsp_pkts;
-#endif
 
 	u64	rx_bytes;
 		u64	rx_bc_bytes;
@@ -194,13 +185,6 @@ bool rtw_st_ctl_chk_reg_rule(struct st_ctl_t *st_ctl, _adapter *adapter, u8 *loc
 void rtw_st_ctl_rx(struct sta_info *sta, u8 *ehdr_pos);
 void dump_st_ctl(void *sel, struct st_ctl_t *st_ctl);
 
-#ifdef CONFIG_TDLS
-struct TDLS_PeerKey {
-	u8 kck[16]; /* TPK-KCK */
-	u8 tk[16]; /* TPK-TK; only CCMP will be used */
-} ;
-#endif /* CONFIG_TDLS */
-
 #ifdef DBG_RX_DFRAME_RAW_DATA
 struct sta_recv_dframe_info {
 
@@ -270,19 +254,6 @@ struct sta_info {
 
 	struct stainfo_stats sta_stats;
 
-#ifdef CONFIG_TDLS
-	u32	tdls_sta_state;
-	u8	SNonce[32];
-	u8	ANonce[32];
-	u32	TDLS_PeerKey_Lifetime;
-	u32	TPK_count;
-	_timer	TPK_timer;
-	struct TDLS_PeerKey	tpk;
-	_timer handshake_timer;
-	u8 alive_count;
-	_timer	pti_timer;
-	u8	TDLS_RSNIE[20];	/* Save peer's RSNIE, used for sending TDLS_SETUP_RSP */
-#endif /* CONFIG_TDLS */
 	/* for A-MPDU TX, ADDBA timeout check	 */
 	_timer addba_retry_timer;
 	/* for A-MPDU Rx reordering buffer control */

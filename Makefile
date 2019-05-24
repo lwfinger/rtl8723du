@@ -40,7 +40,6 @@ CONFIG_SIGNAL_SCALE_MAPPING = n
 CONFIG_80211W = n
 CONFIG_REDUCE_TX_CPU_LOADING = n
 CONFIG_BR_EXT = y
-CONFIG_TDLS = n
 CONFIG_WIFI_MONITOR = n
 CONFIG_MCC_MODE = n
 CONFIG_APPEND_VENDOR_IE_ENABLE = n
@@ -290,10 +289,6 @@ EXTRA_CFLAGS += -DCONFIG_BR_EXT
 EXTRA_CFLAGS += '-DCONFIG_BR_EXT_BRNAME="'$(BR_NAME)'"'
 endif
 
-ifeq ($(CONFIG_TDLS), y)
-EXTRA_CFLAGS += -DCONFIG_TDLS
-endif
-
 ifeq ($(CONFIG_WIFI_MONITOR), y)
 EXTRA_CFLAGS += -DCONFIG_WIFI_MONITOR
 endif
@@ -392,7 +387,6 @@ rtk_core :=	core/rtw_cmd.o \
 		core/rtw_xmit.o	\
 		core/rtw_p2p.o \
 		core/rtw_rson.o \
-		core/rtw_tdls.o \
 		core/rtw_br_ext.o \
 		core/rtw_sreset.o \
 		core/rtw_btcoex_wifionly.o \

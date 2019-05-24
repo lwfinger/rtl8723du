@@ -85,10 +85,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 
 #include <rtw_p2p.h>
 
-#ifdef CONFIG_TDLS
-	#include <rtw_tdls.h>
-#endif /* CONFIG_TDLS */
-
 #ifdef CONFIG_MP_INCLUDED
 	#include <rtw_mp.h>
 #endif /* CONFIG_MP_INCLUDED */
@@ -361,10 +357,6 @@ struct registry_priv {
 
 	u8 iqk_fw_offload;
 	u8 ch_switch_offload;
-
-#ifdef CONFIG_TDLS
-	u8 en_tdls;
-#endif
 
 #ifdef CONFIG_ADVANCE_OTA
 	u8	adv_ota;
@@ -1155,10 +1147,6 @@ struct _ADAPTER {
 	ATOMIC_T bandskip;
 
 	struct wifidirect_info	wdinfo;
-
-#ifdef CONFIG_TDLS
-	struct tdls_info	tdlsinfo;
-#endif /* CONFIG_TDLS */
 
 #ifdef CONFIG_RTW_REPEATER_SON
 	u8	rtw_rson_scanstage;

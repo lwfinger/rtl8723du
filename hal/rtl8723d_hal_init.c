@@ -3602,20 +3602,7 @@ static void rtl8723d_fill_default_txdesc(
 		SET_TX_DESC_USB_TXAGG_NUM_8723D(pbuf, pxmitframe->agg_num);
 #endif
 
-#ifdef CONFIG_TDLS
-#ifdef CONFIG_XMIT_ACK
-		/* CCX-TXRPT ack for xmit mgmt frames. */
-		if (pxmitframe->ack_report) {
-#ifdef DBG_CCX
-			RTW_INFO("%s set spe_rpt\n", __func__);
-#endif
-			SET_TX_DESC_CCX_8723D(pbuf, 1);
-			SET_TX_DESC_SW_DEFINE_8723D(pbuf, (u8)(GET_PRIMARY_ADAPTER(padapter)->xmitpriv.seq_no));
-		}
-#endif /* CONFIG_XMIT_ACK */
-#endif
 	} else if (pxmitframe->frame_tag == MGNT_FRAMETAG) {
-
 		SET_TX_DESC_MACID_8723D(pbuf, pattrib->mac_id);
 		SET_TX_DESC_QUEUE_SEL_8723D(pbuf, pattrib->qsel);
 		SET_TX_DESC_RATE_ID_8723D(pbuf, pattrib->raid);

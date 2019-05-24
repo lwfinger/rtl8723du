@@ -148,10 +148,6 @@ struct mcc_adapter_priv {
 	u8 p2p_go_noa_ie[MAX_P2P_IE_LEN];
 	u32 p2p_go_noa_ie_len;
 	u64 tsf;
-#ifdef CONFIG_TDLS
-	u8 backup_tdls_en;
-#endif /* CONFIG_TDLS */
-
 	u8 null_early;
 	u8 null_rty_num;
 };

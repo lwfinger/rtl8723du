@@ -404,12 +404,6 @@ ssize_t proc_set_wmmps_info(struct file *file, const char __user *buffer, size_t
 #endif /* CONFIG_WMMPS_STA */
 #endif /* CONFIG_POWER_SAVING */
 
-#ifdef CONFIG_TDLS
-int proc_get_tdls_enable(struct seq_file *m, void *v);
-ssize_t proc_set_tdls_enable(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-int proc_get_tdls_info(struct seq_file *m, void *v);
-#endif
-
 int proc_get_monitor(struct seq_file *m, void *v);
 ssize_t proc_set_monitor(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 

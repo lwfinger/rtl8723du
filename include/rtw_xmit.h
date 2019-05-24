@@ -265,13 +265,7 @@ struct pkt_attrib {
 	union Keytype	dot11tkiptxmickey;
 	/* union Keytype	dot11tkiprxmickey; */
 	union Keytype	dot118021x_UncstKey;
-
-#ifdef CONFIG_TDLS
-	u8 direct_link;
-	struct sta_info *ptdls_sta;
-#endif /* CONFIG_TDLS */
 	u8 key_type;
-
 	u8 icmp_pkt;
 };
 
@@ -618,14 +612,8 @@ extern s32 rtw_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_fra
 #if defined(CONFIG_IEEE80211W) || defined(CONFIG_RTW_MESH)
 extern s32 rtw_mgmt_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxmitframe);
 #endif
-#ifdef CONFIG_TDLS
-extern struct tdls_txmgmt *ptxmgmt;
-s32 rtw_xmit_tdls_coalesce(_adapter *padapter, struct xmit_frame *pxmitframe, struct tdls_txmgmt *ptxmgmt);
-s32 update_tdls_attrib(_adapter *padapter, struct pkt_attrib *pattrib);
-#endif
 s32 _rtw_init_hw_txqueue(struct hw_txqueue *phw_txqueue, u8 ac_tag);
 void _rtw_init_sta_xmit_priv(struct sta_xmit_priv *psta_xmitpriv);
-
 
 s32 rtw_txframes_pending(_adapter *padapter);
 s32 rtw_txframes_sta_ac_pending(_adapter *padapter, struct pkt_attrib *pattrib);
