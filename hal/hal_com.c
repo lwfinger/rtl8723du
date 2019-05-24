@@ -2524,16 +2524,6 @@ void rtw_hal_change_macaddr_mbid(_adapter *adapter, u8 *mac_addr)
 		write_mbssid_cam(adapter, entry_id, mac_addr);
 }
 
-#ifdef CONFIG_SWTIMER_BASED_TXBCN
-u16 rtw_hal_bcn_interval_adjust(_adapter *adapter, u16 bcn_interval)
-{
-	if (adapter_to_dvobj(adapter)->inter_bcn_space != bcn_interval)
-		return adapter_to_dvobj(adapter)->inter_bcn_space;
-	else
-		return bcn_interval;
-}
-#endif/*CONFIG_SWTIMER_BASED_TXBCN*/
-
 #endif/*#ifdef CONFIG_MI_WITH_MBSSID_CAM*/
 
 static void rtw_hal_set_macaddr_port(_adapter *adapter, u8 *val)
@@ -6512,44 +6502,6 @@ inline s16 translate_dbm_to_percentage(s16 signal)
 	else
 		return 100 + signal;
 }
-
-#ifdef CONFIG_SWTIMER_BASED_TXBCN
-#ifdef CONFIG_BCN_RECOVERY
-#define REG_CPU_MGQ_INFO	0x041C
-#define BIT_BCN_POLL			BIT(28)
-u8 rtw_ap_bcn_recovery(_adapter *padapter)
-{
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(padapter);
-
-	if (hal_data->issue_bcn_fail >= 2) {
-		RTW_ERR("%s ISSUE BCN Fail\n", __func__);
-		rtw_write8(padapter, REG_CPU_MGQ_INFO + 3, 0x10);
-		hal_data->issue_bcn_fail = 0;
-	}
-	return _SUCCESS;
-}
-#endif /*CONFIG_BCN_RECOVERY*/
-
-#ifdef CONFIG_BCN_XMIT_PROTECT
-u8 rtw_ap_bcn_queue_empty_check(_adapter *padapter, u32 txbcn_timer_ms)
-{
-	u32 start_time = rtw_get_current_time();
-	u8 bcn_queue_empty = _FALSE;
-
-	do {
-		if (rtw_read16(padapter, REG_TXPKT_EMPTY) & BIT(11)) {
-			bcn_queue_empty = _TRUE;
-			break;
-		}
-	} while (rtw_get_passing_time_ms(start_time) <= (txbcn_timer_ms + 10));
-
-	if (bcn_queue_empty == _FALSE)
-		RTW_ERR("%s BCN queue not empty\n", __func__);
-
-	return bcn_queue_empty;
-}
-#endif /*CONFIG_BCN_XMIT_PROTECT*/
-#endif /*CONFIG_SWTIMER_BASED_TXBCN*/
 
 #ifdef RTW_CHANNEL_SWITCH_OFFLOAD
 void rtw_hal_switch_chnl_and_set_bw_offload(_adapter *adapter, u8 central_ch, u8 pri_ch_idx, u8 bw)

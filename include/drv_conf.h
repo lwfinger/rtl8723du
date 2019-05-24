@@ -291,8 +291,6 @@
 			#undef CONFIG_RUNTIME_PORT_SWITCH
 		#endif
 	#endif
-
-		#define CONFIG_SWTIMER_BASED_TXBCN
 #endif
 
 #define MACID_NUM_SW_LIMIT 32

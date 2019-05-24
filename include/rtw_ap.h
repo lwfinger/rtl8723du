@@ -69,14 +69,4 @@ void rtw_process_public_act_bsscoex(_adapter *padapter, u8 *pframe, uint frame_l
 int rtw_ht_operation_update(_adapter *padapter);
 u8 rtw_ap_sta_linking_state_check(_adapter *adapter);
 
-#ifdef CONFIG_SWTIMER_BASED_TXBCN
-void tx_beacon_handlder(struct dvobj_priv *pdvobj);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
-void tx_beacon_timer_handlder(struct timer_list *t);
-#else
-void tx_beacon_timer_handlder(void *ctx);
-#endif
-
-#endif /*CONFIG_SWTIMER_BASED_TXBCN*/
-
 #endif /*__RTW_AP_H_*/

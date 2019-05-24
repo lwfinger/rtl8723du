@@ -4252,10 +4252,6 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 		{
 			u16 bcn_interval = *((u16 *)val);
 
-			#ifdef CONFIG_SWTIMER_BASED_TXBCN
-			bcn_interval = rtw_hal_bcn_interval_adjust(padapter, bcn_interval);
-			#endif
-
 			rtw_write16(padapter, REG_BCN_INTERVAL, bcn_interval);
 
 			#ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT

@@ -7491,7 +7491,7 @@ void issue_beacon(_adapter *padapter, int timeout_ms)
 	update_mgntframe_attrib(padapter, pattrib);
 	pattrib->qsel = QSLT_BEACON;
 
-#if defined(CONFIG_CONCURRENT_MODE) && (!defined(CONFIG_SWTIMER_BASED_TXBCN))
+#if defined(CONFIG_CONCURRENT_MODE)
 	if (padapter->hw_port == HW_PORT1)
 		pattrib->mbssid = 1;
 #endif
@@ -14696,13 +14696,6 @@ u8 chk_bmc_sleepq_hdl(_adapter *padapter, unsigned char *pbuf)
 
 u8 tx_beacon_hdl(_adapter *padapter, unsigned char *pbuf)
 {
-
-#ifdef CONFIG_SWTIMER_BASED_TXBCN
-
-	tx_beacon_handlder(padapter->dvobj);
-
-#else
-
 	if (send_beacon(padapter) == _FAIL) {
 		RTW_INFO("issue_beacon, fail!\n");
 		return H2C_PARAMETERS_ERROR;
@@ -14710,7 +14703,6 @@ u8 tx_beacon_hdl(_adapter *padapter, unsigned char *pbuf)
 
 	/* tx bc/mc frames after update TIM */
 	chk_bmc_sleepq_hdl(padapter, NULL);
-#endif
 
 	return H2C_SUCCESS;
 }

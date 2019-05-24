@@ -270,9 +270,6 @@ struct dbg_rx_counter {
 #ifdef CONFIG_MI_WITH_MBSSID_CAM
 	void rtw_hal_set_macaddr_mbid(_adapter *adapter, u8 *mac_addr);
 	void rtw_hal_change_macaddr_mbid(_adapter *adapter, u8 *mac_addr);
-	#ifdef CONFIG_SWTIMER_BASED_TXBCN
-	u16 rtw_hal_bcn_interval_adjust(_adapter *adapter, u16 bcn_interval);
-	#endif
 #endif
 
 void rtw_dump_mac_rx_counters(_adapter *padapter, struct dbg_rx_counter *rx_counter);
@@ -595,14 +592,5 @@ void rtw_hal_switch_chnl_and_set_bw_offload(_adapter *adapter, u8 central_ch, u8
 #endif
 
 s16 translate_dbm_to_percentage(s16 signal);
-
-#ifdef CONFIG_SWTIMER_BASED_TXBCN
-#ifdef CONFIG_BCN_RECOVERY
-u8 rtw_ap_bcn_recovery(_adapter *padapter);
-#endif
-#ifdef CONFIG_BCN_XMIT_PROTECT
-u8 rtw_ap_bcn_queue_empty_check(_adapter *padapter, u32 txbcn_timer_ms);
-#endif
-#endif /*CONFIG_SWTIMER_BASED_TXBCN*/
 
 #endif /* __HAL_COMMON_H__ */

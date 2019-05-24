@@ -1513,20 +1513,6 @@ update_beacon:
 		}
 
 		update_beacon(padapter, _TIM_IE_, NULL, _FALSE);
-
-#ifdef CONFIG_SWTIMER_BASED_TXBCN
-		_enter_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
-		if (rtw_is_list_empty(&padapter->list)) {
-			rtw_list_insert_tail(&padapter->list, get_list_head(&pdvobj->ap_if_q));
-			pdvobj->nr_ap_if++;
-			pdvobj->inter_bcn_space = DEFAULT_BCN_INTERVAL / pdvobj->nr_ap_if;
-		}
-		_exit_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
-
-		rtw_hal_set_hwreg(padapter, HW_VAR_BEACON_INTERVAL, (u8 *)(&pdvobj->inter_bcn_space));
-
-#endif /*CONFIG_SWTIMER_BASED_TXBCN*/
-
 	}
 
 	rtw_scan_wait_completed(padapter);
@@ -1537,16 +1523,9 @@ update_beacon:
 		/*update_beacon(padapter, _TIM_IE_, NULL, _TRUE);*/
 
 #if !defined(CONFIG_INTERRUPT_BASED_TXBCN)
-#ifdef CONFIG_SWTIMER_BASED_TXBCN
-		if (pdvobj->nr_ap_if == 1) {
-			RTW_INFO("start SW BCN TIMER!\n");
-			_set_timer(&pdvobj->txbcn_timer, bcn_interval);
-		}
-#else
 		/* other case will  tx beacon when bcn interrupt coming in. */
 		if (send_beacon(padapter) == _FAIL)
 			RTW_INFO("issue_beacon, fail!\n");
-#endif
 #endif /* !defined(CONFIG_INTERRUPT_BASED_TXBCN) */
 	}
 
@@ -3495,25 +3474,6 @@ void stop_ap_mode(_adapter *padapter)
 
 	rtw_free_mlme_priv_ie_data(pmlmepriv);
 
-#ifdef CONFIG_SWTIMER_BASED_TXBCN
-	if (pmlmeext->bstart_bss == _TRUE) {
-		_enter_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
-		pdvobj->nr_ap_if--;
-		if (pdvobj->nr_ap_if > 0)
-			pdvobj->inter_bcn_space = DEFAULT_BCN_INTERVAL / pdvobj->nr_ap_if;
-		else
-			pdvobj->inter_bcn_space = DEFAULT_BCN_INTERVAL;
-
-		rtw_list_delete(&padapter->list);
-		_exit_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
-
-		rtw_hal_set_hwreg(padapter, HW_VAR_BEACON_INTERVAL, (u8 *)(&pdvobj->inter_bcn_space));
-
-		if (pdvobj->nr_ap_if == 0)
-			_cancel_timer_ex(&pdvobj->txbcn_timer);
-	}
-#endif
-
 	pmlmeext->bstart_bss = _FALSE;
 
 	rtw_hal_rcr_set_chk_bssid(padapter, self_action);
@@ -3855,162 +3815,6 @@ u8 rtw_ap_sta_linking_state_check(_adapter *adapter)
 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
 	return rst;
 }
-
-/*#define DBG_SWTIMER_BASED_TXBCN*/
-#ifdef CONFIG_SWTIMER_BASED_TXBCN
-void tx_beacon_handlder(struct dvobj_priv *pdvobj)
-{
-#define BEACON_EARLY_TIME		20	/* unit:TU*/
-	_irqL irqL;
-	_list	*plist, *phead;
-	u32 timestamp[2];
-	u32 bcn_interval_us; /* unit : usec */
-	u64 time;
-	u32 cur_tick, time_offset; /* unit : usec */
-	u32 inter_bcn_space_us; /* unit : usec */
-	u32 txbcn_timer_ms; /* unit : ms */
-	int nr_vap, idx, bcn_idx;
-	int i;
-	u8 val8, late = 0;
-	_adapter *padapter = NULL;
-
-	i = 0;
-
-	/* get first ap mode interface */
-	_enter_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
-	if (rtw_is_list_empty(&pdvobj->ap_if_q.queue) || (pdvobj->nr_ap_if == 0)) {
-		RTW_INFO("[%s] ERROR: ap_if_q is empty!or nr_ap = %d\n", __func__, pdvobj->nr_ap_if);
-		_exit_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
-		return;
-	} else
-		padapter = LIST_CONTAINOR(get_next(&(pdvobj->ap_if_q.queue)), struct _ADAPTER, list);
-	_exit_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
-
-	if (NULL == padapter) {
-		RTW_INFO("[%s] ERROR: no any ap interface!\n", __func__);
-		return;
-	}
-
-
-	bcn_interval_us = DEFAULT_BCN_INTERVAL * NET80211_TU_TO_US;
-	if (0 == bcn_interval_us) {
-		RTW_INFO("[%s] ERROR: beacon interval = 0\n", __func__);
-		return;
-	}
-
-	/* read TSF */
-	timestamp[1] = rtw_read32(padapter, 0x560 + 4);
-	timestamp[0] = rtw_read32(padapter, 0x560);
-	while (timestamp[1]) {
-		time = (0xFFFFFFFF % bcn_interval_us + 1) * timestamp[1] + timestamp[0];
-		timestamp[0] = (u32)time;
-		timestamp[1] = (u32)(time >> 32);
-	}
-	cur_tick = timestamp[0] % bcn_interval_us;
-
-
-	_enter_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
-
-	nr_vap = (pdvobj->nr_ap_if - 1);
-	if (nr_vap > 0) {
-		inter_bcn_space_us = pdvobj->inter_bcn_space * NET80211_TU_TO_US; /* beacon_interval / (nr_vap+1); */
-		idx = cur_tick / inter_bcn_space_us;
-		if (idx < nr_vap)	/* if (idx < (nr_vap+1))*/
-			bcn_idx = idx + 1;	/* bcn_idx = (idx + 1) % (nr_vap+1);*/
-		else
-			bcn_idx = 0;
-
-		/* to get padapter based on bcn_idx */
-		padapter = NULL;
-		phead = get_list_head(&pdvobj->ap_if_q);
-		plist = get_next(phead);
-		while ((rtw_end_of_queue_search(phead, plist)) == _FALSE) {
-			padapter = LIST_CONTAINOR(plist, struct _ADAPTER, list);
-
-			plist = get_next(plist);
-
-			if (i == bcn_idx)
-				break;
-
-			i++;
-		}
-		if ((NULL == padapter) || (i > pdvobj->nr_ap_if)) {
-			RTW_INFO("[%s] ERROR: nr_ap_if = %d, padapter=%p, bcn_idx=%d, index=%d\n",
-				__func__, pdvobj->nr_ap_if, padapter, bcn_idx, i);
-			_exit_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
-			return;
-		}
-#ifdef DBG_SWTIMER_BASED_TXBCN
-		RTW_INFO("BCN_IDX=%d, cur_tick=%d, padapter=%p\n", bcn_idx, cur_tick, padapter);
-#endif
-		if (((idx + 2 == nr_vap + 1) && (idx < nr_vap + 1)) || (0 == bcn_idx)) {
-			time_offset = bcn_interval_us - cur_tick - BEACON_EARLY_TIME * NET80211_TU_TO_US;
-			if ((s32)time_offset < 0)
-				time_offset += inter_bcn_space_us;
-
-		} else {
-			time_offset = (idx + 2) * inter_bcn_space_us - cur_tick - BEACON_EARLY_TIME * NET80211_TU_TO_US;
-			if (time_offset > (inter_bcn_space_us + (inter_bcn_space_us >> 1))) {
-				time_offset -= inter_bcn_space_us;
-				late = 1;
-			}
-		}
-	} else
-		/*#endif*/ { /* MBSSID */
-		time_offset = 2 * bcn_interval_us - cur_tick - BEACON_EARLY_TIME * NET80211_TU_TO_US;
-		if (time_offset > (bcn_interval_us + (bcn_interval_us >> 1))) {
-			time_offset -= bcn_interval_us;
-			late = 1;
-		}
-	}
-	_exit_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
-
-#ifdef DBG_SWTIMER_BASED_TXBCN
-	RTW_INFO("set sw bcn timer %d us\n", time_offset);
-#endif
-	txbcn_timer_ms = time_offset / NET80211_TU_TO_US;
-	_set_timer(&pdvobj->txbcn_timer, txbcn_timer_ms);
-
-	if (padapter) {
-#ifdef CONFIG_BCN_RECOVERY
-		rtw_ap_bcn_recovery(padapter);
-#endif /*CONFIG_BCN_RECOVERY*/
-
-#ifdef CONFIG_BCN_XMIT_PROTECT
-		rtw_ap_bcn_queue_empty_check(padapter, txbcn_timer_ms);
-#endif /*CONFIG_BCN_XMIT_PROTECT*/
-
-#ifdef DBG_SWTIMER_BASED_TXBCN
-		RTW_INFO("padapter=%p, PORT=%d\n", padapter, padapter->hw_port);
-#endif
-		/* bypass TX BCN queue if op ch is switching/waiting */
-		if (!check_fwstate(&padapter->mlmepriv, WIFI_OP_CH_SWITCHING)
-			&& !IS_CH_WAITING(adapter_to_rfctl(padapter))
-		) {
-			/*update_beacon(padapter, _TIM_IE_, NULL, _FALSE);*/
-			/*issue_beacon(padapter, 0);*/
-			send_beacon(padapter);
-		}
-	}
-}
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
-void tx_beacon_timer_handlder(struct timer_list *t)
-#else
-void tx_beacon_timer_handlder(void *ctx)
-#endif
-{
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
-	struct dvobj_priv *pdvobj = from_timer(pdvobj, t, txbcn_timer);
-#else
-	struct dvobj_priv *pdvobj = (struct dvobj_priv *)ctx;
-#endif
-	_adapter *padapter = pdvobj->padapters[0];
-
-	if (padapter)
-		set_tx_beacon_cmd(padapter);
-}
-#endif
 
 void rtw_ap_parse_sta_capability(_adapter *adapter, struct sta_info *sta, u8 *cap)
 {

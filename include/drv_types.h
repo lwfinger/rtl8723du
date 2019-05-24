@@ -928,9 +928,6 @@ struct dvobj_priv {
 	struct wiphy *wiphy;
 	#endif
 
-#ifdef CONFIG_SWTIMER_BASED_TXBCN
-	_timer txbcn_timer;
-#endif
 	_timer dynamic_chk_timer; /* dynamic/periodic check timer */
 	
 #ifdef CONFIG_RTW_NAPI_DYNAMIC
