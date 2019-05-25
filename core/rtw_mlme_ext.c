@@ -2642,7 +2642,7 @@ OnAssocReqFail:
 	return _FAIL;
 }
 
-#if defined(CONFIG_LAYER2_ROAMING) && defined(CONFIG_RTW_80211K)
+#if defined(CONFIG_RTW_80211K)
 void rtw_roam_nb_discover(_adapter *padapter, u8 bfroce)
 {
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
@@ -2766,7 +2766,7 @@ report_assoc_result:
 
 	report_join_res(padapter, res);
 
-#if defined(CONFIG_LAYER2_ROAMING) && defined(CONFIG_RTW_80211K)
+#if defined(CONFIG_RTW_80211K)
 	rtw_roam_nb_discover(padapter, _TRUE);
 #endif
 	return _SUCCESS;
@@ -11748,12 +11748,8 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 	struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	struct sta_priv		*pstapriv = &padapter->stapriv;
-#if defined(CONFIG_ARP_KEEP_ALIVE) || defined(CONFIG_LAYER2_ROAMING)
 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
-#endif
-#ifdef CONFIG_LAYER2_ROAMING
 	struct recv_priv	*precvpriv = &padapter->recvpriv;
-#endif
 
 	if (padapter->registrypriv.mp_mode == _TRUE)
 		return;
@@ -11767,7 +11763,7 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 
 #if defined(CONFIG_RTW_REPEATER_SON)
 	rtw_rson_scan_wk_cmd(padapter, RSON_SCAN_PROCESS);
-#elif defined(CONFIG_LAYER2_ROAMING)
+#else
 		if (rtw_chk_roam_flags(padapter, RTW_ROAM_ACTIVE)) {
 			RTW_INFO("signal_strength_data.avg_val = %d\n", precvpriv->signal_strength_data.avg_val);
 			if (precvpriv->signal_strength_data.avg_val < pmlmepriv->roam_rssi_threshold) {
@@ -12983,10 +12979,8 @@ static u8 rtw_scan_sparse(_adapter *adapter, struct rtw_ieee80211_channel *ch, u
 #ifndef RTW_SCAN_SPARSE_CH_NUM_BG
 #define RTW_SCAN_SPARSE_CH_NUM_BG 4
 #endif
-#ifdef CONFIG_LAYER2_ROAMING
 #ifndef RTW_SCAN_SPARSE_CH_NUM_ROAMING_ACTIVE
 #define RTW_SCAN_SPARSE_CH_NUM_ROAMING_ACTIVE 1
-#endif
 #endif
 
 #define SCAN_SPARSE_CH_NUM_INVALID 255
@@ -13036,7 +13030,7 @@ static u8 rtw_scan_sparse(_adapter *adapter, struct rtw_ieee80211_channel *ch, u
 		max_allow_ch = rtw_min(max_allow_ch, RTW_SCAN_SPARSE_CH_NUM_BG);
 #endif
 
-#if  defined(CONFIG_LAYER2_ROAMING) && defined(RTW_SCAN_SPARSE_ROAMING_ACTIVE)
+#if  defined(RTW_SCAN_SPARSE_ROAMING_ACTIVE)
 	if (rtw_chk_roam_flags(adapter, RTW_ROAM_ACTIVE)) {
 		if (busy_traffic == _TRUE && adapter->mlmepriv.need_to_roam == _TRUE)
 			max_allow_ch = rtw_min(max_allow_ch, RTW_SCAN_SPARSE_CH_NUM_ROAMING_ACTIVE);

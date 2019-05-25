@@ -922,13 +922,9 @@ int rm_radio_mens_nb_rep(_adapter *padapter,
 #endif
 	rm_post_event(padapter, prm->rmid, RM_EV_recv_rep);
 
-#ifdef CONFIG_LAYER2_ROAMING
-	if (rtw_wnm_btm_candidates_survey(padapter
-			,(pdiag_body + 3)
-			,(len - sizeof(struct rtw_ieee80211_hdr_3addr))
-			,_FALSE) == _FAIL)
+	if (rtw_wnm_btm_candidates_survey(padapter, (pdiag_body + 3),
+	    (len - sizeof(struct rtw_ieee80211_hdr_3addr)), _FALSE) == _FAIL)
 		return _FALSE;
-#endif
 	rtw_cfg80211_rx_rrm_action(padapter, precv_frame);
 
 	return _TRUE;

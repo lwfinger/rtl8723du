@@ -103,7 +103,6 @@ static sint	_rtw_init_mlme_priv(_adapter *padapter)
 	pmlmepriv->GetGatewayTryCnt = 0;
 #endif
 
-#ifdef CONFIG_LAYER2_ROAMING
 #define RTW_ROAM_SCAN_RESULT_EXP_MS (5*1000)
 #define RTW_ROAM_RSSI_DIFF_TH 10
 #define RTW_ROAM_SCAN_INTERVAL_MS (10*1000)
@@ -111,30 +110,22 @@ static sint	_rtw_init_mlme_priv(_adapter *padapter)
 
 	pmlmepriv->roam_flags = 0
 				| RTW_ROAM_ON_EXPIRED
-#ifdef CONFIG_LAYER2_ROAMING_RESUME
 				| RTW_ROAM_ON_RESUME
-#endif
-#ifdef CONFIG_LAYER2_ROAMING_ACTIVE
-				| RTW_ROAM_ACTIVE
-#endif
-				;
+				| RTW_ROAM_ACTIVE;
 
 	pmlmepriv->roam_scanr_exp_ms = RTW_ROAM_SCAN_RESULT_EXP_MS;
 	pmlmepriv->roam_rssi_diff_th = RTW_ROAM_RSSI_DIFF_TH;
 	pmlmepriv->roam_scan_int_ms = RTW_ROAM_SCAN_INTERVAL_MS;
 	pmlmepriv->roam_rssi_threshold = RTW_ROAM_RSSI_THRESHOLD;
 	pmlmepriv->need_to_roam = _FALSE;
-#endif /* CONFIG_LAYER2_ROAMING */
 
 #ifdef CONFIG_RTW_80211R
 	rtw_ft_info_init(&pmlmepriv->ft_roam);
 #endif
-#ifdef CONFIG_LAYER2_ROAMING
 #if defined(CONFIG_RTW_WNM) || defined(CONFIG_RTW_80211K)
 	rtw_roam_nb_info_init(padapter);
 	pmlmepriv->ch_cnt = 0;
 #endif	
-#endif
 	rtw_init_mlme_timer(padapter);
 
 exit:
@@ -2530,7 +2521,6 @@ void rtw_stadel_event_callback(_adapter *adapter, u8 *pbuf)
 		bool roam = _FALSE;
 		struct wlan_network *roam_target = NULL;
 
-#ifdef CONFIG_LAYER2_ROAMING
 #ifdef CONFIG_RTW_80211R
 		if (rtw_ft_roam_expired(adapter, reason))
 			pmlmepriv->ft_roam.ft_roam_on_expired = _TRUE;
@@ -2557,7 +2547,6 @@ void rtw_stadel_event_callback(_adapter *adapter, u8 *pbuf)
 				rtw_set_to_roam(adapter, adapter->registrypriv.max_roaming_times);
 		} else
 			rtw_set_to_roam(adapter, 0);
-#endif /* CONFIG_LAYER2_ROAMING */
 
 		rtw_free_uc_swdec_pending_queue(adapter);
 
@@ -2681,7 +2670,6 @@ void rtw_join_timeout_handler (void *FunctionContext)
 
 	_enter_critical_bh(&pmlmepriv->lock, &irqL);
 
-#ifdef CONFIG_LAYER2_ROAMING
 	if (rtw_to_roam(adapter) > 0) { /* join timeout caused by roaming */
 		while (1) {
 			rtw_dec_to_roam(adapter);
@@ -2712,9 +2700,7 @@ void rtw_join_timeout_handler (void *FunctionContext)
 			}
 		}
 
-	} else
-#endif
-	{
+	} else {
 		rtw_indicate_disconnect(adapter, 0, _FALSE);
 		free_scanqueue(pmlmepriv);/* ??? */
 
@@ -2815,12 +2801,9 @@ void rtw_drv_scan_by_self(_adapter *padapter, u8 reason)
 		goto exit;
 
 	if (rtw_mi_busy_traffic_check(padapter, _FALSE)) {
-#ifdef CONFIG_LAYER2_ROAMING
 		if (rtw_chk_roam_flags(padapter, RTW_ROAM_ACTIVE) && pmlmepriv->need_to_roam == _TRUE) {
 			RTW_INFO("need to roam, don't care BusyTraffic\n");
-		} else
-#endif
-		{
+		} else {
 			RTW_INFO(FUNC_ADPT_FMT" exit BusyTraffic\n", FUNC_ADPT_ARG(padapter));
 			goto exit;
 		}
@@ -3135,7 +3118,6 @@ void rtw_set_scan_deny(_adapter *adapter, u32 ms)
 	_set_timer(&mlmepriv->set_scan_deny_timer, ms);
 }
 
-#ifdef CONFIG_LAYER2_ROAMING
 /*
 * Select a new roaming candidate from the original @param candidate and @param competitor
 * @return _TRUE: candidate is updated
@@ -3159,10 +3141,8 @@ static int rtw_check_roaming_candidate(struct mlme_priv *mlme
 	if (rtw_is_desired_network(adapter, competitor) == _FALSE)
 		goto exit;
 
-#ifdef CONFIG_LAYER2_ROAMING
 	if (mlme->need_to_roam == _FALSE)
 		goto exit;
-#endif
 
 #ifdef CONFIG_RTW_80211R
 	if (rtw_ft_chk_flags(adapter, RTW_FT_PEER_EN)) {
@@ -3290,7 +3270,6 @@ exit:
 
 	return ret;
 }
-#endif /* CONFIG_LAYER2_ROAMING */
 
 /*
 * Select a new join candidate from the original @param candidate and @param competitor
@@ -3342,14 +3321,12 @@ static int rtw_check_join_candidate(struct mlme_priv *mlme
 	if (rtw_is_desired_network(adapter, competitor)  == _FALSE)
 		goto exit;
 
-#ifdef CONFIG_LAYER2_ROAMING
 	if (rtw_to_roam(adapter) > 0) {
 		if (rtw_get_passing_time_ms(competitor->last_scanned) >= mlme->roam_scanr_exp_ms
 		    || is_same_ess(&competitor->network, &mlme->cur_network.network) == _FALSE
 		   )
 			goto exit;
 	}
-#endif
 
 	if (*candidate == NULL || (*candidate)->network.Rssi < competitor->network.Rssi) {
 		*candidate = competitor;
@@ -3400,13 +3377,11 @@ int rtw_select_and_join_from_scanned_queue(struct mlme_priv *pmlmepriv)
 
 	_enter_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 
-#ifdef CONFIG_LAYER2_ROAMING
 	if (pmlmepriv->roam_network) {
 		candidate = pmlmepriv->roam_network;
 		pmlmepriv->roam_network = NULL;
 		goto candidate_exist;
 	}
-#endif
 
 	phead = get_list_head(queue);
 	pmlmepriv->pscanned = get_next(phead);
@@ -4472,7 +4447,6 @@ void rtw_append_exented_cap(_adapter *padapter, u8 *out_ie, uint *pout_len)
 		pframe = rtw_set_ie(out_ie + *pout_len, EID_EXTCapability, 8, cap_content , pout_len);
 }
 
-#ifdef CONFIG_LAYER2_ROAMING
 inline void rtw_set_to_roam(_adapter *adapter, u8 to_roam)
 {
 	if (to_roam == 0)
@@ -4538,7 +4512,6 @@ void _rtw_roaming(_adapter *padapter, struct wlan_network *tgt_network)
 	}
 
 }
-#endif /* CONFIG_LAYER2_ROAMING */
 
 bool rtw_adjust_chbw(_adapter *adapter, u8 req_ch, u8 *req_bw, u8 *req_offset)
 {

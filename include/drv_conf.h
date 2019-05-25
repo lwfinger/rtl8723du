@@ -19,10 +19,6 @@
 	#ifndef CONFIG_RTW_REPEATER_SON_ID
 		#define CONFIG_RTW_REPEATER_SON_ID			0x02040608
 	#endif
-	//#define CONFIG_RTW_REPEATER_SON_ROOT
-	#ifndef CONFIG_RTW_REPEATER_SON_ROOT
-		#define CONFIG_LAYER2_ROAMING_ACTIVE
-	#endif
 	#undef CONFIG_POWER_SAVING
 #endif
 
@@ -35,12 +31,6 @@
 #if defined(CONFIG_MCC_MODE) && defined(CONFIG_BT_COEXIST)
 
 	#error "Disable BT COEXIST before enable MCC MODE\n"
-
-#endif
-
-#if defined(CONFIG_RTW_80211R) && !defined(CONFIG_LAYER2_ROAMING)
-
-	#error "Enable CONFIG_LAYER2_ROAMING before enable CONFIG_RTW_80211R\n"
 
 #endif
 

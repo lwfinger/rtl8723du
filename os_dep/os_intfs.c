@@ -375,11 +375,9 @@ module_param(rtw_adaptor_info_caching_file_path, charp, 0644);
 MODULE_PARM_DESC(rtw_adaptor_info_caching_file_path, "The path of adapter info cache file");
 #endif /* CONFIG_ADAPTOR_INFO_CACHING_FILE */
 
-#ifdef CONFIG_LAYER2_ROAMING
 static uint rtw_max_roaming_times = 2;
 module_param(rtw_max_roaming_times, uint, 0644);
 MODULE_PARM_DESC(rtw_max_roaming_times, "The max roaming times to try");
-#endif /* CONFIG_LAYER2_ROAMING */
 
 #ifdef CONFIG_FILE_FWIMG
 char *rtw_fw_file_path = "/system/etc/firmware/rtlwifi/FW_NIC.BIN";
@@ -833,12 +831,10 @@ uint loadparam(_adapter *padapter)
 	registry_par->adaptor_info_caching_file_path[PATH_LENGTH_MAX - 1] = 0;
 #endif
 
-#ifdef CONFIG_LAYER2_ROAMING
 	registry_par->max_roaming_times = (u8)rtw_max_roaming_times;
 #ifdef CONFIG_INTEL_WIDI
 	registry_par->max_roaming_times = (u8)rtw_max_roaming_times + 2;
 #endif /* CONFIG_INTEL_WIDI */
-#endif
 
 #ifdef CONFIG_80211D
 	registry_par->enable80211d = (u8)rtw_80211d;

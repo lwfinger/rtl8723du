@@ -762,7 +762,6 @@ int proc_get_mlmext_state(struct seq_file *m, void *v)
 	return 0;
 }
 
-#ifdef CONFIG_LAYER2_ROAMING
 int proc_get_roam_flags(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -883,7 +882,6 @@ ssize_t proc_set_roam_tgt_addr(struct file *file, const char __user *buffer, siz
 
 	return count;
 }
-#endif /* CONFIG_LAYER2_ROAMING */
 
 #ifdef CONFIG_RTW_80211R
 ssize_t proc_set_ft_flags(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)

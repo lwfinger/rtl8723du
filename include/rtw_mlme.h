@@ -570,7 +570,6 @@ struct ft_roam_info {
 };
 #endif
 
-#ifdef CONFIG_LAYER2_ROAMING
 #if defined(CONFIG_RTW_WNM) || defined(CONFIG_RTW_80211K)
 #define RTW_RRM_NB_RPT_EN		BIT(1)
 #define RTW_MAX_NB_RPT_NUM	8
@@ -668,14 +667,12 @@ struct roam_nb_info {
 	_timer roam_scan_timer;
 };
 #endif	/* defined(CONFIG_RTW_WNM) || defined(CONFIG_RTW_80211K) */
-#endif
 
 struct mlme_priv {
 
 	_lock	lock;
 	sint	fw_state;	/* shall we protect this variable? maybe not necessarily... */
 	u8	to_join; /* flag */
-#ifdef CONFIG_LAYER2_ROAMING
 	u8 to_roam; /* roaming trying times */
 	struct wlan_network *roam_network; /* the target of active roam */
 	u8 roam_flags;
@@ -685,8 +682,6 @@ struct mlme_priv {
 	u8 roam_tgt_addr[ETH_ALEN]; /* request to roam to speicific target without other consideration */
 	u8 roam_rssi_threshold;
 	bool need_to_roam;
-#endif
-
 	u8	*nic_hdl;
 
 	_list		*pscanned;
@@ -1165,7 +1160,6 @@ void rtw_append_exented_cap(_adapter *padapter, u8 *out_ie, uint *pout_len);
 int rtw_is_same_ibss(_adapter *adapter, struct wlan_network *pnetwork);
 int is_same_network(WLAN_BSSID_EX *src, WLAN_BSSID_EX *dst, u8 feature);
 
-#ifdef CONFIG_LAYER2_ROAMING
 #define rtw_roam_flags(adapter) ((adapter)->mlmepriv.roam_flags)
 #define rtw_chk_roam_flags(adapter, flags) ((adapter)->mlmepriv.roam_flags & flags)
 #define rtw_clr_roam_flags(adapter, flags) \
@@ -1189,22 +1183,7 @@ void rtw_set_to_roam(_adapter *adapter, u8 to_roam);
 u8 rtw_dec_to_roam(_adapter *adapter);
 u8 rtw_to_roam(_adapter *adapter);
 int rtw_select_roaming_candidate(struct mlme_priv *pmlmepriv);
-#else
-#define rtw_roam_flags(adapter) 0
-#define rtw_chk_roam_flags(adapter, flags) 0
-#define rtw_clr_roam_flags(adapter, flags) do {} while (0)
-#define rtw_set_roam_flags(adapter, flags) do {} while (0)
-#define rtw_assign_roam_flags(adapter, flags) do {} while (0)
-#define _rtw_roaming(adapter, tgt_network) do {} while (0)
-#define rtw_roaming(adapter, tgt_network) do {} while (0)
-#define rtw_set_to_roam(adapter, to_roam) do {} while (0)
-#define rtw_dec_to_roam(adapter) 0
-#define rtw_to_roam(adapter) 0
-#define rtw_select_roaming_candidate(mlme) _FAIL
-#endif /* CONFIG_LAYER2_ROAMING */
-
 bool rtw_adjust_chbw(_adapter *adapter, u8 req_ch, u8 *req_bw, u8 *req_offset);
-
 struct sta_media_status_rpt_cmd_parm {
 	struct sta_info *sta;
 	bool connected;
