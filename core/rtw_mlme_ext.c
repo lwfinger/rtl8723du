@@ -14900,9 +14900,7 @@ u8 led_blink_hdl(_adapter *padapter, unsigned char *pbuf)
 
 	ledBlink_param = (struct LedBlink_param *)pbuf;
 
-#ifdef CONFIG_RTW_LED_HANDLED_BY_CMD_THREAD
 	BlinkHandler((PLED_DATA)ledBlink_param->pLed);
-#endif
 
 	return	H2C_SUCCESS;
 }

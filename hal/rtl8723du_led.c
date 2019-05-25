@@ -2,7 +2,6 @@
 /* Copyright(c) 2007 - 2017 Realtek Corporation */
 
 #include "rtl8723d_hal.h"
-#ifdef CONFIG_RTW_SW_LED
 
 /*
  * ================================================================================
@@ -111,4 +110,3 @@ rtl8723du_DeInitSwLeds(
 	DeInitLed(&(ledpriv->SwLed0));
 	DeInitLed(&(ledpriv->SwLed1));
 }
-#endif

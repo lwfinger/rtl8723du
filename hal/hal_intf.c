@@ -137,7 +137,6 @@ void rtw_hal_dm_deinit(_adapter *padapter)
 		_rtw_spinlock_free(&pHalData->IQKSpinLock);
 	}
 }
-#ifdef CONFIG_RTW_SW_LED
 void	rtw_hal_sw_led_init(_adapter *padapter)
 {
 	if (padapter->hal_func.InitSwLeds)
@@ -149,7 +148,6 @@ void rtw_hal_sw_led_deinit(_adapter *padapter)
 	if (padapter->hal_func.DeInitSwLeds)
 		padapter->hal_func.DeInitSwLeds(padapter);
 }
-#endif
 
 u32 rtw_hal_power_on(_adapter *padapter)
 {

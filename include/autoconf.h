@@ -7,11 +7,7 @@
 #define AUTOCONF_INCLUDED
 
 #define RTL871X_MODULE_NAME "8723DU"
-#ifdef CONFIG_FOR_RTL8723DU_VQ0
-#define DRV_NAME "rtl8723du-vq0"
-#else
 #define DRV_NAME "rtl8723du"
-#endif
 
 /*
  * Wi-Fi Functions Configure
@@ -29,14 +25,6 @@
 /*
  * Hareware/Firmware Related Configure
  */
-
-#define CONFIG_RTW_LED
-#ifdef CONFIG_RTW_LED
-	#define CONFIG_RTW_SW_LED
-	#ifdef CONFIG_RTW_SW_LED
-		/* define CONFIG_RTW_LED_HANDLED_BY_CMD_THREAD */
-	#endif
-#endif /* CONFIG_RTW_LED */
 
 #define CONFIG_XMIT_ACK
 #ifdef CONFIG_XMIT_ACK

@@ -7,7 +7,6 @@
 #define NO_LED 0
 #define HW_LED 1
 
-#ifdef CONFIG_RTW_LED
 #define MSECS(t)        (HZ * ((t) / 1000) + (HZ * ((t) % 1000)) / 1000)
 
 /* ********************************************************************************
@@ -203,17 +202,14 @@ typedef struct _LED_USB {
 
 typedef struct _LED_USB	LED_DATA, *PLED_DATA;
 typedef enum _LED_STRATEGY_USB	LED_STRATEGY, *PLED_STRATEGY;
-#ifdef CONFIG_RTW_SW_LED
-VOID
-LedControlUSB(
+
+VOID LedControlUSB(
 	IN	PADAPTER		Adapter,
 	IN	LED_CTL_MODE		LedAction
 );
-#endif
 
 struct led_priv {
 	LED_STRATEGY		LedStrategy;
-#ifdef CONFIG_RTW_SW_LED
 	/* add for led controll */
 	LED_DATA			SwLed0;
 	LED_DATA			SwLed1;
@@ -223,7 +219,6 @@ struct led_priv {
 	void (*SwLedOn)(_adapter *padapter, PLED_DATA pLed);
 	void (*SwLedOff)(_adapter *padapter, PLED_DATA pLed);
 	/* add for led controll */
-#endif
 };
 
 #define SwLedOn(adapter, pLed) \
@@ -261,23 +256,14 @@ DeInitLed(
 
 /* hal... */
 extern void BlinkHandler(PLED_DATA	pLed);
-#endif /* CONFIG_RTW_LED */
 
-#if defined(CONFIG_RTW_LED) && defined(CONFIG_RTW_SW_LED)
 #define rtw_led_control(adapter, LedAction) \
 	do { \
 		if ((adapter)->ledpriv.LedControlHandler) \
 			(adapter)->ledpriv.LedControlHandler((adapter), (LedAction)); \
 	} while (0)
-#else
-#define rtw_led_control(adapter, LedAction) do {} while (0)
-#endif
 
-#if defined(CONFIG_RTW_LED)
 #define rtw_led_get_strategy(adapter) ((adapter)->ledpriv.LedStrategy)
-#else
-#define rtw_led_get_strategy(adapter) NO_LED
-#endif
 
 #define IS_NO_LED_STRATEGY(s) ((s) == NO_LED)
 #define IS_HW_LED_STRATEGY(s) ((s) == HW_LED)

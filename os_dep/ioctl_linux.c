@@ -5452,11 +5452,8 @@ static int rtw_rereg_nd_name(struct net_device *dev,
 		goto exit;
 
 	if (_rtw_memcmp(rereg_priv->old_ifname, "disable%d", 9) == _TRUE) {
-		#ifdef CONFIG_RTW_SW_LED
 		padapter->ledpriv.bRegUseLed = rereg_priv->old_bRegUseLed;
 		rtw_hal_sw_led_init(padapter);
-		#endif
-		/* rtw_ips_mode_req(&padapter->pwrctrlpriv, rereg_priv->old_ips_mode); */
 	}
 
 	strncpy(rereg_priv->old_ifname, new_ifname, IFNAMSIZ);
@@ -5470,11 +5467,9 @@ static int rtw_rereg_nd_name(struct net_device *dev,
 
 		/* close led */
 		rtw_led_control(padapter, LED_CTL_POWER_OFF);
-		#ifdef CONFIG_RTW_SW_LED
 		rereg_priv->old_bRegUseLed = padapter->ledpriv.bRegUseLed;
 		padapter->ledpriv.bRegUseLed = _FALSE;
 		rtw_hal_sw_led_deinit(padapter);
-		#endif
 		/* the interface is being "disabled", we can do deeper IPS */
 		/* rereg_priv->old_ips_mode = rtw_get_ips_mode_req(&padapter->pwrctrlpriv); */
 		/* rtw_ips_mode_req(&padapter->pwrctrlpriv, IPS_NORMAL); */

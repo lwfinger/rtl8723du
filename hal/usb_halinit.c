@@ -530,7 +530,6 @@ _InitEDCA(
 
 }
 
-#ifdef CONFIG_RTW_LED
 static void _InitHWLed(PADAPTER padapter)
 {
 	struct led_priv *pledpriv = &(padapter->ledpriv);
@@ -543,7 +542,6 @@ static void _InitHWLed(PADAPTER padapter)
 	/* must consider cases of antenna diversity/ commbo card/solo card/mini card */
 
 }
-#endif /* CONFIG_RTW_LED */
 
 static void
 _InitRDGSetting_8723du(
@@ -1094,9 +1092,7 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 
 	rtw_write16(padapter, REG_PKT_VO_VI_LIFE_TIME, 0x0400); /* unit: 256us. 256ms */
 	rtw_write16(padapter, REG_PKT_BE_BK_LIFE_TIME, 0x0400); /* unit: 256us. 256ms */
-#ifdef CONFIG_RTW_LED
 	_InitHWLed(padapter);
-#endif /* CONFIG_RTW_LED */
 
 	_BBTurnOnBlock(padapter);
 	/* NicIFSetMacAddress(padapter, padapter->PermanentAddress); */
@@ -2180,10 +2176,8 @@ void rtl8723du_set_hal_ops(PADAPTER padapter)
 	pHalFunc->init_recv_priv = &rtl8723du_init_recv_priv;
 	pHalFunc->free_recv_priv = &rtl8723du_free_recv_priv;
 
-#ifdef CONFIG_RTW_SW_LED
 	pHalFunc->InitSwLeds = &rtl8723du_InitSwLeds;
 	pHalFunc->DeInitSwLeds = &rtl8723du_DeInitSwLeds;
-#endif/*CONFIG_RTW_SW_LED */
 
 	pHalFunc->init_default_value = &rtl8723d_init_default_value;
 	pHalFunc->intf_chip_configure = &rtl8723du_interface_configure;

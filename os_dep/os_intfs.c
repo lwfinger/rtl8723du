@@ -2052,9 +2052,7 @@ u8 rtw_init_drv_sw(_adapter *padapter)
 #endif
 
 	rtw_hal_dm_init(padapter);
-#ifdef CONFIG_RTW_SW_LED
 	rtw_hal_sw_led_init(padapter);
-#endif
 #ifdef DBG_CONFIG_ERROR_DETECT
 	rtw_hal_sreset_init(padapter);
 #endif
@@ -2099,10 +2097,8 @@ void rtw_cancel_all_timer(_adapter *padapter)
 #endif
 
 	_cancel_timer_ex(&adapter_to_dvobj(padapter)->dynamic_chk_timer);
-#ifdef CONFIG_RTW_SW_LED
 	/* cancel sw led timer */
 	rtw_hal_sw_led_deinit(padapter);
-#endif
 	_cancel_timer_ex(&padapter->pwr_state_check_timer);
 
 #ifdef CONFIG_TX_AMSDU

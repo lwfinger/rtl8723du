@@ -1120,9 +1120,7 @@ struct _ADAPTER {
 	struct	security_priv	securitypriv;
 	_lock   security_key_mutex; /* add for CONFIG_IEEE80211W, none 11w also can use */
 	struct	registry_priv	registrypriv;
-#ifdef CONFIG_RTW_LED
 	struct	led_priv	ledpriv;
-#endif
 
 
 #ifdef CONFIG_RTW_NAPI
