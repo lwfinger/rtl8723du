@@ -248,9 +248,6 @@ void rtw_cfg80211_rx_probe_request(_adapter *padapter, union recv_frame *rframe)
 int rtw_cfg80211_set_mgnt_wpsp2pie(struct net_device *net, char *buf, int len, int type);
 
 bool rtw_cfg80211_pwr_mgmt(_adapter *adapter);
-#ifdef CONFIG_RTW_80211K
-void rtw_cfg80211_rx_rrm_action(_adapter *adapter, union recv_frame *rframe);
-#endif
 
 #ifdef CONFIG_RFKILL_POLL
 void rtw_cfg80211_init_rfkill(struct wiphy *wiphy);

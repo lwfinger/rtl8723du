@@ -6,22 +6,6 @@
 #include "autoconf.h"
 #include "hal_ic_cfg.h"
 
-#ifdef CONFIG_RTW_REPEATER_SON
-	#ifndef CONFIG_AP
-		#define CONFIG_AP
-	#endif
-	#ifndef CONFIG_CONCURRENT_MODE
-		#define CONFIG_CONCURRENT_MODE
-	#endif
-	#ifndef CONFIG_BR_EXT
-		#define CONFIG_BR_EXT
-	#endif
-	#ifndef CONFIG_RTW_REPEATER_SON_ID
-		#define CONFIG_RTW_REPEATER_SON_ID			0x02040608
-	#endif
-	#undef CONFIG_POWER_SAVING
-#endif
-
 #if defined(CONFIG_MCC_MODE) && (!defined(CONFIG_CONCURRENT_MODE))
 
 	#error "Enable CONCURRENT_MODE before enable MCC MODE\n"
@@ -312,12 +296,6 @@
 		#define CONFIG_BACKGROUND_NOISE_MONITOR
 	#endif
 #endif
-
-#ifdef CONFIG_RTW_80211K
-	#ifndef CONFIG_RTW_ACS
-		#define CONFIG_RTW_ACS
-	#endif
-#endif /*CONFIG_RTW_80211K*/
 
 #ifdef DBG_CONFIG_ERROR_RESET
 #ifndef CONFIG_IPS

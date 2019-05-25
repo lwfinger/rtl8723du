@@ -89,11 +89,6 @@ static void rtl8723du_interface_configure(
 
 	pHalData->interfaceIndex = pdvobjpriv->InterfaceNumber;
 
-#ifdef CONFIG_USB_TX_AGGREGATION
-	pHalData->UsbTxAggMode = 1;
-	pHalData->UsbTxAggDescNum = 0x6; /* only 4 bits */
-#endif
-
 #ifdef CONFIG_USB_RX_AGGREGATION
 	pHalData->rxagg_mode = RX_AGG_USB;
 	pHalData->rxagg_usb_size = 0x5; /* unit: 4KB, for USB mode */
@@ -632,22 +627,6 @@ usb_AggSettingTxUpdate(
 	IN PADAPTER padapter
 )
 {
-#ifdef CONFIG_USB_TX_AGGREGATION
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-	u32 value32;
-
-	if (padapter->registrypriv.wifi_spec)
-		pHalData->UsbTxAggMode = _FALSE;
-
-	if (pHalData->UsbTxAggMode) {
-		value32 = rtw_read32(padapter, REG_DWBCN0_CTRL_8723D);
-		value32 = value32 & ~(BLK_DESC_NUM_MASK << BLK_DESC_NUM_SHIFT);
-		value32 |= ((pHalData->UsbTxAggDescNum & BLK_DESC_NUM_MASK) << BLK_DESC_NUM_SHIFT);
-
-		rtw_write32(padapter, REG_DWBCN0_CTRL_8723D, value32);
-		rtw_write8(padapter, REG_DWBCN1_CTRL_8723D, pHalData->UsbTxAggDescNum << 1);
-	}
-#endif
 }   /* usb_AggSettingTxUpdate */
 
 

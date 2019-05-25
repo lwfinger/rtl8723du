@@ -4435,12 +4435,6 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapter, unsigned char *pbuf)
 		break;
 #endif
 
-#ifdef CONFIG_RTW_REPEATER_SON
-	case RSON_SCAN_WK_CID:
-		rtw_rson_scan_cmd_hdl(padapter, pdrvextra_cmd->type);
-		break;
-#endif
-
 #ifdef CONFIG_IOCTL_CFG80211
 	case MGNT_TX_WK_CID:
 		ret = rtw_mgnt_tx_handler(padapter, pdrvextra_cmd->pbuf);

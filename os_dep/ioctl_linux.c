@@ -1746,9 +1746,6 @@ static int rtw_wx_set_mlme(struct net_device *dev,
 	default:
 		return -EOPNOTSUPP;
 	}
-#ifdef CONFIG_RTW_REPEATER_SON
-	rtw_rson_do_disconnect(padapter);
-#endif
 	return ret;
 }
 
@@ -1794,13 +1791,6 @@ static int rtw_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
 	/* wpa_supplicant will not issue SIOCSIWSCAN cmd again after scan timeout. */
 	/* modify by thomas 2011-02-22. */
 	if (rtw_mi_busy_traffic_check(padapter, _FALSE)) {
-		indicate_wx_scan_complete_event(padapter);
-		goto cancel_ps_deny;
-	}
-#endif
-#ifdef CONFIG_RTW_REPEATER_SON
-	if (padapter->rtw_rson_scanstage == RSON_SCAN_PROCESS) {
-		RTW_INFO(FUNC_ADPT_FMT" blocking scan for under rson scanning process\n", FUNC_ADPT_ARG(padapter));
 		indicate_wx_scan_complete_event(padapter);
 		goto cancel_ps_deny;
 	}
@@ -3001,22 +2991,6 @@ static int rtw_wx_priv_null(struct net_device *dev, struct iw_request_info *a,
 {
 	return -1;
 }
-
-#ifdef CONFIG_RTW_80211K
-extern void rm_dbg_cmd(_adapter *padapter, char *s);
-static int rtw_wx_priv_rrm(struct net_device *dev, struct iw_request_info *a,
-			    union iwreq_data *wrqu, char *b)
-{
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	u32 path, addr, data32;
-
-
-	rm_dbg_cmd(padapter, b);
-	wrqu->data.length = strlen(b);
-
-	return 0;
-}
-#endif
 
 static int dummy(struct net_device *dev, struct iw_request_info *a,
 		 union iwreq_data *wrqu, char *b)
@@ -6166,11 +6140,7 @@ static int wpa_mlme(struct net_device *dev, u32 command, u32 reason)
 		ret = -EOPNOTSUPP;
 		break;
 	}
-#ifdef CONFIG_RTW_REPEATER_SON
-	rtw_rson_do_disconnect(padapter);
-#endif
 	return ret;
-
 }
 
 static int wpa_supplicant_ioctl(struct net_device *dev, struct iw_point *p)
@@ -10204,12 +10174,6 @@ static const struct iw_priv_args rtw_private_args[] = {
 		SIOCIWFIRSTPRIV + 0x16,
 		IW_PRIV_TYPE_CHAR | 64, 0, "pm_set"
 	},
-#ifdef CONFIG_RTW_80211K
-	{
-		SIOCIWFIRSTPRIV + 0x17,
-		IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | 1024 , "rrm"
-	},
-#endif
 	{SIOCIWFIRSTPRIV + 0x18, IW_PRIV_TYPE_CHAR | IFNAMSIZ , 0 , "rereg_nd_name"},
 #ifdef CONFIG_MP_INCLUDED
 	{SIOCIWFIRSTPRIV + 0x1A, IW_PRIV_TYPE_CHAR | 1024, 0,  "NULL"},
@@ -10338,11 +10302,7 @@ static iw_handler rtw_private_handler[] = {
 	rtw_tdls_get,					/* 0x15 */
 
 	rtw_pm_set,						/* 0x16 */
-#ifdef CONFIG_RTW_80211K
-	rtw_wx_priv_rrm,				/* 0x17 */
-#else
 	rtw_wx_priv_null,				/* 0x17 */
-#endif
 	rtw_rereg_nd_name,				/* 0x18 */
 	rtw_wx_priv_null,				/* 0x19 */
 #ifdef CONFIG_MP_INCLUDED

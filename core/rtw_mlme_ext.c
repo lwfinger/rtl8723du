@@ -1417,19 +1417,12 @@ static void init_mlme_ext_timer(_adapter *padapter)
 	timer_setup(&pmlmeext->ft_roam_timer, rtw_ft_roam_timer_hdl, 0);
 #endif
 
-#ifdef CONFIG_RTW_REPEATER_SON
-	timer_setup(&pmlmeext->rson_scan_timer, rson_timer_hdl, 0);
-#endif
 #else
 	rtw_init_timer(&pmlmeext->survey_timer, padapter, survey_timer_hdl, padapter);
 	rtw_init_timer(&pmlmeext->link_timer, padapter, link_timer_hdl, padapter);
 #ifdef CONFIG_RTW_80211R
 	rtw_init_timer(&pmlmeext->ft_link_timer, padapter, rtw_ft_link_timer_hdl, padapter);
 	rtw_init_timer(&pmlmeext->ft_roam_timer, padapter, rtw_ft_roam_timer_hdl, padapter);
-#endif
-
-#ifdef CONFIG_RTW_REPEATER_SON
-	rtw_init_timer(&pmlmeext->rson_scan_timer, padapter, rson_timer_hdl, padapter);
 #endif
 #endif
 }
@@ -1804,11 +1797,7 @@ unsigned int OnProbeRsp(_adapter *padapter, union recv_frame *precv_frame)
 		}
 	}
 
-	if ((mlmeext_chk_scan_state(pmlmeext, SCAN_PROCESS))
-#ifdef CONFIG_RTW_REPEATER_SON
-		|| (padapter->rtw_rson_scanstage == RSON_SCAN_PROCESS)
-#endif
-		) {
+	if ((mlmeext_chk_scan_state(pmlmeext, SCAN_PROCESS))) {
 		rtw_mi_report_survey_event(padapter, precv_frame);
 		return _SUCCESS;
 	}
@@ -1888,10 +1877,6 @@ unsigned int OnBeacon(_adapter *padapter, union recv_frame *precv_frame)
 		rtw_mi_report_survey_event(padapter, precv_frame);
 		return _SUCCESS;
 	}
-#ifdef CONFIG_RTW_REPEATER_SON
-	if (padapter->rtw_rson_scanstage == RSON_SCAN_PROCESS)
-		rtw_mi_report_survey_event(padapter, precv_frame);
-#endif
 
 	rtw_check_legacy_ap(padapter, pframe, len);
 
@@ -2522,20 +2507,11 @@ unsigned int OnAssocReq(_adapter *padapter, union recv_frame *precv_frame)
 	}
 	pstat->p2p_status_code = p2p_status_code;
 
-#ifdef CONFIG_RTW_REPEATER_SON
-	if (rtw_rson_ap_check_sta(padapter, pframe, pkt_len, ie_offset))
-		goto OnAssocReqFail;
-#endif
-
 	/* TODO: identify_proprietary_vendor_ie(); */
 	/* Realtek proprietary IE */
 	/* identify if this is Broadcom sta */
 	/* identify if this is ralink sta */
 	/* Customer proprietary IE */
-
-#ifdef CONFIG_RTW_80211K
-	rtw_ap_parse_sta_rm_en_cap(padapter, pstat, &elems);
-#endif
 
 	/* AID assignment */
 	if (pstat->cmn.aid > 0)
@@ -2642,34 +2618,6 @@ OnAssocReqFail:
 	return _FAIL;
 }
 
-#if defined(CONFIG_RTW_80211K)
-void rtw_roam_nb_discover(_adapter *padapter, u8 bfroce)
-{
-	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
-	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
-	struct mlme_ext_info *pmlmeinfo = &(pmlmeext->mlmext_info);	
-	struct sta_priv *pstapriv = &padapter->stapriv;
-	struct sta_info *psta;
-	u8 nb_req_issue = _FALSE;
-
-	if (!check_fwstate(pmlmepriv, _FW_LINKED))
-		return;
-
-	if (!rtw_chk_roam_flags(padapter, RTW_ROAM_ACTIVE))
-		return;
-
-	psta = rtw_get_stainfo(pstapriv, pmlmeinfo->network.MacAddress);
-	if (!psta)
-		return;
-	
-	if (bfroce || (!pmlmepriv->nb_info.nb_rpt_is_same))
-		nb_req_issue = _TRUE;
-	
-	if (nb_req_issue && (psta->rm_en_cap[0] & RTW_RRM_NB_RPT_EN)) 
-		rm_add_nb_req(padapter, psta);
-}
-#endif
-
 unsigned int OnAssocRsp(_adapter *padapter, union recv_frame *precv_frame)
 {
 	uint i;
@@ -2740,11 +2688,6 @@ unsigned int OnAssocRsp(_adapter *padapter, union recv_frame *precv_frame)
 		case _ERPINFO_IE_:
 			ERP_IE_handler(padapter, pIE);
 			break;
-#ifdef CONFIG_RTW_80211K
-		case _EID_RRM_EN_CAP_IE_:
-			RM_IE_handler(padapter, pIE);
-			break;
-#endif
 		default:
 			break;
 		}
@@ -2765,10 +2708,6 @@ report_assoc_result:
 		rtw_buf_free(&pmlmepriv->assoc_rsp, &pmlmepriv->assoc_rsp_len);
 
 	report_join_res(padapter, res);
-
-#if defined(CONFIG_RTW_80211K)
-	rtw_roam_nb_discover(padapter, _TRUE);
-#endif
 	return _SUCCESS;
 }
 
@@ -6373,7 +6312,7 @@ exit:
 	return ret;
 }
 
-#if defined(CONFIG_RTW_WNM) || defined(CONFIG_RTW_80211K)
+#if defined(CONFIG_RTW_WNM)
 static u8 rtw_wnm_nb_elem_parsing(
 	u8* pdata, u32 data_len, u8 from_btm, 
 	u32 *nb_rpt_num, u8 *nb_rpt_is_same,
@@ -7004,11 +6943,7 @@ unsigned int OnAction_sa_query(_adapter *padapter, union recv_frame *precv_frame
 
 unsigned int on_action_rm(_adapter *padapter, union recv_frame *precv_frame)
 {
-#ifdef CONFIG_RTW_80211K
-	return rm_on_action(padapter, precv_frame);
-#else
 	return _SUCCESS;
-#endif  /* CONFIG_RTW_80211K */
 }
 
 unsigned int OnAction_wmm(_adapter *padapter, union recv_frame *precv_frame)
@@ -7612,9 +7547,6 @@ void issue_beacon(_adapter *padapter, int timeout_ms)
 			pframe += len;
 			pattrib->pktlen += len;
 		}
-#ifdef CONFIG_RTW_REPEATER_SON
-		rtw_rson_append_ie(padapter, pframe, &pattrib->pktlen);
-#endif
 #ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
 		pattrib->pktlen += rtw_build_vendor_ie(padapter , pframe , WIFI_BEACON_VENDOR_IE_BIT);
 #endif
@@ -7825,9 +7757,6 @@ void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probe
 				pattrib->pktlen += ssid_ielen_diff;
 			}
 		}
-#ifdef CONFIG_RTW_REPEATER_SON
-		rtw_rson_append_ie(padapter, pframe, &pattrib->pktlen);
-#endif
 #ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
 		pattrib->pktlen += rtw_build_vendor_ie(padapter , pframe , WIFI_PROBERESP_VENDOR_IE_BIT);
 #endif
@@ -8592,16 +8521,6 @@ void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
 	else
 		RTW_INFO("%s: Connect to AP without 11b and 11g data rate!\n", __FUNCTION__);
 
-#ifdef CONFIG_RTW_80211K
-	if (pmlmeinfo->network.PhyInfo.rm_en_cap[0] /* RM Enabled Capabilities */
-		| pmlmeinfo->network.PhyInfo.rm_en_cap[1]
-		| pmlmeinfo->network.PhyInfo.rm_en_cap[2]
-		| pmlmeinfo->network.PhyInfo.rm_en_cap[3]
-		| pmlmeinfo->network.PhyInfo.rm_en_cap[4])
-		pframe = rtw_set_ie(pframe, _EID_RRM_EN_CAP_IE_, 5,
-				(u8 *)padapter->rmpriv.rm_en_cap_def, &(pattrib->pktlen));
-#endif /* CONFIG_RTW_80211K */
-
 	/* vendor specific IE, such as WPA, WMM, WPS */
 	for (i = sizeof(NDIS_802_11_FIXED_IEs); i < pmlmeinfo->network.IELength;) {
 		pIE = (PNDIS_802_11_VARIABLE_IEs)(pmlmeinfo->network.IEs + i);
@@ -8794,9 +8713,6 @@ void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
 	wfdielen = rtw_append_assoc_req_wfd_ie(padapter, pframe);
 	pframe += wfdielen;
 	pattrib->pktlen += wfdielen;
-#ifdef CONFIG_RTW_REPEATER_SON
-	rtw_rson_append_ie(padapter, pframe, &pattrib->pktlen);
-#endif
 #ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
 	pattrib->pktlen += rtw_build_vendor_ie(padapter , pframe , WIFI_ASSOCREQ_VENDOR_IE_BIT);
 #endif
@@ -10372,14 +10288,6 @@ u8 collect_bss_info(_adapter *padapter, union recv_frame *precv_frame, WLAN_BSSI
 	if (bssid->Configuration.DSConfig != rtw_get_oper_ch(padapter))
 		bssid->PhyInfo.SignalQuality = 101;
 
-#ifdef CONFIG_RTW_80211K
-	p = rtw_get_ie(bssid->IEs + ie_offset, _EID_RRM_EN_CAP_IE_, &len, bssid->IELength - ie_offset);
-	if (p)
-		_rtw_memcpy(bssid->PhyInfo.rm_en_cap, (p + 2), *(p + 1));
-
-	/* save freerun counter */
-	bssid->PhyInfo.free_cnt = precv_frame->u.hdr.attrib.free_cnt;
-#endif
 	return _SUCCESS;
 }
 
@@ -10611,9 +10519,6 @@ unsigned int receive_disconnect(_adapter *padapter, unsigned char *MacAddr, unsi
 
 	RTW_INFO("%s\n", __FUNCTION__);
 
-#ifdef CONFIG_RTW_REPEATER_SON
-	rtw_rson_do_disconnect(padapter);
-#endif
 	if ((pmlmeinfo->state & 0x03) == WIFI_FW_STATION_STATE) {
 		if (pmlmeinfo->state & WIFI_FW_ASSOC_SUCCESS) {
 			if (report_del_sta_event(padapter, MacAddr, reason, _TRUE, locally_generated) != _FAIL)
@@ -11237,15 +11142,6 @@ bool rtw_port_switch_chk(_adapter *adapter)
 		goto exit;
 	}
 
-#ifdef DBG_RUNTIME_PORT_SWITCH
-	RTW_INFO(FUNC_ADPT_FMT" wowlan_mode:%u\n"
-		 ADPT_FMT", port0, mlmeinfo->state:0x%08x, p2p_state:%d, %d\n"
-		 ADPT_FMT", port1, mlmeinfo->state:0x%08x, p2p_state:%d, %d\n",
-		 FUNC_ADPT_ARG(adapter), pwrctl->wowlan_mode,
-		ADPT_ARG(if_port0), if_port0_mlmeinfo->state, rtw_p2p_state(&if_port0->wdinfo), rtw_p2p_chk_state(&if_port0->wdinfo, P2P_STATE_NONE),
-		ADPT_ARG(if_port1), if_port1_mlmeinfo->state, rtw_p2p_state(&if_port1->wdinfo), rtw_p2p_chk_state(&if_port1->wdinfo, P2P_STATE_NONE));
-#endif /* DBG_RUNTIME_PORT_SWITCH */
-
 	/* AP/Mesh should use port0 for ctl frame's ack */
 	if ((if_port1_mlmeinfo->state & 0x03) == WIFI_FW_AP_STATE) {
 		RTW_INFO("%s "ADPT_FMT" is AP/GO/Mesh\n", __func__, ADPT_ARG(if_port1));
@@ -11275,9 +11171,6 @@ bool rtw_port_switch_chk(_adapter *adapter)
 	}
 
 exit:
-#ifdef DBG_RUNTIME_PORT_SWITCH
-	RTW_INFO(FUNC_ADPT_FMT" ret:%d\n", FUNC_ADPT_ARG(adapter), switch_needed);
-#endif /* DBG_RUNTIME_PORT_SWITCH */
 #endif /* CONFIG_RUNTIME_PORT_SWITCH */
 #endif /* CONFIG_CONCURRENT_MODE */
 	return switch_needed;
@@ -11549,9 +11442,6 @@ void mlmeext_joinbss_event_callback(_adapter *padapter, int join_res)
 exit_mlmeext_joinbss_event_callback:
 
 	rtw_join_done_chk_ch(padapter, join_res);
-#ifdef CONFIG_RTW_REPEATER_SON
-	rtw_rson_join_done(padapter);
-#endif
 	RTW_INFO("=>%s - End to Connection without 4-way\n", __FUNCTION__);
 }
 
@@ -11757,21 +11647,14 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 		int rx_chk_limit;
 		int link_count_limit;
 
-#if defined(CONFIG_RTW_REPEATER_SON)
-	rtw_rson_scan_wk_cmd(padapter, RSON_SCAN_PROCESS);
-#else
 		if (rtw_chk_roam_flags(padapter, RTW_ROAM_ACTIVE)) {
 			RTW_INFO("signal_strength_data.avg_val = %d\n", precvpriv->signal_strength_data.avg_val);
 			if (precvpriv->signal_strength_data.avg_val < pmlmepriv->roam_rssi_threshold) {
-#ifdef CONFIG_RTW_80211K
-				rtw_roam_nb_discover(padapter, _FALSE);
-#endif
 				pmlmepriv->need_to_roam = _TRUE;
 				rtw_drv_scan_by_self(padapter, RTW_AUTO_SCAN_REASON_ROAM);
 			} else
 				pmlmepriv->need_to_roam = _FALSE;
 		}
-#endif
 #ifdef CONFIG_MCC_MODE
 		/*
 		 * due to tx ps null date to ao, so ap doest not tx pkt to driver
@@ -11782,7 +11665,7 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 			return;
 #endif
 
-#if defined(DBG_ROAMING_TEST) || defined(CONFIG_RTW_REPEATER_SON)
+#if defined(DBG_ROAMING_TEST)
 		rx_chk_limit = 1;
 #elif defined(CONFIG_ACTIVE_KEEP_ALIVE_CHECK) && !defined(CONFIG_LPS_LCLK_WD_TIMER)
 		rx_chk_limit = 4;
@@ -12008,17 +11891,6 @@ void survey_timer_hdl (void *FunctionContext)
 exit:
 	return;
 }
-
-#ifdef CONFIG_RTW_REPEATER_SON
-/*	 100ms pass, stop rson_scan	*/
-void rson_timer_hdl(void *ctx)
-{
-	_adapter *padapter = (_adapter *)ctx;
-
-	rtw_rson_scan_wk_cmd(padapter, RSON_SCAN_DISABLE);
-}
-
-#endif
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 void link_timer_hdl(struct timer_list *t)
@@ -14000,12 +13872,6 @@ operation_by_state:
 		issue_action_BSSCoexistPacket(padapter);
 		issue_action_BSSCoexistPacket(padapter);
 		issue_action_BSSCoexistPacket(padapter);
-
-#ifdef CONFIG_RTW_80211K
-		if (ss->token)
-			rm_post_event(padapter, ss->token, RM_EV_survey_done);
-#endif /* CONFIG_RTW_80211K */
-
 		break;
 	}
 

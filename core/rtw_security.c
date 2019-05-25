@@ -234,15 +234,10 @@ void rtw_wep_encrypt(_adapter *padapter, u8 *pxmitframe)
 	if (((struct xmit_frame *)pxmitframe)->buf_addr == NULL)
 		return;
 
-#ifdef CONFIG_USB_TX_AGGREGATION
-	hw_hdr_offset = TXDESC_SIZE +
-		(((struct xmit_frame *)pxmitframe)->pkt_offset * PACKET_OFFSET_SZ);
-#else
 #ifdef CONFIG_TX_EARLY_MODE
 	hw_hdr_offset = TXDESC_OFFSET + EARLY_MODE_INFO_SIZE;
 #else
 	hw_hdr_offset = TXDESC_OFFSET;
-#endif
 #endif
 
 	pframe = ((struct xmit_frame *)pxmitframe)->buf_addr + hw_hdr_offset;
@@ -685,15 +680,10 @@ u32	rtw_tkip_encrypt(_adapter *padapter, u8 *pxmitframe)
 	if (((struct xmit_frame *)pxmitframe)->buf_addr == NULL)
 		return _FAIL;
 
-#ifdef CONFIG_USB_TX_AGGREGATION
-	hw_hdr_offset = TXDESC_SIZE +
-		(((struct xmit_frame *)pxmitframe)->pkt_offset * PACKET_OFFSET_SZ);
-#else
 #ifdef CONFIG_TX_EARLY_MODE
 	hw_hdr_offset = TXDESC_OFFSET + EARLY_MODE_INFO_SIZE;
 #else
 	hw_hdr_offset = TXDESC_OFFSET;
-#endif
 #endif
 
 	pframe = ((struct xmit_frame *)pxmitframe)->buf_addr + hw_hdr_offset;
@@ -1557,79 +1547,42 @@ u32	rtw_aes_encrypt(_adapter *padapter, u8 *pxmitframe)
 	if (((struct xmit_frame *)pxmitframe)->buf_addr == NULL)
 		return _FAIL;
 
-#ifdef CONFIG_USB_TX_AGGREGATION
-	hw_hdr_offset = TXDESC_SIZE +
-		(((struct xmit_frame *)pxmitframe)->pkt_offset * PACKET_OFFSET_SZ);
-#else
 #ifdef CONFIG_TX_EARLY_MODE
 	hw_hdr_offset = TXDESC_OFFSET + EARLY_MODE_INFO_SIZE;
 #else
 	hw_hdr_offset = TXDESC_OFFSET;
-#endif
 #endif
 
 	pframe = ((struct xmit_frame *)pxmitframe)->buf_addr + hw_hdr_offset;
 
 	/* 4 start to encrypt each fragment */
 	if ((pattrib->encrypt == _AES_)) {
-		/*
-				if(pattrib->psta)
-				{
-					stainfo = pattrib->psta;
-				}
-				else
-				{
-					RTW_INFO("%s, call rtw_get_stainfo()\n", __func__);
-					stainfo=rtw_get_stainfo(&padapter->stapriv ,&pattrib->ra[0] );
-				}
-		*/
-		/* if (stainfo!=NULL) */
-		{
-			/*
-						if(!(stainfo->state &_FW_LINKED))
-						{
-							RTW_INFO("%s, psta->state(0x%x) != _FW_LINKED\n", __func__, stainfo->state);
-							return _FAIL;
-						}
-			*/
-
-			if (IS_MCAST(pattrib->ra))
-				prwskey = psecuritypriv->dot118021XGrpKey[psecuritypriv->dot118021XGrpKeyid].skey;
-			else {
-				/* prwskey=&stainfo->dot118021x_UncstKey.skey[0]; */
-				prwskey = pattrib->dot118021x_UncstKey.skey;
-			}
-
-			prwskeylen = 16;
-
-			for (curfragnum = 0; curfragnum < pattrib->nr_frags; curfragnum++) {
-
-				if ((curfragnum + 1) == pattrib->nr_frags) {	/* 4 the last fragment */
-					length = pattrib->last_txcmdsz - pattrib->hdrlen - pattrib->iv_len - pattrib->icv_len;
-
-					aes_cipher(prwskey, pattrib->hdrlen, pframe, length);
-				} else {
-					length = pxmitpriv->frag_len - pattrib->hdrlen - pattrib->iv_len - pattrib->icv_len ;
-
-					aes_cipher(prwskey, pattrib->hdrlen, pframe, length);
-					pframe += pxmitpriv->frag_len;
-					pframe = (u8 *)RND4((SIZE_PTR)(pframe));
-
-				}
-			}
-
-			AES_SW_ENC_CNT_INC(psecuritypriv, pattrib->ra);
+		if (IS_MCAST(pattrib->ra))
+			prwskey = psecuritypriv->dot118021XGrpKey[psecuritypriv->dot118021XGrpKeyid].skey;
+		else {
+			prwskey = pattrib->dot118021x_UncstKey.skey;
 		}
-		/*
-				else{
-					RTW_INFO("%s, psta==NUL\n", __func__);
-					res=_FAIL;
-				}
-		*/
+
+		prwskeylen = 16;
+
+		for (curfragnum = 0; curfragnum < pattrib->nr_frags; curfragnum++) {
+
+			if ((curfragnum + 1) == pattrib->nr_frags) {	/* 4 the last fragment */
+				length = pattrib->last_txcmdsz - pattrib->hdrlen - pattrib->iv_len - pattrib->icv_len;
+
+				aes_cipher(prwskey, pattrib->hdrlen, pframe, length);
+			} else {
+				length = pxmitpriv->frag_len - pattrib->hdrlen - pattrib->iv_len - pattrib->icv_len ;
+
+				aes_cipher(prwskey, pattrib->hdrlen, pframe, length);
+				pframe += pxmitpriv->frag_len;
+				pframe = (u8 *)RND4((SIZE_PTR)(pframe));
+
+			}
+		}
+
+		AES_SW_ENC_CNT_INC(psecuritypriv, pattrib->ra);
 	}
-
-
-
 	return res;
 }
 

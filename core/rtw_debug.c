@@ -87,9 +87,7 @@ void dump_drv_cfg(struct seq_file *sel)
 	RTW_PRINT_SEL(sel, "CONFIG_DISABLE_ODM\n");
 #endif
 
-#ifdef CONFIG_MINIMAL_MEMORY_USAGE
 	RTW_PRINT_SEL(sel, "CONFIG_MINIMAL_MEMORY_USAGE\n");
-#endif
 
 	RTW_PRINT_SEL(sel, "CONFIG_RTW_ADAPTIVITY_EN = %d\n", CONFIG_RTW_ADAPTIVITY_EN);
 #if (CONFIG_RTW_ADAPTIVITY_EN)
@@ -109,11 +107,8 @@ void dump_drv_cfg(struct seq_file *sel)
 #ifdef CONFIG_USB_INTERRUPT_IN_PIPE
 	RTW_PRINT_SEL(sel, "CONFIG_USB_INTERRUPT_IN_PIPE\n");
 #endif
-#ifdef CONFIG_USB_TX_AGGREGATION
-	RTW_PRINT_SEL(sel, "CONFIG_USB_TX_AGGREGATION\n");
-#endif
 #ifdef CONFIG_USB_RX_AGGREGATION
-	RTW_PRINT_SEL(sel, "CONFIG_USB_RX_AGGREGATION\n");
+	xRTW_PRINT_SEL(sel, "CONFIG_USB_RX_AGGREGATION\n");
 #endif
 #ifdef CONFIG_USE_USB_BUFFER_ALLOC_TX
 	RTW_PRINT_SEL(sel, "CONFIG_USE_USB_BUFFER_ALLOC_TX\n");
@@ -1165,52 +1160,6 @@ ssize_t proc_set_backop_flags_ap(struct file *file, const char __user *buffer, s
 
 #endif /* CONFIG_SCAN_BACKOP */
 
-#ifdef CONFIG_RTW_REPEATER_SON
-int proc_get_rson_data(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	char rson_data_str[256];
-
-	rtw_rson_get_property_str(padapter, rson_data_str);
-	RTW_PRINT_SEL(m, "%s\n", rson_data_str);
-	return 0;
-}
-
-ssize_t proc_set_rson_data(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct dvobj_priv *pdvobj = adapter_to_dvobj(padapter);
-	char tmp[64] = {0};
-	int num;
-	u8 field[10], value[64];
-
-	if (count < 1)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-		num = sscanf(tmp, "%s %s", field, value);
-		if (num != 2) {
-			RTW_INFO("Invalid format : echo <field> <value> > son_data\n");
-			return count;
-		}
-		RTW_INFO("field=%s  value=%s\n", field, value);
-		num = rtw_rson_set_property(padapter, field, value);
-		if (num != 1) {
-			RTW_INFO("Invalid field(%s) or value(%s)\n", field, value);
-			return count;
-		}
-	}
-	return count;
-}
-#endif /*CONFIG_RTW_REPEATER_SON*/
-
 int proc_get_survey_info(struct seq_file *m, void *v)
 {
 	_irqL irqL;
@@ -1236,10 +1185,6 @@ int proc_get_survey_info(struct seq_file *m, void *v)
 	plist = get_next(phead);
 	if (!plist)
 		goto _exit;
-
-#ifdef CONFIG_RTW_REPEATER_SON
-	rtw_rson_show_survey_info(m, plist, phead);
-#else
 
 	RTW_PRINT_SEL(m, "%5s  %-17s  %3s  %-3s  %-4s  %-4s  %5s  %32s  %32s\n", "index", "bssid", "ch", "RSSI", "SdBm", "Noise", "age", "flag", "ssid");
 	while (1) {
@@ -1288,7 +1233,6 @@ int proc_get_survey_info(struct seq_file *m, void *v)
 			      pnetwork->network.Ssid.Ssid);
 		plist = get_next(plist);
 	}
-#endif
 _exit:
 	_exit_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 
@@ -3186,9 +3130,6 @@ int proc_get_all_sta_info(struct seq_file *m, void *v)
 				RTW_PRINT_SEL(m, "tx_data_pkts=%llu\n", psta->sta_stats.tx_pkts);
 				RTW_PRINT_SEL(m, "tx_bytes=%llu\n", psta->sta_stats.tx_bytes);
 				RTW_PRINT_SEL(m, "tx_avg_tp =%d (MBps)\n", psta->cmn.tx_moving_average_tp);
-#ifdef CONFIG_RTW_80211K
-				RTW_PRINT_SEL(m, "rm_en_cap="RM_CAP_FMT"\n", RM_CAP_ARG(psta->rm_en_cap));
-#endif
 				dump_st_ctl(m, &psta->st_ctl);
 
 				if (STA_OP_WFD_MODE(psta))

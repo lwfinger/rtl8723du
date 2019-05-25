@@ -1342,14 +1342,10 @@ static s32 xmitframe_addmic(_adapter *padapter, struct xmit_frame *pxmitframe)
 	*/
 
 
-#ifdef CONFIG_USB_TX_AGGREGATION
-	hw_hdr_offset = TXDESC_SIZE + (pxmitframe->pkt_offset * PACKET_OFFSET_SZ);;
-#else
 #ifdef CONFIG_TX_EARLY_MODE
 	hw_hdr_offset = TXDESC_OFFSET + EARLY_MODE_INFO_SIZE;
 #else
 	hw_hdr_offset = TXDESC_OFFSET;
-#endif
 #endif
 
 	if (pattrib->encrypt == _TKIP_) { /* if(psecuritypriv->dot11PrivacyAlgrthm==_TKIP_PRIVACY_) */
@@ -1793,14 +1789,10 @@ s32 rtw_xmitframe_coalesce_amsdu(_adapter *padapter, struct xmit_frame *pxmitfra
 
 	pbuf_start = pxmitframe->buf_addr;
 
-#ifdef CONFIG_USB_TX_AGGREGATION
-	hw_hdr_offset =  TXDESC_SIZE + (pxmitframe->pkt_offset * PACKET_OFFSET_SZ);
-#else
 #ifdef CONFIG_TX_EARLY_MODE /* for SDIO && Tx Agg */
 	hw_hdr_offset = TXDESC_OFFSET + EARLY_MODE_INFO_SIZE;
 #else
 	hw_hdr_offset = TXDESC_OFFSET;
-#endif
 #endif
 
 	mem_start = pbuf_start + hw_hdr_offset; //for DMA
@@ -1998,14 +1990,10 @@ s32 rtw_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxm
 
 	pbuf_start = pxmitframe->buf_addr;
 
-#ifdef CONFIG_USB_TX_AGGREGATION
-	hw_hdr_offset =  TXDESC_SIZE + (pxmitframe->pkt_offset * PACKET_OFFSET_SZ);
-#else
 #ifdef CONFIG_TX_EARLY_MODE /* for SDIO && Tx Agg */
 	hw_hdr_offset = TXDESC_OFFSET + EARLY_MODE_INFO_SIZE;
 #else
 	hw_hdr_offset = TXDESC_OFFSET;
-#endif
 #endif
 
 	mem_start = pbuf_start +	hw_hdr_offset;
@@ -2512,9 +2500,6 @@ void rtw_count_tx_stats(PADAPTER padapter, struct xmit_frame *pxmitframe, int sz
 	u8	pkt_num = 1;
 
 	if ((pxmitframe->frame_tag & 0x0f) == DATA_FRAMETAG) {
-#if defined(CONFIG_USB_TX_AGGREGATION)
-		pkt_num = pxmitframe->agg_num;
-#endif
 		pmlmepriv->LinkDetectInfo.NumTxOkInPeriod += pkt_num;
 
 		pxmitpriv->tx_pkts += pkt_num;
@@ -2770,10 +2755,6 @@ static void rtw_init_xmitframe(struct xmit_frame *pxframe)
 		pxframe->pkt_offset = 1;/* default use pkt_offset to fill tx desc */
 #endif
 
-#ifdef CONFIG_USB_TX_AGGREGATION
-		pxframe->agg_num = 1;
-#endif
-
 #ifdef CONFIG_XMIT_ACK
 		pxframe->ack_report = 0;
 #endif
@@ -2988,32 +2969,10 @@ static struct xmit_frame *dequeue_one_xmitframe(struct xmit_priv *pxmitpriv, str
 	while ((rtw_end_of_queue_search(xmitframe_phead, xmitframe_plist)) == _FALSE) {
 		pxmitframe = LIST_CONTAINOR(xmitframe_plist, struct xmit_frame, list);
 
-		/* xmitframe_plist = get_next(xmitframe_plist); */
-
-		/*#ifdef RTK_DMP_PLATFORM
-		#ifdef CONFIG_USB_TX_AGGREGATION
-				if((ptxservq->qcnt>0) && (ptxservq->qcnt<=2))
-				{
-					pxmitframe = NULL;
-
-					tasklet_schedule(&pxmitpriv->xmit_tasklet);
-
-					break;
-				}
-		#endif
-		#endif*/
 		rtw_list_delete(&pxmitframe->list);
 
 		ptxservq->qcnt--;
-
-		/* rtw_list_insert_tail(&pxmitframe->list, &phwxmit->pending); */
-
-		/* ptxservq->qcnt--; */
-
 		break;
-
-		/* pxmitframe = NULL; */
-
 	}
 
 	return pxmitframe;

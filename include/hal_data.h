@@ -495,11 +495,6 @@ typedef struct hal_com_data {
 	/* Interrupt relatd register information. */
 	u32			IntArray[3];/* HISR0,HISR1,HSISR */
 	u32			IntrMask[3];
-#ifdef CONFIG_USB_TX_AGGREGATION
-	u8			UsbTxAggMode;
-	u8			UsbTxAggDescNum;
-#endif /* CONFIG_USB_TX_AGGREGATION */
-
 #ifdef CONFIG_USB_RX_AGGREGATION
 	u16			HwRxPageSize;				/* Hardware setting */
 

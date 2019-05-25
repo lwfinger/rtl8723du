@@ -3597,11 +3597,6 @@ static void rtl8723d_fill_default_txdesc(
 			RTW_INFO(FUNC_ADPT_FMT ": SP Packet(0x%04X) rate=0x%x\n",
 				FUNC_ADPT_ARG(padapter), pattrib->ether_type, MRateToHwRate(pmlmeext->tx_rate));
 		}
-
-#if defined(CONFIG_USB_TX_AGGREGATION)
-		SET_TX_DESC_USB_TXAGG_NUM_8723D(pbuf, pxmitframe->agg_num);
-#endif
-
 	} else if (pxmitframe->frame_tag == MGNT_FRAMETAG) {
 		SET_TX_DESC_MACID_8723D(pbuf, pattrib->mac_id);
 		SET_TX_DESC_QUEUE_SEL_8723D(pbuf, pattrib->qsel);

@@ -2069,14 +2069,6 @@ u8 rtw_init_drv_sw(_adapter *padapter)
 	_rtw_spinlock_init(&padapter->br_ext_lock);
 #endif /* CONFIG_BR_EXT */
 
-#ifdef CONFIG_RTW_REPEATER_SON
-	init_rtw_rson_data(adapter_to_dvobj(padapter));
-#endif
-
-#ifdef CONFIG_RTW_80211K
-	rtw_init_rm(padapter);
-#endif
-
 exit:
 
 
@@ -2158,10 +2150,6 @@ u8 rtw_free_drv_sw(_adapter *padapter)
 #endif /* CONFIG_INTEL_WIDI */
 
 	free_mlme_ext_priv(&padapter->mlmeextpriv);
-
-#ifdef CONFIG_RTW_80211K
-	rtw_free_rm_priv(padapter);
-#endif
 
 	rtw_free_cmd_priv(&padapter->cmdpriv);
 

@@ -17,9 +17,7 @@
 
 #ifdef CONFIG_CONCURRENT_MODE
 	#define CONFIG_TSF_RESET_OFFLOAD			/* For 2 PORT TSF SYNC. */
-	/* #define CONFIG_HWPORT_SWAP	*/			/* Port0->Sec , Port1->Pri */
 	#define CONFIG_RUNTIME_PORT_SWITCH
-	/* #define DBG_RUNTIME_PORT_SWITCH */
 #endif /* CONFIG_CONCURRENT_MODE */
 
 /*
@@ -40,7 +38,6 @@
 /*
  * Interface Related Configure
  */
-#define CONFIG_USB_TX_AGGREGATION
 #define CONFIG_USB_RX_AGGREGATION
 
 #define USB_INTERFERENCE_ISSUE /* this should be checked in all usb interface */
@@ -109,16 +106,11 @@
 /*
  * Auto Configure Section
  */
-#define CONFIG_MINIMAL_MEMORY_USAGE
-#ifdef CONFIG_MINIMAL_MEMORY_USAGE
-	#undef CONFIG_USB_TX_AGGREGATION
-	#undef CONFIG_USB_RX_AGGREGATION
-#endif
+#undef CONFIG_USB_RX_AGGREGATION
 
 #ifdef CONFIG_MP_INCLUDED
 	#define MP_DRIVER	1
 	#define CONFIG_MP_IWPRIV_SUPPORT
-	/* #undef CONFIG_USB_TX_AGGREGATION */
 	/* #undef CONFIG_USB_RX_AGGREGATION */
 #else /* !CONFIG_MP_INCLUDED */
 	#define MP_DRIVER	0
@@ -164,10 +156,6 @@
 	#ifdef CONFIG_PREALLOC_RECV_SKB
 		/* #define CONFIG_FIX_NR_BULKIN_BUFFER */ /* only use PREALLOC_RECV_SKB buffer, don't alloc skb at runtime */
 	#endif
-#endif
-
-#ifdef CONFIG_USB_TX_AGGREGATION
-/* #define CONFIG_TX_EARLY_MODE */
 #endif
 
 #ifdef CONFIG_TX_EARLY_MODE

@@ -221,12 +221,6 @@ struct sta_info {
 	uint state;
 	uint qos_option;
 	u16 hwseq;
-
-#ifdef CONFIG_RTW_80211K
-	u8 rm_en_cap[5];
-	u8 rm_diag_token;
-#endif /* CONFIG_RTW_80211K */
-
 	uint	ieee8021x_blocked;	/* 0: allowed, 1:blocked */
 	uint	dot118021XPrivacy; /* aes, tkip... */
 	union Keytype	dot11tkiptxmickey;

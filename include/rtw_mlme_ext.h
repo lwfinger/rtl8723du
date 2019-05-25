@@ -552,9 +552,6 @@ struct mlme_ext_priv {
 	_timer		survey_timer;
 	_timer		link_timer;
 
-#ifdef CONFIG_RTW_REPEATER_SON
-	_timer		rson_scan_timer;
-#endif
 #ifdef CONFIG_RTW_80211R
 	_timer		ft_link_timer;
 	_timer		ft_roam_timer;
@@ -971,7 +968,7 @@ void rtw_wnm_reset_btm_candidate(struct roam_nb_info *pnb);
 void rtw_wnm_reset_btm_state(_adapter *padapter);
 void rtw_wnm_issue_action(_adapter *padapter, u8 action, u8 reason);
 #endif
-#if defined(CONFIG_RTW_WNM) || defined(CONFIG_RTW_80211K)
+#if defined(CONFIG_RTW_WNM)
 u32 rtw_wnm_btm_candidates_survey(_adapter *padapter, u8* pframe, u32 elem_len, u8 is_preference);
 #endif
 void mlmeext_joinbss_event_callback(_adapter *padapter, int join_res);
@@ -986,9 +983,6 @@ void _linked_info_dump(_adapter *padapter);
 void survey_timer_hdl(struct timer_list *t);
 #else
 void survey_timer_hdl (void *FunctionContext);
-#endif
-#ifdef CONFIG_RTW_REPEATER_SON
-void rson_timer_hdl(void *ctx);
 #endif
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 void link_timer_hdl(struct timer_list *t);

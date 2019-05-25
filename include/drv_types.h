@@ -107,10 +107,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 	#include <rtw_mcc.h>
 #endif /*CONFIG_MCC_MODE */
 
-#ifdef CONFIG_RTW_REPEATER_SON
-	#include <rtw_rson.h>
-#endif /*CONFIG_RTW_REPEATER_SON */
-
 #define SPEC_DEV_ID_NONE BIT(0)
 #define SPEC_DEV_ID_DISABLE_HT BIT(1)
 #define SPEC_DEV_ID_ENABLE_PS BIT(2)
@@ -874,9 +870,6 @@ struct dvobj_priv {
 	u8 nr_ap_if; /* total interface s number of ap/go mode. */
 	u16 inter_bcn_space; /* unit:ms */
 	_queue	ap_if_q;
-#ifdef CONFIG_RTW_REPEATER_SON
-	struct rtw_rson_struct  rson_data;
-#endif
 	struct macid_ctl_t macid_ctl;
 
 	struct cam_ctl_t cam_ctl;
@@ -1108,11 +1101,6 @@ struct _ADAPTER {
 	struct	mlme_ext_priv mlmeextpriv;
 	struct	cmd_priv	cmdpriv;
 	struct	evt_priv	evtpriv;
-
-#ifdef CONFIG_RTW_80211K
-	struct	rm_priv		rmpriv;
-#endif
-	/* struct	io_queue	*pio_queue; */
 	struct	io_priv	iopriv;
 	struct	xmit_priv	xmitpriv;
 	struct	recv_priv	recvpriv;
@@ -1141,10 +1129,6 @@ struct _ADAPTER {
 	ATOMIC_T bandskip;
 
 	struct wifidirect_info	wdinfo;
-
-#ifdef CONFIG_RTW_REPEATER_SON
-	u8	rtw_rson_scanstage;
-#endif
 
 	struct wifi_display_info wfd_info;
 

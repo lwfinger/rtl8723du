@@ -2901,34 +2901,6 @@ void hw_var_port_switch(_adapter *adapter)
 	for (i = 0; i < 6; i++)
 		bssid_1[i] = rtw_read8(adapter, REG_BSSID1 + i);
 
-#ifdef DBG_RUNTIME_PORT_SWITCH
-	RTW_INFO(FUNC_ADPT_FMT" before switch\n"
-		 "msr:0x%02x\n"
-		 "bcn_ctrl:0x%02x\n"
-		 "bcn_ctrl_1:0x%02x\n"
-		 "atimwnd:0x%04x\n"
-		 "atimwnd_1:0x%04x\n"
-		 "tsftr:%llu\n"
-		 "tsftr1:%llu\n"
-		 "macid:"MAC_FMT"\n"
-		 "bssid:"MAC_FMT"\n"
-		 "macid_1:"MAC_FMT"\n"
-		 "bssid_1:"MAC_FMT"\n"
-		 , FUNC_ADPT_ARG(adapter)
-		 , msr
-		 , bcn_ctrl
-		 , bcn_ctrl_1
-		 , *((u16 *)atimwnd)
-		 , *((u16 *)atimwnd_1)
-		 , *((u64 *)tsftr)
-		 , *((u64 *)tsftr_1)
-		 , MAC_ARG(macid)
-		 , MAC_ARG(bssid)
-		 , MAC_ARG(macid_1)
-		 , MAC_ARG(bssid_1)
-		);
-#endif /* DBG_RUNTIME_PORT_SWITCH */
-
 	/* disable bcn function, disable update TSF */
 	rtw_write8(adapter, REG_BCN_CTRL, (bcn_ctrl & (~EN_BCN_FUNCTION)) | DIS_TSF_UDT);
 	rtw_write8(adapter, REG_BCN_CTRL_1, (bcn_ctrl_1 & (~EN_BCN_FUNCTION)) | DIS_TSF_UDT);
@@ -2989,60 +2961,6 @@ void hw_var_port_switch(_adapter *adapter)
 		RTW_PRINT("port switch - port0("ADPT_FMT"), port1("ADPT_FMT")\n",
 			  ADPT_ARG(adapter), ADPT_ARG(iface));
 	}
-
-#ifdef DBG_RUNTIME_PORT_SWITCH
-	msr = rtw_read8(adapter, MSR);
-	bcn_ctrl = rtw_read8(adapter, REG_BCN_CTRL);
-	bcn_ctrl_1 = rtw_read8(adapter, REG_BCN_CTRL_1);
-
-	for (i = 0; i < 2; i++)
-		atimwnd[i] = rtw_read8(adapter, REG_ATIMWND + i);
-	for (i = 0; i < 2; i++)
-		atimwnd_1[i] = rtw_read8(adapter, REG_ATIMWND_1 + i);
-
-	for (i = 0; i < 8; i++)
-		tsftr[i] = rtw_read8(adapter, REG_TSFTR + i);
-	for (i = 0; i < 8; i++)
-		tsftr_1[i] = rtw_read8(adapter, REG_TSFTR1 + i);
-
-	for (i = 0; i < 6; i++)
-		macid[i] = rtw_read8(adapter, REG_MACID + i);
-
-	for (i = 0; i < 6; i++)
-		bssid[i] = rtw_read8(adapter, REG_BSSID + i);
-
-	for (i = 0; i < 6; i++)
-		macid_1[i] = rtw_read8(adapter, REG_MACID1 + i);
-
-	for (i = 0; i < 6; i++)
-		bssid_1[i] = rtw_read8(adapter, REG_BSSID1 + i);
-
-	RTW_INFO(FUNC_ADPT_FMT" after switch\n"
-		 "msr:0x%02x\n"
-		 "bcn_ctrl:0x%02x\n"
-		 "bcn_ctrl_1:0x%02x\n"
-		 "atimwnd:%u\n"
-		 "atimwnd_1:%u\n"
-		 "tsftr:%llu\n"
-		 "tsftr1:%llu\n"
-		 "macid:"MAC_FMT"\n"
-		 "bssid:"MAC_FMT"\n"
-		 "macid_1:"MAC_FMT"\n"
-		 "bssid_1:"MAC_FMT"\n"
-		 , FUNC_ADPT_ARG(adapter)
-		 , msr
-		 , bcn_ctrl
-		 , bcn_ctrl_1
-		 , *((u16 *)atimwnd)
-		 , *((u16 *)atimwnd_1)
-		 , *((u64 *)tsftr)
-		 , *((u64 *)tsftr_1)
-		 , MAC_ARG(macid)
-		 , MAC_ARG(bssid)
-		 , MAC_ARG(macid_1)
-		 , MAC_ARG(bssid_1)
-		);
-#endif /* DBG_RUNTIME_PORT_SWITCH */
 
 #endif /* CONFIG_RUNTIME_PORT_SWITCH */
 #endif /* CONFIG_CONCURRENT_MODE */

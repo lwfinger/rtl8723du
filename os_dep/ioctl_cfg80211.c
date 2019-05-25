@@ -2378,14 +2378,6 @@ static int cfg80211_rtw_scan(struct wiphy *wiphy
 	}
 #endif
 
-#ifdef CONFIG_RTW_REPEATER_SON
-	if (padapter->rtw_rson_scanstage == RSON_SCAN_PROCESS) {
-		RTW_INFO(FUNC_ADPT_FMT" blocking scan for under rson scanning process\n", FUNC_ADPT_ARG(padapter));
-		need_indicate_scan_done = _TRUE;
-		goto check_need_indicate_scan_done;
-	}
-#endif
-
 	if (adapter_wdev_data(padapter)->block_scan == _TRUE) {
 		RTW_INFO(FUNC_ADPT_FMT" wdev_priv.block_scan is set\n", FUNC_ADPT_ARG(padapter));
 		need_indicate_scan_done = _TRUE;
@@ -3239,9 +3231,6 @@ static int cfg80211_rtw_disconnect(struct wiphy *wiphy, struct net_device *ndev,
 		rtw_join_abort_timeout(padapter, 300);
 		LeaveAllPowerSaveMode(padapter);
 		rtw_disassoc_cmd(padapter, 500, RTW_CMDF_WAIT_ACK);
-#ifdef CONFIG_RTW_REPEATER_SON
-		rtw_rson_do_disconnect(padapter);
-#endif
 		RTW_INFO("%s...call rtw_indicate_disconnect\n", __func__);
 
 		rtw_free_assoc_resources(padapter, 1);
@@ -4583,27 +4572,6 @@ void rtw_cfg80211_rx_action(_adapter *adapter, union recv_frame *rframe, const c
 		RTW_INFO("RTW_Rx:category(%u), action(%u)\n", category, action);
 }
 
-#ifdef CONFIG_RTW_80211K
-void rtw_cfg80211_rx_rrm_action(_adapter *adapter, union recv_frame *rframe)
-{
-	struct wireless_dev *wdev = adapter->rtw_wdev;
-	u8 *frame = get_recvframe_data(rframe);
-	uint frame_len = rframe->u.hdr.len;
-	s32 ch, freq;
-
-
-	ch = rtw_get_oper_ch(adapter);
-	freq = rtw_ch2freq(ch);
-
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
-	rtw_cfg80211_rx_mgmt(wdev, freq, 0, frame, frame_len, GFP_ATOMIC);
-#else
-	cfg80211_rx_action(adapter->pnetdev, freq, frame, frame_len, GFP_ATOMIC);
-#endif
-	RTW_INFO("RTW_Rx:ch=%d, freq=%d\n", ch, freq);
-}
-#endif /* CONFIG_RTW_80211K */
-
 void rtw_cfg80211_issue_p2p_provision_request(_adapter *padapter, const u8 *buf, size_t len)
 {
 	u16	wps_devicepassword_id = 0x0000;
@@ -5380,14 +5348,9 @@ static int cfg80211_rtw_mgmt_tx(struct wiphy *wiphy,
 			retry_guarantee_ms = RTW_MAX_MGMT_TX_MS_GAS;
 			break;
 		}
-	}
-#ifdef CONFIG_RTW_80211K
-	else if (category == RTW_WLAN_CATEGORY_RADIO_MEAS)
-		RTW_INFO("RTW_Tx: RRM Action\n");
-#endif
-	else
+	} else {
 		RTW_INFO("RTW_Tx:category(%u), action(%u)\n", category, action);
-
+	}
 dump:
 
 	rtw_ps_deny(padapter, PS_DENY_MGNT_TX);

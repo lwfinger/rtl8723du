@@ -211,9 +211,6 @@ enum rtw_drvextra_cmd_id {
 	TEST_H2C_CID,
 	MP_CMD_WK_CID,
 	CUSTOMER_STR_WK_CID,
-#ifdef CONFIG_RTW_REPEATER_SON
-	RSON_SCAN_WK_CID,
-#endif
 	MGNT_TX_WK_CID,
 #ifdef CONFIG_MCC_MODE
 	MCC_SET_DURATION_WK_CID,
@@ -985,12 +982,6 @@ u8 rtw_c2h_reg_wk_cmd(_adapter *adapter, u8 *c2h_evt);
 #endif
 #ifdef CONFIG_FW_C2H_PKT
 u8 rtw_c2h_packet_wk_cmd(_adapter *adapter, u8 *c2h_evt, u16 length);
-#endif
-
-#ifdef CONFIG_RTW_REPEATER_SON
-#define RSON_SCAN_PROCESS		10
-#define RSON_SCAN_DISABLE		11
-u8 rtw_rson_scan_wk_cmd(_adapter *adapter, int op);
 #endif
 
 u8 rtw_run_in_thread_cmd(PADAPTER padapter, void (*func)(void *), void *context);

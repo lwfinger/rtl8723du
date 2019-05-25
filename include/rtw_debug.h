@@ -259,10 +259,6 @@ ssize_t proc_set_backop_flags_sta(struct file *file, const char __user *buffer, 
 int proc_get_backop_flags_ap(struct seq_file *m, void *v);
 ssize_t proc_set_backop_flags_ap(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 #endif /* CONFIG_SCAN_BACKOP */
-#ifdef CONFIG_RTW_REPEATER_SON
-int proc_get_rson_data(struct seq_file *m, void *v);
-ssize_t proc_set_rson_data(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#endif
 int proc_get_survey_info(struct seq_file *m, void *v);
 ssize_t proc_set_survey_info(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 int proc_get_ap_info(struct seq_file *m, void *v);

@@ -570,7 +570,7 @@ struct ft_roam_info {
 };
 #endif
 
-#if defined(CONFIG_RTW_WNM) || defined(CONFIG_RTW_80211K)
+#if defined(CONFIG_RTW_WNM)
 #define RTW_RRM_NB_RPT_EN		BIT(1)
 #define RTW_MAX_NB_RPT_NUM	8
 
@@ -666,7 +666,7 @@ struct roam_nb_info {
 	bool	nb_rpt_is_same;
 	_timer roam_scan_timer;
 };
-#endif	/* defined(CONFIG_RTW_WNM) || defined(CONFIG_RTW_80211K) */
+#endif	/* defined(CONFIG_RTW_WNM) */
 
 struct mlme_priv {
 
@@ -743,7 +743,7 @@ struct mlme_priv {
 #ifdef CONFIG_RTW_80211R
 	struct ft_roam_info ft_roam;
 #endif
-#if defined(CONFIG_RTW_WNM) || defined(CONFIG_RTW_80211K)
+#if defined(CONFIG_RTW_WNM)
 	struct roam_nb_info nb_info;
 	u8 ch_cnt;
 #endif
@@ -948,7 +948,7 @@ u8 rtw_ft_chk_roaming_candidate(_adapter *padapter,
 void rtw_ft_update_stainfo(_adapter *padapter, WLAN_BSSID_EX *pnetwork);
 void rtw_ft_reassoc_event_callback(_adapter *padapter, u8 *pbuf);
 #endif
-#if defined(CONFIG_RTW_WNM) || defined(CONFIG_RTW_80211K)
+#if defined(CONFIG_RTW_WNM)
 void rtw_roam_nb_info_init(_adapter *padapter);
 #endif
 

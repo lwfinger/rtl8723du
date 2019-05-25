@@ -596,10 +596,6 @@ u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta)
 	if (psta == NULL)
 		goto exit;
 
-#ifdef CONFIG_RTW_80211K
-	rm_post_event(padapter, RM_ID_FOR_ALL(psta->cmn.aid), RM_EV_cancel);
-#endif
-
 	is_pre_link_sta = rtw_is_pre_link_sta(pstapriv, psta->cmn.mac_addr);
 
 	if (is_pre_link_sta == _FALSE) {
