@@ -10634,7 +10634,6 @@ unsigned int receive_disconnect(_adapter *padapter, unsigned char *MacAddr, unsi
 	return _SUCCESS;
 }
 
-#ifdef CONFIG_80211D
 static void process_80211d(PADAPTER padapter, WLAN_BSSID_EX *bssid)
 {
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(padapter);
@@ -10866,7 +10865,6 @@ static void process_80211d(PADAPTER padapter, WLAN_BSSID_EX *bssid)
 		i++;
 	}
 }
-#endif
 
 /****************************************************************************
 
@@ -10928,9 +10926,7 @@ void report_survey_event(_adapter *padapter, union recv_frame *precv_frame)
 		return;
 	}
 
-#ifdef CONFIG_80211D
 	process_80211d(padapter, &psurvey_evt->bss);
-#endif
 
 #ifdef CONFIG_DFS
 	ch_set_idx = rtw_chset_search_ch(chset, psurvey_evt->bss.Configuration.DSConfig);

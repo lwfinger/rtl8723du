@@ -261,9 +261,7 @@ static int rtw_hw_wps_pbc = 1;
 
 int rtw_mc2u_disable = 0;
 
-#ifdef CONFIG_80211D
 static int rtw_80211d = 0;
-#endif
 
 #ifdef CONFIG_PCI_ASPM
 /* CLK_REQ:BIT0 L0s:BIT1 ASPM_L1:BIT2 L1Off:BIT3*/
@@ -397,10 +395,8 @@ MODULE_PARM_DESC(rtw_fw_mp_bt_file_path, "The path of fw for MP-BT image");
 
 module_param(rtw_mc2u_disable, int, 0644);
 
-#ifdef CONFIG_80211D
 module_param(rtw_80211d, int, 0644);
 MODULE_PARM_DESC(rtw_80211d, "Enable 802.11d mechanism");
-#endif
 
 #ifdef CONFIG_ADVANCE_OTA
 /*	BIT(0): OTA continuous rotated test within low RSSI,1R CCA in path B
@@ -836,9 +832,7 @@ uint loadparam(_adapter *padapter)
 	registry_par->max_roaming_times = (u8)rtw_max_roaming_times + 2;
 #endif /* CONFIG_INTEL_WIDI */
 
-#ifdef CONFIG_80211D
 	registry_par->enable80211d = (u8)rtw_80211d;
-#endif
 
 	snprintf(registry_par->ifname, 16, "%s", ifname);
 	snprintf(registry_par->if2name, 16, "%s", if2name);

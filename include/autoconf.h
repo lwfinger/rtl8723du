@@ -26,9 +26,6 @@
 	/* #define DBG_RUNTIME_PORT_SWITCH */
 #endif /* CONFIG_CONCURRENT_MODE */
 
-#define CONFIG_80211D
-
-
 /*
  * Hareware/Firmware Related Configure
  */
