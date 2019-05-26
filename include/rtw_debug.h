@@ -290,10 +290,6 @@ bool rtw_fwdl_test_trigger_wintint_rdy_fail(void);
 ssize_t proc_set_fwdl_test_case(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 bool rtw_del_rx_ampdu_test_trigger_no_tx_fail(void);
 ssize_t proc_set_del_rx_ampdu_test_case(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#ifdef CONFIG_DFS_MASTER
-int proc_get_dfs_master_test_case(struct seq_file *m, void *v);
-ssize_t proc_set_dfs_master_test_case(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#endif /* CONFIG_DFS_MASTER */
 u32 rtw_get_wait_hiq_empty_ms(void);
 ssize_t proc_set_wait_hiq_empty(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 void rtw_sta_linking_test_set_start(void);

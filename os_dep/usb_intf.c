@@ -1145,10 +1145,6 @@ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device
 	}
 #endif
 
-#ifdef CONFIG_INTEL_PROXIM
-	rtw_sw_export = padapter;
-#endif
-
 #ifdef CONFIG_GLOBAL_UI_PID
 	if (ui_pid[1] != 0) {
 		RTW_INFO("ui_pid[1]:%d\n", ui_pid[1]);
@@ -1211,17 +1207,6 @@ static void rtw_dev_remove(struct usb_interface *pusb_intf)
 		/* RTW_INFO("r871xu_dev_remove():padapter->bSurpriseRemoved == _TRUE\n"); */
 		rtw_set_surprise_removed(padapter);
 	}
-	/*else
-	{
-
-		padapter->HalData->hw_init_completed = _FALSE;
-	}*/
-
-
-#if defined(CONFIG_HAS_EARLYSUSPEND) || defined(CONFIG_ANDROID_POWER)
-	rtw_unregister_early_suspend(pwrctl);
-#endif
-
 	if (GET_HAL_DATA(padapter)->bFWReady == _TRUE) {
 		rtw_pm_set_ips(padapter, IPS_NONE);
 		rtw_pm_set_lps(padapter, PS_MODE_ACTIVE);
@@ -1251,15 +1236,7 @@ static void rtw_dev_remove(struct usb_interface *pusb_intf)
 	usb_dvobj_deinit(pusb_intf);
 
 	RTW_INFO("-r871xu_dev_remove, done\n");
-
-
-#ifdef CONFIG_INTEL_PROXIM
-	rtw_sw_export = NULL;
-#endif
-
-
 	return;
-
 }
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 24))
 extern int console_suspend_enabled;
@@ -1327,16 +1304,7 @@ static void __exit rtw_drv_halt(void)
 	rtw_mstat_dump(RTW_DBGDUMP);
 }
 
-
 module_init(rtw_drv_entry);
 module_exit(rtw_drv_halt);
-
-#ifdef CONFIG_INTEL_PROXIM
-_adapter  *rtw_usb_get_sw_pointer(void)
-{
-	return rtw_sw_export;
-}
-EXPORT_SYMBOL(rtw_usb_get_sw_pointer);
-#endif /* CONFIG_INTEL_PROXIM */
 
 #endif

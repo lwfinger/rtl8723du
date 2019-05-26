@@ -199,11 +199,6 @@ void Init_ODM_ComInfo(_adapter *adapter)
 
 	rtw_hal_set_odm_var(adapter, HAL_ODM_REGULATION, NULL, _TRUE);
 
-#ifdef CONFIG_DFS_MASTER
-	odm_cmn_info_init(pDM_Odm, ODM_CMNINFO_DFS_REGION_DOMAIN, adapter->registrypriv.dfs_region_domain);
-	odm_cmn_info_hook(pDM_Odm, ODM_CMNINFO_DFS_MASTER_ENABLE, &(adapter_to_rfctl(adapter)->dfs_master_enabled));
-#endif
-
 	odm_cmn_info_init(pDM_Odm, ODM_CMNINFO_GPA, pHalData->TypeGPA);
 	odm_cmn_info_init(pDM_Odm, ODM_CMNINFO_APA, pHalData->TypeAPA);
 	odm_cmn_info_init(pDM_Odm, ODM_CMNINFO_GLNA, pHalData->TypeGLNA);
@@ -1014,21 +1009,10 @@ void rtw_phydm_watchdog(_adapter *adapter)
 	RTW_INFO("%s rfk_forbidden = %s, segment_iqk = %s\n",
 		__func__, (rfk_forbidden) ? "Y" : "N", (segment_iqk) ? "Y" : "N");
 #endif
-
-	/*if (!rtw_mi_stayin_union_band_chk(adapter)) {
-		#ifdef DBG_PHYDM_STATE_CHK
-		RTW_ERR("Not stay in union band, skip phydm\n");
-		#endif
-		goto _exit;
-	}*/
 	if (pwrctl->bpower_saving)
 		phydm_watchdog_lps(&pHalData->odmpriv);
 	else
 		phydm_watchdog(&pHalData->odmpriv);
-
-	#ifdef CONFIG_RTW_ACS
-	rtw_acs_update_current_info(adapter);
-	#endif
 
 _exit:
 	return;

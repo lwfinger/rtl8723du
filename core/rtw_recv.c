@@ -152,10 +152,6 @@ void rtw_mfree_recv_priv_lock(struct recv_priv *precvpriv)
 	_rtw_spinlock_free(&precvpriv->recv_pending_queue.lock);
 
 	_rtw_spinlock_free(&precvpriv->free_recv_buf_queue.lock);
-
-#ifdef CONFIG_USE_USB_BUFFER_ALLOC_RX
-	_rtw_spinlock_free(&precvpriv->recv_buf_pending_queue.lock);
-#endif /* CONFIG_USE_USB_BUFFER_ALLOC_RX */
 }
 
 void _rtw_free_recv_priv(struct recv_priv *precvpriv)
@@ -1187,21 +1183,9 @@ static sint sta2ap_data_frame(
 
 		*psta = rtw_get_stainfo(pstapriv, pattrib->ta);
 		if (*psta == NULL) {
-			#ifdef CONFIG_DFS_MASTER
-			struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-
-			/* prevent RX tasklet blocks cmd_thread */
-			if (rfctl->radar_detected == 1)
-				goto bypass_deauth7;
-			#endif
-
 			RTW_INFO("issue_deauth to sta=" MAC_FMT " for the reason(7)\n", MAC_ARG(pattrib->src));
 
 			issue_deauth(adapter, pattrib->src, WLAN_REASON_CLASS3_FRAME_FROM_NONASSOC_STA);
-
-#ifdef CONFIG_DFS_MASTER
-bypass_deauth7:
-#endif
 			ret = RTW_RX_HANDLED;
 			goto exit;
 		}
@@ -1652,59 +1636,10 @@ static sint validate_recv_mgnt_frame(PADAPTER padapter, union recv_frame *precv_
 				psta->sta_stats.rx_probersp_uo_pkts++;
 		}
 	}
-
-#ifdef CONFIG_INTEL_PROXIM
-	if (padapter->proximity.proxim_on == _TRUE) {
-		struct rx_pkt_attrib *pattrib = &precv_frame->u.hdr.attrib;
-		struct recv_stat *prxstat = (struct recv_stat *)  precv_frame->u.hdr.rx_head ;
-		u8 *pda, *psa, *pbssid, *ptr;
-		ptr = precv_frame->u.hdr.rx_data;
-		pda = get_da(ptr);
-		psa = get_sa(ptr);
-		pbssid = get_hdr_bssid(ptr);
-
-
-		_rtw_memcpy(pattrib->dst, pda, ETH_ALEN);
-		_rtw_memcpy(pattrib->src, psa, ETH_ALEN);
-
-		_rtw_memcpy(pattrib->bssid, pbssid, ETH_ALEN);
-
-		switch (pattrib->to_fr_ds) {
-		case 0:
-			_rtw_memcpy(pattrib->ra, pda, ETH_ALEN);
-			_rtw_memcpy(pattrib->ta, psa, ETH_ALEN);
-			break;
-
-		case 1:
-			_rtw_memcpy(pattrib->ra, pda, ETH_ALEN);
-			_rtw_memcpy(pattrib->ta, pbssid, ETH_ALEN);
-			break;
-
-		case 2:
-			_rtw_memcpy(pattrib->ra, pbssid, ETH_ALEN);
-			_rtw_memcpy(pattrib->ta, psa, ETH_ALEN);
-			break;
-
-		case 3:
-			_rtw_memcpy(pattrib->ra, GetAddr1Ptr(ptr), ETH_ALEN);
-			_rtw_memcpy(pattrib->ta, get_addr2_ptr(ptr), ETH_ALEN);
-			break;
-
-		default:
-			break;
-
-		}
-		pattrib->priority = 0;
-		pattrib->hdrlen = pattrib->to_fr_ds == 3 ? 30 : 24;
-
-		padapter->proximity.proxim_rx(padapter, precv_frame);
-	}
-#endif
 	mgt_dispatcher(padapter, precv_frame);
 
 exit:
 	return _SUCCESS;
-
 }
 
 static sint validate_recv_data_frame(_adapter *adapter, union recv_frame *precv_frame)

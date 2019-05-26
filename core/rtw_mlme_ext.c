@@ -660,12 +660,6 @@ void rtw_rfctl_init(_adapter *adapter)
 	_rtw_init_listhead(&rfctl->reg_exc_list);
 	_rtw_init_listhead(&rfctl->txpwr_lmt_list);
 #endif
-
-#ifdef CONFIG_DFS_MASTER
-	rfctl->cac_start_time = rfctl->cac_end_time = RTW_CAC_STOPPED;
-
-	/* TODO: dfs_master_timer */
-#endif
 }
 
 void rtw_rfctl_deinit(_adapter *adapter)
@@ -679,302 +673,7 @@ void rtw_rfctl_deinit(_adapter *adapter)
 	rtw_txpwr_lmt_list_free(rfctl);
 	_rtw_mutex_free(&rfctl->txpwr_lmt_mutex);
 #endif
-
-#ifdef CONFIG_DFS_MASTER
-	/* TODO: dfs_master_timer */
-#endif
 }
-
-#ifdef CONFIG_DFS_MASTER
-/*
-* called in rtw_dfs_master_enable()
-* assume the request channel coverage is DFS range
-* base on the current status and the request channel coverage to check if need to reset complete CAC time
-*/
-bool rtw_is_cac_reset_needed(_adapter *adapter, u8 ch, u8 bw, u8 offset)
-{
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-	bool needed = _FALSE;
-	u32 cur_hi, cur_lo, hi, lo;
-
-	if (rfctl->radar_detected == 1) {
-		needed = _TRUE;
-		goto exit;
-	}
-
-	if (rfctl->radar_detect_ch == 0) {
-		needed = _TRUE;
-		goto exit;
-	}
-
-	if (rtw_chbw_to_freq_range(ch, bw, offset, &hi, &lo) == _FALSE) {
-		RTW_ERR("request detection range ch:%u, bw:%u, offset:%u\n", ch, bw, offset);
-		rtw_warn_on(1);
-	}
-
-	if (rtw_chbw_to_freq_range(rfctl->radar_detect_ch, rfctl->radar_detect_bw, rfctl->radar_detect_offset, &cur_hi, &cur_lo) == _FALSE) {
-		RTW_ERR("cur detection range ch:%u, bw:%u, offset:%u\n", rfctl->radar_detect_ch, rfctl->radar_detect_bw, rfctl->radar_detect_offset);
-		rtw_warn_on(1);
-	}
-
-	if (hi <= lo || cur_hi <= cur_lo) {
-		RTW_ERR("hi:%u, lo:%u, cur_hi:%u, cur_lo:%u\n", hi, lo, cur_hi, cur_lo);
-		rtw_warn_on(1);
-	}
-
-	if (rtw_is_range_a_in_b(hi, lo, cur_hi, cur_lo)) {
-		/* request is in current detect range */
-		goto exit;
-	}
-
-	/* check if request channel coverage has new range and the new range is in DFS range */
-	if (!rtw_is_range_overlap(hi, lo, cur_hi, cur_lo)) {
-		/* request has no overlap with current */
-		needed = _TRUE;
-	} else if (rtw_is_range_a_in_b(cur_hi, cur_lo, hi, lo)) {
-		/* request is supper set of current */
-		if ((hi != cur_hi && rtw_is_dfs_range(hi, cur_hi)) || (lo != cur_lo && rtw_is_dfs_range(cur_lo, lo)))
-			needed = _TRUE;
-	} else {
-		/* request is not supper set of current, but has overlap */
-		if ((lo < cur_lo && rtw_is_dfs_range(cur_lo, lo)) || (hi > cur_hi && rtw_is_dfs_range(hi, cur_hi)))
-			needed = _TRUE;
-	}
-
-exit:
-	return needed;
-}
-
-bool _rtw_rfctl_overlap_radar_detect_ch(struct rf_ctl_t *rfctl, u8 ch, u8 bw, u8 offset)
-{
-	bool ret = _FALSE;
-	u32 hi = 0, lo = 0;
-	u32 r_hi = 0, r_lo = 0;
-	int i;
-
-	if (rfctl->radar_detect_by_others)
-		goto exit;
-
-	if (rfctl->radar_detect_ch == 0)
-		goto exit;
-
-	if (rtw_chbw_to_freq_range(ch, bw, offset, &hi, &lo) == _FALSE) {
-		rtw_warn_on(1);
-		goto exit;
-	}
-
-	if (rtw_chbw_to_freq_range(rfctl->radar_detect_ch
-			, rfctl->radar_detect_bw, rfctl->radar_detect_offset
-			, &r_hi, &r_lo) == _FALSE) {
-		rtw_warn_on(1);
-		goto exit;
-	}
-
-	if (rtw_is_range_overlap(hi, lo, r_hi, r_lo))
-		ret = _TRUE;
-
-exit:
-	return ret;
-}
-
-bool rtw_rfctl_overlap_radar_detect_ch(struct rf_ctl_t *rfctl)
-{
-	return _rtw_rfctl_overlap_radar_detect_ch(rfctl
-				, rfctl_to_dvobj(rfctl)->oper_channel
-				, rfctl_to_dvobj(rfctl)->oper_bwmode
-				, rfctl_to_dvobj(rfctl)->oper_ch_offset);
-}
-
-bool rtw_rfctl_is_tx_blocked_by_ch_waiting(struct rf_ctl_t *rfctl)
-{
-	return rtw_rfctl_overlap_radar_detect_ch(rfctl) && IS_CH_WAITING(rfctl);
-}
-
-bool rtw_chset_is_ch_non_ocp(RT_CHANNEL_INFO *ch_set, u8 ch, u8 bw, u8 offset)
-{
-	bool ret = _FALSE;
-	u32 hi = 0, lo = 0;
-	int i;
-
-	if (rtw_chbw_to_freq_range(ch, bw, offset, &hi, &lo) == _FALSE)
-		goto exit;
-
-	for (i = 0; i < MAX_CHANNEL_NUM && ch_set[i].ChannelNum != 0; i++) {
-		if (!rtw_ch2freq(ch_set[i].ChannelNum)) {
-			rtw_warn_on(1);
-			continue;
-		}
-
-		if (!CH_IS_NON_OCP(&ch_set[i]))
-			continue;
-
-		if (lo <= rtw_ch2freq(ch_set[i].ChannelNum)
-			&& rtw_ch2freq(ch_set[i].ChannelNum) <= hi
-		) {
-			ret = _TRUE;
-			break;
-		}
-	}
-
-exit:
-	return ret;
-}
-
-u32 rtw_chset_get_ch_non_ocp_ms(RT_CHANNEL_INFO *ch_set, u8 ch, u8 bw, u8 offset)
-{
-	int ms = 0;
-	systime current_time;
-	u32 hi = 0, lo = 0;
-	int i;
-
-	if (rtw_chbw_to_freq_range(ch, bw, offset, &hi, &lo) == _FALSE)
-		goto exit;
-
-	current_time = rtw_get_current_time();
-
-	for (i = 0; i < MAX_CHANNEL_NUM && ch_set[i].ChannelNum != 0; i++) {
-		if (!rtw_ch2freq(ch_set[i].ChannelNum)) {
-			rtw_warn_on(1);
-			continue;
-		}
-
-		if (!CH_IS_NON_OCP(&ch_set[i]))
-			continue;
-
-		if (lo <= rtw_ch2freq(ch_set[i].ChannelNum)
-			&& rtw_ch2freq(ch_set[i].ChannelNum) <= hi
-		) {
-			if (rtw_systime_to_ms(ch_set[i].non_ocp_end_time - current_time) > ms)
-				ms = rtw_systime_to_ms(ch_set[i].non_ocp_end_time - current_time);
-		}
-	}
-
-exit:
-	return ms;
-}
-
-/**
- * rtw_chset_update_non_ocp - update non_ocp_end_time according to the given @ch, @bw, @offset into @ch_set
- * @ch_set: the given channel set
- * @ch: channel number on which radar is detected
- * @bw: bandwidth on which radar is detected
- * @offset: bandwidth offset on which radar is detected
- * @ms: ms to add from now to update non_ocp_end_time, ms < 0 means use NON_OCP_TIME_MS
- */
-static void _rtw_chset_update_non_ocp(RT_CHANNEL_INFO *ch_set, u8 ch, u8 bw, u8 offset, int ms)
-{
-	u32 hi = 0, lo = 0;
-	int i;
-
-	if (rtw_chbw_to_freq_range(ch, bw, offset, &hi, &lo) == _FALSE)
-		goto exit;
-
-	for (i = 0; i < MAX_CHANNEL_NUM && ch_set[i].ChannelNum != 0; i++) {
-		if (!rtw_ch2freq(ch_set[i].ChannelNum)) {
-			rtw_warn_on(1);
-			continue;
-		}
-
-		if (lo <= rtw_ch2freq(ch_set[i].ChannelNum)
-			&& rtw_ch2freq(ch_set[i].ChannelNum) <= hi
-		) {
-			if (ms >= 0)
-				ch_set[i].non_ocp_end_time = rtw_get_current_time() + rtw_ms_to_systime(ms);
-			else
-				ch_set[i].non_ocp_end_time = rtw_get_current_time() + rtw_ms_to_systime(NON_OCP_TIME_MS);
-		}
-	}
-
-exit:
-	return;
-}
-
-inline void rtw_chset_update_non_ocp(RT_CHANNEL_INFO *ch_set, u8 ch, u8 bw, u8 offset)
-{
-	_rtw_chset_update_non_ocp(ch_set, ch, bw, offset, -1);
-}
-
-inline void rtw_chset_update_non_ocp_ms(RT_CHANNEL_INFO *ch_set, u8 ch, u8 bw, u8 offset, int ms)
-{
-	_rtw_chset_update_non_ocp(ch_set, ch, bw, offset, ms);
-}
-
-u32 rtw_get_ch_waiting_ms(_adapter *adapter, u8 ch, u8 bw, u8 offset, u32 *r_non_ocp_ms, u32 *r_cac_ms)
-{
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-	struct mlme_ext_priv *mlmeext = &adapter->mlmeextpriv;
-	u32 non_ocp_ms;
-	u32 cac_ms;
-	u8 in_rd_range = 0; /* if in current radar detection range*/
-
-	if (rtw_chset_is_ch_non_ocp(rfctl->channel_set, ch, bw, offset))
-		non_ocp_ms = rtw_chset_get_ch_non_ocp_ms(rfctl->channel_set, ch, bw, offset);
-	else
-		non_ocp_ms = 0;
-
-	if (rfctl->dfs_master_enabled) {
-		u32 cur_hi, cur_lo, hi, lo;
-
-		if (rtw_chbw_to_freq_range(ch, bw, offset, &hi, &lo) == _FALSE) {
-			RTW_ERR("input range ch:%u, bw:%u, offset:%u\n", ch, bw, offset);
-			rtw_warn_on(1);
-		}
-
-		if (rtw_chbw_to_freq_range(rfctl->radar_detect_ch, rfctl->radar_detect_bw, rfctl->radar_detect_offset, &cur_hi, &cur_lo) == _FALSE) {
-			RTW_ERR("cur detection range ch:%u, bw:%u, offset:%u\n", rfctl->radar_detect_ch, rfctl->radar_detect_bw, rfctl->radar_detect_offset);
-			rtw_warn_on(1);
-		}
-
-		if (rtw_is_range_a_in_b(hi, lo, cur_hi, cur_lo))
-			in_rd_range = 1;
-	}
-
-	if (!rtw_is_dfs_chbw(ch, bw, offset))
-		cac_ms = 0;
-	else if (in_rd_range && !non_ocp_ms) {
-		if (IS_CH_WAITING(rfctl))
-			cac_ms = rtw_systime_to_ms(rfctl->cac_end_time - rtw_get_current_time());
-		else
-			cac_ms = 0;
-	} else if (rtw_is_long_cac_ch(ch, bw, offset, rtw_odm_get_dfs_domain(adapter)))
-		cac_ms = CAC_TIME_CE_MS;
-	else
-		cac_ms = CAC_TIME_MS;
-
-	if (r_non_ocp_ms)
-		*r_non_ocp_ms = non_ocp_ms;
-	if (r_cac_ms)
-		*r_cac_ms = cac_ms;
-
-	return non_ocp_ms + cac_ms;
-}
-
-void rtw_reset_cac(_adapter *adapter, u8 ch, u8 bw, u8 offset)
-{
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-	u32 non_ocp_ms;
-	u32 cac_ms;
-
-	rtw_get_ch_waiting_ms(adapter
-		, ch
-		, bw
-		, offset
-		, &non_ocp_ms
-		, &cac_ms
-	);
-
-	rfctl->cac_start_time = rtw_get_current_time() + rtw_ms_to_systime(non_ocp_ms);
-	rfctl->cac_end_time = rfctl->cac_start_time + rtw_ms_to_systime(cac_ms);
-
-	/* skip special value */
-	if (rfctl->cac_start_time == RTW_CAC_STOPPED) {
-		rfctl->cac_start_time++;
-		rfctl->cac_end_time++;
-	}
-	if (rfctl->cac_end_time == RTW_CAC_STOPPED)
-		rfctl->cac_end_time++;
-}
-#endif /* CONFIG_DFS_MASTER */
 
 /* choose channel with shortest waiting (non ocp + cac) time */
 bool rtw_choose_shortest_waiting_ch(_adapter *adapter, u8 req_bw, u8 *dec_ch, u8 *dec_bw, u8 *dec_offset, u8 d_flags)
@@ -1041,10 +740,6 @@ bool rtw_choose_shortest_waiting_ch(_adapter *adapter, u8 req_bw, u8 *dec_ch, u8
 
 			if ((d_flags & RTW_CHF_NON_LONG_CAC) && !rtw_is_long_cac_ch(ch, bw, offset, rtw_odm_get_dfs_domain(adapter)))
 				continue;
-
-			#ifdef CONFIG_DFS_MASTER
-			waiting_ms = rtw_get_ch_waiting_ms(adapter, ch, bw, offset, &non_ocp_ms, &cac_ms);
-			#endif
 
 			if (DBG_CHOOSE_SHORTEST_WAITING_CH)
 				RTW_INFO(FUNC_ADPT_FMT":%u,%u,%u %u(non_ocp:%u, cac:%u)\n"
@@ -1148,17 +843,6 @@ void dump_chset(void *sel, RT_CHANNEL_INFO *ch_set)
 	for (i = 0; i < MAX_CHANNEL_NUM && ch_set[i].ChannelNum != 0; i++) {
 		RTW_PRINT_SEL(sel, "ch:%3u, freq:%u, scan_type:%d"
 			, ch_set[i].ChannelNum, rtw_ch2freq(ch_set[i].ChannelNum), ch_set[i].ScanType);
-
-#ifdef CONFIG_DFS_MASTER
-		if (rtw_is_dfs_ch(ch_set[i].ChannelNum)) {
-			if (CH_IS_NON_OCP(&ch_set[i]))
-				_RTW_PRINT_SEL(sel, ", non_ocp:%d"
-					, rtw_systime_to_ms(ch_set[i].non_ocp_end_time - rtw_get_current_time()));
-			else
-				_RTW_PRINT_SEL(sel, ", non_ocp:N/A");
-		}
-#endif
-
 		_RTW_PRINT_SEL(sel, "\n");
 	}
 
@@ -1179,10 +863,6 @@ void dump_cur_chset(void *sel, _adapter *adapter)
 
 #ifdef CONFIG_TXPWR_LIMIT
 	RTW_PRINT_SEL(sel, "PLS regd:%s\n", rfctl->regd_name);
-#endif
-
-#ifdef CONFIG_DFS_MASTER
-	RTW_PRINT_SEL(sel, "dfs_domain:%u\n", rtw_odm_get_dfs_domain(adapter));
 #endif
 
 	for (i = 0; i < MAX_CHANNEL_NUM; i++)
@@ -11270,11 +10950,6 @@ static void rtw_mlmeext_disconnect(_adapter *padapter)
 	if (EN_FCS(padapter))
 		rtw_hal_set_hwreg(padapter, HW_VAR_STOP_FCS_MODE, NULL);
 #endif
-
-#ifdef CONFIG_DFS_MASTER
-	rtw_dfs_master_status_apply(padapter, self_action);
-#endif
-
 	{
 		u8 ch, bw, offset;
 
@@ -12916,11 +12591,6 @@ u32 rtw_scan_timeout_decision(_adapter *padapter)
 	if (ss->duration)
 		scan_ms = ss->duration;
 	else
-	#if defined(CONFIG_RTW_ACS) && defined(CONFIG_RTW_ACS_DBG)
-	if (IS_ACS_ENABLE(padapter) && rtw_is_acs_st_valid(padapter))
-		scan_ms = rtw_acs_get_adv_st(padapter);
-	else
-	#endif /*CONFIG_RTW_ACS*/
 		scan_ms = ss->scan_ch_ms;
 
 	ss->scan_timeout_ms = (scan_ms * max_chan_num) + back_op_times + SCANNING_TIMEOUT_EX;
@@ -13097,13 +12767,7 @@ static u8 sitesurvey_pick_ch_behavior(_adapter *padapter, u8 *ch, RT_SCAN_TYPE *
 		if (ss->channel_idx < ss->ch_num) {
 			ch = &ss->ch[ss->channel_idx];
 			scan_ch = ch->hw_value;
-
-			#if defined(CONFIG_RTW_ACS) && defined(CONFIG_RTW_ACS_DBG)
-			if (IS_ACS_ENABLE(padapter) && rtw_is_acs_passiv_scan(padapter))
-				scan_type = SCAN_PASSIVE;
-			else
-			#endif /*CONFIG_RTW_ACS*/
-				scan_type = (ch->flags & RTW_IEEE80211_CHAN_PASSIVE_SCAN) ? SCAN_PASSIVE : SCAN_ACTIVE;
+			scan_type = (ch->flags & RTW_IEEE80211_CHAN_PASSIVE_SCAN) ? SCAN_PASSIVE : SCAN_ACTIVE;
 		}
 	}
 
@@ -13403,11 +13067,6 @@ static void sitesurvey_set_igi(_adapter *adapter)
 		if (ss->igi)
 			igi = ss->igi;
 		else
-		#if defined(CONFIG_RTW_ACS) && defined(CONFIG_RTW_ACS_DBG)
-		if (IS_ACS_ENABLE(adapter) && rtw_is_acs_igi_valid(adapter))
-			igi = rtw_acs_get_adv_igi(adapter);
-		else
-		#endif /*CONFIG_RTW_ACS*/
 			igi = 0x1e;
 
 		/* record IGI status */
@@ -13585,11 +13244,6 @@ operation_by_state:
 		u8 next_state;
 		u32 scan_ms;
 
-#ifdef CONFIG_RTW_ACS
-		if (IS_ACS_ENABLE(padapter))
-			rtw_acs_get_rst(padapter);
-#endif
-
 		next_state = sitesurvey_pick_ch_behavior(padapter, &scan_ch, &scan_type);
 
 		if (next_state != SCAN_PROCESS) {
@@ -13628,11 +13282,6 @@ operation_by_state:
 #if defined(DBG_SCAN_SW_ANTDIV_BL)
 		if (ss->is_sw_antdiv_bl_scan)
 			scan_ms = scan_ms / 2;
-#endif
-
-#ifdef CONFIG_RTW_ACS
-		if (IS_ACS_ENABLE(padapter))
-			rtw_acs_trigger(padapter, scan_ms, scan_ch);
 #endif
 		set_survey_timer(pmlmeext, scan_ms);
 		break;
@@ -13815,10 +13464,6 @@ operation_by_state:
 		mlmeext_set_scan_state(pmlmeext, SCAN_DISABLE);
 
 		report_surveydone_event(padapter);
-#ifdef CONFIG_RTW_ACS
-		if (IS_ACS_ENABLE(padapter))
-			rtw_acs_select_best_chan(padapter);
-#endif
 		issue_action_BSSCoexistPacket(padapter);
 		issue_action_BSSCoexistPacket(padapter);
 		issue_action_BSSCoexistPacket(padapter);
@@ -14463,10 +14108,6 @@ void rtw_join_done_chk_ch(_adapter *adapter, int join_res)
 				update_beacon(iface, 0xFF, NULL, _TRUE);
 			}
 		}
-
-#ifdef CONFIG_DFS_MASTER
-		rtw_dfs_master_status_apply(adapter, MLME_STA_CONNECTED);
-#endif
 	} else {
 		for (i = 0; i < dvobj->iface_nums; i++) {
 			iface = dvobj->padapters[i];
@@ -14483,9 +14124,6 @@ void rtw_join_done_chk_ch(_adapter *adapter, int join_res)
 				update_beacon(iface, 0xFF, NULL, _TRUE);
 			}
 		}
-#ifdef CONFIG_DFS_MASTER
-		rtw_dfs_master_status_apply(adapter, MLME_STA_DISCONNECTED);
-#endif
 	}
 
 	if (rtw_mi_get_ch_setting_union(adapter, &u_ch, &u_bw, &u_offset)) {
@@ -14599,12 +14237,6 @@ int rtw_chk_start_clnt_join(_adapter *adapter, u8 *ch, u8 *bw, u8 *offset)
 			goto exit;
 
 connect_allow_hdl:
-		/* connect_allow == _TRUE */
-
-#ifdef CONFIG_DFS_MASTER
-		rtw_dfs_master_status_apply(adapter, MLME_STA_CONNECTING);
-#endif
-
 		if (chbw_allow == _FALSE) {
 			u_ch = cur_ch;
 			u_bw = cur_bw;

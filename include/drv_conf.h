@@ -18,25 +18,6 @@
 
 #endif
 
-/* Older Android kernel doesn't has CONFIG_ANDROID defined,
- * add this to force CONFIG_ANDROID defined */
-#ifdef CONFIG_PLATFORM_ANDROID
-	#ifndef CONFIG_ANDROID
-		#define CONFIG_ANDROID
-	#endif
-#endif
-
-#ifdef CONFIG_ANDROID
-	/* Some Android build will restart the UI while non-printable ascii is passed
-	* between java and c/c++ layer (JNI). We force CONFIG_VALIDATE_SSID
-	* for Android here. If you are sure there is no risk on your system about this,
-	* mask this macro define to support non-printable ascii ssid.
-	* #define CONFIG_VALIDATE_SSID */
-
-	/* Android expect dbm as the rx signal strength unit */
-	#define CONFIG_SIGNAL_DISPLAY_DBM
-#endif
-
 /* About USB VENDOR REQ */
 #if defined(CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC) && !defined(CONFIG_USB_VENDOR_REQ_MUTEX)
 	#warning "define CONFIG_USB_VENDOR_REQ_MUTEX for CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC automatically"

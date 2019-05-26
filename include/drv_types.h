@@ -292,19 +292,11 @@ struct registry_priv {
 
 	u8 boffefusemask;
 	BOOLEAN bFileMaskEfuse;
-#ifdef CONFIG_RTW_ACS
-	u8 acs_auto_scan;
-	u8 acs_mode;
-#endif
 
 	u32	reg_rxgain_offset_2g;
 	u32	reg_rxgain_offset_5gl;
 	u32	reg_rxgain_offset_5gm;
 	u32	reg_rxgain_offset_5gh;
-
-#ifdef CONFIG_DFS_MASTER
-	u8 dfs_region_domain;
-#endif
 
 #ifdef CONFIG_MCC_MODE
 	u8 en_mcc;
@@ -757,39 +749,11 @@ struct rf_ctl_t {
 
 	u8 txpwr_lmt_2g_cck_ofdm_state;
 #endif
-
-#ifdef CONFIG_DFS_MASTER
-	bool radar_detect_by_others;
-	u8 dfs_master_enabled;
-	bool radar_detected;
-
-	u8 radar_detect_ch;
-	u8 radar_detect_bw;
-	u8 radar_detect_offset;
-
-	systime cac_start_time;
-	systime cac_end_time;
-
-	u8 dfs_ch_sel_d_flags;
-
-	u8 dbg_dfs_master_fake_radar_detect_cnt;
-	u8 dbg_dfs_master_radar_detect_trigger_non;
-	u8 dbg_dfs_master_choose_dfs_ch_first;
-#endif
 };
 
-#ifdef CONFIG_DFS_MASTER
-#define RTW_CAC_STOPPED 0
-#ifdef CONFIG_DFS_MASTER
-#define IS_CAC_STOPPED(rfctl) ((rfctl)->cac_end_time == RTW_CAC_STOPPED)
-#define IS_CH_WAITING(rfctl) (!IS_CAC_STOPPED(rfctl) && time_after((rfctl)->cac_end_time, rtw_get_current_time()))
-#define IS_UNDER_CAC(rfctl) (IS_CH_WAITING(rfctl) && time_after(rtw_get_current_time(), (rfctl)->cac_start_time))
-#endif /*CONFIG_DFS_MASTER*/
-#else
 #define IS_CAC_STOPPED(rfctl) 1
 #define IS_CH_WAITING(rfctl) 0
 #define IS_UNDER_CAC(rfctl) 0
-#endif /* CONFIG_DFS_MASTER */
 
 #ifdef CONFIG_MBSSID_CAM
 #define TOTAL_MBID_CAM_NUM	8
@@ -1040,18 +1004,6 @@ enum _NAPI_STATE {
 };
 #endif
 
-#ifdef CONFIG_INTEL_PROXIM
-struct proxim {
-	bool proxim_support;
-	bool proxim_on;
-
-	void *proximity_priv;
-	int (*proxim_rx)(_adapter *padapter,
-			 union recv_frame *precv_frame);
-	u8(*proxim_get_var)(_adapter *padapter, u8 type);
-};
-#endif /* CONFIG_INTEL_PROXIM */
-
 #ifdef CONFIG_MAC_LOOPBACK_DRIVER
 typedef struct loopbackdata {
 	_sema	sema;
@@ -1232,13 +1184,6 @@ struct _ADAPTER {
 
 	struct br_ext_info		ethBrExtInfo;
 #endif /* CONFIG_BR_EXT */
-
-#ifdef CONFIG_INTEL_PROXIM
-	/* intel Proximity, should be alloc mem
-	 * in intel Proximity module and can only
-	 * be used in intel Proximity mode */
-	struct proxim proximity;
-#endif /* CONFIG_INTEL_PROXIM */
 
 #ifdef CONFIG_MAC_LOOPBACK_DRIVER
 	PLOOPBACKDATA ploopback;

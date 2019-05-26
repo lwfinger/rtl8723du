@@ -80,7 +80,6 @@ static s32 update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, s32 sz, u8 bag
 	PADAPTER padapter = pxmitframe->padapter;
 	struct tx_desc *ptxdesc = (struct tx_desc *)pmem;
 
-#ifndef CONFIG_USE_USB_BUFFER_ALLOC_TX
 	if ((PACKET_OFFSET_SZ != 0)
 	    && (_FALSE == bagg_pkt)
 	    && (urb_zero_packet_chk(padapter, sz) == 0)) {
@@ -88,7 +87,6 @@ static s32 update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, s32 sz, u8 bag
 		pull = 1;
 		pxmitframe->pkt_offset--;
 	}
-#endif	/* CONFIG_USE_USB_BUFFER_ALLOC_TX */
 
 	_rtw_memset(ptxdesc, 0, sizeof(struct tx_desc));
 

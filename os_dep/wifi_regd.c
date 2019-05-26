@@ -145,11 +145,7 @@ static void _rtw_reg_apply_flags(struct wiphy *wiphy)
 
 		ch = ieee80211_get_channel(wiphy, freq);
 		if (ch) {
-			if (channel_set[i].ScanType == SCAN_PASSIVE
-				#if defined(CONFIG_DFS_MASTER)
-				&& rtw_odm_dfs_domain_unknown(wiphy_to_adapter(wiphy))
-				#endif
-			) {
+			if (channel_set[i].ScanType == SCAN_PASSIVE) {
 				#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
 				ch->flags = (IEEE80211_CHAN_NO_IBSS | IEEE80211_CHAN_PASSIVE_SCAN);
 				#else

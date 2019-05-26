@@ -86,10 +86,6 @@
 	#include <linux/udp.h>
 #endif
 
-#ifdef CONFIG_HAS_EARLYSUSPEND
-	#include <linux/earlysuspend.h>
-#endif /* CONFIG_HAS_EARLYSUSPEND */
-
 #ifdef CONFIG_EFUSE_CONFIG_FILE
 	#include <linux/fs.h>
 #endif
@@ -413,8 +409,6 @@ static inline int rtw_merge_string(char *dst, int dst_len, const char *src1, con
 /* Suspend lock prevent system from going suspend */
 #ifdef CONFIG_WAKELOCK
 	#include <linux/wakelock.h>
-#elif defined(CONFIG_ANDROID_POWER)
-	#include <linux/android_power.h>
 #endif
 
 /* limitation of path length */

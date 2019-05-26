@@ -69,15 +69,9 @@ int recvbuf2recvframe(PADAPTER padapter, void *ptr)
 	precvpriv = &padapter->recvpriv;
 	pfree_recv_queue = &precvpriv->free_recv_queue;
 
-#ifdef CONFIG_USE_USB_BUFFER_ALLOC_RX
-	pskb = NULL;
-	transfer_len = (s32)((struct recv_buf *)ptr)->transfer_len;
-	pbuf = ((struct recv_buf *)ptr)->pbuf;
-#else /* !CONFIG_USE_USB_BUFFER_ALLOC_RX */
 	pskb = (_pkt *)ptr;
 	transfer_len = (s32)pskb->len;
 	pbuf = pskb->data;
-#endif /* !CONFIG_USE_USB_BUFFER_ALLOC_RX */
 
 	do {
 		precvframe = rtw_alloc_recvframe(pfree_recv_queue);

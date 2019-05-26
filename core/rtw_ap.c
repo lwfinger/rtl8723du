@@ -1231,24 +1231,11 @@ static void rtw_ap_check_scan(_adapter *padapter)
 		}
 	_exit_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 
-#ifdef CONFIG_RTW_ACS
-	if (padapter->registrypriv.acs_auto_scan) {
-		do_scan = _TRUE;
-		reason |= RTW_AUTO_SCAN_REASON_ACS;
-		rtw_acs_start(padapter);
-	}
-#endif/*CONFIG_RTW_ACS*/
-
 	if (_TRUE == do_scan) {
 		RTW_INFO("%s : drv scans by itself and wait_completed\n", __func__);
 		rtw_drv_scan_by_self(padapter, reason);
 		rtw_scan_wait_completed(padapter);
 	}
-
-#ifdef CONFIG_RTW_ACS
-	if (padapter->registrypriv.acs_auto_scan)
-		rtw_acs_stop(padapter);
-#endif
 
 	_enter_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 
@@ -1438,9 +1425,6 @@ chbw_decision:
 
 	rtw_start_bss_hdl_after_chbw_decided(padapter);
 
-#if defined(CONFIG_DFS_MASTER)
-	rtw_dfs_master_status_apply(padapter, self_action);
-#endif
 	rtw_hal_rcr_set_chk_bssid(padapter, self_action);
 
 #ifdef CONFIG_MCC_MODE
@@ -3447,10 +3431,6 @@ void stop_ap_mode(_adapter *padapter)
 	padapter->securitypriv.ndisauthtype = Ndis802_11AuthModeOpen;
 	padapter->securitypriv.ndisencryptstatus = Ndis802_11WEPDisabled;
 
-#ifdef CONFIG_DFS_MASTER
-	rtw_dfs_master_status_apply(padapter, self_action);
-#endif
-
 	/* free scan queue */
 	rtw_free_network_queue(padapter, _TRUE);
 
@@ -3720,22 +3700,6 @@ choose_chbw:
 		if (req_bw < 0)
 			req_bw = cur_ie_bw;
 
-#if defined(CONFIG_DFS_MASTER)
-		if (!rtw_odm_dfs_domain_unknown(adapter)) {
-			/* choose 5G DFS channel for debug */
-			if (adapter_to_rfctl(adapter)->dbg_dfs_master_choose_dfs_ch_first
-				&& rtw_choose_shortest_waiting_ch(adapter, req_bw, &dec_ch, &dec_bw, &dec_offset, RTW_CHF_2G | RTW_CHF_NON_DFS) == _TRUE)
-				RTW_INFO(FUNC_ADPT_FMT" choose 5G DFS channel for debug\n", FUNC_ADPT_ARG(adapter));
-			else if (adapter_to_rfctl(adapter)->dfs_ch_sel_d_flags
-				&& rtw_choose_shortest_waiting_ch(adapter, req_bw, &dec_ch, &dec_bw, &dec_offset, adapter_to_rfctl(adapter)->dfs_ch_sel_d_flags) == _TRUE)
-				RTW_INFO(FUNC_ADPT_FMT" choose with dfs_ch_sel_d_flags:0x%02x for debug\n", FUNC_ADPT_ARG(adapter), adapter_to_rfctl(adapter)->dfs_ch_sel_d_flags);
-			else if (rtw_choose_shortest_waiting_ch(adapter, req_bw, &dec_ch, &dec_bw, &dec_offset, 0) == _FALSE) {
-				RTW_WARN(FUNC_ADPT_FMT" no available channel\n", FUNC_ADPT_ARG(adapter));
-				*chbw_allow = _FALSE;
-				goto exit;
-			}
-		} else
-#endif /* defined(CONFIG_DFS_MASTER) */
 		if (rtw_choose_shortest_waiting_ch(adapter, req_bw, &dec_ch, &dec_bw, &dec_offset, RTW_CHF_DFS) == _FALSE) {
 			RTW_WARN(FUNC_ADPT_FMT" no available channel\n", FUNC_ADPT_ARG(adapter));
 			*chbw_allow = _FALSE;

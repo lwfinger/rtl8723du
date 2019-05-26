@@ -207,46 +207,13 @@ void rtw_odm_releasespinlock(_adapter *adapter,	enum rt_spinlock_type type)
 
 inline u8 rtw_odm_get_dfs_domain(_adapter *adapter)
 {
-#ifdef CONFIG_DFS_MASTER
-	struct PHY_DM_STRUCT *pDM_Odm = adapter_to_phydm(adapter);
-
-	return pDM_Odm->dfs_region_domain;
-#else
 	return PHYDM_DFS_DOMAIN_UNKNOWN;
-#endif
 }
 
 inline u8 rtw_odm_dfs_domain_unknown(_adapter *adapter)
 {
-#ifdef CONFIG_DFS_MASTER
-	return rtw_odm_get_dfs_domain(adapter) == PHYDM_DFS_DOMAIN_UNKNOWN;
-#else
 	return 1;
-#endif
 }
-
-#ifdef CONFIG_DFS_MASTER
-inline VOID rtw_odm_radar_detect_reset(_adapter *adapter)
-{
-	phydm_radar_detect_reset(adapter_to_phydm(adapter));
-}
-
-inline VOID rtw_odm_radar_detect_disable(_adapter *adapter)
-{
-	phydm_radar_detect_disable(adapter_to_phydm(adapter));
-}
-
-/* called after ch, bw is set */
-inline VOID rtw_odm_radar_detect_enable(_adapter *adapter)
-{
-	phydm_radar_detect_enable(adapter_to_phydm(adapter));
-}
-
-inline BOOLEAN rtw_odm_radar_detect(_adapter *adapter)
-{
-	return phydm_radar_detect(adapter_to_phydm(adapter));
-}
-#endif /* CONFIG_DFS_MASTER */
 
 void rtw_odm_parse_rx_phy_status_chinfo(union recv_frame *rframe, u8 *phys)
 {
@@ -260,33 +227,6 @@ void rtw_odm_parse_rx_phy_status_chinfo(union recv_frame *rframe, u8 *phys)
 	u8 *wlanhdr = get_recvframe_data(rframe);
 
 	if (phydm->support_ic_type & ODM_IC_PHY_STATUE_NEW_TYPE) {
-		/*
-		* 8723D:
-		* type_0(CCK)
-		*     l_rxsc
-		*         is filled with primary channel SC, not real rxsc.
-		*         0:LSC, 1:USC
-		* type_1(OFDM)
-		*     rf_mode
-		*         RF bandwidth when RX
-		*     l_rxsc(legacy), ht_rxsc
-		*         see below RXSC N-series
-		* type_2(Not used)
-		*/
-		/*
-		* 8821C, 8822B:
-		* type_0(CCK)
-		*     l_rxsc
-		*         is filled with primary channel SC, not real rxsc.
-		*         0:LSC, 1:USC
-		* type_1(OFDM)
-		*     rf_mode
-		*         RF bandwidth when RX
-		*     l_rxsc(legacy), ht_rxsc
-		*         see below RXSC AC-series
-		* type_2(Not used)
-		*/
-
 		if ((*phys & 0xf) == 0) {
 			struct _phy_status_rpt_jaguar2_type0 *phys_t0 = (struct _phy_status_rpt_jaguar2_type0 *)phys;
 

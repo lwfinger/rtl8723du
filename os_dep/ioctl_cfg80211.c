@@ -3482,13 +3482,6 @@ static int rtw_cfg80211_monitor_if_xmit_entry(struct sk_buff *skb, struct net_de
 	if (skb)
 		rtw_mstat_update(MSTAT_TYPE_SKB, MSTAT_ALLOC_SUCCESS, skb->truesize);
 
-	if (IS_CH_WAITING(rfctl)) {
-		#ifdef CONFIG_DFS_MASTER
-		if (rtw_rfctl_overlap_radar_detect_ch(rfctl))
-			goto fail;
-		#endif
-	}
-
 	if (unlikely(skb->len < sizeof(struct ieee80211_radiotap_header)))
 		goto fail;
 
@@ -5298,14 +5291,6 @@ static int cfg80211_rtw_mgmt_tx(struct wiphy *wiphy,
 
 	rfctl = adapter_to_rfctl(padapter);
 	tx_ch = (u8)ieee80211_frequency_to_channel(chan->center_freq);
-	if (IS_CH_WAITING(rfctl)) {
-		#ifdef CONFIG_DFS_MASTER
-		if (_rtw_rfctl_overlap_radar_detect_ch(rfctl, tx_ch, CHANNEL_WIDTH_20, HAL_PRIME_CHNL_OFFSET_DONT_CARE)) {
-			ret = -EINVAL;
-			goto exit;
-		}
-		#endif
-	}
 
 	dvobj = adapter_to_dvobj(padapter);
 	pwdev_priv = adapter_wdev_data(padapter);

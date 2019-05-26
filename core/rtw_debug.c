@@ -107,12 +107,6 @@ void dump_drv_cfg(struct seq_file *sel)
 #ifdef CONFIG_USB_INTERRUPT_IN_PIPE
 	RTW_PRINT_SEL(sel, "CONFIG_USB_INTERRUPT_IN_PIPE\n");
 #endif
-#ifdef CONFIG_USE_USB_BUFFER_ALLOC_TX
-	RTW_PRINT_SEL(sel, "CONFIG_USE_USB_BUFFER_ALLOC_TX\n");
-#endif
-#ifdef CONFIG_USE_USB_BUFFER_ALLOC_RX
-	RTW_PRINT_SEL(sel, "CONFIG_USE_USB_BUFFER_ALLOC_RX\n");
-#endif
 #ifdef CONFIG_PREALLOC_RECV_SKB
 	RTW_PRINT_SEL(sel, "CONFIG_PREALLOC_RECV_SKB\n");
 #endif
@@ -367,55 +361,6 @@ void dump_adapters_status(void *sel, struct dvobj_priv *dvobj)
 		, rfctl->offch_state
 	);
 
-#ifdef CONFIG_DFS_MASTER
-	if (rfctl->radar_detect_ch != 0) {
-		RTW_PRINT_SEL(sel, "%55s %3u,%u,%u"
-			, "radar_detect:"
-			, rfctl->radar_detect_ch
-			, rfctl->radar_detect_bw
-			, rfctl->radar_detect_offset
-		);
-
-		if (rfctl->radar_detect_by_others)
-			_RTW_PRINT_SEL(sel, ", by AP of STA link");
-		else {
-			u32 non_ocp_ms;
-			u32 cac_ms;
-			u8 dfs_domain = rtw_odm_get_dfs_domain(dvobj_get_primary_adapter(dvobj));
-
-			_RTW_PRINT_SEL(sel, ", domain:%u", dfs_domain);
-
-			for (i = 0; i < dvobj->iface_nums; i++) {
-				if (!dvobj->padapters[i])
-					continue;
-				if (check_fwstate(&dvobj->padapters[i]->mlmepriv, WIFI_AP_STATE | WIFI_MESH_STATE)
-					&& check_fwstate(&dvobj->padapters[i]->mlmepriv, WIFI_ASOC_STATE))
-					break;
-			}
-
-			if (i >= dvobj->iface_nums) {
-				RTW_PRINT_SEL(sel, "DFS master enable without AP/Mesh mode???");
-				goto end_dfs_master;
-			}
-
-			rtw_get_ch_waiting_ms(dvobj->padapters[i]
-				, rfctl->radar_detect_ch
-				, rfctl->radar_detect_bw
-				, rfctl->radar_detect_offset
-				, &non_ocp_ms
-				, &cac_ms
-			);
-
-			if (non_ocp_ms)
-				_RTW_PRINT_SEL(sel, ", non_ocp:%d", non_ocp_ms);
-			if (cac_ms)
-				_RTW_PRINT_SEL(sel, ", cac:%d", cac_ms);
-		}
-
-end_dfs_master:
-		_RTW_PRINT_SEL(sel, "\n");
-	}
-#endif /* CONFIG_DFS_MASTER */
 }
 
 #define SEC_CAM_ENT_ID_TITLE_FMT "%-2s"
@@ -1746,52 +1691,6 @@ ssize_t proc_set_del_rx_ampdu_test_case(struct file *file, const char __user *bu
 
 	return count;
 }
-
-#ifdef CONFIG_DFS_MASTER
-int proc_get_dfs_master_test_case(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-
-	RTW_PRINT_SEL(m, "%-24s %-19s\n", "radar_detect_trigger_non", "choose_dfs_ch_first");
-	RTW_PRINT_SEL(m, "%24hhu %19hhu\n"
-		, rfctl->dbg_dfs_master_radar_detect_trigger_non
-		, rfctl->dbg_dfs_master_choose_dfs_ch_first
-	);
-
-	return 0;
-}
-
-ssize_t proc_set_dfs_master_test_case(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-	char tmp[32];
-	u8 radar_detect_trigger_non;
-	u8 choose_dfs_ch_first;
-
-	if (count < 1)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-		int num = sscanf(tmp, "%hhu %hhu", &radar_detect_trigger_non, &choose_dfs_ch_first);
-
-		if (num >= 1)
-			rfctl->dbg_dfs_master_radar_detect_trigger_non = radar_detect_trigger_non;
-		if (num >= 2)
-			rfctl->dbg_dfs_master_choose_dfs_ch_first = choose_dfs_ch_first;
-	}
-
-	return count;
-}
-#endif /* CONFIG_DFS_MASTER */
 
 static u32 g_wait_hiq_empty_ms = 0;
 

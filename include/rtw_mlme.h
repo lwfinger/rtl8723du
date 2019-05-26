@@ -736,10 +736,6 @@ struct mlme_priv {
 #ifdef CONFIG_DFS
 	u8	handle_dfs;
 #endif
-#ifdef CONFIG_DFS_MASTER
-	/* TODO: move to rfctl */
-	_timer dfs_master_timer;
-#endif
 #ifdef CONFIG_RTW_80211R
 	struct ft_roam_info ft_roam;
 #endif
@@ -1193,12 +1189,6 @@ void rtw_sta_media_status_rpt(_adapter *adapter, struct sta_info *sta, bool conn
 u8 rtw_sta_media_status_rpt_cmd(_adapter *adapter, struct sta_info *sta, bool connected);
 void rtw_sta_media_status_rpt_cmd_hdl(_adapter *adapter, struct sta_media_status_rpt_cmd_parm *parm);
 void rtw_sta_traffic_info(void *sel, _adapter *adapter);
-
-#ifdef CONFIG_INTEL_PROXIM
-void rtw_proxim_enable(_adapter *padapter);
-void rtw_proxim_disable(_adapter *padapter);
-void rtw_proxim_send_packet(_adapter *padapter, u8 *pbuf, u16 len, u8 m_rate);
-#endif /* CONFIG_INTEL_PROXIM */
 
 #define IPV4_SRC(_iphdr)			(((u8 *)(_iphdr)) + 12)
 #define IPV4_DST(_iphdr)			(((u8 *)(_iphdr)) + 16)

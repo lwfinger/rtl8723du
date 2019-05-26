@@ -591,20 +591,6 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 			RTW_INFO("Warning: Do not set channel setting reg MCC mode\n");
 	}
 #endif
-
-#ifdef CONFIG_DFS_MASTER
-	{
-		struct rf_ctl_t *rfctl = adapter_to_rfctl(padapter);
-		bool ori_overlap_radar_detect_ch = rtw_rfctl_overlap_radar_detect_ch(rfctl);
-		bool new_overlap_radar_detect_ch = _rtw_rfctl_overlap_radar_detect_ch(rfctl, channel, bwmode, channel_offset);
-
-		if (new_overlap_radar_detect_ch && IS_CH_WAITING(rfctl)) {
-			u8 pause = 0xFF;
-
-			rtw_hal_set_hwreg(padapter, HW_VAR_TXPAUSE, &pause);
-		}
-#endif /* CONFIG_DFS_MASTER */
-
 		/* set Channel */
 		/* saved channel/bw info */
 		rtw_set_oper_ch(padapter, channel);
@@ -629,19 +615,6 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 		if (iqk_info_backup == _TRUE)
 			rtw_hal_ch_sw_iqk_info_backup(padapter);
 #endif
-
-#ifdef CONFIG_DFS_MASTER
-		if (new_overlap_radar_detect_ch)
-			rtw_odm_radar_detect_enable(padapter);
-		else if (ori_overlap_radar_detect_ch) {
-			u8 pause = 0x00;
-
-			rtw_odm_radar_detect_disable(padapter);
-			rtw_hal_set_hwreg(padapter, HW_VAR_TXPAUSE, &pause);
-		}
-	}
-#endif /* CONFIG_DFS_MASTER */
-
 	_exit_critical_mutex(&(adapter_to_dvobj(padapter)->setch_mutex), NULL);
 }
 

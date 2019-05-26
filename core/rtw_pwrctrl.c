@@ -228,11 +228,6 @@ static bool rtw_pwr_unassociated_idle(_adapter *adapter)
 		goto exit;
 #endif
 
-#ifdef CONFIG_INTEL_PROXIM
-	if (adapter->proximity.proxim_on == _TRUE)
-		return;
-#endif
-
 	if (pxmit_priv->free_xmitbuf_cnt != NR_XMITBUFF ||
 	    pxmit_priv->free_xmit_extbuf_cnt != NR_XMIT_EXTBUFF) {
 		RTW_PRINT("There are some pkts to transmit\n");
@@ -1974,11 +1969,6 @@ void rtw_init_pwrctrl_priv(PADAPTER padapter)
 	pwrctrlpriv->wowlan_in_resume = _FALSE;
 	pwrctrlpriv->wowlan_last_wake_reason = 0;
 
-#if defined(CONFIG_HAS_EARLYSUSPEND) || defined(CONFIG_ANDROID_POWER)
-	pwrctrlpriv->early_suspend.suspend = NULL;
-	rtw_register_early_suspend(pwrctrlpriv);
-#endif /* CONFIG_HAS_EARLYSUSPEND || CONFIG_ANDROID_POWER */
-
 #ifdef CONFIG_LPS_POFF
 	rtw_hal_set_hwreg(padapter, HW_VAR_LPS_POFF_INIT, 0);
 #endif
@@ -2005,130 +1995,9 @@ void rtw_free_pwrctrl_priv(PADAPTER adapter)
 	#endif
 #endif /* CONFIG_LPS_LCLK */
 
-#if defined(CONFIG_HAS_EARLYSUSPEND) || defined(CONFIG_ANDROID_POWER)
-	rtw_unregister_early_suspend(pwrctrlpriv);
-#endif /* CONFIG_HAS_EARLYSUSPEND || CONFIG_ANDROID_POWER */
-
 	_free_pwrlock(&pwrctrlpriv->lock);
 	_free_pwrlock(&pwrctrlpriv->check_32k_lock);
-
 }
-
-#if defined(CONFIG_HAS_EARLYSUSPEND) || defined(CONFIG_ANDROID_POWER)
-inline bool rtw_is_earlysuspend_registered(struct pwrctrl_priv *pwrpriv)
-{
-	return (pwrpriv->early_suspend.suspend) ? _TRUE : _FALSE;
-}
-
-inline bool rtw_is_do_late_resume(struct pwrctrl_priv *pwrpriv)
-{
-	return (pwrpriv->do_late_resume) ? _TRUE : _FALSE;
-}
-
-inline void rtw_set_do_late_resume(struct pwrctrl_priv *pwrpriv, bool enable)
-{
-	pwrpriv->do_late_resume = enable;
-}
-#endif
-
-#ifdef CONFIG_HAS_EARLYSUSPEND
-extern int rtw_resume_process(_adapter *padapter);
-static void rtw_early_suspend(struct early_suspend *h)
-{
-	struct pwrctrl_priv *pwrpriv = container_of(h, struct pwrctrl_priv, early_suspend);
-	RTW_INFO("%s\n", __FUNCTION__);
-
-	rtw_set_do_late_resume(pwrpriv, _FALSE);
-}
-
-static void rtw_late_resume(struct early_suspend *h)
-{
-	struct pwrctrl_priv *pwrpriv = container_of(h, struct pwrctrl_priv, early_suspend);
-	struct dvobj_priv *dvobj = pwrctl_to_dvobj(pwrpriv);
-	_adapter *adapter = dvobj_get_primary_adapter(dvobj);
-
-	RTW_INFO("%s\n", __FUNCTION__);
-
-	if (pwrpriv->do_late_resume) {
-		rtw_set_do_late_resume(pwrpriv, _FALSE);
-		rtw_resume_process(adapter);
-	}
-}
-
-void rtw_register_early_suspend(struct pwrctrl_priv *pwrpriv)
-{
-	RTW_INFO("%s\n", __FUNCTION__);
-
-	/* jeff: set the early suspend level before blank screen, so we wll do late resume after scree is lit */
-	pwrpriv->early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN - 20;
-	pwrpriv->early_suspend.suspend = rtw_early_suspend;
-	pwrpriv->early_suspend.resume = rtw_late_resume;
-	register_early_suspend(&pwrpriv->early_suspend);
-
-
-}
-
-void rtw_unregister_early_suspend(struct pwrctrl_priv *pwrpriv)
-{
-	RTW_INFO("%s\n", __FUNCTION__);
-
-	rtw_set_do_late_resume(pwrpriv, _FALSE);
-
-	if (pwrpriv->early_suspend.suspend)
-		unregister_early_suspend(&pwrpriv->early_suspend);
-
-	pwrpriv->early_suspend.suspend = NULL;
-	pwrpriv->early_suspend.resume = NULL;
-}
-#endif /* CONFIG_HAS_EARLYSUSPEND */
-
-#ifdef CONFIG_ANDROID_POWER
-	extern int rtw_resume_process(PADAPTER padapter);
-static void rtw_early_suspend(android_early_suspend_t *h)
-{
-	struct pwrctrl_priv *pwrpriv = container_of(h, struct pwrctrl_priv, early_suspend);
-	RTW_INFO("%s\n", __FUNCTION__);
-
-	rtw_set_do_late_resume(pwrpriv, _FALSE);
-}
-
-static void rtw_late_resume(android_early_suspend_t *h)
-{
-	struct pwrctrl_priv *pwrpriv = container_of(h, struct pwrctrl_priv, early_suspend);
-	struct dvobj_priv *dvobj = pwrctl_to_dvobj(pwrpriv);
-	_adapter *adapter = dvobj_get_primary_adapter(dvobj);
-
-	RTW_INFO("%s\n", __FUNCTION__);
-	if (pwrpriv->do_late_resume) {
-		rtw_set_do_late_resume(pwrpriv, _FALSE);
-		rtw_resume_process(adapter);
-	}
-}
-
-void rtw_register_early_suspend(struct pwrctrl_priv *pwrpriv)
-{
-	RTW_INFO("%s\n", __FUNCTION__);
-
-	/* jeff: set the early suspend level before blank screen, so we wll do late resume after scree is lit */
-	pwrpriv->early_suspend.level = ANDROID_EARLY_SUSPEND_LEVEL_BLANK_SCREEN - 20;
-	pwrpriv->early_suspend.suspend = rtw_early_suspend;
-	pwrpriv->early_suspend.resume = rtw_late_resume;
-	android_register_early_suspend(&pwrpriv->early_suspend);
-}
-
-void rtw_unregister_early_suspend(struct pwrctrl_priv *pwrpriv)
-{
-	RTW_INFO("%s\n", __FUNCTION__);
-
-	rtw_set_do_late_resume(pwrpriv, _FALSE);
-
-	if (pwrpriv->early_suspend.suspend)
-		android_unregister_early_suspend(&pwrpriv->early_suspend);
-
-	pwrpriv->early_suspend.suspend = NULL;
-	pwrpriv->early_suspend.resume = NULL;
-}
-#endif /* CONFIG_ANDROID_POWER */
 
 u8 rtw_interface_ps_func(_adapter *padapter, HAL_INTF_PS_FUNC efunc_id, u8 *val)
 {

@@ -9,10 +9,6 @@
 
 /* --------------------------------------------------*/
 
-#ifdef CONFIG_DFS_MASTER
-	#define CONFIG_PHYDM_DFS_MASTER
-#endif
-
 /*#define PHYDM_DIG_MODE_DECISION_SUPPORT*/
 #define	CONFIG_PSD_TOOL
 /*#define	CONFIG_RA_DBG_CMD*/

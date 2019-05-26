@@ -51,14 +51,6 @@
 /* #define CONFIG_USB_INTERRUPT_IN_PIPE */
 #endif
 
-/* #define CONFIG_REDUCE_USB_TX_INT	*/ /* Trade-off: Improve performance, but may cause TX URBs blocked by USB Host/Bus driver on few platforms. */
-
-/*
- * CONFIG_USE_USB_BUFFER_ALLOC_XX uses Linux USB Buffer alloc API and is for Linux platform only now!
- */
-/* #define CONFIG_USE_USB_BUFFER_ALLOC_TX	*/ /* Trade-off: For TX path, improve stability on some platforms, but may cause performance degrade on other platforms. */
-/* #define CONFIG_USE_USB_BUFFER_ALLOC_RX	*/ /* For RX path */
-
 /*
  * USB VENDOR REQ BUFFER ALLOCATION METHOD
  * if not set we'll use function local variable (stack memory)
@@ -67,8 +59,6 @@
 #define CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC
 #define CONFIG_USB_VENDOR_REQ_MUTEX
 #define CONFIG_VENDOR_REQ_RETRY
-/* #define CONFIG_USB_SUPPORT_ASYNC_VDN_REQ */
-
 
 /*
  * Others
@@ -76,8 +66,6 @@
 #define CONFIG_SKB_COPY	/* for amsdu */
 
 #define CONFIG_NEW_SIGNAL_STAT_PROCESS
-
-/* #define CONFIG_SIGNAL_DISPLAY_DBM */ /* display RX signal with dbm */
 
 /* #define CONFIG_CHECK_AC_LIFETIME	*/ /* Check packet lifetime of 4 ACs. */
 
@@ -135,13 +123,9 @@
 		#define CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR
 	#endif
 
-#ifdef CONFIG_USE_USB_BUFFER_ALLOC_RX
-
-#else
-	#define CONFIG_PREALLOC_RECV_SKB
-	#ifdef CONFIG_PREALLOC_RECV_SKB
-		/* #define CONFIG_FIX_NR_BULKIN_BUFFER */ /* only use PREALLOC_RECV_SKB buffer, don't alloc skb at runtime */
-	#endif
+#define CONFIG_PREALLOC_RECV_SKB
+#ifdef CONFIG_PREALLOC_RECV_SKB
+	/* #define CONFIG_FIX_NR_BULKIN_BUFFER */ /* only use PREALLOC_RECV_SKB buffer, don't alloc skb at runtime */
 #endif
 
 /*

@@ -273,23 +273,11 @@ static int rtw_qos_opt_enable = 0; /* 0: disable,1:enable */
 #endif
 module_param(rtw_qos_opt_enable, int, 0644);
 
-#ifdef CONFIG_RTW_ACS
-int rtw_acs_auto_scan = 0; /*0:disable, 1:enable*/
-module_param(rtw_acs_auto_scan, int, 0644);
-
-int rtw_acs = 1;
-module_param(rtw_acs, int, 0644);
-#endif
-
 static char *ifname = "wlan%d";
 module_param(ifname, charp, 0644);
 MODULE_PARM_DESC(ifname, "The default name to allocate for first interface");
 
-#ifdef CONFIG_PLATFORM_ANDROID
-	char *if2name = "p2p%d";
-#else /* CONFIG_PLATFORM_ANDROID */
 static 	char *if2name = "wlan%d";
-#endif /* CONFIG_PLATFORM_ANDROID */
 module_param(if2name, charp, 0644);
 MODULE_PARM_DESC(if2name, "The default name to allocate for second interface");
 
@@ -419,12 +407,6 @@ MODULE_PARM_DESC(rtw_adaptivity_th_l2h_ini, "th_l2h_ini for Adaptivity");
 static int rtw_adaptivity_th_edcca_hl_diff = CONFIG_RTW_ADAPTIVITY_TH_EDCCA_HL_DIFF;
 module_param(rtw_adaptivity_th_edcca_hl_diff, int, 0644);
 MODULE_PARM_DESC(rtw_adaptivity_th_edcca_hl_diff, "th_edcca_hl_diff for Adaptivity");
-
-#ifdef CONFIG_DFS_MASTER
-uint rtw_dfs_region_domain = CONFIG_RTW_DFS_REGION_DOMAIN;
-module_param(rtw_dfs_region_domain, uint, 0644);
-MODULE_PARM_DESC(rtw_dfs_region_domain, "0:UNKNOWN, 1:FCC, 2:MKK, 3:ETSI");
-#endif
 
 static uint rtw_amplifier_type_2g = CONFIG_RTW_AMPLIFIER_TYPE_2G;
 module_param(rtw_amplifier_type_2g, uint, 0644);
@@ -851,18 +833,10 @@ uint loadparam(_adapter *padapter)
 	registry_par->boffefusemask = (u8)rtw_OffEfuseMask;
 	registry_par->bFileMaskEfuse = (u8)rtw_FileMaskEfuse;
 
-#ifdef CONFIG_RTW_ACS
-	registry_par->acs_mode = (u8)rtw_acs;
-	registry_par->acs_auto_scan = (u8)rtw_acs_auto_scan;
-#endif
 	registry_par->reg_rxgain_offset_2g = (u32) rtw_rxgain_offset_2g;
 	registry_par->reg_rxgain_offset_5gl = (u32) rtw_rxgain_offset_5gl;
 	registry_par->reg_rxgain_offset_5gm = (u32) rtw_rxgain_offset_5gm;
 	registry_par->reg_rxgain_offset_5gh = (u32) rtw_rxgain_offset_5gh;
-
-#ifdef CONFIG_DFS_MASTER
-	registry_par->dfs_region_domain = (u8)rtw_dfs_region_domain;
-#endif
 
 #ifdef CONFIG_MCC_MODE
 	registry_par->en_mcc = (u8)rtw_en_mcc;
@@ -1700,12 +1674,6 @@ u8 rtw_init_default_value(_adapter *padapter)
 	padapter->tsf.sync_port =  MAX_HW_PORT;
 	padapter->tsf.offset = 0;
 
-#ifdef CONFIG_RTW_ACS
-	if (pregistrypriv->acs_mode)
-		rtw_acs_start(padapter);
-	else
-		rtw_acs_stop(padapter);
-#endif
 	return ret;
 }
 
@@ -2007,10 +1975,6 @@ void rtw_cancel_all_timer(_adapter *padapter)
 	_cancel_timer_ex(&padapter->mlmepriv.assoc_timer);
 
 	_cancel_timer_ex(&padapter->mlmepriv.scan_to_timer);
-
-#ifdef CONFIG_DFS_MASTER
-	_cancel_timer_ex(&padapter->mlmepriv.dfs_master_timer);
-#endif
 
 	_cancel_timer_ex(&adapter_to_dvobj(padapter)->dynamic_chk_timer);
 	/* cancel sw led timer */
@@ -2993,7 +2957,6 @@ static int netdev_close(struct net_device *pnetdev)
 		if (pnetdev)
 			rtw_netif_stop_queue(pnetdev);
 
-#ifndef CONFIG_ANDROID
 		/* s2. */
 		LeaveAllPowerSaveMode(padapter);
 		rtw_disassoc_cmd(padapter, 500, RTW_CMDF_DIRECTLY);
@@ -3003,7 +2966,6 @@ static int netdev_close(struct net_device *pnetdev)
 		rtw_free_assoc_resources(padapter, 1);
 		/* s2-4. */
 		rtw_free_network_queue(padapter, _TRUE);
-#endif
 		/* Close LED */
 		rtw_led_control(padapter, LED_CTL_POWER_OFF);
 	}

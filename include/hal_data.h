@@ -309,9 +309,6 @@ typedef struct hal_com_data {
 	BOOLEAN			bChnlBWInitialized;
 	u32				BackUp_BB_REG_4_2nd_CCA[3];
 
-#ifdef CONFIG_RTW_ACS
-	struct auto_chan_sel acs;
-#endif
 #ifdef CONFIG_BCN_RECOVERY
 	u8 issue_bcn_fail;
 #endif /*CONFIG_BCN_RECOVERY*/

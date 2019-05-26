@@ -17,18 +17,10 @@ static void rtw_init_mlme_timer(_adapter *padapter)
 	rtw_init_timer(&(pmlmepriv->assoc_timer), padapter, rtw_join_timeout_handler, padapter);
 	rtw_init_timer(&(pmlmepriv->scan_to_timer), padapter, rtw_scan_timeout_handler, padapter);
 
-#ifdef CONFIG_DFS_MASTER
-	rtw_init_timer(&(pmlmepriv->dfs_master_timer), padapter, rtw_dfs_master_timer_hdl, padapter);
-#endif
-
 	rtw_init_timer(&(pmlmepriv->set_scan_deny_timer), padapter, rtw_set_scan_deny_timer_hdl, padapter);
 #else
 	timer_setup(&pmlmepriv->assoc_timer, rtw_join_timeout_handler, 0);
 	timer_setup(&pmlmepriv->scan_to_timer, rtw_scan_timeout_handler, 0);
-
-#ifdef CONFIG_DFS_MASTER
-	timer_setup(&pmlmepriv->dfs_master_timer, rtw_dfs_master_timer_hdl, 0);
-#endif
 
 	timer_setup(&pmlmepriv->set_scan_deny_timer, rtw_set_scan_deny_timer_hdl, 0);
 #endif

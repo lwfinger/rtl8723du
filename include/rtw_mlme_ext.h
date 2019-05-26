@@ -423,9 +423,6 @@ typedef struct _RT_CHANNEL_INFO {
 	/* s32				MaxTxPwrDbm;	 */ /* Max allowed tx power. */
 	/* u32				ExInfo;			 */ /* Extended Information for this channel. */
 #ifdef CONFIG_DFS
-	#ifdef CONFIG_DFS_MASTER
-	systime non_ocp_end_time;
-	#endif
 	u8 hidden_bss_cnt; /* per scan count */
 #endif
 } RT_CHANNEL_INFO, *PRT_CHANNEL_INFO;
@@ -441,23 +438,9 @@ void rtw_txpwr_init_regd(struct rf_ctl_t *rfctl);
 void rtw_rfctl_init(_adapter *adapter);
 void rtw_rfctl_deinit(_adapter *adapter);
 
-#ifdef CONFIG_DFS_MASTER
-struct rf_ctl_t;
-#define CH_IS_NON_OCP(rt_ch_info) (time_after((rt_ch_info)->non_ocp_end_time, rtw_get_current_time()))
-bool rtw_is_cac_reset_needed(_adapter *adapter, u8 ch, u8 bw, u8 offset);
-bool _rtw_rfctl_overlap_radar_detect_ch(struct rf_ctl_t *rfctl, u8 ch, u8 bw, u8 offset);
-bool rtw_rfctl_overlap_radar_detect_ch(struct rf_ctl_t *rfctl);
-bool rtw_rfctl_is_tx_blocked_by_ch_waiting(struct rf_ctl_t *rfctl);
-bool rtw_chset_is_ch_non_ocp(RT_CHANNEL_INFO *ch_set, u8 ch, u8 bw, u8 offset);
-void rtw_chset_update_non_ocp(RT_CHANNEL_INFO *ch_set, u8 ch, u8 bw, u8 offset);
-void rtw_chset_update_non_ocp_ms(RT_CHANNEL_INFO *ch_set, u8 ch, u8 bw, u8 offset, int ms);
-u32 rtw_get_ch_waiting_ms(_adapter *adapter, u8 ch, u8 bw, u8 offset, u32 *r_non_ocp_ms, u32 *r_cac_ms);
-void rtw_reset_cac(_adapter *adapter, u8 ch, u8 bw, u8 offset);
-#else
 #define CH_IS_NON_OCP(rt_ch_info) 0
 #define rtw_chset_is_ch_non_ocp(ch_set, ch, bw, offset) _FALSE
 #define rtw_rfctl_is_tx_blocked_by_ch_waiting(rfctl) _FALSE
-#endif
 
 enum {
 	RTW_CHF_2G = BIT0,
