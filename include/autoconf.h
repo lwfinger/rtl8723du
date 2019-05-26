@@ -38,8 +38,6 @@
 /*
  * Interface Related Configure
  */
-#define CONFIG_USB_RX_AGGREGATION
-
 #define USB_INTERFERENCE_ISSUE /* this should be checked in all usb interface */
 
 #define CONFIG_GLOBAL_UI_PID
@@ -77,18 +75,9 @@
  */
 #define CONFIG_SKB_COPY	/* for amsdu */
 
-/* #define CONFIG_EASY_REPLACEMENT */
-
-/* #define CONFIG_ADAPTOR_INFO_CACHING_FILE */ /* now just applied on 8192cu only, should make it general... */
-
-/* #define CONFIG_RESUME_IN_WORKQUEUE */
-
 #define CONFIG_NEW_SIGNAL_STAT_PROCESS
 
 /* #define CONFIG_SIGNAL_DISPLAY_DBM */ /* display RX signal with dbm */
-#ifdef CONFIG_SIGNAL_DISPLAY_DBM
-/* #define CONFIG_BACKGROUND_NOISE_MONITOR */
-#endif
 
 /* #define CONFIG_CHECK_AC_LIFETIME	*/ /* Check packet lifetime of 4 ACs. */
 
@@ -106,12 +95,9 @@
 /*
  * Auto Configure Section
  */
-#undef CONFIG_USB_RX_AGGREGATION
-
 #ifdef CONFIG_MP_INCLUDED
 	#define MP_DRIVER	1
 	#define CONFIG_MP_IWPRIV_SUPPORT
-	/* #undef CONFIG_USB_RX_AGGREGATION */
 #else /* !CONFIG_MP_INCLUDED */
 	#define MP_DRIVER	0
 #endif /* !CONFIG_MP_INCLUDED */
@@ -158,10 +144,6 @@
 	#endif
 #endif
 
-#ifdef CONFIG_TX_EARLY_MODE
-#define RTL8723C_EARLY_MODE_PKT_NUM_10	0
-#endif
-
 /*
  * Debug Related Configure
  */
@@ -174,15 +156,10 @@
 	#define DBG_PHYDM_MORE 0
 #endif /* CONFIG_DEBUG */
 
-
-
 #define CONFIG_PROC_DEBUG
 /* #define CONFIG_DIS_UPHY */
 
 /*
-#define DBG_CONFIG_ERROR_DETECT
-#define DBG_CONFIG_ERROR_DETECT_INT
-#define DBG_CONFIG_ERROR_RESET
 
 #define DBG_IO
 #define DBG_DELAY_OS

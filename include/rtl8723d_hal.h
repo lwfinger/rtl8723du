@@ -16,9 +16,6 @@
 #include "Hal8723DPwrSeq.h"
 #include "Hal8723DPhyReg.h"
 #include "Hal8723DPhyCfg.h"
-#ifdef DBG_CONFIG_ERROR_DETECT
-	#include "rtl8723d_sreset.h"
-#endif
 #ifdef CONFIG_LPS_POFF
 	#include "rtl8723d_lps_poff.h"
 #endif

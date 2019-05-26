@@ -2525,23 +2525,12 @@ void EFUSE_ShadowMapUpdate(
 #else /* !RTW_HALMAC */
 	EFUSE_GetEfuseDefinition(pAdapter, efuseType, TYPE_EFUSE_MAP_LEN, (PVOID)&mapLen, bPseudoTest);
 
-	if (pHalData->bautoload_fail_flag == _TRUE)
+	if (pHalData->bautoload_fail_flag == _TRUE) {
 		_rtw_memset(pHalData->efuse_eeprom_data, 0xFF, mapLen);
-	else {
-#ifdef CONFIG_ADAPTOR_INFO_CACHING_FILE
-		if (_SUCCESS != retriveAdaptorInfoFile(pAdapter->registrypriv.adaptor_info_caching_file_path, pHalData->efuse_eeprom_data)) {
-#endif
-
+	} else {
 			Efuse_ReadAllMap(pAdapter, efuseType, pHalData->efuse_eeprom_data, bPseudoTest);
 
-#ifdef CONFIG_ADAPTOR_INFO_CACHING_FILE
-			storeAdaptorInfoFile(pAdapter->registrypriv.adaptor_info_caching_file_path, pHalData->efuse_eeprom_data);
-		}
-#endif
 	}
-
-	/* PlatformMoveMemory((PVOID)&pHalData->EfuseMap[EFUSE_MODIFY_MAP][0], */
-	/* (PVOID)&pHalData->EfuseMap[EFUSE_INIT_MAP][0], mapLen); */
 #endif /* !RTW_HALMAC */
 
 	rtw_mask_map_read(pAdapter, 0x00, mapLen, pHalData->efuse_eeprom_data);
@@ -2582,53 +2571,6 @@ u8 mac_hidden_wl_func_to_hal_wl_func(u8 func)
 
 	return wl_func;
 }
-
-#ifdef CONFIG_ADAPTOR_INFO_CACHING_FILE
-/* #include <rtw_eeprom.h> */
-
-int isAdaptorInfoFileValid(void)
-{
-	return _TRUE;
-}
-
-int storeAdaptorInfoFile(char *path, u8 *efuse_data)
-{
-	int ret = _SUCCESS;
-
-	if (path && efuse_data) {
-		ret = rtw_store_to_file(path, efuse_data, EEPROM_MAX_SIZE_512);
-		if (ret == EEPROM_MAX_SIZE)
-			ret = _SUCCESS;
-		else
-			ret = _FAIL;
-	} else {
-		RTW_INFO("%s NULL pointer\n", __FUNCTION__);
-		ret =  _FAIL;
-	}
-	return ret;
-}
-
-int retriveAdaptorInfoFile(char *path, u8 *efuse_data)
-{
-	int ret = _SUCCESS;
-	mm_segment_t oldfs;
-	struct file *fp;
-
-	if (path && efuse_data) {
-
-		ret = rtw_retrieve_from_file(path, efuse_data, EEPROM_MAX_SIZE);
-
-		if (ret == EEPROM_MAX_SIZE)
-			ret = _SUCCESS;
-		else
-			ret = _FAIL;
-	} else {
-		RTW_INFO("%s NULL pointer\n", __FUNCTION__);
-		ret = _FAIL;
-	}
-	return ret;
-}
-#endif /* CONFIG_ADAPTOR_INFO_CACHING_FILE */
 
 u8 rtw_efuse_file_read(PADAPTER padapter, u8 *filepatch, u8 *buf, u32 len)
 {

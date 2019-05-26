@@ -174,12 +174,6 @@ static inline bool rtw_os_need_wake_queue(_adapter *padapter, u16 qidx)
 	if (padapter->registrypriv.wifi_spec) {
 		if (pxmitpriv->hwxmits[qidx].accnt < WMM_XMIT_THRESHOLD)
 			return _TRUE;
-#ifdef DBG_CONFIG_ERROR_DETECT
-#ifdef DBG_CONFIG_ERROR_RESET
-	} else if (rtw_hal_sreset_inprogress(padapter) == _TRUE) {
-		return _FALSE;
-#endif/* #ifdef DBG_CONFIG_ERROR_RESET */
-#endif/* #ifdef DBG_CONFIG_ERROR_DETECT */
 	} else {
 #ifdef CONFIG_MCC_MODE
 		if (MCC_EN(padapter)) {

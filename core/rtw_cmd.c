@@ -2495,18 +2495,10 @@ static void rtw_dynamic_chk_wk_hdl(_adapter *padapter)
 {
 	rtw_mi_dynamic_chk_wk_hdl(padapter);
 
-#ifdef DBG_CONFIG_ERROR_DETECT
-	rtw_hal_sreset_xmit_status_check(padapter);
-	rtw_hal_sreset_linked_status_check(padapter);
-#endif
-
-	/* if(check_fwstate(pmlmepriv, _FW_UNDER_LINKING|_FW_UNDER_SURVEY)==_FALSE) */
-	{
 #ifdef DBG_RX_COUNTER_DUMP
-		rtw_dump_rx_counters(padapter);
+	rtw_dump_rx_counters(padapter);
 #endif
-		dm_DynamicUsbTxAgg(padapter, 0);
-	}
+	dm_DynamicUsbTxAgg(padapter, 0);
 	rtw_hal_dm_watchdog(padapter);
 
 	/* check_hw_pbc(padapter, pdrvextra_cmd->pbuf, pdrvextra_cmd->type); */

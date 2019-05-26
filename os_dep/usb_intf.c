@@ -770,9 +770,6 @@ static int rtw_resume(struct usb_interface *pusb_intf)
 			ret = rtw_resume_process(padapter);
 			rtw_resume_unlock_suspend();
 		} else {
-#ifdef CONFIG_RESUME_IN_WORKQUEUE
-			rtw_resume_in_workqueue(pwrpriv);
-#else
 			if (rtw_is_earlysuspend_registered(pwrpriv)) {
 				/* jeff: bypass resume here, do in late_resume */
 				rtw_set_do_late_resume(pwrpriv, _TRUE);
@@ -781,7 +778,6 @@ static int rtw_resume(struct usb_interface *pusb_intf)
 				ret = rtw_resume_process(padapter);
 				rtw_resume_unlock_suspend();
 			}
-#endif
 		}
 	}
 

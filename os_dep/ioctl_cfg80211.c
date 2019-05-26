@@ -6163,95 +6163,6 @@ static void cfg80211_rtw_rfkill_poll(struct wiphy *wiphy)
 }
 #endif
 
-#if defined(CONFIG_RTW_HOSTAPD_ACS) && (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 33))
-
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) && (LINUX_VERSION_CODE < KERNEL_VERSION(4, 0, 0))
-#define SURVEY_INFO_TIME			SURVEY_INFO_CHANNEL_TIME
-#define SURVEY_INFO_TIME_BUSY		SURVEY_INFO_CHANNEL_TIME_BUSY
-#define SURVEY_INFO_TIME_EXT_BUSY	SURVEY_INFO_CHANNEL_TIME_EXT_BUSY
-#define SURVEY_INFO_TIME_RX			SURVEY_INFO_CHANNEL_TIME_RX
-#define SURVEY_INFO_TIME_TX			SURVEY_INFO_CHANNEL_TIME_TX
-#endif
-
-#if defined(CONFIG_RTW_ACS) && defined(CONFIG_BACKGROUND_NOISE_MONITOR)
-static void rtw_cfg80211_set_survey_info_with_clm(PADAPTER padapter, int idx, struct survey_info *pinfo)
-{
-	s8 noise = -50;			/*channel noise in dBm. This and all following fields are optional */
-	u64 time = SURVEY_TO;	/*amount of time in ms the radio was turn on (on the channel)*/
-	u64 time_busy = 0;		/*amount of time the primary channel was sensed busy*/
-	u8 chan = (u8)idx;
-
-	if ((idx < 0) || (pinfo == NULL))
-		return;
-
-	pinfo->filled  = SURVEY_INFO_NOISE_DBM
-		#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
-		| SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY
-		#endif
-		;
-
-	time_busy = rtw_acs_get_clm_ratio_by_ch_idx(padapter, chan);
-	noise = rtw_noise_query_by_chan_idx(padapter, chan);
-	/* RTW_INFO("%s: ch-idx:%d time=%llu(ms), time_busy=%llu(ms), noise=%d(dbm)\n", __func__, idx, time, time_busy, noise); */
-
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
-	#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 0, 0))
-	pinfo->channel_time = time;
-	pinfo->channel_time_busy = time_busy;
-	#else
-	pinfo->time = time;
-	pinfo->time_busy = time_busy;
-	#endif
-#endif
-	pinfo->noise = noise;
-}
-#endif
-
-int rtw_hostapd_acs_dump_survey(struct wiphy *wiphy, struct net_device *netdev, int idx, struct survey_info *info)
-{
-	PADAPTER padapter = (_adapter *)rtw_netdev_priv(netdev);
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(padapter);
-	RT_CHANNEL_INFO *pch_set = rfctl->channel_set;
-	u8 max_chan_nums = rfctl->max_chan_nums;
-	u32 freq = 0;
-	u8 ret = 0;
-	u16 channel = 0;
-
-	if (!netdev || !info) {
-		RTW_INFO("%s: invial parameters.\n", __func__);
-		return -EINVAL;
-	}
-
-	_rtw_memset(info, 0, sizeof(struct survey_info));
-	if (padapter->bup == _FALSE) {
-		RTW_INFO("%s: net device is down.\n", __func__);
-		return -EIO;
-	}
-
-	if (idx >= max_chan_nums)
-		return -ENOENT;
-
-	channel = pch_set[idx].ChannelNum;
-	freq = rtw_ch2freq(channel);
-	info->channel = ieee80211_get_channel(wiphy, freq);
-	/* RTW_INFO("%s: channel %d, freq %d\n", __func__, channel, freq); */
-
-	if (!info->channel)
-		return -EINVAL;
-
-	if (info->channel->flags == IEEE80211_CHAN_DISABLED)
-		return ret;
-
-#if defined(CONFIG_RTW_ACS) && defined(CONFIG_BACKGROUND_NOISE_MONITOR)
-	rtw_cfg80211_set_survey_info_with_clm(padapter, idx, info);
-#else
-	RTW_ERR("%s: unknown acs operation!\n", __func__); 
-#endif
-
-	return ret;
-}
-#endif /* defined(CONFIG_RTW_HOSTAPD_ACS) && (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 33)) */
-
 static struct cfg80211_ops rtw_cfg80211_ops = {
 	.change_virtual_intf = cfg80211_rtw_change_iface,
 	.add_key = cfg80211_rtw_add_key,
@@ -6332,9 +6243,6 @@ static struct cfg80211_ops rtw_cfg80211_ops = {
 #endif /* CONFIG_PNO_SUPPORT */
 #ifdef CONFIG_RFKILL_POLL
 	.rfkill_poll = cfg80211_rtw_rfkill_poll,
-#endif
-#if defined(CONFIG_RTW_HOSTAPD_ACS) && (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 33))
-	.dump_survey = rtw_hostapd_acs_dump_survey,
 #endif
 };
 

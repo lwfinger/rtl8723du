@@ -119,9 +119,7 @@ endif
 
 EXTRA_CFLAGS += -DCONFIG_RTL8723D
 
-_HAL_INTFS_FILES += hal/HalPwrSeqCmd.o \
-					hal/Hal8723DPwrSeq.o\
-					hal/rtl8723d_sreset.o
+_HAL_INTFS_FILES += hal/HalPwrSeqCmd.o hal/Hal8723DPwrSeq.o
 
 _HAL_INTFS_FILES +=	hal/rtl8723d_hal_init.o \
 			hal/rtl8723d_phycfg.o \

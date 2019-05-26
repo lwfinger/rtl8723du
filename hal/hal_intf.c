@@ -571,42 +571,6 @@ void rtw_hal_bcn_related_reg_setting(_adapter *padapter)
 	padapter->hal_func.SetBeaconRelatedRegistersHandler(padapter);
 }
 
-#ifdef DBG_CONFIG_ERROR_DETECT
-void	rtw_hal_sreset_init(_adapter *padapter)
-{
-	padapter->hal_func.sreset_init_value(padapter);
-}
-void rtw_hal_sreset_reset(_adapter *padapter)
-{
-	padapter = GET_PRIMARY_ADAPTER(padapter);
-	padapter->hal_func.silentreset(padapter);
-}
-
-void rtw_hal_sreset_reset_value(_adapter *padapter)
-{
-	padapter->hal_func.sreset_reset_value(padapter);
-}
-
-void rtw_hal_sreset_xmit_status_check(_adapter *padapter)
-{
-	padapter->hal_func.sreset_xmit_status_check(padapter);
-}
-void rtw_hal_sreset_linked_status_check(_adapter *padapter)
-{
-	padapter->hal_func.sreset_linked_status_check(padapter);
-}
-u8   rtw_hal_sreset_get_wifi_status(_adapter *padapter)
-{
-	return padapter->hal_func.sreset_get_wifi_status(padapter);
-}
-
-bool rtw_hal_sreset_inprogress(_adapter *padapter)
-{
-	padapter = GET_PRIMARY_ADAPTER(padapter);
-	return padapter->hal_func.sreset_inprogress(padapter);
-}
-#endif /* DBG_CONFIG_ERROR_DETECT */
-
 #ifdef CONFIG_XMIT_THREAD_MODE
 s32 rtw_hal_xmit_thread_handler(_adapter *padapter)
 {
@@ -1257,37 +1221,6 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 	}
 
 	/*** SReset section ***/
-#ifdef DBG_CONFIG_ERROR_DETECT
-	if (NULL == padapter->hal_func.sreset_init_value) {
-		rtw_hal_error_msg("sreset_init_value");
-		ret = _FAIL;
-	}
-	if (NULL == padapter->hal_func.sreset_reset_value) {
-		rtw_hal_error_msg("sreset_reset_value");
-		ret = _FAIL;
-	}
-	if (NULL == padapter->hal_func.silentreset) {
-		rtw_hal_error_msg("silentreset");
-		ret = _FAIL;
-	}
-	if (NULL == padapter->hal_func.sreset_xmit_status_check) {
-		rtw_hal_error_msg("sreset_xmit_status_check");
-		ret = _FAIL;
-	}
-	if (NULL == padapter->hal_func.sreset_linked_status_check) {
-		rtw_hal_error_msg("sreset_linked_status_check");
-		ret = _FAIL;
-	}
-	if (NULL == padapter->hal_func.sreset_get_wifi_status) {
-		rtw_hal_error_msg("sreset_get_wifi_status");
-		ret = _FAIL;
-	}
-	if (NULL == padapter->hal_func.sreset_inprogress) {
-		rtw_hal_error_msg("sreset_inprogress");
-		ret = _FAIL;
-	}
-#endif  /* #ifdef DBG_CONFIG_ERROR_DETECT */
-
 #ifdef RTW_HALMAC
 	if (NULL == padapter->hal_func.init_mac_register) {
 		rtw_hal_error_msg("init_mac_register");

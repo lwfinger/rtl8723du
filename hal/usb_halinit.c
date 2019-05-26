@@ -89,14 +89,6 @@ static void rtl8723du_interface_configure(
 
 	pHalData->interfaceIndex = pdvobjpriv->InterfaceNumber;
 
-#ifdef CONFIG_USB_RX_AGGREGATION
-	pHalData->rxagg_mode = RX_AGG_USB;
-	pHalData->rxagg_usb_size = 0x5; /* unit: 4KB, for USB mode */
-	pHalData->rxagg_usb_timeout = 0x20; /* unit: 32us, for USB mode */
-	pHalData->rxagg_dma_size = 0xF; /* uint: 1KB, for DMA mode */
-	pHalData->rxagg_dma_timeout = 0x20; /* unit: 32us, for DMA mode */
-#endif
-
 	HalUsbSetQueuePipeMapping8723DUsb(padapter,
 			  pdvobjpriv->RtNumInPipes, pdvobjpriv->RtNumOutPipes);
 }
@@ -658,58 +650,11 @@ usb_AggSettingRxUpdate(PADAPTER padapter)
 	aggrx &= ~BIT_USB_RXDMA_AGG_EN;
 	aggrx &= ~0xFF0F; /* reset agg size and timeout */
 
-#ifdef CONFIG_USB_RX_AGGREGATION
-	switch (pHalData->rxagg_mode) {
-	case RX_AGG_DMA:
-		agg_size = pHalData->rxagg_dma_size << 10;
-		if (agg_size > RX_DMA_BOUNDARY_8723D)
-			agg_size = RX_DMA_BOUNDARY_8723D >> 1;
-		if ((agg_size + 2048) > MAX_RECVBUF_SZ)
-			agg_size = MAX_RECVBUF_SZ - 2048;
-		agg_size >>= 10; /* unit: 1K */
-		if (agg_size > 0xF)
-			agg_size = 0xF;
-
-		aggctrl |= RXDMA_AGG_EN;
-		aggrx |= BIT_USB_RXDMA_AGG_EN;
-		aggrx |= agg_size;
-		aggrx |= (pHalData->rxagg_dma_timeout << 8);
-		RTW_INFO("%s: RX Agg-DMA mode, size=%dKB, timeout=%dus\n",
-			__func__, agg_size, pHalData->rxagg_dma_timeout * 32);
-		break;
-
-	case RX_AGG_USB:
-	case RX_AGG_MIX:
-		agg_size = pHalData->rxagg_usb_size << 12;
-		if ((agg_size + 2048) > MAX_RECVBUF_SZ)
-			agg_size = MAX_RECVBUF_SZ - 2048;
-		agg_size >>= 12; /* unit: 4K */
-		if (agg_size > 0xF)
-			agg_size = 0xF;
-
-		aggctrl |= RXDMA_AGG_EN;
-		aggrx &= ~BIT_USB_RXDMA_AGG_EN;
-		aggrx |= agg_size;
-		aggrx |= (pHalData->rxagg_usb_timeout << 8);
-		RTW_INFO("%s: RX Agg-USB mode, size=%dKB, timeout=%dus\n",
-				 __func__, agg_size * 4, pHalData->rxagg_usb_timeout * 32);
-		break;
-
-	case RX_AGG_DISABLE:
-	default:
-		RTW_INFO("%s: RX Aggregation Disable!\n", __func__);
-		break;
-	}
-#endif /* CONFIG_USB_RX_AGGREGATION */
-
 	rtw_write8(padapter, REG_TRXDMA_CTRL, aggctrl);
 	rtw_write32(padapter, REG_RXDMA_AGG_PG_TH, aggrx);
 }
 
-static void
-_initUsbAggregationSetting(
-	IN PADAPTER padapter
-)
+static void _initUsbAggregationSetting(PADAPTER padapter)
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
 
@@ -723,18 +668,11 @@ _initUsbAggregationSetting(
 	pHalData->UsbRxHighSpeedMode = _FALSE;
 }
 
-static void
-PHY_InitAntennaSelection8723D(
-	PADAPTER padapter
-)
+static void PHY_InitAntennaSelection8723D(PADAPTER padapter)
 {
 }
 
-
-static void
-_InitRFType(
-	IN PADAPTER Adapter
-)
+static void _InitRFType(PADAPTER Adapter)
 {
 	struct registry_priv *pregpriv = &Adapter->registrypriv;
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(Adapter);
@@ -752,9 +690,7 @@ _InitRFType(
 }
 
 /* Set CCK and OFDM Block "ON" */
-static void _BBTurnOnBlock(
-	IN PADAPTER padapter
-)
+static void _BBTurnOnBlock(PADAPTER padapter)
 {
 #if (DISABLE_BB_RF)
 	return;
@@ -949,28 +885,7 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 	rtw_write8(padapter, REG_TX_RPT_CTRL + 1, 2);
 	/* Tx RPT Timer. Unit: 32us */
 	rtw_write16(padapter, REG_TX_RPT_TIME, 0xCdf0);
-#ifdef CONFIG_TX_EARLY_MODE
-	if (pHalData->AMPDUBurstMode) {
-
-		value8 = rtw_read8(padapter, REG_EARLY_MODE_CONTROL_8723D);
-#if RTL8723D_EARLY_MODE_PKT_NUM_10 == 1
-		value8 = value8 | 0x1f;
-#else
-		value8 = value8 | 0xf;
-#endif
-		rtw_write8(padapter, REG_EARLY_MODE_CONTROL_8723D, value8);
-
-		rtw_write8(padapter, REG_EARLY_MODE_CONTROL_8723D + 3, 0x80);
-
-		value8 = rtw_read8(padapter, REG_TCR_8723D + 1);
-		value8 = value8 | 0x40;
-		rtw_write8(padapter, REG_TCR_8723D + 1, value8);
-	} else
-#endif
-		rtw_write8(padapter, REG_EARLY_MODE_CONTROL_8723D, 0);
-
-	/* <Kordan> InitHalDm should be put ahead of FirmwareDownload. (HWConfig flow: FW->MAC->-BB->RF) */
-	/* rtl8723d_InitHalDm(padapter); */
+	rtw_write8(padapter, REG_EARLY_MODE_CONTROL_8723D, 0);
 
 	if (padapter->registrypriv.mp_mode == 0
 		#if defined(CONFIG_MP_INCLUDED) && defined(CONFIG_RTW_CUSTOMER_STR)
@@ -1987,17 +1902,7 @@ static u8 SetHwReg8723du(PADAPTER padapter, u8 variable, u8 *val)
 
 	switch (variable) {
 	case HW_VAR_RXDMA_AGG_PG_TH:
-#ifdef CONFIG_USB_RX_AGGREGATION
-		{
-			u8 threshold = *val;
-
-			if (threshold == 0)
-				threshold = pHalData->rxagg_dma_size;
-			ret = SetHwReg8723D(padapter, HW_VAR_RXDMA_AGG_PG_TH, &threshold);
-		}
-#endif
 		break;
-
 	case HW_VAR_SET_RPWM:
 		rtw_write8(padapter, REG_USB_HRPWM, *val);
 		break;
@@ -2008,7 +1913,6 @@ static u8 SetHwReg8723du(PADAPTER padapter, u8 variable, u8 *val)
 		ret = SetHwReg8723D(padapter, variable, val);
 		break;
 	}
-
 	return ret;
 }
 

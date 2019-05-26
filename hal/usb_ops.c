@@ -42,17 +42,6 @@ void rtl8723du_interrupt_handler(_adapter *padapter, u16 pkt_len, u8 *pbuf)
 			rtw_mi_set_tx_beacon_cmd(padapter);
 #endif /* CONFIG_INTERRUPT_BASED_TXBCN */
 
-#ifdef DBG_CONFIG_ERROR_DETECT_INT
-	if (pHalData->IntArray[1] & IMR_TXERR_8723D)
-		RTW_INFO("===> %s Tx Error Flag Interrupt Status\n", __func__);
-	if (pHalData->IntArray[1] & IMR_RXERR_8723D)
-		RTW_INFO("===> %s Rx Error Flag INT Status\n", __func__);
-	if (pHalData->IntArray[1] & IMR_TXFOVW_8723D)
-		RTW_INFO("===> %s Transmit FIFO Overflow\n", __func__);
-	if (pHalData->IntArray[1] & IMR_RXFOVW_8723D)
-		RTW_INFO("===> %s Receive FIFO Overflow\n", __func__);
-#endif /* DBG_CONFIG_ERROR_DETECT_INT */
-
 #ifdef CONFIG_FW_C2H_REG
 	/* C2H Event */
 	if (pbuf[0] != 0)
@@ -89,10 +78,6 @@ int recvbuf2recvframe(PADAPTER padapter, void *ptr)
 	transfer_len = (s32)pskb->len;
 	pbuf = pskb->data;
 #endif /* !CONFIG_USE_USB_BUFFER_ALLOC_RX */
-
-#ifdef CONFIG_USB_RX_AGGREGATION
-	pkt_cnt = GET_RX_STATUS_DESC_USB_AGG_PKTNUM_8723D(pbuf);
-#endif
 
 	do {
 		precvframe = rtw_alloc_recvframe(pfree_recv_queue);
@@ -157,13 +142,6 @@ int recvbuf2recvframe(PADAPTER padapter, void *ptr)
 #endif /* CONFIG_FW_C2H_PKT */
 			rtw_free_recvframe(precvframe, pfree_recv_queue);
 		}
-
-#ifdef CONFIG_USB_RX_AGGREGATION
-		/* jaguar 8-byte alignment */
-		pkt_offset = (u16)_RND8(pkt_offset);
-		pkt_cnt--;
-		pbuf += pkt_offset;
-#endif
 		transfer_len -= pkt_offset;
 		precvframe = NULL;
 	} while (transfer_len > 0);

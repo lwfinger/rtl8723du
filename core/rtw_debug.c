@@ -107,9 +107,6 @@ void dump_drv_cfg(struct seq_file *sel)
 #ifdef CONFIG_USB_INTERRUPT_IN_PIPE
 	RTW_PRINT_SEL(sel, "CONFIG_USB_INTERRUPT_IN_PIPE\n");
 #endif
-#ifdef CONFIG_USB_RX_AGGREGATION
-	xRTW_PRINT_SEL(sel, "CONFIG_USB_RX_AGGREGATION\n");
-#endif
 #ifdef CONFIG_USE_USB_BUFFER_ALLOC_TX
 	RTW_PRINT_SEL(sel, "CONFIG_USE_USB_BUFFER_ALLOC_TX\n");
 #endif
@@ -1201,11 +1198,6 @@ int proc_get_survey_info(struct seq_file *m, void *v)
 		} else {
 			notify_signal = translate_percentage_to_dbm(pnetwork->network.PhyInfo.SignalStrength);/* dbm */
 		}
-
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-		if (IS_NM_ENABLE(padapter))
-			notify_noise = rtw_noise_query_by_chan_num(padapter, pnetwork->network.Configuration.DSConfig);
-#endif
 
 		ie_wpa = rtw_get_wpa_ie(&pnetwork->network.IEs[12], &ielen, pnetwork->network.IELength - 12);
 		ie_wpa2 = rtw_get_wpa2_ie(&pnetwork->network.IEs[12], &ielen, pnetwork->network.IELength - 12);
@@ -3327,65 +3319,6 @@ ssize_t proc_set_rf4ce_state(struct file *file, const char __user *buffer, size_
 }
 #endif /* CONFIG_RF4CE_COEXIST */
 #endif /* CONFIG_BT_COEXIST */
-
-#if defined(DBG_CONFIG_ERROR_DETECT)
-int proc_get_sreset(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct dvobj_priv *psdpriv = padapter->dvobj;
-	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-	struct sreset_priv *psrtpriv = &pHalData->srestpriv;
-	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
-
-	if (psrtpriv->dbg_sreset_ctrl == _TRUE) {
-		RTW_PRINT_SEL(m, "self_dect_tx_cnt:%llu\n", psrtpriv->self_dect_tx_cnt);
-		RTW_PRINT_SEL(m, "self_dect_rx_cnt:%llu\n", psrtpriv->self_dect_rx_cnt);
-		RTW_PRINT_SEL(m, "self_dect_fw_cnt:%llu\n", psrtpriv->self_dect_fw_cnt);
-		RTW_PRINT_SEL(m, "self_dect_scan_cnt:%llu\n", psrtpriv->self_dect_scan_cnt);
-		RTW_PRINT_SEL(m, "txbuf_empty_cnt:%llu\n", psrtpriv->txbuf_empty_cnt);
-		RTW_PRINT_SEL(m, "tx_dma_status_cnt:%llu\n", psrtpriv->tx_dma_status_cnt);
-		RTW_PRINT_SEL(m, "rx_dma_status_cnt:%llu\n", psrtpriv->rx_dma_status_cnt);
-		RTW_PRINT_SEL(m, "self_dect_case:%d\n", psrtpriv->self_dect_case);
-		RTW_PRINT_SEL(m, "dbg_sreset_cnt:%d\n", pdbgpriv->dbg_sreset_cnt);
-	}
-	return 0;
-}
-
-ssize_t proc_set_sreset(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-	struct sreset_priv *psrtpriv = &pHalData->srestpriv;
-	char tmp[32];
-	s32 trigger_point;
-
-	if (count < 1)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-
-		int num = sscanf(tmp, "%d", &trigger_point);
-
-		if (trigger_point == SRESET_TGP_NULL)
-			rtw_hal_sreset_reset(padapter);
-		else if (trigger_point == 99)
-			psrtpriv->dbg_sreset_ctrl = _TRUE;
-		else
-			sreset_set_trigger_point(padapter, trigger_point);
-	}
-
-	return count;
-
-}
-#endif /* DBG_CONFIG_ERROR_DETECT */
 
 int proc_get_new_bcn_max(struct seq_file *m, void *v)
 {

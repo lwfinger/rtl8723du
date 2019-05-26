@@ -37,25 +37,6 @@
 	#define CONFIG_SIGNAL_DISPLAY_DBM
 #endif
 
-/*
-#if defined(CONFIG_HAS_EARLYSUSPEND) && defined(CONFIG_RESUME_IN_WORKQUEUE)
-	#warning "You have CONFIG_HAS_EARLYSUSPEND enabled in your system, we disable CONFIG_RESUME_IN_WORKQUEUE automatically"
-	#undef CONFIG_RESUME_IN_WORKQUEUE
-#endif
-
-#if defined(CONFIG_ANDROID_POWER) && defined(CONFIG_RESUME_IN_WORKQUEUE)
-	#warning "You have CONFIG_ANDROID_POWER enabled in your system, we disable CONFIG_RESUME_IN_WORKQUEUE automatically"
-	#undef CONFIG_RESUME_IN_WORKQUEUE
-#endif
-*/
-
-#ifdef CONFIG_RESUME_IN_WORKQUEUE /* this can be removed, because there is no case for this... */
-	#if !defined(CONFIG_WAKELOCK) && !defined(CONFIG_ANDROID_POWER)
-		#error "enable CONFIG_RESUME_IN_WORKQUEUE without CONFIG_WAKELOCK or CONFIG_ANDROID_POWER will suffer from the danger of wifi's unfunctionality..."
-		#error "If you still want to enable CONFIG_RESUME_IN_WORKQUEUE in this case, mask this preprossor checking and GOOD LUCK..."
-	#endif
-#endif
-
 /* About USB VENDOR REQ */
 #if defined(CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC) && !defined(CONFIG_USB_VENDOR_REQ_MUTEX)
 	#warning "define CONFIG_USB_VENDOR_REQ_MUTEX for CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC automatically"
@@ -264,42 +245,7 @@
 #define MACID_NUM_SW_LIMIT 32
 #define SEC_CAM_ENT_NUM_SW_LIMIT 32
 
-/*
-	Mark CONFIG_DEAUTH_BEFORE_CONNECT by Arvin 2015/07/20
-	If the failure of Wi-Fi connection is due to some irregular disconnection behavior (like unplug dongle,
-	power down etc.) in last time, we can unmark this flag to avoid some unpredictable response from AP.
-*/
-/*#define CONFIG_DEAUTH_BEFORE_CONNECT */
-
-/*#define CONFIG_WEXT_DONT_JOIN_BYSSID	*/
-/* #include <rtl871x_byteorder.h> */
-
-
-/*#define CONFIG_DOSCAN_IN_BUSYTRAFFIC	*/
-
 /*Don't release SDIO irq in suspend/resume procedure*/
 #define CONFIG_RTW_SDIO_KEEP_IRQ	0
 
-/*
- * Add by Lucas@2016/02/15
- * For RX Aggregation
- */
-#if defined(CONFIG_USB_RX_AGGREGATION)
-	#define RTW_RX_AGGREGATION
-#endif /* CONFIG_USB_RX_AGGREGATION */
-
-#ifdef CONFIG_RTW_HOSTAPD_ACS
-	#ifndef CONFIG_RTW_ACS
-		#define CONFIG_RTW_ACS
-	#endif
-	#ifndef CONFIG_BACKGROUND_NOISE_MONITOR
-		#define CONFIG_BACKGROUND_NOISE_MONITOR
-	#endif
-#endif
-
-#ifdef DBG_CONFIG_ERROR_RESET
-#ifndef CONFIG_IPS
-#define CONFIG_IPS
-#endif
-#endif
 #endif /* __DRV_CONF_H__ */

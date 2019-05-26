@@ -9,10 +9,6 @@
 	#include <hal_btcoex.h>
 #endif
 
-#if defined(CONFIG_RTW_ACS) || defined(CONFIG_BACKGROUND_NOISE_MONITOR)
-#include "../hal/hal_dm_acs.h"
-#endif
-
 /*
  * <Roger_Notes> For RTL8723 WiFi/BT/GPS multi-function configuration. 2010.10.06.
  *   */
@@ -495,17 +491,6 @@ typedef struct hal_com_data {
 	/* Interrupt relatd register information. */
 	u32			IntArray[3];/* HISR0,HISR1,HSISR */
 	u32			IntrMask[3];
-#ifdef CONFIG_USB_RX_AGGREGATION
-	u16			HwRxPageSize;				/* Hardware setting */
-
-	/* For RX Aggregation USB Mode */
-	u8			rxagg_usb_size;
-	u8			rxagg_usb_timeout;
-#endif/* CONFIG_USB_RX_AGGREGATION */
-
-#ifdef DBG_CONFIG_ERROR_DETECT
-	struct sreset_priv srestpriv;
-#endif /* #ifdef DBG_CONFIG_ERROR_DETECT */
 
 #ifdef CONFIG_BT_COEXIST
 	/* For bluetooth co-existance */
@@ -532,10 +517,6 @@ typedef struct hal_com_data {
 	u32	rf_tx_pwr_track_len;
 	char *rf_tx_pwr_lmt;
 	u32	rf_tx_pwr_lmt_len;
-#endif
-
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-	struct noise_monitor nm;
 #endif
 
 	struct hal_spec_t hal_spec;

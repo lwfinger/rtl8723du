@@ -1342,15 +1342,10 @@ static s32 xmitframe_addmic(_adapter *padapter, struct xmit_frame *pxmitframe)
 	*/
 
 
-#ifdef CONFIG_TX_EARLY_MODE
-	hw_hdr_offset = TXDESC_OFFSET + EARLY_MODE_INFO_SIZE;
-#else
 	hw_hdr_offset = TXDESC_OFFSET;
-#endif
 
 	if (pattrib->encrypt == _TKIP_) { /* if(psecuritypriv->dot11PrivacyAlgrthm==_TKIP_PRIVACY_) */
 		/* encode mic code */
-		/* if(stainfo!= NULL) */
 		{
 			u8 null_key[16] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
 
@@ -1358,16 +1353,12 @@ static s32 xmitframe_addmic(_adapter *padapter, struct xmit_frame *pxmitframe)
 
 			if (bmcst) {
 				if (_rtw_memcmp(psecuritypriv->dot118021XGrptxmickey[psecuritypriv->dot118021XGrpKeyid].skey, null_key, 16) == _TRUE) {
-					/* DbgPrint("\nxmitframe_addmic:stainfo->dot11tkiptxmickey==0\n"); */
-					/* rtw_msleep_os(10); */
 					return _FAIL;
 				}
 				/* start to calculate the mic code */
 				rtw_secmicsetkey(&micdata, psecuritypriv->dot118021XGrptxmickey[psecuritypriv->dot118021XGrpKeyid].skey);
 			} else {
 				if (_rtw_memcmp(&pattrib->dot11tkiptxmickey.skey[0], null_key, 16) == _TRUE) {
-					/* DbgPrint("\nxmitframe_addmic:stainfo->dot11tkiptxmickey==0\n"); */
-					/* rtw_msleep_os(10); */
 					return _FAIL;
 				}
 				/* start to calculate the mic code */
@@ -1789,11 +1780,7 @@ s32 rtw_xmitframe_coalesce_amsdu(_adapter *padapter, struct xmit_frame *pxmitfra
 
 	pbuf_start = pxmitframe->buf_addr;
 
-#ifdef CONFIG_TX_EARLY_MODE /* for SDIO && Tx Agg */
-	hw_hdr_offset = TXDESC_OFFSET + EARLY_MODE_INFO_SIZE;
-#else
 	hw_hdr_offset = TXDESC_OFFSET;
-#endif
 
 	mem_start = pbuf_start + hw_hdr_offset; //for DMA
 
@@ -1958,31 +1945,6 @@ s32 rtw_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxm
 	s32 bmcst = IS_MCAST(pattrib->ra);
 	s32 res = _SUCCESS;
 
-
-	/*
-		if (pattrib->psta)
-		{
-			psta = pattrib->psta;
-		} else
-		{
-			RTW_INFO("%s, call rtw_get_stainfo()\n", __func__);
-			psta = rtw_get_stainfo(&padapter->stapriv, pattrib->ra);
-		}
-
-		if(psta==NULL)
-		{
-
-			RTW_INFO("%s, psta==NUL\n", __func__);
-			return _FAIL;
-		}
-
-
-		if(!(psta->state &_FW_LINKED))
-		{
-			RTW_INFO("%s, psta->state(0x%x) != _FW_LINKED\n", __func__, psta->state);
-			return _FAIL;
-		}
-	*/
 	if (pxmitframe->buf_addr == NULL) {
 		RTW_INFO("==> %s buf_addr==NULL\n", __FUNCTION__);
 		return _FAIL;
@@ -1990,11 +1952,7 @@ s32 rtw_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxm
 
 	pbuf_start = pxmitframe->buf_addr;
 
-#ifdef CONFIG_TX_EARLY_MODE /* for SDIO && Tx Agg */
-	hw_hdr_offset = TXDESC_OFFSET + EARLY_MODE_INFO_SIZE;
-#else
 	hw_hdr_offset = TXDESC_OFFSET;
-#endif
 
 	mem_start = pbuf_start +	hw_hdr_offset;
 
@@ -4521,14 +4479,6 @@ bool rtw_xmit_ac_blocked(_adapter *adapter)
 	struct mlme_ext_info *mlmeextinfo;
 	bool blocked = _FALSE;
 	int i;
-#ifdef DBG_CONFIG_ERROR_DETECT
-#ifdef DBG_CONFIG_ERROR_RESET
-	if (rtw_hal_sreset_inprogress(adapter) == _TRUE) {
-		blocked = _TRUE;
-		goto exit;
-	}
-#endif/* #ifdef DBG_CONFIG_ERROR_RESET */
-#endif/* #ifdef DBG_CONFIG_ERROR_DETECT */
 
 	if (rfctl->offch_state != OFFCHS_NONE)
 		blocked = _TRUE;

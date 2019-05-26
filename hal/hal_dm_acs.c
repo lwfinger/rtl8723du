@@ -5,7 +5,7 @@
 #include <hal_data.h>
 
 
-#if defined(CONFIG_RTW_ACS) || defined(CONFIG_BACKGROUND_NOISE_MONITOR)
+#if defined(CONFIG_RTW_ACS)
 static void _rtw_bss_nums_count(_adapter *adapter, u8 *pbss_nums)
 {
 	struct mlme_priv	*pmlmepriv = &(adapter->mlmepriv);
@@ -58,7 +58,7 @@ u8 rtw_get_ch_num_by_idx(_adapter *adapter, u8 idx)
 		return 0;
 	return pch_set[idx].ChannelNum;
 }
-#endif /*defined(CONFIG_RTW_ACS) || defined(CONFIG_BACKGROUND_NOISE_MONITOR)*/
+#endif /*defined(CONFIG_RTW_ACS)*/
 
 
 #ifdef CONFIG_RTW_ACS
@@ -322,125 +322,3 @@ void rtw_acs_update_current_info(_adapter *adapter)
 	#endif
 }
 #endif /*CONFIG_RTW_ACS*/
-
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-void rtw_noise_monitor_version_dump(void *sel, _adapter *adapter)
-{
-	_RTW_PRINT_SEL(sel, "RTK_NOISE_MONITOR VER_%d\n", RTK_NOISE_MONITOR_VERSION);
-}
-void rtw_nm_enable(_adapter *adapter)
-{
-	SET_NM_STATE(adapter, NM_ENABLE);
-}
-void rtw_nm_disable(_adapter *adapter)
-{
-	SET_NM_STATE(adapter, NM_DISABLE);
-}
-void rtw_noise_info_dump(void *sel, _adapter *adapter)
-{
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-	u8 max_chan_nums = rfctl->max_chan_nums;
-	u8 ch_idx, ch_num;
-
-	_RTW_PRINT_SEL(sel, "========== NM (VER-%d) ==========\n", RTK_NOISE_MONITOR_VERSION);
-
-	_RTW_PRINT_SEL(sel, "%5s  %3s  %3s  %10s", "Index", "CH", "BSS", "Noise(dBm)\n");
-
-	_rtw_bss_nums_count(adapter, hal_data->nm.bss_nums);
-
-	for (ch_idx = 0; ch_idx < max_chan_nums; ch_idx++) {
-		ch_num = rtw_get_ch_num_by_idx(adapter, ch_idx);
-		_RTW_PRINT_SEL(sel, "%5d  %3d  %3d  %10d\n",
-						ch_idx, ch_num, hal_data->nm.bss_nums[ch_idx],
-						hal_data->nm.noise[ch_idx]);
-	}
-}
-
-void rtw_noise_measure(_adapter *adapter, u8 chan, u8 is_pause_dig, u8 igi_value, u32 max_time)
-{
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT *phydm = &hal_data->odmpriv;
-	int chan_idx = -1;
-	s16 noise = 0;
-
-	#ifdef DBG_NOISE_MONITOR
-	RTW_INFO("[NM] chan(%d)-PauseDIG:%s,  IGIValue:0x%02x, max_time:%d (ms)\n",
-		chan, (is_pause_dig) ? "Y" : "N", igi_value, max_time);
-	#endif
-
-	chan_idx = rtw_chset_search_ch(adapter_to_chset(adapter), chan);
-	if ((chan_idx == -1) || (chan_idx >= MAX_CHANNEL_NUM)) {
-		RTW_ERR("[NM] Get noise fail, can't get chan_idx(CH:%d)\n", chan);
-		return;
-	}
-	noise = odm_inband_noise_monitor(phydm, is_pause_dig, igi_value, max_time); /*dBm*/
-
-	hal_data->nm.noise[chan_idx] = noise;
-
-	#ifdef DBG_NOISE_MONITOR
-	RTW_INFO("[NM] %s chan_%d, noise = %d (dBm)\n", __func__, chan, hal_data->nm.noise[chan_idx]);
-
-	RTW_INFO("[NM] noise_a = %d, noise_b = %d  noise_all:%d\n",
-			 phydm->noise_level.noise[RF_PATH_A],
-			 phydm->noise_level.noise[RF_PATH_B],
-			 phydm->noise_level.noise_all);
-	#endif /*DBG_NOISE_MONITOR*/
-}
-
-s16 rtw_noise_query_by_chan_num(_adapter *adapter, u8 chan)
-{
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
-	s16 noise = 0;
-	int chan_idx = -1;
-
-	chan_idx = rtw_chset_search_ch(adapter_to_chset(adapter), chan);
-	if ((chan_idx == -1) || (chan_idx >= MAX_CHANNEL_NUM)) {
-		RTW_ERR("[NM] Get noise fail, can't get chan_idx(CH:%d)\n", chan);
-		return noise;
-	}
-	noise = hal_data->nm.noise[chan_idx];
-
-	#ifdef DBG_NOISE_MONITOR
-	RTW_INFO("[NM] %s chan_%d, noise = %d (dBm)\n", __func__, chan, noise);
-	#endif/*DBG_NOISE_MONITOR*/
-	return noise;
-}
-s16 rtw_noise_query_by_chan_idx(_adapter *adapter, u8 ch_idx)
-{
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
-	s16 noise = 0;
-
-	if (ch_idx >= MAX_CHANNEL_NUM) {
-		RTW_ERR("[NM] %s ch_idx(%d) is invalid\n", __func__, ch_idx);
-		return noise;
-	}
-	noise = hal_data->nm.noise[ch_idx];
-
-	#ifdef DBG_NOISE_MONITOR
-	RTW_INFO("[NM] %s ch_idx %d, noise = %d (dBm)\n", __func__, ch_idx, noise);
-	#endif/*DBG_NOISE_MONITOR*/
-	return noise;
-}
-
-s16 rtw_noise_measure_curchan(_adapter *padapter)
-{
-	s16 noise = 0;
-	u8 igi_value = 0x1E;
-	u32 max_time = 100;/* ms */
-	u8 is_pause_dig = _TRUE;
-	u8 cur_chan = rtw_get_oper_ch(padapter);
-
-	if (rtw_linked_check(padapter) == _FALSE)
-		return noise;
-
-	rtw_ps_deny(padapter, PS_DENY_IOCTL);
-	LeaveAllPowerSaveModeDirect(padapter);
-	rtw_noise_measure(padapter, cur_chan, is_pause_dig, igi_value, max_time);
-	noise = rtw_noise_query_by_chan_num(padapter, cur_chan);
-	rtw_ps_deny_cancel(padapter, PS_DENY_IOCTL);
-
-	return noise;
-}
-#endif /*CONFIG_BACKGROUND_NOISE_MONITOR*/
-

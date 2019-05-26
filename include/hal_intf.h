@@ -325,16 +325,6 @@ struct hal_ops {
 	u8(*Efuse_WordEnableDataWrite)(_adapter *padapter, u16 efuse_addr, u8 word_en, u8 *data, BOOLEAN bPseudoTest);
 	BOOLEAN(*Efuse_PgPacketWrite_BT)(_adapter *padapter, u8 offset, u8 word_en, u8 *data, BOOLEAN bPseudoTest);
 
-#ifdef DBG_CONFIG_ERROR_DETECT
-	void (*sreset_init_value)(_adapter *padapter);
-	void (*sreset_reset_value)(_adapter *padapter);
-	void (*silentreset)(_adapter *padapter);
-	void (*sreset_xmit_status_check)(_adapter *padapter);
-	void (*sreset_linked_status_check)(_adapter *padapter);
-	u8(*sreset_get_wifi_status)(_adapter *padapter);
-	bool (*sreset_inprogress)(_adapter *padapter);
-#endif
-
 	void (*hal_notch_filter)(_adapter *adapter, bool enable);
 #ifdef RTW_HALMAC
 	void (*hal_mac_c2h_handler)(_adapter *adapter, u8 *pbuf, u16 length);
@@ -597,16 +587,6 @@ void	rtw_hal_dm_watchdog_in_lps(_adapter *padapter);
 
 void	rtw_hal_set_tx_power_level(_adapter *padapter, u8 channel);
 void	rtw_hal_get_tx_power_level(_adapter *padapter, s32 *powerlevel);
-
-#ifdef DBG_CONFIG_ERROR_DETECT
-void rtw_hal_sreset_init(_adapter *padapter);
-void rtw_hal_sreset_reset(_adapter *padapter);
-void rtw_hal_sreset_reset_value(_adapter *padapter);
-void rtw_hal_sreset_xmit_status_check(_adapter *padapter);
-void rtw_hal_sreset_linked_status_check(_adapter *padapter);
-u8   rtw_hal_sreset_get_wifi_status(_adapter *padapter);
-bool rtw_hal_sreset_inprogress(_adapter *padapter);
-#endif
 
 #ifdef CONFIG_XMIT_THREAD_MODE
 s32 rtw_hal_xmit_thread_handler(_adapter *padapter);

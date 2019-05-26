@@ -161,9 +161,6 @@ struct registry_priv {
 	u8  mp_dm;
 	u8	software_encrypt;
 	u8	software_decrypt;
-#ifdef CONFIG_TX_EARLY_MODE
-	u8   early_mode;
-#endif
 	u8	acm_method;
 	/* WMM */
 	u8	wmm_enable;
@@ -244,10 +241,6 @@ struct registry_priv {
 
 	u8	hw_wps_pbc;/* 0:disable,1:enable */
 
-#ifdef CONFIG_ADAPTOR_INFO_CACHING_FILE
-	char	adaptor_info_caching_file_path[PATH_LENGTH_MAX];
-#endif
-
 	u8	max_roaming_times; /* the max number driver will try to roaming */
 
 	u8 enable80211d;
@@ -304,9 +297,6 @@ struct registry_priv {
 	u8 acs_mode;
 #endif
 
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-	u8 nm_mode;
-#endif
 	u32	reg_rxgain_offset_2g;
 	u32	reg_rxgain_offset_5gl;
 	u32	reg_rxgain_offset_5gm;

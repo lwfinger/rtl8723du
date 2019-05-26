@@ -71,10 +71,6 @@ int rtw_wmm_smart_ps = 2;
 
 static int rtw_check_fw_ps = 1;
 
-#ifdef CONFIG_TX_EARLY_MODE
-int rtw_early_mode = 1;
-#endif
-
 static int rtw_usb_rxagg_mode = 2;/* RX_AGG_DMA=1, RX_AGG_USB=2 */
 module_param(rtw_usb_rxagg_mode, int, 0644);
 
@@ -285,11 +281,6 @@ int rtw_acs = 1;
 module_param(rtw_acs, int, 0644);
 #endif
 
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-int rtw_nm = 1;/*noise monitor*/
-module_param(rtw_nm, int, 0644);
-#endif
-
 static char *ifname = "wlan%d";
 module_param(ifname, charp, 0644);
 MODULE_PARM_DESC(ifname, "The default name to allocate for first interface");
@@ -363,15 +354,6 @@ module_param(rtw_hwpwrp_detect, int, 0644);
 
 module_param(rtw_hw_wps_pbc, int, 0644);
 module_param(rtw_check_hw_status, int, 0644);
-
-#ifdef CONFIG_TX_EARLY_MODE
-module_param(rtw_early_mode, int, 0644);
-#endif
-#ifdef CONFIG_ADAPTOR_INFO_CACHING_FILE
-char *rtw_adaptor_info_caching_file_path = "/data/misc/wifi/rtw_cache";
-module_param(rtw_adaptor_info_caching_file_path, charp, 0644);
-MODULE_PARM_DESC(rtw_adaptor_info_caching_file_path, "The path of adapter info cache file");
-#endif /* CONFIG_ADAPTOR_INFO_CACHING_FILE */
 
 static uint rtw_max_roaming_times = 2;
 module_param(rtw_max_roaming_times, uint, 0644);
@@ -767,9 +749,6 @@ uint loadparam(_adapter *padapter)
 	registry_par->beamformee_rf_num = (u8)rtw_bfee_rf_number;
 	rtw_regsty_init_rx_ampdu_sz_limit(registry_par);
 
-#ifdef CONFIG_TX_EARLY_MODE
-	registry_par->early_mode = (u8)rtw_early_mode;
-#endif
 	registry_par->lowrate_two_xmit = (u8)rtw_lowrate_two_xmit;
 	registry_par->rf_config = (u8)rtw_rf_config;
 	registry_par->low_power = (u8)rtw_low_power;
@@ -821,11 +800,6 @@ uint loadparam(_adapter *padapter)
 #endif
 
 	registry_par->hw_wps_pbc = (u8)rtw_hw_wps_pbc;
-
-#ifdef CONFIG_ADAPTOR_INFO_CACHING_FILE
-	snprintf(registry_par->adaptor_info_caching_file_path, PATH_LENGTH_MAX, "%s", rtw_adaptor_info_caching_file_path);
-	registry_par->adaptor_info_caching_file_path[PATH_LENGTH_MAX - 1] = 0;
-#endif
 
 	registry_par->max_roaming_times = (u8)rtw_max_roaming_times;
 #ifdef CONFIG_INTEL_WIDI
@@ -880,9 +854,6 @@ uint loadparam(_adapter *padapter)
 #ifdef CONFIG_RTW_ACS
 	registry_par->acs_mode = (u8)rtw_acs;
 	registry_par->acs_auto_scan = (u8)rtw_acs_auto_scan;
-#endif
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-	registry_par->nm_mode = (u8)rtw_nm;
 #endif
 	registry_par->reg_rxgain_offset_2g = (u32) rtw_rxgain_offset_2g;
 	registry_par->reg_rxgain_offset_5gl = (u32) rtw_rxgain_offset_5gl;
@@ -1211,44 +1182,10 @@ int rtw_init_netdev_name(struct net_device *pnetdev, const char *ifname)
 {
 	_adapter *padapter = rtw_netdev_priv(pnetdev);
 
-#ifdef CONFIG_EASY_REPLACEMENT
-	struct net_device	*TargetNetdev = NULL;
-	_adapter			*TargetAdapter = NULL;
-	struct net		*devnet = NULL;
-
-	if (padapter->bDongle == 1) {
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24))
-		TargetNetdev = dev_get_by_name("wlan0");
-#else
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 26))
-		devnet = pnetdev->nd_net;
-#else
-		devnet = dev_net(pnetdev);
-#endif
-		TargetNetdev = dev_get_by_name(devnet, "wlan0");
-#endif
-		if (TargetNetdev) {
-			RTW_INFO("Force onboard module driver disappear !!!\n");
-			TargetAdapter = rtw_netdev_priv(TargetNetdev);
-			TargetAdapter->DriverState = DRIVER_DISAPPEAR;
-
-			padapter->pid[0] = TargetAdapter->pid[0];
-			padapter->pid[1] = TargetAdapter->pid[1];
-			padapter->pid[2] = TargetAdapter->pid[2];
-
-			dev_put(TargetNetdev);
-			unregister_netdev(TargetNetdev);
-
-			padapter->DriverState = DRIVER_REPLACE_DONGLE;
-		}
-	}
-#endif /* CONFIG_EASY_REPLACEMENT */
-
 	if (dev_alloc_name(pnetdev, ifname) < 0)
 		RTW_ERR("dev_alloc_name, fail!\n");
 
 	rtw_netif_carrier_off(pnetdev);
-	/* rtw_netif_stop_queue(pnetdev); */
 
 	return 0;
 }
@@ -1769,12 +1706,6 @@ u8 rtw_init_default_value(_adapter *padapter)
 	else
 		rtw_acs_stop(padapter);
 #endif
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-	if (pregistrypriv->nm_mode)
-		rtw_nm_enable(padapter);
-	else
-		rtw_nm_disable(padapter);
-#endif
 	return ret;
 }
 
@@ -1940,10 +1871,6 @@ u8 rtw_reset_drv_sw(_adapter *padapter)
 #endif
 #endif
 
-#ifdef DBG_CONFIG_ERROR_DETECT
-	if (is_primary_adapter(padapter))
-		rtw_hal_sreset_reset_value(padapter);
-#endif
 	padapter->pwr_state_check_cnts = 0;
 
 	/* mlmeextpriv */
@@ -2053,9 +1980,6 @@ u8 rtw_init_drv_sw(_adapter *padapter)
 
 	rtw_hal_dm_init(padapter);
 	rtw_hal_sw_led_init(padapter);
-#ifdef DBG_CONFIG_ERROR_DETECT
-	rtw_hal_sreset_init(padapter);
-#endif
 
 #ifdef CONFIG_INTEL_WIDI
 	if (rtw_init_intel_widi(padapter) == _FAIL) {
@@ -2975,18 +2899,9 @@ int rtw_ips_pwr_up(_adapter *padapter)
 {
 	int result;
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
-#ifdef DBG_CONFIG_ERROR_DETECT
-	struct sreset_priv *psrtpriv = &pHalData->srestpriv;
-#endif/* #ifdef DBG_CONFIG_ERROR_DETECT */
 	systime start_time = rtw_get_current_time();
 	RTW_INFO("===>  rtw_ips_pwr_up..............\n");
-
-#if defined(CONFIG_SWLPS_IN_IPS) || defined(CONFIG_FWLPS_IN_IPS)
-#ifdef DBG_CONFIG_ERROR_DETECT
-	if (psrtpriv->silent_reset_inprogress == _TRUE)
-#endif/* #ifdef DBG_CONFIG_ERROR_DETECT */
-#endif /* defined(CONFIG_SWLPS_IN_IPS) || defined(CONFIG_FWLPS_IN_IPS) */
-		rtw_reset_drv_sw(padapter);
+	rtw_reset_drv_sw(padapter);
 
 	result = ips_netdrv_open(padapter);
 
@@ -3013,21 +2928,10 @@ void rtw_ips_dev_unload(_adapter *padapter)
 	struct net_device *pnetdev = (struct net_device *)padapter->pnetdev;
 	struct xmit_priv	*pxmitpriv = &(padapter->xmitpriv);
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
-#ifdef DBG_CONFIG_ERROR_DETECT
-	struct sreset_priv *psrtpriv = &pHalData->srestpriv;
-#endif/* #ifdef DBG_CONFIG_ERROR_DETECT */
 	RTW_INFO("====> %s...\n", __FUNCTION__);
 
-
-#if defined(CONFIG_SWLPS_IN_IPS) || defined(CONFIG_FWLPS_IN_IPS)
-#ifdef DBG_CONFIG_ERROR_DETECT
-	if (psrtpriv->silent_reset_inprogress == _TRUE)
-#endif /* #ifdef DBG_CONFIG_ERROR_DETECT */
-#endif /* defined(CONFIG_SWLPS_IN_IPS) || defined(CONFIG_FWLPS_IN_IPS) */
-	{
-		rtw_hal_set_hwreg(padapter, HW_VAR_FIFO_CLEARN_UP, NULL);
-		rtw_intf_stop(padapter);
-	}
+	rtw_hal_set_hwreg(padapter, HW_VAR_FIFO_CLEARN_UP, NULL);
+	rtw_intf_stop(padapter);
 
 	if (!rtw_is_surprise_removed(padapter))
 		rtw_hal_deinit(padapter);
@@ -3716,9 +3620,6 @@ static int rtw_resume_process_normal(_adapter *padapter)
 
 	rtw_mi_resume_process_normal(padapter);
 
-#ifdef CONFIG_RESUME_IN_WORKQUEUE
-	/* rtw_unlock_suspend(); */
-#endif /* CONFIG_RESUME_IN_WORKQUEUE */
 	RTW_INFO("<== "FUNC_ADPT_FMT" exit....\n", FUNC_ADPT_ARG(padapter));
 
 exit:

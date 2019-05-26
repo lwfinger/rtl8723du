@@ -3651,13 +3651,6 @@ static void rtl8723d_fill_default_txdesc(
 		pkt_offset = pxmitframe->pkt_offset;
 		offset += (pxmitframe->pkt_offset >> 3);
 
-#ifdef CONFIG_TX_EARLY_MODE
-		if (pxmitframe->frame_tag == DATA_FRAMETAG) {
-			pkt_offset = 1;
-			offset += EARLY_MODE_INFO_SIZE;
-		}
-#endif /* CONFIG_TX_EARLY_MODE */
-
 		SET_TX_DESC_PKT_OFFSET_8723D(pbuf, pkt_offset);
 		SET_TX_DESC_OFFSET_8723D(pbuf, offset);
 	}
@@ -4973,15 +4966,6 @@ void rtl8723d_set_hal_ops(struct hal_ops *pHalFunc)
 	pHalFunc->Efuse_WordEnableDataWrite = &Hal_EfuseWordEnableDataWrite;
 	pHalFunc->Efuse_PgPacketWrite_BT = &Hal_EfusePgPacketWrite_BT;
 
-#ifdef DBG_CONFIG_ERROR_DETECT
-	pHalFunc->sreset_init_value = &sreset_init_value;
-	pHalFunc->sreset_reset_value = &sreset_reset_value;
-	pHalFunc->silentreset = &sreset_reset;
-	pHalFunc->sreset_xmit_status_check = &rtl8723d_sreset_xmit_status_check;
-	pHalFunc->sreset_linked_status_check  = &rtl8723d_sreset_linked_status_check;
-	pHalFunc->sreset_get_wifi_status  = &sreset_get_wifi_status;
-	pHalFunc->sreset_inprogress = &sreset_inprogress;
-#endif
 	pHalFunc->GetHalODMVarHandler = GetHalODMVar;
 	pHalFunc->SetHalODMVarHandler = SetHalODMVar;
 

@@ -7,87 +7,27 @@
 
 void sreset_init_value(_adapter *padapter)
 {
-#if defined(DBG_CONFIG_ERROR_DETECT)
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-	struct sreset_priv *psrtpriv = &pHalData->srestpriv;
-
-	_rtw_mutex_init(&psrtpriv->silentreset_mutex);
-	psrtpriv->silent_reset_inprogress = _FALSE;
-	psrtpriv->Wifi_Error_Status = WIFI_STATUS_SUCCESS;
-	psrtpriv->last_tx_time = 0;
-	psrtpriv->last_tx_complete_time = 0;
-#endif
 }
 void sreset_reset_value(_adapter *padapter)
 {
-#if defined(DBG_CONFIG_ERROR_DETECT)
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-	struct sreset_priv *psrtpriv = &pHalData->srestpriv;
-
-	psrtpriv->Wifi_Error_Status = WIFI_STATUS_SUCCESS;
-	psrtpriv->last_tx_time = 0;
-	psrtpriv->last_tx_complete_time = 0;
-#endif
 }
 
 u8 sreset_get_wifi_status(_adapter *padapter)
 {
-#if defined(DBG_CONFIG_ERROR_DETECT)
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-	struct sreset_priv *psrtpriv = &pHalData->srestpriv;
-
-	u8 status = WIFI_STATUS_SUCCESS;
-	u32 val32 = 0;
-	_irqL irqL;
-	if (psrtpriv->silent_reset_inprogress == _TRUE)
-		return status;
-	val32 = rtw_read32(padapter, REG_TXDMA_STATUS);
-	if (val32 == 0xeaeaeaea)
-		psrtpriv->Wifi_Error_Status = WIFI_IF_NOT_EXIST;
-	else if (val32 != 0) {
-		RTW_INFO("txdmastatu(%x)\n", val32);
-		psrtpriv->Wifi_Error_Status = WIFI_MAC_TXDMA_ERROR;
-	}
-
-	if (WIFI_STATUS_SUCCESS != psrtpriv->Wifi_Error_Status) {
-		RTW_INFO("==>%s error_status(0x%x)\n", __FUNCTION__, psrtpriv->Wifi_Error_Status);
-		status = (psrtpriv->Wifi_Error_Status & (~(USB_READ_PORT_FAIL | USB_WRITE_PORT_FAIL)));
-	}
-	RTW_INFO("==> %s wifi_status(0x%x)\n", __FUNCTION__, status);
-
-	/* status restore */
-	psrtpriv->Wifi_Error_Status = WIFI_STATUS_SUCCESS;
-
-	return status;
-#else
 	return WIFI_STATUS_SUCCESS;
-#endif
 }
 
 void sreset_set_wifi_error_status(_adapter *padapter, u32 status)
 {
-#if defined(DBG_CONFIG_ERROR_DETECT)
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-	pHalData->srestpriv.Wifi_Error_Status = status;
-#endif
 }
 
 void sreset_set_trigger_point(_adapter *padapter, s32 tgp)
 {
-#if defined(DBG_CONFIG_ERROR_DETECT)
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-	pHalData->srestpriv.dbg_trigger_point = tgp;
-#endif
 }
 
 bool sreset_inprogress(_adapter *padapter)
 {
-#if defined(DBG_CONFIG_ERROR_RESET)
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-	return pHalData->srestpriv.silent_reset_inprogress;
-#else
 	return _FALSE;
-#endif
 }
 
 static void sreset_restore_security_station(_adapter *padapter)
@@ -243,43 +183,4 @@ void sreset_start_adapter(_adapter *padapter)
 
 void sreset_reset(_adapter *padapter)
 {
-#ifdef DBG_CONFIG_ERROR_RESET
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-	struct sreset_priv *psrtpriv = &pHalData->srestpriv;
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
-	struct mlme_priv	*pmlmepriv = &(padapter->mlmepriv);
-	struct xmit_priv	*pxmitpriv = &padapter->xmitpriv;
-	_irqL irqL;
-	systime start = rtw_get_current_time();
-	struct dvobj_priv *psdpriv = padapter->dvobj;
-	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
-
-	RTW_INFO("%s\n", __FUNCTION__);
-
-	psrtpriv->Wifi_Error_Status = WIFI_STATUS_SUCCESS;
-
-
-#ifdef CONFIG_LPS
-	rtw_set_ps_mode(padapter, PS_MODE_ACTIVE, 0, 0, "SRESET");
-#endif/* #ifdef CONFIG_LPS */
-
-	_enter_pwrlock(&pwrpriv->lock);
-
-	psrtpriv->silent_reset_inprogress = _TRUE;
-	pwrpriv->change_rfpwrstate = rf_off;
-
-	rtw_mi_sreset_adapter_hdl(padapter, _FALSE);/*sreset_stop_adapter*/
-#ifdef CONFIG_IPS
-	_ips_enter(padapter);
-	_ips_leave(padapter);
-#endif
-	rtw_mi_sreset_adapter_hdl(padapter, _TRUE);/*sreset_start_adapter*/
-
-	psrtpriv->silent_reset_inprogress = _FALSE;
-
-	_exit_pwrlock(&pwrpriv->lock);
-
-	RTW_INFO("%s done in %d ms\n", __FUNCTION__, rtw_get_passing_time_ms(start));
-	pdbgpriv->dbg_sreset_cnt++;
-#endif
 }

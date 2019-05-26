@@ -604,11 +604,7 @@ static inline char   *iwe_stream_rssi_process(_adapter *padapter,
 	/* Add quality statistics */
 	iwe->cmd = IWEVQUAL;
 	iwe->u.qual.updated = IW_QUAL_QUAL_UPDATED | IW_QUAL_LEVEL_UPDATED
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-			      | IW_QUAL_NOISE_UPDATED
-#else
 			      | IW_QUAL_NOISE_INVALID
-#endif
 #ifdef CONFIG_SIGNAL_DISPLAY_DBM
 			      | IW_QUAL_DBM
 #endif
@@ -645,17 +641,7 @@ static inline char   *iwe_stream_rssi_process(_adapter *padapter,
 #ifdef CONFIG_PLATFORM_ROCKCHIPS
 	iwe->u.qual.noise = -100; /* noise level suggest by zhf@rockchips */
 #else
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-	if (IS_NM_ENABLE(padapter)) {
-		noise = rtw_noise_query_by_chan_num(padapter, pnetwork->network.Configuration.DSConfig);
-		#ifndef CONFIG_SIGNAL_DISPLAY_DBM
-		noise = translate_dbm_to_percentage(noise);/*percentage*/
-		#endif
-		iwe->u.qual.noise = noise;
-	}
-#else
 	iwe->u.qual.noise = 0; /* noise level */
-#endif
 #endif /* CONFIG_PLATFORM_ROCKCHIPS */
 
 	/* RTW_INFO("iqual=%d, ilevel=%d, inoise=%d, iupdated=%d\n", iwe.u.qual.qual, iwe.u.qual.level , iwe.u.qual.noise, iwe.u.qual.updated); */
@@ -1786,7 +1772,6 @@ static int rtw_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
 		goto cancel_ps_deny;
 	}
 
-#ifndef CONFIG_DOSCAN_IN_BUSYTRAFFIC
 	/* When Busy Traffic, driver do not site survey. So driver return success. */
 	/* wpa_supplicant will not issue SIOCSIWSCAN cmd again after scan timeout. */
 	/* modify by thomas 2011-02-22. */
@@ -1794,7 +1779,6 @@ static int rtw_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
 		indicate_wx_scan_complete_event(padapter);
 		goto cancel_ps_deny;
 	}
-#endif
 	if (check_fwstate(pmlmepriv, WIFI_AP_STATE) && check_fwstate(pmlmepriv, WIFI_UNDER_WPS)) {
 		RTW_INFO("AP mode process WPS\n");
 		indicate_wx_scan_complete_event(padapter);
@@ -2046,15 +2030,9 @@ static int rtw_wx_set_essid(struct net_device *dev,
 
 	uint ret = 0, len;
 
-
 #ifdef DBG_IOCTL
 	RTW_INFO("DBG_IOCTL %s:%d\n", __FUNCTION__, __LINE__);
 #endif
-#ifdef CONFIG_WEXT_DONT_JOIN_BYSSID
-	RTW_INFO("%s: CONFIG_WEXT_DONT_JOIN_BYSSID be defined!! only allow bssid joining\n", __func__);
-	return -EPERM;
-#endif
-
 #if WIRELESS_EXT <= 20
 	if ((wrqu->essid.length - 1) > IW_ESSID_MAX_SIZE) {
 #else
@@ -2063,8 +2041,6 @@ static int rtw_wx_set_essid(struct net_device *dev,
 		ret = -E2BIG;
 		goto exit;
 	}
-
-
 
 	rtw_ps_deny(padapter, PS_DENY_JOIN);
 	if (_FAIL == rtw_pwr_wakeup(padapter)) {
@@ -3143,12 +3119,6 @@ static void rtw_dbg_mode_hdl(_adapter *padapter, u32 id, u8 *pdata, u32 len)
 		rtw_hal_set_hwreg(padapter, HW_VAR_BT_ISSUE_DELBA, pdata);
 		break;
 #endif
-#ifdef DBG_CONFIG_ERROR_DETECT
-	case GEN_MP_IOCTL_SUBCODE(GET_WIFI_STATUS):
-		*pdata = rtw_hal_sreset_get_wifi_status(padapter);
-		break;
-#endif
-
 	default:
 		break;
 	}
@@ -5453,9 +5423,6 @@ exit:
 
 }
 
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-#include "../../hal/hal_dm_acs.h"
-#endif
 #ifdef DBG_CMD_QUEUE
 u8 dump_cmd_id = 0;
 #endif
@@ -5740,27 +5707,6 @@ static int rtw_dbg_port(struct net_device *dev,
 			}
 		}
 			break;
-		#ifdef DBG_CONFIG_ERROR_DETECT
-		case 0x0f: {
-			if (extra_arg == 0) {
-				RTW_INFO("###### silent reset test.......#####\n");
-				rtw_hal_sreset_reset(padapter);
-			} else {
-				HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-				struct sreset_priv *psrtpriv = &pHalData->srestpriv;
-				psrtpriv->dbg_trigger_point = extra_arg;
-			}
-
-		}
-			break;
-		case 0x15: {
-			struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
-			RTW_INFO("==>silent resete cnts:%d\n", pwrpriv->ips_enter_cnts);
-		}
-			break;
-
-		#endif
-
 		case 0x10: /* driver version display */
 			dump_drv_version(RTW_DBGDUMP);
 			break;
@@ -5896,16 +5842,6 @@ static int rtw_dbg_port(struct net_device *dev,
 			}
 		}
 			break;
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-		case 0x1e: {
-			RTW_INFO("===========================================\n");
-			rtw_noise_measure_curchan(padapter);
-			RTW_INFO("===========================================\n");
-		}
-			break;
-#endif
-
-
 		case 0x20:
 			{
 				if (arg == 0xAA) {
@@ -10352,16 +10288,6 @@ static struct iw_statistics *rtw_get_wireless_stats(struct net_device *dev)
 #endif
 
 		tmp_qual = padapter->recvpriv.signal_qual;
-		#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-		if (IS_NM_ENABLE(padapter)) {
-			tmp_noise = rtw_noise_measure_curchan(padapter);
-			#ifndef CONFIG_SIGNAL_DISPLAY_DBM
-			tmp_noise = translate_dbm_to_percentage(tmp_noise);/*percentage*/
-			#endif
-		}
-		#endif
-		/* RTW_INFO("level:%d, qual:%d, noise:%d, rssi (%d)\n", tmp_level, tmp_qual, tmp_noise,padapter->recvpriv.rssi); */
-
 		piwstats->qual.level = tmp_level;
 		piwstats->qual.qual = tmp_qual;
 		piwstats->qual.noise = tmp_noise;

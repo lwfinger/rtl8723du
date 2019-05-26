@@ -97,14 +97,6 @@ void rtw_btcoex_ConnectNotify(PADAPTER padapter, u8 action)
 	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
 		return;
 
-#ifdef DBG_CONFIG_ERROR_RESET
-	if (_TRUE == rtw_hal_sreset_inprogress(padapter)) {
-		RTW_INFO(FUNC_ADPT_FMT ": [BTCoex] under reset, skip notify!\n",
-			 FUNC_ADPT_ARG(padapter));
-		return;
-	}
-#endif /* DBG_CONFIG_ERROR_RESET */
-
 #ifdef CONFIG_CONCURRENT_MODE
 	if (_FALSE == action) {
 		if (rtw_mi_buddy_check_fwstate(padapter, WIFI_UNDER_LINKING))
@@ -122,14 +114,6 @@ void rtw_btcoex_MediaStatusNotify(PADAPTER padapter, u8 mediaStatus)
 	pHalData = GET_HAL_DATA(padapter);
 	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
 		return;
-
-#ifdef DBG_CONFIG_ERROR_RESET
-	if (_TRUE == rtw_hal_sreset_inprogress(padapter)) {
-		RTW_INFO(FUNC_ADPT_FMT ": [BTCoex] under reset, skip notify!\n",
-			 FUNC_ADPT_ARG(padapter));
-		return;
-	}
-#endif /* DBG_CONFIG_ERROR_RESET */
 
 #ifdef CONFIG_CONCURRENT_MODE
 	if (RT_MEDIA_DISCONNECT == mediaStatus) {

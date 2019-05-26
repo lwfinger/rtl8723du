@@ -373,11 +373,6 @@ ssize_t proc_set_rf4ce_state(struct file *file, const char __user *buffer, size_
 #endif
 #endif /* CONFIG_BT_COEXIST */
 
-#if defined(DBG_CONFIG_ERROR_DETECT)
-int proc_get_sreset(struct seq_file *m, void *v);
-ssize_t proc_set_sreset(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#endif /* DBG_CONFIG_ERROR_DETECT */
-
 int proc_get_odm_adaptivity(struct seq_file *m, void *v);
 ssize_t proc_set_odm_adaptivity(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 

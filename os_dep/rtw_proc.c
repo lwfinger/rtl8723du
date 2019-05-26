@@ -2208,47 +2208,6 @@ static ssize_t proc_set_acs(struct file *file, const char __user *buffer, size_t
 }
 #endif /*CONFIG_RTW_ACS*/
 
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-static int proc_get_nm(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
-
-	rtw_noise_info_dump(m, adapter);
-	return 0;
-}
-
-static ssize_t proc_set_nm(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	char tmp[32];
-	u8 nm_state = 0;
-
-	if (count < 1)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-
-		int num = sscanf(tmp, "%hhu", &nm_state);
-
-		if (num < 1)
-			return -EINVAL;
-
-		if (nm_state)
-			rtw_nm_enable(padapter);
-		else
-			rtw_nm_disable(padapter);
-
-	}
-	return count;
-}
-#endif /*CONFIG_RTW_ACS*/
-
 static int proc_get_hal_spec(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -2602,9 +2561,6 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 #endif
 #endif /* CONFIG_BT_COEXIST */
 
-#if defined(DBG_CONFIG_ERROR_DETECT)
-	RTW_PROC_HDL_SSEQ("sreset", proc_get_sreset, proc_set_sreset),
-#endif /* DBG_CONFIG_ERROR_DETECT */
 	RTW_PROC_HDL_SSEQ("trx_info_debug", proc_get_trx_info_debug, NULL),
 	RTW_PROC_HDL_SSEQ("linked_info_dump", proc_get_linked_info_dump, proc_set_linked_info_dump),
 	RTW_PROC_HDL_SSEQ("sta_tp_dump", proc_get_sta_tp_dump, proc_set_sta_tp_dump),
@@ -2670,10 +2626,6 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 #ifdef CONFIG_RTW_ACS
 	RTW_PROC_HDL_SSEQ("acs", proc_get_best_chan, proc_set_acs),
 	RTW_PROC_HDL_SSEQ("chan_info", proc_get_chan_info, NULL),
-#endif
-
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-	RTW_PROC_HDL_SSEQ("noise_monitor", proc_get_nm, proc_set_nm),
 #endif
 
 #ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
