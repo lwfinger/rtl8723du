@@ -286,11 +286,9 @@ u8 rtw_set_802_11_ssid(_adapter *padapter, NDIS_802_11_SSID *ssid)
 				} else {
 					goto release_mlme_lock;/* it means driver is in WIFI_ADHOC_MASTER_STATE, we needn't create bss again. */
 				}
-			}
-#ifdef CONFIG_LPS
-			else
+			} else {
 				rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_JOINBSS, 1);
-#endif
+			}
 		} else {
 
 			rtw_disassoc_cmd(padapter, 0, 0);

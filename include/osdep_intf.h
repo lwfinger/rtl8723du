@@ -95,10 +95,8 @@ void rtw_set_rtnl_lock_holder(struct dvobj_priv *dvobj, _thread_hdl_ thd_hdl);
 
 void rtw_ips_dev_unload(_adapter *padapter);
 
-#ifdef CONFIG_IPS
 int rtw_ips_pwr_up(_adapter *padapter);
 void rtw_ips_pwr_down(_adapter *padapter);
-#endif
 
 #ifdef CONFIG_CONCURRENT_MODE
 struct _io_ops;

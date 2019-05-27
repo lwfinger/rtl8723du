@@ -47,13 +47,6 @@ enum h2c_cmd {
 	H2C_SAP_PS_ = 0x26,
 	H2C_INACTIVE_PS_ = 0x27, /* Inactive_PS */
 	H2C_FWLPS_IN_IPS_ = 0x28,
-#ifdef CONFIG_LPS_POFF
-	H2C_LPS_POFF_CTRL = 0x29,
-	H2C_LPS_POFF_PARAM = 0x2A,
-#endif
-#ifdef CONFIG_LPS_PG
-	H2C_LPS_PG_INFO = 0x2B,
-#endif
 
 #ifdef CONFIG_FW_MULTI_PORT_SUPPORT
 	H2C_DEFAULT_PORT_ID = 0x2C,
@@ -67,7 +60,7 @@ enum h2c_cmd {
 	H2C_IQ_CALIBRATION	= 0x45,
 
 	H2C_RA_MASK_3SS = 0x46,/* for 8814A */
-	H2C_RA_PARA_ADJUST = 0x47,/* CONFIG_RA_DBG_CMD */
+	H2C_RA_PARA_ADJUST = 0x47,
 	H2C_DYNAMIC_TX_PATH = 0x48,/* for 8814A */
 
 	H2C_FW_TRACE_EN = 0x49,
@@ -84,7 +77,7 @@ enum h2c_cmd {
 	H2C_BT_CONTROL = 0x68,
 	H2C_BT_WIFI_CTRL = 0x69,
 	H2C_BT_FW_PATCH = 0x6A,
-#if defined(CONFIG_BT_COEXIST) && defined(CONFIG_FW_MULTI_PORT_SUPPORT)
+#if defined(CONFIG_FW_MULTI_PORT_SUPPORT)
 	H2C_BTC_WL_PORT_ID = 0x71,
 #endif
 	/* WOWLAN Class: 100 */
@@ -150,16 +143,8 @@ enum h2c_cmd {
 	#define H2C_MCC_TIME_SETTING_LEN		6
 	#define H2C_MCC_IQK_PARAM_LEN		7
 #endif /* CONFIG_MCC_MODE */
-#ifdef CONFIG_LPS_PG
-	#define H2C_LPS_PG_INFO_LEN		2
-	#define H2C_LPSPG_LEN			16
-#endif
-#ifdef CONFIG_LPS_POFF
-	#define H2C_LPS_POFF_CTRL_LEN		1
-	#define H2C_LPS_POFF_PARAM_LEN		5
-#endif
 
-#if defined(CONFIG_BT_COEXIST) && defined(CONFIG_FW_MULTI_PORT_SUPPORT)
+#if defined(CONFIG_FW_MULTI_PORT_SUPPORT)
 #define H2C_BTC_WL_PORT_ID_LEN	1
 #endif
 #define H2C_SINGLE_CHANNELSWITCH_V2_LEN 2
@@ -452,45 +437,6 @@ static inline void SET_H2CCMD_AP_WOW_PS_DURATION(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
 }
-
-#ifdef CONFIG_LPS_POFF
-/*PARTIAL OFF Control 0x29*/
-static inline void SET_H2CCMD_LPS_POFF_CTRL_EN(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd, __Value, BIT(0));
-}
-
-/*PARTIAL OFF PARAM   0x2A*/
-static inline void SET_H2CCMD_LPS_POFF_PARAM_RDVLD(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd, __Value, BIT(0));
-}
-
-static inline void SET_H2CCMD_LPS_POFF_PARAM_WRVLD(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd, __Value, BIT(1));
-}
-
-static inline void SET_H2CCMD_LPS_POFF_PARAM_STARTADDL(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
-}
-
-static inline void SET_H2CCMD_LPS_POFF_PARAM_STARTADDH(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(7, 0));
-}
-
-static inline void SET_H2CCMD_LPS_POFF_PARAM_ENDADDL(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
-}
-
-static inline void SET_H2CCMD_LPS_POFF_PARAM_ENDADDH(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 4, __Value, GENMASK(7, 0));
-}
-#endif
 
 #ifdef CONFIG_FW_MULTI_PORT_SUPPORT
 /* DEFAULT PORT ID 0x2C*/
@@ -841,7 +787,7 @@ static inline void SET_H2CCMD_SINGLE_CH_SWITCH_V2_BW(u8 *__pH2CCmd, u8 __Value)
 	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 4));
 }
 
-#if defined(CONFIG_BT_COEXIST) && defined(CONFIG_FW_MULTI_PORT_SUPPORT)
+#if defined(CONFIG_FW_MULTI_PORT_SUPPORT)
 #static inline voidSET_H2CCMD_BTC_WL_PORT_ID(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd, __Value, GENMASK(3, 0));
@@ -1095,44 +1041,6 @@ static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_SSID_INFO(u8 *__pH2CCmd, u8 __Va
 }
 
 #endif /* CONFIG_PNO_SUPPORT */
-
-#ifdef CONFIG_LPS_PG
-static inline void SET_H2CCMD_LPSPG_SEC_CAM_EN(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 0, __Value, BIT(0));
-}
-
-static inline void SET_H2CCMD_LPSPG_MBID_CAM_EN(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 0, __Value, BIT(1));
-}
-
-static inline void SET_H2CCMD_LPSPG_PMC_CAM_EN(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 0, __Value, BIT(2));
-}
-
-static inline void SET_H2CCMD_LPSPG_MACID_SEARCH_EN(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 0, __Value, BIT(3));
-}
-
-static inline void SET_H2CCMD_LPSPG_TXSC_EN(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 0, __Value, BIT(4));
-}
-
-static inline void SET_H2CCMD_LPSPG_MU_RATE_TB_EN(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 0, __Value, BIT(5));
-}
-
-static inline void SET_H2CCMD_LPSPG_LOC(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
-}
-
-#endif
 
 /* ---------------------------------------------------------------------------------------------------------
  * -------------------------------------------    Structure    --------------------------------------------------

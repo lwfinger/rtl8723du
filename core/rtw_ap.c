@@ -3360,10 +3360,7 @@ void stop_ap_mode(_adapter *padapter)
 
 	rtw_hal_rcr_set_chk_bssid(padapter, self_action);
 
-#ifdef CONFIG_BT_COEXIST
 	rtw_btcoex_MediaStatusNotify(padapter, 0); /* disconnect */
-#endif
-
 }
 
 void rtw_ap_update_bss_chbw(_adapter *adapter, WLAN_BSSID_EX *bss, u8 ch, u8 bw, u8 offset)

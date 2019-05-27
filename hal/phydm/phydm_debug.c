@@ -1798,23 +1798,12 @@ phydm_cmd_parser(
 		for (i = 0; i < 5; i++) {
 			if (input[i + 1]) {
 				PHYDM_SSCANF(input[i + 1], DCMD_HEX, &var1[i]);
-
-				/*PHYDM_SNPRINTF((output+used, out_len-used, "new SET, PATHDIV_var[%d]= (( %d ))\n", i, var1[i]));*/
 				input_idx++;
 			}
 		}
-
-		if (input_idx >= 1) {
-			/*PHYDM_SNPRINTF((output+used, out_len-used, "odm_PATHDIV_debug\n"));*/
-#if (defined(CONFIG_PATH_DIVERSITY))
-			odm_pathdiv_debug(p_dm, (u32 *)var1, &used, output, &out_len);
-#endif
-		}
-
 		break;
 
 	case PHYDM_DEBUG:
-
 		for (i = 0; i < 5; i++) {
 			if (input[i + 1]) {
 				PHYDM_SSCANF(input[i + 1], DCMD_DECIMAL, &var1[i]);
@@ -1828,10 +1817,7 @@ phydm_cmd_parser(
 			/*PHYDM_SNPRINTF((output+used, out_len-used, "odm_debug_comp\n"));*/
 			phydm_debug_trace(p_dm, (u32 *)var1, &used, output, &out_len);
 		}
-
-
 		break;
-
 	case PHYDM_FW_DEBUG:
 
 		for (i = 0; i < 5; i++) {
@@ -1978,9 +1964,6 @@ phydm_cmd_parser(
 	case PHYDM_BIG_JUMP:
 		break;
 	case PHYDM_AUTO_DBG:
-		#ifdef PHYDM_AUTO_DEGBUG
-		phydm_auto_dbg_console(p_dm, &input[0], &used, output, &out_len, input_num);
-		#endif
 		break;
 	case PHYDM_SHOW_RXRATE:
 		break;
@@ -2508,145 +2491,9 @@ phydm_fw_trace_handler_code(
 	/*	function, dbg_num, content_0, content_1, content_2, content_3, content_4)); */
 
 	/*--------------------------------------------*/
-#ifdef CONFIG_RA_FW_DBG_CODE
-	if (function == RATE_DECISION) {
-		if (dbg_num == 0) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] RA_CNT=((%d))  Max_device=((%d))--------------------------->\n", content_1, content_2));
-			else if (content_0 == 2)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] Check RA macid= ((%d)), MediaStatus=((%d)), Dis_RA=((%d)),  try_bit=((0x%x))\n", content_1, content_2, content_3, content_4));
-			else if (content_0 == 3)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] Check RA  total=((%d)),  drop=((0x%x)), TXRPT_TRY_bit=((%x)), bNoisy=((%x))\n", content_1, content_2, content_3, content_4));
-		} else if (dbg_num == 1) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] RTY[0,1,2,3]=[ %d , %d , %d , %d ]\n", content_1, content_2, content_3, content_4));
-			else if (content_0 == 2) {
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] RTY[4]=[ %d ], drop=(( %d )), total=(( %d )), current_rate=((0x %x ))", content_1, content_2, content_3, content_4));
-				phydm_print_rate(p_dm, (u8)content_4, DBG_FW_TRACE);
-			} else if (content_0 == 3)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] penality_idx=(( %d ))\n", content_1));
-			else if (content_0 == 4)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] RSSI=(( %d )), ra_stage = (( %d ))\n", content_1, content_2));
-		}
-
-		else if (dbg_num == 3) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] Fast_RA (( DOWN ))  total=((%d)),  total>>1=((%d)), R4+R3+R2 = ((%d)), RateDownHold = ((%d))\n", content_1, content_2, content_3, content_4));
-			else if (content_0 == 2)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] Fast_RA (( UP ))  total_acc=((%d)),  total_acc>>1=((%d)), R4+R3+R2 = ((%d)), RateDownHold = ((%d))\n", content_1, content_2, content_3, content_4));
-			else if (content_0 == 3)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] Fast_RA (( UP )) ((rate Down Hold))  RA_CNT=((%d))\n", content_1));
-			else if (content_0 == 4)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] Fast_RA (( UP )) ((tota_accl<5 skip))  RA_CNT=((%d))\n", content_1));
-			else if (content_0 == 8)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] Fast_RA (( Reset Tx Rpt )) RA_CNT=((%d))\n", content_1));
-		}
-
-		else if (dbg_num == 4) {
-			if (content_0 == 3) {
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] RER_CNT   PCR_ori =(( %d )),  ratio_ori =(( %d )), pcr_updown_bitmap =(( 0x%x )), pcr_var_diff =(( %d ))\n", content_1, content_2, content_3, content_4));
-				/**/
-			} else if (content_0 == 4) {
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] pcr_shift_value =(( %s%d )), rate_down_threshold =(( %d )), rate_up_threshold =(( %d ))\n", ((content_1) ? "+" : "-"), content_2, content_3, content_4));
-				/**/
-			} else if (content_0 == 5) {
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] pcr_mean =(( %d )), PCR_VAR =(( %d )), offset =(( %d )), decision_offset_p =(( %d ))\n", content_1, content_2, content_3, content_4));
-				/**/
-			}
-		}
-
-		else if (dbg_num == 5) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] (( UP))  Nsc=(( %d )), N_High=(( %d )), RateUp_Waiting=(( %d )), RateUp_Fail=(( %d ))\n", content_1, content_2, content_3, content_4));
-			else if (content_0 == 2)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] ((DOWN))  Nsc=(( %d )), N_Low=(( %d ))\n", content_1, content_2));
-			else if (content_0 == 3)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] ((HOLD))  Nsc=((%d)), N_High=((%d)), N_Low=((%d)), Reset_CNT=((%d))\n", content_1, content_2, content_3, content_4));
-		} else if (dbg_num == 0x60) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] ((AP RPT))  macid=((%d)), BUPDATE[macid]=((%d))\n", content_1, content_2));
-			else if (content_0 == 4)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] ((AP RPT))  pass=((%d)), rty_num=((%d)), drop=((%d)), total=((%d))\n", content_1, content_2, content_3, content_4));
-			else if (content_0 == 5)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW] ((AP RPT))  PASS=((%d)), RTY_NUM=((%d)), DROP=((%d)), TOTAL=((%d))\n", content_1, content_2, content_3, content_4));
-		}
-	}
-	/*--------------------------------------------*/
-	else if (function == INIT_RA_TABLE) {
-		if (dbg_num == 3)
-			PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][INIT_RA_INFO] Ra_init, RA_SKIP_CNT = (( %d ))\n", content_0));
-
-	}
-	/*--------------------------------------------*/
-	else if (function == RATE_UP) {
-		if (dbg_num == 2) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][RateUp]  ((Highest rate->return)), macid=((%d))  Nsc=((%d))\n", content_1, content_2));
-		} else if (dbg_num == 5) {
-			if (content_0 == 0)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][RateUp]  ((rate UP)), up_rate_tmp=((0x%x)), rate_idx=((0x%x)), SGI_en=((%d)),  SGI=((%d))\n", content_1, content_2, content_3, content_4));
-			else if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][RateUp]  ((rate UP)), rate_1=((0x%x)), rate_2=((0x%x)), BW=((%d)), Try_Bit=((%d))\n", content_1, content_2, content_3, content_4));
-		}
-
-	}
-	/*--------------------------------------------*/
-	else if (function == RATE_DOWN) {
-		if (dbg_num == 5) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][RateDownStep]  ((rate Down)), macid=((%d)), rate1=((0x%x)),  rate2=((0x%x)), BW=((%d))\n", content_1, content_2, content_3, content_4));
-		}
-	} else if (function == TRY_DONE) {
-		if (dbg_num == 1) {
-			if (content_0 == 1) {
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][Try Done]  ((try succsess )) macid=((%d)), Try_Done_cnt=((%d))\n", content_1, content_2));
-				/**/
-			}
-		} else if (dbg_num == 2) {
-			if (content_0 == 1) {
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][Try Done]  ((try)) macid=((%d)), Try_Done_cnt=((%d)),  rate_2=((%d)),  try_succes=((%d))\n", content_1, content_2, content_3, content_4));
-				/**/
-			}
-		}
-	}
-	/*--------------------------------------------*/
-	else if (function == RA_H2C) {
-		if (dbg_num == 1) {
-			if (content_0 == 0) {
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][H2C=0x49]  fw_trace_en=((%d)), mode =((%d)),  macid=((%d))\n", content_1, content_2, content_3));
-				/**/
-				/*C2H_RA_Dbg_code(F_RA_H2C,1,0, SysMib.ODM.DEBUG.fw_trace_en, mode, macid, 0);    //RA MASK*/
-			}
-		}
-	}
-	/*--------------------------------------------*/
-	else if (function == F_RATE_AP_RPT) {
-		if (dbg_num == 1) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][AP RPT]  ((1)), SPE_STATIS=((0x%x))---------->\n", content_3));
-		} else if (dbg_num == 2) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][AP RPT]  RTY_all=((%d))\n", content_1));
-		} else if (dbg_num == 3) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][AP RPT]  MACID1[%d], TOTAL=((%d)),  RTY=((%d))\n", content_3, content_1, content_2));
-		} else if (dbg_num == 4) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][AP RPT]  MACID2[%d], TOTAL=((%d)),  RTY=((%d))\n", content_3, content_1, content_2));
-		} else if (dbg_num == 5) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][AP RPT]  MACID1[%d], PASS=((%d)),  DROP=((%d))\n", content_3, content_1, content_2));
-		} else if (dbg_num == 6) {
-			if (content_0 == 1)
-				PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][AP RPT]  MACID2[%d],, PASS=((%d)),  DROP=((%d))\n", content_3, content_1, content_2));
-		}
-	} else {
-		PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][general][%d, %d, %d] = {%d, %d, %d, %d}\n", function, dbg_num, content_0, content_1, content_2, content_3, content_4));
-		/**/
-	}
-#else
-	PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][general][%d, %d, %d] = {%d, %d, %d, %d}\n", function, dbg_num, content_0, content_1, content_2, content_3, content_4));
-#endif
+	PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW][general][%d, %d, %d] = {%d, %d, %d, %d}\n",
+		  function, dbg_num, content_0, content_1, content_2,
+		  content_3, content_4));
 	/*--------------------------------------------*/
 
 #endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/

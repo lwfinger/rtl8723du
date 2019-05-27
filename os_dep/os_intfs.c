@@ -31,17 +31,10 @@ static int rtw_scan_mode = 1;/* active, passive */
 static int rtw_adhoc_tx_pwr = 1;
 static int rtw_soft_ap = 0;
 /* int smart_ps = 1; */
-#ifdef CONFIG_POWER_SAVING
 static 	int rtw_power_mgnt = PS_MODE_MAX;
 static	int rtw_ips_mode = IPS_NORMAL;
 
 static 	int rtw_lps_level = LPS_NORMAL; /*USB default LPS level*/
-#else /* !CONFIG_POWER_SAVING */
-	int rtw_power_mgnt = PS_MODE_ACTIVE;
-	int rtw_ips_mode = IPS_NONE;
-	int rtw_lps_level = LPS_NORMAL;
-#endif /* CONFIG_POWER_SAVING */
-
 
 module_param(rtw_ips_mode, int, 0644);
 MODULE_PARM_DESC(rtw_ips_mode, "The default IPS mode");
@@ -216,7 +209,6 @@ MODULE_PARM_DESC(rtw_excl_chs, "exclusive channel array");
 But Softap must be SHUT DOWN once P2P decide to set up connection and become a GO.*/
 static 	int rtw_full_ch_in_p2p_handshake = 0; /* reply only softap channel*/
 
-#ifdef CONFIG_BT_COEXIST
 static int rtw_btcoex_enable = 2;
 module_param(rtw_btcoex_enable, int, 0644);
 MODULE_PARM_DESC(rtw_btcoex_enable, "BT co-existence on/off, 0:off, 1:on, 2:by efuse");
@@ -228,7 +220,6 @@ MODULE_PARM_DESC(rtw_ant_num, "Antenna number setting, 0:by efuse");
 static int rtw_bt_iso = 2;/* 0:Low, 1:High, 2:From Efuse */
 static int rtw_bt_sco = 3;/* 0:Idle, 1:None-SCO, 2:SCO, 3:From Counter, 4.Busy, 5.OtherBusy */
 static int rtw_bt_ampdu = 1 ; /* 0:Disable BT control A-MPDU, 1:Enable BT control A-MPDU. */
-#endif /* CONFIG_BT_COEXIST */
 
 static int rtw_AcceptAddbaReq = _TRUE;/* 0:Reject AP's Add BA req, 1:Accept AP's Add BA req. */
 
@@ -751,14 +742,12 @@ uint loadparam(_adapter *padapter)
 	registry_par->special_rf_path = (u8)rtw_special_rf_path;
 
 	registry_par->full_ch_in_p2p_handshake = (u8)rtw_full_ch_in_p2p_handshake;
-#ifdef CONFIG_BT_COEXIST
 	registry_par->btcoex = (u8)rtw_btcoex_enable;
 	registry_par->bt_iso = (u8)rtw_bt_iso;
 	registry_par->bt_sco = (u8)rtw_bt_sco;
 	registry_par->bt_ampdu = (u8)rtw_bt_ampdu;
 	registry_par->ant_num = (u8)rtw_ant_num;
 	registry_par->single_ant_path = (u8) rtw_single_ant_path;
-#endif
 
 	registry_par->bAcceptAddbaReq = (u8)rtw_AcceptAddbaReq;
 
@@ -1940,10 +1929,6 @@ void rtw_cancel_all_timer(_adapter *padapter)
 	_cancel_timer_ex(&padapter->recvpriv.signal_stat_timer);
 #endif
 
-#ifdef CONFIG_LPS_RPWM_TIMER
-	_cancel_timer_ex(&(adapter_to_pwrctl(padapter)->pwr_rpwm_timer));
-#endif /* CONFIG_LPS_RPWM_TIMER */
-
 	/* cancel dm timer */
 	rtw_hal_dm_deinit(padapter);
 
@@ -2615,10 +2600,6 @@ int _netdev_open(struct net_device *pnetdev)
 	uint status;
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(pnetdev);
 	struct pwrctrl_priv *pwrctrlpriv = adapter_to_pwrctl(padapter);
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(padapter);
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
-
 
 	RTW_INFO(FUNC_NDEV_FMT" , bup=%d\n", FUNC_NDEV_ARG(pnetdev), padapter->bup);
 
@@ -2674,9 +2655,7 @@ int _netdev_open(struct net_device *pnetdev)
 
 	_set_timer(&adapter_to_dvobj(padapter)->dynamic_chk_timer, 2000);
 
-#ifndef CONFIG_IPS_CHECK_IN_WD
 	rtw_set_pwr_state_check_timer(padapter);
-#endif
 
 	/* rtw_netif_carrier_on(pnetdev); */ /* call this func when rtw_joinbss_event_callback return success */
 	rtw_netif_wake_queue(pnetdev);
@@ -2684,16 +2663,6 @@ int _netdev_open(struct net_device *pnetdev)
 #ifdef CONFIG_BR_EXT
 	netdev_br_init(pnetdev);
 #endif /* CONFIG_BR_EXT */
-
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-	if (is_primary_adapter(padapter) && (_TRUE == pHalData->EEPROMBluetoothCoexist)) {
-		rtw_btcoex_init_socket(padapter);
-		padapter->coex_info.BtMgnt.ExtConfig.HCIExtensionVer = 0x04;
-		rtw_btcoex_SetHciVersion(padapter, 0x04);
-	} else
-		RTW_INFO("CONFIG_BT_COEXIST: VIRTUAL_ADAPTER\n");
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
-
 
 netdev_open_normal_process:
 
@@ -2764,7 +2733,6 @@ int netdev_open(struct net_device *pnetdev)
 	return ret;
 }
 
-#ifdef CONFIG_IPS
 static int  ips_netdrv_open(_adapter *padapter)
 {
 	int status = _SUCCESS;
@@ -2786,9 +2754,7 @@ static int  ips_netdrv_open(_adapter *padapter)
 	rtw_intf_start(padapter);
 #endif /* !RTW_HALMAC */
 
-#ifndef CONFIG_IPS_CHECK_IN_WD
 	rtw_set_pwr_state_check_timer(padapter);
-#endif
 	_set_timer(&adapter_to_dvobj(padapter)->dynamic_chk_timer, 2000);
 
 	return _SUCCESS;
@@ -2827,7 +2793,7 @@ void rtw_ips_pwr_down(_adapter *padapter)
 	rtw_ips_dev_unload(padapter);
 	RTW_INFO("<=== rtw_ips_pwr_down..................... in %dms\n", rtw_get_passing_time_ms(start_time));
 }
-#endif
+
 void rtw_ips_dev_unload(_adapter *padapter)
 {
 	struct net_device *pnetdev = (struct net_device *)padapter->pnetdev;
@@ -2853,12 +2819,9 @@ static int pm_netdev_open(struct net_device *pnetdev, u8 bnormal)
 		_enter_critical_mutex(&(adapter_to_dvobj(padapter)->hw_init_mutex), NULL);
 		status = _netdev_open(pnetdev);
 		_exit_critical_mutex(&(adapter_to_dvobj(padapter)->hw_init_mutex), NULL);
-	}
-#ifdef CONFIG_IPS
-	else
+	} else {
 		status = (_SUCCESS == ips_netdrv_open(padapter)) ? (0) : (-1);
-#endif
-
+	}
 	return status;
 }
 
@@ -2867,9 +2830,6 @@ static int netdev_close(struct net_device *pnetdev)
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(pnetdev);
 	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(padapter);
 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(padapter);
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
 
 	RTW_INFO(FUNC_NDEV_FMT" , bup=%d\n", FUNC_NDEV_ARG(pnetdev), padapter->bup);
 	#ifdef CONFIG_AUTOSUSPEND
@@ -2883,14 +2843,6 @@ static int netdev_close(struct net_device *pnetdev)
 	padapter->netif_up = _FALSE;
 	pmlmepriv->LinkDetectInfo.bBusyTraffic = _FALSE;
 
-	/*	if (!rtw_is_hw_init_completed(padapter)) {
-			RTW_INFO("(1)871x_drv - drv_close, bup=%d, hw_init_completed=%s\n", padapter->bup, rtw_is_hw_init_completed(padapter)?"_TRUE":"_FALSE");
-
-			rtw_set_drv_stopped(padapter);
-
-			rtw_dev_unload(padapter);
-		}
-		else*/
 	if (pwrctl->rf_pwrstate == rf_on) {
 		RTW_INFO("(2)871x_drv - drv_close, bup=%d, hw_init_completed=%s\n", padapter->bup, rtw_is_hw_init_completed(padapter) ? "_TRUE" : "_FALSE");
 
@@ -2929,12 +2881,6 @@ static int netdev_close(struct net_device *pnetdev)
 	/* padapter->rtw_wdev->iftype = NL80211_IFTYPE_MONITOR; */ /* set this at the end */
 #endif /* CONFIG_IOCTL_CFG80211 */
 
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-	if (is_primary_adapter(padapter) && (_TRUE == pHalData->EEPROMBluetoothCoexist))
-		rtw_btcoex_close_socket(padapter);
-	else
-		RTW_INFO("CONFIG_BT_COEXIST: VIRTUAL_ADAPTER\n");
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
 	RTW_INFO("-871x_drv - drv_close, bup=%d\n", padapter->bup);
 
 	return 0;
@@ -3291,10 +3237,7 @@ void rtw_dev_unload(PADAPTER padapter)
 			RTW_PRINT("%s: driver not in IPS\n", __func__);
 
 		if (!rtw_is_surprise_removed(padapter)) {
-#ifdef CONFIG_BT_COEXIST
 			rtw_btcoex_IpsNotify(padapter, pwrctl->ips_mode_req);
-#endif
-			/* amy modify 20120221 for power seq is different between driver open and ips */
 			rtw_hal_deinit(padapter);
 			rtw_set_surprise_removed(padapter);
 		}
@@ -3369,9 +3312,7 @@ static int rtw_suspend_normal(_adapter *padapter)
 
 	RTW_INFO("==> "FUNC_ADPT_FMT" entry....\n", FUNC_ADPT_ARG(padapter));
 
-#ifdef CONFIG_BT_COEXIST
 	rtw_btcoex_SuspendNotify(padapter, BTCOEX_SUSPEND_STATE_SUSPEND);
-#endif
 	rtw_mi_netif_caroff_qstop(padapter);
 
 	rtw_mi_suspend_free_assoc_resource(padapter);
@@ -3517,9 +3458,7 @@ static int rtw_resume_process_normal(_adapter *padapter)
 		rtw_signal_process(padapter->pid[1], SIGUSR2);
 	}
 
-#ifdef CONFIG_BT_COEXIST
 	rtw_btcoex_SuspendNotify(padapter, BTCOEX_SUSPEND_STATE_RESUME);
-#endif /* CONFIG_BT_COEXIST */
 
 	rtw_mi_resume_process_normal(padapter);
 

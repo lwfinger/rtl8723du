@@ -140,62 +140,12 @@ odm_c2h_ra_para_report_handler(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#if (defined(CONFIG_RA_DBG_CMD))
-	struct _rate_adaptive_table_			*p_ra_table = &p_dm->dm_ra_table;
-#endif
-
 	u8	para_idx = cmd_buf[0]; /*Retry Penalty, NH, NL*/
-#if (defined(CONFIG_RA_DBG_CMD))
-	u8	rate_type_start = cmd_buf[1];
-	u8	rate_type_length = cmd_len - 2;
-#endif
 	u8	i;
 
 
 	PHYDM_DBG(p_dm, DBG_RA, ("[ From FW C2H RA Para ]  cmd_buf[0]= (( %d ))\n", cmd_buf[0]));
 
-#if (defined(CONFIG_RA_DBG_CMD))
-	if (para_idx == RADBG_RTY_PENALTY) {
-		PHYDM_DBG(p_dm, DBG_RA, (" |rate index|   |RTY Penality index|\n"));
-
-		for (i = 0 ; i < (rate_type_length) ; i++) {
-			if (p_ra_table->is_ra_dbg_init)
-				p_ra_table->RTY_P_default[rate_type_start + i] = cmd_buf[2 + i];
-
-			p_ra_table->RTY_P[rate_type_start + i] = cmd_buf[2 + i];
-			PHYDM_DBG(p_dm, DBG_RA, ("%8d  %15d\n", (rate_type_start + i), p_ra_table->RTY_P[rate_type_start + i]));
-		}
-
-	} else	if (para_idx == RADBG_N_HIGH) {
-		/**/
-		PHYDM_DBG(p_dm, DBG_RA, (" |rate index|    |N-High|\n"));
-
-
-	} else if (para_idx == RADBG_N_LOW) {
-		PHYDM_DBG(p_dm, DBG_RA, (" |rate index|   |N-Low|\n"));
-		/**/
-	} else if (para_idx == RADBG_RATE_UP_RTY_RATIO) {
-		PHYDM_DBG(p_dm, DBG_RA, (" |rate index|   |rate Up RTY Ratio|\n"));
-
-		for (i = 0; i < (rate_type_length); i++) {
-			if (p_ra_table->is_ra_dbg_init)
-				p_ra_table->RATE_UP_RTY_RATIO_default[rate_type_start + i] = cmd_buf[2 + i];
-
-			p_ra_table->RATE_UP_RTY_RATIO[rate_type_start + i] = cmd_buf[2 + i];
-			PHYDM_DBG(p_dm, DBG_RA, ("%8d  %15d\n", (rate_type_start + i), p_ra_table->RATE_UP_RTY_RATIO[rate_type_start + i]));
-		}
-	} else	 if (para_idx == RADBG_RATE_DOWN_RTY_RATIO) {
-		PHYDM_DBG(p_dm, DBG_RA, (" |rate index|   |rate Down RTY Ratio|\n"));
-
-		for (i = 0; i < (rate_type_length); i++) {
-			if (p_ra_table->is_ra_dbg_init)
-				p_ra_table->RATE_DOWN_RTY_RATIO_default[rate_type_start + i] = cmd_buf[2 + i];
-
-			p_ra_table->RATE_DOWN_RTY_RATIO[rate_type_start + i] = cmd_buf[2 + i];
-			PHYDM_DBG(p_dm, DBG_RA, ("%8d  %15d\n", (rate_type_start + i), p_ra_table->RATE_DOWN_RTY_RATIO[rate_type_start + i]));
-		}
-	} else
-#endif
 		if (para_idx == RADBG_DEBUG_MONITOR1) {
 			PHYDM_DBG(p_dm, DBG_FW_TRACE, ("-------------------------------\n"));
 			if (p_dm->support_ic_type & PHYDM_IC_3081_SERIES) {
@@ -1398,9 +1348,6 @@ phydm_ra_info_watchdog(
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
 	phydm_ra_common_info_update(p_dm);
-	#if (defined(CONFIG_RA_DYNAMIC_RTY_LIMIT))
-	phydm_ra_dynamic_retry_limit(p_dm);
-	#endif
 	phydm_ra_dynamic_retry_count(p_dm);
 	phydm_refresh_rate_adaptive_mask(p_dm);
 }
@@ -1418,20 +1365,11 @@ phydm_ra_info_init(
 	p_ra_table->RA_threshold_offset = 0;
 	p_ra_table->RA_offset_direction = 0;
 	
-	#ifdef CONFIG_RA_DYNAMIC_RTY_LIMIT
-	phydm_ra_dynamic_retry_limit_init(p_dm);
-	#endif
-
 	#ifdef CONFIG_RA_DYNAMIC_RATE_ID
 	phydm_ra_dynamic_rate_id_init(p_dm);
 	#endif
 
-	#ifdef CONFIG_RA_DBG_CMD
-	odm_ra_para_adjust_init(p_dm);
-	#endif
-
 	phydm_rate_adaptive_mask_init(p_dm);
-	
 }
 
 u8
@@ -1528,112 +1466,6 @@ odm_find_rts_rate(
 
 }
 
-#if (defined(CONFIG_RA_DYNAMIC_RTY_LIMIT))
-
-void
-phydm_retry_limit_table_bound(
-	void	*p_dm_void,
-	u8	*retry_limit,
-	u8	offset
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_		*p_ra_table = &p_dm->dm_ra_table;
-
-	if (*retry_limit >  offset) {
-
-		*retry_limit -= offset;
-
-		if (*retry_limit < p_ra_table->retrylimit_low)
-			*retry_limit = p_ra_table->retrylimit_low;
-		else if (*retry_limit > p_ra_table->retrylimit_high)
-			*retry_limit = p_ra_table->retrylimit_high;
-	} else
-		*retry_limit = p_ra_table->retrylimit_low;
-}
-
-void
-phydm_reset_retry_limit_table(
-	void	*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_		*p_ra_table = &p_dm->dm_ra_table;
-	u8			i;
-
-	u8 per_rate_retrylimit_table_20M[ODM_RATEMCS15 + 1] = {
-		1, 1, 2, 4,					/*CCK*/
-		2, 2, 4, 6, 8, 12, 16, 18,		/*OFDM*/
-		2, 4, 6, 8, 12, 18, 20, 22,		/*20M HT-1SS*/
-		2, 4, 6, 8, 12, 18, 20, 22		/*20M HT-2SS*/
-	};
-	u8 per_rate_retrylimit_table_40M[ODM_RATEMCS15 + 1] = {
-		1, 1, 2, 4,					/*CCK*/
-		2, 2, 4, 6, 8, 12, 16, 18,		/*OFDM*/
-		4, 8, 12, 16, 24, 32, 32, 32,		/*40M HT-1SS*/
-		4, 8, 12, 16, 24, 32, 32, 32		/*40M HT-2SS*/
-	};
-
-	memcpy(&(p_ra_table->per_rate_retrylimit_20M[0]), &(per_rate_retrylimit_table_20M[0]), ODM_NUM_RATE_IDX);
-	memcpy(&(p_ra_table->per_rate_retrylimit_40M[0]), &(per_rate_retrylimit_table_40M[0]), ODM_NUM_RATE_IDX);
-
-	for (i = 0; i < ODM_NUM_RATE_IDX; i++) {
-		phydm_retry_limit_table_bound(p_dm, &(p_ra_table->per_rate_retrylimit_20M[i]), 0);
-		phydm_retry_limit_table_bound(p_dm, &(p_ra_table->per_rate_retrylimit_40M[i]), 0);
-	}
-}
-
-void
-phydm_ra_dynamic_retry_limit_init(
-	void	*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_			*p_ra_table = &p_dm->dm_ra_table;
-
-	p_ra_table->retry_descend_num = RA_RETRY_DESCEND_NUM;
-	p_ra_table->retrylimit_low = RA_RETRY_LIMIT_LOW;
-	p_ra_table->retrylimit_high = RA_RETRY_LIMIT_HIGH;
-
-	phydm_reset_retry_limit_table(p_dm);
-
-}
-
-void
-phydm_ra_dynamic_retry_limit(
-	void	*p_dm_void
-)
-{
-
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_		*p_ra_table = &p_dm->dm_ra_table;
-	u8	i, retry_offset;
-	u32	ma_rx_tp;
-
-
-	if (p_dm->pre_number_active_client == p_dm->number_active_client) {
-
-		PHYDM_DBG(p_dm, DBG_RA, (" pre_number_active_client ==  number_active_client\n"));
-		return;
-
-	} else {
-		if (p_dm->number_active_client == 1) {
-			phydm_reset_retry_limit_table(p_dm);
-			PHYDM_DBG(p_dm, DBG_RA, ("one client only->reset to default value\n"));
-		} else {
-
-			retry_offset = p_dm->number_active_client * p_ra_table->retry_descend_num;
-
-			for (i = 0; i < ODM_NUM_RATE_IDX; i++) {
-
-				phydm_retry_limit_table_bound(p_dm, &(p_ra_table->per_rate_retrylimit_20M[i]), retry_offset);
-				phydm_retry_limit_table_bound(p_dm, &(p_ra_table->per_rate_retrylimit_40M[i]), retry_offset);
-			}
-		}
-	}
-}
-#endif
-
 #if (defined(CONFIG_RA_DYNAMIC_RATE_ID))
 void
 phydm_ra_dynamic_rate_id_on_assoc(
@@ -1691,209 +1523,3 @@ phydm_update_rate_id(
 {
 }
 #endif
-
-#if (defined(CONFIG_RA_DBG_CMD))
-void
-odm_ra_para_adjust_send_h2c(
-	void	*p_dm_void
-)
-{
-
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_			*p_ra_table = &p_dm->dm_ra_table;
-	u8			h2c_parameter[6] = {0};
-
-	h2c_parameter[0] = RA_FIRST_MACID;
-
-	if (p_ra_table->ra_para_feedback_req) { /*h2c_parameter[5]=1 ; ask FW for all RA parameters*/
-		PHYDM_DBG(p_dm, DBG_RA, ("[H2C] Ask FW for RA parameter\n"));
-		h2c_parameter[5] |= BIT(1); /*ask FW to report RA parameters*/
-		h2c_parameter[1] = p_ra_table->para_idx; /*p_ra_table->para_idx;*/
-		p_ra_table->ra_para_feedback_req = 0;
-	} else {
-		PHYDM_DBG(p_dm, DBG_RA, ("[H2C] Send H2C to FW for modifying RA parameter\n"));
-
-		h2c_parameter[1] =  p_ra_table->para_idx;
-		h2c_parameter[2] =  p_ra_table->rate_idx;
-		/* [8 bit]*/
-		if (p_ra_table->para_idx == RADBG_RTY_PENALTY || p_ra_table->para_idx == RADBG_RATE_UP_RTY_RATIO || p_ra_table->para_idx == RADBG_RATE_DOWN_RTY_RATIO) {
-			h2c_parameter[3] = p_ra_table->value;
-			h2c_parameter[4] = 0;
-		}
-		/* [16 bit]*/
-		else {
-			h2c_parameter[3] = (u8)(((p_ra_table->value_16) & 0xf0) >> 4); /*byte1*/
-			h2c_parameter[4] = (u8)((p_ra_table->value_16) & 0x0f);	/*byte0*/
-		}
-	}
-	PHYDM_DBG(p_dm, DBG_RA, (" h2c_parameter[1] = 0x%x\n", h2c_parameter[1]));
-	PHYDM_DBG(p_dm, DBG_RA, (" h2c_parameter[2] = 0x%x\n", h2c_parameter[2]));
-	PHYDM_DBG(p_dm, DBG_RA, (" h2c_parameter[3] = 0x%x\n", h2c_parameter[3]));
-	PHYDM_DBG(p_dm, DBG_RA, (" h2c_parameter[4] = 0x%x\n", h2c_parameter[4]));
-	PHYDM_DBG(p_dm, DBG_RA, (" h2c_parameter[5] = 0x%x\n", h2c_parameter[5]));
-
-	odm_fill_h2c_cmd(p_dm, ODM_H2C_RA_PARA_ADJUST, 6, h2c_parameter);
-
-}
-
-
-void
-odm_ra_para_adjust(
-	void		*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_			*p_ra_table = &p_dm->dm_ra_table;
-	u8			rate_idx = p_ra_table->rate_idx;
-	u8			value = p_ra_table->value;
-	u8			pre_value = 0xff;
-
-	if (p_ra_table->para_idx == RADBG_RTY_PENALTY) {
-		pre_value = p_ra_table->RTY_P[rate_idx];
-		p_ra_table->RTY_P[rate_idx] = value;
-		p_ra_table->RTY_P_modify_note[rate_idx] = 1;
-	} else if (p_ra_table->para_idx == RADBG_N_HIGH) {
-
-	} else if (p_ra_table->para_idx == RADBG_N_LOW) {
-
-	} else if (p_ra_table->para_idx == RADBG_RATE_UP_RTY_RATIO) {
-		pre_value = p_ra_table->RATE_UP_RTY_RATIO[rate_idx];
-		p_ra_table->RATE_UP_RTY_RATIO[rate_idx] = value;
-		p_ra_table->RATE_UP_RTY_RATIO_modify_note[rate_idx] = 1;
-	} else if (p_ra_table->para_idx == RADBG_RATE_DOWN_RTY_RATIO) {
-		pre_value = p_ra_table->RATE_DOWN_RTY_RATIO[rate_idx];
-		p_ra_table->RATE_DOWN_RTY_RATIO[rate_idx] = value;
-		p_ra_table->RATE_DOWN_RTY_RATIO_modify_note[rate_idx] = 1;
-	}
-	PHYDM_DBG(p_dm, DBG_RA, ("Change RA Papa[%d], rate[ %d ],   ((%d))  ->  ((%d))\n", p_ra_table->para_idx, rate_idx, pre_value, value));
-	odm_ra_para_adjust_send_h2c(p_dm);
-}
-
-void
-phydm_ra_print_msg(
-	void		*p_dm_void,
-	u8		*value,
-	u8		*value_default,
-	u8		*modify_note
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_			*p_ra_table = &p_dm->dm_ra_table;
-	u32 i;
-
-	PHYDM_DBG(p_dm, DBG_RA, (" |rate index| |Current-value| |Default-value| |Modify?|\n"));
-	for (i = 0 ; i <= (p_ra_table->rate_length); i++) {
-		PHYDM_DBG(p_dm, DBG_RA, ("     [ %d ]  %10d  %14d  %14s\n", i, value[i], value_default[i], ((modify_note[i] == 1) ? "V" : " .  ")));
-	}
-}
-
-void
-odm_RA_debug(
-	void		*p_dm_void,
-	u32		*const dm_value
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_			*p_ra_table = &p_dm->dm_ra_table;
-
-	p_ra_table->is_ra_dbg_init = false;
-
-	if (dm_value[0] == 100) { /*1 Print RA Parameters*/
-		u8	default_pointer_value;
-		u8	*pvalue;
-		u8	*pvalue_default;
-		u8	*pmodify_note;
-
-		pvalue = pvalue_default = pmodify_note = &default_pointer_value;
-
-		PHYDM_DBG(p_dm, DBG_RA, ("\n------------------------------------------------------------------------------------\n"));
-
-		if (dm_value[1] == RADBG_RTY_PENALTY) { /* [1]*/
-			PHYDM_DBG(p_dm, DBG_RA, (" [1] RTY_PENALTY\n"));
-			pvalue		=	&(p_ra_table->RTY_P[0]);
-			pvalue_default	=	&(p_ra_table->RTY_P_default[0]);
-			pmodify_note	=	(u8 *)&(p_ra_table->RTY_P_modify_note[0]);
-		} else if (dm_value[1] == RADBG_N_HIGH)   /* [2]*/
-			PHYDM_DBG(p_dm, DBG_RA, (" [2] N_HIGH\n"));
-
-		else if (dm_value[1] == RADBG_N_LOW)   /*[3]*/
-			PHYDM_DBG(p_dm, DBG_RA, (" [3] N_LOW\n"));
-
-		else if (dm_value[1] == RADBG_RATE_UP_RTY_RATIO) { /* [8]*/
-			PHYDM_DBG(p_dm, DBG_RA, (" [8] RATE_UP_RTY_RATIO\n"));
-			pvalue		=	&(p_ra_table->RATE_UP_RTY_RATIO[0]);
-			pvalue_default	=	&(p_ra_table->RATE_UP_RTY_RATIO_default[0]);
-			pmodify_note	=	(u8 *)&(p_ra_table->RATE_UP_RTY_RATIO_modify_note[0]);
-		} else if (dm_value[1] == RADBG_RATE_DOWN_RTY_RATIO) { /* [9]*/
-			PHYDM_DBG(p_dm, DBG_RA, (" [9] RATE_DOWN_RTY_RATIO\n"));
-			pvalue		=	&(p_ra_table->RATE_DOWN_RTY_RATIO[0]);
-			pvalue_default	=	&(p_ra_table->RATE_DOWN_RTY_RATIO_default[0]);
-			pmodify_note	=	(u8 *)&(p_ra_table->RATE_DOWN_RTY_RATIO_modify_note[0]);
-		}
-
-		phydm_ra_print_msg(p_dm, pvalue, pvalue_default, pmodify_note);
-		PHYDM_DBG(p_dm, DBG_RA, ("\n------------------------------------------------------------------------------------\n\n"));
-
-	} else if (dm_value[0] == 101) {
-		p_ra_table->para_idx = (u8)dm_value[1];
-
-		p_ra_table->ra_para_feedback_req = 1;
-		odm_ra_para_adjust_send_h2c(p_dm);
-	} else {
-		p_ra_table->para_idx = (u8)dm_value[0];
-		p_ra_table->rate_idx  = (u8)dm_value[1];
-		p_ra_table->value = (u8)dm_value[2];
-
-		odm_ra_para_adjust(p_dm);
-	}
-}
-
-void
-odm_ra_para_adjust_init(
-	void		*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _rate_adaptive_table_			*p_ra_table = &p_dm->dm_ra_table;
-	u8			i;
-	u8			ra_para_pool_u8[3] = { RADBG_RTY_PENALTY,  RADBG_RATE_UP_RTY_RATIO, RADBG_RATE_DOWN_RTY_RATIO};
-	u8			rate_size_ht_1ss = 20, rate_size_ht_2ss = 28, rate_size_ht_3ss = 36;	 /*4+8+8+8+8 =36*/
-	u8			rate_size_vht_1ss = 10, rate_size_vht_2ss = 20, rate_size_vht_3ss = 30;	 /*10 + 10 +10 =30*/
-	/* RTY_PENALTY		=	1,   u8 */
-	/* N_HIGH 				=	2, */
-	/* N_LOW				=	3, */
-	/* RATE_UP_TABLE		=	4, */
-	/* RATE_DOWN_TABLE	=	5, */
-	/* TRYING_NECESSARY	=	6, */
-	/* DROPING_NECESSARY =	7, */
-	/* RATE_UP_RTY_RATIO	=	8,  u8 */
-	/* RATE_DOWN_RTY_RATIO=	9,  u8 */
-	/* ALL_PARA		=	0xff */
-
-	PHYDM_DBG(p_dm, DBG_RA, ("odm_ra_para_adjust_init\n"));
-
-/* JJ ADD 20161014 */
-	if (p_dm->support_ic_type & (ODM_RTL8188F | ODM_RTL8195A | ODM_RTL8703B | ODM_RTL8723B | ODM_RTL8188E | ODM_RTL8723D | ODM_RTL8710B))
-		p_ra_table->rate_length = rate_size_ht_1ss;
-	else if (p_dm->support_ic_type & (ODM_RTL8192E | ODM_RTL8197F))
-		p_ra_table->rate_length = rate_size_ht_2ss;
-	else if (p_dm->support_ic_type & (ODM_RTL8821 | ODM_RTL8881A | ODM_RTL8821C))
-		p_ra_table->rate_length = rate_size_ht_1ss + rate_size_vht_1ss;
-	else if (p_dm->support_ic_type & (ODM_RTL8812 | ODM_RTL8822B))
-		p_ra_table->rate_length = rate_size_ht_2ss + rate_size_vht_2ss;
-	else if (p_dm->support_ic_type == ODM_RTL8814A)
-		p_ra_table->rate_length = rate_size_ht_3ss + rate_size_vht_3ss;
-	else
-		p_ra_table->rate_length = rate_size_ht_1ss;
-
-	p_ra_table->is_ra_dbg_init = true;
-	for (i = 0; i < 3; i++) {
-		p_ra_table->ra_para_feedback_req = 1;
-		p_ra_table->para_idx	=	ra_para_pool_u8[i];
-		odm_ra_para_adjust_send_h2c(p_dm);
-	}
-}
-
-#endif /*#if (defined(CONFIG_RA_DBG_CMD))*/
-
-

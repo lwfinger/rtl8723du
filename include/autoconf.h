@@ -66,10 +66,6 @@
 #endif
 /* #define CONFIG_FILE_FWIMG */
 
-#define CONFIG_LONG_DELAY_ISSUE
-#define CONFIG_ATTEMPT_TO_FIX_AP_BEACON_ERROR
-
-
 /*
  * Auto Configure Section
  */
@@ -79,21 +75,6 @@
 #else /* !CONFIG_MP_INCLUDED */
 	#define MP_DRIVER	0
 #endif /* !CONFIG_MP_INCLUDED */
-
-#ifdef CONFIG_POWER_SAVING
-	#define CONFIG_IPS
-	#define CONFIG_LPS
-
-	/* #define CONFIG_LPS_LCLK */
-
-#endif /* CONFIG_POWER_SAVING */
-
-#ifdef CONFIG_BT_COEXIST
-	/* for ODM and outsrc BT-Coex */
-	#ifndef CONFIG_LPS
-		#define CONFIG_LPS	/* download reserved page to FW */
-	#endif
-#endif /* CONFIG_BT_COEXIST */
 
 #define CONFIG_PREALLOC_RECV_SKB
 

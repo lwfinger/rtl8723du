@@ -1537,7 +1537,6 @@ unsigned int OnBeacon(_adapter *padapter, union recv_frame *precv_frame)
 
 	if (validate_beacon_len(pframe, len) == _FALSE)
 		return _SUCCESS;
-#ifdef CONFIG_ATTEMPT_TO_FIX_AP_BEACON_ERROR
 	p = rtw_get_ie(pframe + sizeof(struct rtw_ieee80211_hdr_3addr) + _BEACON_IE_OFFSET_, _EXT_SUPPORTEDRATES_IE_, &ielen,
 		precv_frame->u.hdr.len - sizeof(struct rtw_ieee80211_hdr_3addr) - _BEACON_IE_OFFSET_);
 	if ((p != NULL) && (ielen > 0)) {
@@ -1547,7 +1546,6 @@ unsigned int OnBeacon(_adapter *padapter, union recv_frame *precv_frame)
 			*(p + 1) = ielen - 1;
 		}
 	}
-#endif
 
 	if (mlmeext_chk_scan_state(pmlmeext, SCAN_PROCESS)) {
 		rtw_mi_report_survey_event(padapter, precv_frame);
@@ -2710,13 +2708,10 @@ u8 rtw_rx_ampdu_size(_adapter *adapter)
 	u8 size;
 	HT_CAP_AMPDU_FACTOR max_rx_ampdu_factor;
 
-#ifdef CONFIG_BT_COEXIST
 	if (rtw_btcoex_IsBTCoexCtrlAMPDUSize(adapter) == _TRUE) {
 		size = rtw_btcoex_GetAMPDUSize(adapter);
 		goto exit;
 	}
-#endif
-
 	/* for scan */
 	if (!mlmeext_chk_scan_state(&adapter->mlmeextpriv, SCAN_DISABLE)
 	    && !mlmeext_chk_scan_state(&adapter->mlmeextpriv, SCAN_COMPLETE)
@@ -2772,14 +2767,10 @@ bool rtw_rx_ampdu_is_accept(_adapter *adapter)
 		accept = adapter->fix_rx_ampdu_accept;
 		goto exit;
 	}
-
-#ifdef CONFIG_BT_COEXIST
 	if (rtw_btcoex_IsBTCoexRejectAMPDU(adapter) == _TRUE) {
 		accept = _FALSE;
 		goto exit;
 	}
-#endif
-
 	/* for scan */
 	if (!mlmeext_chk_scan_state(&adapter->mlmeextpriv, SCAN_DISABLE)
 	    && !mlmeext_chk_scan_state(&adapter->mlmeextpriv, SCAN_COMPLETE)
@@ -10902,13 +10893,11 @@ static void rtw_mlmeext_disconnect(_adapter *padapter)
 	if (state_backup == WIFI_FW_STATION_STATE) {
 		if (rtw_port_switch_chk(padapter) == _TRUE) {
 			rtw_hal_set_hwreg(padapter, HW_VAR_PORT_SWITCH, NULL);
-#ifdef CONFIG_LPS
 			{
 				_adapter *port0_iface = dvobj_get_port0_adapter(adapter_to_dvobj(padapter));
 				if (port0_iface)
 					rtw_lps_ctrl_wk_cmd(port0_iface, LPS_CTRL_CONNECT, 0);
 			}
-#endif
 		}
 	}
 
@@ -11037,12 +11026,10 @@ void mlmeext_joinbss_event_callback(_adapter *padapter, int join_res)
 		/* set_link_timer(pmlmeext, DISCONNECT_TO); */
 	}
 
-#ifdef CONFIG_LPS
 	#ifndef CONFIG_FW_MULTI_PORT_SUPPORT
 	if (get_hw_port(padapter) == HW_PORT0)
 	#endif
 		rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_CONNECT, 0);
-#endif
 
 exit_mlmeext_joinbss_event_callback:
 
@@ -11270,11 +11257,7 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 			return;
 #endif
 
-#if !defined(CONFIG_LPS_LCLK_WD_TIMER)
 		rx_chk_limit = 4;
-#else
-		rx_chk_limit = 8;
-#endif
 #ifdef CONFIG_ARP_KEEP_ALIVE
 		if (!from_timer && pmlmepriv->bGetGateway == 1 && pmlmepriv->GetGatewayTryCnt < 3) {
 			RTW_INFO("do rtw_gw_addr_query() : %d\n", pmlmepriv->GetGatewayTryCnt);
@@ -11314,7 +11297,6 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 			if (sta_last_tx_pkts(psta) == sta_tx_pkts(psta))
 				tx_chk = _FAIL;
 
-#if !defined(CONFIG_LPS_LCLK_WD_TIMER)
 			if (pmlmeext->active_keep_alive_check && (rx_chk == _FAIL || tx_chk == _FAIL)
 			) {
 				u8 backup_ch = 0, backup_bw = 0, backup_offset = 0;
@@ -11359,9 +11341,7 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 
 bypass_active_keep_alive:
 				;
-			} else
-#endif
-			{
+			} else {
 				if (rx_chk != _SUCCESS) {
 					if (pmlmeext->retry == 0) {
 #ifdef DBG_EXPIRATION_CHK
@@ -12144,25 +12124,18 @@ u8 setopmode_hdl(_adapter *padapter, u8 *pbuf)
 		if (psetop->mode == Ndis802_11APMode)
 			adapter_to_pwrctl(padapter)->fw_psmode_iface_id = 0xff; /* ap mode won't dowload rsvd pages */
 		else if (psetop->mode == Ndis802_11Infrastructure) {
-#ifdef CONFIG_LPS
 			_adapter *port0_iface = dvobj_get_port0_adapter(adapter_to_dvobj(padapter));
 			if (port0_iface)
 				rtw_lps_ctrl_wk_cmd(port0_iface, LPS_CTRL_CONNECT, 0);
-#endif
 		}
 	}
-
-#ifdef CONFIG_BT_COEXIST
 	if (psetop->mode == Ndis802_11APMode ||
 		psetop->mode == Ndis802_11Monitor) {
 		/* Do this after port switch to */
 		/* prevent from downloading rsvd page to wrong port */
 		rtw_btcoex_MediaStatusNotify(padapter, 1); /* connect */
 	}
-#endif /* CONFIG_BT_COEXIST */
-
 	return H2C_SUCCESS;
-
 }
 
 u8 createbss_hdl(_adapter *padapter, u8 *pbuf)

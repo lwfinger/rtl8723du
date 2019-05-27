@@ -756,9 +756,7 @@ s32 rtl8723d_FirmwareDownload(PADAPTER padapter, BOOLEAN  bUsedWoWLANFw)
 		}
 	}
 
-#ifdef CONFIG_BT_COEXIST
 	rtw_btcoex_PreLoadFirmware(padapter);
-#endif /* CONFIG_BT_COEXIST */
 
 #ifdef CONFIG_FILE_FWIMG
 	fwfilepath = rtw_fw_file_path;
@@ -2228,10 +2226,8 @@ void rtl8723d_InitBeaconParameters(PADAPTER padapter)
 
 	val8 = DIS_TSF_UDT;
 	val16 = val8 | (val8 << 8); /* port0 and port1 */
-#ifdef CONFIG_BT_COEXIST
 	/* Enable prot0 beacon function for PSTDMA */
 	val16 |= EN_BCN_FUNCTION;
-#endif
 
 #ifdef CONFIG_CONCURRENT_MODE
 	val16 |= (EN_BCN_FUNCTION << 8);
@@ -3105,7 +3101,6 @@ Hal_EfuseParseBTCoexistInfo_8723D(
 		pHalData->ant_path = RF_PATH_A;
 	}
 
-#ifdef CONFIG_BT_COEXIST
 	if (padapter->registrypriv.ant_num > 0) {
 		RTW_INFO("%s: Apply driver defined antenna number(%d) to replace origin(%d)\n"
 			 , __func__
@@ -3125,7 +3120,6 @@ Hal_EfuseParseBTCoexistInfo_8723D(
 			break;
 		}
 	}
-#endif /* CONFIG_BT_COEXIST */
 
 	RTW_INFO("%s: %s BT-coex, ant_num=%d\n"
 		 , __func__
@@ -3913,11 +3907,9 @@ static void hw_var_set_bcn_func(PADAPTER padapter, u8 variable, u8 *val)
 
 		val8 = rtw_read8(padapter, bcn_ctrl_reg);
 		val8 &= ~(EN_BCN_FUNCTION | EN_TXBCN_RPT);
-#ifdef CONFIG_BT_COEXIST
 		/* Always enable port0 beacon function for PSTDMA */
 		if (REG_BCN_CTRL == bcn_ctrl_reg)
 			val8 |= EN_BCN_FUNCTION;
-#endif
 		rtw_write8(padapter, bcn_ctrl_reg, val8);
 	}
 }
@@ -4160,7 +4152,6 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 	case HW_VAR_MLME_JOIN:
 		hw_var_set_mlme_join(padapter, variable, val);
 
-#ifdef CONFIG_BT_COEXIST
 		switch (*val) {
 		case 0:
 			/* Notify coex. mechanism before join */
@@ -4172,9 +4163,7 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 			rtw_btcoex_ConnectNotify(padapter, _FALSE);
 			break;
 		}
-#endif /* CONFIG_BT_COEXIST */
 		break;
-
 	case HW_VAR_BEACON_INTERVAL:
 		{
 			u16 bcn_interval = *((u16 *)val);
@@ -4307,28 +4296,10 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 
 	case HW_VAR_H2C_FW_JOINBSSRPT:
 		rtl8723d_set_FwJoinBssRpt_cmd(padapter, *val);
-#ifdef CONFIG_LPS_POFF
-		rtl8723d_lps_poff_h2c_ctrl(padapter, *val);
-#endif
 		break;
 	case HW_VAR_H2C_FW_P2P_PS_OFFLOAD:
 		rtl8723d_set_p2p_ps_offload_cmd(padapter, *val);
 		break;
-#ifdef CONFIG_LPS_POFF
-	case HW_VAR_LPS_POFF_INIT:
-		rtl8723d_lps_poff_init(padapter);
-		break;
-	case HW_VAR_LPS_POFF_DEINIT:
-		rtl8723d_lps_poff_deinit(padapter);
-		break;
-	case HW_VAR_LPS_POFF_SET_MODE:
-		rtl8723d_lps_poff_set_ps_mode(padapter, *val);
-		break;
-	case HW_VAR_LPS_POFF_WOW_EN:
-		rtl8723d_lps_poff_h2c_ctrl(padapter, *val);
-		break;
-#endif /*CONFIG_LPS_POFF*/
-
 	case HW_VAR_EFUSE_USAGE:
 		pHalData->EfuseUsedPercentage = *val;
 		break;
@@ -4477,14 +4448,10 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 		break;
 
 	case HW_VAR_DL_RSVD_PAGE:
-#ifdef CONFIG_BT_COEXIST
 		if (check_fwstate(&padapter->mlmepriv, WIFI_AP_STATE) == _TRUE)
 			rtl8723d_download_BTCoex_AP_mode_rsvd_page(padapter);
 		else
-#endif /* CONFIG_BT_COEXIST */
-		{
 			rtl8723d_download_rsvd_page(padapter, RT_MEDIA_CONNECT);
-		}
 		break;
 	default:
 		ret = SetHwReg(padapter, variable, val);
@@ -4842,7 +4809,7 @@ void rtl8723d_stop_thread(_adapter *padapter)
 {
 }
 
-#if defined(CONFIG_CHECK_BT_HANG) && defined(CONFIG_BT_COEXIST)
+#if defined(CONFIG_CHECK_BT_HANG)
 void rtl8723ds_init_checkbthang_workqueue(_adapter *adapter)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))

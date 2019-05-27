@@ -59,9 +59,7 @@ void dump_drv_cfg(struct seq_file *sel)
 	RTW_PRINT_SEL(sel, "CONFIG_CONCURRENT_MODE\n");
 #endif
 
-#ifdef CONFIG_POWER_SAVING
 	RTW_PRINT_SEL(sel, "CONFIG_POWER_SAVING\n");
-#endif
 
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
 	RTW_PRINT_SEL(sel, "LOAD_PHY_PARA_FROM_FILE - REALTEK_CONFIG_PATH=%s\n", REALTEK_CONFIG_PATH);
@@ -3004,7 +3002,6 @@ int proc_get_rtkm_info(struct seq_file *m, void *v)
 }
 #endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
 
-#ifdef CONFIG_BT_COEXIST
 int proc_get_btcoex_dbg(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -3147,7 +3144,6 @@ ssize_t proc_set_rf4ce_state(struct file *file, const char __user *buffer, size_
 	return count;
 }
 #endif /* CONFIG_RF4CE_COEXIST */
-#endif /* CONFIG_BT_COEXIST */
 
 int proc_get_new_bcn_max(struct seq_file *m, void *v)
 {
@@ -3174,7 +3170,6 @@ ssize_t proc_set_new_bcn_max(struct file *file, const char __user *buffer, size_
 	return count;
 }
 
-#ifdef CONFIG_POWER_SAVING
 int proc_get_ps_info(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -3314,7 +3309,6 @@ ssize_t proc_set_wmmps_info(struct file *file, const char __user *buffer, size_t
 	return count;
 }
 #endif /* CONFIG_WMMPS_STA */
-#endif /* CONFIG_POWER_SAVING */
 
 int proc_get_monitor(struct seq_file *m, void *v)
 {

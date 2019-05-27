@@ -549,12 +549,8 @@ _next:
 		}
 
 		pcmd = rtw_dequeue_cmd(pcmdpriv);
-		if (!pcmd) {
-#ifdef CONFIG_LPS_LCLK
-			rtw_unregister_cmd_alive(padapter);
-#endif
+		if (!pcmd)
 			continue;
-		}
 
 		cmd_start_time = rtw_get_current_time();
 		pcmdpriv->cmd_issued_cnt++;
@@ -587,29 +583,6 @@ _next:
 			}
 			goto post_process;
 		}
-
-#ifdef CONFIG_LPS_LCLK
-		if (pcmd->no_io)
-			rtw_unregister_cmd_alive(padapter);
-		else {
-			if (rtw_register_cmd_alive(padapter) != _SUCCESS) {
-				if (DBG_CMD_EXECUTE)
-					RTW_PRINT("%s: wait to leave LPS_LCLK\n", __func__);
-
-				pcmd->res = H2C_ENQ_HEAD;
-				ret = _rtw_enqueue_cmd(&pcmdpriv->cmd_queue, pcmd, 1);
-				if (ret == _SUCCESS) {
-					if (DBG_CMD_EXECUTE)
-						RTW_INFO(ADPT_FMT" "CMD_FMT" ENQ_HEAD\n", ADPT_ARG(pcmd->padapter), CMD_ARG(pcmd));
-					continue;
-				}
-
-				RTW_INFO(ADPT_FMT" "CMD_FMT" ENQ_HEAD_FAIL\n", ADPT_ARG(pcmd->padapter), CMD_ARG(pcmd));
-				pcmd->res = H2C_ENQ_HEAD_FAIL;
-				rtw_warn_on(1);
-			}
-		}
-#endif /* CONFIG_LPS_LCLK */
 
 		if (DBG_CMD_EXECUTE)
 			RTW_INFO(ADPT_FMT" "CMD_FMT" %sexecute\n", ADPT_ARG(pcmd->padapter), CMD_ARG(pcmd)
@@ -655,11 +628,6 @@ post_process:
 		goto _next;
 
 	}
-
-#ifdef CONFIG_LPS_LCLK
-	rtw_unregister_cmd_alive(padapter);
-#endif
-
 	/* to avoid enqueue cmd after free all cmd_obj */
 	ATOMIC_SET(&(pcmdpriv->cmdthd_running), _FALSE);
 
@@ -820,10 +788,8 @@ u8 rtw_sitesurvey_cmd(_adapter *padapter, struct sitesurvey_parm *pparm)
 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
 	struct wifidirect_info *pwdinfo = &(padapter->wdinfo);
 
-#ifdef CONFIG_LPS
 	if (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE)
 		rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_SCAN, 1);
-#endif
 
 	if (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE)
 		p2p_ps_wk_cmd(padapter, P2P_PS_SCAN, 1);
@@ -2303,42 +2269,13 @@ u8 traffic_status_watchdog(_adapter *padapter, u8 from_timer)
 				bHigherBusyTxTraffic = _TRUE;
 		}
 
-#ifdef CONFIG_LPS
 		/* check traffic for  powersaving. */
 		if (((pmlmepriv->LinkDetectInfo.NumRxUnicastOkInPeriod + pmlmepriv->LinkDetectInfo.NumTxOkInPeriod) > 8) ||
-#ifdef CONFIG_LPS_SLOW_TRANSITION
-		    (pmlmepriv->LinkDetectInfo.NumRxUnicastOkInPeriod > 2)
-#else /* CONFIG_LPS_SLOW_TRANSITION */
 		    (pmlmepriv->LinkDetectInfo.NumRxUnicastOkInPeriod > 4)
-#endif /* CONFIG_LPS_SLOW_TRANSITION */
 		   ) {
 			bEnterPS = _FALSE;
-#ifdef CONFIG_LPS_SLOW_TRANSITION
-			if (bBusyTraffic == _TRUE) {
-				if (pmlmepriv->LinkDetectInfo.TrafficTransitionCount <= 4)
-					pmlmepriv->LinkDetectInfo.TrafficTransitionCount = 4;
-
-				pmlmepriv->LinkDetectInfo.TrafficTransitionCount++;
-
-				/* RTW_INFO("Set TrafficTransitionCount to %d\n", pmlmepriv->LinkDetectInfo.TrafficTransitionCount); */
-
-				if (pmlmepriv->LinkDetectInfo.TrafficTransitionCount > 30/*TrafficTransitionLevel*/)
-					pmlmepriv->LinkDetectInfo.TrafficTransitionCount = 30;
-			}
-#endif /* CONFIG_LPS_SLOW_TRANSITION */
-
 		} else {
-#ifdef CONFIG_LPS_SLOW_TRANSITION
-			if (pmlmepriv->LinkDetectInfo.TrafficTransitionCount >= 2)
-				pmlmepriv->LinkDetectInfo.TrafficTransitionCount -= 2;
-			else
-				pmlmepriv->LinkDetectInfo.TrafficTransitionCount = 0;
-
-			if (pmlmepriv->LinkDetectInfo.TrafficTransitionCount == 0)
-				bEnterPS = _TRUE;
-#else /* CONFIG_LPS_SLOW_TRANSITION */
 			bEnterPS = _TRUE;
-#endif /* CONFIG_LPS_SLOW_TRANSITION */
 		}
 
 #ifdef CONFIG_DYNAMIC_DTIM
@@ -2385,10 +2322,7 @@ u8 traffic_status_watchdog(_adapter *padapter, u8 from_timer)
 					rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_TRAFFIC_BUSY, 1);
 			}
 		}
-
-#endif /* CONFIG_LPS */
 	} else {
-#ifdef CONFIG_LPS
 		struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
 		int n_assoc_iface = 0;
 		int i;
@@ -2400,7 +2334,6 @@ u8 traffic_status_watchdog(_adapter *padapter, u8 from_timer)
 
 		if (!from_timer && n_assoc_iface == 0)
 			LPS_Leave(padapter, "NON_LINKED");
-#endif
 	}
 
 	session_tracker_chk_cmd(padapter, NULL);
@@ -2488,25 +2421,13 @@ static void rtw_dynamic_chk_wk_hdl(_adapter *padapter)
 	dm_DynamicUsbTxAgg(padapter, 0);
 	rtw_hal_dm_watchdog(padapter);
 
-	/* check_hw_pbc(padapter, pdrvextra_cmd->pbuf, pdrvextra_cmd->type); */
-
-#ifdef CONFIG_BT_COEXIST
 	/* BT-Coexist */
 	rtw_btcoex_Handler(padapter);
-#endif
-
-#ifdef CONFIG_IPS_CHECK_IN_WD
-	/* always call rtw_ps_processor() at last one. */
-	rtw_ps_processor(padapter);
-#endif
 
 #ifdef CONFIG_MCC_MODE
 	rtw_hal_mcc_sw_status_check(padapter);
 #endif /* CONFIG_MCC_MODE */
-
 }
-
-#ifdef CONFIG_LPS
 
 void lps_ctrl_wk_hdl(_adapter *padapter, u8 lps_ctrl_type);
 void lps_ctrl_wk_hdl(_adapter *padapter, u8 lps_ctrl_type)
@@ -2523,9 +2444,7 @@ void lps_ctrl_wk_hdl(_adapter *padapter, u8 lps_ctrl_type)
 	switch (lps_ctrl_type) {
 	case LPS_CTRL_SCAN:
 		/* RTW_INFO("LPS_CTRL_SCAN\n"); */
-#ifdef CONFIG_BT_COEXIST
 		rtw_btcoex_ScanNotify(padapter, _TRUE);
-#endif /* CONFIG_BT_COEXIST */
 		if (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE) {
 			/* connect */
 			LPS_Leave(padapter, "LPS_CTRL_SCAN");
@@ -2541,25 +2460,19 @@ void lps_ctrl_wk_hdl(_adapter *padapter, u8 lps_ctrl_type)
 		/* Reset LPS Setting */
 		pwrpriv->LpsIdleCount = 0;
 		rtw_hal_set_hwreg(padapter, HW_VAR_H2C_FW_JOINBSSRPT, (u8 *)(&mstatus));
-#ifdef CONFIG_BT_COEXIST
 		rtw_btcoex_MediaStatusNotify(padapter, mstatus);
-#endif /* CONFIG_BT_COEXIST */
 		break;
 	case LPS_CTRL_DISCONNECT:
 		/* RTW_INFO("LPS_CTRL_DISCONNECT\n"); */
 		mstatus = 0;/* disconnect */
-#ifdef CONFIG_BT_COEXIST
 		rtw_btcoex_MediaStatusNotify(padapter, mstatus);
-#endif /* CONFIG_BT_COEXIST */
 		LPS_Leave(padapter, "LPS_CTRL_DISCONNECT");
 		rtw_hal_set_hwreg(padapter, HW_VAR_H2C_FW_JOINBSSRPT, (u8 *)(&mstatus));
 		break;
 	case LPS_CTRL_SPECIAL_PACKET:
 		/* RTW_INFO("LPS_CTRL_SPECIAL_PACKET\n"); */
 		pwrpriv->DelayLPSLastTimeStamp = rtw_get_current_time();
-#ifdef CONFIG_BT_COEXIST
 		rtw_btcoex_SpecialPacketNotify(padapter, PACKET_DHCP);
-#endif /* CONFIG_BT_COEXIST */
 		LPS_Leave(padapter, "LPS_CTRL_SPECIAL_PACKET");
 		break;
 	case LPS_CTRL_LEAVE:
@@ -2668,7 +2581,6 @@ u8 rtw_dm_in_lps_wk_cmd(_adapter *padapter)
 exit:
 
 	return res;
-
 }
 
 static void rtw_lps_change_dtim_hdl(_adapter *padapter, u8 dtim)
@@ -2678,15 +2590,8 @@ static void rtw_lps_change_dtim_hdl(_adapter *padapter, u8 dtim)
 	if (dtim <= 0 || dtim > 16)
 		return;
 
-#ifdef CONFIG_BT_COEXIST
 	if (rtw_btcoex_IsBtControlLps(padapter) == _TRUE)
 		return;
-#endif
-
-#ifdef CONFIG_LPS_LCLK
-	_enter_pwrlock(&pwrpriv->lock);
-#endif
-
 	if (pwrpriv->dtim != dtim) {
 		RTW_INFO("change DTIM from %d to %d, bFwCurrentInPSMode=%d, ps_mode=%d\n", pwrpriv->dtim, dtim,
 			 pwrpriv->bFwCurrentInPSMode, pwrpriv->pwr_mode);
@@ -2697,18 +2602,9 @@ static void rtw_lps_change_dtim_hdl(_adapter *padapter, u8 dtim)
 	if ((pwrpriv->bFwCurrentInPSMode == _TRUE) && (pwrpriv->pwr_mode > PS_MODE_ACTIVE)) {
 		u8 ps_mode = pwrpriv->pwr_mode;
 
-		/* RTW_INFO("change DTIM from %d to %d, ps_mode=%d\n", pwrpriv->dtim, dtim, ps_mode); */
-
 		rtw_hal_set_hwreg(padapter, HW_VAR_H2C_FW_PWRMODE, (u8 *)(&ps_mode));
 	}
-
-#ifdef CONFIG_LPS_LCLK
-	_exit_pwrlock(&pwrpriv->lock);
-#endif
-
 }
-
-#endif
 
 u8 rtw_lps_change_dtim_cmd(_adapter *padapter, u8 dtim)
 {
@@ -3178,7 +3074,6 @@ exit:
 
 }
 
-#ifdef CONFIG_BT_COEXIST
 struct btinfo {
 	u8 cid;
 	u8 len;
@@ -3248,11 +3143,7 @@ static void rtw_btinfo_hdl(_adapter *adapter, u8 *buf, u16 buf_len)
 {
 #define BTINFO_WIFI_FETCH 0x23
 #define BTINFO_BT_AUTO_RPT 0x27
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-	struct btinfo_8761ATV *info = (struct btinfo_8761ATV *)buf;
-#else /* !CONFIG_BT_COEXIST_SOCKET_TRX */
 	struct btinfo *info = (struct btinfo *)buf;
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
 	u8 cmd_idx;
 	u8 len;
 
@@ -3266,12 +3157,7 @@ static void rtw_btinfo_hdl(_adapter *adapter, u8 *buf, u16 buf_len)
 
 	/* #define DBG_PROC_SET_BTINFO_EVT */
 #ifdef DBG_PROC_SET_BTINFO_EVT
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-	RTW_INFO("%s: btinfo[0]=%x,btinfo[1]=%x,btinfo[2]=%x,btinfo[3]=%x btinfo[4]=%x,btinfo[5]=%x,btinfo[6]=%x,btinfo[7]=%x\n"
-		, __func__, buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
-#else/* !CONFIG_BT_COEXIST_SOCKET_TRX */
 	btinfo_evt_dump((struct seq_file *)RTW_DBGDUMP, info);
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
 #endif /* DBG_PROC_SET_BTINFO_EVT */
 
 	/* transform BT-FW btinfo to WiFI-FW C2H format and notify */
@@ -3279,10 +3165,6 @@ static void rtw_btinfo_hdl(_adapter *adapter, u8 *buf, u16 buf_len)
 		buf[1] = 0;
 	else if (cmd_idx == BTINFO_BT_AUTO_RPT)
 		buf[1] = 2;
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-	else if (0x01 == cmd_idx || 0x02 == cmd_idx)
-		buf[1] = buf[0];
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
 	rtw_btcoex_BtInfoNotify(adapter , len + 1, &buf[1]);
 }
 
@@ -3329,7 +3211,6 @@ u8 rtw_btinfo_cmd(_adapter *adapter, u8 *buf, u16 len)
 exit:
 	return res;
 }
-#endif /* CONFIG_BT_COEXIST */
 
 u8 rtw_test_h2c_cmd(_adapter *adapter, u8 *buf, u8 len)
 {
@@ -4010,7 +3891,6 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapter, unsigned char *pbuf)
 	case POWER_SAVING_CTRL_WK_CID:
 		power_saving_wk_hdl(padapter);
 		break;
-#ifdef CONFIG_LPS
 	case LPS_CTRL_WK_CID:
 		lps_ctrl_wk_hdl(padapter, (u8)pdrvextra_cmd->type);
 		break;
@@ -4020,7 +3900,6 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapter, unsigned char *pbuf)
 	case LPS_CHANGE_DTIM_CID:
 		rtw_lps_change_dtim_hdl(padapter, (u8)pdrvextra_cmd->type);
 		break;
-#endif
 #if (RATE_ADAPTIVE_SUPPORT == 1)
 	case RTP_TIMER_CFG_WK_CID:
 		rpt_timer_setting_wk_hdl(padapter, pdrvextra_cmd->type);
@@ -4072,11 +3951,9 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapter, unsigned char *pbuf)
 	case DM_RA_MSK_WK_CID:
 		rtw_dm_ra_mask_hdl(padapter, (struct sta_info *)pdrvextra_cmd->pbuf);
 		break;
-#ifdef CONFIG_BT_COEXIST
 	case BTINFO_WK_CID:
 		rtw_btinfo_hdl(padapter, pdrvextra_cmd->pbuf, pdrvextra_cmd->size);
 		break;
-#endif
 	case SESSION_TRACKER_WK_CID:
 		session_tracker_cmd_hdl(padapter, (struct st_cmd_parm *)pdrvextra_cmd->pbuf);
 		break;

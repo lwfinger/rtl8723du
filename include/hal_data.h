@@ -5,9 +5,7 @@
 #define __HAL_DATA_H__
 
 #include "../hal/phydm/phydm_precomp.h"
-#ifdef CONFIG_BT_COEXIST
-	#include <hal_btcoex.h>
-#endif
+#include <hal_btcoex.h>
 
 /*
  * <Roger_Notes> For RTL8723 WiFi/BT/GPS multi-function configuration. 2010.10.06.
@@ -179,9 +177,7 @@ struct hal_spec_t {
 	u8 proto_cap;	/* value of PROTO_CAP_XXX */
 	u8 wl_func;		/* value of WL_FUNC_XXX */
 	u8 hci_type;	/* value of HCI Type */
-#ifdef CONFIG_BT_COEXIST
 	u8 bt_ft_ver;	/*bt FT version*/
-#endif /*CONFIG_BT_COEXIST*/
 };
 
 #define HAL_SPEC_CHK_RF_PATH_2G(_spec, _path) ((_spec)->rfpath_num_2g > (_path))
@@ -489,10 +485,8 @@ typedef struct hal_com_data {
 	u32			IntArray[3];/* HISR0,HISR1,HSISR */
 	u32			IntrMask[3];
 
-#ifdef CONFIG_BT_COEXIST
 	/* For bluetooth co-existance */
 	BT_COEXIST		bt_coexist;
-#endif /* CONFIG_BT_COEXIST */
 
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
 	char	para_file_buf[MAX_PARA_FILE_BUF_LEN];

@@ -3041,7 +3041,6 @@ static void rtw_dbg_mode_hdl(_adapter *padapter, u32 id, u8 *pdata, u32 len)
 		RTW_INFO("==> trigger gpio 0\n");
 		rtw_hal_set_hwreg(padapter, HW_VAR_TRIGGER_GPIO_0, NULL);
 		break;
-#ifdef CONFIG_BT_COEXIST
 	case GEN_MP_IOCTL_SUBCODE(SET_DM_BT):
 		RTW_INFO("==> set dm_bt_coexist:%x\n", *(u8 *)pdata);
 		rtw_hal_set_hwreg(padapter, HW_VAR_BT_SET_COEXIST, pdata);
@@ -3050,7 +3049,6 @@ static void rtw_dbg_mode_hdl(_adapter *padapter, u32 id, u8 *pdata, u32 len)
 		RTW_INFO("==> delete ba:%x\n", *(u8 *)pdata);
 		rtw_hal_set_hwreg(padapter, HW_VAR_BT_ISSUE_DELBA, pdata);
 		break;
-#endif
 	default:
 		break;
 	}
@@ -7301,15 +7299,11 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 
 	*(extra + wrqu->length) = '\0';
 
-#ifdef CONFIG_LPS
 	lps_mode = pwrctrlpriv->power_mgnt;/* keep org value */
 	rtw_pm_set_lps(padapter, PS_MODE_ACTIVE);
-#endif
 
-#ifdef CONFIG_IPS
 	ips_mode = pwrctrlpriv->ips_mode;/* keep org value */
 	rtw_pm_set_ips(padapter, IPS_NONE);
-#endif
 
 	pch = extra;
 	RTW_INFO("%s: in=%s\n", __FUNCTION__, extra);
@@ -7862,13 +7856,9 @@ exit:
 		wrqu->length = strlen(extra);
 
 	if (padapter->registrypriv.mp_mode == 0) {
-#ifdef CONFIG_IPS
 		rtw_pm_set_ips(padapter, ips_mode);
-#endif /* CONFIG_IPS */
 
-#ifdef CONFIG_LPS
 		rtw_pm_set_lps(padapter, lps_mode);
-#endif /* CONFIG_LPS */
 	}
 	return err;
 }
@@ -7937,15 +7927,11 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 		goto exit;
 	}
 
-#ifdef CONFIG_LPS
 	lps_mode = pwrctrlpriv->power_mgnt;/* keep org value */
 	rtw_pm_set_lps(padapter, PS_MODE_ACTIVE);
-#endif
 
-#ifdef CONFIG_IPS
 	ips_mode = pwrctrlpriv->ips_mode;/* keep org value */
 	rtw_pm_set_ips(padapter, IPS_NONE);
-#endif
 
 	pch = extra;
 	RTW_INFO("%s: in=%s\n", __FUNCTION__, extra);
@@ -8520,13 +8506,9 @@ exit:
 	wrqu->length = strlen(extra);
 
 	if (padapter->registrypriv.mp_mode == 0) {
-#ifdef CONFIG_IPS
 		rtw_pm_set_ips(padapter, ips_mode);
-#endif /* CONFIG_IPS */
 
-#ifdef CONFIG_LPS
 		rtw_pm_set_lps(padapter, lps_mode);
-#endif /* CONFIG_LPS */
 	}
 
 	return err;
@@ -9774,8 +9756,6 @@ static int rtw_test(
 	}
 #endif
 
-
-#ifdef CONFIG_BT_COEXIST
 	if (strcmp(pch, "bton") == 0) {
 		rtw_btcoex_SetManualControl(padapter, _FALSE);
 		goto free_buf;
@@ -9783,7 +9763,6 @@ static int rtw_test(
 		rtw_btcoex_SetManualControl(padapter, _TRUE);
 		goto free_buf;
 	}
-#endif
 
 	if (strcmp(pch, "h2c") == 0) {
 		u8 param[8];

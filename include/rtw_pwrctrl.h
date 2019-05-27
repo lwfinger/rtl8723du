@@ -24,9 +24,7 @@
 #define RECV_ALIVE	BIT(1)
 #define CMD_ALIVE	BIT(2)
 #define EVT_ALIVE	BIT(3)
-#ifdef CONFIG_BT_COEXIST
 #define BTCOEX_ALIVE	BIT(4)
-#endif /* CONFIG_BT_COEXIST */
 
 enum Power_Mgnt {
 	PS_MODE_ACTIVE	= 0	,
@@ -234,23 +232,6 @@ typedef struct pno_scan_info {
 } pno_scan_info_t;
 #endif /* CONFIG_PNO_SUPPORT */
 
-#ifdef CONFIG_LPS_POFF
-/* Driver context for LPS 32K Close IO Power */
-typedef struct lps_poff_info {
-	bool	bEn;
-	u8	*pStaticFile;
-	u8	*pDynamicFile;
-	u32	ConfFileOffset;
-	u32	tx_bndy_static;
-	u32	tx_bndy_dynamic;
-	u16	ConfLenForPTK;
-	u16	ConfLenForGTK;
-	ATOMIC_T bEnterPOFF;
-	ATOMIC_T bTxBoundInProgress;
-	ATOMIC_T bSetPOFFParm;
-} lps_poff_info_t;
-#endif /*CONFIG_LPS_POFF*/
-
 struct aoac_report {
 	u8 iv[8];
 	u8 replay_counter_eapol_key[8];
@@ -284,11 +265,6 @@ struct pwrctrl_priv {
 	u32	alives;
 	_workitem cpwm_event;
 	_workitem dma_event; /*for handle un-synchronized tx dma*/
-#ifdef CONFIG_LPS_RPWM_TIMER
-	u8 brpwmtimeout;
-	_workitem rpwmtimeoutwi;
-	_timer pwr_rpwm_timer;
-#endif /* CONFIG_LPS_RPWM_TIMER */
 	u8	bpower_saving; /* for LPS/IPS */
 
 	u8	b_hw_radio_off;
@@ -335,10 +311,8 @@ struct pwrctrl_priv {
 	u8		bInternalAutoSuspend;
 	#endif
 	u8		bInSuspend;
-#ifdef CONFIG_BT_COEXIST
 	u8		bAutoResume;
 	u8		autopm_cnt;
-#endif
 	u8		bSupportRemoteWakeup;
 	u8		wowlan_wake_reason;
 	u8		wowlan_last_wake_reason;
@@ -347,8 +321,6 @@ struct pwrctrl_priv {
 	u8		wowlan_p2p_mode;
 	u8		wowlan_pno_enable;
 	u8		wowlan_in_resume;
-
-
 
 	rt_rf_power_state	rf_pwrstate;/* cur power state, only for IPS */
 	/* rt_rf_power_state	current_rfpwrstate; */
@@ -360,15 +332,8 @@ struct pwrctrl_priv {
 	u8		brfoffbyhw;
 	unsigned long PS_BBRegBackup[PSBBREG_TOTALCNT];
 
-#ifdef CONFIG_LPS_POFF
-	lps_poff_info_t	*plps_poff_info;
-#endif
 	u8 lps_level_bk;
 	u8 lps_level; /*LPS_NORMAL,LPA_CG,LPS_PG*/
-#ifdef CONFIG_LPS_PG
-	u8 lpspg_rsvd_page_locate;
-	u8 blpspg_info_up;
-#endif
 	u8 current_lps_hw_port_id;
 
 #ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS
@@ -402,29 +367,12 @@ struct pwrctrl_priv {
 extern void rtw_init_pwrctrl_priv(_adapter *adapter);
 extern void rtw_free_pwrctrl_priv(_adapter *adapter);
 
-#ifdef CONFIG_LPS_LCLK
-s32 rtw_register_task_alive(PADAPTER, u32 task);
-void rtw_unregister_task_alive(PADAPTER, u32 task);
-extern s32 rtw_register_tx_alive(PADAPTER padapter);
-extern void rtw_unregister_tx_alive(PADAPTER padapter);
-extern s32 rtw_register_rx_alive(PADAPTER padapter);
-extern void rtw_unregister_rx_alive(PADAPTER padapter);
-extern s32 rtw_register_cmd_alive(PADAPTER padapter);
-extern void rtw_unregister_cmd_alive(PADAPTER padapter);
-extern s32 rtw_register_evt_alive(PADAPTER padapter);
-extern void rtw_unregister_evt_alive(PADAPTER padapter);
-extern void cpwm_int_hdl(PADAPTER padapter, struct reportpwrstate_parm *preportpwrstate);
-extern void LPS_Leave_check(PADAPTER padapter);
-#endif
-
 extern void LeaveAllPowerSaveMode(PADAPTER Adapter);
 extern void LeaveAllPowerSaveModeDirect(PADAPTER Adapter);
-#ifdef CONFIG_IPS
 void _ips_enter(_adapter *padapter);
 void ips_enter(_adapter *padapter);
 int _ips_leave(_adapter *padapter);
 int ips_leave(_adapter *padapter);
-#endif
 
 void rtw_ps_processor(_adapter *padapter);
 
@@ -438,7 +386,6 @@ rt_rf_power_state RfOnOffDetect(IN	PADAPTER pAdapter);
 
 int rtw_fw_ps_state(PADAPTER padapter);
 
-#ifdef CONFIG_LPS
 s32 LPS_RF_ON_check(PADAPTER padapter, u32 delay_ms);
 void LPS_Enter(PADAPTER padapter, const char *msg);
 void LPS_Leave(PADAPTER padapter, const char *msg);
@@ -447,7 +394,6 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 void rtw_set_fw_in_ips_mode(PADAPTER padapter, u8 enable);
 void rtw_set_rpwm(_adapter *padapter, u8 val8);
 void rtw_wow_lps_level_decide(_adapter *adapter, u8 wow_en);
-#endif
 
 #define rtw_is_earlysuspend_registered(pwrpriv) _FALSE
 #define rtw_is_do_late_resume(pwrpriv) _FALSE

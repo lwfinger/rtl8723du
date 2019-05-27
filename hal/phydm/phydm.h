@@ -463,7 +463,6 @@ struct pkt_process_info {
 	u8	vga_idx;
 };
 
-#ifdef ODM_CONFIG_BT_COEXIST
 struct	phydm_bt_info {
 	boolean		is_bt_enabled;			/*BT is enabled*/
 	boolean		is_bt_connect_process;	/*BT HS is under connection progress.*/
@@ -471,7 +470,6 @@ struct	phydm_bt_info {
 	boolean		is_bt_hs_operation;		/*BT HS mode is under progress*/
 	boolean		is_bt_limited_dig;		/*BT is busy.*/
 };
-#endif
 
 struct	phydm_iot_center {
 	boolean		is_linked_cmw500;
@@ -803,9 +801,7 @@ struct	phydm_iot_center {
 	struct	phydm_func_poiner			phydm_func_handler;
 	struct	phydm_iot_center				iot_table;
 
-#ifdef ODM_CONFIG_BT_COEXIST
 	struct	phydm_bt_info				bt_info_table;
-#endif
 
 	struct	pkt_process_info				pkt_proc_struct;
 	struct phydm_adaptivity_struct			adaptivity;
@@ -857,18 +853,6 @@ struct	phydm_iot_center {
 #endif
 
 	struct _IQK_INFORMATION				IQK_info;
-
-#if (defined(CONFIG_PATH_DIVERSITY))
-	struct _ODM_PATH_DIVERSITY_			dm_path_div;
-#endif
-
-#if (defined(CONFIG_ANT_DETECTION))
-	struct _ANT_DETECTED_INFO			ant_detected_info;	/* Antenna detected information for RSSI tool*/
-#endif
-
-#ifdef PHYDM_AUTO_DEGBUG
-	struct	phydm_auto_dbg_struc			auto_dbg_table;
-#endif
 
 	struct	phydm_pause_lv				pause_lv_table;	
 	struct	phydm_api_stuc 				api_table;

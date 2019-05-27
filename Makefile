@@ -25,9 +25,7 @@ CONFIG_RTL8723D = y
 CONFIG_USB_HCI = y
 ########################## Features ###########################
 CONFIG_MP_INCLUDED = y
-CONFIG_POWER_SAVING = y
 CONFIG_WIFI_TEST = n
-CONFIG_BT_COEXIST = y
 CONFIG_EFUSE_CONFIG_FILE = y
 CONFIG_XTAL_26M = n
 CONFIG_LOAD_PHY_PARA_FROM_FILE = y
@@ -126,8 +124,7 @@ _HAL_INTFS_FILES +=	hal/rtl8723d_hal_init.o \
 			hal/rtl8723d_dm.o \
 			hal/rtl8723d_rxdesc.o \
 			hal/rtl8723d_cmd.o \
-			hal/hal8723d_fw.o \
-			hal/rtl8723d_lps_poff.o
+			hal/hal8723d_fw.o
 
 
 _HAL_INTFS_FILES +=	\
@@ -141,10 +138,8 @@ _HAL_INTFS_FILES += hal/$(HCI_NAME)_ops.o
 ifeq ($(CONFIG_USB_HCI), y)
 _HAL_INTFS_FILES +=hal/HalEfuseMask8723D_USB.o
 endif
-ifeq ($(CONFIG_BT_COEXIST), y)
 _BTC_FILES += hal/halbtc8723d1ant.o \
 				hal/halbtc8723d2ant.o
-endif
 
 endif
 
@@ -167,16 +162,8 @@ ifeq ($(CONFIG_MP_INCLUDED), y)
 EXTRA_CFLAGS += -DCONFIG_MP_INCLUDED
 endif
 
-ifeq ($(CONFIG_POWER_SAVING), y)
-EXTRA_CFLAGS += -DCONFIG_POWER_SAVING
-endif
-
 ifeq ($(CONFIG_WIFI_TEST), y)
 EXTRA_CFLAGS += -DCONFIG_WIFI_TEST
-endif
-
-ifeq ($(CONFIG_BT_COEXIST), y)
-EXTRA_CFLAGS += -DCONFIG_BT_COEXIST
 endif
 
 ifeq ($(CONFIG_INTEL_WIDI), y)

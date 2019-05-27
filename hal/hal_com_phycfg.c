@@ -3093,11 +3093,7 @@ phy_ConfigBBWithParaFile(
 						/* Ending. */
 						break;
 					} else if (u4bRegOffset == 0xfe || u4bRegOffset == 0xffe) {
-#ifdef CONFIG_LONG_DELAY_ISSUE
 						rtw_msleep_os(50);
-#else
-						rtw_mdelay_os(50);
-#endif
 					} else if (u4bRegOffset == 0xfd)
 						rtw_mdelay_os(5);
 					else if (u4bRegOffset == 0xfc)
@@ -3521,11 +3517,7 @@ phy_ConfigBBWithMpParaFile(
 						/* Ending. */
 						break;
 					} else if (u4bRegOffset == 0xfe || u4bRegOffset == 0xffe) {
-#ifdef CONFIG_LONG_DELAY_ISSUE
 						rtw_msleep_os(50);
-#else
-						rtw_mdelay_os(50);
-#endif
 					} else if (u4bRegOffset == 0xfd)
 						rtw_mdelay_os(5);
 					else if (u4bRegOffset == 0xfc)
@@ -3634,12 +3626,8 @@ PHY_ConfigRFWithParaFile(
 				/* Get 1st hex value as register offset. */
 				if (GetHexValueFromString(szLine, &u4bRegOffset, &u4bMove)) {
 					if (u4bRegOffset == 0xfe || u4bRegOffset == 0xffe) {
-						/* Deay specific ms. Only RF configuration require delay.												 */
-#ifdef CONFIG_LONG_DELAY_ISSUE
+						/* Delay specific ms. Only RF configuration require delay. */
 						rtw_msleep_os(50);
-#else
-						rtw_mdelay_os(50);
-#endif
 					} else if (u4bRegOffset == 0xfd) {
 						/* delay_ms(5); */
 						for (i = 0; i < 100; i++)

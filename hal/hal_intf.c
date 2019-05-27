@@ -156,26 +156,21 @@ u32 rtw_hal_power_on(_adapter *padapter)
 
 	ret = padapter->hal_func.hal_power_on(padapter);
 
-#ifdef CONFIG_BT_COEXIST
 	if ((ret == _SUCCESS) && (pHalData->EEPROMBluetoothCoexist == _TRUE))
 		rtw_btcoex_PowerOnSetting(padapter);
-#endif
-
 	return ret;
 }
+
 void rtw_hal_power_off(_adapter *padapter)
 {
 	struct macid_ctl_t *macid_ctl = &padapter->dvobj->macid_ctl;
 
 	_rtw_memset(macid_ctl->h2c_msr, 0, MACID_NUM_SW_LIMIT);
 
-#ifdef CONFIG_BT_COEXIST
 	rtw_btcoex_PowerOffSetting(padapter);
-#endif
 
 	padapter->hal_func.hal_power_off(padapter);
 }
-
 
 static void rtw_hal_init_opmode(_adapter *padapter)
 {
@@ -544,21 +539,6 @@ void	rtw_hal_dm_watchdog(_adapter *padapter)
 #endif
 }
 
-#ifdef CONFIG_LPS_LCLK_WD_TIMER
-void	rtw_hal_dm_watchdog_in_lps(_adapter *padapter)
-{
-#if defined(CONFIG_CONCURRENT_MODE)
-#ifndef CONFIG_FW_MULTI_PORT_SUPPORT
-	if (padapter->hw_port != HW_PORT0)
-		return;
-#endif
-#endif
-
-	if (adapter_to_pwrctl(padapter)->bFwCurrentInPSMode == _TRUE)
-		rtw_phydm_watchdog_in_lps_lclk(padapter);/* this function caller is in interrupt context */
-}
-#endif /*CONFIG_LPS_LCLK_WD_TIMER*/
-
 void rtw_hal_bcn_related_reg_setting(_adapter *padapter)
 {
 	padapter->hal_func.SetBeaconRelatedRegistersHandler(padapter);
@@ -640,7 +620,6 @@ s32 c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 		RTW_INFO("[C2H], FW Scan Complete\n");
 		break;
 
-#ifdef CONFIG_BT_COEXIST
 	case C2H_BT_INFO:
 		rtw_btcoex_BtInfoNotify(adapter, plen, payload);
 		break;
@@ -653,7 +632,6 @@ s32 c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 	case C2H_WLAN_INFO:
 		rtw_btcoex_WlFwDbgInfoNotify(adapter, payload, plen);
 		break;
-#endif /* CONFIG_BT_COEXIST */
 
 	case C2H_IQK_FINISH:
 		c2h_iqk_offload(adapter, payload, plen);
@@ -1134,13 +1112,10 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 		ret = _FAIL;
 	}
 #endif
-
-#if defined(CONFIG_LPS)
 	if (NULL == padapter->hal_func.fill_fake_txdesc) {
 		rtw_hal_error_msg("fill_fake_txdesc");
 		ret = _FAIL;
 	}
-#endif
 
 #ifndef RTW_HALMAC
 	if (NULL == padapter->hal_func.hal_get_tx_buff_rsvd_page_num) {
@@ -1153,13 +1128,6 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 		rtw_hal_error_msg("fw_dl");
 		ret = _FAIL;
 	}
-
-#if defined(RTW_HALMAC) && defined(CONFIG_LPS_PG)
-	if (NULL == padapter->hal_func.fw_mem_dl) {
-		rtw_hal_error_msg("fw_mem_dl");
-		ret = _FAIL;
-	}
-#endif
 
 	if ((IS_HARDWARE_TYPE_8814A(padapter)
 	     || IS_HARDWARE_TYPE_8822BU(padapter) || IS_HARDWARE_TYPE_8822BS(padapter))

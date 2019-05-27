@@ -804,7 +804,6 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		break;
 	}
 	case ANDROID_WIFI_CMD_CHANGE_DTIM: {
-#ifdef CONFIG_LPS
 		u8 dtim;
 		u8 *ptr = (u8 *) &priv_cmd.buf;
 
@@ -815,7 +814,6 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		RTW_INFO("DTIM=%d\n", dtim);
 
 		rtw_lps_change_dtim_cmd(padapter, dtim);
-#endif
 	}
 	break;
 

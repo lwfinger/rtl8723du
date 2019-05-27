@@ -1035,17 +1035,13 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 				rtw_msleep_os(50);
 			} while (rtw_get_passing_time_ms(start_time) <= 400);
 
-#ifdef CONFIG_BT_COEXIST
 			rtw_btcoex_IQKNotify(padapter, _TRUE);
-#endif
 			restore_iqk_rst = (pwrpriv->bips_processing == _TRUE) ? _TRUE : _FALSE;
 			b2Ant = pHalData->EEPROMBluetoothAntNum == Ant_x2 ? _TRUE : _FALSE;
 			halrf_iqk_trigger(&pHalData->odmpriv, _FALSE);
 			/*phy_iq_calibrate_8723d(padapter, _FALSE);*/
 			pHalData->bIQKInitialized = _TRUE;
-#ifdef CONFIG_BT_COEXIST
 			rtw_btcoex_IQKNotify(padapter, _FALSE);
-#endif
 
 			/* Inform WiFi FW that it is the finish of IQK */
 			h2cCmdBuf = 0;
@@ -1055,13 +1051,11 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 		}
 	}
 
-#ifdef CONFIG_BT_COEXIST
 	/* Init BT hw config. */
 	if (padapter->registrypriv.mp_mode == 1)
 		rtw_btcoex_HAL_Initialize(padapter, _TRUE);
 	else
 		rtw_btcoex_HAL_Initialize(padapter, _FALSE);
-#endif
 
 	rtw_hal_set_hwreg(padapter, HW_VAR_NAV_UPPER, (u8 *)&NavUpper);
 

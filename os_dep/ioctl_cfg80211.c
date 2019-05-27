@@ -3290,10 +3290,8 @@ static int cfg80211_rtw_set_power_mgmt(struct wiphy *wiphy,
 
 	rtw_wdev_priv->power_mgmt = enabled;
 
-#ifdef CONFIG_LPS
 	if (!enabled)
 		rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_LEAVE_CFG80211_PWRMGMT, 1);
-#endif
 
 	return 0;
 }
@@ -5062,9 +5060,7 @@ static int _cfg80211_rtw_mgmt_tx(_adapter *padapter, u8 tx_ch, u8 no_cck, const 
 
 	rtw_cfg80211_set_is_mgmt_tx(padapter, 1);
 
-#ifdef CONFIG_BT_COEXIST
 	rtw_btcoex_ScanNotify(padapter, _TRUE);
-#endif
 
 	if (rtw_cfg80211_get_is_roch(padapter) == _TRUE) {
 		#ifdef CONFIG_CONCURRENT_MODE
@@ -5184,9 +5180,7 @@ exit:
 
 	rtw_cfg80211_set_is_mgmt_tx(padapter, 0);
 
-#ifdef CONFIG_BT_COEXIST
 	rtw_btcoex_ScanNotify(padapter, _FALSE);
-#endif
 
 	return ret;
 }

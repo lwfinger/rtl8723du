@@ -128,30 +128,6 @@ struct _odm_ra_info_ {
 
 struct _rate_adaptive_table_ {
 	u8		firstconnect;
-#if (defined(CONFIG_RA_DBG_CMD))
-	boolean		is_ra_dbg_init;
-
-	u8	RTY_P[ODM_NUM_RATE_IDX];
-	u8	RTY_P_default[ODM_NUM_RATE_IDX];
-	boolean	RTY_P_modify_note[ODM_NUM_RATE_IDX];
-
-	u8	RATE_UP_RTY_RATIO[ODM_NUM_RATE_IDX];
-	u8	RATE_UP_RTY_RATIO_default[ODM_NUM_RATE_IDX];
-	boolean	RATE_UP_RTY_RATIO_modify_note[ODM_NUM_RATE_IDX];
-
-	u8	RATE_DOWN_RTY_RATIO[ODM_NUM_RATE_IDX];
-	u8	RATE_DOWN_RTY_RATIO_default[ODM_NUM_RATE_IDX];
-	boolean	RATE_DOWN_RTY_RATIO_modify_note[ODM_NUM_RATE_IDX];
-
-	boolean ra_para_feedback_req;
-
-	u8   para_idx;
-	u8	rate_idx;
-	u8	value;
-	u16	value_16;
-	u8	rate_length;
-#endif
-	/*u8	link_tx_rate[ODM_ASSOCIATE_ENTRY_NUM];*/
 	u8	ra_ratio[ODM_ASSOCIATE_ENTRY_NUM];
 	u8	mu1_rate[30];
 	u8	highest_client_tx_order;
@@ -161,16 +137,7 @@ struct _rate_adaptive_table_ {
 	u8	RA_offset_direction;
 	u8	up_ramask_cnt; /*force update_ra_mask counter*/
 	u8	up_ramask_cnt_tmp; /*Just for debug, should be removed latter*/
-
-#if (defined(CONFIG_RA_DYNAMIC_RTY_LIMIT))
-	u8	per_rate_retrylimit_20M[ODM_NUM_RATE_IDX];
-	u8	per_rate_retrylimit_40M[ODM_NUM_RATE_IDX];
-	u8	retry_descend_num;
-	u8	retrylimit_low;
-	u8	retrylimit_high;
-#endif
-	u8	ldpc_thres;			/* if RSSI > ldpc_thres => switch from LPDC to BCC */
-
+	u8	ldpc_thres;	/* if RSSI > ldpc_thres => switch from LPDC to BCC */
 	void (*record_ra_info)(void *p_dm_void, u8 macid, struct cmn_sta_info *p_sta, u64 ra_mask);
 };
 
@@ -182,21 +149,6 @@ phydm_h2C_debug(
 	char			*output,
 	u32		*_out_len
 );
-
-#if (defined(CONFIG_RA_DBG_CMD))
-
-void
-odm_RA_debug(
-	void		*p_dm_void,
-	u32		*const dm_value
-);
-
-void
-odm_ra_para_adjust_init(
-	void		*p_dm_void
-);
-
-#endif
 
 void
 phydm_ra_debug(

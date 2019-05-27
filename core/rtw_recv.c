@@ -884,7 +884,7 @@ void count_rx_stats(_adapter *padapter, union recv_frame *prframe, struct sta_in
 
 #ifdef CONFIG_CHECK_LEAVE_LPS
 	traffic_check_for_leave_lps(padapter, _FALSE, 0);
-#endif /* CONFIG_LPS */
+#endif
 
 }
 

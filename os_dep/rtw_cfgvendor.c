@@ -1017,14 +1017,10 @@ static void LinkLayerStats(_adapter *padapter)
 				pwrpriv->pwr_saving_start_time = rtw_get_current_time();
 			}
 		} else {		
-#ifdef CONFIG_IPS
 			if ( pwrpriv->bpower_saving == _TRUE ) {
 				pwrpriv->pwr_saving_time += rtw_get_passing_time_ms(pwrpriv->pwr_saving_start_time);
 				pwrpriv->pwr_saving_start_time = rtw_get_current_time();
 			}
-#else
-			pwrpriv->pwr_saving_time = pwrpriv->on_time;
-#endif
 		}
 
 		ps_time = pwrpriv->pwr_saving_time;

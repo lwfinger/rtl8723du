@@ -1071,11 +1071,6 @@ phydm_process_rssi_for_dm(
 	is_cck_rate = (p_pktinfo->data_rate <= ODM_RATE11M) ? true : false;
 	p_dm->rx_rate = p_pktinfo->data_rate;
 
-	/* --------------Statistic for antenna/path diversity------------------ */
-#if (defined(CONFIG_PATH_DIVERSITY))
-	if (p_dm->support_ability & ODM_BB_PATH_DIV)
-		phydm_process_rssi_for_path_div(p_dm, p_phy_info, p_pktinfo);
-#endif
 	/* -----------------Smart Antenna Debug Message------------------ */
 
 	undecorated_smoothed_cck =  p_sta->rssi_stat.rssi_cck;

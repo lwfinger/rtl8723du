@@ -37,14 +37,6 @@ void rtw_hal_lck_test(_adapter *adapter);
 s8 rtw_phydm_get_min_rssi(_adapter *adapter);
 u8 rtw_phydm_get_cur_igi(_adapter *adapter);
 
-
-#ifdef CONFIG_LPS_LCLK_WD_TIMER
-extern void phydm_rssi_monitor_check(void *p_dm_void);
-
-void rtw_phydm_wd_lps_lclk_hdl(_adapter *adapter);
-void rtw_phydm_watchdog_in_lps_lclk(_adapter *adapter);
-#endif
-
 enum phy_cnt {
 	FA_OFDM,
 	FA_CCK,

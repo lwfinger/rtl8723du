@@ -312,9 +312,6 @@ struct sta_info {
 #endif
 
 	u8		IOTPeer;			/* Enum value.	HT_IOT_PEER_E */
-#ifdef CONFIG_LPS_PG
-	u8		lps_pg_rssi_lv;
-#endif
 
 	/* To store the sequence number of received management frame */
 	u16 RxMgmtFrameSeqNum;

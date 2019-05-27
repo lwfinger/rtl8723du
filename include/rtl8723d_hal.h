@@ -16,9 +16,6 @@
 #include "Hal8723DPwrSeq.h"
 #include "Hal8723DPhyReg.h"
 #include "Hal8723DPhyCfg.h"
-#ifdef CONFIG_LPS_POFF
-	#include "rtl8723d_lps_poff.h"
-#endif
 
 #define FW_8723D_SIZE		0x8000
 #define FW_8723D_START_ADDRESS	0x1000
@@ -247,7 +244,7 @@ void _8051Reset8723(PADAPTER padapter);
 void rtl8723d_start_thread(_adapter *padapter);
 void rtl8723d_stop_thread(_adapter *padapter);
 
-#if defined(CONFIG_CHECK_BT_HANG) && defined(CONFIG_BT_COEXIST)
+#if defined(CONFIG_CHECK_BT_HANG)
 	void rtl8723ds_init_checkbthang_workqueue(_adapter *adapter);
 	void rtl8723ds_free_checkbthang_workqueue(_adapter *adapter);
 	void rtl8723ds_cancle_checkbthang_workqueue(_adapter *adapter);
@@ -264,7 +261,7 @@ u8 HwRateToMRate8723D(u8 rate);
 
 void Hal_ReadRFGainOffset(PADAPTER pAdapter, u8 *hwinfo, BOOLEAN AutoLoadFail);
 
-#if defined(CONFIG_CHECK_BT_HANG) && defined(CONFIG_BT_COEXIST)
+#if defined(CONFIG_CHECK_BT_HANG)
 	void check_bt_status_work(void *data);
 #endif
 

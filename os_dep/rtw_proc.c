@@ -1687,7 +1687,6 @@ static ssize_t proc_set_tx_gain_offset(struct file *file, const char __user *buf
 }
 #endif /* CONFIG_RF_POWER_TRIM */
 
-#ifdef CONFIG_BT_COEXIST
 static ssize_t proc_set_btinfo_evt(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
@@ -1970,7 +1969,6 @@ exit:
 
 	return count;
 }
-#endif /* CONFIG_BT_COEXIST */
 
 #ifdef CONFIG_MBSSID_CAM
 int proc_get_mbid_cam_cache(struct seq_file *m, void *v)
@@ -2376,7 +2374,6 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	/* RTW_PROC_HDL_SSEQ("path_rssi", proc_get_two_path_rssi, NULL),
 	* 	RTW_PROC_HDL_SSEQ("rssi_disp",proc_get_rssi_disp, proc_set_rssi_disp), */
 
-#ifdef CONFIG_BT_COEXIST
 	RTW_PROC_HDL_SSEQ("btcoex_dbg", proc_get_btcoex_dbg, proc_set_btcoex_dbg),
 	RTW_PROC_HDL_SSEQ("btcoex", proc_get_btcoex_info, NULL),
 	RTW_PROC_HDL_SSEQ("btinfo_evt", NULL, proc_set_btinfo_evt),
@@ -2385,7 +2382,6 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 #ifdef CONFIG_RF4CE_COEXIST
 	RTW_PROC_HDL_SSEQ("rf4ce_state", proc_get_rf4ce_state, proc_set_rf4ce_state),
 #endif
-#endif /* CONFIG_BT_COEXIST */
 
 	RTW_PROC_HDL_SSEQ("trx_info_debug", proc_get_trx_info_debug, NULL),
 	RTW_PROC_HDL_SSEQ("linked_info_dump", proc_get_linked_info_dump, proc_set_linked_info_dump),
@@ -2432,12 +2428,10 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("kfree_bb_gain", proc_get_kfree_bb_gain, proc_set_kfree_bb_gain),
 	RTW_PROC_HDL_SSEQ("kfree_thermal", proc_get_kfree_thermal, proc_set_kfree_thermal),
 #endif
-#ifdef CONFIG_POWER_SAVING
 	RTW_PROC_HDL_SSEQ("ps_info", proc_get_ps_info, NULL),
 #ifdef CONFIG_WMMPS_STA
 	RTW_PROC_HDL_SSEQ("wmmps_info", proc_get_wmmps_info, proc_set_wmmps_info),
 #endif /* CONFIG_WMMPS_STA */	
-#endif
 	RTW_PROC_HDL_SSEQ("monitor", proc_get_monitor, proc_set_monitor),
 
 #ifdef CONFIG_PREALLOC_RX_SKB_BUFFER

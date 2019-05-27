@@ -218,7 +218,6 @@ void rtl8723d_set_FwPwrMode_cmd(PADAPTER padapter, u8 psmode)
 	}
 
 	if (psmode > 0) {
-#ifdef CONFIG_BT_COEXIST
 		if (rtw_btcoex_IsBtControlLps(padapter) == _TRUE) {
 			PowerState = rtw_btcoex_RpwmVal(padapter);
 			byte5 = rtw_btcoex_LpsVal(padapter);
@@ -229,9 +228,7 @@ void rtl8723d_set_FwPwrMode_cmd(PADAPTER padapter, u8 psmode)
 				awake_intvl = 2;
 				rlbm = 2;
 			}
-		} else
-#endif /* CONFIG_BT_COEXIST */
-		{
+		} else {
 			PowerState = 0x00;/* AllON(0x0C), RFON(0x04), RFOFF(0x00) */
 			byte5 = 0x40;
 		}
@@ -247,68 +244,7 @@ void rtl8723d_set_FwPwrMode_cmd(PADAPTER padapter, u8 psmode)
 	SET_8723D_H2CCMD_PWRMODE_PARM_ALL_QUEUE_UAPSD(u1H2CPwrModeParm, allQueueUAPSD);
 	SET_8723D_H2CCMD_PWRMODE_PARM_PWR_STATE(u1H2CPwrModeParm, PowerState);
 	SET_8723D_H2CCMD_PWRMODE_PARM_BYTE5(u1H2CPwrModeParm, byte5);
-#ifdef CONFIG_LPS_LCLK
-	if (psmode != PS_MODE_ACTIVE) {
-		if (pmlmeext->adaptive_tsf_done == _FALSE && pmlmeext->bcn_cnt > 0) {
-			u8 ratio_20_delay, ratio_80_delay;
-
-			/* byte 6 for adaptive_early_32k */
-			/* [0:3] = DrvBcnEarly  (ms) , [4:7] = DrvBcnTimeOut  (ms) */
-			/* 20% for DrvBcnEarly, 80% for DrvBcnTimeOut */
-			ratio_20_delay = 0;
-			ratio_80_delay = 0;
-			pmlmeext->DrvBcnEarly = 0xff;
-			pmlmeext->DrvBcnTimeOut = 0xff;
-
-			/* RTW_INFO("%s(): bcn_cnt = %d\n", __func__, pmlmeext->bcn_cnt); */
-
-			for (i = 0; i < 9; i++) {
-				pmlmeext->bcn_delay_ratio[i] = (pmlmeext->bcn_delay_cnt[i] * 100) / pmlmeext->bcn_cnt;
-
-				/* RTW_INFO("%s(): bcn_delay_cnt[%d]=%d, bcn_delay_ratio[%d] = %d\n", __func__, i, pmlmeext->bcn_delay_cnt[i] */
-				/*	,i ,pmlmeext->bcn_delay_ratio[i]); */
-
-				ratio_20_delay += pmlmeext->bcn_delay_ratio[i];
-				ratio_80_delay += pmlmeext->bcn_delay_ratio[i];
-
-				if (ratio_20_delay > 20 && pmlmeext->DrvBcnEarly == 0xff) {
-					pmlmeext->DrvBcnEarly = i;
-					/* RTW_INFO("%s(): DrvBcnEarly = %d\n", __func__, pmlmeext->DrvBcnEarly); */
-				}
-
-				if (ratio_80_delay > 80 && pmlmeext->DrvBcnTimeOut == 0xff) {
-					pmlmeext->DrvBcnTimeOut = i;
-					/* RTW_INFO("%s(): DrvBcnTimeOut = %d\n", __func__, pmlmeext->DrvBcnTimeOut); */
-				}
-
-				/* reset adaptive_early_32k cnt */
-				pmlmeext->bcn_delay_cnt[i] = 0;
-				pmlmeext->bcn_delay_ratio[i] = 0;
-
-			}
-
-			pmlmeext->bcn_cnt = 0;
-			pmlmeext->adaptive_tsf_done = _TRUE;
-
-		} else {
-			/* RTW_INFO("%s(): DrvBcnEarly = %d\n", __func__, pmlmeext->DrvBcnEarly); */
-			/* RTW_INFO("%s(): DrvBcnTimeOut = %d\n", __func__, pmlmeext->DrvBcnTimeOut); */
-		}
-
-		/* offload to FW if fw version > v15.10
-				pmlmeext->DrvBcnEarly=0;
-				pmlmeext->DrvBcnTimeOut=7;
-
-				if((pmlmeext->DrvBcnEarly!=0Xff) && (pmlmeext->DrvBcnTimeOut!=0xff))
-					u1H2CPwrModeParm[H2C_PWRMODE_LEN-1] = BIT(0) | ((pmlmeext->DrvBcnEarly<<1)&0x0E) |((pmlmeext->DrvBcnTimeOut<<4)&0xf0) ;
-		*/
-
-	}
-#endif
-
-#ifdef CONFIG_BT_COEXIST
 	rtw_btcoex_RecordPwrMode(padapter, u1H2CPwrModeParm, H2C_PWRMODE_LEN);
-#endif /* CONFIG_BT_COEXIST */
 
 	RTW_DBG_DUMP("u1H2CPwrModeParm:",
 		     u1H2CPwrModeParm, H2C_PWRMODE_LEN);
@@ -450,7 +386,6 @@ void rtl8723d_set_FwJoinBssRpt_cmd(PADAPTER padapter, u8 mstatus)
 		rtl8723d_download_rsvd_page(padapter, RT_MEDIA_CONNECT);
 }
 
-#ifdef CONFIG_BT_COEXIST
 static void SetFwRsvdPagePkt_BTCoex(PADAPTER padapter)
 {
 	PHAL_DATA_TYPE pHalData;
@@ -467,9 +402,6 @@ static void SetFwRsvdPagePkt_BTCoex(PADAPTER padapter)
 	u16	BufIndex, PageSize;
 	u32	TotalPacketLen, MaxRsvdPageBufSize = 0;
 	RSVDPAGE_LOC RsvdPageLoc;
-
-
-	/*	RTW_INFO("+" FUNC_ADPT_FMT "\n", FUNC_ADPT_ARG(padapter)); */
 
 	pHalData = GET_HAL_DATA(padapter);
 	pxmitpriv = &padapter->xmitpriv;
@@ -657,7 +589,6 @@ void rtl8723d_download_BTCoex_AP_mode_rsvd_page(PADAPTER padapter)
 	val8 &= ~BIT(0); /* ~ENSWBCN */
 	rtw_write8(padapter, REG_CR + 1, val8);
 }
-#endif /* CONFIG_BT_COEXIST */
 
 void rtl8723d_set_p2p_ps_offload_cmd(_adapter *padapter, u8 p2p_ps_state)
 {

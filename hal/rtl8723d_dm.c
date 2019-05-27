@@ -133,25 +133,17 @@ rtl8723d_HalDmWatchDog(
 	if (!rtw_is_hw_init_completed(Adapter))
 		goto skip_dm;
 
-#ifdef CONFIG_LPS
 	bFwCurrentInPSMode = adapter_to_pwrctl(Adapter)->bFwCurrentInPSMode;
 	rtw_hal_get_hwreg(Adapter, HW_VAR_FWLPS_RF_ON, &bFwPSAwake);
-#endif
 
 	/* Fw is under p2p powersaving mode, driver should stop dynamic mechanism. */
 	/* modifed by thomas. 2011.06.11. */
 	if (Adapter->wdinfo.p2p_ps_mode)
 		bFwPSAwake = _FALSE;
 
-	if ((rtw_is_hw_init_completed(Adapter))
-	    && ((!bFwCurrentInPSMode) && bFwPSAwake)) {
-
+	if ((rtw_is_hw_init_completed(Adapter)) &&
+	    ((!bFwCurrentInPSMode) && bFwPSAwake))
 		rtw_hal_check_rxfifo_full(Adapter);
-		/* */
-		/* Dynamically switch RTS/CTS protection. */
-		/* */
-		/* dm_CheckProtection(Adapter); */
-	}
 
 #ifdef CONFIG_DISABLE_ODM
 	goto skip_dm;

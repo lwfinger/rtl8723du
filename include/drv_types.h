@@ -219,14 +219,12 @@ struct registry_priv {
 	u8	excl_chs[MAX_CHANNEL_NUM];
 	u8	full_ch_in_p2p_handshake; /* 0: reply only softap channel, 1: reply full channel list*/
 
-#ifdef CONFIG_BT_COEXIST
 	u8	btcoex;
 	u8	bt_iso;
 	u8	bt_sco;
 	u8	bt_ampdu;
 	u8	ant_num;
 	u8	single_ant_path;
-#endif
 	BOOLEAN	bAcceptAddbaReq;
 
 	u8	antdiv_cfg;
@@ -1073,10 +1071,6 @@ struct _ADAPTER {
 	struct wifidirect_info	wdinfo;
 
 	struct wifi_display_info wfd_info;
-
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-	struct bt_coex_info coex_info;
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
 
 	ERROR_CODE		LastError; /* <20130613, Kordan> Only the functions associated with MP records the error code by now. */
 

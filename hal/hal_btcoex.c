@@ -3,8 +3,6 @@
 
 #define __HAL_BTCOEX_C__
 
-#ifdef CONFIG_BT_COEXIST
-
 #include <hal_data.h>
 #include <hal_btcoex.h>
 #include "mp_precomp.h"
@@ -359,44 +357,6 @@ static void halbtcoutsrc_Post_NormalLps(PBTC_COEXIST pBtCoexist)
  */
 static void halbtcoutsrc_LeaveLowPower(PBTC_COEXIST pBtCoexist)
 {
-#ifdef CONFIG_LPS_LCLK
-	PADAPTER padapter;
-	PHAL_DATA_TYPE pHalData;
-	struct pwrctrl_priv *pwrctrl;
-	s32 ready;
-	systime stime;
-	s32 utime;
-	u32 timeout; /* unit: ms */
-
-
-	padapter = pBtCoexist->Adapter;
-	pHalData = GET_HAL_DATA(padapter);
-	pwrctrl = adapter_to_pwrctl(padapter);
-	ready = _FAIL;
-#ifdef LPS_RPWM_WAIT_MS
-	timeout = LPS_RPWM_WAIT_MS;
-#else /* !LPS_RPWM_WAIT_MS */
-	timeout = 30;
-#endif /* !LPS_RPWM_WAIT_MS */
-
-	if (GLBtcBtCoexAliveRegistered == _TRUE)
-		return;
-
-	stime = rtw_get_current_time();
-	do {
-		ready = rtw_register_task_alive(padapter, BTCOEX_ALIVE);
-		if (_SUCCESS == ready)
-			break;
-
-		utime = rtw_get_passing_time_ms(stime);
-		if (utime > timeout)
-			break;
-
-		rtw_msleep_os(1);
-	} while (1);
-
-	GLBtcBtCoexAliveRegistered = _TRUE;
-#endif /* CONFIG_LPS_LCLK */
 }
 
 /*
@@ -405,17 +365,6 @@ static void halbtcoutsrc_LeaveLowPower(PBTC_COEXIST pBtCoexist)
  */
 static void halbtcoutsrc_NormalLowPower(PBTC_COEXIST pBtCoexist)
 {
-#ifdef CONFIG_LPS_LCLK
-	PADAPTER padapter;
-
-	if (GLBtcBtCoexAliveRegistered == _FALSE)
-		return;
-
-	padapter = pBtCoexist->Adapter;
-	rtw_unregister_task_alive(padapter, BTCOEX_ALIVE);
-
-	GLBtcBtCoexAliveRegistered = _FALSE;
-#endif /* CONFIG_LPS_LCLK */
 }
 
 static void halbtcoutsrc_DisableLowPower(PBTC_COEXIST pBtCoexist, u8 bLowPwrDisable)
@@ -711,15 +660,6 @@ static u32 halbtcoutsrc_GetBtPatchVer(PBTC_COEXIST pBtCoexist)
 			}
 
 			_exit_critical_mutex(&GLBtcBtMpOperLock, &irqL);
-		} else {
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-			u1Byte dataLen = 2;
-			u1Byte buf[4] = {0};
-
-			buf[0] = 0x0;	/* OP_Code */
-			buf[1] = 0x0;	/* OP_Code_Length */
-			BT_SendEventExtBtCoexControl(pBtCoexist->Adapter, _FALSE, dataLen, &buf[0]);
-#endif /* !CONFIG_BT_COEXIST_SOCKET_TRX */
 		}
 	}
 
@@ -1320,31 +1260,10 @@ static u8 halbtcoutsrc_Set(void *pBtcContext, u8 setType, void *pInBuf)
 	break;
 
 	case BTC_SET_ACT_CTRL_BT_INFO:
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-		{
-			u8 dataLen = *pU1Tmp;
-			u8 tmpBuf[BTC_TMP_BUF_SHORT];
-			if (dataLen)
-				_rtw_memcpy(tmpBuf, pU1Tmp + 1, dataLen);
-			BT_SendEventExtBtInfoControl(padapter, dataLen, &tmpBuf[0]);
-		}
-#else /* !CONFIG_BT_COEXIST_SOCKET_TRX */
 		ret = _FALSE;
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
 		break;
-
 	case BTC_SET_ACT_CTRL_BT_COEX:
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-		{
-			u8 dataLen = *pU1Tmp;
-			u8 tmpBuf[BTC_TMP_BUF_SHORT];
-			if (dataLen)
-				_rtw_memcpy(tmpBuf, pU1Tmp + 1, dataLen);
-			BT_SendEventExtBtCoexControl(padapter, _FALSE, dataLen, &tmpBuf[0]);
-		}
-#else /* !CONFIG_BT_COEXIST_SOCKET_TRX */
 		ret = _FALSE;
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
 		break;
 	case BTC_SET_ACT_CTRL_8723B_ANT:
 		ret = _FALSE;
@@ -2561,52 +2480,6 @@ static void EXhalbtcoutsrc_dbg_control(PBTC_COEXIST pBtCoexist, u8 opCode, u8 op
 
 void EXhalbtcoutsrc_StackUpdateProfileInfo(void)
 {
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-	PBTC_COEXIST pBtCoexist = &GLBtCoexist;
-	PADAPTER padapter = (PADAPTER)GLBtCoexist.Adapter;
-	PBT_MGNT pBtMgnt = &padapter->coex_info.BtMgnt;
-	u8 i;
-
-	if (!halbtcoutsrc_IsBtCoexistAvailable(pBtCoexist))
-		return;
-
-	pBtCoexist->stack_info.profile_notified = _TRUE;
-
-	pBtCoexist->stack_info.num_of_link =
-		pBtMgnt->ExtConfig.NumberOfACL + pBtMgnt->ExtConfig.NumberOfSCO;
-
-	/* reset first */
-	pBtCoexist->stack_info.bt_link_exist = _FALSE;
-	pBtCoexist->stack_info.sco_exist = _FALSE;
-	pBtCoexist->stack_info.acl_exist = _FALSE;
-	pBtCoexist->stack_info.a2dp_exist = _FALSE;
-	pBtCoexist->stack_info.hid_exist = _FALSE;
-	pBtCoexist->stack_info.num_of_hid = 0;
-	pBtCoexist->stack_info.pan_exist = _FALSE;
-
-	if (!pBtMgnt->ExtConfig.NumberOfACL)
-		pBtCoexist->stack_info.min_bt_rssi = 0;
-
-	if (pBtCoexist->stack_info.num_of_link) {
-		pBtCoexist->stack_info.bt_link_exist = _TRUE;
-		if (pBtMgnt->ExtConfig.NumberOfSCO)
-			pBtCoexist->stack_info.sco_exist = _TRUE;
-		if (pBtMgnt->ExtConfig.NumberOfACL)
-			pBtCoexist->stack_info.acl_exist = _TRUE;
-	}
-
-	for (i = 0; i < pBtMgnt->ExtConfig.NumberOfACL; i++) {
-		if (BT_PROFILE_A2DP == pBtMgnt->ExtConfig.aclLink[i].BTProfile)
-			pBtCoexist->stack_info.a2dp_exist = _TRUE;
-		else if (BT_PROFILE_PAN == pBtMgnt->ExtConfig.aclLink[i].BTProfile)
-			pBtCoexist->stack_info.pan_exist = _TRUE;
-		else if (BT_PROFILE_HID == pBtMgnt->ExtConfig.aclLink[i].BTProfile) {
-			pBtCoexist->stack_info.hid_exist = _TRUE;
-			pBtCoexist->stack_info.num_of_hid++;
-		} else
-			pBtCoexist->stack_info.unknown_acl_exist = _TRUE;
-	}
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
 }
 
 void EXhalbtcoutsrc_UpdateMinBtRssi(s8 btRssi)
@@ -3771,4 +3644,3 @@ void hal_btcoex_rx_rate_change_notify(PADAPTER padapter, u8 is_data_frame, u8 ra
 {
 	EXhalbtcoutsrc_rx_rate_change_notify(&GLBtCoexist, is_data_frame, EXhalbtcoutsrc_rate_id_to_btc_rate_id(rate_id));
 }
-#endif /* CONFIG_BT_COEXIST */

@@ -93,14 +93,6 @@
 #include <linux/usb.h>
 #include <linux/usb/ch9.h>
 
-#ifdef CONFIG_BT_COEXIST_SOCKET_TRX
-	#include <net/sock.h>
-	#include <net/tcp.h>
-	#include <linux/udp.h>
-	#include <linux/in.h>
-	#include <linux/netlink.h>
-#endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
-
 typedef struct urb   *PURB;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 22))
 	#ifdef CONFIG_USB_SUSPEND

@@ -14,11 +14,7 @@ odm_config_rf_reg_8723d(
 )
 {
 	if (addr == 0xfe || addr == 0xffe) {
-#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-#else
-		ODM_delay_ms(50);
-#endif
 	} else {
 		odm_set_rf_reg(p_dm, RF_PATH, reg_addr, RFREGOFFSETMASK, data);
 		/* Add 1us delay between BB/RF register setting. */
@@ -96,11 +92,7 @@ odm_config_bb_phy_reg_pg_8723d(
 )
 {
 	if (addr == 0xfe || addr == 0xffe)
-#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-#else
-		ODM_delay_ms(50);
-#endif
 	else {
 		phy_store_tx_power_by_rate(p_dm->adapter, band, rf_path, tx_num, addr, bitmask, data);
 	}
@@ -117,11 +109,7 @@ odm_config_bb_phy_8723d(
 {
 	/*dbg_print("odm_config_bb_phy_8723d(), addr = 0x%x, data = 0x%x\n", addr, data);*/
 	if (addr == 0xfe)
-#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-#else
-		ODM_delay_ms(50);
-#endif
 	else if (addr == 0xfd)
 		ODM_delay_ms(5);
 	else if (addr == 0xfc)

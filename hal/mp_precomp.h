@@ -34,26 +34,16 @@ extern u4Byte GLBtcDbgType[];
 #define DBG_LOUD		4
 #define DBG_TRACE		5
 
-#ifdef CONFIG_BT_COEXIST
 #define BT_SUPPORT		1
-#define COEX_SUPPORT	1
+#define COEX_SUPPORT		1
 #define HS_SUPPORT		1
-#else
-#define BT_SUPPORT		0
-#define COEX_SUPPORT	0
-#define HS_SUPPORT		0
-#endif
 
 #include "halbtcoutsrc.h"
 
 /* for wifi only mode */
 #include "hal_btcoex_wifionly.h"
 
-#ifdef CONFIG_BT_COEXIST
-
 #include "halbtc8723d1ant.h"
 #include "halbtc8723d2ant.h"
-
-#endif /* CONFIG_BT_COEXIST */
 
 #endif /*  __MP_PRECOMP_H__ */

@@ -1362,8 +1362,6 @@ odm_cmn_info_update(
 	case	ODM_CMNINFO_DBG_LEVEL:
 		p_dm->debug_level = (u32)value;
 		break;
-
-#ifdef ODM_CONFIG_BT_COEXIST
 	/* The following is for BT HS mode and BT coexist mechanism. */
 	case ODM_CMNINFO_BT_ENABLED:
 		p_dm->bt_info_table.is_bt_enabled = (boolean)value;
@@ -1384,8 +1382,6 @@ odm_cmn_info_update(
 	case	ODM_CMNINFO_BT_LIMITED_DIG:
 		p_dm->bt_info_table.is_bt_limited_dig = (boolean)value;
 		break;
-#endif
-
 	case	ODM_CMNINFO_AP_TOTAL_NUM:
 		p_dm->ap_total_num = (u8)value;
 		break;

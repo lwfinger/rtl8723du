@@ -1496,9 +1496,7 @@ void rtw_indicate_disconnect(_adapter *padapter, u16 reason, u8 locally_generate
 
 	p2p_ps_wk_cmd(padapter, P2P_PS_DISABLE, 1);
 
-#ifdef CONFIG_LPS
 	rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_DISCONNECT, 1);
-#endif
 }
 
 inline void rtw_indicate_scan_done(_adapter *padapter, bool aborted)
@@ -1507,7 +1505,6 @@ inline void rtw_indicate_scan_done(_adapter *padapter, bool aborted)
 
 	rtw_os_indicate_scan_done(padapter, aborted);
 
-#ifdef CONFIG_IPS
 	if (is_primary_adapter(padapter)
 	    && (_FALSE == adapter_to_pwrctl(padapter)->bInSuspend)
 	    && (check_fwstate(&padapter->mlmepriv, WIFI_ASOC_STATE | WIFI_UNDER_LINKING) == _FALSE)) {
@@ -1515,13 +1512,8 @@ inline void rtw_indicate_scan_done(_adapter *padapter, bool aborted)
 
 		pwrpriv = adapter_to_pwrctl(padapter);
 		rtw_set_ips_deny(padapter, 0);
-#ifdef CONFIG_IPS_CHECK_IN_WD
-		_set_timer(&adapter_to_dvobj(padapter)->dynamic_chk_timer, 1);
-#else /* !CONFIG_IPS_CHECK_IN_WD */
 		_rtw_set_pwr_state_check_timer(padapter, 1);
-#endif /* !CONFIG_IPS_CHECK_IN_WD */
 	}
-#endif /* CONFIG_IPS */
 }
 
 static u32 _rtw_wait_scan_done(_adapter *adapter, u8 abort, u32 timeout_ms)
@@ -2566,27 +2558,11 @@ void rtw_stadel_event_callback(_adapter *adapter, u8 *pbuf)
 
 void rtw_cpwm_event_callback(PADAPTER padapter, u8 *pbuf)
 {
-#ifdef CONFIG_LPS_LCLK
-	struct reportpwrstate_parm *preportpwrstate;
-#endif
-
-
-#ifdef CONFIG_LPS_LCLK
-	preportpwrstate = (struct reportpwrstate_parm *)pbuf;
-	preportpwrstate->state |= (u8)(adapter_to_pwrctl(padapter)->cpwm_tog + 0x80);
-	cpwm_int_hdl(padapter, preportpwrstate);
-#endif
-
-
 }
-
 
 void rtw_wmm_event_callback(PADAPTER padapter, u8 *pbuf)
 {
-
 	WMMOnAssocRsp(padapter);
-
-
 }
 
 /*
@@ -2812,42 +2788,20 @@ static void rtw_auto_scan_handler(_adapter *padapter)
 exit:
 	return;
 }
+
 static u8 is_drv_in_lps(_adapter *adapter)
 {
 	u8 is_in_lps = _FALSE;
 
-	#ifdef CONFIG_LPS_LCLK_WD_TIMER /* to avoid leaving lps 32k frequently*/
-	if ((adapter_to_pwrctl(adapter)->bFwCurrentInPSMode == _TRUE)
-	#ifdef CONFIG_BT_COEXIST
-		&& (rtw_btcoex_IsBtControlLps(adapter) == _FALSE)
-	#endif
-		)
-		is_in_lps = _TRUE;
-	#endif /* CONFIG_LPS_LCLK_WD_TIMER*/
 	return is_in_lps;
 }
+
 void rtw_iface_dynamic_check_timer_handlder(_adapter *adapter)
 {
 	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
 
 	if (adapter->net_closed == _TRUE)
 		return;
-	#ifdef CONFIG_LPS_LCLK_WD_TIMER /* to avoid leaving lps 32k frequently*/
-	if (is_drv_in_lps(adapter)) {
-		u8 bEnterPS;
-
-		linked_status_chk(adapter, 1);
-
-		bEnterPS = traffic_status_watchdog(adapter, 1);
-		if (bEnterPS) {
-			/* rtw_lps_ctrl_wk_cmd(adapter, LPS_CTRL_ENTER, 1); */
-			rtw_hal_dm_watchdog_in_lps(adapter);
-		} else {
-			/* call rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_LEAVE, 1) in traffic_status_watchdog() */
-		}
-	}
-	#endif /* CONFIG_LPS_LCLK_WD_TIMER	*/
-
 	/* auto site survey */
 	rtw_auto_scan_handler(adapter);
 

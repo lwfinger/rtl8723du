@@ -1465,7 +1465,6 @@ exit:
 	return ret;
 }
 
-#ifdef CONFIG_BT_COEXIST
 static int c2h_mac_hidden_rpt_bt_info_hdl(_adapter *adapter, u8 val)
 {
 	HAL_DATA_TYPE	*hal_data = GET_HAL_DATA(adapter);
@@ -1482,7 +1481,6 @@ static int c2h_mac_hidden_rpt_bt_info_hdl(_adapter *adapter, u8 val)
 exit:
 	return ret;
 }
-#endif /* CONFIG_BT_COEXIST */
 
 int hal_read_mac_hidden_rpt(_adapter *adapter)
 {
@@ -1535,9 +1533,7 @@ int hal_read_mac_hidden_rpt(_adapter *adapter)
 mac_hidden_rpt_hdl:
 	c2h_mac_hidden_rpt_hdl(adapter, mac_hidden_rpt, MAC_HIDDEN_RPT_LEN);
 	c2h_mac_hidden_rpt_2_hdl(adapter, mac_hidden_rpt + MAC_HIDDEN_RPT_LEN, MAC_HIDDEN_RPT_2_LEN);
-#ifdef CONFIG_BT_COEXIST
 	c2h_mac_hidden_rpt_bt_info_hdl(adapter, rtw_read8(adapter, REG_C2HEVT_MSG_NORMAL + 1));
-#endif /* CONFIG_BT_COEXIST */
 
 	if (ret_fwdl == _SUCCESS && id == C2H_MAC_HIDDEN_RPT)
 		ret = _SUCCESS;
@@ -2932,7 +2928,6 @@ void hw_var_port_switch(_adapter *adapter)
 		rtw_write8(adapter, REG_BSSID1 + i, bssid[i]);
 
 	/* write bcn ctl */
-#ifdef CONFIG_BT_COEXIST
 	/* always enable port0 beacon function for PSTDMA */
 	if (IS_HARDWARE_TYPE_8723B(adapter) || IS_HARDWARE_TYPE_8703B(adapter)
 	    || IS_HARDWARE_TYPE_8723D(adapter))
@@ -2940,7 +2935,6 @@ void hw_var_port_switch(_adapter *adapter)
 	/* always disable port1 beacon function for PSTDMA */
 	if (IS_HARDWARE_TYPE_8723B(adapter) || IS_HARDWARE_TYPE_8703B(adapter))
 		bcn_ctrl &= ~EN_BCN_FUNCTION;
-#endif
 	rtw_write8(adapter, REG_BCN_CTRL, bcn_ctrl_1);
 	rtw_write8(adapter, REG_BCN_CTRL_1, bcn_ctrl);
 
@@ -3614,197 +3608,6 @@ static void rtw_hal_construct_ProbeRsp(_adapter *padapter, u8 *pframe, u32 *pLen
 	*pLength = pktlen;
 }
 
-#ifdef CONFIG_LPS_PG
-#include "hal_halmac.h"
-
-#define DBG_LPSPG_SEC_DUMP
-#define LPS_PG_INFO_RSVD_LEN	16
-#define LPS_PG_INFO_RSVD_PAGE_NUM	1
-
-#define DBG_LPSPG_INFO_DUMP
-static void rtw_hal_set_lps_pg_info_rsvd_page(_adapter *adapter)
-{
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapter);
-	struct sta_info	*psta = rtw_get_stainfo(&adapter->stapriv, get_bssid(&adapter->mlmepriv));
-	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
-	PHAL_DATA_TYPE phal_data = GET_HAL_DATA(adapter);
-	u8 lps_pg_info[LPS_PG_INFO_RSVD_LEN] = {0};
-#ifdef CONFIG_MBSSID_CAM
-	u8 cam_id = INVALID_CAM_ID;
-#endif
-	u8 *psec_cam_id = lps_pg_info + 8;
-	u8 sec_cam_num = 0;
-	u8 drv_rsvdpage_num = 0;
-
-	if (!psta) {
-		RTW_ERR("%s [ERROR] sta is NULL\n", __func__);
-		rtw_warn_on(1);
-		return;
-	}
-
-	/*Byte 0 - used macid*/
-	LPSPG_RSVD_PAGE_SET_MACID(lps_pg_info, psta->cmn.mac_id);
-	RTW_INFO("[LPSPG-INFO] mac_id:%d\n", psta->cmn.mac_id);
-
-#ifdef CONFIG_MBSSID_CAM
-	/*Byte 1 - used BSSID CAM entry*/
-	cam_id = rtw_mbid_cam_search_by_ifaceid(adapter, adapter->iface_id);
-	if (cam_id != INVALID_CAM_ID)
-		LPSPG_RSVD_PAGE_SET_MBSSCAMID(lps_pg_info, cam_id);
-	RTW_INFO("[LPSPG-INFO] mbss_cam_id:%d\n", cam_id);
-#endif
-
-	/*Btye 8 ~15 - used Security CAM entry */
-	sec_cam_num = rtw_get_sec_camid(adapter, 8, psec_cam_id);
-
-	/*Btye 4 - used Security CAM entry number*/
-	if (sec_cam_num < 8)
-		LPSPG_RSVD_PAGE_SET_SEC_CAM_NUM(lps_pg_info, sec_cam_num);
-	RTW_INFO("[LPSPG-INFO] Security CAM entry number :%d\n", sec_cam_num);
-
-	/*Btye 5 - Txbuf used page number for fw offload*/
-	if (pwrpriv->wowlan_mode == _TRUE || pwrpriv->wowlan_ap_mode == _TRUE)
-		drv_rsvdpage_num = rtw_hal_get_txbuff_rsvd_page_num(adapter, _TRUE);
-	else
-		drv_rsvdpage_num = rtw_hal_get_txbuff_rsvd_page_num(adapter, _FALSE);
-	LPSPG_RSVD_PAGE_SET_DRV_RSVDPAGE_NUM(lps_pg_info, drv_rsvdpage_num);
-	RTW_INFO("[LPSPG-INFO] DRV's rsvd page numbers :%d\n", drv_rsvdpage_num);
-
-#ifdef DBG_LPSPG_SEC_DUMP
-	{
-		int i;
-
-		for (i = 0; i < sec_cam_num; i++)
-			RTW_INFO("%d = sec_cam_id:%d\n", i, psec_cam_id[i]);
-	}
-#endif
-
-#ifdef DBG_LPSPG_INFO_DUMP
-	RTW_INFO("==== DBG_LPSPG_INFO_RSVD_PAGE_DUMP====\n");
-	RTW_INFO("  %02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X\n",
-		*(lps_pg_info), *(lps_pg_info + 1), *(lps_pg_info + 2), *(lps_pg_info + 3),
-		*(lps_pg_info + 4), *(lps_pg_info + 5), *(lps_pg_info + 6), *(lps_pg_info + 7));
-	RTW_INFO("  %02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X\n",
-		*(lps_pg_info + 8), *(lps_pg_info + 9), *(lps_pg_info + 10), *(lps_pg_info + 11),
-		*(lps_pg_info + 12), *(lps_pg_info + 13), *(lps_pg_info + 14), *(lps_pg_info + 15));
-	RTW_INFO("==== DBG_LPSPG_INFO_RSVD_PAGE_DUMP====\n");
-#endif
-
-	rtw_halmac_download_rsvd_page(dvobj, pwrpriv->lpspg_rsvd_page_locate, lps_pg_info, LPS_PG_INFO_RSVD_LEN);
-
-#ifdef DBG_LPSPG_INFO_DUMP
-	RTW_INFO("Get LPS-PG INFO from rsvd page_offset:%d\n", pwrpriv->lpspg_rsvd_page_locate);
-	rtw_dump_rsvd_page(RTW_DBGDUMP, adapter, pwrpriv->lpspg_rsvd_page_locate, 1);
-#endif
-}
-
-
-static u8 rtw_hal_set_lps_pg_info_cmd(_adapter *adapter)
-{
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapter);
-	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
-
-	u8 lpspg_info[H2C_LPS_PG_INFO_LEN] = {0};
-	u8 ret = _FAIL;
-
-	RTW_INFO("%s: loc_lpspg_info:%d\n", __func__, pwrpriv->lpspg_rsvd_page_locate);
-
-	if (_NO_PRIVACY_ != adapter->securitypriv.dot11PrivacyAlgrthm)
-		SET_H2CCMD_LPSPG_SEC_CAM_EN(lpspg_info, 1);	/*SecurityCAM_En*/
-#ifdef CONFIG_MBSSID_CAM
-	SET_H2CCMD_LPSPG_MBID_CAM_EN(lpspg_info, 1);		/*BSSIDCAM_En*/
-#endif
-
-#ifdef CONFIG_MACID_SEARCH
-	SET_H2CCMD_LPSPG_MACID_SEARCH_EN(lpspg_info, 1);	/*MACIDSearch_En*/
-#endif
-
-#ifdef CONFIG_TX_SC
-	SET_H2CCMD_LPSPG_TXSC_EN(lpspg_info, 1);	/*TXSC_En*/
-#endif
-
-	SET_H2CCMD_LPSPG_LOC(lpspg_info, pwrpriv->lpspg_rsvd_page_locate);
-
-#ifdef DBG_LPSPG_INFO_DUMP
-	RTW_INFO("==== DBG_LPSPG_INFO_CMD_DUMP====\n");
-	RTW_INFO("  H2C_CMD: 0x%02x, H2C_LEN: %d\n", H2C_LPS_PG_INFO, H2C_LPS_PG_INFO_LEN);
-	RTW_INFO("  %02X:%02X\n", *(lpspg_info), *(lpspg_info + 1));
-	RTW_INFO("==== DBG_LPSPG_INFO_CMD_DUMP====\n");
-#endif
-
-	ret = rtw_hal_fill_h2c_cmd(adapter,
-				   H2C_LPS_PG_INFO,
-				   H2C_LPS_PG_INFO_LEN,
-				   lpspg_info);
-	return ret;
-}
-u8 rtw_hal_set_lps_pg_info(_adapter *adapter)
-{
-	u8 ret = _FAIL;
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapter);
-
-	if (pwrpriv->lpspg_rsvd_page_locate == 0) {
-		RTW_ERR("%s [ERROR] lpspg_rsvd_page_locate = 0\n", __func__);
-		rtw_warn_on(1);
-		return ret;
-	}
-
-	rtw_hal_set_lps_pg_info_rsvd_page(adapter);
-	ret = rtw_hal_set_lps_pg_info_cmd(adapter);
-	if (_SUCCESS == ret)
-		pwrpriv->blpspg_info_up = _FALSE;
-
-	return ret;
-}
-
-void rtw_hal_lps_pg_rssi_lv_decide(_adapter *adapter, struct sta_info *sta)
-{
-	sta->lps_pg_rssi_lv = 0;
-	RTW_INFO("%s mac-id:%d, rssi:%d, rssi_level:%d, lps_pg_rssi_lv:%d\n",
-		__func__, sta->cmn.mac_id, sta->cmn.rssi_stat.rssi, sta->cmn.ra_info.rssi_level, sta->lps_pg_rssi_lv);
-}
-
-void rtw_hal_lps_pg_handler(_adapter *adapter, enum lps_pg_hdl_id hdl_id)
-{
-	switch (hdl_id) {
-	case LPS_PG_INFO_CFG:
-		rtw_hal_set_lps_pg_info(adapter);
-		break;
-	case LPS_PG_REDLEMEM:
-		{
-			/*set xmit_block*/
-			rtw_set_xmit_block(adapter, XMIT_BLOCK_REDLMEM);
-			if (_FAIL == rtw_hal_fw_mem_dl(adapter, FW_EMEM))
-				rtw_warn_on(1);
-			/*clearn xmit_block*/
-			rtw_clr_xmit_block(adapter, XMIT_BLOCK_REDLMEM);
-		}
-		break;
-
-	case LPS_PG_RESEND_H2C:
-		{
-			struct macid_ctl_t *macid_ctl = &adapter->dvobj->macid_ctl;
-			struct sta_info *sta;
-			int i;
-
-			for (i = 0; i < MACID_NUM_SW_LIMIT; i++) {
-				sta = macid_ctl->sta[i];
-				if (sta && !is_broadcast_mac_addr(sta->cmn.mac_addr)) {
-					rtw_hal_lps_pg_rssi_lv_decide(adapter, sta);
-					set_sta_rate(adapter, sta);
-					sta->lps_pg_rssi_lv = 0;
-				}
-			}
-		}
-		break;
-
-	default:
-		break;
-	}
-}
-
-#endif /*CONFIG_LPS_PG*/
-
 /*
  * Description: Fill the reserved packets that FW will use to RSVD page.
  *			Now we just send 4 types packet to rsvd page.
@@ -3948,7 +3751,6 @@ static void _rtw_hal_set_fw_rsvd_page(_adapter *adapter, bool finished, u8 *page
 
 	BufIndex += (CurtPktPageNum * PageSize);
 
-#ifdef CONFIG_BT_COEXIST
 	if (pwrctl->wowlan_mode == _FALSE ||
 		pwrctl->wowlan_in_resume == _TRUE) {
 		/* BT Qos null data * 1 page */
@@ -3972,7 +3774,6 @@ static void _rtw_hal_set_fw_rsvd_page(_adapter *adapter, bool finished, u8 *page
 		TotalPageNum += CurtPktPageNum;
 		BufIndex += (CurtPktPageNum * PageSize);
 	}
-#endif /* CONFIG_BT_COEXIT */
 
 #ifdef CONFIG_MCC_MODE
 	if (MCC_EN(adapter)) {
@@ -4029,14 +3830,6 @@ static void _rtw_hal_set_fw_rsvd_page(_adapter *adapter, bool finished, u8 *page
 
 	TotalPacketLen = BufIndex + QosNullLength;
 
-#ifdef CONFIG_LPS_PG
-	/* must reserved last 1 x page for LPS PG Info*/
-	pwrctl->lpspg_rsvd_page_locate = TotalPageNum;
-	pwrctl->blpspg_info_up = _TRUE;
-	if (page_num)
-		TotalPageNum += LPS_PG_INFO_RSVD_PAGE_NUM;
-#endif
-
 	TotalPacketLen -= TxDescOffset;
 
 download_page:
@@ -4047,20 +3840,8 @@ download_page:
 		return;
 	}
 
-	/* RTW_INFO("%s BufIndex(%d), TxDescLen(%d), PageSize(%d)\n",__func__, BufIndex, TxDescLen, PageSize);*/
 	RTW_INFO("%s PageNum(%d), pktlen(%d)\n",
 		 __func__, TotalPageNum, TotalPacketLen);
-
-#ifdef CONFIG_LPS_PG
-	if ((TotalPacketLen + (LPS_PG_INFO_RSVD_PAGE_NUM * PageSize)) > MaxRsvdPageBufSize) {
-		pwrctl->lpspg_rsvd_page_locate = 0;
-		pwrctl->blpspg_info_up = _FALSE;
-
-		RTW_ERR("%s rsvd page size is not enough!!TotalPacketLen+LPS_PG_INFO_LEN %d, MaxRsvdPageBufSize %d\n",
-			 __func__, (TotalPacketLen + (LPS_PG_INFO_RSVD_PAGE_NUM * PageSize)), MaxRsvdPageBufSize);
-		rtw_warn_on(1);
-	}
-#endif
 
 	if (TotalPacketLen > MaxRsvdPageBufSize) {
 		RTW_ERR("%s(ERROR): rsvd page size is not enough!!TotalPacketLen %d, MaxRsvdPageBufSize %d\n",
@@ -4369,7 +4150,7 @@ void rtw_hal_update_uapsd_tid(_adapter *adapter)
 }
 #endif /* CONFIG_WMMPS_STA */
 
-#if defined(CONFIG_BT_COEXIST) && defined(CONFIG_FW_MULTI_PORT_SUPPORT)
+#if defined(CONFIG_FW_MULTI_PORT_SUPPORT)
 /* For multi-port support, driver needs to inform the port ID to FW for btc operations */
 s32 rtw_hal_set_wifi_port_id_cmd(_adapter *adapter)
 {
@@ -4510,20 +4291,15 @@ u8 SetHwReg(_adapter *adapter, u8 variable, u8 *val)
 		break;
 	case HW_VAR_MLME_SITESURVEY:
 		hw_var_set_mlme_sitesurvey(adapter, variable, val);
-		#ifdef CONFIG_BT_COEXIST
 		if (hal_data->EEPROMBluetoothCoexist == 1)
 			rtw_btcoex_ScanNotify(adapter, *val ? _TRUE : _FALSE);
-		#endif
 		break;
-
 	case HW_VAR_EN_HW_UPDATE_TSF:
 		rtw_hal_set_hw_update_tsf(adapter);
 		break;
-
 	case HW_VAR_CORRECT_TSF:
 		hw_var_set_correct_tsf(adapter);
 		break;
-
 	case HW_VAR_APFM_ON_MAC:
 		hal_data->bMacPwrCtrlOn = *val;
 		RTW_INFO("%s: bMacPwrCtrlOn=%d\n", __func__, hal_data->bMacPwrCtrlOn);
@@ -4533,16 +4309,6 @@ u8 SetHwReg(_adapter *adapter, u8 variable, u8 *val)
 		rtw_hal_update_uapsd_tid(adapter);
 		break;
 #endif /* CONFIG_WMMPS_STA */
-#ifdef CONFIG_LPS_PG
-	case HW_VAR_LPS_PG_HANDLE:
-		rtw_hal_lps_pg_handler(adapter, *val);
-		break;
-#endif
-#ifdef CONFIG_LPS_LCLK_WD_TIMER
-	case HW_VAR_DM_IN_LPS_LCLK:
-		rtw_phydm_wd_lps_lclk_hdl(adapter);
-		break;
-#endif
 	case HW_VAR_ENABLE_RX_BAR:
 		if (*val == _TRUE) {
 			/* enable RX BAR */
@@ -5012,23 +4778,15 @@ void linked_info_dump(_adapter *padapter, u8 benable)
 	RTW_INFO("%s %s\n", __FUNCTION__, (benable) ? "enable" : "disable");
 
 	if (benable) {
-#ifdef CONFIG_LPS
 		pwrctrlpriv->org_power_mgnt = pwrctrlpriv->power_mgnt;/* keep org value */
 		rtw_pm_set_lps(padapter, PS_MODE_ACTIVE);
-#endif
 
-#ifdef CONFIG_IPS
 		pwrctrlpriv->ips_org_mode = pwrctrlpriv->ips_mode;/* keep org value */
 		rtw_pm_set_ips(padapter, IPS_NONE);
-#endif
 	} else {
-#ifdef CONFIG_IPS
 		rtw_pm_set_ips(padapter, pwrctrlpriv->ips_org_mode);
-#endif /* CONFIG_IPS */
 
-#ifdef CONFIG_LPS
 		rtw_pm_set_lps(padapter, pwrctrlpriv->org_power_mgnt);
-#endif /* CONFIG_LPS */
 	}
 	padapter->bLinkInfoDump = benable ;
 }

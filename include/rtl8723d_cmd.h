@@ -339,10 +339,8 @@ void rtl8723d_set_FwJoinBssRpt_cmd(PADAPTER padapter, u8 mstatus);
 /* s32 rtl8723d_set_lowpwr_lps_cmd(PADAPTER padapter, u8 enable); */
 void rtl8723d_set_FwPsTuneParam_cmd(PADAPTER padapter);
 void rtl8723d_download_rsvd_page(PADAPTER padapter, u8 mstatus);
-#ifdef CONFIG_BT_COEXIST
-	void rtl8723d_download_BTCoex_AP_mode_rsvd_page(PADAPTER padapter);
-#endif /* CONFIG_BT_COEXIST */
-	void rtl8723d_set_p2p_ps_offload_cmd(PADAPTER padapter, u8 p2p_ps_state);
+void rtl8723d_download_BTCoex_AP_mode_rsvd_page(PADAPTER padapter);
+void rtl8723d_set_p2p_ps_offload_cmd(PADAPTER padapter, u8 p2p_ps_state);
 
 s32 FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer);
 u8 GetTxBufferRsvdPageNum8723D(_adapter *padapter, bool wowlan);

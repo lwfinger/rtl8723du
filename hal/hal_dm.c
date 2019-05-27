@@ -746,70 +746,6 @@ rtw_phydm_cfg_phy_para(
 	return HAL_STATUS_SUCCESS;
 }
 
-
-#ifdef CONFIG_LPS_LCLK_WD_TIMER
-void rtw_phydm_wd_lps_lclk_hdl(_adapter *adapter)
-{
-	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
-	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT	*podmpriv = &(pHalData->odmpriv);
-	struct sta_priv *pstapriv = &adapter->stapriv;
-	struct sta_info *psta = NULL;
-	u8 rssi_min = 0;
-	u32	rssi_rpt = 0;
-	bool is_linked = _FALSE;
-
-	if (!rtw_is_hw_init_completed(adapter))
-		return;
-
-	if (rtw_mi_check_status(adapter, MI_ASSOC))
-		is_linked = _TRUE;
-
-	if (is_linked == _FALSE)
-		return;
-
-	psta = rtw_get_stainfo(pstapriv, get_bssid(pmlmepriv));
-	if (psta == NULL)
-		return;
-
-	odm_cmn_info_update(&pHalData->odmpriv, ODM_CMNINFO_LINK, is_linked);
-
-	phydm_watchdog_lps_32k(&pHalData->odmpriv);
-}
-
-void rtw_phydm_watchdog_in_lps_lclk(_adapter *adapter)
-{
-	struct mlme_priv	*pmlmepriv = &adapter->mlmepriv;
-	struct sta_priv *pstapriv = &adapter->stapriv;
-	struct sta_info *psta = NULL;
-	u8 cur_igi = 0;
-	s8 min_rssi = 0;
-
-	if (!rtw_is_hw_init_completed(adapter))
-		return;
-
-	psta = rtw_get_stainfo(pstapriv, get_bssid(pmlmepriv));
-	if (psta == NULL)
-		return;
-
-	cur_igi = rtw_phydm_get_cur_igi(adapter);
-	min_rssi = rtw_phydm_get_min_rssi(adapter);
-	if (min_rssi <= 0)
-		min_rssi = psta->cmn.rssi_stat.rssi;
-	/*RTW_INFO("%s "ADPT_FMT" cur_ig_value=%d, min_rssi = %d\n", __func__,  ADPT_ARG(adapter), cur_igi, min_rssi);*/
-
-	if (min_rssi <= 0)
-		return;
-
-	if ((cur_igi > min_rssi + 5) ||
-		(cur_igi < min_rssi - 5)) {
-#ifdef CONFIG_LPS
-		rtw_dm_in_lps_wk_cmd(adapter);
-#endif
-	}
-}
-#endif /*CONFIG_LPS_LCLK_WD_TIMER*/
-
 void dump_sta_traffic(void *sel, _adapter *adapter, struct sta_info *psta)
 {
 	struct ra_sta_info *ra_info;
@@ -884,25 +820,6 @@ void rtw_phydm_ra_registed(_adapter *adapter, struct sta_info *psta)
 	if (_DRV_DEBUG_ <= rtw_drv_log_level)
 		dump_sta_info(RTW_DBGDUMP, psta);
 }
-
-#ifdef CONFIG_LPS_PG
-static void _lps_pg_state_update(_adapter *adapter)
-{
-	u8	is_in_lpspg = _FALSE;
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapter);
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(adapter);
-	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
-	struct sta_priv *pstapriv = &adapter->stapriv;
-	struct sta_info *psta = NULL;
-
-	if ((pwrpriv->lps_level == LPS_PG) && (pwrpriv->pwr_mode != PS_MODE_ACTIVE) && (pwrpriv->rpwm <= PS_STATE_S2))
-		is_in_lpspg = _TRUE;
-	psta = rtw_get_stainfo(pstapriv, get_bssid(pmlmepriv));
-
-	if (psta)
-		psta->cmn.ra_info.disable_ra = (is_in_lpspg) ? _TRUE : _FALSE;
-}
-#endif
 
 /*#define DBG_PHYDM_STATE_CHK*/
 
@@ -979,17 +896,11 @@ void rtw_phydm_watchdog(_adapter *adapter)
 	odm_cmn_info_update(&pHalData->odmpriv, ODM_CMNINFO_LINK, bLinked);
 	odm_cmn_info_update(&pHalData->odmpriv, ODM_CMNINFO_STATION_STATE, bsta_state);
 
-#ifdef CONFIG_BT_COEXIST
 	bBtDisabled = rtw_btcoex_IsBtDisabled(adapter);
-#endif /* CONFIG_BT_COEXIST */
 	odm_cmn_info_update(&pHalData->odmpriv, ODM_CMNINFO_BT_ENABLED,
 							(bBtDisabled == _TRUE) ? _FALSE : _TRUE);
 	odm_cmn_info_update(&pHalData->odmpriv, ODM_CMNINFO_POWER_TRAINING,
 							(pHalData->bDisableTXPowerTraining) ? _TRUE : _FALSE);
-#ifdef CONFIG_LPS_PG
-	_lps_pg_state_update(adapter);
-#endif
-
 	if (bLinked == _TRUE) {
 		rfk_forbidden = (_rtw_phydm_rfk_condition_check(adapter) == _TRUE) ? _FALSE : _TRUE;
 		halrf_cmn_info_set(&pHalData->odmpriv, HALRF_CMNINFO_RFK_FORBIDDEN, rfk_forbidden);
