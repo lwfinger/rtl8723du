@@ -16,21 +16,6 @@ int	usb_init_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
 		     (void(*)(unsigned long))usb_recv_tasklet,
 		     (unsigned long)padapter);
 
-#ifdef CONFIG_USB_INTERRUPT_IN_PIPE
-	precvpriv->int_in_urb = usb_alloc_urb(0, GFP_KERNEL);
-	if (precvpriv->int_in_urb == NULL) {
-		res = _FAIL;
-		RTW_INFO("alloc_urb for interrupt in endpoint fail !!!!\n");
-		goto exit;
-	}
-	precvpriv->int_in_buf = rtw_zmalloc(ini_in_buf_sz);
-	if (precvpriv->int_in_buf == NULL) {
-		res = _FAIL;
-		RTW_INFO("alloc_mem for interrupt in endpoint fail !!!!\n");
-		goto exit;
-	}
-#endif /* CONFIG_USB_INTERRUPT_IN_PIPE */
-
 	/* init recv_buf */
 	_rtw_init_queue(&precvpriv->free_recv_buf_queue);
 	_rtw_init_queue(&precvpriv->recv_buf_pending_queue);
@@ -85,9 +70,6 @@ int	usb_init_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
 		struct sk_buff *pskb = NULL;
 
 		RTW_INFO("NR_PREALLOC_RECV_SKB: %d\n", NR_PREALLOC_RECV_SKB);
-#ifdef CONFIG_FIX_NR_BULKIN_BUFFER
-		RTW_INFO("Enable CONFIG_FIX_NR_BULKIN_BUFFER\n");
-#endif
 
 		for (i = 0; i < NR_PREALLOC_RECV_SKB; i++) {
 #ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
@@ -130,13 +112,6 @@ void usb_free_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
 
 	if (precvpriv->pallocated_recv_buf)
 		rtw_mfree(precvpriv->pallocated_recv_buf, NR_RECVBUFF * sizeof(struct recv_buf) + 4);
-
-#ifdef CONFIG_USB_INTERRUPT_IN_PIPE
-	if (precvpriv->int_in_urb)
-		usb_free_urb(precvpriv->int_in_urb);
-	if (precvpriv->int_in_buf)
-		rtw_mfree(precvpriv->int_in_buf, ini_in_buf_sz);
-#endif /* CONFIG_USB_INTERRUPT_IN_PIPE */
 
 	if (skb_queue_len(&precvpriv->rx_skb_queue))
 		RTW_WARN("rx_skb_queue not empty\n");
@@ -383,9 +358,4 @@ void usb_set_intf_ops(_adapter *padapter, struct _io_ops *pops)
 
 	pops->_read_port_cancel = &usb_read_port_cancel;
 	pops->_write_port_cancel = &usb_write_port_cancel;
-
-#ifdef CONFIG_USB_INTERRUPT_IN_PIPE
-	pops->_read_interrupt = &usb_read_interrupt;
-#endif
-
 }

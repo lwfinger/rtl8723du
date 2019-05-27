@@ -257,28 +257,18 @@ struct hal_ops {
 	 */
 	s32(*mgnt_xmit)(_adapter *padapter, struct xmit_frame *pmgntframe);
 	s32(*hal_xmitframe_enqueue)(_adapter *padapter, struct xmit_frame *pxmitframe);
-#ifdef CONFIG_XMIT_THREAD_MODE
-	s32(*xmit_thread_handler)(_adapter *padapter);
-#endif
 	void	(*run_thread)(_adapter *padapter);
 	void	(*cancel_thread)(_adapter *padapter);
 
 	/*** recv section ***/
 	s32(*init_recv_priv)(_adapter *padapter);
 	void	(*free_recv_priv)(_adapter *padapter);
-#ifdef CONFIG_RECV_THREAD_MODE
-	s32 (*recv_hdl)(_adapter *adapter);
-#endif
 	u32(*inirp_init)(_adapter *padapter);
 	u32(*inirp_deinit)(_adapter *padapter);
 	/*** interrupt hdl section ***/
 	void	(*enable_interrupt)(_adapter *padapter);
 	void	(*disable_interrupt)(_adapter *padapter);
 	u8(*check_ips_status)(_adapter *padapter);
-
-#if defined(CONFIG_SUPPORT_USB_INT)
-	void	(*interrupt_handler)(_adapter *padapter, u16 pkt_len, u8 *pbuf);
-#endif
 
 	/*** DM section ***/
 	void	(*InitSwLeds)(_adapter *padapter);
@@ -576,25 +566,12 @@ void	rtw_hal_write_rfreg(_adapter *padapter, enum rf_path eRFPath, u32 RegAddr, 
 #define phy_set_mac_reg	phy_set_bb_reg
 #define phy_query_mac_reg phy_query_bb_reg
 
-
-#if  defined(CONFIG_SUPPORT_USB_INT)
-	void	rtw_hal_interrupt_handler(_adapter *padapter, u16 pkt_len, u8 *pbuf);
-#endif
-
 void	rtw_hal_set_chnl_bw(_adapter *padapter, u8 channel, enum channel_width Bandwidth, u8 Offset40, u8 Offset80);
 void	rtw_hal_dm_watchdog(_adapter *padapter);
 void	rtw_hal_dm_watchdog_in_lps(_adapter *padapter);
 
 void	rtw_hal_set_tx_power_level(_adapter *padapter, u8 channel);
 void	rtw_hal_get_tx_power_level(_adapter *padapter, s32 *powerlevel);
-
-#ifdef CONFIG_XMIT_THREAD_MODE
-s32 rtw_hal_xmit_thread_handler(_adapter *padapter);
-#endif
-
-#ifdef CONFIG_RECV_THREAD_MODE
-s32 rtw_hal_recv_hdl(_adapter *adapter);
-#endif
 
 void rtw_hal_notch_filter(_adapter *adapter, bool enable);
 

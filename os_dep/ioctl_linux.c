@@ -1723,10 +1723,6 @@ static int rtw_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
 	struct sitesurvey_parm parm;
 	struct wifidirect_info *pwdinfo = &(padapter->wdinfo);
 
-#ifdef DBG_IOCTL
-	RTW_INFO("DBG_IOCTL %s:%d\n", __FUNCTION__, __LINE__);
-#endif
-
 #ifdef CONFIG_MP_INCLUDED
 	if (rtw_mp_mode_check(padapter)) {
 		RTW_INFO("MP mode block Scan request\n");
@@ -1896,10 +1892,6 @@ cancel_ps_deny:
 	rtw_ps_deny_cancel(padapter, PS_DENY_SCAN);
 
 exit:
-#ifdef DBG_IOCTL
-	RTW_INFO("DBG_IOCTL %s:%d return %d\n", __FUNCTION__, __LINE__, ret);
-#endif
-
 	return ret;
 }
 
@@ -1919,10 +1911,6 @@ static int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
 	u32 wait_for_surveydone;
 	sint wait_status;
 	struct	wifidirect_info	*pwdinfo = &padapter->wdinfo;
-
-#ifdef DBG_IOCTL
-	RTW_INFO("DBG_IOCTL %s:%d\n", __FUNCTION__, __LINE__);
-#endif
 
 	if (adapter_to_pwrctl(padapter)->brfoffbyhw && rtw_is_drv_stopped(padapter)) {
 		ret = -EINVAL;
@@ -1973,13 +1961,7 @@ static int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
 
 exit:
 
-
-#ifdef DBG_IOCTL
-	RTW_INFO("DBG_IOCTL %s:%d return %d\n", __FUNCTION__, __LINE__, ret);
-#endif
-
 	return ret ;
-
 }
 
 /* set ssid flow
@@ -2001,12 +1983,8 @@ static int rtw_wx_set_essid(struct net_device *dev,
 	NDIS_802_11_AUTHENTICATION_MODE authmode;
 	NDIS_802_11_SSID ndis_ssid;
 	u8 *dst_ssid, *src_ssid;
-
 	uint ret = 0, len;
 
-#ifdef DBG_IOCTL
-	RTW_INFO("DBG_IOCTL %s:%d\n", __FUNCTION__, __LINE__);
-#endif
 #if WIRELESS_EXT <= 20
 	if ((wrqu->essid.length - 1) > IW_ESSID_MAX_SIZE) {
 #else
@@ -2111,12 +2089,6 @@ cancel_ps_deny:
 
 exit:
 	RTW_INFO("<=%s, ret %d\n", __FUNCTION__, ret);
-
-#ifdef DBG_IOCTL
-	RTW_INFO("DBG_IOCTL %s:%d return %d\n", __FUNCTION__, __LINE__, ret);
-#endif
-
-
 	return ret;
 }
 

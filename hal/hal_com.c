@@ -5033,137 +5033,11 @@ void linked_info_dump(_adapter *padapter, u8 benable)
 	padapter->bLinkInfoDump = benable ;
 }
 
-#ifdef DBG_RX_SIGNAL_DISPLAY_RAW_DATA
-void rtw_get_raw_rssi_info(void *sel, _adapter *padapter)
-{
-	u8 isCCKrate, rf_path;
-	PHAL_DATA_TYPE	pHalData =  GET_HAL_DATA(padapter);
-	struct rx_raw_rssi *psample_pkt_rssi = &padapter->recvpriv.raw_rssi_info;
-	RTW_PRINT_SEL(sel, "RxRate = %s, PWDBALL = %d(%%), rx_pwr_all = %d(dBm)\n",
-		HDATA_RATE(psample_pkt_rssi->data_rate), psample_pkt_rssi->pwdball, psample_pkt_rssi->pwr_all);
-	isCCKrate = (psample_pkt_rssi->data_rate <= DESC_RATE11M) ? TRUE : FALSE;
-
-	if (isCCKrate)
-		psample_pkt_rssi->mimo_signal_strength[0] = psample_pkt_rssi->pwdball;
-
-	for (rf_path = 0; rf_path < pHalData->NumTotalRFPath; rf_path++) {
-		RTW_PRINT_SEL(sel, "RF_PATH_%d=>signal_strength:%d(%%),signal_quality:%d(%%)\n"
-			, rf_path, psample_pkt_rssi->mimo_signal_strength[rf_path], psample_pkt_rssi->mimo_signal_quality[rf_path]);
-
-		if (!isCCKrate) {
-			RTW_PRINT_SEL(sel, "\trx_ofdm_pwr:%d(dBm),rx_ofdm_snr:%d(dB)\n",
-				psample_pkt_rssi->ofdm_pwr[rf_path], psample_pkt_rssi->ofdm_snr[rf_path]);
-		}
-	}
-}
-
-void rtw_dump_raw_rssi_info(_adapter *padapter, void *sel)
-{
-	u8 isCCKrate, rf_path;
-	PHAL_DATA_TYPE	pHalData =  GET_HAL_DATA(padapter);
-	struct rx_raw_rssi *psample_pkt_rssi = &padapter->recvpriv.raw_rssi_info;
-	_RTW_PRINT_SEL(sel, "============ RAW Rx Info dump ===================\n");
-	_RTW_PRINT_SEL(sel, "RxRate = %s, PWDBALL = %d(%%), rx_pwr_all = %d(dBm)\n", HDATA_RATE(psample_pkt_rssi->data_rate), psample_pkt_rssi->pwdball, psample_pkt_rssi->pwr_all);
-
-	isCCKrate = (psample_pkt_rssi->data_rate <= DESC_RATE11M) ? TRUE : FALSE;
-
-	if (isCCKrate)
-		psample_pkt_rssi->mimo_signal_strength[0] = psample_pkt_rssi->pwdball;
-
-	for (rf_path = 0; rf_path < pHalData->NumTotalRFPath; rf_path++) {
-		_RTW_PRINT_SEL(sel , "RF_PATH_%d=>signal_strength:%d(%%),signal_quality:%d(%%)"
-			, rf_path, psample_pkt_rssi->mimo_signal_strength[rf_path], psample_pkt_rssi->mimo_signal_quality[rf_path]);
-
-		if (!isCCKrate)
-			_RTW_PRINT_SEL(sel , ",rx_ofdm_pwr:%d(dBm),rx_ofdm_snr:%d(dB)\n", psample_pkt_rssi->ofdm_pwr[rf_path], psample_pkt_rssi->ofdm_snr[rf_path]);
-		else
-			_RTW_PRINT_SEL(sel , "\n");
-
-	}
-}
-#endif
-
-#ifdef DBG_RX_DFRAME_RAW_DATA
-void rtw_dump_rx_dframe_info(_adapter *padapter, void *sel)
-{
-#define DBG_RX_DFRAME_RAW_DATA_UC		0
-#define DBG_RX_DFRAME_RAW_DATA_BMC		1
-#define DBG_RX_DFRAME_RAW_DATA_TYPES	2
-
-	_irqL irqL;
-	u8 isCCKrate, rf_path;
-	struct recv_priv *precvpriv = &(padapter->recvpriv);
-	PHAL_DATA_TYPE	pHalData =  GET_HAL_DATA(padapter);
-	struct sta_priv *pstapriv = &padapter->stapriv;
-	struct sta_info *psta;
-	struct sta_recv_dframe_info *psta_dframe_info;
-	int i, j;
-	_list	*plist, *phead;
-	u8 bc_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-	u8 null_addr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-	if (precvpriv->store_law_data_flag) {
-
-		_enter_critical_bh(&pstapriv->sta_hash_lock, &irqL);
-
-		for (i = 0; i < NUM_STA; i++) {
-			phead = &(pstapriv->sta_hash[i]);
-			plist = get_next(phead);
-
-			while ((rtw_end_of_queue_search(phead, plist)) == _FALSE) {
-
-				psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
-				plist = get_next(plist);
-
-				if (psta) {
-					if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)  !=   _TRUE)
-					    && (_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6)  !=  _TRUE)
-					    && (_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(padapter), 6)  !=  _TRUE)) {
-
-						RTW_PRINT_SEL(sel, "==============================\n");
-						RTW_PRINT_SEL(sel, "macaddr =" MAC_FMT "\n", MAC_ARG(psta->cmn.mac_addr));
-
-						for (j = 0; j < DBG_RX_DFRAME_RAW_DATA_TYPES; j++) {
-							if (j == DBG_RX_DFRAME_RAW_DATA_UC) {
-								psta_dframe_info = &psta->sta_dframe_info;
-								RTW_PRINT_SEL(sel, "\n");
-								RTW_PRINT_SEL(sel, "Unicast:\n");
-							} else if (j == DBG_RX_DFRAME_RAW_DATA_BMC) {
-								psta_dframe_info = &psta->sta_dframe_info_bmc;
-								RTW_PRINT_SEL(sel, "\n");
-								RTW_PRINT_SEL(sel, "Broadcast/Multicast:\n");
-							}
-
-							isCCKrate = (psta_dframe_info->sta_data_rate <= DESC_RATE11M) ? TRUE : FALSE;
-
-							RTW_PRINT_SEL(sel, "BW=%s, sgi =%d\n", ch_width_str(psta_dframe_info->sta_bw_mode), psta_dframe_info->sta_sgi);
-							RTW_PRINT_SEL(sel, "Rx_Data_Rate = %s\n", HDATA_RATE(psta_dframe_info->sta_data_rate));
-
-							for (rf_path = 0; rf_path < pHalData->NumTotalRFPath; rf_path++) {
-								if (!isCCKrate) {
-									RTW_PRINT_SEL(sel , "RF_PATH_%d RSSI:%d(dBm)", rf_path, psta_dframe_info->sta_RxPwr[rf_path]);
-									_RTW_PRINT_SEL(sel , ",rx_ofdm_snr:%d(dB)\n", psta_dframe_info->sta_ofdm_snr[rf_path]);
-								} else
-									RTW_PRINT_SEL(sel , "RF_PATH_%d RSSI:%d(dBm)\n", rf_path, (psta_dframe_info->sta_mimo_signal_strength[rf_path]) - 100);
-							}
-						}
-
-					}
-				}
-			}
-		}
-		_exit_critical_bh(&pstapriv->sta_hash_lock, &irqL);
-	}
-}
-#endif
 void rtw_store_phy_info(_adapter *padapter, union recv_frame *prframe)
 {
 	u8 isCCKrate, rf_path , dframe_type;
 	u8 *ptr;
 	u8	bc_addr[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-#ifdef DBG_RX_DFRAME_RAW_DATA
-	struct sta_recv_dframe_info *psta_dframe_info;
-#endif
 	struct recv_priv *precvpriv = &(padapter->recvpriv);
 	PHAL_DATA_TYPE	pHalData =  GET_HAL_DATA(padapter);
 	struct rx_pkt_attrib *pattrib = &prframe->u.hdr.attrib;
@@ -5173,8 +5047,6 @@ void rtw_store_phy_info(_adapter *padapter, union recv_frame *prframe)
 	psample_pkt_rssi->data_rate = pattrib->data_rate;
 	ptr = prframe->u.hdr.rx_data;
 	dframe_type = GetFrameType(ptr);
-	/*RTW_INFO("=>%s\n", __FUNCTION__);*/
-
 
 	if (precvpriv->store_law_data_flag) {
 		isCCKrate = (pattrib->data_rate <= DESC_RATE11M) ? TRUE : FALSE;
@@ -5190,34 +5062,6 @@ void rtw_store_phy_info(_adapter *padapter, union recv_frame *prframe)
 				psample_pkt_rssi->ofdm_snr[rf_path] = p_phy_info->rx_snr[rf_path];
 			}
 		}
-#ifdef DBG_RX_DFRAME_RAW_DATA
-		if ((dframe_type == WIFI_DATA_TYPE) || (dframe_type == WIFI_QOS_DATA_TYPE) || (padapter->registrypriv.mp_mode == 1)) {
-
-			/*RTW_INFO("=>%s WIFI_DATA_TYPE or WIFI_QOS_DATA_TYPE\n", __FUNCTION__);*/
-			if (psta) {
-				if (IS_MCAST(get_ra(get_recvframe_data(prframe))))
-					psta_dframe_info = &psta->sta_dframe_info_bmc;
-				else
-					psta_dframe_info = &psta->sta_dframe_info;
-				/*RTW_INFO("=>%s psta->cmn.mac_addr="MAC_FMT" !\n",
-					__FUNCTION__, MAC_ARG(psta->cmn.mac_addr));*/
-				if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, ETH_ALEN) != _TRUE) || (padapter->registrypriv.mp_mode == 1)) {
-					psta_dframe_info->sta_data_rate = pattrib->data_rate;
-					psta_dframe_info->sta_sgi = pattrib->sgi;
-					psta_dframe_info->sta_bw_mode = pattrib->bw;
-					for (rf_path = 0; rf_path < pHalData->NumTotalRFPath; rf_path++) {
-
-						psta_dframe_info->sta_mimo_signal_strength[rf_path] = (p_phy_info->rx_mimo_signal_strength[rf_path]);/*Percentage to dbm*/
-
-						if (!isCCKrate) {
-							psta_dframe_info->sta_ofdm_snr[rf_path] = p_phy_info->rx_snr[rf_path];
-							psta_dframe_info->sta_RxPwr[rf_path] = p_phy_info->rx_pwr[rf_path];
-						}
-					}
-				}
-			}
-		}
-#endif
 	}
 
 }
@@ -5700,79 +5544,6 @@ void rtw_reset_phy_rx_counters(_adapter *padapter)
 	phy_set_bb_reg(padapter, 0xA2C, BIT15, 0x1);
 }
 
-#ifdef DBG_RX_COUNTER_DUMP
-void rtw_dump_drv_rx_counters(_adapter *padapter, struct dbg_rx_counter *rx_counter)
-{
-	struct recv_priv *precvpriv = &padapter->recvpriv;
-	if (!rx_counter) {
-		rtw_warn_on(1);
-		return;
-	}
-	rx_counter->rx_pkt_ok = padapter->drv_rx_cnt_ok;
-	rx_counter->rx_pkt_crc_error = padapter->drv_rx_cnt_crcerror;
-	rx_counter->rx_pkt_drop = precvpriv->rx_drop - padapter->drv_rx_cnt_drop;
-}
-void rtw_reset_drv_rx_counters(_adapter *padapter)
-{
-	struct recv_priv *precvpriv = &padapter->recvpriv;
-	padapter->drv_rx_cnt_ok = 0;
-	padapter->drv_rx_cnt_crcerror = 0;
-	padapter->drv_rx_cnt_drop = precvpriv->rx_drop;
-}
-void rtw_dump_phy_rxcnts_preprocess(_adapter *padapter, u8 rx_cnt_mode)
-{
-	u8 initialgain;
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(padapter);
-
-	if ((!(padapter->dump_rx_cnt_mode & DUMP_PHY_RX_COUNTER)) && (rx_cnt_mode & DUMP_PHY_RX_COUNTER)) {
-		rtw_hal_get_odm_var(padapter, HAL_ODM_INITIAL_GAIN, &initialgain, NULL);
-		RTW_INFO("%s CurIGValue:0x%02x\n", __FUNCTION__, initialgain);
-		rtw_hal_set_odm_var(padapter, HAL_ODM_INITIAL_GAIN, &initialgain, _FALSE);
-		/*disable dynamic functions, such as high power, DIG*/
-		rtw_phydm_ability_backup(padapter);
-		rtw_phydm_func_clr(padapter, (ODM_BB_DIG | ODM_BB_FA_CNT));
-	} else if ((padapter->dump_rx_cnt_mode & DUMP_PHY_RX_COUNTER) && (!(rx_cnt_mode & DUMP_PHY_RX_COUNTER))) {
-		/* turn on phy-dynamic functions */
-		rtw_phydm_ability_restore(padapter);
-		initialgain = 0xff; /* restore RX GAIN */
-		rtw_hal_set_odm_var(padapter, HAL_ODM_INITIAL_GAIN, &initialgain, _FALSE);
-
-	}
-}
-
-void rtw_dump_rx_counters(_adapter *padapter)
-{
-	struct dbg_rx_counter rx_counter;
-
-	if (padapter->dump_rx_cnt_mode & DUMP_DRV_RX_COUNTER) {
-		_rtw_memset(&rx_counter, 0, sizeof(struct dbg_rx_counter));
-		rtw_dump_drv_rx_counters(padapter, &rx_counter);
-		RTW_INFO("Drv Received packet OK:%d CRC error:%d Drop Packets: %d\n",
-			rx_counter.rx_pkt_ok, rx_counter.rx_pkt_crc_error, rx_counter.rx_pkt_drop);
-		rtw_reset_drv_rx_counters(padapter);
-	}
-
-	if (padapter->dump_rx_cnt_mode & DUMP_MAC_RX_COUNTER) {
-		_rtw_memset(&rx_counter, 0, sizeof(struct dbg_rx_counter));
-		rtw_dump_mac_rx_counters(padapter, &rx_counter);
-		RTW_INFO("Mac Received packet OK:%d CRC error:%d FA Counter: %d Drop Packets: %d\n",
-			 rx_counter.rx_pkt_ok, rx_counter.rx_pkt_crc_error,
-			rx_counter.rx_cck_fa + rx_counter.rx_ofdm_fa + rx_counter.rx_ht_fa,
-			 rx_counter.rx_pkt_drop);
-		rtw_reset_mac_rx_counters(padapter);
-	}
-
-	if (padapter->dump_rx_cnt_mode & DUMP_PHY_RX_COUNTER) {
-		_rtw_memset(&rx_counter, 0, sizeof(struct dbg_rx_counter));
-		rtw_dump_phy_rx_counters(padapter, &rx_counter);
-		/* RTW_INFO("%s: OFDM_FA =%d\n", __FUNCTION__, rx_counter.rx_ofdm_fa); */
-		/* RTW_INFO("%s: CCK_FA =%d\n", __FUNCTION__, rx_counter.rx_cck_fa); */
-		RTW_INFO("Phy Received packet OK:%d CRC error:%d FA Counter: %d\n", rx_counter.rx_pkt_ok, rx_counter.rx_pkt_crc_error,
-			 rx_counter.rx_ofdm_fa + rx_counter.rx_cck_fa);
-		rtw_reset_phy_rx_counters(padapter);
-	}
-}
-#endif
 u8 rtw_get_current_tx_sgi(_adapter *padapter, struct sta_info *psta)
 {
 	u8 curr_tx_sgi = 0;

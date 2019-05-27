@@ -121,14 +121,6 @@ static ssize_t proc_set_log_level(struct file *file, const char __user *buffer, 
 	return count;
 }
 
-#ifdef DBG_MEM_ALLOC
-static int proc_get_mstat(struct seq_file *m, void *v)
-{
-	rtw_mstat_dump(m);
-	return 0;
-}
-#endif /* DBG_MEM_ALLOC */
-
 static int proc_get_country_chplan_map(struct seq_file *m, void *v)
 {
 	dump_country_chplan_map(m);
@@ -170,9 +162,6 @@ static const struct rtw_proc_hdl drv_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("ver_info", proc_get_drv_version, NULL),
 	RTW_PROC_HDL_SSEQ("log_level", proc_get_log_level, proc_set_log_level),
 	RTW_PROC_HDL_SSEQ("drv_cfg", proc_get_drv_cfg, NULL),
-#ifdef DBG_MEM_ALLOC
-	RTW_PROC_HDL_SSEQ("mstat", proc_get_mstat, NULL),
-#endif /* DBG_MEM_ALLOC */
 	RTW_PROC_HDL_SSEQ("country_chplan_map", proc_get_country_chplan_map, NULL),
 	RTW_PROC_HDL_SSEQ("chplan_id_list", proc_get_chplan_id_list, NULL),
 	RTW_PROC_HDL_SSEQ("chplan_test", proc_get_chplan_test, NULL),
@@ -2364,10 +2353,6 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("all_sta_info", proc_get_all_sta_info, NULL),
 	RTW_PROC_HDL_SSEQ("bmc_tx_rate", proc_get_bmc_tx_rate, proc_set_bmc_tx_rate),
 
-#ifdef DBG_MEMORY_LEAK
-	RTW_PROC_HDL_SSEQ("_malloc_cnt", proc_get_malloc_cnt, NULL),
-#endif /* DBG_MEMORY_LEAK */
-
 	RTW_PROC_HDL_SSEQ("rx_signal", proc_get_rx_signal, proc_set_rx_signal),
 	RTW_PROC_HDL_SSEQ("hw_info", proc_get_hw_status, proc_set_hw_status),
 
@@ -2431,9 +2416,6 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 #endif
 	RTW_PROC_HDL_SSEQ("new_bcn_max", proc_get_new_bcn_max, proc_set_new_bcn_max),
 	RTW_PROC_HDL_SSEQ("sink_udpport", proc_get_udpport, proc_set_udpport),
-#ifdef DBG_RX_COUNTER_DUMP
-	RTW_PROC_HDL_SSEQ("dump_rx_cnt_mode", proc_get_rx_cnt_dump, proc_set_rx_cnt_dump),
-#endif
 	RTW_PROC_HDL_SSEQ("change_bss_chbw", NULL, proc_set_change_bss_chbw),
 	RTW_PROC_HDL_SSEQ("tx_bw_mode", proc_get_tx_bw_mode, proc_set_tx_bw_mode),
 	RTW_PROC_HDL_SSEQ("hal_txpwr_info", proc_get_hal_txpwr_info, NULL),
@@ -2500,15 +2482,10 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 #endif
 	RTW_PROC_HDL_SSEQ("fw_info", proc_get_fw_info, NULL),
 
-#ifdef DBG_XMIT_BLOCK
-	RTW_PROC_HDL_SSEQ("xmit_block", proc_get_xmit_block, proc_set_xmit_block),
-#endif
-
 	RTW_PROC_HDL_SSEQ("ack_timeout", proc_get_ack_timeout, proc_set_ack_timeout),
 
 	RTW_PROC_HDL_SSEQ("dynamic_agg_enable", proc_get_dynamic_agg_enable, proc_set_dynamic_agg_enable),
 	RTW_PROC_HDL_SSEQ("fw_offload", proc_get_fw_offload, proc_set_fw_offload),
-
 };
 
 static const int adapter_proc_hdls_num = sizeof(adapter_proc_hdls) / sizeof(struct rtw_proc_hdl);

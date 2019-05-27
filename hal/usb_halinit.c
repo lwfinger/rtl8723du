@@ -190,11 +190,6 @@ static u8 _LLTRead(
  */
 static void _InitInterrupt(PADAPTER padapter)
 {
-#ifdef CONFIG_SUPPORT_USB_INT
-	/* clear interrupt, write 1 clear */
-	rtw_write32(padapter, REG_HISR0_8723D, 0xFFFFFFFF);
-	rtw_write32(padapter, REG_HISR1_8723D, 0xFFFFFFFF);
-#endif /* CONFIG_SUPPORT_USB_INT */
 }
 
 static void _InitQueueReservedPage(PADAPTER padapter)
@@ -979,26 +974,17 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 	_InitHardwareDropIncorrectBulkOut(padapter);
 #endif
 
-#ifdef CONFIG_CHECK_AC_LIFETIME
-	/* Enable lifetime check for the four ACs */
-	rtw_write8(padapter, REG_LIFETIME_CTRL, rtw_read8(padapter, REG_LIFETIME_CTRL) | 0x0f);
-#endif	/* CONFIG_CHECK_AC_LIFETIME */
-
 	rtw_write16(padapter, REG_PKT_VO_VI_LIFE_TIME, 0x0400); /* unit: 256us. 256ms */
 	rtw_write16(padapter, REG_PKT_BE_BK_LIFE_TIME, 0x0400); /* unit: 256us. 256ms */
 	_InitHWLed(padapter);
 
 	_BBTurnOnBlock(padapter);
-	/* NicIFSetMacAddress(padapter, padapter->PermanentAddress); */
-
 
 	rtw_hal_set_chnl_bw(padapter, padapter->registrypriv.channel,
 		CHANNEL_WIDTH_20, HAL_PRIME_CHNL_OFFSET_DONT_CARE, HAL_PRIME_CHNL_OFFSET_DONT_CARE);
 
 	invalidate_cam_all(padapter);
 
-	/* 2010/12/17 MH We need to set TX power according to EFUSE content at first. */
-	/* PHY_SetTxPowerLevel8723D(padapter, pHalData->current_channel); */
 	rtl8723d_InitAntenna_Selection(padapter);
 
 	/* HW SEQ CTRL */
@@ -1013,10 +999,6 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 
 	if (pregistrypriv->wifi_spec)
 		rtw_write16(padapter, REG_FAST_EDCA_CTRL, 0);
-
-	/* Move by Neo for USB SS from above setp */
-
-	/* _RfPowerSave(padapter); */
 
 	rtl8723d_InitHalDm(padapter);
 
@@ -1073,10 +1055,6 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 		}
 	}
 
-
-
-	/*	_InitPABias(padapter); */
-
 #ifdef CONFIG_BT_COEXIST
 	/* Init BT hw config. */
 	if (padapter->registrypriv.mp_mode == 1)
@@ -1102,7 +1080,6 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 	if (padapter->registrypriv.wifi_spec == 1)
 		phy_set_bb_reg(padapter, rOFDM0_ECCAThreshold,
 			       0x00ff00ff, 0x00250029);
-	/*_dbg_dump_macreg(padapter); */
 
 exit:
 
@@ -1112,11 +1089,7 @@ exit:
 	return status;
 }
 
-
-static void
-_DisableGPIO(
-	IN PADAPTER padapter
-)
+static void _DisableGPIO(PADAPTER padapter)
 {
 	/*
 	 * j. GPIO_PIN_CTRL 0x44[31:0]=0x000
@@ -1145,8 +1118,6 @@ _DisableGPIO(
 
 	/* 3. Disable LED0 & 1 */
 	rtw_write16(padapter, REG_LEDCFG0, 0x8080);
-
-
 } /* end of _DisableGPIO() */
 
 static void
@@ -1296,20 +1267,6 @@ _ResetDigitalProcedure1(
 		valu16 = rtw_read16(padapter, REG_SYS_FUNC_EN) & 0x0FFF;
 		rtw_write16(padapter, REG_SYS_FUNC_EN, (valu16 | (FEN_HWPDN | FEN_ELDR))); /*reset MAC */
 
-#ifdef DBG_SHOW_MCUFWDL_BEFORE_51_ENABLE
-		{
-			u8 val;
-
-			val = rtw_read8(padapter, REG_MCUFWDL)
-
-			if (val) {
-				RTW_INFO("DBG_SHOW_MCUFWDL_BEFORE_51_ENABLE %s:%d REG_MCUFWDL:0x%02x\n",
-					 __func__, __LINE__, val);
-			}
-		}
-#endif
-
-
 		valu16 = rtw_read16(padapter, REG_SYS_FUNC_EN);
 		rtw_write16(padapter, REG_SYS_FUNC_EN, (valu16 | FEN_CPUEN)); /*enable MCU ,8051 */
 	} else {
@@ -1346,19 +1303,6 @@ _ResetDigitalProcedure1(
 		} else {
 			/*RTW_INFO("%s =====> 8051 in ROM.\n", __func__); */
 		}
-
-#ifdef DBG_SHOW_MCUFWDL_BEFORE_51_ENABLE
-		{
-			u8 val;
-
-			val = rtw_read8(padapter, REG_MCUFWDL);
-
-			if (val) {
-				RTW_INFO("DBG_SHOW_MCUFWDL_BEFORE_51_ENABLE %s:%d REG_MCUFWDL:0x%02x\n",
-					 __func__, __LINE__, val);
-			}
-		}
-#endif
 
 		rtw_write8(padapter, REG_SYS_FUNC_EN + 1, 0x54); /*Reset MAC and Enable 8051 */
 	}
@@ -1566,13 +1510,7 @@ static unsigned int rtl8723du_inirp_init(PADAPTER padapter)
 	struct dvobj_priv *pdev = adapter_to_dvobj(padapter);
 	struct intf_hdl *pintfhdl = &padapter->iopriv.intf;
 	struct recv_priv *precvpriv = &(padapter->recvpriv);
-
 	u32(*_read_port)(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *pmem);
-#ifdef CONFIG_USB_INTERRUPT_IN_PIPE
-	u32(*_read_interrupt)(struct intf_hdl *pintfhdl, u32 addr);
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-#endif /*CONFIG_USB_INTERRUPT_IN_PIPE */
-
 
 	_read_port = pintfhdl->io_ops._read_port;
 
@@ -1593,17 +1531,6 @@ static unsigned int rtl8723du_inirp_init(PADAPTER padapter)
 		precvpriv->free_recv_buf_queue_cnt--;
 	}
 
-#ifdef CONFIG_USB_INTERRUPT_IN_PIPE
-	_read_interrupt = pintfhdl->io_ops._read_interrupt;
-	if (_read_interrupt(pintfhdl, RECV_INT_IN_ADDR) == _FALSE) {
-		status = _FAIL;
-	}
-	pHalData->IntrMask[0] = rtw_read32(padapter, REG_USB_HIMR);
-	RTW_INFO("pHalData->IntrMask = 0x%04x\n", pHalData->IntrMask[0]);
-	pHalData->IntrMask[0] |= UHIMR_C2HCMD | UHIMR_CPWM;
-	rtw_write32(padapter, REG_USB_HIMR, pHalData->IntrMask[0]);
-#endif /*CONFIG_USB_INTERRUPT_IN_PIPE */
-
 exit:
 
 
@@ -1614,29 +1541,12 @@ exit:
 
 static unsigned int rtl8723du_inirp_deinit(PADAPTER padapter)
 {
-#ifdef CONFIG_USB_INTERRUPT_IN_PIPE
-	u32(*_read_interrupt)(struct intf_hdl *pintfhdl, u32 addr);
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-#endif /*CONFIG_USB_INTERRUPT_IN_PIPE */
-
 	rtw_read_port_cancel(padapter);
-#ifdef CONFIG_USB_INTERRUPT_IN_PIPE
-	pHalData->IntrMask[0] = rtw_read32(padapter, REG_USB_HIMR);
-	RTW_INFO("%s pHalData->IntrMask = 0x%04x\n", __func__, pHalData->IntrMask[0]);
-	pHalData->IntrMask[0] = 0x0;
-	rtw_write32(padapter, REG_USB_HIMR, pHalData->IntrMask[0]);
-#endif /*CONFIG_USB_INTERRUPT_IN_PIPE */
 	return _SUCCESS;
 }
 
-
-static u32
-_GetChannelGroup(
-	IN u32 channel
-)
+static u32 _GetChannelGroup(u32 channel)
 {
-	/*RT_ASSERT((channel < 14), ("Channel %d no is supported!\n")); */
-
 	if (channel < 3)    /* Channel 1~3 */
 		return 0;
 	else if (channel < 9)   /* Channel 4~9 */
@@ -2076,12 +1986,4 @@ void rtl8723du_set_hal_ops(PADAPTER padapter)
 	pHalFunc->hal_xmitframe_enqueue = &rtl8723du_hal_xmitframe_enqueue;
 
 	pHalFunc->interface_ps_func = &rtl8723du_ps_func;
-
-#ifdef CONFIG_XMIT_THREAD_MODE
-	pHalFunc->xmit_thread_handler = &rtl8723du_xmit_buf_handler;
-#endif
-#ifdef CONFIG_SUPPORT_USB_INT
-	pHalFunc->interrupt_handler = &rtl8723du_interrupt_handler;
-#endif
-
 }

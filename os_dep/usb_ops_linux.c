@@ -272,10 +272,6 @@ void usb_read_port_cancel(struct intf_hdl *pintfhdl)
 		}
 		precvbuf++;
 	}
-
-#ifdef CONFIG_USB_INTERRUPT_IN_PIPE
-	usb_kill_urb(padapter->recvpriv.int_in_urb);
-#endif
 }
 
 static void usb_write_port_complete(struct urb *purb, struct pt_regs *regs)
@@ -426,11 +422,6 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 
 
 	if (RTW_CANNOT_TX(padapter)) {
-#ifdef DBG_TX
-		RTW_INFO(" DBG_TX %s:%d bDriverStopped%s, bSurpriseRemoved:%s\n", __func__, __LINE__
-			 , rtw_is_drv_stopped(padapter) ? "True" : "False"
-			, rtw_is_surprise_removed(padapter) ? "True" : "False");
-#endif
 		rtw_sctx_done_err(&pxmitbuf->sctx, RTW_SCTX_DONE_TX_DENY);
 		goto exit;
 	}
@@ -624,9 +615,7 @@ static void usb_read_port_complete(struct urb *purb, struct pt_regs *regs)
 			skb_put(precvbuf->pskb, purb->actual_length);
 			skb_queue_tail(&precvpriv->rx_skb_queue, precvbuf->pskb);
 
-			#ifndef CONFIG_FIX_NR_BULKIN_BUFFER
 			if (skb_queue_len(&precvpriv->rx_skb_queue) <= 1)
-			#endif
 				tasklet_schedule(&precvpriv->recv_tasklet);
 
 			precvbuf->pskb = NULL;
@@ -694,9 +683,7 @@ u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
 		if (NULL != precvbuf->pskb)
 			goto recv_buf_hook;
 
-		#ifndef CONFIG_FIX_NR_BULKIN_BUFFER
 		precvbuf->pskb = rtw_skb_alloc(MAX_RECVBUF_SZ + RECVBUFF_ALIGN_SZ);
-		#endif
 
 		if (precvbuf->pskb == NULL) {
 			/* enqueue precvbuf and wait for free skb */
@@ -742,84 +729,3 @@ exit:
 
 	return ret;
 }
-
-#ifdef CONFIG_USB_INTERRUPT_IN_PIPE
-void usb_read_interrupt_complete(struct urb *purb, struct pt_regs *regs)
-{
-	int	err;
-	_adapter	*padapter = (_adapter *)purb->context;
-
-	if (RTW_CANNOT_RX(padapter)) {
-		RTW_INFO("%s() RX Warning! bDriverStopped(%s) OR bSurpriseRemoved(%s)\n"
-			, __func__
-			, rtw_is_drv_stopped(padapter) ? "True" : "False"
-			, rtw_is_surprise_removed(padapter) ? "True" : "False");
-
-		return;
-	}
-
-	if (purb->status == 0) {/*SUCCESS*/
-		if (purb->actual_length > INTERRUPT_MSG_FORMAT_LEN)
-			RTW_INFO("usb_read_interrupt_complete: purb->actual_length > INTERRUPT_MSG_FORMAT_LEN(%d)\n", INTERRUPT_MSG_FORMAT_LEN);
-
-		rtw_hal_interrupt_handler(padapter, purb->actual_length, purb->transfer_buffer);
-
-		err = usb_submit_urb(purb, GFP_ATOMIC);
-		if ((err) && (err != (-EPERM)))
-			RTW_INFO("cannot submit interrupt in-token(err = 0x%08x),urb_status = %d\n", err, purb->status);
-	} else {
-		RTW_INFO("###=> usb_read_interrupt_complete => urb status(%d)\n", purb->status);
-
-		switch (purb->status) {
-		case -EINVAL:
-		case -EPIPE:
-		case -ENODEV:
-		case -ESHUTDOWN:
-		case -ENOENT:
-			rtw_set_drv_stopped(padapter);
-			break;
-		case -EPROTO:
-			break;
-		case -EINPROGRESS:
-			RTW_INFO("ERROR: URB IS IN PROGRESS!/n");
-			break;
-		default:
-			break;
-		}
-	}
-}
-
-u32 usb_read_interrupt(struct intf_hdl *pintfhdl, u32 addr)
-{
-	int	err;
-	unsigned int pipe;
-	u32	ret = _SUCCESS;
-	_adapter			*adapter = pintfhdl->padapter;
-	struct dvobj_priv	*pdvobj = adapter_to_dvobj(adapter);
-	struct recv_priv	*precvpriv = &adapter->recvpriv;
-	struct usb_device	*pusbd = pdvobj->pusbdev;
-
-
-	if (RTW_CANNOT_RX(adapter)) {
-		return _FAIL;
-	}
-
-	/*translate DMA FIFO addr to pipehandle*/
-	pipe = ffaddr2pipehdl(pdvobj, addr);
-
-	usb_fill_int_urb(precvpriv->int_in_urb, pusbd, pipe,
-			precvpriv->int_in_buf,
-			INTERRUPT_MSG_FORMAT_LEN,
-			usb_read_interrupt_complete,
-			adapter,
-			1);
-
-	err = usb_submit_urb(precvpriv->int_in_urb, GFP_ATOMIC);
-	if ((err) && (err != (-EPERM))) {
-		RTW_INFO("cannot submit interrupt in-token(err = 0x%08x), urb_status = %d\n", err, precvpriv->int_in_urb->status);
-		ret = _FAIL;
-	}
-
-	return ret;
-}
-#endif /* CONFIG_USB_INTERRUPT_IN_PIPE */

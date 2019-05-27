@@ -866,9 +866,6 @@ struct	phydm_iot_center {
 	struct _ANT_DETECTED_INFO			ant_detected_info;	/* Antenna detected information for RSSI tool*/
 #endif
 
-#if (BEAMFORMING_SUPPORT == 1)
-	struct _RT_BEAMFORMING_INFO 		beamforming_info;
-#endif
 #ifdef PHYDM_AUTO_DEGBUG
 	struct	phydm_auto_dbg_struc			auto_dbg_table;
 #endif

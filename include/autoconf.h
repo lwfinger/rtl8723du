@@ -25,9 +25,6 @@
  */
 
 #define CONFIG_XMIT_ACK
-#ifdef CONFIG_XMIT_ACK
-	#define CONFIG_ACTIVE_KEEP_ALIVE_CHECK
-#endif
 
 #define CONFIG_RF_POWER_TRIM
 
@@ -46,11 +43,6 @@
 
 #define ENABLE_USB_DROP_INCORRECT_OUT
 
-/* #define CONFIG_SUPPORT_USB_INT */
-#ifdef CONFIG_SUPPORT_USB_INT
-/* #define CONFIG_USB_INTERRUPT_IN_PIPE */
-#endif
-
 /*
  * USB VENDOR REQ BUFFER ALLOCATION METHOD
  * if not set we'll use function local variable (stack memory)
@@ -66,8 +58,6 @@
 #define CONFIG_SKB_COPY	/* for amsdu */
 
 #define CONFIG_NEW_SIGNAL_STAT_PROCESS
-
-/* #define CONFIG_CHECK_AC_LIFETIME	*/ /* Check packet lifetime of 4 ACs. */
 
 #define CONFIG_EMBEDDED_FWIMG
 
@@ -94,17 +84,8 @@
 	#define CONFIG_IPS
 	#define CONFIG_LPS
 
-	#ifdef CONFIG_IPS
-	/* #define CONFIG_IPS_LEVEL_2	1  */ /*enable this to set default IPS mode to IPS_LEVEL_2 */
-	#endif
+	/* #define CONFIG_LPS_LCLK */
 
-	#if defined(CONFIG_LPS) && defined(CONFIG_SUPPORT_USB_INT)
-		/* #define CONFIG_LPS_LCLK */
-	#endif
-
-	#ifdef CONFIG_LPS_LCLK
-		#define CONFIG_XMIT_THREAD_MODE
-	#endif
 #endif /* CONFIG_POWER_SAVING */
 
 #ifdef CONFIG_BT_COEXIST
@@ -114,19 +95,7 @@
 	#endif
 #endif /* CONFIG_BT_COEXIST */
 
-	/* #define CONFIG_INTERRUPT_BASED_TXBCN */ /* Tx Beacon when driver BCN_OK ,BCN_ERR interrupt occurs */
-	#if defined(CONFIG_CONCURRENT_MODE) && defined(CONFIG_INTERRUPT_BASED_TXBCN)
-		#undef CONFIG_INTERRUPT_BASED_TXBCN
-	#endif
-	#ifdef CONFIG_INTERRUPT_BASED_TXBCN
-		/* #define CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT */
-		#define CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR
-	#endif
-
 #define CONFIG_PREALLOC_RECV_SKB
-#ifdef CONFIG_PREALLOC_RECV_SKB
-	/* #define CONFIG_FIX_NR_BULKIN_BUFFER */ /* only use PREALLOC_RECV_SKB buffer, don't alloc skb at runtime */
-#endif
 
 /*
  * Debug Related Configure
@@ -141,29 +110,3 @@
 #endif /* CONFIG_DEBUG */
 
 #define CONFIG_PROC_DEBUG
-/* #define CONFIG_DIS_UPHY */
-
-/*
-
-#define DBG_IO
-#define DBG_DELAY_OS
-#define DBG_MEM_ALLOC
-#define DBG_IOCTL
-
-#define DBG_TX
-#define DBG_XMIT_BUF
-#define DBG_XMIT_BUF_EXT
-#define DBG_TX_DROP_FRAME
-
-#define DBG_RX_DROP_FRAME
-#define DBG_RX_SEQ
-#define DBG_RX_SIGNAL_DISPLAY_PROCESSING
-#define DBG_RX_SIGNAL_DISPLAY_SSID_MONITORED "rtw-ap"
-
-#define DBG_SHOW_MCUFWDL_BEFORE_51_ENABLE
-#define DBG_ROAMING_TEST
-
-#define DBG_HAL_INIT_PROFILING
-
-#define DBG_MEMORY_LEAK	1
-*/

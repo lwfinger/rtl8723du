@@ -3752,40 +3752,14 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 			 __func__, __LINE__, padapter->hw_port, mode);
 
 		if ((mode == _HW_STATE_STATION_) || (mode == _HW_STATE_NOLINK_)) {
-			if (!rtw_mi_get_ap_num(padapter) && !rtw_mi_get_mesh_num(padapter)) {
+			if (!rtw_mi_get_ap_num(padapter) && !rtw_mi_get_mesh_num(padapter))
 				StopTxBeacon(padapter);
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN
-
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT
-				rtw_write8(padapter, REG_DRVERLYINT, 0x05);/* restore early int time to 5ms */
-				UpdateInterruptMask8723DU(padapter, _TRUE, 0, IMR_BCNDMAINT0_8723D);
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT */
-
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR
-				UpdateInterruptMask8723DU(padapter, _TRUE , 0, (IMR_TXBCN0ERR_8723D | IMR_TXBCN0OK_8723D));
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR */
-
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN */
-			}
-
 			/* disable atim wnd */
 			rtw_write8(padapter, REG_BCN_CTRL_1, DIS_TSF_UDT | DIS_ATIM | EN_BCN_FUNCTION);
 		} else if (mode == _HW_STATE_ADHOC_) {
 			ResumeTxBeacon(padapter);
 			rtw_write8(padapter, REG_BCN_CTRL_1, DIS_TSF_UDT | EN_BCN_FUNCTION | DIS_BCNQ_SUB);
 		} else if (mode == _HW_STATE_AP_) {
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN
-
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT
-			UpdateInterruptMask8723DU(padapter, _TRUE, IMR_BCNDMAINT0_8723D, 0);
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT */
-
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR
-			UpdateInterruptMask8723DU(padapter, _TRUE, (IMR_TXBCN0ERR_8723D | IMR_TXBCN0OK_8723D), 0);
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR */
-
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN */
-
 			ResumeTxBeacon(padapter);
 
 			rtw_write8(padapter, REG_BCN_CTRL_1, DIS_TSF_UDT | DIS_BCNQ_SUB);
@@ -3859,17 +3833,6 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 			{
 #endif /* CONFIG_CONCURRENT_MODE */
 				StopTxBeacon(padapter);
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT
-				rtw_write8(padapter, REG_DRVERLYINT, 0x05); /* restore early int time to 5ms */
-				UpdateInterruptMask8812AU(padapter, _TRUE, 0, IMR_BCNDMAINT0_8723D);
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT */
-
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR
-				UpdateInterruptMask8812AU(padapter, _TRUE , 0, (IMR_TXBCN0ERR_8723D | IMR_TXBCN0OK_8723D));
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR */
-
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN */
 			}
 
 			/* disable atim wnd */
@@ -3879,17 +3842,6 @@ static void hw_var_set_opmode(PADAPTER padapter, u8 variable, u8 *val)
 			ResumeTxBeacon(padapter);
 			rtw_write8(padapter, REG_BCN_CTRL, DIS_TSF_UDT | EN_BCN_FUNCTION | DIS_BCNQ_SUB);
 		} else if (mode == _HW_STATE_AP_) {
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT
-			UpdateInterruptMask8723DU(padapter, _TRUE , IMR_BCNDMAINT0_8723D, 0);
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT */
-
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR
-			UpdateInterruptMask8723DU(padapter, _TRUE , (IMR_TXBCN0ERR_8723D | IMR_TXBCN0OK_8723D), 0);
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR */
-
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN */
-
 			ResumeTxBeacon(padapter);
 
 			rtw_write8(padapter, REG_BCN_CTRL, DIS_TSF_UDT | DIS_BCNQ_SUB);
@@ -4228,18 +4180,6 @@ u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val)
 			u16 bcn_interval = *((u16 *)val);
 
 			rtw_write16(padapter, REG_BCN_INTERVAL, bcn_interval);
-
-			#ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT
-			{
-				struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
-				struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
-
-				if ((pmlmeinfo->state & 0x03) == WIFI_FW_AP_STATE) {
-					RTW_INFO("%s==> bcn_interval:%d, eraly_int:%d\n", __func__, bcn_interval, bcn_interval >> 1);
-					rtw_write8(padapter, REG_DRVERLYINT, bcn_interval >> 1);
-				}
-			}
-			#endif/* CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT */
 		}
 		break;
 
@@ -4969,9 +4909,6 @@ void rtl8723d_set_hal_ops(struct hal_ops *pHalFunc)
 	pHalFunc->GetHalODMVarHandler = GetHalODMVar;
 	pHalFunc->SetHalODMVarHandler = SetHalODMVar;
 
-#ifdef CONFIG_XMIT_THREAD_MODE
-	pHalFunc->xmit_thread_handler = &hal_xmit_handler;
-#endif
 	pHalFunc->hal_notch_filter = &hal_notch_filter_8723d;
 	pHalFunc->c2h_handler = c2h_handler_8723d;
 	pHalFunc->fill_h2c_cmd = &FillH2CCmd8723D;

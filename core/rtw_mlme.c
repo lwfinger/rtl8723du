@@ -794,18 +794,6 @@ void update_network(WLAN_BSSID_EX *dst, WLAN_BSSID_EX *src,
 	u8 sq_final;
 	long rssi_final;
 
-
-#if defined(DBG_RX_SIGNAL_DISPLAY_SSID_MONITORED) && 1
-	if (strcmp(dst->Ssid.Ssid, DBG_RX_SIGNAL_DISPLAY_SSID_MONITORED) == 0) {
-		RTW_INFO(FUNC_ADPT_FMT" %s("MAC_FMT", ch%u) ss_ori:%3u, sq_ori:%3u, rssi_ori:%3ld, ss_smp:%3u, sq_smp:%3u, rssi_smp:%3ld\n"
-			 , FUNC_ADPT_ARG(padapter)
-			, src->Ssid.Ssid, MAC_ARG(src->MacAddress), src->Configuration.DSConfig
-			 , ss_ori, sq_ori, rssi_ori
-			 , ss_smp, sq_smp, rssi_smp
-			);
-	}
-#endif
-
 	/* The rule below is 1/5 for sample value, 4/5 for history value */
 	if (check_fwstate(&padapter->mlmepriv, _FW_LINKED) && is_same_network(&(padapter->mlmepriv.cur_network.network), src, 0)) {
 		/* Take the recvpriv's value for the connected AP*/
@@ -839,14 +827,6 @@ void update_network(WLAN_BSSID_EX *dst, WLAN_BSSID_EX *src,
 	dst->PhyInfo.SignalStrength = ss_final;
 	dst->PhyInfo.SignalQuality = sq_final;
 	dst->Rssi = rssi_final;
-
-#if defined(DBG_RX_SIGNAL_DISPLAY_SSID_MONITORED) && 1
-	if (strcmp(dst->Ssid.Ssid, DBG_RX_SIGNAL_DISPLAY_SSID_MONITORED) == 0) {
-		RTW_INFO(FUNC_ADPT_FMT" %s("MAC_FMT"), SignalStrength:%u, SignalQuality:%u, RawRSSI:%ld\n"
-			 , FUNC_ADPT_ARG(padapter)
-			, dst->Ssid.Ssid, MAC_ARG(dst->MacAddress), dst->PhyInfo.SignalStrength, dst->PhyInfo.SignalQuality, dst->Rssi);
-	}
-#endif
 }
 
 static void update_current_network(_adapter *adapter, WLAN_BSSID_EX *pnetwork)
@@ -1741,10 +1721,6 @@ static struct sta_info *rtw_joinbss_update_stainfo(_adapter *padapter, struct wl
 			preorder_ctrl = &psta->recvreorder_ctrl[i];
 			preorder_ctrl->enable = _FALSE;
 			preorder_ctrl->indicate_seq = 0xffff;
-			#ifdef DBG_RX_SEQ
-			RTW_INFO("DBG_RX_SEQ "FUNC_ADPT_FMT" tid:%u SN_CLEAR indicate_seq:%u\n"
-				, FUNC_ADPT_ARG(padapter), i, preorder_ctrl->indicate_seq);
-			#endif
 			preorder_ctrl->wend_b = 0xffff;
 			preorder_ctrl->wsize_b = 64;/* max_ampdu_sz; */ /* ex. 32(kbytes) -> wsize_b=32 */
 			preorder_ctrl->ampdu_size = RX_AMPDU_SIZE_INVALID;
@@ -1780,15 +1756,6 @@ static void rtw_joinbss_update_network(_adapter *padapter, struct wlan_network *
 	padapter->recvpriv.signal_qual = ptarget_wlan->network.PhyInfo.SignalQuality;
 	/* the ptarget_wlan->network.Rssi is raw data, we use ptarget_wlan->network.PhyInfo.SignalStrength instead (has scaled) */
 	padapter->recvpriv.rssi = translate_percentage_to_dbm(ptarget_wlan->network.PhyInfo.SignalStrength);
-#if defined(DBG_RX_SIGNAL_DISPLAY_PROCESSING) && 1
-	RTW_INFO(FUNC_ADPT_FMT" signal_strength:%3u, rssi:%3d, signal_qual:%3u"
-		 "\n"
-		 , FUNC_ADPT_ARG(padapter)
-		 , padapter->recvpriv.signal_strength
-		 , padapter->recvpriv.rssi
-		 , padapter->recvpriv.signal_qual
-		);
-#endif
 #ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	rtw_set_signal_stat_timer(&padapter->recvpriv);
 #endif
@@ -2885,10 +2852,6 @@ void rtw_iface_dynamic_check_timer_handlder(_adapter *adapter)
 	rtw_auto_scan_handler(adapter);
 
 	if (MLME_IS_AP(adapter)|| MLME_IS_MESH(adapter)) {
-		#ifndef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
-		expire_timeout_chk(adapter);
-		#endif /* !CONFIG_ACTIVE_KEEP_ALIVE_CHECK */
-
 		#ifdef CONFIG_BMC_TX_RATE_SELECT
 		rtw_update_bmc_sta_tx_rate(adapter);
 		#endif /*CONFIG_BMC_TX_RATE_SELECT*/

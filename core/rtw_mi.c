@@ -932,23 +932,6 @@ u8 rtw_mi_check_miracast_enabled(_adapter *padapter)
 	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_check_miracast_enabled);
 }
 
-#ifdef CONFIG_XMIT_THREAD_MODE
-static u8 _rtw_mi_check_pending_xmitbuf(_adapter *padapter , void *data)
-{
-	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
-
-	return check_pending_xmitbuf(pxmitpriv);
-}
-u8 rtw_mi_check_pending_xmitbuf(_adapter *padapter)
-{
-	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_check_pending_xmitbuf);
-}
-u8 rtw_mi_buddy_check_pending_xmitbuf(_adapter *padapter)
-{
-	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_check_pending_xmitbuf);
-}
-#endif
-
 static void _rtw_mi_adapter_reset(_adapter *padapter , u8 exclude_self)
 {
 	int i;
@@ -1069,13 +1052,10 @@ u8 rtw_mi_buddy_sreset_adapter_hdl(_adapter *padapter, u8 bstart)
 }
 static u8 _rtw_mi_tx_beacon_hdl(_adapter *adapter, void *data)
 {
-	if ((MLME_IS_AP(adapter) || MLME_IS_MESH(adapter))
-		&& check_fwstate(&adapter->mlmepriv, WIFI_ASOC_STATE) == _TRUE
-	) {
+	if ((MLME_IS_AP(adapter) || MLME_IS_MESH(adapter)) &&
+	    check_fwstate(&adapter->mlmepriv, WIFI_ASOC_STATE) == _TRUE) {
 		adapter->mlmepriv.update_bcn = _TRUE;
-#ifndef CONFIG_INTERRUPT_BASED_TXBCN
 		tx_beacon_hdl(adapter, NULL);
-#endif
 	}
 	return _TRUE;
 }

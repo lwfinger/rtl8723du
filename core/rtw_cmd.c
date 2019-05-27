@@ -2312,10 +2312,6 @@ u8 traffic_status_watchdog(_adapter *padapter, u8 from_timer)
 		    (pmlmepriv->LinkDetectInfo.NumRxUnicastOkInPeriod > 4)
 #endif /* CONFIG_LPS_SLOW_TRANSITION */
 		   ) {
-#ifdef DBG_RX_COUNTER_DUMP
-			if (padapter->dump_rx_cnt_mode & DUMP_DRV_TRX_COUNTER_DATA)
-				RTW_INFO("(-)Tx = %d, Rx = %d\n", pmlmepriv->LinkDetectInfo.NumTxOkInPeriod, pmlmepriv->LinkDetectInfo.NumRxUnicastOkInPeriod);
-#endif
 			bEnterPS = _FALSE;
 #ifdef CONFIG_LPS_SLOW_TRANSITION
 			if (bBusyTraffic == _TRUE) {
@@ -2332,10 +2328,6 @@ u8 traffic_status_watchdog(_adapter *padapter, u8 from_timer)
 #endif /* CONFIG_LPS_SLOW_TRANSITION */
 
 		} else {
-#ifdef DBG_RX_COUNTER_DUMP
-			if (padapter->dump_rx_cnt_mode & DUMP_DRV_TRX_COUNTER_DATA)
-				RTW_INFO("(+)Tx = %d, Rx = %d\n", pmlmepriv->LinkDetectInfo.NumTxOkInPeriod, pmlmepriv->LinkDetectInfo.NumRxUnicastOkInPeriod);
-#endif
 #ifdef CONFIG_LPS_SLOW_TRANSITION
 			if (pmlmepriv->LinkDetectInfo.TrafficTransitionCount >= 2)
 				pmlmepriv->LinkDetectInfo.TrafficTransitionCount -= 2;
@@ -2479,10 +2471,8 @@ void rtw_iface_dynamic_chk_wk_hdl(_adapter *padapter)
 {
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
 
-	#ifdef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
 	if (MLME_IS_AP(padapter) || MLME_IS_MESH(padapter))
 		expire_timeout_chk(padapter);
-	#endif /* CONFIG_ACTIVE_KEEP_ALIVE_CHECK */
 	dynamic_update_bcn_check(padapter);
 
 	linked_status_chk(padapter, 0);
@@ -2495,9 +2485,6 @@ static void rtw_dynamic_chk_wk_hdl(_adapter *padapter)
 {
 	rtw_mi_dynamic_chk_wk_hdl(padapter);
 
-#ifdef DBG_RX_COUNTER_DUMP
-	rtw_dump_rx_counters(padapter);
-#endif
 	dm_DynamicUsbTxAgg(padapter, 0);
 	rtw_hal_dm_watchdog(padapter);
 

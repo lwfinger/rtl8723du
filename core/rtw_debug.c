@@ -101,17 +101,8 @@ void dump_drv_cfg(struct seq_file *sel)
 #ifdef CONFIG_RTW_WIFI_HAL
 	RTW_PRINT_SEL(sel, "CONFIG_RTW_WIFI_HAL\n");
 #endif
-#ifdef CONFIG_SUPPORT_USB_INT
-	RTW_PRINT_SEL(sel, "CONFIG_SUPPORT_USB_INT\n");
-#endif
-#ifdef CONFIG_USB_INTERRUPT_IN_PIPE
-	RTW_PRINT_SEL(sel, "CONFIG_USB_INTERRUPT_IN_PIPE\n");
-#endif
 #ifdef CONFIG_PREALLOC_RECV_SKB
 	RTW_PRINT_SEL(sel, "CONFIG_PREALLOC_RECV_SKB\n");
-#endif
-#ifdef CONFIG_FIX_NR_BULKIN_BUFFER
-	RTW_PRINT_SEL(sel, "CONFIG_FIX_NR_BULKIN_BUFFER\n");
 #endif
 
 	RTW_PRINT_SEL(sel, "\n=== XMIT-INFO ===\n");
@@ -1572,49 +1563,6 @@ ssize_t proc_set_bw_ctl(struct file *file, const char __user *buffer, size_t cou
 	return count;
 }
 
-#ifdef DBG_RX_COUNTER_DUMP
-int proc_get_rx_cnt_dump(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	int i;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
-
-	RTW_PRINT_SEL(m, "BIT0- Dump RX counters of DRV\n");
-	RTW_PRINT_SEL(m, "BIT1- Dump RX counters of MAC\n");
-	RTW_PRINT_SEL(m, "BIT2- Dump RX counters of PHY\n");
-	RTW_PRINT_SEL(m, "BIT3- Dump TRX data frame of DRV\n");
-	RTW_PRINT_SEL(m, "dump_rx_cnt_mode = 0x%02x\n", adapter->dump_rx_cnt_mode);
-
-	return 0;
-}
-ssize_t proc_set_rx_cnt_dump(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
-	char tmp[32];
-	u8 dump_rx_cnt_mode;
-
-	if (count < 1)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-
-		int num = sscanf(tmp, "%hhx", &dump_rx_cnt_mode);
-
-		rtw_dump_phy_rxcnts_preprocess(adapter, dump_rx_cnt_mode);
-		adapter->dump_rx_cnt_mode = dump_rx_cnt_mode;
-
-	}
-
-	return count;
-}
-#endif
-
 static u8 fwdl_test_chksum_fail = 0;
 static u8 fwdl_test_wintint_rdy_fail = 0;
 
@@ -2201,10 +2149,6 @@ int proc_get_rx_signal(struct seq_file *m, void *v)
 			RTW_PRINT_SEL(m, "Antenna: __\n");
 		return 0;
 	}
-#endif
-#ifdef DBG_RX_SIGNAL_DISPLAY_RAW_DATA
-	rtw_odm_get_perpkt_rssi(m, padapter);
-	rtw_get_raw_rssi_info(m, padapter);
 #endif
 	return 0;
 }
@@ -3060,20 +3004,6 @@ int proc_get_rtkm_info(struct seq_file *m, void *v)
 }
 #endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
 
-#ifdef DBG_MEMORY_LEAK
-#include <asm/atomic.h>
-extern atomic_t _malloc_cnt;;
-extern atomic_t _malloc_size;;
-
-int proc_get_malloc_cnt(struct seq_file *m, void *v)
-{
-	RTW_PRINT_SEL(m, "_malloc_cnt=%d\n", atomic_read(&_malloc_cnt));
-	RTW_PRINT_SEL(m, "_malloc_size=%d\n", atomic_read(&_malloc_size));
-
-	return 0;
-}
-#endif /* DBG_MEMORY_LEAK */
-
 #ifdef CONFIG_BT_COEXIST
 int proc_get_btcoex_dbg(struct seq_file *m, void *v)
 {
@@ -3435,52 +3365,6 @@ ssize_t proc_set_monitor(struct file *file, const char __user *buffer, size_t co
 
 	return count;
 }
-#ifdef DBG_XMIT_BLOCK
-int proc_get_xmit_block(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-
-	dump_xmit_block(m, padapter);
-
-	return 0;
-}
-
-ssize_t proc_set_xmit_block(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	char tmp[32];
-	u8 xb_mode, xb_reason;
-
-	if (count < 1)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-
-		int num = sscanf(tmp, "%hhx %hhx", &xb_mode, &xb_reason);
-
-		if (num != 2) {
-			RTW_INFO("invalid parameter!\n");
-			return count;
-		}
-
-		if (xb_mode == 0)/*set*/
-			rtw_set_xmit_block(padapter, xb_reason);
-		else if (xb_mode == 1)/*clear*/
-			rtw_clr_xmit_block(padapter, xb_reason);
-		else
-			RTW_INFO("invalid parameter!\n");
-	}
-
-	return count;
-}
-#endif
 
 #include <hal_data.h>
 int proc_get_efuse_map(struct seq_file *m, void *v)

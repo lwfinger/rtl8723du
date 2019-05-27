@@ -1519,11 +1519,6 @@ odm_init_all_timers(
 #ifdef CONFIG_DYNAMIC_RX_PATH
 	phydm_dynamic_rx_path_timers(p_dm, INIT_DRP_TIMMER);
 #endif
-
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_initialize_timer(p_dm, &p_dm->beamforming_info.beamforming_timer,
-		(void *)beamforming_sw_timer_callback, NULL, "beamforming_timer");
-#endif
 }
 
 void
@@ -1541,10 +1536,6 @@ odm_cancel_all_timers(
 #ifdef CONFIG_DYNAMIC_RX_PATH
 	phydm_dynamic_rx_path_timers(p_dm, CANCEL_DRP_TIMMER);
 #endif
-
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_cancel_timer(p_dm, &p_dm->beamforming_info.beamforming_timer);
-#endif
 }
 
 void
@@ -1560,10 +1551,6 @@ odm_release_all_timers(
 
 #ifdef CONFIG_DYNAMIC_RX_PATH
 	phydm_dynamic_rx_path_timers(p_dm, RELEASE_DRP_TIMMER);
-#endif
-
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_release_timer(p_dm, &p_dm->beamforming_info.beamforming_timer);
 #endif
 }
 

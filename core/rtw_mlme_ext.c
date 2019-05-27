@@ -1133,11 +1133,7 @@ int	init_mlme_ext_priv(_adapter *padapter)
 	pmlmeext->mlmeext_init = _TRUE;
 
 
-#ifdef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
 	pmlmeext->active_keep_alive_check = _TRUE;
-#else
-	pmlmeext->active_keep_alive_check = _FALSE;
-#endif
 
 #ifdef DBG_FIXED_CHAN
 	pmlmeext->fixed_chan = 0xFF;
@@ -5499,9 +5495,7 @@ int issue_probereq_p2p_ex(_adapter *adapter, u8 *da, int try_cnt, int wait_ms)
 
 	if (ret != _FAIL) {
 		ret = _SUCCESS;
-#ifndef DBG_XMIT_ACK
 		goto exit;
-#endif
 	}
 
 	if (try_cnt && wait_ms) {
@@ -7663,9 +7657,7 @@ int issue_probereq_ex(_adapter *padapter, NDIS_802_11_SSID *pssid, u8 *da, u8 ch
 
 	if (ret != _FAIL) {
 		ret = _SUCCESS;
-#ifndef DBG_XMIT_ACK
 		goto exit;
-#endif
 	}
 
 	if (try_cnt && wait_ms) {
@@ -8535,9 +8527,7 @@ int issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int power_mod
 
 	if (ret != _FAIL) {
 		ret = _SUCCESS;
-#ifndef DBG_XMIT_ACK
 		goto exit;
-#endif
 	}
 
 	if (try_cnt && wait_ms) {
@@ -8672,9 +8662,7 @@ int issue_qos_nulldata(_adapter *padapter, unsigned char *da, u16 tid, int try_c
 
 	if (ret != _FAIL) {
 		ret = _SUCCESS;
-#ifndef DBG_XMIT_ACK
 		goto exit;
-#endif
 	}
 
 	if (try_cnt && wait_ms) {
@@ -8801,9 +8789,7 @@ int issue_deauth_ex(_adapter *padapter, u8 *da, unsigned short reason, int try_c
 
 	if (ret != _FAIL) {
 		ret = _SUCCESS;
-#ifndef DBG_XMIT_ACK
 		goto exit;
-#endif
 	}
 
 	if (try_cnt && wait_ms) {
@@ -9220,9 +9206,7 @@ inline u8 issue_addba_rsp_wait_ack(_adapter *adapter, unsigned char *ra, u8 tid,
 
 	if (ret != _FAIL) {
 		ret = _SUCCESS;
-#ifndef DBG_XMIT_ACK
 		/* goto exit; */
-#endif
 	}
 
 	if (try_cnt && wait_ms) {
@@ -9298,9 +9282,7 @@ int issue_del_ba_ex(_adapter *adapter, unsigned char *ra, u8 tid, u16 reason, u8
 
 	if (ret != _FAIL) {
 		ret = _SUCCESS;
-#ifndef DBG_XMIT_ACK
 		/* goto exit; */
-#endif
 	}
 
 	if (try_cnt && wait_ms) {
@@ -9571,9 +9553,7 @@ int issue_action_SM_PS_wait_ack(_adapter *padapter, unsigned char *raddr, u8 New
 
 	if (ret != _FAIL) {
 		ret = _SUCCESS;
-#ifndef DBG_XMIT_ACK
 		goto exit;
-#endif
 	}
 
 	if (try_cnt && wait_ms) {
@@ -9953,16 +9933,6 @@ u8 collect_bss_info(_adapter *padapter, union recv_frame *precv_frame, WLAN_BSSI
 	if (process_intel_widi_query_or_tigger(padapter, bssid))
 		return _FAIL;
 #endif /* CONFIG_INTEL_WIDI */
-
-#if defined(DBG_RX_SIGNAL_DISPLAY_SSID_MONITORED) & 1
-	if (strcmp(bssid->Ssid.Ssid, DBG_RX_SIGNAL_DISPLAY_SSID_MONITORED) == 0) {
-		RTW_INFO("Receiving %s("MAC_FMT", DSConfig:%u) from ch%u with ss:%3u, sq:%3u, RawRSSI:%3ld\n"
-			, bssid->Ssid.Ssid, MAC_ARG(bssid->MacAddress), bssid->Configuration.DSConfig
-			 , rtw_get_oper_ch(padapter)
-			, bssid->PhyInfo.SignalStrength, bssid->PhyInfo.SignalQuality, bssid->Rssi
-			);
-	}
-#endif
 
 	/* mark bss info receving from nearby channel as SignalQuality 101 */
 	if (bssid->Configuration.DSConfig != rtw_get_oper_ch(padapter))
@@ -11300,9 +11270,7 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 			return;
 #endif
 
-#if defined(DBG_ROAMING_TEST)
-		rx_chk_limit = 1;
-#elif defined(CONFIG_ACTIVE_KEEP_ALIVE_CHECK) && !defined(CONFIG_LPS_LCLK_WD_TIMER)
+#if !defined(CONFIG_LPS_LCLK_WD_TIMER)
 		rx_chk_limit = 4;
 #else
 		rx_chk_limit = 8;
@@ -11346,7 +11314,7 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 			if (sta_last_tx_pkts(psta) == sta_tx_pkts(psta))
 				tx_chk = _FAIL;
 
-#if defined(CONFIG_ACTIVE_KEEP_ALIVE_CHECK) && !defined(CONFIG_LPS_LCLK_WD_TIMER)
+#if !defined(CONFIG_LPS_LCLK_WD_TIMER)
 			if (pmlmeext->active_keep_alive_check && (rx_chk == _FAIL || tx_chk == _FAIL)
 			) {
 				u8 backup_ch = 0, backup_bw = 0, backup_offset = 0;
@@ -11392,7 +11360,7 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 bypass_active_keep_alive:
 				;
 			} else
-#endif /* CONFIG_ACTIVE_KEEP_ALIVE_CHECK */
+#endif
 			{
 				if (rx_chk != _SUCCESS) {
 					if (pmlmeext->retry == 0) {
@@ -13755,17 +13723,9 @@ u8 add_ba_rsp_hdl(_adapter *padapter, unsigned char *pbuf)
 	/* status = 0 means accept this addba req, so update indicate seq = start_seq under this compile flag */
 	if (pparm->status == 0) {
 		preorder_ctrl->indicate_seq = pparm->start_seq;
-		#ifdef DBG_RX_SEQ
-		RTW_INFO("DBG_RX_SEQ "FUNC_ADPT_FMT" tid:%u SN_UPDATE indicate_seq:%d, start_seq:%d\n"
-			, FUNC_ADPT_ARG(padapter), preorder_ctrl->tid, preorder_ctrl->indicate_seq, pparm->start_seq);
-		#endif
 	}
 #else
 	preorder_ctrl->indicate_seq = 0xffff;
-	#ifdef DBG_RX_SEQ
-	RTW_INFO("DBG_RX_SEQ "FUNC_ADPT_FMT" tid:%u SN_CLEAR indicate_seq:%d, start_seq:%d\n"
-		, FUNC_ADPT_ARG(padapter), preorder_ctrl->tid, preorder_ctrl->indicate_seq, pparm->start_seq);
-	#endif
 #endif
 
 	/*

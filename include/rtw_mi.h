@@ -177,11 +177,6 @@ void dump_mi_status(void *sel, struct dvobj_priv *dvobj);
 u8 rtw_mi_traffic_statistics(_adapter *padapter);
 u8 rtw_mi_check_miracast_enabled(_adapter *padapter);
 
-#ifdef CONFIG_XMIT_THREAD_MODE
-u8 rtw_mi_check_pending_xmitbuf(_adapter *padapter);
-u8 rtw_mi_buddy_check_pending_xmitbuf(_adapter *padapter);
-#endif
-
 void rtw_mi_adapter_reset(_adapter *padapter);
 void rtw_mi_buddy_adapter_reset(_adapter *padapter);
 

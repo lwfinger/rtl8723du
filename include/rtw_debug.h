@@ -271,11 +271,6 @@ int proc_get_wifi_spec(struct seq_file *m, void *v);
 ssize_t proc_set_rate_ctl(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 int proc_get_bw_ctl(struct seq_file *m, void *v);
 ssize_t proc_set_bw_ctl(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#ifdef DBG_RX_COUNTER_DUMP
-int proc_get_rx_cnt_dump(struct seq_file *m, void *v);
-ssize_t proc_set_rx_cnt_dump(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#endif
-
 int proc_get_bmc_tx_rate(struct seq_file *m, void *v);
 ssize_t proc_set_bmc_tx_rate(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 
@@ -300,10 +295,6 @@ ssize_t proc_set_sta_linking_test(struct file *file, const char __user *buffer, 
 int proc_get_rx_stat(struct seq_file *m, void *v);
 int proc_get_tx_stat(struct seq_file *m, void *v);
 int proc_get_all_sta_info(struct seq_file *m, void *v);
-
-#ifdef DBG_MEMORY_LEAK
-int proc_get_malloc_cnt(struct seq_file *m, void *v);
-#endif /* DBG_MEMORY_LEAK */
 
 int proc_get_trx_info_debug(struct seq_file *m, void *v);
 
@@ -391,11 +382,6 @@ ssize_t proc_set_wmmps_info(struct file *file, const char __user *buffer, size_t
 
 int proc_get_monitor(struct seq_file *m, void *v);
 ssize_t proc_set_monitor(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-
-#ifdef DBG_XMIT_BLOCK
-int proc_get_xmit_block(struct seq_file *m, void *v);
-ssize_t proc_set_xmit_block(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#endif
 
 #ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
 int proc_get_rtkm_info(struct seq_file *m, void *v);

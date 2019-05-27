@@ -185,18 +185,6 @@ bool rtw_st_ctl_chk_reg_rule(struct st_ctl_t *st_ctl, _adapter *adapter, u8 *loc
 void rtw_st_ctl_rx(struct sta_info *sta, u8 *ehdr_pos);
 void dump_st_ctl(void *sel, struct st_ctl_t *st_ctl);
 
-#ifdef DBG_RX_DFRAME_RAW_DATA
-struct sta_recv_dframe_info {
-
-	u8 sta_data_rate;
-	u8 sta_sgi;
-	u8 sta_bw_mode;
-	s8 sta_mimo_signal_strength[4];
-	s8 sta_RxPwr[4];
-	u8 sta_ofdm_snr[4];
-};
-#endif
-
 struct sta_info {
 
 	_lock	lock;
@@ -211,10 +199,6 @@ struct sta_info {
 	struct sta_xmit_priv sta_xmitpriv;
 	struct sta_recv_priv sta_recvpriv;
 
-#ifdef DBG_RX_DFRAME_RAW_DATA
-	struct sta_recv_dframe_info  sta_dframe_info;
-	struct sta_recv_dframe_info  sta_dframe_info_bmc;
-#endif
 	_queue sleep_q;
 	unsigned int sleepq_len;
 

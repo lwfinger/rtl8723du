@@ -275,11 +275,7 @@ u32	_rtw_init_sta_priv(struct	sta_priv *pstapriv)
 	pstapriv->assoc_to = 3;
 	/* pstapriv->expire_to = 900; */ /* 900*2 = 1800 sec = 30 min, expire after no any traffic. */
 	/* pstapriv->expire_to = 30; */ /* 30*2 = 60 sec = 1 min, expire after no any traffic. */
-#ifdef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
 	pstapriv->expire_to = 3; /* 3*2 = 6 sec */
-#else
-	pstapriv->expire_to = 60;/* 60*2 = 120 sec = 2 min, expire after no any traffic. */
-#endif
 #ifdef CONFIG_ATMEL_RC_PATCH
 	_rtw_memset(pstapriv->atmel_rc_pattern, 0, ETH_ALEN);
 #endif
@@ -538,10 +534,6 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 			preorder_ctrl->tid = i;
 			preorder_ctrl->enable = _FALSE;
 			preorder_ctrl->indicate_seq = 0xffff;
-			#ifdef DBG_RX_SEQ
-			RTW_INFO("DBG_RX_SEQ "FUNC_ADPT_FMT" tid:%u SN_CLEAR indicate_seq:%d\n"
-				, FUNC_ADPT_ARG(pstapriv->padapter), i, preorder_ctrl->indicate_seq);
-			#endif
 			preorder_ctrl->wend_b = 0xffff;
 			/* preorder_ctrl->wsize_b = (NR_RECVBUFF-2); */
 			preorder_ctrl->wsize_b = 64;/* 64; */

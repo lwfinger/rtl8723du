@@ -7,11 +7,6 @@
 
 #define RT_TAG	'1178'
 
-#ifdef DBG_MEMORY_LEAK
-atomic_t _malloc_cnt = ATOMIC_INIT(0);
-atomic_t _malloc_size = ATOMIC_INIT(0);
-#endif /* DBG_MEMORY_LEAK */
-
 /*
 * Translate the OS dependent @param error_code to OS independent RTW_STATUS_CODE
 * @return: one of RTW_STATUS_CODE
@@ -55,14 +50,6 @@ inline void *_rtw_vmalloc(u32 sz)
 	void *pbuf;
 
 	pbuf = vmalloc(sz);
-
-#ifdef DBG_MEMORY_LEAK
-	if (pbuf != NULL) {
-		atomic_inc(&_malloc_cnt);
-		atomic_add(sz, &_malloc_size);
-	}
-#endif /* DBG_MEMORY_LEAK */
-
 	return pbuf;
 }
 
@@ -78,11 +65,6 @@ inline void *_rtw_zvmalloc(u32 sz)
 inline void _rtw_vmfree(void *pbuf, u32 sz)
 {
 	vfree(pbuf);
-
-#ifdef DBG_MEMORY_LEAK
-	atomic_dec(&_malloc_cnt);
-	atomic_sub(sz, &_malloc_size);
-#endif /* DBG_MEMORY_LEAK */
 }
 
 void *_rtw_malloc(u32 sz)
@@ -95,18 +77,8 @@ void *_rtw_malloc(u32 sz)
 	else
 #endif
 		pbuf = kmalloc(sz, in_interrupt() ? GFP_ATOMIC : GFP_KERNEL);
-
-#ifdef DBG_MEMORY_LEAK
-	if (pbuf != NULL) {
-		atomic_inc(&_malloc_cnt);
-		atomic_add(sz, &_malloc_size);
-	}
-#endif /* DBG_MEMORY_LEAK */
-
 	return pbuf;
-
 }
-
 
 void *_rtw_zmalloc(u32 sz)
 {
@@ -128,11 +100,6 @@ void _rtw_mfree(void *pbuf, u32 sz)
 	else
 #endif
 		kfree(pbuf);
-
-#ifdef DBG_MEMORY_LEAK
-	atomic_dec(&_malloc_cnt);
-	atomic_sub(sz, &_malloc_size);
-#endif /* DBG_MEMORY_LEAK */
 }
 
 inline struct sk_buff *_rtw_skb_alloc(u32 sz)
@@ -208,457 +175,6 @@ inline void _rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr
 	usb_buffer_free(dev, size, addr, dma);
 #endif
 }
-
-#if defined(DBG_MEM_ALLOC)
-
-struct rtw_mem_stat {
-	ATOMIC_T alloc; /* the memory bytes we allocate currently */
-	ATOMIC_T peak; /* the peak memory bytes we allocate */
-	ATOMIC_T alloc_cnt; /* the alloc count for alloc currently */
-	ATOMIC_T alloc_err_cnt; /* the error times we fail to allocate memory */
-};
-
-struct rtw_mem_stat rtw_mem_type_stat[mstat_tf_idx(MSTAT_TYPE_MAX)];
-#ifdef RTW_MEM_FUNC_STAT
-struct rtw_mem_stat rtw_mem_func_stat[mstat_ff_idx(MSTAT_FUNC_MAX)];
-#endif
-
-char *MSTAT_TYPE_str[] = {
-	"VIR",
-	"PHY",
-	"SKB",
-	"USB",
-};
-
-#ifdef RTW_MEM_FUNC_STAT
-char *MSTAT_FUNC_str[] = {
-	"UNSP",
-	"IO",
-	"TXIO",
-	"RXIO",
-	"TX",
-	"RX",
-};
-#endif
-
-void rtw_mstat_dump(void *sel)
-{
-	int i;
-	int value_t[4][mstat_tf_idx(MSTAT_TYPE_MAX)];
-#ifdef RTW_MEM_FUNC_STAT
-	int value_f[4][mstat_ff_idx(MSTAT_FUNC_MAX)];
-#endif
-
-	int vir_alloc, vir_peak, vir_alloc_err, phy_alloc, phy_peak, phy_alloc_err;
-	int tx_alloc, tx_peak, tx_alloc_err, rx_alloc, rx_peak, rx_alloc_err;
-
-	for (i = 0; i < mstat_tf_idx(MSTAT_TYPE_MAX); i++) {
-		value_t[0][i] = ATOMIC_READ(&(rtw_mem_type_stat[i].alloc));
-		value_t[1][i] = ATOMIC_READ(&(rtw_mem_type_stat[i].peak));
-		value_t[2][i] = ATOMIC_READ(&(rtw_mem_type_stat[i].alloc_cnt));
-		value_t[3][i] = ATOMIC_READ(&(rtw_mem_type_stat[i].alloc_err_cnt));
-	}
-
-#ifdef RTW_MEM_FUNC_STAT
-	for (i = 0; i < mstat_ff_idx(MSTAT_FUNC_MAX); i++) {
-		value_f[0][i] = ATOMIC_READ(&(rtw_mem_func_stat[i].alloc));
-		value_f[1][i] = ATOMIC_READ(&(rtw_mem_func_stat[i].peak));
-		value_f[2][i] = ATOMIC_READ(&(rtw_mem_func_stat[i].alloc_cnt));
-		value_f[3][i] = ATOMIC_READ(&(rtw_mem_func_stat[i].alloc_err_cnt));
-	}
-#endif
-
-	RTW_PRINT_SEL(sel, "===================== MSTAT =====================\n");
-	RTW_PRINT_SEL(sel, "%4s %10s %10s %10s %10s\n", "TAG", "alloc", "peak", "aloc_cnt", "err_cnt");
-	RTW_PRINT_SEL(sel, "-------------------------------------------------\n");
-	for (i = 0; i < mstat_tf_idx(MSTAT_TYPE_MAX); i++)
-		RTW_PRINT_SEL(sel, "%4s %10d %10d %10d %10d\n", MSTAT_TYPE_str[i], value_t[0][i], value_t[1][i], value_t[2][i], value_t[3][i]);
-#ifdef RTW_MEM_FUNC_STAT
-	RTW_PRINT_SEL(sel, "-------------------------------------------------\n");
-	for (i = 0; i < mstat_ff_idx(MSTAT_FUNC_MAX); i++)
-		RTW_PRINT_SEL(sel, "%4s %10d %10d %10d %10d\n", MSTAT_FUNC_str[i], value_f[0][i], value_f[1][i], value_f[2][i], value_f[3][i]);
-#endif
-}
-
-void rtw_mstat_update(const enum mstat_f flags, const MSTAT_STATUS status, u32 sz)
-{
-	static systime update_time = 0;
-	int peak, alloc;
-	int i;
-
-	/* initialization */
-	if (!update_time) {
-		for (i = 0; i < mstat_tf_idx(MSTAT_TYPE_MAX); i++) {
-			ATOMIC_SET(&(rtw_mem_type_stat[i].alloc), 0);
-			ATOMIC_SET(&(rtw_mem_type_stat[i].peak), 0);
-			ATOMIC_SET(&(rtw_mem_type_stat[i].alloc_cnt), 0);
-			ATOMIC_SET(&(rtw_mem_type_stat[i].alloc_err_cnt), 0);
-		}
-		#ifdef RTW_MEM_FUNC_STAT
-		for (i = 0; i < mstat_ff_idx(MSTAT_FUNC_MAX); i++) {
-			ATOMIC_SET(&(rtw_mem_func_stat[i].alloc), 0);
-			ATOMIC_SET(&(rtw_mem_func_stat[i].peak), 0);
-			ATOMIC_SET(&(rtw_mem_func_stat[i].alloc_cnt), 0);
-			ATOMIC_SET(&(rtw_mem_func_stat[i].alloc_err_cnt), 0);
-		}
-		#endif
-	}
-
-	switch (status) {
-	case MSTAT_ALLOC_SUCCESS:
-		ATOMIC_INC(&(rtw_mem_type_stat[mstat_tf_idx(flags)].alloc_cnt));
-		alloc = ATOMIC_ADD_RETURN(&(rtw_mem_type_stat[mstat_tf_idx(flags)].alloc), sz);
-		peak = ATOMIC_READ(&(rtw_mem_type_stat[mstat_tf_idx(flags)].peak));
-		if (peak < alloc)
-			ATOMIC_SET(&(rtw_mem_type_stat[mstat_tf_idx(flags)].peak), alloc);
-
-		#ifdef RTW_MEM_FUNC_STAT
-		ATOMIC_INC(&(rtw_mem_func_stat[mstat_ff_idx(flags)].alloc_cnt));
-		alloc = ATOMIC_ADD_RETURN(&(rtw_mem_func_stat[mstat_ff_idx(flags)].alloc), sz);
-		peak = ATOMIC_READ(&(rtw_mem_func_stat[mstat_ff_idx(flags)].peak));
-		if (peak < alloc)
-			ATOMIC_SET(&(rtw_mem_func_stat[mstat_ff_idx(flags)].peak), alloc);
-		#endif
-		break;
-
-	case MSTAT_ALLOC_FAIL:
-		ATOMIC_INC(&(rtw_mem_type_stat[mstat_tf_idx(flags)].alloc_err_cnt));
-		#ifdef RTW_MEM_FUNC_STAT
-		ATOMIC_INC(&(rtw_mem_func_stat[mstat_ff_idx(flags)].alloc_err_cnt));
-		#endif
-		break;
-
-	case MSTAT_FREE:
-		ATOMIC_DEC(&(rtw_mem_type_stat[mstat_tf_idx(flags)].alloc_cnt));
-		ATOMIC_SUB(&(rtw_mem_type_stat[mstat_tf_idx(flags)].alloc), sz);
-		#ifdef RTW_MEM_FUNC_STAT
-		ATOMIC_DEC(&(rtw_mem_func_stat[mstat_ff_idx(flags)].alloc_cnt));
-		ATOMIC_SUB(&(rtw_mem_func_stat[mstat_ff_idx(flags)].alloc), sz);
-		#endif
-		break;
-	};
-
-	/* if (rtw_get_passing_time_ms(update_time) > 5000) { */
-	/*	rtw_mstat_dump(RTW_DBGDUMP); */
-	update_time = rtw_get_current_time();
-	/* } */
-}
-
-#ifndef SIZE_MAX
-	#define SIZE_MAX (~(size_t)0)
-#endif
-
-struct mstat_sniff_rule {
-	enum mstat_f flags;
-	size_t lb;
-	size_t hb;
-};
-
-struct mstat_sniff_rule mstat_sniff_rules[] = {
-	{MSTAT_TYPE_PHY, 4097, SIZE_MAX},
-};
-
-int mstat_sniff_rule_num = sizeof(mstat_sniff_rules) / sizeof(struct mstat_sniff_rule);
-
-bool match_mstat_sniff_rules(const enum mstat_f flags, const size_t size)
-{
-	int i;
-	for (i = 0; i < mstat_sniff_rule_num; i++) {
-		if (mstat_sniff_rules[i].flags == flags
-			&& mstat_sniff_rules[i].lb <= size
-			&& mstat_sniff_rules[i].hb >= size)
-			return _TRUE;
-	}
-
-	return _FALSE;
-}
-
-inline void *dbg_rtw_vmalloc(u32 sz, const enum mstat_f flags, const char *func, const int line)
-{
-	void *p;
-
-	if (match_mstat_sniff_rules(flags, sz))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%d)\n", func, line, __FUNCTION__, (sz));
-
-	p = _rtw_vmalloc((sz));
-
-	rtw_mstat_update(
-		flags
-		, p ? MSTAT_ALLOC_SUCCESS : MSTAT_ALLOC_FAIL
-		, sz
-	);
-
-	return p;
-}
-
-inline void *dbg_rtw_zvmalloc(u32 sz, const enum mstat_f flags, const char *func, const int line)
-{
-	void *p;
-
-	if (match_mstat_sniff_rules(flags, sz))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%d)\n", func, line, __FUNCTION__, (sz));
-
-	p = _rtw_zvmalloc((sz));
-
-	rtw_mstat_update(
-		flags
-		, p ? MSTAT_ALLOC_SUCCESS : MSTAT_ALLOC_FAIL
-		, sz
-	);
-
-	return p;
-}
-
-inline void dbg_rtw_vmfree(void *pbuf, u32 sz, const enum mstat_f flags, const char *func, const int line)
-{
-
-	if (match_mstat_sniff_rules(flags, sz))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%d)\n", func, line, __FUNCTION__, (sz));
-
-	_rtw_vmfree((pbuf), (sz));
-
-	rtw_mstat_update(
-		flags
-		, MSTAT_FREE
-		, sz
-	);
-}
-
-inline void *dbg_rtw_malloc(u32 sz, const enum mstat_f flags, const char *func, const int line)
-{
-	void *p;
-
-	if (match_mstat_sniff_rules(flags, sz))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%d)\n", func, line, __FUNCTION__, (sz));
-
-	p = _rtw_malloc((sz));
-
-	rtw_mstat_update(
-		flags
-		, p ? MSTAT_ALLOC_SUCCESS : MSTAT_ALLOC_FAIL
-		, sz
-	);
-
-	return p;
-}
-
-inline void *dbg_rtw_zmalloc(u32 sz, const enum mstat_f flags, const char *func, const int line)
-{
-	void *p;
-
-	if (match_mstat_sniff_rules(flags, sz))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%d)\n", func, line, __FUNCTION__, (sz));
-
-	p = _rtw_zmalloc((sz));
-
-	rtw_mstat_update(
-		flags
-		, p ? MSTAT_ALLOC_SUCCESS : MSTAT_ALLOC_FAIL
-		, sz
-	);
-
-	return p;
-}
-
-inline void dbg_rtw_mfree(void *pbuf, u32 sz, const enum mstat_f flags, const char *func, const int line)
-{
-	if (match_mstat_sniff_rules(flags, sz))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%d)\n", func, line, __FUNCTION__, (sz));
-
-	_rtw_mfree((pbuf), (sz));
-
-	rtw_mstat_update(
-		flags
-		, MSTAT_FREE
-		, sz
-	);
-}
-
-inline struct sk_buff *dbg_rtw_skb_alloc(unsigned int size, const enum mstat_f flags, const char *func, int line)
-{
-	struct sk_buff *skb;
-	unsigned int truesize = 0;
-
-	skb = _rtw_skb_alloc(size);
-
-	if (skb)
-		truesize = skb->truesize;
-
-	if (!skb || truesize < size || match_mstat_sniff_rules(flags, truesize))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%d), skb:%p, truesize=%u\n", func, line, __FUNCTION__, size, skb, truesize);
-
-	rtw_mstat_update(
-		flags
-		, skb ? MSTAT_ALLOC_SUCCESS : MSTAT_ALLOC_FAIL
-		, truesize
-	);
-
-	return skb;
-}
-
-inline void dbg_rtw_skb_free(struct sk_buff *skb, const enum mstat_f flags, const char *func, int line)
-{
-	unsigned int truesize = skb->truesize;
-
-	if (match_mstat_sniff_rules(flags, truesize))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s, truesize=%u\n", func, line, __FUNCTION__, truesize);
-
-	_rtw_skb_free(skb);
-
-	rtw_mstat_update(
-		flags
-		, MSTAT_FREE
-		, truesize
-	);
-}
-
-inline struct sk_buff *dbg_rtw_skb_copy(const struct sk_buff *skb, const enum mstat_f flags, const char *func, const int line)
-{
-	struct sk_buff *skb_cp;
-	unsigned int truesize = skb->truesize;
-	unsigned int cp_truesize = 0;
-
-	skb_cp = _rtw_skb_copy(skb);
-	if (skb_cp)
-		cp_truesize = skb_cp->truesize;
-
-	if (!skb_cp || cp_truesize < truesize || match_mstat_sniff_rules(flags, cp_truesize))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%u), skb_cp:%p, cp_truesize=%u\n", func, line, __FUNCTION__, truesize, skb_cp, cp_truesize);
-
-	rtw_mstat_update(
-		flags
-		, skb_cp ? MSTAT_ALLOC_SUCCESS : MSTAT_ALLOC_FAIL
-		, cp_truesize
-	);
-
-	return skb_cp;
-}
-
-inline struct sk_buff *dbg_rtw_skb_clone(struct sk_buff *skb, const enum mstat_f flags, const char *func, const int line)
-{
-	struct sk_buff *skb_cl;
-	unsigned int truesize = skb->truesize;
-	unsigned int cl_truesize = 0;
-
-	skb_cl = _rtw_skb_clone(skb);
-	if (skb_cl)
-		cl_truesize = skb_cl->truesize;
-
-	if (!skb_cl || cl_truesize < truesize || match_mstat_sniff_rules(flags, cl_truesize))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%u), skb_cl:%p, cl_truesize=%u\n", func, line, __FUNCTION__, truesize, skb_cl, cl_truesize);
-
-	rtw_mstat_update(
-		flags
-		, skb_cl ? MSTAT_ALLOC_SUCCESS : MSTAT_ALLOC_FAIL
-		, cl_truesize
-	);
-
-	return skb_cl;
-}
-
-inline int dbg_rtw_netif_rx(_nic_hdl ndev, struct sk_buff *skb, const enum mstat_f flags, const char *func, int line)
-{
-	int ret;
-	unsigned int truesize = skb->truesize;
-
-	if (match_mstat_sniff_rules(flags, truesize))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s, truesize=%u\n", func, line, __FUNCTION__, truesize);
-
-	ret = _rtw_netif_rx(ndev, skb);
-
-	rtw_mstat_update(
-		flags
-		, MSTAT_FREE
-		, truesize
-	);
-
-	return ret;
-}
-
-#ifdef CONFIG_RTW_NAPI
-inline int dbg_rtw_netif_receive_skb(_nic_hdl ndev, struct sk_buff *skb, const enum mstat_f flags, const char *func, int line)
-{
-	int ret;
-	unsigned int truesize = skb->truesize;
-
-	if (match_mstat_sniff_rules(flags, truesize))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s, truesize=%u\n", func, line, __FUNCTION__, truesize);
-
-	ret = _rtw_netif_receive_skb(ndev, skb);
-
-	rtw_mstat_update(
-		flags
-		, MSTAT_FREE
-		, truesize
-	);
-
-	return ret;
-}
-
-#ifdef CONFIG_RTW_GRO
-inline gro_result_t dbg_rtw_napi_gro_receive(struct napi_struct *napi, struct sk_buff *skb, const enum mstat_f flags, const char *func, int line)
-{
-	int ret;
-	unsigned int truesize = skb->truesize;
-
-	if (match_mstat_sniff_rules(flags, truesize))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s, truesize=%u\n", func, line, __FUNCTION__, truesize);
-
-	ret = _rtw_napi_gro_receive(napi, skb);
-
-	rtw_mstat_update(
-		flags
-		, MSTAT_FREE
-		, truesize
-	);
-
-	return ret;
-}
-#endif /* CONFIG_RTW_GRO */
-#endif /* CONFIG_RTW_NAPI */
-
-inline void dbg_rtw_skb_queue_purge(struct sk_buff_head *list, enum mstat_f flags, const char *func, int line)
-{
-	struct sk_buff *skb;
-
-	while ((skb = skb_dequeue(list)) != NULL)
-		dbg_rtw_skb_free(skb, flags, func, line);
-}
-
-inline void *dbg_rtw_usb_buffer_alloc(struct usb_device *dev, size_t size, dma_addr_t *dma, const enum mstat_f flags, const char *func, int line)
-{
-	void *p;
-
-	if (match_mstat_sniff_rules(flags, size))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%zu)\n", func, line, __FUNCTION__, size);
-
-	p = _rtw_usb_buffer_alloc(dev, size, dma);
-
-	rtw_mstat_update(
-		flags
-		, p ? MSTAT_ALLOC_SUCCESS : MSTAT_ALLOC_FAIL
-		, size
-	);
-
-	return p;
-}
-
-inline void dbg_rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr, dma_addr_t dma, const enum mstat_f flags, const char *func, int line)
-{
-
-	if (match_mstat_sniff_rules(flags, size))
-		RTW_INFO("DBG_MEM_ALLOC %s:%d %s(%zu)\n", func, line, __FUNCTION__, size);
-
-	_rtw_usb_buffer_free(dev, size, addr, dma);
-
-	rtw_mstat_update(
-		flags
-		, MSTAT_FREE
-		, size
-	);
-}
-
-#endif /* defined(DBG_MEM_ALLOC) */
 
 void *rtw_malloc2d(int h, int w, size_t size)
 {
@@ -945,20 +461,6 @@ void rtw_usleep_os(int us)
 }
 
 
-#ifdef DBG_DELAY_OS
-void _rtw_mdelay_os(int ms, const char *func, const int line)
-{
-	RTW_INFO("%s:%d %s(%d)\n", func, line, __FUNCTION__, ms);
-
-	mdelay((unsigned long)ms);
-}
-void _rtw_udelay_os(int us, const char *func, const int line)
-{
-	RTW_INFO("%s:%d %s(%d)\n", func, line, __FUNCTION__, us);
-
-	udelay((unsigned long)us);
-}
-#else
 void rtw_mdelay_os(int ms)
 {
 	mdelay((unsigned long)ms);
@@ -968,7 +470,6 @@ void rtw_udelay_os(int us)
 {
 	udelay((unsigned long)us);
 }
-#endif
 
 void rtw_yield_os(void)
 {

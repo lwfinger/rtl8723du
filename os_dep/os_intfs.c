@@ -33,11 +33,7 @@ static int rtw_soft_ap = 0;
 /* int smart_ps = 1; */
 #ifdef CONFIG_POWER_SAVING
 static 	int rtw_power_mgnt = PS_MODE_MAX;
-	#ifdef CONFIG_IPS_LEVEL_2
-static 		int rtw_ips_mode = IPS_LEVEL_2;
-	#else
-static 		int rtw_ips_mode = IPS_NORMAL;
-	#endif /*CONFIG_IPS_LEVEL_2*/
+static	int rtw_ips_mode = IPS_NORMAL;
 
 static 	int rtw_lps_level = LPS_NORMAL; /*USB default LPS level*/
 #else /* !CONFIG_POWER_SAVING */
@@ -1489,31 +1485,6 @@ u32 rtw_start_drv_threads(_adapter *padapter)
 {
 	u32 _status = _SUCCESS;
 
-
-#ifdef CONFIG_XMIT_THREAD_MODE
-	if (padapter->xmitThread == NULL) {
-		RTW_INFO(FUNC_ADPT_FMT " start RTW_XMIT_THREAD\n", FUNC_ADPT_ARG(padapter));
-		padapter->xmitThread = kthread_run(rtw_xmit_thread, padapter, "RTW_XMIT_THREAD");
-		if (IS_ERR(padapter->xmitThread)) {
-			padapter->xmitThread = NULL;
-			_status = _FAIL;
-		}
-	}
-#endif /* #ifdef CONFIG_XMIT_THREAD_MODE */
-
-#ifdef CONFIG_RECV_THREAD_MODE
-	if (is_primary_adapter(padapter)) {
-		if (padapter->recvThread == NULL) {
-			RTW_INFO(FUNC_ADPT_FMT " start RTW_RECV_THREAD\n", FUNC_ADPT_ARG(padapter));
-			padapter->recvThread = kthread_run(rtw_recv_thread, padapter, "RTW_RECV_THREAD");
-			if (IS_ERR(padapter->recvThread)) {
-				padapter->recvThread = NULL;
-				_status = _FAIL;
-			}
-		}
-	}
-#endif
-
 	if (is_primary_adapter(padapter)) {
 		if (padapter->cmdThread == NULL) {
 			RTW_INFO(FUNC_ADPT_FMT " start RTW_CMD_THREAD\n", FUNC_ADPT_ARG(padapter));
@@ -1555,24 +1526,6 @@ void rtw_stop_drv_threads(_adapter *padapter)
 		_rtw_up_sema(&padapter->evtpriv.evt_notify);
 		rtw_thread_stop(padapter->evtThread);
 		padapter->evtThread = NULL;
-	}
-#endif
-
-#ifdef CONFIG_XMIT_THREAD_MODE
-	/* Below is to termindate tx_thread... */
-	if (padapter->xmitThread) {
-		_rtw_up_sema(&padapter->xmitpriv.xmit_sema);
-		rtw_thread_stop(padapter->xmitThread);
-		padapter->xmitThread = NULL;
-	}
-#endif
-
-#ifdef CONFIG_RECV_THREAD_MODE
-	if (is_primary_adapter(padapter) && padapter->recvThread) {
-		/* Below is to termindate rx_thread... */
-		_rtw_up_sema(&padapter->recvpriv.recv_sema);
-		rtw_thread_stop(padapter->recvThread);
-		padapter->recvThread = NULL;
 	}
 #endif
 
@@ -1662,12 +1615,6 @@ u8 rtw_init_default_value(_adapter *padapter)
 	padapter->tx_amsdu_rate = 400;
 #endif
 	padapter->driver_tx_max_agg_num = 0xFF;
-#ifdef DBG_RX_COUNTER_DUMP
-	padapter->dump_rx_cnt_mode = 0;
-	padapter->drv_rx_cnt_ok = 0;
-	padapter->drv_rx_cnt_crcerror = 0;
-	padapter->drv_rx_cnt_drop = 0;
-#endif
 #ifdef CONFIG_RTW_NAPI
 	padapter->napi_state = NAPI_DISABLE;
 #endif
@@ -1929,12 +1876,6 @@ u8 rtw_init_drv_sw(_adapter *padapter)
 	padapter->data_fb = 0;
 	padapter->fix_rx_ampdu_accept = RX_AMPDU_ACCEPT_INVALID;
 	padapter->fix_rx_ampdu_size = RX_AMPDU_SIZE_INVALID;
-#ifdef DBG_RX_COUNTER_DUMP
-	padapter->dump_rx_cnt_mode = 0;
-	padapter->drv_rx_cnt_ok = 0;
-	padapter->drv_rx_cnt_crcerror = 0;
-	padapter->drv_rx_cnt_drop = 0;
-#endif
 	rtw_init_bcmc_stainfo(padapter);
 
 	rtw_init_pwrctrl_priv(padapter);

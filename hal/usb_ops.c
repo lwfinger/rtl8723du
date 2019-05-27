@@ -5,51 +5,6 @@
 
 #include <rtl8723d_hal.h>
 
-#ifdef CONFIG_SUPPORT_USB_INT
-void rtl8723du_interrupt_handler(_adapter *padapter, u16 pkt_len, u8 *pbuf)
-{
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-	struct reportpwrstate_parm pwr_rpt;
-
-	if (pkt_len != INTERRUPT_MSG_FORMAT_LEN) {
-		RTW_INFO("%s Invalid interrupt content length (%d)!\n", __func__, pkt_len);
-		return;
-	}
-
-	/* HISR */
-	_rtw_memcpy(&(pHalData->IntArray[0]), &(pbuf[USB_INTR_CONTENT_HISR_OFFSET]), 4);
-	_rtw_memcpy(&(pHalData->IntArray[1]), &(pbuf[USB_INTR_CONTENT_HISRE_OFFSET]), 4);
-
-#ifdef CONFIG_LPS_LCLK
-	if (pHalData->IntArray[0] & IMR_CPWM_88E) {
-		_rtw_memcpy(&pwr_rpt.state, &(pbuf[USB_INTR_CONTENT_CPWM1_OFFSET]), 1);
-		/* _rtw_memcpy(&pwr_rpt.state2, &(pbuf[USB_INTR_CONTENT_CPWM2_OFFSET]), 1); */
-
-		/* 88e's cpwm value only change BIT0, so driver need to add PS_STATE_S2 for LPS flow. */
-		pwr_rpt.state |= PS_STATE_S2;
-		_set_workitem(&(adapter_to_pwrctl(padapter)->cpwm_event));
-	}
-#endif /* CONFIG_LPS_LCLK */
-
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN_EARLY_INT
-	/*only for BCN_0*/
-	if (pHalData->IntArray[0] & IMR_BCNDMAINT0_8723D)
-#endif
-#ifdef CONFIG_INTERRUPT_BASED_TXBCN_BCN_OK_ERR
-		if (pHalData->IntArray[0] & (IMR_TBDER_88E | IMR_TBDOK_88E))
-#endif
-			rtw_mi_set_tx_beacon_cmd(padapter);
-#endif /* CONFIG_INTERRUPT_BASED_TXBCN */
-
-#ifdef CONFIG_FW_C2H_REG
-	/* C2H Event */
-	if (pbuf[0] != 0)
-		usb_c2h_hisr_hdl(padapter, pbuf);
-#endif
-}
-#endif /* CONFIG_SUPPORT_USB_INT */
-
 int recvbuf2recvframe(PADAPTER padapter, void *ptr)
 {
 	u8 *pbuf;

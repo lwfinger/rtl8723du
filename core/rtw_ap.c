@@ -377,26 +377,6 @@ void	expire_timeout_chk(_adapter *padapter)
 		} else
 			psta->expire_to--;
 
-#ifndef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
-		if ((psta->flags & WLAN_STA_HT) && (psta->htpriv.agg_enable_bitmap || psta->under_exist_checking)) {
-			/* check sta by delba(addba) for 11n STA */
-			/* ToDo: use CCX report to check for all STAs */
-
-			if (psta->expire_to <= (pstapriv->expire_to - 50)) {
-				RTW_INFO("asoc expire by DELBA/ADDBA! (%d s)\n", (pstapriv->expire_to - psta->expire_to) * 2);
-				psta->under_exist_checking = 0;
-				psta->expire_to = 0;
-			} else if (psta->expire_to <= (pstapriv->expire_to - 3) && (psta->under_exist_checking == 0)) {
-				RTW_INFO("asoc check by DELBA/ADDBA! (%d s)\n", (pstapriv->expire_to - psta->expire_to) * 2);
-				psta->under_exist_checking = 1;
-				/* tear down TX AMPDU */
-				send_delba(padapter, 1, psta->cmn.mac_addr);/*  */ /* originator */
-				psta->htpriv.agg_enable_bitmap = 0x0;/* reset */
-				psta->htpriv.candidate_tid_bitmap = 0x0;/* reset */
-			}
-		}
-#endif /* CONFIG_ACTIVE_KEEP_ALIVE_CHECK */
-
 		if (psta->expire_to <= 0) {
 			struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
 
@@ -405,57 +385,6 @@ void	expire_timeout_chk(_adapter *padapter)
 				continue;
 			}
 
-#ifndef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
-
-#define KEEP_ALIVE_TRYCNT (3)
-
-			if (psta->keep_alive_trycnt > 0 && psta->keep_alive_trycnt <= KEEP_ALIVE_TRYCNT) {
-				if (psta->state & WIFI_STA_ALIVE_CHK_STATE)
-					psta->state ^= WIFI_STA_ALIVE_CHK_STATE;
-				else
-					psta->keep_alive_trycnt = 0;
-
-			} else if ((psta->keep_alive_trycnt > KEEP_ALIVE_TRYCNT) && !(psta->state & WIFI_STA_ALIVE_CHK_STATE))
-				psta->keep_alive_trycnt = 0;
-			if ((psta->htpriv.ht_option == _TRUE) && (psta->htpriv.ampdu_enable == _TRUE)) {
-				uint priority = 1; /* test using BK */
-				u8 issued = 0;
-
-				/* issued = (psta->htpriv.agg_enable_bitmap>>priority)&0x1; */
-				issued |= (psta->htpriv.candidate_tid_bitmap >> priority) & 0x1;
-
-				if (0 == issued) {
-					if (!(psta->state & WIFI_STA_ALIVE_CHK_STATE)) {
-						psta->htpriv.candidate_tid_bitmap |= BIT((u8)priority);
-
-						if (psta->state & WIFI_SLEEP_STATE)
-							psta->expire_to = 2; /* 2x2=4 sec */
-						else
-							psta->expire_to = 1; /* 2 sec */
-
-						psta->state |= WIFI_STA_ALIVE_CHK_STATE;
-
-						/* add_ba_hdl(padapter, (u8*)paddbareq_parm); */
-
-						RTW_INFO("issue addba_req to check if sta alive, keep_alive_trycnt=%d\n", psta->keep_alive_trycnt);
-
-						issue_addba_req(padapter, psta->cmn.mac_addr, (u8)priority);
-
-						_set_timer(&psta->addba_retry_timer, ADDBA_TO);
-
-						psta->keep_alive_trycnt++;
-
-						continue;
-					}
-				}
-			}
-			if (psta->keep_alive_trycnt > 0 && psta->state & WIFI_STA_ALIVE_CHK_STATE) {
-				psta->keep_alive_trycnt = 0;
-				psta->state ^= WIFI_STA_ALIVE_CHK_STATE;
-				RTW_INFO("change to another methods to check alive if staion is at ps mode\n");
-			}
-
-#endif /* CONFIG_ACTIVE_KEEP_ALIVE_CHECK	 */
 			if (psta->state & WIFI_SLEEP_STATE) {
 				if (!(psta->state & WIFI_STA_ALIVE_CHK_STATE)) {
 					/* to check if alive by another methods if staion is at ps mode.					 */
@@ -505,7 +434,6 @@ void	expire_timeout_chk(_adapter *padapter)
 
 		_rtw_memset(del_asoc_list, NUM_STA, NUM_STA);
 
-		#ifdef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
 		if (pmlmeext->active_keep_alive_check) {
 			#ifdef CONFIG_MCC_MODE
 			if (MCC_EN(padapter)) {
@@ -527,7 +455,6 @@ void	expire_timeout_chk(_adapter *padapter)
 				set_channel_bwmode(padapter, union_ch, union_offset, union_bw);
 			}
 		}
-		#endif /* CONFIG_ACTIVE_KEEP_ALIVE_CHECK */
 
 		/* check loop */
 		for (i = 0; i < chk_alive_num; i++) {
@@ -545,7 +472,6 @@ void	expire_timeout_chk(_adapter *padapter)
 			if (!(psta->state & _FW_LINKED))
 				continue;
 
-			#ifdef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
 			if (pmlmeext->active_keep_alive_check) {
 				/* issue null data to check sta alive*/
 				if (psta->state & WIFI_SLEEP_STATE)
@@ -565,7 +491,6 @@ void	expire_timeout_chk(_adapter *padapter)
 					continue;
 				}
 			}
-			#endif /* CONFIG_ACTIVE_KEEP_ALIVE_CHECK */
 
 			psta->keep_alive_trycnt = 0;
 			del_asoc_list[i] = chk_alive_list[i];
@@ -591,13 +516,11 @@ void	expire_timeout_chk(_adapter *padapter)
 			updated = ap_free_sta(padapter, psta, _FALSE, WLAN_REASON_DEAUTH_LEAVING, _FALSE);
 		}
 
-		#ifdef CONFIG_ACTIVE_KEEP_ALIVE_CHECK
 		if (pmlmeext->active_keep_alive_check) {
 			/* back to the original operation channel */
 			if (switch_channel_by_drv == _TRUE && backup_ch > 0)
 				set_channel_bwmode(padapter, backup_ch, backup_offset, backup_bw);
 		}
-		#endif
 	}
 
 	associated_clients_update(padapter, updated, STA_INFO_UPDATE_ALL);
@@ -1506,11 +1429,9 @@ update_beacon:
 
 		/*update_beacon(padapter, _TIM_IE_, NULL, _TRUE);*/
 
-#if !defined(CONFIG_INTERRUPT_BASED_TXBCN)
 		/* other case will  tx beacon when bcn interrupt coming in. */
 		if (send_beacon(padapter) == _FAIL)
 			RTW_INFO("issue_beacon, fail!\n");
-#endif /* !defined(CONFIG_INTERRUPT_BASED_TXBCN) */
 	}
 
 	/*Set EDCA param reg after update cur_wireless_mode & update_capinfo*/
@@ -2538,27 +2459,10 @@ static void update_bcn_wps_ie(_adapter *padapter)
 
 	if (pbackup_remainder_ie)
 		rtw_mfree(pbackup_remainder_ie, remainder_ielen);
-
-	/* deal with the case without set_tx_beacon_cmd() in update_beacon() */
-#if defined(CONFIG_INTERRUPT_BASED_TXBCN)
-	if ((pmlmeinfo->state & 0x03) == WIFI_FW_AP_STATE) {
-		u8 sr = 0;
-		rtw_get_wps_attr_content(pwps_ie_src,  wps_ielen, WPS_ATTR_SELECTED_REGISTRAR, (u8 *)(&sr), NULL);
-
-		if (sr) {
-			set_fwstate(pmlmepriv, WIFI_UNDER_WPS);
-			RTW_INFO("%s, set WIFI_UNDER_WPS\n", __func__);
-		} else {
-			clr_fwstate(pmlmepriv, WIFI_UNDER_WPS);
-			RTW_INFO("%s, clr WIFI_UNDER_WPS\n", __func__);
-		}
-	}
-#endif
 }
 
 static void update_bcn_p2p_ie(_adapter *padapter)
 {
-
 }
 
 static void update_bcn_vendor_spec_ie(_adapter *padapter, u8 *oui)
@@ -2634,12 +2538,10 @@ void _update_beacon(_adapter *padapter, u8 ie_id, u8 *oui, u8 tx, const char *ta
 
 	_exit_critical_bh(&pmlmepriv->bcn_update_lock, &irqL);
 
-#ifndef CONFIG_INTERRUPT_BASED_TXBCN
 	if (tx) {
-		/* send_beacon(padapter); */ /* send_beacon must execute on TSR level */
+		/* send_beacon must execute on TSR level */
 		set_tx_beacon_cmd(padapter);
 	}
-#endif /* !CONFIG_INTERRUPT_BASED_TXBCN */
 }
 
 void rtw_process_public_act_bsscoex(_adapter *padapter, u8 *pframe, uint frame_len)

@@ -278,16 +278,6 @@ void rtw_reset_mac_rx_counters(_adapter *padapter);
 void rtw_reset_phy_rx_counters(_adapter *padapter);
 void rtw_reset_phy_trx_ok_counters(_adapter *padapter);
 
-#ifdef DBG_RX_COUNTER_DUMP
-	#define DUMP_DRV_RX_COUNTER	BIT0
-	#define DUMP_MAC_RX_COUNTER	BIT1
-	#define DUMP_PHY_RX_COUNTER	BIT2
-	#define DUMP_DRV_TRX_COUNTER_DATA	BIT3
-
-	void rtw_dump_phy_rxcnts_preprocess(_adapter *padapter, u8 rx_cnt_mode);
-	void rtw_dump_rx_counters(_adapter *padapter);
-#endif
-
 void dump_chip_info(HAL_VERSION	ChipVersion);
 void rtw_hal_config_rftype(PADAPTER  padapter);
 
@@ -468,14 +458,6 @@ isAllSpaceOrTab(
 );
 
 void linked_info_dump(_adapter *padapter, u8 benable);
-#ifdef DBG_RX_SIGNAL_DISPLAY_RAW_DATA
-	void rtw_get_raw_rssi_info(void *sel, _adapter *padapter);
-	void rtw_dump_raw_rssi_info(_adapter *padapter, void *sel);
-#endif
-
-#ifdef DBG_RX_DFRAME_RAW_DATA
-	void rtw_dump_rx_dframe_info(_adapter *padapter, void *sel);
-#endif
 void rtw_store_phy_info(_adapter *padapter, union recv_frame *prframe);
 #define		HWSET_MAX_SIZE			1024
 #ifdef CONFIG_EFUSE_CONFIG_FILE

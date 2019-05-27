@@ -17,10 +17,7 @@ _PHYDM_FILES := hal/phydm/phydm_debug.o	\
 			hal/phydm/phydm_cfotracking.o\
 			hal/phydm/phydm_noisemonitor.o\
 			hal/phydm/phydm_acs.o\
-			hal/phydm/phydm_beamforming.o\
 			hal/phydm/phydm_dfs.o\
-			hal/phydm/txbf/halcomtxbf.o\
-			hal/phydm/txbf/haltxbfinterface.o\
 			hal/phydm/txbf/phydm_hal_txbf_api.o\
 			hal/phydm/phydm_ccx.o\
 			hal/phydm/phydm_psd.o\

@@ -492,13 +492,6 @@ void rtw_hal_write_rfreg(_adapter *padapter, enum rf_path eRFPath, u32 RegAddr, 
 	}
 }
 
-#if defined(CONFIG_SUPPORT_USB_INT)
-void	rtw_hal_interrupt_handler(_adapter *padapter, u16 pkt_len, u8 *pbuf)
-{
-	padapter->hal_func.interrupt_handler(padapter, pkt_len, pbuf);
-}
-#endif
-
 void	rtw_hal_set_chnl_bw(_adapter *padapter, u8 channel, enum channel_width Bandwidth, u8 Offset40, u8 Offset80)
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(padapter);
@@ -570,20 +563,6 @@ void rtw_hal_bcn_related_reg_setting(_adapter *padapter)
 {
 	padapter->hal_func.SetBeaconRelatedRegistersHandler(padapter);
 }
-
-#ifdef CONFIG_XMIT_THREAD_MODE
-s32 rtw_hal_xmit_thread_handler(_adapter *padapter)
-{
-	return padapter->hal_func.xmit_thread_handler(padapter);
-}
-#endif
-
-#ifdef CONFIG_RECV_THREAD_MODE
-s32 rtw_hal_recv_hdl(_adapter *adapter)
-{
-	return adapter->hal_func.recv_hdl(adapter);
-}
-#endif
 
 void rtw_hal_notch_filter(_adapter *adapter, bool enable)
 {
@@ -1067,12 +1046,6 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 		rtw_hal_error_msg("mgnt_xmit");
 		ret = _FAIL;
 	}
-#ifdef CONFIG_XMIT_THREAD_MODE
-	if (NULL == padapter->hal_func.xmit_thread_handler) {
-		rtw_hal_error_msg("xmit_thread_handler");
-		ret = _FAIL;
-	}
-#endif
 	if (NULL == padapter->hal_func.hal_xmitframe_enqueue) {
 		rtw_hal_error_msg("hal_xmitframe_enqueue");
 		ret = _FAIL;
@@ -1086,12 +1059,6 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 		rtw_hal_error_msg("free_recv_priv");
 		ret = _FAIL;
 	}
-#ifdef CONFIG_RECV_THREAD_MODE
-	if (NULL == padapter->hal_func.recv_hdl) {
-		rtw_hal_error_msg("recv_hdl");
-		ret = _FAIL;
-	}
-#endif
 	if (NULL == padapter->hal_func.inirp_init) {
 		rtw_hal_error_msg("inirp_init");
 		ret = _FAIL;
@@ -1100,13 +1067,6 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 		rtw_hal_error_msg("inirp_deinit");
 		ret = _FAIL;
 	}
-
-#if defined(CONFIG_SUPPORT_USB_INT)
-	if (NULL == padapter->hal_func.interrupt_handler) {
-		rtw_hal_error_msg("interrupt_handler");
-		ret = _FAIL;
-	}
-#endif /*#if defined(CONFIG_SUPPORT_USB_INT)*/
 
 	/*** DM section ***/
 	if (NULL == padapter->hal_func.dm_init) {

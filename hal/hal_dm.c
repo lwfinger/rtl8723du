@@ -592,9 +592,6 @@ void SetHalODMVar(
 					podmpriv->RSSI_A, podmpriv->RSSI_B, podmpriv->RSSI_C, podmpriv->RSSI_D);
 			else
 				_RTW_PRINT_SEL(sel, " RSSI_A = %d(%%), RSSI_B = %d(%%)\n", podmpriv->RSSI_A, podmpriv->RSSI_B);
-#ifdef DBG_RX_SIGNAL_DISPLAY_RAW_DATA
-			rtw_dump_raw_rssi_info(Adapter, sel);
-#endif
 		}
 	}
 		break;
@@ -602,11 +599,6 @@ void SetHalODMVar(
 		void *sel;
 
 		sel = pValue1;
-
-		/*_RTW_PRINT_SEL(sel , "HAL_ODM_RX_Dframe_INFO\n");*/
-#ifdef DBG_RX_DFRAME_RAW_DATA
-		rtw_dump_rx_dframe_info(Adapter, sel);
-#endif
 	}
 		break;
 	default:

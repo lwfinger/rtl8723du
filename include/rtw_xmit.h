@@ -348,13 +348,7 @@ struct xmit_buf {
 	u8 bpending[8];
 
 	sint last[8];
-
-#if defined(DBG_XMIT_BUF) || defined(DBG_XMIT_BUF_EXT)
-	u8 no;
-#endif
-
 };
-
 
 struct xmit_frame {
 	_list	list;
@@ -541,9 +535,6 @@ struct	xmit_priv	{
 	u32 amsdu_debug_coalesce_two;
 
 #endif
-#ifdef DBG_TXBD_DESC_DUMP
-	BOOLEAN	 dump_txbd_desc;
-#endif
 	_lock lock_sctx;
 
 };
@@ -625,15 +616,6 @@ u8 query_ra_short_GI(struct sta_info *psta, u8 bw);
 
 u8	qos_acm(u8 acm_mask, u8 priority);
 
-#ifdef CONFIG_XMIT_THREAD_MODE
-void	enqueue_pending_xmitbuf(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf);
-void enqueue_pending_xmitbuf_to_head(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf);
-struct xmit_buf	*dequeue_pending_xmitbuf(struct xmit_priv *pxmitpriv);
-struct xmit_buf	*select_and_dequeue_pending_xmitbuf(_adapter *padapter);
-sint	check_pending_xmitbuf(struct xmit_priv *pxmitpriv);
-thread_return	rtw_xmit_thread(thread_context context);
-#endif
-
 #ifdef CONFIG_TX_AMSDU
 extern void rtw_amsdu_vo_timeout_handler(void *FunctionContext);
 extern void rtw_amsdu_vi_timeout_handler(void *FunctionContext);
@@ -649,12 +631,6 @@ extern s32 rtw_xmitframe_coalesce_amsdu(_adapter *padapter, struct xmit_frame *p
 extern s32 check_amsdu(struct xmit_frame *pxmitframe);
 extern s32 check_amsdu_tx_support(_adapter *padapter);
 extern struct xmit_frame *rtw_get_xframe(struct xmit_priv *pxmitpriv, int *num_frame);
-#endif
-
-#ifdef DBG_TXBD_DESC_DUMP
-void rtw_tx_desc_backup(_adapter *padapter, struct xmit_frame *pxmitframe, u8 desc_size, u8 hwq);
-void rtw_tx_desc_backup_reset(void);
-u8 rtw_get_tx_desc_backup(_adapter *padapter, u8 hwq, struct rtw_tx_desc_backup **pbak);
 #endif
 
 static void do_queue_select(_adapter *padapter, struct pkt_attrib *pattrib);
@@ -674,9 +650,6 @@ enum XMIT_BLOCK_REASON {
 void rtw_init_xmit_block(_adapter *padapter);
 void rtw_deinit_xmit_block(_adapter *padapter);
 
-#ifdef DBG_XMIT_BLOCK
-void dump_xmit_block(void *sel, _adapter *padapter);
-#endif
 void rtw_set_xmit_block(_adapter *padapter, enum XMIT_BLOCK_REASON reason);
 void rtw_clr_xmit_block(_adapter *padapter, enum XMIT_BLOCK_REASON reason);
 bool rtw_is_xmit_blocked(_adapter *padapter);

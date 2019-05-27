@@ -1095,12 +1095,6 @@ struct _ADAPTER {
 #ifdef CONFIG_EVENT_THREAD_MODE
 	_thread_hdl_ evtThread;
 #endif
-#ifdef CONFIG_XMIT_THREAD_MODE
-	_thread_hdl_ xmitThread;
-#endif
-#ifdef CONFIG_RECV_THREAD_MODE
-	_thread_hdl_ recvThread;
-#endif
 	u8 registered;
 
 	void (*intf_start)(_adapter *adapter);
@@ -1215,12 +1209,6 @@ struct _ADAPTER {
 	u16 tx_amsdu_rate;
 #endif
 	u8 driver_tx_max_agg_num; /*fix tx desc max agg num , 0xff: disable drv ctrl*/
-#ifdef DBG_RX_COUNTER_DUMP
-	u8 dump_rx_cnt_mode;/*BIT0:drv,BIT1:mac,BIT2:phy*/
-	u32 drv_rx_cnt_ok;
-	u32 drv_rx_cnt_crcerror;
-	u32 drv_rx_cnt_drop;
-#endif
 
 #ifdef CONFIG_DBG_COUNTER
 	struct rx_logs rx_logs;

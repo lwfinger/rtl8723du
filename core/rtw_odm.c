@@ -217,30 +217,13 @@ inline u8 rtw_odm_dfs_domain_unknown(_adapter *adapter)
 
 void rtw_odm_parse_rx_phy_status_chinfo(union recv_frame *rframe, u8 *phys)
 {
-#ifndef DBG_RX_PHYSTATUS_CHINFO
-#define DBG_RX_PHYSTATUS_CHINFO 0
-#endif
-
 	_adapter *adapter = rframe->u.hdr.adapter;
 	struct PHY_DM_STRUCT *phydm = adapter_to_phydm(adapter);
 	struct rx_pkt_attrib *attrib = &rframe->u.hdr.attrib;
 	u8 *wlanhdr = get_recvframe_data(rframe);
 
 	if (phydm->support_ic_type & ODM_IC_PHY_STATUE_NEW_TYPE) {
-		if ((*phys & 0xf) == 0) {
-			struct _phy_status_rpt_jaguar2_type0 *phys_t0 = (struct _phy_status_rpt_jaguar2_type0 *)phys;
-
-			if (DBG_RX_PHYSTATUS_CHINFO) {
-				RTW_PRINT("phys_t%u ta="MAC_FMT" %s, %s(band:%u, ch:%u, l_rxsc:%u)\n"
-					, *phys & 0xf
-					, MAC_ARG(get_ta(wlanhdr))
-					, is_broadcast_mac_addr(get_ra(wlanhdr)) ? "BC" : is_multicast_mac_addr(get_ra(wlanhdr)) ? "MC" : "UC"
-					, HDATA_RATE(attrib->data_rate)
-					, phys_t0->band, phys_t0->channel, phys_t0->rxsc
-				);
-			}
-
-		} else if ((*phys & 0xf) == 1) {
+		if ((*phys & 0xf) == 1) {
 			struct _phy_status_rpt_jaguar2_type1 *phys_t1 = (struct _phy_status_rpt_jaguar2_type1 *)phys;
 			u8 rxsc = (attrib->data_rate > DESC_RATE11M && attrib->data_rate < DESC_RATEMCS0) ? phys_t1->l_rxsc : phys_t1->ht_rxsc;
 			u8 pkt_cch = 0;
@@ -346,33 +329,9 @@ void rtw_odm_parse_rx_phy_status_chinfo(union recv_frame *rframe, u8 *phys)
 			#endif /* ODM_IC_11AC_SERIES_SUPPORT */
 
 type1_end:
-			if (DBG_RX_PHYSTATUS_CHINFO) {
-				RTW_PRINT("phys_t%u ta="MAC_FMT" %s, %s(band:%u, ch:%u, rf_mode:%u, l_rxsc:%u, ht_rxsc:%u) => %u,%u\n"
-					, *phys & 0xf
-					, MAC_ARG(get_ta(wlanhdr))
-					, is_broadcast_mac_addr(get_ra(wlanhdr)) ? "BC" : is_multicast_mac_addr(get_ra(wlanhdr)) ? "MC" : "UC"
-					, HDATA_RATE(attrib->data_rate)
-					, phys_t1->band, phys_t1->channel, phys_t1->rf_mode, phys_t1->l_rxsc, phys_t1->ht_rxsc
-					, pkt_cch, pkt_bw
-				);
-			}
-
 			/* for now, only return cneter channel of 20MHz packet */
 			if (pkt_cch && pkt_bw == CHANNEL_WIDTH_20)
 				attrib->ch = pkt_cch;
-
-		} else {
-			struct _phy_status_rpt_jaguar2_type2 *phys_t2 = (struct _phy_status_rpt_jaguar2_type2 *)phys;
-
-			if (DBG_RX_PHYSTATUS_CHINFO) {
-				RTW_PRINT("phys_t%u ta="MAC_FMT" %s, %s(band:%u, ch:%u, l_rxsc:%u, ht_rxsc:%u)\n"
-					, *phys & 0xf
-					, MAC_ARG(get_ta(wlanhdr))
-					, is_broadcast_mac_addr(get_ra(wlanhdr)) ? "BC" : is_multicast_mac_addr(get_ra(wlanhdr)) ? "MC" : "UC"
-					, HDATA_RATE(attrib->data_rate)
-					, phys_t2->band, phys_t2->channel, phys_t2->l_rxsc, phys_t2->ht_rxsc
-				);
-			}
 		}
 	}
 }
