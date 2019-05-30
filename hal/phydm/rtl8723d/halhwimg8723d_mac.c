@@ -5,7 +5,6 @@
 #include "mp_precomp.h"
 #include "../phydm_precomp.h"
 
-#if (RTL8723D_SUPPORT == 1)
 static boolean
 check_positive(
 	struct PHY_DM_STRUCT *p_dm,
@@ -284,6 +283,3 @@ odm_get_version_mp_8723d_mac_reg(void)
 {
 		return 37;
 }
-
-#endif /* end of HWIMG_SUPPORT*/
-

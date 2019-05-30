@@ -7,8 +7,6 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-#ifdef CONFIG_PSD_TOOL
-
 u32
 phydm_get_psd_data(
 	void			*p_dm_void,
@@ -376,6 +374,3 @@ phydm_get_psd_result_table(
 	return temp_result;
 	
 }
-
-#endif
-

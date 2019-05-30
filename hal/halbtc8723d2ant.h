@@ -3,8 +3,6 @@
 
 #if (BT_SUPPORT == 1 && COEX_SUPPORT == 1)
 
-#if (RTL8723D_SUPPORT == 1)
-
 /* *******************************************
  * The following is for 8723D 2Ant BT Co-exist definition
  * ******************************************* */
@@ -428,31 +426,6 @@ void ex_halbtc8723d2ant_display_coex_info(IN struct btc_coexist *btcoexist);
 void ex_halbtc8723d2ant_antenna_detection(IN struct btc_coexist *btcoexist,
 		IN u32 cent_freq, IN u32 offset, IN u32 span, IN u32 seconds);
 void ex_halbtc8723d2ant_display_ant_detection(IN struct btc_coexist *btcoexist);
-
-
-#else
-#define	ex_halbtc8723d2ant_power_on_setting(btcoexist)
-#define	ex_halbtc8723d2ant_pre_load_firmware(btcoexist)
-#define	ex_halbtc8723d2ant_init_hw_config(btcoexist, wifi_only)
-#define	ex_halbtc8723d2ant_init_coex_dm(btcoexist)
-#define	ex_halbtc8723d2ant_ips_notify(btcoexist, type)
-#define	ex_halbtc8723d2ant_lps_notify(btcoexist, type)
-#define	ex_halbtc8723d2ant_scan_notify(btcoexist, type)
-#define	ex_halbtc8723d2ant_connect_notify(btcoexist, type)
-#define	ex_halbtc8723d2ant_media_status_notify(btcoexist, type)
-#define	ex_halbtc8723d2ant_specific_packet_notify(btcoexist, type)
-#define	ex_halbtc8723d2ant_bt_info_notify(btcoexist, tmp_buf, length)
-#define ex_halbtc8723d2ant_wl_fwdbginfo_notify(btcoexist, tmp_buf, length)
-#define	ex_halbtc8723d2ant_rx_rate_change_notify(btcoexist, is_data_frame, btc_rate_id)
-#define	ex_halbtc8723d2ant_rf_status_notify(btcoexist, type)
-#define	ex_halbtc8723d2ant_halt_notify(btcoexist)
-#define	ex_halbtc8723d2ant_pnp_notify(btcoexist, pnp_state)
-#define	ex_halbtc8723d2ant_periodical(btcoexist)
-#define	ex_halbtc8723d2ant_display_coex_info(btcoexist)
-#define	ex_halbtc8723d2ant_set_antenna_notify(btcoexist, type)
-#define	ex_halbtc8723d2ant_display_ant_detection(btcoexist)
-#define	ex_halbtc8723d2ant_antenna_detection(btcoexist, cent_freq, offset, span, seconds)
-#endif
 
 #endif
 

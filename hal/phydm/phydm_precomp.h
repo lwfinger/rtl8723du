@@ -6,16 +6,11 @@
 
 #include "phydm_types.h"
 #include "phydm_features.h"
-#include "halrf/halrf_features.h"
 
 #define		TEST_FALG___		1
 
 /* 2 Config Flags and Structs - defined by each ODM type */
 
-#ifdef DM_ODM_CE_MAC80211
-	#include "../wifi.h"
-	#include "rtl_phydm.h"
-#endif
 #define __PACK
 #define __WLAN_ATTRIB_PACK__
 
@@ -29,8 +24,6 @@
 #include "phydm_regdefine11n.h"
 #include "phydm_interface.h"
 #include "phydm_reg.h"
-
-#if !defined(DM_ODM_CE_MAC80211)
 
 void
 phy_set_tx_power_limit(
@@ -61,33 +54,6 @@ rtw_phydm_cfg_phy_para(
 	enum rf_path e_rf_path,
 	u32 delay_time
 );
-
-#endif
-
-#if defined(DM_ODM_CE_MAC80211)
-#include "../halmac/halmac_reg2.h"
-
-#define	LDPC_HT_ENABLE_RX			BIT(0)
-#define	LDPC_HT_ENABLE_TX			BIT(1)
-#define	LDPC_HT_TEST_TX_ENABLE			BIT(2)
-#define	LDPC_HT_CAP_TX				BIT(3)
-
-#define	STBC_HT_ENABLE_RX			BIT(0)
-#define	STBC_HT_ENABLE_TX			BIT(1)
-#define	STBC_HT_TEST_TX_ENABLE			BIT(2)
-#define	STBC_HT_CAP_TX				BIT(3)
-
-
-#define	LDPC_VHT_ENABLE_RX			BIT(0)
-#define	LDPC_VHT_ENABLE_TX			BIT(1)
-#define	LDPC_VHT_TEST_TX_ENABLE			BIT(2)
-#define	LDPC_VHT_CAP_TX				BIT(3)
-
-#define	STBC_VHT_ENABLE_RX			BIT(0)
-#define	STBC_VHT_ENABLE_TX			BIT(1)
-#define	STBC_VHT_TEST_TX_ENABLE			BIT(2)
-#define	STBC_VHT_CAP_TX				BIT(3)
-#endif
 
 #include "rtl8723d/halhwimg8723d_bb.h"
 #include "rtl8723d/halhwimg8723d_mac.h"

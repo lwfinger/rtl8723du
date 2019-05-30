@@ -23,7 +23,6 @@
 #include "phydm_dfs.h"
 #include "phydm_ccx.h"
 #include "txbf/phydm_hal_txbf_api.h"
-#include "phydm_adc_sampling.h"
 #include "phydm_dynamic_rx_path.h"
 #include "phydm_psd.h"
 #include "phydm_primary_cca.h"
@@ -823,9 +822,7 @@ struct	phydm_iot_center {
 	struct phydm_dig_struct				dm_dig_table;
 	struct phydm_lna_sat_info_struct	dm_lna_sat_info;
 
-#ifdef PHYDM_SUPPORT_CCKPD
 	struct phydm_cckpd_struct				dm_cckpd_table;
-#endif
 	
 #ifdef PHYDM_PRIMARY_CCA
 	struct phydm_pricca_struct				dm_pri_cca;
@@ -843,10 +840,7 @@ struct	phydm_iot_center {
 	struct _hal_rf_						rf_table; 		/*for HALRF function*/
 	struct odm_rf_calibration_structure		rf_calibrate_info;
 	struct odm_power_trim_data			power_trim_data;	
-
-#ifdef CONFIG_PSD_TOOL
-	struct _PHYDM_PSD_					dm_psd_table;
-#endif
+	struct _PHYDM_PSD_				dm_psd_table;
 
 #ifdef CONFIG_DYNAMIC_RX_PATH
 	struct _DYNAMIC_RX_PATH_			dm_drp_table;
@@ -1080,24 +1074,7 @@ phydm_get_structure(
 	/* The following is for compile only*/
 	/*===========================================================*/
 
-	#if defined(DM_ODM_CE_MAC80211)
-		#define IS_HARDWARE_TYPE_8188E(_adapter)		false
-		#define IS_HARDWARE_TYPE_8188F(_adapter)		false
-		#define IS_HARDWARE_TYPE_8703B(_adapter)		false
-		#define IS_HARDWARE_TYPE_8723D(_adapter)		false
-		#define IS_HARDWARE_TYPE_8821C(_adapter)		false
-		#define IS_HARDWARE_TYPE_8812AU(_adapter)	false
-		#define IS_HARDWARE_TYPE_8814A(_adapter)		false
-		#define IS_HARDWARE_TYPE_8814AU(_adapter)	false
-		#define IS_HARDWARE_TYPE_8814AE(_adapter)	false
-		#define IS_HARDWARE_TYPE_8814AS(_adapter)	false
-		#define IS_HARDWARE_TYPE_8723BU(_adapter)	false
-		#define IS_HARDWARE_TYPE_8822BU(_adapter)	false
-		#define IS_HARDWARE_TYPE_8822BS(_adapter)		false
-		#define IS_HARDWARE_TYPE_JAGUAR(_Adapter)	false
-	#else
-		#define	IS_HARDWARE_TYPE_8723A(_adapter)	false
-	#endif
+	#define	IS_HARDWARE_TYPE_8723A(_adapter)	false
 	#define	IS_HARDWARE_TYPE_8723AE(_adapter)		false
 	#define	IS_HARDWARE_TYPE_8192C(_adapter)			false
 	#define	IS_HARDWARE_TYPE_8192D(_adapter)		false

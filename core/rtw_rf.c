@@ -558,11 +558,7 @@ const u8 _rf_type_to_rf_rx_cnt[] = {
 
 #define COUNTRY_CHPLAN_ASSIGN_EN_11AC(_val)
 
-#if RTW_DEF_MODULE_REGULATORY_CERT
-#define COUNTRY_CHPLAN_ASSIGN_DEF_MODULE_FLAGS(_val) , .def_module_flags = (_val)
-#else
 #define COUNTRY_CHPLAN_ASSIGN_DEF_MODULE_FLAGS(_val)
-#endif
 
 /* has def_module_flags specified, used by common map and HAL dfference map */
 #define COUNTRY_CHPLAN_ENT(_alpha2, _chplan, _en_11ac, _def_module_flags) \
@@ -575,165 +571,7 @@ const u8 _rf_type_to_rf_rx_cnt[] = {
 
 #include "../platform/custom_country_chplan.h"
 
-#elif RTW_DEF_MODULE_REGULATORY_CERT
-
-/* leave def_module_flags empty, def_module_flags check is done on country_chplan_map */
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8821AE_HMC_M2) /* 2013 certify */
-static const struct country_chplan RTL8821AE_HMC_M2_country_chplan_exc_map[] = {
-	COUNTRY_CHPLAN_ENT("CA", 0x34, 1, 0), /* Canada */
-	COUNTRY_CHPLAN_ENT("CL", 0x30, 1, 0), /* Chile */
-	COUNTRY_CHPLAN_ENT("CN", 0x51, 1, 0), /* China */
-	COUNTRY_CHPLAN_ENT("MX", 0x34, 1, 0), /* Mexico */
-	COUNTRY_CHPLAN_ENT("MY", 0x47, 1, 0), /* Malaysia */
-	COUNTRY_CHPLAN_ENT("TW", 0x39, 1, 0), /* Taiwan */
-	COUNTRY_CHPLAN_ENT("UA", 0x36, 0, 0), /* Ukraine */
-	COUNTRY_CHPLAN_ENT("US", 0x34, 1, 0), /* United States of America (USA) */
-};
-#endif
-
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8821AU) /* 2014 certify */
-static const struct country_chplan RTL8821AU_country_chplan_exc_map[] = {
-	COUNTRY_CHPLAN_ENT("CA", 0x34, 1, 0), /* Canada */
-	COUNTRY_CHPLAN_ENT("RU", 0x59, 0, 0), /* Russia(fac/gost), Kaliningrad */
-	COUNTRY_CHPLAN_ENT("TW", 0x39, 1, 0), /* Taiwan */
-	COUNTRY_CHPLAN_ENT("UA", 0x36, 0, 0), /* Ukraine */
-	COUNTRY_CHPLAN_ENT("US", 0x34, 1, 0), /* United States of America (USA) */
-};
-#endif
-
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8812AENF_NGFF) /* 2014 certify */
-static const struct country_chplan RTL8812AENF_NGFF_country_chplan_exc_map[] = {
-	COUNTRY_CHPLAN_ENT("TW", 0x39, 1, 0), /* Taiwan */
-	COUNTRY_CHPLAN_ENT("US", 0x34, 1, 0), /* United States of America (USA) */
-};
-#endif
-
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8812AEBT_HMC) /* 2013 certify */
-static const struct country_chplan RTL8812AEBT_HMC_country_chplan_exc_map[] = {
-	COUNTRY_CHPLAN_ENT("CA", 0x34, 1, 0), /* Canada */
-	COUNTRY_CHPLAN_ENT("RU", 0x59, 0, 0), /* Russia(fac/gost), Kaliningrad */
-	COUNTRY_CHPLAN_ENT("TW", 0x39, 1, 0), /* Taiwan */
-	COUNTRY_CHPLAN_ENT("UA", 0x36, 0, 0), /* Ukraine */
-	COUNTRY_CHPLAN_ENT("US", 0x34, 1, 0), /* United States of America (USA) */
-};
-#endif
-
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8188EE_HMC_M2) /* 2012 certify */
-static const struct country_chplan RTL8188EE_HMC_M2_country_chplan_exc_map[] = {
-	COUNTRY_CHPLAN_ENT("CA", 0x20, 1, 0), /* Canada */
-	COUNTRY_CHPLAN_ENT("MX", 0x34, 1, 0), /* Mexico */
-	COUNTRY_CHPLAN_ENT("TW", 0x39, 1, 0), /* Taiwan */
-	COUNTRY_CHPLAN_ENT("US", 0x34, 1, 0), /* United States of America (USA) */
-};
-#endif
-
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8723BE_HMC_M2) /* 2013 certify */
-static const struct country_chplan RTL8723BE_HMC_M2_country_chplan_exc_map[] = {
-	COUNTRY_CHPLAN_ENT("CA", 0x20, 1, 0), /* Canada */
-	COUNTRY_CHPLAN_ENT("MX", 0x34, 1, 0), /* Mexico */
-	COUNTRY_CHPLAN_ENT("TW", 0x39, 1, 0), /* Taiwan */
-	COUNTRY_CHPLAN_ENT("US", 0x34, 1, 0), /* United States of America (USA) */
-};
-#endif
-
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8723BS_NGFF1216) /* 2014 certify */
-static const struct country_chplan RTL8723BS_NGFF1216_country_chplan_exc_map[] = {
-	COUNTRY_CHPLAN_ENT("CA", 0x20, 1, 0), /* Canada */
-	COUNTRY_CHPLAN_ENT("MX", 0x34, 1, 0), /* Mexico */
-	COUNTRY_CHPLAN_ENT("TW", 0x39, 1, 0), /* Taiwan */
-	COUNTRY_CHPLAN_ENT("US", 0x34, 1, 0), /* United States of America (USA) */
-};
-#endif
-
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8192EEBT_HMC_M2) /* 2013 certify */
-static const struct country_chplan RTL8192EEBT_HMC_M2_country_chplan_exc_map[] = {
-	COUNTRY_CHPLAN_ENT("CA", 0x20, 1, 0), /* Canada */
-	COUNTRY_CHPLAN_ENT("MX", 0x34, 1, 0), /* Mexico */
-	COUNTRY_CHPLAN_ENT("TW", 0x39, 1, 0), /* Taiwan */
-	COUNTRY_CHPLAN_ENT("US", 0x34, 1, 0), /* United States of America (USA) */
-};
-#endif
-
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8723DE_NGFF1630) /* 2016 certify */
-static const struct country_chplan RTL8723DE_NGFF1630_country_chplan_exc_map[] = {
-	COUNTRY_CHPLAN_ENT("CA", 0x2A, 1, 0), /* Canada */
-	COUNTRY_CHPLAN_ENT("MX", 0x34, 1, 0), /* Mexico */
-};
-#endif
-
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8822BE) /* 2016 certify */
-static const struct country_chplan RTL8822BE_country_chplan_exc_map[] = {
-};
-#endif
-
-#if (RTW_DEF_MODULE_REGULATORY_CERT & RTW_MODULE_RTL8821CE) /* 2016 certify */
-static const struct country_chplan RTL8821CE_country_chplan_exc_map[] = {
-};
-#endif
-
-/**
- * rtw_def_module_get_chplan_from_country -
- * @country_code: string of country code
- * @return:
- * Return NULL for case referring to common map
- */
-static const struct country_chplan *rtw_def_module_get_chplan_from_country(const char *country_code)
-{
-	const struct country_chplan *ent = NULL;
-	const struct country_chplan *hal_map = NULL;
-	u16 hal_map_sz = 0;
-	int i;
-
-	/* TODO: runtime selection for multi driver */
-#if (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8821AE_HMC_M2)
-	hal_map = RTL8821AE_HMC_M2_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8821AE_HMC_M2_country_chplan_exc_map) / sizeof(struct country_chplan);
-#elif (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8821AU)
-	hal_map = RTL8821AU_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8821AU_country_chplan_exc_map) / sizeof(struct country_chplan);
-#elif (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8812AENF_NGFF)
-	hal_map = RTL8812AENF_NGFF_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8812AENF_NGFF_country_chplan_exc_map) / sizeof(struct country_chplan);
-#elif (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8812AEBT_HMC)
-	hal_map = RTL8812AEBT_HMC_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8812AEBT_HMC_country_chplan_exc_map) / sizeof(struct country_chplan);
-#elif (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8188EE_HMC_M2)
-	hal_map = RTL8188EE_HMC_M2_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8188EE_HMC_M2_country_chplan_exc_map) / sizeof(struct country_chplan);
-#elif (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8723BE_HMC_M2)
-	hal_map = RTL8723BE_HMC_M2_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8723BE_HMC_M2_country_chplan_exc_map) / sizeof(struct country_chplan);
-#elif (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8723BS_NGFF1216)
-	hal_map = RTL8723BS_NGFF1216_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8723BS_NGFF1216_country_chplan_exc_map) / sizeof(struct country_chplan);
-#elif (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8192EEBT_HMC_M2)
-	hal_map = RTL8192EEBT_HMC_M2_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8192EEBT_HMC_M2_country_chplan_exc_map) / sizeof(struct country_chplan);
-#elif (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8723DE_NGFF1630)
-	hal_map = RTL8723DE_NGFF1630_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8723DE_NGFF1630_country_chplan_exc_map) / sizeof(struct country_chplan);
-#elif (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8822BE)
-	hal_map = RTL8822BE_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8822BE_country_chplan_exc_map) / sizeof(struct country_chplan);
-#elif (RTW_DEF_MODULE_REGULATORY_CERT == RTW_MODULE_RTL8821CE)
-	hal_map = RTL8821CE_country_chplan_exc_map;
-	hal_map_sz = sizeof(RTL8821CE_country_chplan_exc_map) / sizeof(struct country_chplan);
-#endif
-
-	if (hal_map == NULL || hal_map_sz == 0)
-		goto exit;
-
-	for (i = 0; i < hal_map_sz; i++) {
-		if (strncmp(country_code, hal_map[i].alpha2, 2) == 0) {
-			ent = &hal_map[i];
-			break;
-		}
-	}
-
-exit:
-	return ent;
-}
-#endif /* CONFIG_CUSTOMIZED_COUNTRY_CHPLAN_MAP or RTW_DEF_MODULE_REGULATORY_CERT */
+#endif /* CONFIG_CUSTOMIZED_COUNTRY_CHPLAN_MAP */
 
 static const struct country_chplan country_chplan_map[] = {
 	COUNTRY_CHPLAN_ENT("AD", 0x26, 1, 0x000), /* Andorra */
@@ -976,9 +814,6 @@ static const struct country_chplan country_chplan_map[] = {
 */
 const struct country_chplan *rtw_get_chplan_from_country(const char *country_code)
 {
-#if RTW_DEF_MODULE_REGULATORY_CERT
-	const struct country_chplan *exc_ent = NULL;
-#endif
 	const struct country_chplan *ent = NULL;
 	const struct country_chplan *map = NULL;
 	u16 map_sz = 0;
@@ -992,9 +827,6 @@ const struct country_chplan *rtw_get_chplan_from_country(const char *country_cod
 	map = CUSTOMIZED_country_chplan_map;
 	map_sz = sizeof(CUSTOMIZED_country_chplan_map) / sizeof(struct country_chplan);
 #else
-	#if RTW_DEF_MODULE_REGULATORY_CERT
-	exc_ent = rtw_def_module_get_chplan_from_country(code);
-	#endif
 	map = country_chplan_map;
 	map_sz = sizeof(country_chplan_map) / sizeof(struct country_chplan);
 #endif
@@ -1007,13 +839,6 @@ const struct country_chplan *rtw_get_chplan_from_country(const char *country_cod
 	}
 
 exit:
-	#if RTW_DEF_MODULE_REGULATORY_CERT
-	if (!ent || !(COUNTRY_CHPLAN_DEF_MODULE_FALGS(ent) & RTW_DEF_MODULE_REGULATORY_CERT))
-		exc_ent = ent = NULL;
-	if (exc_ent)
-		ent = exc_ent;
-	#endif
-
 	return ent;
 }
 

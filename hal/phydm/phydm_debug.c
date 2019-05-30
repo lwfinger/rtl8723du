@@ -169,8 +169,6 @@ phydm_get_bb_dbg_port_value(
 	return	dbg_port_value;
 }
 
-#ifdef CONFIG_PHYDM_DEBUG_FUNCTION
-
 static void
 phydm_bb_debug_info_n_series(
 	void			*p_dm_void,
@@ -784,7 +782,6 @@ phydm_bb_debug_info(
 	*_out_len = out_len;
 
 }
-#endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/
 
 void
 phydm_reset_rx_rate_distribution(
@@ -1113,7 +1110,6 @@ void phydm_basic_profile(
 	u32			*_out_len
 )
 {
-#ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	char  *cut = NULL;
 	char *ic_type = NULL;
@@ -1156,20 +1152,11 @@ void phydm_basic_profile(
 	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "PHY Para Commit by", commit_by));
 	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d\n", "PHY Para Release Ver", release_ver));
 
-#if defined(DM_ODM_CE_MAC80211)
-	{
-		struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-		struct rtl_hal *rtlhal = rtl_hal(rtlpriv);
-
-		PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d (Subversion: %d)\n", "FW Ver", rtlhal->fw_version, rtlhal->fw_subversion));
-	}
-#else
 	{
 		struct _ADAPTER		*adapter = p_dm->adapter;
 		HAL_DATA_TYPE		*p_hal_data = GET_HAL_DATA(adapter);
 		PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d (Subversion: %d)\n", "FW Ver", p_hal_data->firmware_version, p_hal_data->firmware_sub_version));
 	}
-#endif
 	/* 1 PHY DM version List */
 	PHYDM_SNPRINTF((output + used, out_len - used, "%-35s\n", "% PHYDM version %"));
 	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "Code base", PHYDM_CODE_BASE));
@@ -1182,16 +1169,13 @@ void phydm_basic_profile(
 	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "RA Info", RAINFO_VERSION));
 	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "ACS", ACS_VERSION));
 	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "PathDiv", PATHDIV_VERSION));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "LA mode", DYNAMIC_LA_MODE));
 	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "Primary CCA", PRIMARYCCA_VERSION));
 	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "DFS", DFS_VERSION));
 
 	*_used = used;
 	*_out_len = out_len;
-#endif /*#if CONFIG_PHYDM_DEBUG_FUNCTION*/
 }
 
-#ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 void
 phydm_fw_trace_en_h2c(
 	void		*p_dm_void,
@@ -1705,8 +1689,6 @@ static struct _PHYDM_COMMAND phy_dm_ary[] = {
 	{"pause", PHYDM_PAUSE_FUNC}
 };
 
-#endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/
-
 void
 phydm_cmd_parser(
 	struct PHY_DM_STRUCT	*p_dm,
@@ -1717,7 +1699,6 @@ phydm_cmd_parser(
 	u32	out_len
 )
 {
-#ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 	u32 used = 0;
 	u8 id = 0;
 	int var1[10] = {0};
@@ -2215,13 +2196,8 @@ phydm_cmd_parser(
 		break;
 
 	case PHYDM_PSD:
-
-		#ifdef CONFIG_PSD_TOOL
 		phydm_psd_debug(p_dm, &input[0], &used, output, &out_len, input_num);
-		#endif
-
 		break;
-		
 	case PHYDM_DEBUG_PORT:
 		{
 			u32	dbg_port_value;
@@ -2345,7 +2321,6 @@ phydm_cmd_parser(
 		break;
 
 	}
-#endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/
 }
 
 #ifdef __ECOS
@@ -2403,7 +2378,6 @@ phydm_fw_trace_handler(
 	u8	cmd_len
 )
 {
-#ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
 	/*u8	debug_trace_11byte[60];*/
@@ -2464,7 +2438,6 @@ phydm_fw_trace_handler(
 	}
 
 	p_dm->pre_c2h_seq = c2h_seq;
-#endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/
 }
 
 void
@@ -2474,7 +2447,6 @@ phydm_fw_trace_handler_code(
 	u8	cmd_len
 )
 {
-#ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8	function = buffer[0];
 	u8	dbg_num = buffer[1];
@@ -2495,8 +2467,6 @@ phydm_fw_trace_handler_code(
 		  function, dbg_num, content_0, content_1, content_2,
 		  content_3, content_4));
 	/*--------------------------------------------*/
-
-#endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/
 }
 
 void
@@ -2506,7 +2476,6 @@ phydm_fw_trace_handler_8051(
 	u8	cmd_len
 )
 {
-#ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	int i = 0;
 	u8	extend_c2h_sub_id = 0, extend_c2h_dbg_len = 0, extend_c2h_dbg_seq = 0;
@@ -2538,7 +2507,4 @@ go_backfor_aggre_dbg_pkt:
 			goto go_backfor_aggre_dbg_pkt;
 		}
 	}
-
-
-#endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/
 }

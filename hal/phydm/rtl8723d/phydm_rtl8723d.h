@@ -15,14 +15,10 @@
 #ifndef	__ODM_RTL8723D_H__
 #define __ODM_RTL8723D_H__
 
-#if (RTL8723D_SUPPORT == 1)
-
 s8
 odm_cckrssi_8723d(
 	u8	lna_idx,
 	u8	vga_idx
 );
-
-#endif
 
 #endif

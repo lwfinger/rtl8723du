@@ -60,17 +60,10 @@ odm_clear_txpowertracking_state(
 
 void
 odm_txpowertracking_callback_thermal_meter(
-#if defined(DM_ODM_CE_MAC80211)
-	void	*p_dm
-#else
 	struct _ADAPTER	*adapter
-#endif
 );
 
-
-
 #define ODM_TARGET_CHNL_NUM_2G_5G	59
-
 
 void
 odm_reset_iqk_result(

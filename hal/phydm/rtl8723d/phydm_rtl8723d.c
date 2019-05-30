@@ -8,8 +8,6 @@
 #include "mp_precomp.h"
 #include "../phydm_precomp.h"
 
-#if (RTL8723D_SUPPORT == 1)
-
 s8
 odm_cckrssi_8723d(
 	u8	lna_idx,
@@ -39,5 +37,3 @@ odm_cckrssi_8723d(
 	return rx_pwr_all;
 
 }
-
-#endif

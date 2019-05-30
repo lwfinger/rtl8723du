@@ -409,32 +409,6 @@ phydm_dig_init(
 #endif
 }
 
-static boolean
-phydm_dig_performance_mode_decision(
-	struct PHY_DM_STRUCT		*p_dm
-)
-{
-	boolean	is_performance = true;
-
-#ifdef PHYDM_DIG_MODE_DECISION_SUPPORT
-	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
-
-	switch (p_dig_t->dig_mode_decision) {
-	case PHYDM_DIG_PERFORAMNCE_MODE:
-		is_performance = true;
-		break;
-	case PHYDM_DIG_COVERAGE_MODE:
-		is_performance = false;
-		break;
-	default:
-		is_performance = true;
-		break;
-	}
-#endif
-
-	return is_performance;
-}
-
 static void
 phydm_dig_abs_boundary_decision(
 	struct PHY_DM_STRUCT		*p_dm,
@@ -744,9 +718,7 @@ phydm_dig(
 		PHYDM_DBG(p_dm, DBG_DIG, ("In DFS band\n"));
 	}
 
-	is_performance = phydm_dig_performance_mode_decision(p_dm);
-	PHYDM_DBG(p_dm, DBG_DIG,
-		("DIG ((%s)) mode\n", (is_performance ? "Performance" : "Coverage")));
+	is_performance = true;
 
 	/* Boundary Decision */
 	phydm_dig_abs_boundary_decision(p_dm, is_performance, is_dfs_band);

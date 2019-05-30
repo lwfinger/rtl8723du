@@ -22,7 +22,6 @@
  * 1  structure
  * 1 ============================================================ */
 
-#ifdef PHYDM_SUPPORT_CCKPD
 struct phydm_cckpd_struct {
 
 	u8		cur_cck_cca_thres; /*0xA0A*/
@@ -34,7 +33,6 @@ struct phydm_cckpd_struct {
 	u8		pause_lv;
 	u8		pause_cckpd_value[PHYDM_PAUSE_MAX_NUM]; /*will be removed*/
 };
-#endif
 
 /* 1 ============================================================
  * 1  enumeration

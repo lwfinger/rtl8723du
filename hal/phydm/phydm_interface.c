@@ -8,40 +8,19 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-/*
- * ODM IO Relative API.
- *   */
+/* ODM IO Relative API. */
 
-u8
-odm_read_1byte(
-	struct PHY_DM_STRUCT		*p_dm,
-	u32			reg_addr
-)
+u8 odm_read_1byte(struct PHY_DM_STRUCT *p_dm, u32 reg_addr)
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	return rtl_read_byte(rtlpriv, reg_addr);
-#else
 	struct _ADAPTER		*adapter = p_dm->adapter;
+
 	return rtw_read8(adapter, reg_addr);
-#endif
 }
 
-u16
-odm_read_2byte(
-	struct PHY_DM_STRUCT		*p_dm,
-	u32			reg_addr
-)
+u16 odm_read_2byte(struct PHY_DM_STRUCT *p_dm, u32 reg_addr)
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	return rtl_read_word(rtlpriv, reg_addr);
-#else
 	struct _ADAPTER		*adapter = p_dm->adapter;
 	return rtw_read16(adapter, reg_addr);
-#endif
 }
 
 
@@ -51,14 +30,8 @@ odm_read_4byte(
 	u32			reg_addr
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	return rtl_read_dword(rtlpriv, reg_addr);
-#else
 	struct _ADAPTER		*adapter = p_dm->adapter;
 	return rtw_read32(adapter, reg_addr);
-#endif
 }
 
 void
@@ -68,15 +41,8 @@ odm_write_1byte(
 	u8			data
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	rtl_write_byte(rtlpriv, reg_addr, data);
-#else
 	struct _ADAPTER		*adapter = p_dm->adapter;
 	rtw_write8(adapter, reg_addr, data);
-#endif
-
 }
 
 
@@ -87,14 +53,8 @@ odm_write_2byte(
 	u16			data
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	rtl_write_word(rtlpriv, reg_addr, data);
-#else
 	struct _ADAPTER		*adapter = p_dm->adapter;
 	rtw_write16(adapter, reg_addr, data);
-#endif
 }
 
 void
@@ -104,14 +64,8 @@ odm_write_4byte(
 	u32			data
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	rtl_write_dword(rtlpriv, reg_addr, data);
-#else
 	struct _ADAPTER		*adapter = p_dm->adapter;
 	rtw_write32(adapter, reg_addr, data);
-#endif
 }
 
 void
@@ -122,13 +76,7 @@ odm_set_mac_reg(
 	u32		data
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	rtl_set_bbreg(rtlpriv->hw, reg_addr, bit_mask, data);
-#else
 	phy_set_bb_reg(p_dm->adapter, reg_addr, bit_mask, data);
-#endif
 }
 
 u32
@@ -138,13 +86,7 @@ odm_get_mac_reg(
 	u32		bit_mask
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	return rtl_get_bbreg(rtlpriv->hw, reg_addr, bit_mask);
-#else
 	return phy_query_mac_reg(p_dm->adapter, reg_addr, bit_mask);
-#endif
 }
 
 
@@ -156,13 +98,7 @@ odm_set_bb_reg(
 	u32		data
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	rtl_set_bbreg(rtlpriv->hw, reg_addr, bit_mask, data);
-#else
 	phy_set_bb_reg(p_dm->adapter, reg_addr, bit_mask, data);
-#endif
 }
 
 
@@ -173,13 +109,7 @@ odm_get_bb_reg(
 	u32		bit_mask
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	return rtl_get_bbreg(rtlpriv->hw, reg_addr, bit_mask);
-#else
 	return phy_query_bb_reg(p_dm->adapter, reg_addr, bit_mask);
-#endif
 }
 
 
@@ -192,13 +122,7 @@ odm_set_rf_reg(
 	u32				data
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	rtl_set_rfreg(rtlpriv->hw, e_rf_path, reg_addr, bit_mask, data);
-#else
 	phy_set_rf_reg(p_dm->adapter, e_rf_path, reg_addr, bit_mask, data);
-#endif
 }
 
 u32
@@ -209,13 +133,7 @@ odm_get_rf_reg(
 	u32				bit_mask
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-
-	return rtl_get_rfreg(rtlpriv->hw, e_rf_path, reg_addr, bit_mask);
-#else
 	return phy_query_rf_reg(p_dm->adapter, e_rf_path, reg_addr, bit_mask);
-#endif
 }
 
 enum hal_status
@@ -248,11 +166,7 @@ odm_allocate_memory(
 	u32		length
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	*p_ptr = kmalloc(length, GFP_ATOMIC);
-#else
 	*p_ptr = rtw_zvmalloc(length);
-#endif
 }
 
 /* length could be ignored, used to detect memory leakage. */
@@ -263,11 +177,7 @@ odm_free_memory(
 	u32		length
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	kfree(p_ptr);
-#else
 	rtw_vmfree(p_ptr, length);
-#endif
 }
 
 void
@@ -278,11 +188,7 @@ odm_move_memory(
 	u32		length
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	memcpy(p_dest, p_src, length);
-#else
 	_rtw_memcpy(p_dest, p_src, length);
-#endif
 }
 
 void odm_memory_set(
@@ -292,11 +198,7 @@ void odm_memory_set(
 	u32		length
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	memset(pbuf, value, length);
-#else
 	_rtw_memset(pbuf, value, length);
-#endif
 }
 s32 odm_compare_memory(
 	struct PHY_DM_STRUCT		*p_dm,
@@ -305,11 +207,7 @@ s32 odm_compare_memory(
 	u32          length
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	return memcmp(p_buf1, p_buf2, length);
-#else
 	return _rtw_memcmp(p_buf1, p_buf2, length);
-#endif
 }
 
 
@@ -345,41 +243,25 @@ odm_release_spin_lock(
 void
 ODM_delay_ms(u32	ms)
 {
-#if defined(DM_ODM_CE_MAC80211)
-	mdelay(ms);
-#else
 	rtw_mdelay_os(ms);
-#endif
 }
 
 void
 ODM_delay_us(u32	us)
 {
-#if defined(DM_ODM_CE_MAC80211)
-	udelay(us);
-#else
 	rtw_udelay_os(us);
-#endif
 }
 
 void
 ODM_sleep_ms(u32	ms)
 {
-#if defined(DM_ODM_CE_MAC80211)
-	msleep(ms);
-#else
 	rtw_msleep_os(ms);
-#endif
 }
 
 void
 ODM_sleep_us(u32	us)
 {
-#if defined(DM_ODM_CE_MAC80211)
-	usleep_range(us, us + 1);
-#else
 	rtw_usleep_os(us);
-#endif
 }
 
 void
@@ -389,11 +271,7 @@ odm_set_timer(
 	u32			ms_delay
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	mod_timer(p_timer, jiffies + msecs_to_jiffies(ms_delay));
-#else
 	_set_timer(p_timer, ms_delay); /* ms */
-#endif
 
 }
 
@@ -407,16 +285,9 @@ odm_initialize_timer(
 	const char			*sz_id
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	init_timer(p_timer);
-	p_timer->function = call_back_func;
-	p_timer->data = (unsigned long)p_dm;
-	/*mod_timer(p_timer, jiffies+RTL_MILISECONDS_TO_JIFFIES(10));	*/
-#else
 	struct _ADAPTER *adapter = p_dm->adapter;
 
 	_init_timer(p_timer, adapter->pnetdev, call_back_func, p_dm);
-#endif
 }
 #endif
 
@@ -426,11 +297,7 @@ odm_cancel_timer(
 	struct timer_list		*p_timer
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	del_timer(p_timer);
-#else
 	_cancel_timer_ex(p_timer);
-#endif
 }
 
 
@@ -497,20 +364,12 @@ odm_fill_h2c_cmd(
 	u8			*p_cmd_buffer
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-#else
 	struct _ADAPTER	*adapter = p_dm->adapter;
-#endif
 	u8		h2c_id = phydm_trans_h2c_id(p_dm, phydm_h2c_id);
 
 	PHYDM_DBG(p_dm, DBG_RA, ("[H2C]  h2c_id=((0x%x))\n", h2c_id));
 
-	#ifdef DM_ODM_CE_MAC80211
-	rtlpriv->cfg->ops->fill_h2c_cmd(rtlpriv->hw, h2c_id,cmd_len, p_cmd_buffer);
-	#else
 	rtw_hal_fill_h2c_cmd(adapter, h2c_id, cmd_len, p_cmd_buffer);
-	#endif
 }
 
 u8
@@ -573,11 +432,7 @@ odm_get_current_time(
 	struct PHY_DM_STRUCT		*p_dm
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	return jiffies;
-#else
 	return rtw_get_current_time();
-#endif
 }
 
 u64
@@ -586,14 +441,8 @@ odm_get_progressing_time(
 	u64			start_time
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	return jiffies_to_msecs(jiffies - start_time);
-#else
 	return rtw_get_passing_time_ms((systime)start_time);
-#endif
 }
-
-#if !defined(DM_ODM_CE_MAC80211)
 
 void
 phydm_set_hw_reg_handler_interface (
@@ -619,8 +468,6 @@ phydm_get_hal_def_var_handler_interface (
 	adapter->hal_func.get_hal_def_var_handler(adapter, e_variable, p_value);
 }
 
-#endif
-
 void
 odm_set_tx_power_index_by_rate_section (
 	struct PHY_DM_STRUCT	*p_dm,
@@ -629,13 +476,7 @@ odm_set_tx_power_index_by_rate_section (
 	u8				RateSection
 	)
 {
-#if defined(DM_ODM_CE_MAC80211)
-	void *adapter = p_dm->adapter;
-
-	phy_set_tx_power_index_by_rs(adapter, Channel, path, RateSection);
-#else
 	phy_set_tx_power_index_by_rate_section(p_dm->adapter, path, Channel, RateSection);
-#endif
 }
 
 
@@ -648,13 +489,7 @@ odm_get_tx_power_index (
 	u8				Channel
 	)
 {
-#if defined(DM_ODM_CE_MAC80211)
-	void		*adapter = p_dm->adapter;
-
-	return phy_get_tx_power_index(adapter, (enum rf_path)path, tx_rate, band_width, Channel);
-#else
 	return phy_get_tx_power_index(p_dm->adapter, path, tx_rate, band_width, Channel);
-#endif
 }
 
 u8
@@ -665,13 +500,7 @@ odm_efuse_one_byte_read(
 	boolean		b_pseu_do_test
 	)
 {
-#if defined(DM_ODM_CE_MAC80211)
-	void		*adapter = p_dm->adapter;
-
-	return rtl_efuse_onebyte_read(adapter, addr, data, b_pseu_do_test);
-#else
 	return efuse_onebyte_read(p_dm->adapter, addr, data, b_pseu_do_test);
-#endif
 }
 
 void
@@ -682,13 +511,7 @@ odm_efuse_logical_map_read(
 	u32	*data
 )
 {
-#if defined(DM_ODM_CE_MAC80211)
-	void		*adapter = p_dm->adapter;
-
-	rtl_efuse_logical_map_read(adapter, type, offset, data);
-#else
 	efuse_logical_map_read(p_dm->adapter, type, offset, data);
-#endif
 }
 
 enum hal_status

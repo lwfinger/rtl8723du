@@ -98,15 +98,6 @@ struct phydm_dig_struct {
 	enum dig_goupcheck_level		dig_go_up_check_level;
 	u8		aaa_default;
 	u16		fa_th[3];
-#if (RTL8822B_SUPPORT == 1 || RTL8197F_SUPPORT == 1 || RTL8821C_SUPPORT == 1)
-	u8		rf_gain_idx;
-	u8		agc_table_idx;
-	u8		big_jump_lmt[16];
-	u8		enable_adjust_big_jump:1;
-	u8		big_jump_step1:3;
-	u8		big_jump_step2:2;
-	u8		big_jump_step3:2;
-#endif
 	u8		dig_upcheck_initial_value;
 	u8		dig_level0_ratio_reciprocal;
 	u8		dig_level1_ratio_reciprocal;

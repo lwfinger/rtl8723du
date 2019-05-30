@@ -8,8 +8,6 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
  
-#ifdef PHYDM_SUPPORT_CCKPD
-
 static void
 phydm_write_cck_cca_th_new_cs_ratio(
 	void			*p_dm_void,
@@ -74,16 +72,11 @@ phydm_set_cckpd_val(
 		PHYDM_DBG(p_dm, ODM_COMP_API, ("[Error][CCKPD]Need val_len=2\n"));
 		return;
 	}
-	
-	/*val_buf[0]: 0xa0a*/
-	/*val_buf[1]: 0xaaa*/
-	
 	if (p_dm->support_ic_type & EXTEND_CCK_CCATH_AAA_IC) {
 		phydm_write_cck_cca_th_new_cs_ratio(p_dm, (u8)val_buf[0], (u8)val_buf[1]);
 	} else {
 		phydm_write_cck_cca_th(p_dm, (u8)val_buf[0]);
 	}
-
 }
 
 static boolean
@@ -224,14 +217,11 @@ phydm_cckpd_new_cs_ratio(
 	/*phydm_write_cck_cca_th_new_cs_ratio(p_dm, pd_th, cs_ration);*/
 }
 
-#endif
-
 void
 phydm_cck_pd_th(
 	void		*p_dm_void
 )
 {
-#ifdef PHYDM_SUPPORT_CCKPD
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct phydm_fa_struct		*p_fa_t= &p_dm->false_alm_cnt;
 	struct phydm_cckpd_struct	*p_cckpd_t = &p_dm->dm_cckpd_table;
@@ -262,8 +252,6 @@ phydm_cck_pd_th(
 		phydm_cckpd_new_cs_ratio(p_dm);
 	else
 		phydm_cckpd(p_dm);
-	
-#endif
 }
 
 void
@@ -274,7 +262,6 @@ odm_pause_cck_packet_detection(
 	u8					cck_pd_th
 )
 {
-#ifdef PHYDM_SUPPORT_CCKPD
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct phydm_cckpd_struct	*p_cckpd_t = &p_dm->dm_cckpd_table;
 	s8	max_level;
@@ -304,9 +291,7 @@ odm_pause_cck_packet_detection(
 	}
 
 	switch (pause_type) {
-
 	case PHYDM_PAUSE:
-	{
 		/* Disable CCK PD */
 		p_dm->support_ability &= ~ODM_BB_CCK_PD;
 		
@@ -333,9 +318,7 @@ odm_pause_cck_packet_detection(
 			phydm_write_cck_cca_th(p_dm, cck_pd_th);
 		}
 		break;
-	}
 	case PHYDM_RESUME:
-	{
 		/* check if the level is illegal or not */
 		if ((p_cckpd_t->pause_bitmap & (BIT(pause_lv))) != 0) {
 			
@@ -352,7 +335,7 @@ odm_pause_cck_packet_detection(
 		if (p_cckpd_t->pause_bitmap == 0) {
 			
 			PHYDM_DBG(p_dm, DBG_CCKPD,("Revert bkp_CCKPD=0x%x\n", 
-														p_cckpd_t->cckpd_bkp));
+				  p_cckpd_t->cckpd_bkp));
 			
 			phydm_write_cck_cca_th(p_dm, p_cckpd_t->cckpd_bkp);
 			p_dm->support_ability |= ODM_BB_CCK_PD;/* Enable CCKPD */
@@ -374,20 +357,17 @@ odm_pause_cck_packet_detection(
 			break;
 		}
 		break;
-	}
 	default:
 		PHYDM_DBG(p_dm, DBG_CCKPD,("Wrong  type\n"));
 		break;
 	}
 
 	PHYDM_DBG(p_dm, DBG_CCKPD, ("New pause bitmap=0x%x\n", 
-													p_cckpd_t->pause_bitmap));
-	
+		  p_cckpd_t->pause_bitmap));
 	for (i = 0; i < PHYDM_PAUSE_MAX_NUM; i ++) {
 		PHYDM_DBG(p_dm, DBG_CCKPD, ("pause val[%d]=0x%x\n", 
-										i, p_cckpd_t->pause_cckpd_value[i]));
+			  i, p_cckpd_t->pause_cckpd_value[i]));
 	}
-#endif
 }
 
 void
@@ -395,7 +375,6 @@ phydm_cck_pd_init(
 	void		*p_dm_void
 )
 {
-#ifdef PHYDM_SUPPORT_CCKPD
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct phydm_cckpd_struct		*p_cckpd_t = &p_dm->dm_cckpd_table;
 	struct phydm_dig_struct		*p_dig_t = &p_dm->dm_dig_table;
@@ -409,7 +388,6 @@ phydm_cck_pd_init(
 		p_dig_t->aaa_default = odm_read_1byte(p_dm, 0xaaa) & 0x1f;
 	
 	odm_memory_set(p_dm, p_cckpd_t->pause_cckpd_value, 0, PHYDM_PAUSE_MAX_NUM);
-#endif
 }
 
 

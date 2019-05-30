@@ -5,11 +5,7 @@
 #ifndef	__PHYDMPSD_H__
 #define    __PHYDMPSD_H__
 
-/*#define PSD_VERSION	"1.0"*/  /*2016.09.22  Dino*/
 #define PSD_VERSION	"1.1"  /*2016.10.07  Dino, Add Option for PSD Tone index Selection */
-
-#ifdef CONFIG_PSD_TOOL
-
 
 struct _PHYDM_PSD_ {
 
@@ -77,6 +73,5 @@ phydm_get_psd_result_table(
 	int		index
 );
 
-#endif
 #endif
 

@@ -279,8 +279,6 @@ phydm_show_sta_info(
 	u32		input_num
 );
 
-#ifdef	PHYDM_3RD_REFORM_RA_MASK
-
 void
 phydm_ra_registed(
 	void	*p_dm_void,
@@ -299,9 +297,6 @@ void
 phydm_ra_mask_watchdog(
 	void	*p_dm_void
 );
-
-#endif
-
 
 #if (defined(CONFIG_RA_DYNAMIC_RATE_ID))
 void

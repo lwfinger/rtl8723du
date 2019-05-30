@@ -74,17 +74,9 @@
 
 #define	config_phydm_read_txagc_check(data)		(data != INVALID_TXAGC_DATA)
 
-#if defined(DM_ODM_CE_MAC80211)
-	#define dbg_print(args...)
-	#define RT_PRINTK(fmt, args...)	\
-			RT_TRACE(((struct rtl_priv *)p_dm->adapter),	\
-				 COMP_PHYDM, DBG_DMESG, fmt, ## args)
-	#define	RT_DISP(dbgtype, dbgflag, printstr)
-#else
-	#define dbg_print	printk
-	#define RT_PRINTK(fmt, args...)	dbg_print(fmt, ## args)
-	#define	RT_DISP(dbgtype, dbgflag, printstr)
-#endif
+#define dbg_print	printk
+#define RT_PRINTK(fmt, args...)	dbg_print(fmt, ## args)
+#define	RT_DISP(dbgtype, dbgflag, printstr)
 
 #ifndef ASSERT
 	#define ASSERT(expr)

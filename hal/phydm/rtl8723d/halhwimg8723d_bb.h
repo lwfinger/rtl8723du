@@ -13,8 +13,6 @@
  *
  *****************************************************************************/
 
-/*Image2HeaderVersion: 3.5.2*/
-#if (RTL8723D_SUPPORT == 1)
 #ifndef __INC_MP_BB_HW_IMG_8723D_H
 #define __INC_MP_BB_HW_IMG_8723D_H
 
@@ -49,6 +47,5 @@ odm_read_and_config_mp_8723d_phy_reg_pg(/* tc: Test Chip, mp: mp Chip*/
 );
 u32	odm_get_version_mp_8723d_phy_reg_pg(void);
 
-#endif
 #endif /* end of HWIMG_SUPPORT*/
 

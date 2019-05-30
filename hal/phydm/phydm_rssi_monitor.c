@@ -8,9 +8,6 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
  
-#ifdef PHYDM_SUPPORT_RSSI_MONITOR
-
-#ifdef PHYDM_3RD_REFORM_RSSI_MONOTOR
 static void
 phydm_rssi_monitor_h2c(
 	void	*p_dm_void,
@@ -101,7 +98,6 @@ phydm_calculate_rssi_min_max(
 	p_dm->rssi_min = (u8)rssi_min_tmp;
 
 }
-#endif
 
 void
 phydm_rssi_monitor_check(
@@ -118,9 +114,7 @@ phydm_rssi_monitor_check(
 
 	PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("%s ======>\n", __func__));
 
-#ifdef PHYDM_3RD_REFORM_RSSI_MONOTOR
 	phydm_calculate_rssi_min_max(p_dm);
-#endif
 
 	PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("RSSI {max, min} = {%d, %d}\n",
 		p_dm->rssi_max, p_dm->rssi_min));
@@ -141,5 +135,3 @@ phydm_rssi_monitor_init(
 	p_dm->rssi_min = 0;
 
 }
-
-#endif

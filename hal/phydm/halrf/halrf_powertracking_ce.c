@@ -534,13 +534,8 @@ odm_txpowertracking_thermal_meter_init(
 	u8 default_cck_swing_index = get_cck_swing_index(p_dm);
 	u8			p = 0;
 	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
-#ifdef DM_ODM_CE_MAC80211
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-	struct rtl_efuse *rtlefu = rtl_efuse(rtlpriv);
-#else
 	struct _ADAPTER		*adapter = p_dm->adapter;
 	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
-#endif
 
 	p_rf_calibrate_info->is_txpowertracking = true;
 	p_rf_calibrate_info->tx_powercount = 0;
@@ -557,15 +552,9 @@ odm_txpowertracking_thermal_meter_init(
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("p_dm txpowertrack_control = %d\n", p_rf_calibrate_info->txpowertrack_control));
 
 	/* p_dm->rf_calibrate_info.txpowertrack_control = true; */
-#if defined(DM_ODM_CE_MAC80211)
-	p_rf_calibrate_info->thermal_value = rtlefu->eeprom_thermalmeter;
-	p_rf_calibrate_info->thermal_value_iqk = rtlefu->eeprom_thermalmeter;
-	p_rf_calibrate_info->thermal_value_lck = rtlefu->eeprom_thermalmeter;
-#else
 	p_rf_calibrate_info->thermal_value = p_hal_data->eeprom_thermal_meter;
 	p_rf_calibrate_info->thermal_value_iqk = p_hal_data->eeprom_thermal_meter;
 	p_rf_calibrate_info->thermal_value_lck = p_hal_data->eeprom_thermal_meter;
-#endif
 
 	if (p_rf_calibrate_info->default_bb_swing_index_flag != true) {
 		/*The index of "0 dB" in SwingTable.*/
@@ -652,12 +641,7 @@ odm_txpowertracking_check_ce(
 		p_dm->rf_calibrate_info.tm_trigger = 1;
 		return;
 	} else {
-
-#if defined(DM_ODM_CE_MAC80211)
-		odm_txpowertracking_callback_thermal_meter(p_dm);
-#else
 		odm_txpowertracking_callback_thermal_meter(adapter);
-#endif
 		p_dm->rf_calibrate_info.tm_trigger = 0;
 	}
 }

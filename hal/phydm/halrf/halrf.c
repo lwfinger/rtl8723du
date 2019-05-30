@@ -8,14 +8,9 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-void halrf_basic_profile(
-	void			*p_dm_void,
-	u32			*_used,
-	char			*output,
-	u32			*_out_len
-)
+void halrf_basic_profile(void *p_dm_void, u32 *_used, char *output,
+			 u32 *_out_len)
 {
-#ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u32 used = *_used;
 	u32 out_len = *_out_len;
@@ -29,14 +24,9 @@ void halrf_basic_profile(
 
 	*_used = used;
 	*_out_len = out_len;
-#endif
 }
 
-void
-halrf_rf_lna_setting(
-	void	*p_dm_void,
-	enum phydm_lna_set type
-)
+void halrf_rf_lna_setting(void *p_dm_void, enum phydm_lna_set type)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _hal_rf_	 *p_rf = &(p_dm->rf_table);
@@ -45,17 +35,10 @@ halrf_rf_lna_setting(
 		default:
 			break;
 		}
-
 }
 
-void
-halrf_support_ability_debug(
-	void		*p_dm_void,
-	char		input[][16],
-	u32		*_used,
-	char		*output,
-	u32		*_out_len
-)
+void halrf_support_ability_debug(void *p_dm_void, char input[][16], u32 *_used,
+				 char *output, u32 *_out_len)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _hal_rf_				*p_rf = &(p_dm->rf_table);
@@ -80,9 +63,7 @@ halrf_support_ability_debug(
 		PHYDM_SNPRINTF((output + used, out_len - used, "03. (( %s ))DPK\n", ((p_rf->rf_supportability & HAL_RF_DPK) ? ("V") : ("."))));
 		PHYDM_SNPRINTF((output + used, out_len - used, "04. (( %s ))HAL_RF_TXGAPK\n", ((p_rf->rf_supportability & HAL_RF_TXGAPK) ? ("V") : ("."))));
 		PHYDM_SNPRINTF((output + used, out_len - used, "%s\n", "================================"));		
-	}
-	else {
-
+	} else {
 		if (dm_value[1] == 1) { /* enable */
 			p_rf->rf_supportability |= BIT(dm_value[0]) ;
 		} else if (dm_value[1] == 2) /* disable */
@@ -98,12 +79,8 @@ halrf_support_ability_debug(
 	*_out_len = out_len;
 }
 
-void
-halrf_cmn_info_init(
-	void		*p_dm_void,
-enum halrf_cmninfo_init_e	cmn_info,
-	u32			value
-)
+void halrf_cmn_info_init(void *p_dm_void, enum halrf_cmninfo_init_e cmn_info,
+			 u32 value)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _hal_rf_				*p_rf = &(p_dm->rf_table);
@@ -121,12 +98,8 @@ enum halrf_cmninfo_init_e	cmn_info,
 }
 
 
-void
-halrf_cmn_info_hook(
-	void		*p_dm_void,
-enum halrf_cmninfo_hook_e cmn_info,
-	void		*p_value
-)
+void halrf_cmn_info_hook(void *p_dm_void, enum halrf_cmninfo_hook_e cmn_info,
+			 void *p_value)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _hal_rf_				*p_rf = &(p_dm->rf_table);
@@ -150,16 +123,9 @@ enum halrf_cmninfo_hook_e cmn_info,
 	}
 }
 
-void
-halrf_cmn_info_set(
-	void		*p_dm_void,
-	u32			cmn_info,
-	u64			value
-)
+void halrf_cmn_info_set(void *p_dm_void, u32 cmn_info, u64 value)
 {
-	/*  */
 	/* This init variable may be changed in run time. */
-	/*  */
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _hal_rf_				*p_rf = &(p_dm->rf_table);
 	
@@ -184,106 +150,86 @@ halrf_cmn_info_set(
 	}
 }
 
-u64
-halrf_cmn_info_get(
-	void		*p_dm_void,
-	u32			cmn_info
-)
+u64 halrf_cmn_info_get(void *p_dm_void, u32 cmn_info)
 {
-	/*  */
 	/* This init variable may be changed in run time. */
-	/*  */
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _hal_rf_				*p_rf = &(p_dm->rf_table);
 	u64	return_value = 0;
 	
 	switch	(cmn_info) {
-
-		case	HALRF_CMNINFO_ABILITY:
-			return_value = (u32)p_rf->rf_supportability;
-			break;
-		case HALRF_CMNINFO_RFK_FORBIDDEN :
-			return_value = p_dm->IQK_info.rfk_forbidden;
-			break;
-		default:
-			/* do nothing */
-			break;
+	case	HALRF_CMNINFO_ABILITY:
+		return_value = (u32)p_rf->rf_supportability;
+		break;
+	case HALRF_CMNINFO_RFK_FORBIDDEN :
+		return_value = p_dm->IQK_info.rfk_forbidden;
+		break;
+	default:
+		break;
 	}
-
 	return	return_value;
 }
 
-static void
-halrf_supportability_init_mp(
-	void		*p_dm_void
-)
+static void halrf_supportability_init_mp(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _hal_rf_				*p_rf = &(p_dm->rf_table);
 
 	switch (p_dm->support_ic_type) {
-
 	case ODM_RTL8814B:
 		break;
 	default:
 		p_rf->rf_supportability = 
 			HAL_RF_TX_PWR_TRACK	|
-			HAL_RF_IQK				|
-			HAL_RF_LCK				|
+			HAL_RF_IQK		|
+			HAL_RF_LCK		|
 			0;
 		break;
-
 	}
 
-	ODM_RT_TRACE(p_dm, ODM_COMP_INIT, ODM_DBG_LOUD, ("IC = ((0x%x)), RF_Supportability Init MP = ((0x%x))\n", p_dm->support_ic_type, p_rf->rf_supportability));
+	ODM_RT_TRACE(p_dm, ODM_COMP_INIT, ODM_DBG_LOUD, ("IC = ((0x%x)), RF_Supportability Init MP = ((0x%x))\n",
+		     p_dm->support_ic_type, p_rf->rf_supportability));
 }
 
-void
-halrf_supportability_init(
-	void		*p_dm_void
-)
+void halrf_supportability_init(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _hal_rf_				*p_rf = &(p_dm->rf_table);
 
 	switch (p_dm->support_ic_type) {
-
 	case ODM_RTL8814B:
 		break;
 	default:
 		p_rf->rf_supportability = 
 			HAL_RF_TX_PWR_TRACK	|
-			HAL_RF_IQK				|
-			HAL_RF_LCK				|
+			HAL_RF_IQK		|
+			HAL_RF_LCK		|
 			0;
 		break;
 	}
 
-	ODM_RT_TRACE(p_dm, ODM_COMP_INIT, ODM_DBG_LOUD, ("IC = ((0x%x)), RF_Supportability Init = ((0x%x))\n", p_dm->support_ic_type, p_rf->rf_supportability));
+	ODM_RT_TRACE(p_dm, ODM_COMP_INIT, ODM_DBG_LOUD, ("IC = ((0x%x)), RF_Supportability Init = ((0x%x))\n",
+		     p_dm->support_ic_type, p_rf->rf_supportability));
 }
 
-void
-halrf_watchdog(
-	void			*p_dm_void
-)
+void halrf_watchdog(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	phydm_rf_watchdog(p_dm);
 }
 
-void
-halrf_iqk_trigger(
-	void			*p_dm_void,
-	boolean		is_recovery
-)
+void halrf_iqk_trigger(void *p_dm_void, boolean is_recovery)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _IQK_INFORMATION		*p_iqk_info = &p_dm->IQK_info;
 	struct _hal_rf_				*p_rf = &(p_dm->rf_table);
 	u64 start_time;
 
-	if ((p_dm->p_mp_mode != NULL) && (p_rf->p_is_con_tx != NULL) && (p_rf->p_is_single_tone != NULL) && (p_rf->p_is_carrier_suppresion != NULL))
-		if (*(p_dm->p_mp_mode) && ((*(p_rf->p_is_con_tx) || *(p_rf->p_is_single_tone) || *(p_rf->p_is_carrier_suppresion))))
+	if ((p_dm->p_mp_mode) && (p_rf->p_is_con_tx) &&
+	    (p_rf->p_is_single_tone) && (p_rf->p_is_carrier_suppresion))
+		if (*(p_dm->p_mp_mode) && ((*(p_rf->p_is_con_tx) ||
+		    *(p_rf->p_is_single_tone) ||
+		    *(p_rf->p_is_carrier_suppresion))))
 			return;
 
 	if (!(p_rf->rf_supportability & HAL_RF_IQK))
@@ -308,29 +254,32 @@ halrf_iqk_trigger(
 			break;
 		}
 		p_dm->rf_calibrate_info.iqk_progressing_time = odm_get_progressing_time(p_dm, start_time);
-		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK]IQK progressing_time = %lld ms\n", p_dm->rf_calibrate_info.iqk_progressing_time));
+		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD,
+			     ("[IQK]IQK progressing_time = %lld ms\n",
+			      p_dm->rf_calibrate_info.iqk_progressing_time));
 
 		odm_acquire_spin_lock(p_dm, RT_IQK_SPINLOCK);
 		p_dm->rf_calibrate_info.is_iqk_in_progress = false;
 		odm_release_spin_lock(p_dm, RT_IQK_SPINLOCK);
-	} else
-		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("== Return the IQK CMD, because RFKs in Progress ==\n"));
+	} else {
+		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD,
+			     ("== Return the IQK CMD, because RFKs in Progress ==\n"));
+	}
 }
 
-void
-halrf_lck_trigger(
-	void			*p_dm_void
-)
+void halrf_lck_trigger(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _IQK_INFORMATION		*p_iqk_info = &p_dm->IQK_info;
 	struct _hal_rf_				*p_rf = &(p_dm->rf_table);
 	u64 start_time;
 	
-	if ((p_dm->p_mp_mode != NULL) && (p_rf->p_is_con_tx != NULL) && (p_rf->p_is_single_tone != NULL) && (p_rf->p_is_carrier_suppresion != NULL))
-		if (*(p_dm->p_mp_mode) && ((*(p_rf->p_is_con_tx) || *(p_rf->p_is_single_tone) || *(p_rf->p_is_carrier_suppresion))))
+	if ((p_dm->p_mp_mode) && (p_rf->p_is_con_tx) &&
+	    (p_rf->p_is_single_tone) && (p_rf->p_is_carrier_suppresion))
+		if (*(p_dm->p_mp_mode) && ((*(p_rf->p_is_con_tx) ||
+		    *(p_rf->p_is_single_tone) ||
+		    *(p_rf->p_is_carrier_suppresion))))
 			return;
-
 	if (!(p_rf->rf_supportability & HAL_RF_LCK))
 		return;
 #if DISABLE_BB_RF
@@ -339,7 +288,8 @@ halrf_lck_trigger(
 	if (p_iqk_info->rfk_forbidden)
 		return;
 	while (*(p_dm->p_is_scan_in_process)) {
-		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[LCK]scan is in process, bypass LCK\n"));
+	       ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD,
+			    ("[LCK]scan is in process, bypass LCK\n"));
 		return;
 	}
 
@@ -355,19 +305,21 @@ halrf_lck_trigger(
 		default:
 			break;
 		}
-		p_dm->rf_calibrate_info.lck_progressing_time = odm_get_progressing_time(p_dm, start_time);
-		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK]LCK progressing_time = %lld ms\n", p_dm->rf_calibrate_info.lck_progressing_time));
+		p_dm->rf_calibrate_info.lck_progressing_time =
+			 odm_get_progressing_time(p_dm, start_time);
+		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD,
+			     ("[IQK]LCK progressing_time = %lld ms\n",
+			      p_dm->rf_calibrate_info.lck_progressing_time));
 		odm_acquire_spin_lock(p_dm, RT_IQK_SPINLOCK);
 		p_dm->rf_calibrate_info.is_lck_in_progress = false;
 		odm_release_spin_lock(p_dm, RT_IQK_SPINLOCK);		
-	}else
-		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("== Return the LCK CMD, because RFK is in Progress ==\n"));
+	} else {
+		ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD,
+			     ("== Return the LCK CMD, because RFK is in Progress ==\n"));
+	}
 }
 
-void
-halrf_init(
-	void			*p_dm_void
-)
+void halrf_init(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	
@@ -377,12 +329,4 @@ halrf_init(
 		halrf_supportability_init_mp(p_dm);
 	else
 		halrf_supportability_init(p_dm);
-
-	/*Init all RF funciton*/
-	/*iqk_init();*/
-	/*dpk_init();*/
 }
-
-
-
-

@@ -347,8 +347,6 @@ odm_get_progressing_time(
 	u64			start_time
 );
 
-#ifndef DM_ODM_CE_MAC80211
-
 void
 phydm_set_hw_reg_handler_interface (
 	struct PHY_DM_STRUCT		*p_dm,
@@ -362,8 +360,6 @@ phydm_get_hal_def_var_handler_interface (
 	enum _HAL_DEF_VARIABLE		e_variable,
 	void						*p_value
 	);
-
-#endif
 
 void
 odm_set_tx_power_index_by_rate_section (

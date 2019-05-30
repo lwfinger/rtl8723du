@@ -77,40 +77,6 @@ enum rt_spinlock_type {
 	RT_LAST_SPINLOCK,
 };
 
-#if defined(DM_ODM_CE_MAC80211)
-
-	#include <asm/byteorder.h>
-
-	/* define useless flag to avoid compile warning */
-	#define	USE_WORKITEM 0
-	#define	FOR_BRAZIL_PRETEST 0
-	#define	FPGA_TWO_MAC_VERIFICATION	0
-	#define	RTL8881A_SUPPORT	0
-	#define	PHYDM_TESTCHIP_SUPPORT 0
-
-	/* support list */
-	#define RTL8188E_SUPPORT				0
-	#define RTL8812A_SUPPORT				0
-	#define RTL8821A_SUPPORT				0
-	#define RTL8723B_SUPPORT				0
-	#define RTL8723D_SUPPORT				0
-	#define RTL8192E_SUPPORT				0
-	#define RTL8814A_SUPPORT				0
-	#define RTL8195A_SUPPORT				0
-	#define RTL8197F_SUPPORT				0
-	#define RTL8703B_SUPPORT				0
-	#define RTL8188F_SUPPORT				0
-	#define RTL8822B_SUPPORT				1
-	#define RTL8821B_SUPPORT				0
-	#define RTL8821C_SUPPORT				0
-
-	#define RATE_ADAPTIVE_SUPPORT			0
-	#define POWER_TRAINING_ACTIVE			0
-
-	#define sta_info	rtl_sta_info
-	#define	boolean		bool
-
-#else
 	#include <drv_types.h>
 
 	#define	boolean	bool
@@ -130,7 +96,6 @@ enum rt_spinlock_type {
 	#else
 		#define	PHYDM_TESTCHIP_SUPPORT 0
 	#endif
-#endif
 
 #define READ_NEXT_PAIR(v1, v2, i) do { if (i+2 >= array_len) break; i += 2; v1 = array[i]; v2 = array[i+1]; } while (0)
 #define COND_ELSE  2

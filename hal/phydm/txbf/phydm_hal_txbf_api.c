@@ -4,12 +4,7 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-#if (defined(CONFIG_BB_TXBF_API))
-u8
-beamforming_get_htndp_tx_rate(
-	void	*p_dm_void,
-	u8	comp_steering_num_of_bfer
-)
+u8 beamforming_get_htndp_tx_rate(void *p_dm_void, u8 comp_steering_num_of_bfer)
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8 nr_index = 0;
@@ -21,29 +16,21 @@ beamforming_get_htndp_tx_rate(
 	case 1:
 		ndp_tx_rate = ODM_MGN_MCS8;
 		break;
-
 	case 2:
 		ndp_tx_rate = ODM_MGN_MCS16;
 		break;
-
 	case 3:
 		ndp_tx_rate = ODM_MGN_MCS24;
 		break;
-
 	default:
 		ndp_tx_rate = ODM_MGN_MCS8;
 		break;
 	}
-
 	return ndp_tx_rate;
-
 }
 
-u8
-beamforming_get_vht_ndp_tx_rate(
-	void	*p_dm_void,
-	u8	comp_steering_num_of_bfer
-)
+u8 beamforming_get_vht_ndp_tx_rate(void *p_dm_void,
+				   u8 comp_steering_num_of_bfer)
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8 nr_index = 0;
@@ -72,5 +59,3 @@ beamforming_get_vht_ndp_tx_rate(
 	return ndp_tx_rate;
 
 }
-
-#endif

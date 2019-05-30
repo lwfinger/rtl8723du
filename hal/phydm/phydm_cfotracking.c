@@ -37,19 +37,10 @@ odm_get_default_crytaltal_cap(
 {
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8						crystal_cap = 0x20;
-
-#if defined(DM_ODM_CE_MAC80211)
-	struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-	struct rtl_efuse *rtlefuse = rtl_efuse(rtlpriv);
-
-	crystal_cap = rtlefuse->crystalcap;
-#else
 	struct _ADAPTER					*adapter = p_dm->adapter;
 	HAL_DATA_TYPE				*p_hal_data = GET_HAL_DATA(adapter);
 
 	crystal_cap = p_hal_data->crystal_cap;
-#endif
-
 	crystal_cap = crystal_cap & 0x3f;
 
 	return crystal_cap;

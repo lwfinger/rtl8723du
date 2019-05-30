@@ -476,8 +476,6 @@ phydm_show_sta_info(
 	*_out_len = out_len;
 }
 
-#ifdef	PHYDM_3RD_REFORM_RA_MASK
-
 static u8
 phydm_get_tx_stream_num(
 	void		*p_dm_void,
@@ -953,7 +951,6 @@ phydm_ra_mask_watchdog(
 	}
 
 }
-#endif
 
 u8
 phydm_vht_en_mapping(

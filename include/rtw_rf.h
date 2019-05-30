@@ -155,18 +155,11 @@ bool rtw_chbw_to_freq_range(u8 ch, u8 bw, u8 offset, u32 *hi, u32 *lo);
 struct country_chplan {
 	char alpha2[2];
 	u8 chplan;
-#if RTW_DEF_MODULE_REGULATORY_CERT
-	u16 def_module_flags; /* RTW_MODULE_RTLXXX */
-#endif
 };
 
 #define COUNTRY_CHPLAN_EN_11AC(_ent) 0
 
-#if RTW_DEF_MODULE_REGULATORY_CERT
-#define COUNTRY_CHPLAN_DEF_MODULE_FALGS(_ent) ((_ent)->def_module_flags)
-#else
 #define COUNTRY_CHPLAN_DEF_MODULE_FALGS(_ent) 0
-#endif
 
 const struct country_chplan *rtw_get_chplan_from_country(const char *country_code);
 

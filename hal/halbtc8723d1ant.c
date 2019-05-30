@@ -18,7 +18,6 @@
 
 #if (BT_SUPPORT == 1 && COEX_SUPPORT == 1)
 
-#if (RTL8723D_SUPPORT == 1)
 /* ************************************************************
  * Global variables, these are static variables
  * ************************************************************ */
@@ -6388,13 +6387,9 @@ void ex_halbtc8723d1ant_antenna_detection(IN struct btc_coexist *btcoexist,
 			else
 				btcoexist->bdontenterLPS = FALSE;
 		}
-
 	}
 #endif
-
-
 }
-
 
 void ex_halbtc8723d1ant_display_ant_detection(IN struct btc_coexist *btcoexist)
 {
@@ -6408,25 +6403,16 @@ void ex_halbtc8723d1ant_display_ant_detection(IN struct btc_coexist *btcoexist)
 			halbtc8723d1ant_psd_showdata(btcoexist);
 	}
 #endif
-
 }
 
 void ex_halbtc8723d1ant_antenna_isolation(IN struct btc_coexist *btcoexist,
 		IN u32 cent_freq, IN u32 offset, IN u32 span, IN u32 seconds)
 {
-
-
 }
 
 void ex_halbtc8723d1ant_psd_scan(IN struct btc_coexist *btcoexist,
 		 IN u32 cent_freq, IN u32 offset, IN u32 span, IN u32 seconds)
 {
-
-
 }
-
-
-#endif
-
 #endif	/* #if (BT_SUPPORT == 1 && COEX_SUPPORT == 1) */
 

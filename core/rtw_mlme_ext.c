@@ -786,9 +786,6 @@ void dump_country_chplan_map(void *sel)
 	const struct country_chplan *ent;
 	u8 code[2];
 
-#if RTW_DEF_MODULE_REGULATORY_CERT
-	RTW_PRINT_SEL(sel, "RTW_DEF_MODULE_REGULATORY_CERT:0x%x\n", RTW_DEF_MODULE_REGULATORY_CERT);
-#endif
 #ifdef CONFIG_CUSTOMIZED_COUNTRY_CHPLAN_MAP
 	RTW_PRINT_SEL(sel, "CONFIG_CUSTOMIZED_COUNTRY_CHPLAN_MAP\n");
 #endif

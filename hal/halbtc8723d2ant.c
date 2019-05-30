@@ -18,7 +18,6 @@
 
 #if (BT_SUPPORT == 1 && COEX_SUPPORT == 1)
 
-#if (RTL8723D_SUPPORT == 1)
 /* ************************************************************
  * Global variables, these are static variables
  * ************************************************************ */
@@ -7141,11 +7140,5 @@ void ex_halbtc8723d2ant_display_ant_detection(IN struct btc_coexist *btcoexist)
 			halbtc8723d2ant_psd_showdata(btcoexist);
 	}
 #endif
-
 }
-
-
 #endif
-
-#endif	/*  #if (RTL8723D_SUPPORT == 1) */
-

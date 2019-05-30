@@ -502,9 +502,7 @@ odm_dm_init(
 	phydm_beamforming_init(p_dm);
 	phydm_primary_cca_init(p_dm);
 
-	#ifdef CONFIG_PSD_TOOL
 	phydm_psd_init(p_dm);
-	#endif
 	
 	#ifdef CONFIG_SMART_ANTENNA
 	phydm_smt_ant_init(p_dm);
@@ -700,7 +698,6 @@ phydm_pause_func(
 	
 	} else
 	
-#ifdef PHYDM_SUPPORT_CCKPD
 	if (pause_func == F05_CCK_PD) {
 		
 		PHYDM_DBG(p_dm, ODM_COMP_API, ("[CCK_PD]\n"));
@@ -716,11 +713,7 @@ phydm_pause_func(
 		bkp_val = &(p_dm->dm_cckpd_table.rvrt_val[0]);
 		p_dm->phydm_func_handler.pause_phydm_handler = phydm_set_cckpd_val; /*function pointer hook*/
 		
-	} else 
-#endif
-
-	if (pause_func == F13_ADPTVTY) {
-
+	} else if (pause_func == F13_ADPTVTY) {
 		PHYDM_DBG(p_dm, ODM_COMP_API, ("[Adaptivity]\n"));
 
 		if (val_lehgth != 2) {
@@ -733,10 +726,7 @@ phydm_pause_func(
 		pause_lv_pre = &(p_dm->pause_lv_table.lv_adapt);
 		bkp_val = (u32 *)(&(p_dm->adaptivity.rvrt_val));
 		p_dm->phydm_func_handler.pause_phydm_handler = phydm_set_edcca_val; /*function pointer hook*/
-
-	} else
-
-	{
+	} else {
 		PHYDM_DBG(p_dm, ODM_COMP_API, ("[WARNING] error func idx\n"));
 		return PAUSE_FAIL;
 	}
@@ -744,41 +734,32 @@ phydm_pause_func(
 	PHYDM_DBG(p_dm, ODM_COMP_API, ("Pause_LV{new , pre} = {%d ,%d}\n", pause_lv, *pause_lv_pre));
 
 	if ((pause_type == PHYDM_PAUSE) || (pause_type == PHYDM_PAUSE_NO_SET)) {
-		
 		if (pause_lv > *pause_lv_pre) {
-
 			if (!(p_dm->pause_ability & pause_func_bitmap)) {
-
 				for (i = 0; i < val_lehgth; i ++)
 					bkp_val[i] = ori_val[i];
 			}
-
 			p_dm->pause_ability |= pause_func_bitmap;
 			PHYDM_DBG(p_dm, ODM_COMP_API, ("pause_ability=0x%llx\n", p_dm->pause_ability));
 			
 			if (pause_type == PHYDM_PAUSE) {
-
 				for (i = 0; i < val_lehgth; i ++) {
 					PHYDM_DBG(p_dm, ODM_COMP_API, ("[PAUSE SUCCESS] val_idx[%d]{New, Ori}={0x%x, 0x%x}\n",i, val_buf[i], bkp_val[i]));
-				/**/
 				}
 				p_dm->phydm_func_handler.pause_phydm_handler(p_dm, val_buf, val_lehgth);
 			} else {
 			
 				for (i = 0; i < val_lehgth; i ++) {
 					PHYDM_DBG(p_dm, ODM_COMP_API, ("[PAUSE NO Set: SUCCESS] val_idx[%d]{Ori}={0x%x}\n",i, bkp_val[i]));
-				/**/
 				}
 			}
 
 			*pause_lv_pre = pause_lv;
 			return PAUSE_SUCCESS;
-			
 		} else {
 			PHYDM_DBG(p_dm, ODM_COMP_API, ("[PAUSE FAIL] Pre_LV >= Curr_LV\n"));
 			return PAUSE_FAIL;
 		}
-
 	} else if (pause_type == PHYDM_RESUME) {
 		p_dm->pause_ability &= ~pause_func_bitmap;
 		PHYDM_DBG(p_dm, ODM_COMP_API, ("pause_ability=0x%llx\n", p_dm->pause_ability));
@@ -796,7 +777,6 @@ phydm_pause_func(
 		PHYDM_DBG(p_dm, ODM_COMP_API, ("[WARNING] error pause_type\n"));
 		return PAUSE_FAIL;
 	}
-	
 }
 
 void

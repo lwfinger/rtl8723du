@@ -47,16 +47,8 @@
 #define PHYDM_MAX_RF_PATH		4
 
 /* number of entry */
-#ifdef DM_ODM_CE_MAC80211
-	/* defined in wifi.h (32+1) */
-#else
-	#define	ASSOCIATE_ENTRY_NUM					MACID_NUM_SW_LIMIT  /* Max size of asoc_entry[].*/
-#endif
-#define	ODM_ASSOCIATE_ENTRY_NUM				ASSOCIATE_ENTRY_NUM
-
-#if defined(DM_ODM_CE_MAC80211)
-	#define RX_SMOOTH_FACTOR	20
-#endif
+#define	ASSOCIATE_ENTRY_NUM		MACID_NUM_SW_LIMIT  /* Max size of asoc_entry[].*/
+#define	ODM_ASSOCIATE_ENTRY_NUM		ASSOCIATE_ENTRY_NUM
 
 /* -----MGN rate--------------------------------- */
 
@@ -353,16 +345,8 @@ enum phydm_ic_e {
 
 /*========[Compile time IC flag] ===============================================================================]*/
 /*========[AC/N Support] ===========================*/
-#if defined(DM_ODM_CE_MAC80211)
-
-	#define ODM_IC_11AC_SERIES_SUPPORT		1
-	#define ODM_IC_11N_SERIES_SUPPORT			1
-
-#else /*ODM_CE*/
-
-	#define ODM_IC_11N_SERIES_SUPPORT			1
-	#define ODM_IC_11AC_SERIES_SUPPORT		0
-#endif
+#define ODM_IC_11N_SERIES_SUPPORT		1
+#define ODM_IC_11AC_SERIES_SUPPORT		0
 
 /*===IC SS Compile Flag, prepare for code size reduction==============*/
 

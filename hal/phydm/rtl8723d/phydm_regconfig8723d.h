@@ -15,8 +15,6 @@
 #ifndef __INC_ODM_REGCONFIG_H_8723D
 #define __INC_ODM_REGCONFIG_H_8723D
 
-#if (RTL8723D_SUPPORT == 1)
-
 void
 odm_config_rf_reg_8723d(
 	struct PHY_DM_STRUCT				*p_dm,
@@ -86,6 +84,4 @@ odm_config_bb_txpwr_lmt_8723d(
 	u8	*power_limit
 );
 
-
-#endif
 #endif /* end of SUPPORT */
