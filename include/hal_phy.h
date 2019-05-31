@@ -162,61 +162,61 @@ PHY_CalculateBitShift(
 
 u32
 PHY_RFShadowRead(
-	IN	PADAPTER		Adapter,
-	IN	enum rf_path		eRFPath,
-	IN	u32				Offset);
+	PADAPTER		Adapter,
+	enum rf_path		eRFPath,
+	u32				Offset);
 
 VOID
 PHY_RFShadowWrite(
-	IN	PADAPTER		Adapter,
-	IN	enum rf_path		eRFPath,
-	IN	u32				Offset,
-	IN	u32				Data);
+	PADAPTER		Adapter,
+	enum rf_path		eRFPath,
+	u32				Offset,
+	u32				Data);
 
 BOOLEAN
 PHY_RFShadowCompare(
-	IN	PADAPTER		Adapter,
-	IN	enum rf_path		eRFPath,
-	IN	u32				Offset);
+	PADAPTER		Adapter,
+	enum rf_path		eRFPath,
+	u32				Offset);
 
 VOID
 PHY_RFShadowRecorver(
-	IN	PADAPTER		Adapter,
-	IN	enum rf_path		eRFPath,
-	IN	u32				Offset);
+	PADAPTER		Adapter,
+	enum rf_path		eRFPath,
+	u32				Offset);
 
 VOID
 PHY_RFShadowCompareAll(
-	IN	PADAPTER		Adapter);
+	PADAPTER		Adapter);
 
 VOID
 PHY_RFShadowRecorverAll(
-	IN	PADAPTER		Adapter);
+	PADAPTER		Adapter);
 
 VOID
 PHY_RFShadowCompareFlagSet(
-	IN	PADAPTER		Adapter,
-	IN	enum rf_path		eRFPath,
-	IN	u32				Offset,
-	IN	u8				Type);
+	PADAPTER		Adapter,
+	enum rf_path		eRFPath,
+	u32				Offset,
+	u8				Type);
 
 VOID
 PHY_RFShadowRecorverFlagSet(
-	IN	PADAPTER		Adapter,
-	IN	enum rf_path		eRFPath,
-	IN	u32				Offset,
-	IN	u8				Type);
+	PADAPTER		Adapter,
+	enum rf_path		eRFPath,
+	u32				Offset,
+	u8				Type);
 
 VOID
 PHY_RFShadowCompareFlagSetAll(
-	IN	PADAPTER		Adapter);
+	PADAPTER		Adapter);
 
 VOID
 PHY_RFShadowRecorverFlagSetAll(
-	IN	PADAPTER		Adapter);
+	PADAPTER		Adapter);
 
 VOID
 PHY_RFShadowRefresh(
-	IN	PADAPTER		Adapter);
+	PADAPTER		Adapter);
 
 #endif /* __HAL_COMMON_H__ */

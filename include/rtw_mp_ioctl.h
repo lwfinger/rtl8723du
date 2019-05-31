@@ -43,7 +43,7 @@ typedef struct _USB_VendorReq {
 	u16	wValue;
 	u16	wIndex;
 	u16	wLength;
-	u8	u8Dir;/* 0:OUT, 1:IN */
+	u8	u8Dir;
 	u8	u8InData;
 } usb_vendor_req, USB_VendorReq, *pUSB_VendorReq;
 

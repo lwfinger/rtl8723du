@@ -22,7 +22,7 @@
 
 static VOID
 dm_CheckProtection(
-	IN	PADAPTER	Adapter
+	PADAPTER	Adapter
 )
 {
 }
@@ -68,7 +68,7 @@ static void dm_CheckPbcGPIO(_adapter *padapter)
  *   */
 static void
 dm_InitGPIOSetting(
-	IN	PADAPTER	Adapter
+	PADAPTER	Adapter
 )
 {
 	PHAL_DATA_TYPE		pHalData = GET_HAL_DATA(Adapter);
@@ -103,7 +103,7 @@ static void Init_ODM_ComInfo_8723d(PADAPTER	Adapter)
 
 void
 rtl8723d_InitHalDm(
-	IN	PADAPTER	Adapter
+	PADAPTER	Adapter
 )
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
@@ -116,7 +116,7 @@ rtl8723d_InitHalDm(
 
 VOID
 rtl8723d_HalDmWatchDog(
-	IN	PADAPTER	Adapter
+	PADAPTER	Adapter
 )
 {
 	BOOLEAN		bFwCurrentInPSMode = _FALSE;
@@ -165,7 +165,7 @@ skip_dm:
 	return;
 }
 
-void rtl8723d_init_dm_priv(IN PADAPTER Adapter)
+void rtl8723d_init_dm_priv(PADAPTER Adapter)
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT		*podmpriv = &pHalData->odmpriv;
@@ -175,7 +175,7 @@ void rtl8723d_init_dm_priv(IN PADAPTER Adapter)
 
 }
 
-void rtl8723d_deinit_dm_priv(IN PADAPTER Adapter)
+void rtl8723d_deinit_dm_priv(PADAPTER Adapter)
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT		*podmpriv = &pHalData->odmpriv;

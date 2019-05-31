@@ -391,41 +391,41 @@ struct psdscan_sta_8723d_2ant {
 /* *******************************************
  * The following is interface which will notify coex module.
  * ******************************************* */
-void ex_halbtc8723d2ant_power_on_setting(IN struct btc_coexist *btcoexist);
-void ex_halbtc8723d2ant_pre_load_firmware(IN struct btc_coexist *btcoexist);
-void ex_halbtc8723d2ant_init_hw_config(IN struct btc_coexist *btcoexist,
-				       IN boolean wifi_only);
-void ex_halbtc8723d2ant_init_coex_dm(IN struct btc_coexist *btcoexist);
-void ex_halbtc8723d2ant_ips_notify(IN struct btc_coexist *btcoexist,
-				   IN u8 type);
-void ex_halbtc8723d2ant_lps_notify(IN struct btc_coexist *btcoexist,
-				   IN u8 type);
-void ex_halbtc8723d2ant_scan_notify(IN struct btc_coexist *btcoexist,
-				    IN u8 type);
-void ex_halbtc8723d2ant_connect_notify(IN struct btc_coexist *btcoexist,
-				       IN u8 type);
-void ex_halbtc8723d2ant_media_status_notify(IN struct btc_coexist *btcoexist,
-		IN u8 type);
-void ex_halbtc8723d2ant_specific_packet_notify(IN struct btc_coexist *btcoexist,
-		IN u8 type);
-void ex_halbtc8723d2ant_bt_info_notify(IN struct btc_coexist *btcoexist,
-				       IN u8 *tmp_buf, IN u8 length);
-void ex_halbtc8723d2ant_wl_fwdbginfo_notify(IN struct btc_coexist *btcoexist,
-				       IN u8 *tmp_buf, IN u8 length);
-void ex_halbtc8723d2ant_rx_rate_change_notify(IN struct btc_coexist *btcoexist,
-		IN BOOLEAN is_data_frame, IN u8 btc_rate_id);
-void ex_halbtc8723d2ant_rf_status_notify(IN struct btc_coexist *btcoexist,
-		IN u8 type);
-void ex_halbtc8723d2ant_halt_notify(IN struct btc_coexist *btcoexist);
-void ex_halbtc8723d2ant_pnp_notify(IN struct btc_coexist *btcoexist,
-				   IN u8 pnp_state);
-void ex_halbtc8723d2ant_set_antenna_notify(IN struct btc_coexist *btcoexist,
-		IN u8 type);
-void ex_halbtc8723d2ant_periodical(IN struct btc_coexist *btcoexist);
-void ex_halbtc8723d2ant_display_coex_info(IN struct btc_coexist *btcoexist);
-void ex_halbtc8723d2ant_antenna_detection(IN struct btc_coexist *btcoexist,
-		IN u32 cent_freq, IN u32 offset, IN u32 span, IN u32 seconds);
-void ex_halbtc8723d2ant_display_ant_detection(IN struct btc_coexist *btcoexist);
+void ex_halbtc8723d2ant_power_on_setting(struct btc_coexist *btcoexist);
+void ex_halbtc8723d2ant_pre_load_firmware(struct btc_coexist *btcoexist);
+void ex_halbtc8723d2ant_init_hw_config(struct btc_coexist *btcoexist,
+				       boolean wifi_only);
+void ex_halbtc8723d2ant_init_coex_dm(struct btc_coexist *btcoexist);
+void ex_halbtc8723d2ant_ips_notify(struct btc_coexist *btcoexist,
+				   u8 type);
+void ex_halbtc8723d2ant_lps_notify(struct btc_coexist *btcoexist,
+				   u8 type);
+void ex_halbtc8723d2ant_scan_notify(struct btc_coexist *btcoexist,
+				    u8 type);
+void ex_halbtc8723d2ant_connect_notify(struct btc_coexist *btcoexist,
+				       u8 type);
+void ex_halbtc8723d2ant_media_status_notify(struct btc_coexist *btcoexist,
+		u8 type);
+void ex_halbtc8723d2ant_specific_packet_notify(struct btc_coexist *btcoexist,
+		u8 type);
+void ex_halbtc8723d2ant_bt_info_notify(struct btc_coexist *btcoexist,
+				       u8 *tmp_buf, u8 length);
+void ex_halbtc8723d2ant_wl_fwdbginfo_notify(struct btc_coexist *btcoexist,
+				       u8 *tmp_buf, u8 length);
+void ex_halbtc8723d2ant_rx_rate_change_notify(struct btc_coexist *btcoexist,
+		BOOLEAN is_data_frame, u8 btc_rate_id);
+void ex_halbtc8723d2ant_rf_status_notify(struct btc_coexist *btcoexist,
+		u8 type);
+void ex_halbtc8723d2ant_halt_notify(struct btc_coexist *btcoexist);
+void ex_halbtc8723d2ant_pnp_notify(struct btc_coexist *btcoexist,
+				   u8 pnp_state);
+void ex_halbtc8723d2ant_set_antenna_notify(struct btc_coexist *btcoexist,
+		u8 type);
+void ex_halbtc8723d2ant_periodical(struct btc_coexist *btcoexist);
+void ex_halbtc8723d2ant_display_coex_info(struct btc_coexist *btcoexist);
+void ex_halbtc8723d2ant_antenna_detection(struct btc_coexist *btcoexist,
+		u32 cent_freq, u32 offset, u32 span, u32 seconds);
+void ex_halbtc8723d2ant_display_ant_detection(struct btc_coexist *btcoexist);
 
 #endif
 

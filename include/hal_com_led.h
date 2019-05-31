@@ -52,14 +52,14 @@
 
 /* Netgear */
 #define LED_BLINK_LINK_INTERVAL_NETGEAR		500
-#define LED_BLINK_LINK_SLOWLY_INTERVAL_NETGEAR		1000
+#define LED_BLINK_LINK_SLOWLY_INTERVAL_NETGEAR	1000
 
-#define LED_WPS_BLINK_OFF_INTERVAL_NETGEAR		100
-#define LED_WPS_BLINK_ON_INTERVAL_NETGEAR		500
+#define LED_WPS_BLINK_OFF_INTERVAL_NETGEAR	100
+#define LED_WPS_BLINK_ON_INTERVAL_NETGEAR	500
 
 /* Belkin AC950 */
-#define LED_BLINK_LINK_INTERVAL_ON_BELKIN		200
-#define LED_BLINK_LINK_INTERVAL_OFF_BELKIN		100
+#define LED_BLINK_LINK_INTERVAL_ON_BELKIN	200
+#define LED_BLINK_LINK_INTERVAL_OFF_BELKIN	100
 #define LED_BLINK_ERROR_INTERVAL_BELKIN		100
 
 /* by chiyokolin for Azurewave */
@@ -176,7 +176,7 @@ typedef	enum _LED_STRATEGY_USB {
 typedef struct _LED_USB {
 	PADAPTER			padapter;
 
-	LED_PIN				LedPin;	/* Identify how to implement this SW led. */
+	LED_PIN			LedPin;	/* Identify how to implement this SW led. */
 
 	LED_STATE			CurrLedState; /* Current LED state. */
 	BOOLEAN				bLedOn; /* TRUE if LED is ON, FALSE if LED is OFF. */
@@ -204,8 +204,8 @@ typedef struct _LED_USB	LED_DATA, *PLED_DATA;
 typedef enum _LED_STRATEGY_USB	LED_STRATEGY, *PLED_STRATEGY;
 
 VOID LedControlUSB(
-	IN	PADAPTER		Adapter,
-	IN	LED_CTL_MODE		LedAction
+	PADAPTER		Adapter,
+	LED_CTL_MODE		LedAction
 );
 
 struct led_priv {
@@ -246,7 +246,7 @@ void
 InitLed(
 	_adapter			*padapter,
 	PLED_DATA		pLed,
-	LED_PIN			LedPin
+	LED_PIN		LedPin
 );
 
 void

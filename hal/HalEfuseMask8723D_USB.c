@@ -54,7 +54,7 @@ EFUSE_GetArrayLen_MP_8723D_MUSB(VOID)
 
 VOID
 EFUSE_GetMaskArray_MP_8723D_MUSB(
-	IN	OUT pu1Byte Array
+	pu1Byte Array
 )
 {
 	u2Byte len = EFUSE_GetArrayLen_MP_8723D_MUSB(), i = 0;
@@ -64,7 +64,7 @@ EFUSE_GetMaskArray_MP_8723D_MUSB(
 }
 BOOLEAN
 EFUSE_IsAddressMasked_MP_8723D_MUSB(
-	IN   u2Byte  Offset
+	u2Byte  Offset
 )
 {
 	int r = Offset / 16;

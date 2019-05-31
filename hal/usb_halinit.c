@@ -20,8 +20,8 @@ static void _dbg_dump_macreg(PADAPTER padapter)
 
 static void
 _ConfigChipOutEP_8723(
-	IN PADAPTER padapter,
-	IN u8 NumOutPipe
+	PADAPTER padapter,
+	u8 NumOutPipe
 )
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
@@ -52,9 +52,9 @@ _ConfigChipOutEP_8723(
 }
 
 static BOOLEAN HalUsbSetQueuePipeMapping8723DUsb(
-	IN PADAPTER padapter,
-	IN u8 NumInPipe,
-	IN u8 NumOutPipe
+	PADAPTER padapter,
+	u8 NumInPipe,
+	u8 NumOutPipe
 )
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
@@ -128,9 +128,9 @@ static u32 _InitPowerOn_8723du(PADAPTER padapter)
  * -------------------------------------------------------------------------
  */
 static u8 _LLTWrite(
-	IN PADAPTER padapter,
-	IN u32 address,
-	IN u32 data
+	PADAPTER padapter,
+	u32 address,
+	u32 data
 )
 {
 	u8 status = _SUCCESS;
@@ -154,8 +154,8 @@ static u8 _LLTWrite(
 }
 
 static u8 _LLTRead(
-	IN PADAPTER padapter,
-	IN u32 address
+	PADAPTER padapter,
+	u32 address
 )
 {
 	int count = 0;
@@ -279,13 +279,13 @@ _InitTransferPageSize_8723du(
 
 static void
 _InitNormalChipRegPriority(
-	IN PADAPTER padapter,
-	IN u16 beQ,
-	IN u16 bkQ,
-	IN u16 viQ,
-	IN u16 voQ,
-	IN u16 mgtQ,
-	IN u16 hiQ
+	PADAPTER padapter,
+	u16 beQ,
+	u16 bkQ,
+	u16 viQ,
+	u16 voQ,
+	u16 mgtQ,
+	u16 hiQ
 )
 {
 	u16 value16 = (rtw_read16(padapter, REG_TRXDMA_CTRL) & 0x7);
@@ -300,7 +300,7 @@ _InitNormalChipRegPriority(
 
 static void
 _InitNormalChipTwoOutEpPriority(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
@@ -350,7 +350,7 @@ _InitNormalChipTwoOutEpPriority(
 
 static void
 _InitNormalChipThreeOutEpPriority(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
@@ -395,7 +395,7 @@ static void _InitQueuePriority(PADAPTER padapter)
 
 static void
 _InitHardwareDropIncorrectBulkOut(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u32 value32 = rtw_read32(padapter, REG_TXDMA_OFFSET_CHK);
@@ -407,7 +407,7 @@ _InitHardwareDropIncorrectBulkOut(
 
 static void
 _InitNetworkType(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u32 value32;
@@ -421,8 +421,8 @@ _InitNetworkType(
 
 static void
 _InitDriverInfoSize(
-	IN PADAPTER padapter,
-	IN u8 drvInfoSize
+	PADAPTER padapter,
+	u8 drvInfoSize
 )
 {
 	u8 value8;
@@ -435,7 +435,7 @@ _InitDriverInfoSize(
 
 static void
 _InitWMACSetting(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u16 value16;
@@ -464,7 +464,7 @@ _InitWMACSetting(
 
 static void
 _InitAdaptiveCtrl(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u16 value16;
@@ -491,7 +491,7 @@ _InitAdaptiveCtrl(
 
 static void
 _InitEDCA(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	/* Set Spec SIFS (used in NAV) */
@@ -527,7 +527,7 @@ static void _InitHWLed(PADAPTER padapter)
 
 static void
 _InitRDGSetting_8723du(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	rtw_write8(padapter, REG_RD_CTRL_8723D, 0xFF);
@@ -537,7 +537,7 @@ _InitRDGSetting_8723du(
 
 static void
 _InitRetryFunction(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u8 value8;
@@ -611,7 +611,7 @@ static void _InitBurstPktLen(PADAPTER padapter)
  *---------------------------------------------------------------------------*/
 static void
 usb_AggSettingTxUpdate(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 }   /* usb_AggSettingTxUpdate */
@@ -705,7 +705,7 @@ enum {
 /* 2010/08/09 MH Add for power down check. */
 static BOOLEAN
 HalDetectPwrDownMode(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u8 tmpvalue;
@@ -731,7 +731,7 @@ HalDetectPwrDownMode(
  */
 static void
 HalDetectSelectiveSuspendMode(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 }   /* HalDetectSelectiveSuspendMode */
@@ -753,8 +753,8 @@ HalDetectSelectiveSuspendMode(
  *---------------------------------------------------------------------------*/
 static void
 HwSuspendModeEnable(
-	IN PADAPTER padapter,
-	IN u8 Type
+	PADAPTER padapter,
+	u8 Type
 )
 {
 	/* PRT_USB_DEVICE pDevice = GET_RT_USB_DEVICE(padapter); */
@@ -788,7 +788,7 @@ HwSuspendModeEnable(
 
 }   /* HwSuspendModeEnable */
 
-static rt_rf_power_state RfOnOffDetect(IN PADAPTER padapter)
+static rt_rf_power_state RfOnOffDetect(PADAPTER padapter)
 {
 	/* HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter); */
 	u8 val8;
@@ -1088,7 +1088,7 @@ static void _DisableGPIO(PADAPTER padapter)
 	/*
 	 * j. GPIO_PIN_CTRL 0x44[31:0]=0x000
 	 * k. Value = GPIO_PIN_CTRL[7:0]
-	 * l. GPIO_PIN_CTRL 0x44[31:0] = 0x00FF0000 | (value <<8); write external PIN level
+	 * l. GPIO_PIN_CTRL 0x44[31:0] = 0x00FF0000 | (value <<8); write external Plevel
 	 * m. GPIO_MUXCFG 0x42 [15:0] = 0x0780
 	 * n. LEDCFG 0x4C[15:0] = 0x8080
 	 */
@@ -1116,7 +1116,7 @@ static void _DisableGPIO(PADAPTER padapter)
 
 static void
 _ResetFWDownloadRegister(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u32 value32;
@@ -1128,7 +1128,7 @@ _ResetFWDownloadRegister(
 
 static void
 _ResetBB(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u16 value16;
@@ -1141,7 +1141,7 @@ _ResetBB(
 
 static void
 _ResetMCU(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u16 value16;
@@ -1154,7 +1154,7 @@ _ResetMCU(
 
 static void
 _DisableMAC_AFE_PLL(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u32 value32;
@@ -1170,7 +1170,7 @@ _DisableMAC_AFE_PLL(
 
 static void
 _AutoPowerDownToHostOff(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u32 value32;
@@ -1191,7 +1191,7 @@ _AutoPowerDownToHostOff(
 
 static void
 _SetUsbSuspend(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u32 value32;
@@ -1208,7 +1208,7 @@ _SetUsbSuspend(
 
 static void
 _DisableRFAFEAndResetBB(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	/*
@@ -1237,8 +1237,8 @@ _DisableRFAFEAndResetBB(
 
 static void
 _ResetDigitalProcedure1(
-	IN PADAPTER padapter,
-	IN BOOLEAN bWithoutHWSM
+	PADAPTER padapter,
+	BOOLEAN bWithoutHWSM
 )
 {
 
@@ -1326,7 +1326,7 @@ _ResetDigitalProcedure1(
 
 static void
 _ResetDigitalProcedure2(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	/*
@@ -1344,8 +1344,8 @@ _ResetDigitalProcedure2(
 
 static void
 _DisableAnalog(
-	IN PADAPTER padapter,
-	IN BOOLEAN bWithoutHWSM
+	PADAPTER padapter,
+	BOOLEAN bWithoutHWSM
 )
 {
 	u16 value16 = 0;
@@ -1556,18 +1556,18 @@ static u32 _GetChannelGroup(u32 channel)
  */
 static void
 hal_EfuseParseLEDSetting(
-	IN PADAPTER padapter,
-	IN u8 *PROMContent,
-	IN BOOLEAN AutoloadFail
+	PADAPTER padapter,
+	u8 *PROMContent,
+	BOOLEAN AutoloadFail
 )
 {
 }
 
 static void
 hal_EfuseParseRFSetting(
-	IN PADAPTER padapter,
-	IN u8 *PROMContent,
-	IN BOOLEAN AutoloadFail
+	PADAPTER padapter,
+	u8 *PROMContent,
+	BOOLEAN AutoloadFail
 )
 {
 }
@@ -1575,9 +1575,9 @@ hal_EfuseParseRFSetting(
 /* Read HW power down mode selection */
 static void
 hal_EfuseParsePowerSavingSetting(
-	IN PADAPTER padapter,
-	IN u8 *PROMContent,
-	IN u8 AutoloadFail
+	PADAPTER padapter,
+	u8 *PROMContent,
+	u8 AutoloadFail
 )
 {
 	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(padapter);
@@ -1616,9 +1616,9 @@ hal_EfuseParsePowerSavingSetting(
 
 static void
 hal_EfuseParseIDs(
-	IN PADAPTER padapter,
-	IN u8 *hwinfo,
-	IN BOOLEAN AutoLoadFail
+	PADAPTER padapter,
+	u8 *hwinfo,
+	BOOLEAN AutoLoadFail
 )
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
@@ -1652,7 +1652,7 @@ hal_EfuseParseIDs(
 
 static u8
 InitpadapterVariablesByPROM_8723du(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
@@ -1702,7 +1702,7 @@ exit:
 
 static u8
 hal_EfuseParsePROMContent(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
@@ -1730,7 +1730,7 @@ exit:
 }
 
 static void
-_ReadRFType(IN PADAPTER padapter)
+_ReadRFType(PADAPTER padapter)
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
 
@@ -1748,7 +1748,7 @@ _ReadRFType(IN PADAPTER padapter)
  *    PASSIVE_LEVEL
  */
 static void
-hal_EfuseCellSel(IN PADAPTER padapter)
+hal_EfuseCellSel(PADAPTER padapter)
 {
 	u32 value32;
 
@@ -1843,9 +1843,9 @@ static void GetHwReg8723du(PADAPTER padapter, u8 variable, u8 *val)
  */
 static u8
 GetHalDefVar8723du(
-	IN PADAPTER padapter,
-	IN HAL_DEF_VARIABLE eVariable,
-	IN PVOID pValue
+	PADAPTER padapter,
+	HAL_DEF_VARIABLE eVariable,
+	PVOID pValue
 )
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
@@ -1883,9 +1883,9 @@ GetHalDefVar8723du(
  */
 static u8
 SetHalDefVar8723du(
-	IN PADAPTER padapter,
-	IN HAL_DEF_VARIABLE eVariable,
-	IN PVOID pValue
+	PADAPTER padapter,
+	HAL_DEF_VARIABLE eVariable,
+	PVOID pValue
 )
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);

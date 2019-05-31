@@ -253,7 +253,7 @@ halrf_do_imr_test(
 
 u32
 halrf_psd_log2base(
-	IN u32 val
+	u32 val
 );
 
 #endif

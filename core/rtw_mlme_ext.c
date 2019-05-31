@@ -6049,8 +6049,8 @@ static u8 rtw_wnm_nb_elem_parsing(
 }	
 
 /* selection sorting based on preference value
- * IN : 		nb_rpt_entries - candidate num
- * IN/OUT :	pcandidates	- candidate list
+ * 	nb_rpt_entries - candidate num
+ * 	pcandidates	- candidate list
  * return : TRUE - means pcandidates is updated.  
  */
 static u8 rtw_wnm_candidates_sorting(
@@ -8369,8 +8369,6 @@ static int _issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int p
 	struct mlme_ext_priv	*pmlmeext;
 	struct mlme_ext_info	*pmlmeinfo;
 
-	/* RTW_INFO("%s:%d\n", __FUNCTION__, power_mode); */
-
 	if (!padapter)
 		goto exit;
 
@@ -8879,7 +8877,6 @@ void issue_action_SA_Query(_adapter *padapter, unsigned char *raddr, unsigned ch
 		if (pattrib->key_type == IEEE80211W_RIGHT_KEY) {
 			psta = rtw_get_stainfo(pstapriv, pwlanhdr->addr1);
 			if (psta != NULL) {
-				/* RTW_INFO("%s, %d, set dot11w_expire_timer\n", __func__, __LINE__); */
 				_set_timer(&psta->dot11w_expire_timer, 1000);
 			}
 		}
@@ -8887,7 +8884,6 @@ void issue_action_SA_Query(_adapter *padapter, unsigned char *raddr, unsigned ch
 
 	case 1: /* SA Query rsp */
 		tid = cpu_to_le16(tid);
-		/* RTW_INFO("rtw_set_fixed_ie, %04x\n", tid); */
 		pframe = rtw_set_fixed_ie(pframe, 2, (unsigned char *)&tid, &pattrib->pktlen);
 		break;
 	default:
@@ -9661,8 +9657,8 @@ Following are some utitity fuctions for WiFi MLME
 *****************************************************************************/
 
 BOOLEAN IsLegal5GChannel(
-	IN PADAPTER			Adapter,
-	IN u8			channel)
+	PADAPTER			Adapter,
+	u8			channel)
 {
 
 	int i = 0;

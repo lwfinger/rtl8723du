@@ -105,7 +105,7 @@ typedef struct _RT_PMAC_TX_INFO {
 } RT_PMAC_TX_INFO, *PRT_PMAC_TX_INFO;
 
 
-typedef VOID (*MPT_WORK_ITEM_HANDLER)(IN PVOID Adapter);
+typedef VOID (*MPT_WORK_ITEM_HANDLER)(PVOID Adapter);
 typedef struct _MPT_CONTEXT {
 	/* Indicate if we have started Mass Production Test. */
 	BOOLEAN			bMassProdTest;

@@ -1620,8 +1620,8 @@ static u8 halbtcoutsrc_SetBtAntDetection(void *pBtcContext, u8 txTime, u8 btChnl
 
 static BOOLEAN
 halbtcoutsrc_SetBtTRXMASK(
-	IN	PVOID			pBtcContext,
-	IN	u1Byte			bt_trx_mask
+	PVOID			pBtcContext,
+	u1Byte			bt_trx_mask
 	)
 {
 	/* Always return _FALSE since we don't implement this yet */
@@ -2351,8 +2351,8 @@ void EXhalbtcoutsrc_rx_rate_change_notify(PBTC_COEXIST pBtCoexist, u8 is_data_fr
 
 VOID
 EXhalbtcoutsrc_RfStatusNotify(
-	IN	PBTC_COEXIST		pBtCoexist,
-	IN	u1Byte				type
+	PBTC_COEXIST		pBtCoexist,
+	u1Byte				type
 )
 {
 	if (!halbtcoutsrc_IsBtCoexistAvailable(pBtCoexist))
@@ -3513,8 +3513,8 @@ hal_btcoex_ParseAntIsolationConfigFile(
 
 int
 hal_btcoex_AntIsolationConfig_ParaFile(
-	IN	PADAPTER	Adapter,
-	IN	char		*pFileName
+	PADAPTER	Adapter,
+	char		*pFileName
 )
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(Adapter);

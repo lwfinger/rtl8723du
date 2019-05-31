@@ -11,10 +11,10 @@ EFUSE_GetArrayLen_MP_8723D_MUSB(VOID);
 
 VOID
 EFUSE_GetMaskArray_MP_8723D_MUSB(
-	IN	OUT pu1Byte Array
+	pu1Byte Array
 );
 
 BOOLEAN
 EFUSE_IsAddressMasked_MP_8723D_MUSB(/* TC: Test Chip, MP: MP Chip */
-	IN   u2Byte  Offset
+	u2Byte  Offset
 );

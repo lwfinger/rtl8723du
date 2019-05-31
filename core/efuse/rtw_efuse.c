@@ -399,14 +399,14 @@ static VOID efuse_PostUpdateAction(
 
 BOOLEAN
 Efuse_Read1ByteFromFakeContent(
-	IN		PADAPTER	pAdapter,
-	IN		u16		Offset,
-	IN OUT	u8		*Value);
+		PADAPTER	pAdapter,
+		u16		Offset,
+	u8		*Value);
 BOOLEAN
 Efuse_Read1ByteFromFakeContent(
-	IN		PADAPTER	pAdapter,
-	IN		u16		Offset,
-	IN OUT	u8		*Value)
+		PADAPTER	pAdapter,
+		u16		Offset,
+	u8		*Value)
 {
 	if (Offset >= EFUSE_MAX_HW_SIZE)
 		return _FALSE;
@@ -420,14 +420,14 @@ Efuse_Read1ByteFromFakeContent(
 
 BOOLEAN
 Efuse_Write1ByteToFakeContent(
-	IN		PADAPTER	pAdapter,
-	IN		u16		Offset,
-	IN		u8		Value);
+		PADAPTER	pAdapter,
+		u16		Offset,
+		u8		Value);
 BOOLEAN
 Efuse_Write1ByteToFakeContent(
-	IN		PADAPTER	pAdapter,
-	IN		u16		Offset,
-	IN		u8		Value)
+		PADAPTER	pAdapter,
+		u16		Offset,
+		u8		Value)
 {
 	if (Offset >= EFUSE_MAX_HW_SIZE)
 		return _FALSE;
@@ -458,18 +458,18 @@ Efuse_Write1ByteToFakeContent(
  *---------------------------------------------------------------------------*/
 VOID
 Efuse_PowerSwitch(
-	IN	PADAPTER	pAdapter,
-	IN	u8		bWrite,
-	IN	u8		PwrState)
+	PADAPTER	pAdapter,
+	u8		bWrite,
+	u8		PwrState)
 {
 	pAdapter->hal_func.EfusePowerSwitch(pAdapter, bWrite, PwrState);
 }
 
 VOID
 BTEfuse_PowerSwitch(
-	IN	PADAPTER	pAdapter,
-	IN	u8		bWrite,
-	IN	u8		PwrState)
+	PADAPTER	pAdapter,
+	u8		bWrite,
+	u8		PwrState)
 {
 	if (pAdapter->hal_func.BTEfusePowerSwitch)
 		pAdapter->hal_func.BTEfusePowerSwitch(pAdapter, bWrite, PwrState);
@@ -493,9 +493,9 @@ BTEfuse_PowerSwitch(
  *---------------------------------------------------------------------------*/
 u16
 Efuse_GetCurrentSize(
-	IN PADAPTER		pAdapter,
-	IN u8			efuseType,
-	IN BOOLEAN		bPseudoTest)
+	PADAPTER		pAdapter,
+	u8			efuseType,
+	BOOLEAN		bPseudoTest)
 {
 	u16 ret = 0;
 
@@ -520,7 +520,7 @@ ReadEFuseByte(
 	PADAPTER	Adapter,
 	u16			_offset,
 	u8			*pbuf,
-	IN BOOLEAN	bPseudoTest)
+	BOOLEAN	bPseudoTest)
 {
 	u32	value32;
 	u8	readbyte;
@@ -591,7 +591,7 @@ efuse_ReadEFuse(
 	u16		_offset,
 	u16		_size_byte,
 	u8	*pbuf,
-	IN	BOOLEAN	bPseudoTest
+	BOOLEAN	bPseudoTest
 );
 VOID
 efuse_ReadEFuse(
@@ -600,7 +600,7 @@ efuse_ReadEFuse(
 	u16		_offset,
 	u16		_size_byte,
 	u8	*pbuf,
-	IN	BOOLEAN	bPseudoTest
+	BOOLEAN	bPseudoTest
 )
 {
 	Adapter->hal_func.ReadEFuse(Adapter, efuseType, _offset, _size_byte, pbuf, bPseudoTest);
@@ -608,11 +608,11 @@ efuse_ReadEFuse(
 
 VOID
 EFUSE_GetEfuseDefinition(
-	IN		PADAPTER	pAdapter,
-	IN		u8		efuseType,
-	IN		u8		type,
-	OUT		void		*pOut,
-	IN		BOOLEAN		bPseudoTest
+		PADAPTER	pAdapter,
+		u8		efuseType,
+		u8		type,
+	void		*pOut,
+		BOOLEAN		bPseudoTest
 )
 {
 	pAdapter->hal_func.EFUSEGetEfuseDefinition(pAdapter, efuseType, type, pOut, bPseudoTest);
@@ -622,10 +622,10 @@ EFUSE_GetEfuseDefinition(
 /*  11/16/2008 MH Read one byte from real Efuse. */
 u8
 efuse_OneByteRead(
-	IN	PADAPTER	pAdapter,
-	IN	u16			addr,
-	IN	u8			*data,
-	IN	BOOLEAN		bPseudoTest)
+	PADAPTER	pAdapter,
+	u16			addr,
+	u8			*data,
+	BOOLEAN		bPseudoTest)
 {
 	u32	tmpidx = 0;
 	u8	bResult;
@@ -681,10 +681,10 @@ efuse_OneByteRead(
 /*  11/16/2008 MH Write one byte to reald Efuse. */
 u8
 efuse_OneByteWrite(
-	IN	PADAPTER	pAdapter,
-	IN	u16			addr,
-	IN	u8			data,
-	IN	BOOLEAN		bPseudoTest)
+	PADAPTER	pAdapter,
+	u16			addr,
+	u8			data,
+	BOOLEAN		bPseudoTest)
 {
 	u8	tmpidx = 0;
 	u8	bResult = _FALSE;
@@ -752,10 +752,10 @@ efuse_OneByteWrite(
 }
 
 int
-Efuse_PgPacketRead(IN	PADAPTER	pAdapter,
-		   IN	u8			offset,
-		   IN	u8			*data,
-		   IN	BOOLEAN		bPseudoTest)
+Efuse_PgPacketRead(PADAPTER	pAdapter,
+		   u8			offset,
+		   u8			*data,
+		   BOOLEAN		bPseudoTest)
 {
 	int	ret = 0;
 
@@ -765,11 +765,11 @@ Efuse_PgPacketRead(IN	PADAPTER	pAdapter,
 }
 
 int
-Efuse_PgPacketWrite(IN	PADAPTER	pAdapter,
-		    IN	u8			offset,
-		    IN	u8			word_en,
-		    IN	u8			*data,
-		    IN	BOOLEAN		bPseudoTest)
+Efuse_PgPacketWrite(PADAPTER	pAdapter,
+		    u8			offset,
+		    u8			word_en,
+		    u8			*data,
+		    BOOLEAN		bPseudoTest)
 {
 	int ret;
 
@@ -780,11 +780,11 @@ Efuse_PgPacketWrite(IN	PADAPTER	pAdapter,
 
 
 static int
-Efuse_PgPacketWrite_BT(IN	PADAPTER	pAdapter,
-		       IN	u8			offset,
-		       IN	u8			word_en,
-		       IN	u8			*data,
-		       IN	BOOLEAN		bPseudoTest)
+Efuse_PgPacketWrite_BT(PADAPTER	pAdapter,
+		       u8			offset,
+		       u8			word_en,
+		       u8			*data,
+		       BOOLEAN		bPseudoTest)
 {
 	int ret;
 
@@ -795,11 +795,11 @@ Efuse_PgPacketWrite_BT(IN	PADAPTER	pAdapter,
 
 
 u8
-Efuse_WordEnableDataWrite(IN	PADAPTER	pAdapter,
-			  IN	u16		efuse_addr,
-			  IN	u8		word_en,
-			  IN	u8		*data,
-			  IN	BOOLEAN		bPseudoTest)
+Efuse_WordEnableDataWrite(PADAPTER	pAdapter,
+			  u16		efuse_addr,
+			  u8		word_en,
+			  u8		*data,
+			  BOOLEAN		bPseudoTest)
 {
 	u8	ret = 0;
 
@@ -1183,16 +1183,16 @@ exit:
  *---------------------------------------------------------------------------*/
 VOID
 Efuse_ReadAllMap(
-	IN		PADAPTER	pAdapter,
-	IN		u8		efuseType,
-	IN OUT	u8		*Efuse,
-	IN		BOOLEAN		bPseudoTest);
+		PADAPTER	pAdapter,
+		u8		efuseType,
+	u8		*Efuse,
+		BOOLEAN		bPseudoTest);
 VOID
 Efuse_ReadAllMap(
-	IN		PADAPTER	pAdapter,
-	IN		u8		efuseType,
-	IN OUT	u8		*Efuse,
-	IN		BOOLEAN		bPseudoTest)
+		PADAPTER	pAdapter,
+		u8		efuseType,
+	u8		*Efuse,
+		BOOLEAN		bPseudoTest)
 {
 	u16	mapLen = 0;
 
@@ -1226,15 +1226,15 @@ Efuse_ReadAllMap(
 #ifdef PLATFORM
 static VOID
 efuse_ShadowWrite1Byte(
-	IN	PADAPTER	pAdapter,
-	IN	u16		Offset,
-	IN	u8		Value);
+	PADAPTER	pAdapter,
+	u16		Offset,
+	u8		Value);
 #endif /* PLATFORM */
 static VOID
 efuse_ShadowWrite1Byte(
-	IN	PADAPTER	pAdapter,
-	IN	u16		Offset,
-	IN	u8		Value)
+	PADAPTER	pAdapter,
+	u16		Offset,
+	u8		Value)
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(pAdapter);
 
@@ -1245,9 +1245,9 @@ efuse_ShadowWrite1Byte(
 /* ---------------Write Two Bytes */
 static VOID
 efuse_ShadowWrite2Byte(
-	IN	PADAPTER	pAdapter,
-	IN	u16		Offset,
-	IN	u16		Value)
+	PADAPTER	pAdapter,
+	u16		Offset,
+	u16		Value)
 {
 
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(pAdapter);
@@ -1261,9 +1261,9 @@ efuse_ShadowWrite2Byte(
 /* ---------------Write Four Bytes */
 static VOID
 efuse_ShadowWrite4Byte(
-	IN	PADAPTER	pAdapter,
-	IN	u16		Offset,
-	IN	u32		Value)
+	PADAPTER	pAdapter,
+	u16		Offset,
+	u32		Value)
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(pAdapter);
 
@@ -1293,16 +1293,16 @@ efuse_ShadowWrite4Byte(
  *---------------------------------------------------------------------------*/
 VOID
 EFUSE_ShadowWrite(
-	IN	PADAPTER	pAdapter,
-	IN	u8		Type,
-	IN	u16		Offset,
-	IN OUT	u32		Value);
+	PADAPTER	pAdapter,
+	u8		Type,
+	u16		Offset,
+	u32		Value);
 VOID
 EFUSE_ShadowWrite(
-	IN	PADAPTER	pAdapter,
-	IN	u8		Type,
-	IN	u16		Offset,
-	IN OUT	u32		Value)
+	PADAPTER	pAdapter,
+	u8		Type,
+	u16		Offset,
+	u32		Value)
 {
 #if (MP_DRIVER == 0)
 	return;
@@ -1322,11 +1322,11 @@ EFUSE_ShadowWrite(
 
 VOID
 Efuse_InitSomeVar(
-	IN		PADAPTER	pAdapter
+		PADAPTER	pAdapter
 );
 VOID
 Efuse_InitSomeVar(
-	IN		PADAPTER	pAdapter
+		PADAPTER	pAdapter
 )
 {
 	u8 i;
@@ -1366,9 +1366,9 @@ Efuse_InitSomeVar(
  *---------------------------------------------------------------------------*/
 static VOID
 efuse_ShadowRead1Byte(
-	IN	PADAPTER	pAdapter,
-	IN	u16		Offset,
-	IN OUT	u8		*Value)
+	PADAPTER	pAdapter,
+	u16		Offset,
+	u8		*Value)
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(pAdapter);
 
@@ -1379,9 +1379,9 @@ efuse_ShadowRead1Byte(
 /* ---------------Read Two Bytes */
 static VOID
 efuse_ShadowRead2Byte(
-	IN	PADAPTER	pAdapter,
-	IN	u16		Offset,
-	IN OUT	u16		*Value)
+	PADAPTER	pAdapter,
+	u16		Offset,
+	u16		*Value)
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(pAdapter);
 
@@ -1393,9 +1393,9 @@ efuse_ShadowRead2Byte(
 /* ---------------Read Four Bytes */
 static VOID
 efuse_ShadowRead4Byte(
-	IN	PADAPTER	pAdapter,
-	IN	u16		Offset,
-	IN OUT	u32		*Value)
+	PADAPTER	pAdapter,
+	u16		Offset,
+	u32		*Value)
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(pAdapter);
 
@@ -1413,10 +1413,10 @@ efuse_ShadowRead4Byte(
  *---------------------------------------------------------------------------*/
 void
 EFUSE_ShadowRead(
-	IN		PADAPTER	pAdapter,
-	IN		u8		Type,
-	IN		u16		Offset,
-	IN OUT	u32		*Value)
+		PADAPTER	pAdapter,
+		u8		Type,
+		u16		Offset,
+	u32		*Value)
 {
 	if (Type == 1)
 		efuse_ShadowRead1Byte(pAdapter, Offset, (u8 *)Value);
@@ -1429,7 +1429,7 @@ EFUSE_ShadowRead(
 
 /*  11/16/2008 MH Add description. Get current efuse area enabled word!!. */
 u8
-Efuse_CalculateWordCnts(IN u8	word_en)
+Efuse_CalculateWordCnts(u8	word_en)
 {
 	u8 word_cnts = 0;
 	if (!(word_en & BIT(0)))
@@ -1461,9 +1461,9 @@ Efuse_CalculateWordCnts(IN u8	word_en)
  *
  *---------------------------------------------------------------------------*/
 void
-efuse_WordEnableDataRead(IN	u8	word_en,
-			 IN	u8	*sourdata,
-			 IN	u8	*targetdata)
+efuse_WordEnableDataRead(u8	word_en,
+			 u8	*sourdata,
+			 u8	*targetdata)
 {
 	if (!(word_en & BIT(0))) {
 		targetdata[0] = sourdata[0];
@@ -1500,9 +1500,9 @@ efuse_WordEnableDataRead(IN	u8	word_en,
  *
  *---------------------------------------------------------------------------*/
 void EFUSE_ShadowMapUpdate(
-	IN PADAPTER	pAdapter,
-	IN u8		efuseType,
-	IN BOOLEAN	bPseudoTest)
+	PADAPTER	pAdapter,
+	u8		efuseType,
+	BOOLEAN	bPseudoTest)
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(pAdapter);
 	u16	mapLen = 0;

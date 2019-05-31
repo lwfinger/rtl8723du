@@ -252,7 +252,7 @@ void rtl8723d_stop_thread(_adapter *padapter);
 #endif
 
 #ifdef CONFIG_MP_INCLUDED
-int FirmwareDownloadBT(IN PADAPTER Adapter, struct rt_mp_firmware *pFirmware);
+int FirmwareDownloadBT(PADAPTER Adapter, struct rt_mp_firmware *pFirmware);
 #endif
 void CCX_FwC2HTxRpt_8723d(PADAPTER padapter, u8 *pdata, u8 len);
 

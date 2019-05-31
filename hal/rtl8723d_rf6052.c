@@ -55,8 +55,8 @@ static	RF_SHADOW_T	RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG];
  *---------------------------------------------------------------------------*/
 VOID
 PHY_RF6052SetBandwidth8723D(
-	IN PADAPTER padapter,
-	IN enum channel_width Bandwidth)	/* 20M or 40M */
+	PADAPTER padapter,
+	enum channel_width Bandwidth)	/* 20M or 40M */
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
 
@@ -84,7 +84,7 @@ PHY_RF6052SetBandwidth8723D(
 
 static VOID
 phy_RF6052_Config_HardCode(
-	IN	PADAPTER		Adapter
+	PADAPTER		Adapter
 )
 {
 
@@ -97,7 +97,7 @@ phy_RF6052_Config_HardCode(
 
 static int
 phy_RF6052_Config_ParaFile(
-	IN	PADAPTER		Adapter
+	PADAPTER		Adapter
 )
 {
 	u32					u4RegValue = 0;
@@ -221,7 +221,7 @@ phy_RF6052_Config_ParaFile_Fail:
 
 int
 PHY_RF6052_Config8723D(
-	IN	PADAPTER		Adapter)
+	PADAPTER		Adapter)
 {
 	HAL_DATA_TYPE				*pHalData = GET_HAL_DATA(Adapter);
 	int					rtStatus = _SUCCESS;

@@ -215,13 +215,13 @@ void rtw_hal_config_rftype(PADAPTER  padapter)
  *
  */
 void hal_com_config_channel_plan(
-	IN	PADAPTER padapter,
-	IN	char *hw_alpha2,
-	IN	u8 hw_chplan,
-	IN	char *sw_alpha2,
-	IN	u8 sw_chplan,
-	IN	u8 def_chplan,
-	IN	BOOLEAN AutoLoadFail
+	PADAPTER padapter,
+	char *hw_alpha2,
+	u8 hw_chplan,
+	char *sw_alpha2,
+	u8 sw_chplan,
+	u8 def_chplan,
+	BOOLEAN AutoLoadFail
 )
 {
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(padapter);
@@ -305,8 +305,8 @@ done:
 
 BOOLEAN
 HAL_IsLegalChannel(
-	IN	PADAPTER	Adapter,
-	IN	u32			Channel
+	PADAPTER	Adapter,
+	u32			Channel
 )
 {
 	BOOLEAN bLegalChannel = _TRUE;
@@ -863,9 +863,9 @@ u8	hw_rate_to_m_rate(u8 rate)
 }
 
 void	HalSetBrateCfg(
-	IN PADAPTER		Adapter,
-	IN u8			*mBratesOS,
-	OUT u16			*pBrateCfg)
+	PADAPTER		Adapter,
+	u8			*mBratesOS,
+	u16			*pBrateCfg)
 {
 	u8	i, is_brate, brate;
 
@@ -918,7 +918,7 @@ void	HalSetBrateCfg(
 
 static VOID
 _OneOutPipeMapping(
-	IN	PADAPTER	pAdapter
+	PADAPTER	pAdapter
 )
 {
 	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(pAdapter);
@@ -936,8 +936,8 @@ _OneOutPipeMapping(
 
 static VOID
 _TwoOutPipeMapping(
-	IN	PADAPTER	pAdapter,
-	IN	BOOLEAN		bWIFICfg
+	PADAPTER	pAdapter,
+	BOOLEAN		bWIFICfg
 )
 {
 	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(pAdapter);
@@ -980,8 +980,8 @@ _TwoOutPipeMapping(
 }
 
 static VOID _ThreeOutPipeMapping(
-	IN	PADAPTER	pAdapter,
-	IN	BOOLEAN		bWIFICfg
+	PADAPTER	pAdapter,
+	BOOLEAN		bWIFICfg
 )
 {
 	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(pAdapter);
@@ -1022,8 +1022,8 @@ static VOID _ThreeOutPipeMapping(
 
 }
 static VOID _FourOutPipeMapping(
-	IN	PADAPTER	pAdapter,
-	IN	BOOLEAN		bWIFICfg
+	PADAPTER	pAdapter,
+	BOOLEAN		bWIFICfg
 )
 {
 	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(pAdapter);
@@ -1066,8 +1066,8 @@ static VOID _FourOutPipeMapping(
 
 BOOLEAN
 Hal_MappingOutPipe(
-	IN	PADAPTER	pAdapter,
-	IN	u8		NumOutPipe
+	PADAPTER	pAdapter,
+	u8		NumOutPipe
 )
 {
 	struct registry_priv *pregistrypriv = &pAdapter->registrypriv;
@@ -4292,7 +4292,7 @@ eqNByte(
  *   */
 u32
 MapCharToHexDigit(
-	IN		char		chTmp
+	char		chTmp
 )
 {
 	if (chTmp >= '0' && chTmp <= '9')
@@ -4313,9 +4313,9 @@ MapCharToHexDigit(
  *   */
 BOOLEAN
 GetHexValueFromString(
-	IN		char			*szStr,
-	IN OUT	u32			*pu4bVal,
-	IN OUT	u32			*pu4bMove
+	char			*szStr,
+	u32			*pu4bVal,
+	u32			*pu4bMove
 )
 {
 	char		*szScan = szStr;
@@ -4362,10 +4362,10 @@ GetHexValueFromString(
 
 BOOLEAN
 GetFractionValueFromString(
-	IN		char			*szStr,
-	IN OUT	u8				*pInteger,
-	IN OUT	u8				*pFraction,
-	IN OUT	u32			*pu4bMove
+	char			*szStr,
+	u8				*pInteger,
+	u8				*pFraction,
+	u32			*pu4bMove
 )
 {
 	char	*szScan = szStr;
@@ -4413,7 +4413,7 @@ GetFractionValueFromString(
  *   */
 BOOLEAN
 IsCommentString(
-	IN		char			*szStr
+	char			*szStr
 )
 {
 	if (*szStr == '/' && *(szStr + 1) == '/')
@@ -4424,8 +4424,8 @@ IsCommentString(
 
 BOOLEAN
 GetU1ByteIntegerFromStringInDecimal(
-	IN		char	*Str,
-	IN OUT	u8		*pInt
+	char	*Str,
+	u8		*pInt
 )
 {
 	u16 i = 0;
@@ -4448,11 +4448,11 @@ GetU1ByteIntegerFromStringInDecimal(
  * If RightQualifier does not exist, it will hang on in the while loop */
 BOOLEAN
 ParseQualifiedString(
-	IN		char	*In,
-	IN OUT	u32	*Start,
-	OUT		char	*Out,
-	IN		char		LeftQualifier,
-	IN		char		RightQualifier
+	char	*In,
+	u32	*Start,
+	char	*Out,
+	char		LeftQualifier,
+	char		RightQualifier
 )
 {
 	u32	i = 0, j = 0;

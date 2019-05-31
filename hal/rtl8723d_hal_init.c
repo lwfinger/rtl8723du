@@ -16,8 +16,8 @@
 
 static VOID
 _FWDownloadEnable(
-	IN	PADAPTER		padapter,
-	IN	BOOLEAN			enable
+	PADAPTER		padapter,
+	BOOLEAN			enable
 )
 {
 	u8	tmp, count = 0;
@@ -52,9 +52,9 @@ _FWDownloadEnable(
 
 static int
 _BlockWrite(
-	IN		PADAPTER		padapter,
-	IN		PVOID		buffer,
-	IN		u32			buffSize
+	PADAPTER		padapter,
+	PVOID		buffer,
+	u32			buffSize
 )
 {
 	int ret = _SUCCESS;
@@ -120,10 +120,10 @@ exit:
 
 static int
 _PageWrite(
-	IN		PADAPTER	padapter,
-	IN		u32			page,
-	IN		PVOID		buffer,
-	IN		u32			size
+		PADAPTER	padapter,
+		u32			page,
+		PVOID		buffer,
+		u32			size
 )
 {
 	u8 value8;
@@ -157,9 +157,9 @@ _FillDummy(
 
 static int
 _WriteFW(
-	IN PADAPTER padapter,
-	IN PVOID buffer,
-	IN u32 size
+	PADAPTER padapter,
+	PVOID buffer,
+	u32 size
 )
 {
 	/* Since we need dynamic decide method of dwonload fw, so we call this function to get chip version. */
@@ -335,10 +335,10 @@ void rtl8723d_FirmwareSelfReset(PADAPTER padapter)
 
 #ifdef CONFIG_MP_INCLUDED
 static int _WriteBTFWtoTxPktBuf8723D(
-	IN		PADAPTER		Adapter,
-	IN		PVOID			buffer,
-	IN		u4Byte			FwBufLen,
-	IN		u1Byte			times
+		PADAPTER		Adapter,
+		PVOID			buffer,
+		u4Byte			FwBufLen,
+		u1Byte			times
 )
 {
 	int			rtStatus = _SUCCESS;
@@ -490,8 +490,8 @@ exit:
  *   */
 static void
 SetFwBTFwPatchCmd(
-	IN PADAPTER	Adapter,
-	IN u16		FwSize
+	PADAPTER	Adapter,
+	u16		FwSize
 )
 {
 	u8 u1BTFwPatchParm[H2C_BT_FW_PATCH_LEN] = {0};
@@ -513,8 +513,8 @@ SetFwBTFwPatchCmd(
 
 static void
 SetFwBTPwrCmd(
-	IN PADAPTER	Adapter,
-	IN u1Byte	PwrIdx
+	PADAPTER	Adapter,
+	u1Byte	PwrIdx
 )
 {
 	u1Byte		u1BTPwrIdxParm[H2C_FORCE_BT_TXPWR_LEN] = {0};
@@ -2973,8 +2973,8 @@ Hal_InitPGData(
 
 void
 Hal_EfuseParseIDCode(
-	IN	PADAPTER	padapter,
-	IN	u8			*hwinfo
+	PADAPTER	padapter,
+	u8			*hwinfo
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
@@ -2993,9 +2993,9 @@ Hal_EfuseParseIDCode(
 
 static void
 Hal_EEValueCheck(
-	IN		u8		EEType,
-	IN		PVOID		pInValue,
-	OUT		PVOID		pOutValue
+	u8		EEType,
+	PVOID		pInValue,
+	PVOID		pOutValue
 )
 {
 	switch (EEType) {
@@ -3018,9 +3018,9 @@ Hal_EEValueCheck(
 
 void
 Hal_EfuseParseTxPowerInfo_8723D(
-	IN	PADAPTER		padapter,
-	IN	u8			*PROMContent,
-	IN	BOOLEAN			AutoLoadFail
+	PADAPTER		padapter,
+	u8			*PROMContent,
+	BOOLEAN			AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
@@ -3039,9 +3039,9 @@ Hal_EfuseParseTxPowerInfo_8723D(
 
 VOID
 Hal_EfuseParseBoardType_8723D(
-	IN	PADAPTER	Adapter,
-	IN	u8			*PROMContent,
-	IN	BOOLEAN		AutoloadFail
+	PADAPTER	Adapter,
+	u8			*PROMContent,
+	BOOLEAN		AutoloadFail
 )
 {
 
@@ -3059,9 +3059,9 @@ Hal_EfuseParseBoardType_8723D(
 
 VOID
 Hal_EfuseParseBTCoexistInfo_8723D(
-	IN PADAPTER padapter,
-	IN u8 *hwinfo,
-	IN BOOLEAN AutoLoadFail
+	PADAPTER padapter,
+	u8 *hwinfo,
+	BOOLEAN AutoLoadFail
 )
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
@@ -3129,9 +3129,9 @@ Hal_EfuseParseBTCoexistInfo_8723D(
 
 VOID
 Hal_EfuseParseEEPROMVer_8723D(
-	IN	PADAPTER		padapter,
-	IN	u8			*hwinfo,
-	IN	BOOLEAN			AutoLoadFail
+	PADAPTER		padapter,
+	u8			*hwinfo,
+	BOOLEAN			AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
@@ -3145,9 +3145,9 @@ Hal_EfuseParseEEPROMVer_8723D(
 
 VOID
 Hal_EfuseParsePackageType_8723D(
-	IN	PADAPTER		pAdapter,
-	IN	u8				*hwinfo,
-	IN	BOOLEAN		AutoLoadFail
+	PADAPTER		pAdapter,
+	u8				*hwinfo,
+	BOOLEAN		AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
@@ -3184,9 +3184,9 @@ Hal_EfuseParsePackageType_8723D(
 
 VOID
 Hal_EfuseParseVoltage_8723D(
-	IN	PADAPTER		pAdapter,
-	IN	u8			*hwinfo,
-	IN	BOOLEAN	AutoLoadFail
+	PADAPTER		pAdapter,
+	u8			*hwinfo,
+	BOOLEAN	AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
@@ -3199,9 +3199,9 @@ Hal_EfuseParseVoltage_8723D(
 
 VOID
 Hal_EfuseParseChnlPlan_8723D(
-	IN	PADAPTER		padapter,
-	IN	u8			*hwinfo,
-	IN	BOOLEAN			AutoLoadFail
+	PADAPTER		padapter,
+	u8			*hwinfo,
+	BOOLEAN			AutoLoadFail
 )
 {
 	hal_com_config_channel_plan(
@@ -3217,9 +3217,9 @@ Hal_EfuseParseChnlPlan_8723D(
 
 VOID
 Hal_EfuseParseCustomerID_8723D(
-	IN	PADAPTER		padapter,
-	IN	u8			*hwinfo,
-	IN	BOOLEAN			AutoLoadFail
+	PADAPTER		padapter,
+	u8			*hwinfo,
+	BOOLEAN			AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
@@ -3232,18 +3232,18 @@ Hal_EfuseParseCustomerID_8723D(
 
 VOID
 Hal_EfuseParseAntennaDiversity_8723D(
-	IN	PADAPTER		pAdapter,
-	IN	u8				*hwinfo,
-	IN	BOOLEAN			AutoLoadFail
+	PADAPTER		pAdapter,
+	u8				*hwinfo,
+	BOOLEAN			AutoLoadFail
 )
 {
 }
 
 VOID
 Hal_EfuseParseXtal_8723D(
-	IN	PADAPTER		pAdapter,
-	IN	u8			*hwinfo,
-	IN	BOOLEAN		AutoLoadFail
+	PADAPTER		pAdapter,
+	u8			*hwinfo,
+	BOOLEAN		AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
@@ -3283,9 +3283,9 @@ Hal_EfuseParseThermalMeter_8723D(
 
 
 void Hal_ReadRFGainOffset(
-	IN		PADAPTER		Adapter,
-	IN		u8			*PROMContent,
-	IN		BOOLEAN		AutoloadFail)
+		PADAPTER		Adapter,
+		u8			*PROMContent,
+		BOOLEAN		AutoloadFail)
 {
 #ifdef CONFIG_RF_POWER_TRIM
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
@@ -3326,8 +3326,8 @@ void Hal_ReadRFGainOffset(
 
 u8
 BWMapping_8723D(
-	IN	PADAPTER		Adapter,
-	IN	struct pkt_attrib	*pattrib
+	PADAPTER		Adapter,
+	struct pkt_attrib	*pattrib
 )
 {
 	u8	BWSettingOfDesc = 0;

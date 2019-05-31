@@ -22,7 +22,6 @@ static unsigned char AIRGOCAP_OUI[] = {0x00, 0x0a, 0xf5};
 
 #define R2T_PHY_DELAY	(0)
 
-/* #define WAIT_FOR_BCN_TO_MIN	(3000) */
 #define WAIT_FOR_BCN_TO_MIN	(6000)
 #define WAIT_FOR_BCN_TO_MAX	(20000)
 
@@ -285,8 +284,8 @@ void set_mcs_rate_by_mask(u8 *mcs_set, u32 mask)
 }
 
 void UpdateBrateTbl(
-	IN PADAPTER		Adapter,
-	IN u8			*mBratesOS
+	PADAPTER		Adapter,
+	u8			*mBratesOS
 )
 {
 	u8	i;

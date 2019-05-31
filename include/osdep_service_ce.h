@@ -103,10 +103,10 @@ __inline static void rtw_list_delete(_list *plist)
 }
 
 static inline void timer_hdl(
-	IN PVOID SystemSpecific1,
-	IN PVOID FunctionContext,
-	IN PVOID SystemSpecific2,
-	IN PVOID SystemSpecific3)
+	PVOID SystemSpecific1,
+	PVOID FunctionContext,
+	PVOID SystemSpecific2,
+	PVOID SystemSpecific3)
 {
 	_timer *timer = (_timer *)FunctionContext;
 

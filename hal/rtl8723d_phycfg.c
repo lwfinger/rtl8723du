@@ -74,9 +74,9 @@ phy_CalculateBitShift(
 */
 u32
 PHY_QueryBBReg_8723D(
-	IN	PADAPTER	Adapter,
-	IN	u32		RegAddr,
-	IN	u32		BitMask
+	PADAPTER	Adapter,
+	u32		RegAddr,
+	u32		BitMask
 )
 {
 	u32	ReturnValue = 0, OriginalValue, BitShift;
@@ -116,10 +116,10 @@ PHY_QueryBBReg_8723D(
 
 VOID
 PHY_SetBBReg_8723D(
-	IN	PADAPTER	Adapter,
-	IN	u32		RegAddr,
-	IN	u32		BitMask,
-	IN	u32		Data
+	PADAPTER	Adapter,
+	u32		RegAddr,
+	u32		BitMask,
+	u32		Data
 )
 {
 	HAL_DATA_TYPE	*pHalData		= GET_HAL_DATA(Adapter);
@@ -164,9 +164,9 @@ PHY_SetBBReg_8723D(
  *---------------------------------------------------------------------------*/
 static	u32
 phy_FwRFSerialRead(
-	IN	PADAPTER			Adapter,
-	IN	enum rf_path			eRFPath,
-	IN	u32				Offset)
+	PADAPTER			Adapter,
+	enum rf_path			eRFPath,
+	u32				Offset)
 {
 	u32		retValue = 0;
 	/* RT_ASSERT(FALSE,("deprecate!\n")); */
@@ -193,19 +193,19 @@ phy_FwRFSerialRead(
  *---------------------------------------------------------------------------*/
 static	VOID
 phy_FwRFSerialWrite(
-	IN	PADAPTER			Adapter,
-	IN	enum rf_path			eRFPath,
-	IN	u32				Offset,
-	IN	u32				Data)
+	PADAPTER			Adapter,
+	enum rf_path			eRFPath,
+	u32				Offset,
+	u32				Data)
 {
 	/* RT_ASSERT(FALSE,("deprecate!\n")); */
 }
 
 static	u32
 phy_RFSerialRead_8723D(
-	IN	PADAPTER			Adapter,
-	IN	enum rf_path			eRFPath,
-	IN	u32				Offset
+	PADAPTER			Adapter,
+	enum rf_path			eRFPath,
+	u32				Offset
 )
 {
 	u32						retValue = 0;
@@ -311,10 +311,10 @@ phy_RFSerialRead_8723D(
 */
 static	VOID
 phy_RFSerialWrite_8723D(
-	IN	PADAPTER			Adapter,
-	IN	enum rf_path			eRFPath,
-	IN	u32				Offset,
-	IN	u32				Data
+	PADAPTER			Adapter,
+	enum rf_path			eRFPath,
+	u32				Offset,
+	u32				Data
 )
 {
 	u32						DataAndAddr = 0;
@@ -367,10 +367,10 @@ phy_RFSerialWrite_8723D(
 */
 u32
 PHY_QueryRFReg_8723D(
-	IN	PADAPTER			Adapter,
-	IN	enum rf_path			eRFPath,
-	IN	u32				RegAddr,
-	IN	u32				BitMask
+	PADAPTER			Adapter,
+	enum rf_path			eRFPath,
+	u32				RegAddr,
+	u32				BitMask
 )
 {
 	u32 Original_Value, Readback_Value, BitShift;
@@ -407,11 +407,11 @@ PHY_QueryRFReg_8723D(
 */
 VOID
 PHY_SetRFReg_8723D(
-	IN	PADAPTER			Adapter,
-	IN	enum rf_path			eRFPath,
-	IN	u32				RegAddr,
-	IN	u32				BitMask,
-	IN	u32				Data
+	PADAPTER			Adapter,
+	enum rf_path			eRFPath,
+	u32				RegAddr,
+	u32				BitMask,
+	u32				Data
 )
 {
 	u32		Original_Value, BitShift;
@@ -488,7 +488,7 @@ s32 PHY_MACConfig8723D(PADAPTER Adapter)
 */
 static	VOID
 phy_InitBBRFRegisterDefinition(
-	IN	PADAPTER		Adapter
+	PADAPTER		Adapter
 )
 {
 	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
@@ -521,7 +521,7 @@ phy_InitBBRFRegisterDefinition(
 
 static	int
 phy_BB8723d_Config_ParaFile(
-	IN	PADAPTER	Adapter
+	PADAPTER	Adapter
 )
 {
 	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
@@ -579,7 +579,7 @@ phy_BB8190_Config_ParaFile_Fail:
 
 int
 PHY_BBConfig8723D(
-	IN PADAPTER Adapter
+	PADAPTER Adapter
 )
 {
 	int	rtStatus = _SUCCESS;
@@ -616,7 +616,7 @@ PHY_BBConfig8723D(
 
 int
 PHY_RFConfig8723D(
-	IN	PADAPTER	Adapter
+	PADAPTER	Adapter
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
@@ -649,8 +649,8 @@ PHY_RFConfig8723D(
  *---------------------------------------------------------------------------*/
 int
 PHY_ConfigRFWithParaFile_8723D(
-	IN	PADAPTER			Adapter,
-	IN	u8					*pFileName,
+	PADAPTER			Adapter,
+	u8					*pFileName,
 	enum rf_path				eRFPath
 )
 {
@@ -666,10 +666,10 @@ PHY_ConfigRFWithParaFile_8723D(
 
 VOID
 PHY_SetTxPowerIndex_8723D(
-	IN	PADAPTER			Adapter,
-	IN	u32					PowerIndex,
-	IN	enum rf_path			RFPath,
-	IN	u8					Rate
+	PADAPTER			Adapter,
+	u32					PowerIndex,
+	enum rf_path			RFPath,
+	u8					Rate
 )
 {
 	if (RFPath == RF_PATH_A || RFPath == RF_PATH_B) {
@@ -748,11 +748,11 @@ PHY_SetTxPowerIndex_8723D(
 
 u8
 PHY_GetTxPowerIndex_8723D(
-	IN	PADAPTER			pAdapter,
-	IN	enum rf_path			RFPath,
-	IN	u8					Rate,
-	IN	u8					BandWidth,
-	IN	u8					Channel,
+	PADAPTER			pAdapter,
+	enum rf_path			RFPath,
+	u8					Rate,
+	u8					BandWidth,
+	u8					Channel,
 	struct txpwr_idx_comp *tic
 )
 {
@@ -791,8 +791,8 @@ PHY_GetTxPowerIndex_8723D(
 
 VOID
 PHY_SetTxPowerLevel8723D(
-	IN	PADAPTER		Adapter,
-	IN	u8				Channel
+	PADAPTER		Adapter,
+	u8				Channel
 )
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
@@ -805,8 +805,8 @@ PHY_SetTxPowerLevel8723D(
 
 VOID
 PHY_GetTxPowerLevel8723D(
-	IN	PADAPTER		Adapter,
-	OUT s32				*powerlevel
+	PADAPTER		Adapter,
+	s32				*powerlevel
 )
 {
 }
@@ -814,9 +814,9 @@ PHY_GetTxPowerLevel8723D(
 /* <20160217, Jessica> A workaround to eliminate the 2472MHz & 2484MHz spur of 8723D. */
 static VOID
 phy_SpurCalibration_8723D(
-	IN	PADAPTER					pAdapter,
-	IN	u1Byte						ToChannel,
-	IN	u1Byte						threshold
+	PADAPTER					pAdapter,
+	u1Byte						ToChannel,
+	u1Byte						threshold
 )
 {
 	u4Byte		freq[2] = {0xFCCD, 0xFF9A}; /* {chnl 13, 14} */
@@ -902,7 +902,7 @@ phy_SpurCalibration_8723D(
 
 static VOID
 phy_SetRegBW_8723D(
-	IN	PADAPTER		Adapter,
+	PADAPTER		Adapter,
 	enum channel_width	CurrentBW
 )
 {
@@ -933,7 +933,7 @@ phy_SetRegBW_8723D(
 
 static u8
 phy_GetSecondaryChnl_8723D(
-	IN	PADAPTER	Adapter
+	PADAPTER	Adapter
 )
 {
 	u8	SCSettingOf40 = 0, SCSettingOf20 = 0;
@@ -969,7 +969,7 @@ phy_GetSecondaryChnl_8723D(
 
 static void
 phy_PostSetBwMode8723D(
-	IN PADAPTER padapter
+	PADAPTER padapter
 )
 {
 	u1Byte SubChnlNum = 0;
@@ -1023,7 +1023,7 @@ phy_PostSetBwMode8723D(
 
 static VOID
 phy_SwChnl8723D(
-	IN	PADAPTER					pAdapter
+	PADAPTER					pAdapter
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
@@ -1068,7 +1068,7 @@ phy_SwChnl8723D(
 
 static VOID
 phy_SwChnlAndSetBwMode8723D(
-	IN  PADAPTER		Adapter
+	PADAPTER		Adapter
 )
 {
 	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
@@ -1100,14 +1100,14 @@ phy_SwChnlAndSetBwMode8723D(
 
 static VOID
 PHY_HandleSwChnlAndSetBW8723D(
-	IN	PADAPTER			Adapter,
-	IN	BOOLEAN				bSwitchChannel,
-	IN	BOOLEAN				bSetBandWidth,
-	IN	u8					ChannelNum,
-	IN	enum channel_width	ChnlWidth,
-	IN	EXTCHNL_OFFSET	ExtChnlOffsetOf40MHz,
-	IN	EXTCHNL_OFFSET	ExtChnlOffsetOf80MHz,
-	IN	u8					CenterFrequencyIndex1
+	PADAPTER			Adapter,
+	BOOLEAN				bSwitchChannel,
+	BOOLEAN				bSetBandWidth,
+	u8					ChannelNum,
+	enum channel_width	ChnlWidth,
+	EXTCHNL_OFFSET	ExtChnlOffsetOf40MHz,
+	EXTCHNL_OFFSET	ExtChnlOffsetOf80MHz,
+	u8					CenterFrequencyIndex1
 )
 {
 	/* static BOOLEAN		bInitialzed = _FALSE; */
@@ -1182,11 +1182,11 @@ PHY_HandleSwChnlAndSetBW8723D(
 
 VOID
 PHY_SetSwChnlBWMode8723D(
-	IN	PADAPTER			Adapter,
-	IN	u8					channel,
-	IN	enum channel_width	Bandwidth,
-	IN	u8					Offset40,
-	IN	u8					Offset80
+	PADAPTER			Adapter,
+	u8					channel,
+	enum channel_width	Bandwidth,
+	u8					Offset40,
+	u8					Offset80
 )
 {
 	/* RTW_INFO("%s()===>\n",__FUNCTION__); */
@@ -1197,7 +1197,7 @@ PHY_SetSwChnlBWMode8723D(
 }
 
 static VOID
-_PHY_DumpRFReg_8723D(IN	PADAPTER	pAdapter)
+_PHY_DumpRFReg_8723D(PADAPTER	pAdapter)
 {
 	u32 rfRegValue, rfRegOffset;
 
