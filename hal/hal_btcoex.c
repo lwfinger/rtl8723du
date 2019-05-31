@@ -448,20 +448,6 @@ static u8 halbtcoutsrc_IsDualBandConnected(PADAPTER padapter)
 {
 	u8 ret = BTC_MULTIPORT_SCC;
 
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(padapter) && (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC))) {
-		struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
-		struct mcc_obj_priv *mccobjpriv = &(dvobj->mcc_objpriv);
-		u8 band0 = mccobjpriv->iface[0]->mlmeextpriv.cur_channel > 14 ? BAND_ON_5G : BAND_ON_2_4G;
-		u8 band1 = mccobjpriv->iface[1]->mlmeextpriv.cur_channel > 14 ? BAND_ON_5G : BAND_ON_2_4G;
-
-		if (band0 != band1)
-			ret = BTC_MULTIPORT_MCC_DUAL_BAND;
-		else
-			ret = BTC_MULTIPORT_MCC_DUAL_CHANNEL;
-	}
-#endif
-
 	return ret;
 }
 
@@ -927,16 +913,8 @@ static u8 halbtcoutsrc_Get(void *pBtcContext, u8 getType, void *pOutBuf)
 		break;
 
 	case BTC_GET_BL_RF4CE_CONNECTED:
-#ifdef CONFIG_RF4CE_COEXIST
-		if (hal_btcoex_get_rf4ce_link_state() == 0)
-			*pu8 = FALSE;
-		else
-			*pu8 = TRUE;
-#else
 		*pu8 = FALSE;
-#endif
 		break;
-
 	case BTC_GET_S4_WIFI_RSSI:
 		*pS4Tmp = halbtcoutsrc_GetWifiRssi(padapter);
 		break;
@@ -2603,18 +2581,6 @@ static void EXhalbtcoutsrc_set_rfe_type(u8 type)
 	GLBtCoexist.board_info.rfe_type= type;
 }
 
-#ifdef CONFIG_RF4CE_COEXIST
-void EXhalbtcoutsrc_set_rf4ce_link_state(u8 state)
-{
-	GLBtCoexist.rf4ce_info.link_state = state;
-}
-
-u8 EXhalbtcoutsrc_get_rf4ce_link_state(void)
-{
-	return GLBtCoexist.rf4ce_info.link_state;
-}
-#endif
-
 static void EXhalbtcoutsrc_switchband_notify(struct btc_coexist *pBtCoexist, u8 type)
 {
 	if(!halbtcoutsrc_IsBtCoexistAvailable(pBtCoexist))
@@ -3604,18 +3570,6 @@ void hal_btcoex_set_rfe_type(u8 type)
 {
 	EXhalbtcoutsrc_set_rfe_type(type);
 }
-
-#ifdef CONFIG_RF4CE_COEXIST
-void hal_btcoex_set_rf4ce_link_state(u8 state)
-{
-	EXhalbtcoutsrc_set_rf4ce_link_state(state);
-}
-
-u8 hal_btcoex_get_rf4ce_link_state(void)
-{
-	return EXhalbtcoutsrc_get_rf4ce_link_state();
-}
-#endif /* CONFIG_RF4CE_COEXIST */
 
 void hal_btcoex_switchband_notify(u8 under_scan, u8 band_type)
 {

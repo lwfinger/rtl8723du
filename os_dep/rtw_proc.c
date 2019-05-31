@@ -139,21 +139,6 @@ static int proc_get_chplan_test(struct seq_file *m, void *v)
 	return 0;
 }
 
-#ifdef RTW_HALMAC
-extern void rtw_halmac_get_version(char *str, u32 len);
-
-static int proc_get_halmac_info(struct seq_file *m, void *v)
-{
-	char ver[30] = {0};
-
-
-	rtw_halmac_get_version(ver, 30);
-	RTW_PRINT_SEL(m, "version: %s\n", ver);
-
-	return 0;
-}
-#endif
-
 /*
 * rtw_drv_proc:
 * init/deinit when register/unregister driver
@@ -165,9 +150,6 @@ static const struct rtw_proc_hdl drv_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("country_chplan_map", proc_get_country_chplan_map, NULL),
 	RTW_PROC_HDL_SSEQ("chplan_id_list", proc_get_chplan_id_list, NULL),
 	RTW_PROC_HDL_SSEQ("chplan_test", proc_get_chplan_test, NULL),
-#ifdef RTW_HALMAC
-	RTW_PROC_HDL_SSEQ("halmac_info", proc_get_halmac_info, NULL),
-#endif /* RTW_HALMAC */
 };
 
 static const int drv_proc_hdls_num = sizeof(drv_proc_hdls) / sizeof(struct rtw_proc_hdl);
@@ -2379,9 +2361,6 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("btinfo_evt", NULL, proc_set_btinfo_evt),
 	RTW_PROC_HDL_SSEQ("btreg_read", proc_get_btreg_read, proc_set_btreg_read),
 	RTW_PROC_HDL_SSEQ("btreg_write", proc_get_btreg_write, proc_set_btreg_write),
-#ifdef CONFIG_RF4CE_COEXIST
-	RTW_PROC_HDL_SSEQ("rf4ce_state", proc_get_rf4ce_state, proc_set_rf4ce_state),
-#endif
 
 	RTW_PROC_HDL_SSEQ("trx_info_debug", proc_get_trx_info_debug, NULL),
 	RTW_PROC_HDL_SSEQ("linked_info_dump", proc_get_linked_info_dump, proc_set_linked_info_dump),
@@ -2776,143 +2755,6 @@ static void rtw_odm_proc_deinit(_adapter	*adapter)
 	}
 }
 
-#ifdef CONFIG_MCC_MODE
-/*
-* rtw_mcc_proc:
-* init/deinit when register/unregister net_device, along with rtw_adapter_proc
-*/
-const struct rtw_proc_hdl mcc_proc_hdls[] = {
-	RTW_PROC_HDL_SSEQ("mcc_info", proc_get_mcc_info, NULL),
-	RTW_PROC_HDL_SSEQ("mcc_enable", proc_get_mcc_info, proc_set_mcc_enable),
-	RTW_PROC_HDL_SSEQ("mcc_duration", proc_get_mcc_info, proc_set_mcc_duration),
-	RTW_PROC_HDL_SSEQ("mcc_single_tx_criteria", proc_get_mcc_info, proc_set_mcc_single_tx_criteria),
-	RTW_PROC_HDL_SSEQ("mcc_ap_bw20_target_tp", proc_get_mcc_info, proc_set_mcc_ap_bw20_target_tp),
-	RTW_PROC_HDL_SSEQ("mcc_ap_bw40_target_tp", proc_get_mcc_info, proc_set_mcc_ap_bw40_target_tp),
-	RTW_PROC_HDL_SSEQ("mcc_ap_bw80_target_tp", proc_get_mcc_info, proc_set_mcc_ap_bw80_target_tp),
-	RTW_PROC_HDL_SSEQ("mcc_sta_bw20_target_tp", proc_get_mcc_info, proc_set_mcc_sta_bw20_target_tp),
-	RTW_PROC_HDL_SSEQ("mcc_sta_bw40_target_tp", proc_get_mcc_info, proc_set_mcc_sta_bw40_target_tp),
-	RTW_PROC_HDL_SSEQ("mcc_sta_bw80_target_tp", proc_get_mcc_info, proc_set_mcc_sta_bw80_target_tp),
-	RTW_PROC_HDL_SSEQ("mcc_policy_table", proc_get_mcc_policy_table, NULL),
-};
-
-const int mcc_proc_hdls_num = sizeof(mcc_proc_hdls) / sizeof(struct rtw_proc_hdl);
-
-static int rtw_mcc_proc_open(struct inode *inode, struct file *file)
-{
-	ssize_t index = (ssize_t)PDE_DATA(inode);
-	const struct rtw_proc_hdl *hdl = mcc_proc_hdls + index;
-	void *private = proc_get_parent_data(inode);
-
-	if (hdl->type == RTW_PROC_HDL_TYPE_SEQ) {
-		int res = seq_open(file, hdl->u.seq_op);
-
-		if (res == 0)
-			((struct seq_file *)file->private_data)->private = private;
-
-		return res;
-	} else if (hdl->type == RTW_PROC_HDL_TYPE_SSEQ) {
-		int (*show)(struct seq_file *, void *) = hdl->u.show ? hdl->u.show : proc_get_dummy;
-
-		return single_open(file, show, private);
-	} else {
-		return -EROFS;
-	}
-}
-
-static ssize_t rtw_mcc_proc_write(struct file *file, const char __user *buffer, size_t count, loff_t *pos)
-{
-	ssize_t index = (ssize_t)PDE_DATA(file_inode(file));
-	const struct rtw_proc_hdl *hdl = mcc_proc_hdls + index;
-	ssize_t (*write)(struct file *, const char __user *, size_t, loff_t *, void *) = hdl->write;
-
-	if (write)
-		return write(file, buffer, count, pos, ((struct seq_file *)file->private_data)->private);
-
-	return -EROFS;
-}
-
-static const struct file_operations rtw_mcc_proc_seq_fops = {
-	.owner = THIS_MODULE,
-	.open = rtw_mcc_proc_open,
-	.read = seq_read,
-	.llseek = seq_lseek,
-	.release = seq_release,
-	.write = rtw_mcc_proc_write,
-};
-
-static const struct file_operations rtw_mcc_proc_sseq_fops = {
-	.owner = THIS_MODULE,
-	.open = rtw_mcc_proc_open,
-	.read = seq_read,
-	.llseek = seq_lseek,
-	.release = single_release,
-	.write = rtw_mcc_proc_write,
-};
-
-struct proc_dir_entry *rtw_mcc_proc_init(struct net_device *dev)
-{
-	struct proc_dir_entry *dir_mcc = NULL;
-	struct proc_dir_entry *entry = NULL;
-	_adapter	*adapter = rtw_netdev_priv(dev);
-	ssize_t i;
-
-	if (adapter->dir_dev == NULL) {
-		rtw_warn_on(1);
-		goto exit;
-	}
-
-	if (adapter->dir_mcc != NULL) {
-		rtw_warn_on(1);
-		goto exit;
-	}
-
-	dir_mcc = rtw_proc_create_dir("mcc", adapter->dir_dev, dev);
-	if (dir_mcc == NULL) {
-		rtw_warn_on(1);
-		goto exit;
-	}
-
-	adapter->dir_mcc = dir_mcc;
-
-	for (i = 0; i < mcc_proc_hdls_num; i++) {
-		if (mcc_proc_hdls[i].type == RTW_PROC_HDL_TYPE_SEQ)
-			entry = rtw_proc_create_entry(mcc_proc_hdls[i].name, dir_mcc, &rtw_mcc_proc_seq_fops, (void *)i);
-		else if (mcc_proc_hdls[i].type == RTW_PROC_HDL_TYPE_SSEQ)
-			entry = rtw_proc_create_entry(mcc_proc_hdls[i].name, dir_mcc, &rtw_mcc_proc_sseq_fops, (void *)i);
-		else
-			entry = NULL;
-
-		if (!entry) {
-			rtw_warn_on(1);
-			goto exit;
-		}
-	}
-
-exit:
-	return dir_mcc;
-}
-
-void rtw_mcc_proc_deinit(_adapter	*adapter)
-{
-	struct proc_dir_entry *dir_mcc = NULL;
-	int i;
-
-	dir_mcc = adapter->dir_mcc;
-
-	if (dir_mcc == NULL) {
-		rtw_warn_on(1);
-		return;
-	}
-
-	for (i = 0; i < mcc_proc_hdls_num; i++)
-		remove_proc_entry(mcc_proc_hdls[i].name, dir_mcc);
-
-	remove_proc_entry("mcc", adapter->dir_dev);
-
-	adapter->dir_mcc = NULL;
-}
-#endif /* CONFIG_MCC_MODE */
-
 struct proc_dir_entry *rtw_adapter_proc_init(struct net_device *dev)
 {
 	struct proc_dir_entry *drv_proc = get_rtw_drv_proc();
@@ -2956,10 +2798,6 @@ struct proc_dir_entry *rtw_adapter_proc_init(struct net_device *dev)
 
 	rtw_odm_proc_init(dev);
 
-#ifdef CONFIG_MCC_MODE
-	rtw_mcc_proc_init(dev);
-#endif /* CONFIG_MCC_MODE */
-
 exit:
 	return dir_dev;
 }
@@ -2982,10 +2820,6 @@ void rtw_adapter_proc_deinit(struct net_device *dev)
 		remove_proc_entry(adapter_proc_hdls[i].name, dir_dev);
 
 	rtw_odm_proc_deinit(adapter);
-
-#ifdef CONFIG_MCC_MODE
-	rtw_mcc_proc_deinit(adapter);
-#endif /* CONFIG_MCC_MODE */
 
 	remove_proc_entry(dev->name, drv_proc);
 
@@ -3010,10 +2844,6 @@ void rtw_adapter_proc_replace(struct net_device *dev)
 		remove_proc_entry(adapter_proc_hdls[i].name, dir_dev);
 
 	rtw_odm_proc_deinit(adapter);
-
-#ifdef CONFIG_MCC_MODE
-	rtw_mcc_proc_deinit(adapter);
-#endif /* CONIG_MCC_MODE */
 
 	remove_proc_entry(adapter->old_ifname, drv_proc);
 

@@ -873,12 +873,6 @@ struct btc_bt_link_info {
 	boolean					acl_busy;
 };
 
-#ifdef CONFIG_RF4CE_COEXIST
-struct btc_rf4ce_info {
-	u8					link_state;
-};
-#endif
-
 struct btc_statistics {
 	u32					cnt_bind;
 	u32					cnt_power_on;
@@ -907,10 +901,6 @@ struct btc_coexist {
 	struct  btc_bt_info			bt_info;		/*some bt info referenced by non-bt module*/
 	struct  btc_stack_info		stack_info;
 	struct  btc_bt_link_info		bt_link_info;
-
-#ifdef CONFIG_RF4CE_COEXIST
-	struct  btc_rf4ce_info		rf4ce_info;
-#endif
 	BTC_CHIP_INTERFACE		chip_interface;
 	PVOID					odm_priv;
 

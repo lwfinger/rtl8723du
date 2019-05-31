@@ -183,11 +183,7 @@ module_param(rtw_rf_config, int, 0644);
 static int rtw_check_hw_status = 0;
 
 static int rtw_low_power = 0;
-#ifdef CONFIG_WIFI_TEST
-	int rtw_wifi_spec = 1;/* for wifi test */
-#else
 static 	int rtw_wifi_spec = 0;
-#endif
 
 static int rtw_special_rf_path = 0; /* 0: 2T2R ,1: only turn on path A 1T1R */
 
@@ -515,32 +511,6 @@ int _netdev_open(struct net_device *pnetdev);
 int netdev_open(struct net_device *pnetdev);
 static int netdev_close(struct net_device *pnetdev);
 
-#ifdef CONFIG_MCC_MODE
-/* enable MCC mode or not */
-int rtw_en_mcc = 1;
-/* can referece following value before insmod driver */
-int rtw_mcc_ap_bw20_target_tx_tp = MCC_AP_BW20_TARGET_TX_TP;
-int rtw_mcc_ap_bw40_target_tx_tp = MCC_AP_BW40_TARGET_TX_TP;
-int rtw_mcc_ap_bw80_target_tx_tp = MCC_AP_BW80_TARGET_TX_TP;
-int rtw_mcc_sta_bw20_target_tx_tp = MCC_STA_BW20_TARGET_TX_TP;
-int rtw_mcc_sta_bw40_target_tx_tp = MCC_STA_BW40_TARGET_TX_TP;
-int rtw_mcc_sta_bw80_target_tx_tp = MCC_STA_BW80_TARGET_TX_TP;
-int rtw_mcc_single_tx_cri = MCC_SINGLE_TX_CRITERIA;
-int rtw_mcc_policy_table_idx = 0;
-int rtw_mcc_duration = 0;
-int rtw_mcc_enable_runtime_duration = 1;
-module_param(rtw_en_mcc, int, 0644);
-module_param(rtw_mcc_single_tx_cri, int, 0644);
-module_param(rtw_mcc_ap_bw20_target_tx_tp, int, 0644);
-module_param(rtw_mcc_ap_bw40_target_tx_tp, int, 0644);
-module_param(rtw_mcc_ap_bw80_target_tx_tp, int, 0644);
-module_param(rtw_mcc_sta_bw20_target_tx_tp, int, 0644);
-module_param(rtw_mcc_sta_bw40_target_tx_tp, int, 0644);
-module_param(rtw_mcc_sta_bw80_target_tx_tp, int, 0644);
-module_param(rtw_mcc_policy_table_idx, int, 0644);
-module_param(rtw_mcc_duration, int, 0644);
-#endif /*CONFIG_MCC_MODE */
-
 #ifdef CONFIG_RTW_NAPI
 /*following setting should define NAPI in Makefile
 enable napi only = 1, disable napi = 0*/
@@ -822,20 +792,6 @@ uint loadparam(_adapter *padapter)
 	registry_par->reg_rxgain_offset_5gl = (u32) rtw_rxgain_offset_5gl;
 	registry_par->reg_rxgain_offset_5gm = (u32) rtw_rxgain_offset_5gm;
 	registry_par->reg_rxgain_offset_5gh = (u32) rtw_rxgain_offset_5gh;
-
-#ifdef CONFIG_MCC_MODE
-	registry_par->en_mcc = (u8)rtw_en_mcc;
-	registry_par->rtw_mcc_ap_bw20_target_tx_tp = (u32)rtw_mcc_ap_bw20_target_tx_tp;
-	registry_par->rtw_mcc_ap_bw40_target_tx_tp = (u32)rtw_mcc_ap_bw40_target_tx_tp;
-	registry_par->rtw_mcc_ap_bw80_target_tx_tp = (u32)rtw_mcc_ap_bw80_target_tx_tp;
-	registry_par->rtw_mcc_sta_bw20_target_tx_tp = (u32)rtw_mcc_sta_bw20_target_tx_tp;
-	registry_par->rtw_mcc_sta_bw40_target_tx_tp = (u32)rtw_mcc_sta_bw40_target_tx_tp;
-	registry_par->rtw_mcc_sta_bw80_target_tx_tp = (u32)rtw_mcc_sta_bw80_target_tx_tp;
-	registry_par->rtw_mcc_single_tx_cri = (u32)rtw_mcc_single_tx_cri;
-	registry_par->rtw_mcc_policy_table_idx = rtw_mcc_policy_table_idx;
-	registry_par->rtw_mcc_duration = (u8)rtw_mcc_duration;
-	registry_par->rtw_mcc_enable_runtime_duration = rtw_mcc_enable_runtime_duration;
-#endif /*CONFIG_MCC_MODE */
 
 #ifdef CONFIG_SUPPORT_TRX_SHARED
 	registry_par->trx_share_mode = rtw_trx_share_mode;
@@ -1336,12 +1292,8 @@ void rtw_os_ndev_unregister(_adapter *adapter)
 	}
 
 #if defined(CONFIG_IOCTL_CFG80211) && !defined(RTW_SINGLE_WIPHY)
-#ifdef CONFIG_RFKILL_POLL
-	rtw_cfg80211_deinit_rfkill(adapter_to_wiphy(adapter));
-#endif
 	rtw_wiphy_unregister(adapter_to_wiphy(adapter));
 #endif
-
 #ifdef CONFIG_RTW_NAPI
 	if (adapter->napi_state == NAPI_ENABLE) {
 		napi_disable(&adapter->napi);
@@ -1572,11 +1524,6 @@ u8 rtw_init_default_value(_adapter *padapter)
 	/* hal_priv */
 	rtw_hal_def_value_init(padapter);
 
-#ifdef CONFIG_MCC_MODE
-	/* MCC parameter */
-	rtw_hal_mcc_parameter_init(padapter);
-#endif /* CONFIG_MCC_MODE */
-
 	/* misc. */
 	RTW_ENABLE_FUNC(padapter, DF_RX_BIT);
 	RTW_ENABLE_FUNC(padapter, DF_TX_BIT);
@@ -1653,11 +1600,6 @@ struct dvobj_priv *devobj_init(void)
 	rtw_init_timer(&(pdvobj->dynamic_chk_timer), NULL, rtw_dynamic_check_timer_handler, pdvobj);
 #endif
 
-#ifdef CONFIG_MCC_MODE
-	_rtw_mutex_init(&(pdvobj->mcc_objpriv.mcc_mutex));
-	_rtw_spinlock_init(&pdvobj->mcc_objpriv.mcc_lock);
-#endif /* CONFIG_MCC_MODE */
-
 #ifdef CONFIG_RTW_NAPI_DYNAMIC
 	pdvobj->en_napi_dynamic = 0;
 #endif /* CONFIG_RTW_NAPI_DYNAMIC */
@@ -1676,11 +1618,6 @@ void devobj_deinit(struct dvobj_priv *pdvobj)
 #if defined(CONFIG_IOCTL_CFG80211)
 	rtw_cfg80211_dev_res_free(pdvobj);
 #endif
-
-#ifdef CONFIG_MCC_MODE
-	_rtw_mutex_free(&(pdvobj->mcc_objpriv.mcc_mutex));
-	_rtw_spinlock_free(&pdvobj->mcc_objpriv.mcc_lock);
-#endif /* CONFIG_MCC_MODE */
 
 	_rtw_mutex_free(&pdvobj->hw_init_mutex);
 	_rtw_mutex_free(&pdvobj->h2c_fwcmd_mutex);
@@ -2622,13 +2559,11 @@ int _netdev_open(struct net_device *pnetdev)
 		}
 		RTW_INFO("MAC Address = "MAC_FMT"\n", MAC_ARG(pnetdev->dev_addr));
 
-#ifndef RTW_HALMAC
 		status = rtw_start_drv_threads(padapter);
 		if (status == _FAIL) {
 			RTW_INFO("Initialize driver software resource Failed!\n");
 			goto netdev_open_error;
 		}
-#endif /* !RTW_HALMAC */
 
 #ifdef CONFIG_RTW_NAPI
 		if(padapter->napi_state == NAPI_DISABLE) {
@@ -2637,9 +2572,7 @@ int _netdev_open(struct net_device *pnetdev)
 		}
 #endif
 
-#ifndef RTW_HALMAC
 		rtw_intf_start(padapter);
-#endif /* !RTW_HALMAC */
 
 #ifdef CONFIG_IOCTL_CFG80211
 		rtw_cfg80211_init_wiphy(padapter);
@@ -2750,9 +2683,7 @@ static int  ips_netdrv_open(_adapter *padapter)
 	if (status == _FAIL) {
 		goto netdev_open_error;
 	}
-#ifndef RTW_HALMAC
 	rtw_intf_start(padapter);
-#endif /* !RTW_HALMAC */
 
 	rtw_set_pwr_state_check_timer(padapter);
 	_set_timer(&adapter_to_dvobj(padapter)->dynamic_chk_timer, 2000);
@@ -3498,23 +3429,3 @@ int rtw_resume_common(_adapter *padapter)
 
 	return ret;
 }
-
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-
-int rtw_vendor_ie_get_api(struct net_device *dev, int ie_num, char *extra,
-		u16 extra_len)
-{
-	int ret = 0;
-
-	ret = rtw_vendor_ie_get_raw_data(dev, ie_num, extra, extra_len);
-	return ret;
-}
-EXPORT_SYMBOL(rtw_vendor_ie_get_api);
-
-int rtw_vendor_ie_set_api(struct net_device *dev, char *extra)
-{
-	return rtw_vendor_ie_set(dev, NULL, NULL, extra);
-}
-EXPORT_SYMBOL(rtw_vendor_ie_set_api);
-
-#endif

@@ -3417,26 +3417,7 @@ static void do_queue_select(_adapter	*padapter, struct pkt_attrib *pattrib)
 	u8 qsel;
 
 	qsel = pattrib->priority;
-
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(padapter)) {
-		/* Under MCC */
-		if (rtw_hal_check_mcc_status(padapter, MCC_STATUS_NEED_MCC)) {
-			if (padapter->mcc_adapterpriv.role == MCC_ROLE_GO
-			    || padapter->mcc_adapterpriv.role == MCC_ROLE_AP) {
-				pattrib->qsel = QSLT_VO; /* AP interface VO queue */
-			} else {
-				pattrib->qsel = QSLT_BE; /* STA interface BE queue */
-			}
-		} else
-			/* Not Under MCC */
-			pattrib->qsel = qsel;
-	} else
-		/* Not enable MCC */
-		pattrib->qsel = qsel;
-#else /* !CONFIG_MCC_MODE */
 	pattrib->qsel = qsel;
-#endif /* CONFIG_MCC_MODE */
 }
 
 /*
@@ -3649,11 +3630,6 @@ s32 rtw_xmit(_adapter *padapter, _pkt **ppkt)
 #endif /* CONFIG_BR_EXT */
 
 	res = update_attrib(padapter, *ppkt, &pxmitframe->attrib);
-
-#ifdef CONFIG_MCC_MODE
-	/* record data kernel TX to driver to check MCC concurrent TX */
-	rtw_hal_mcc_calc_tx_bytes_from_kernel(padapter, pxmitframe->attrib.pktlen);
-#endif /* CONFIG_MCC_MODE */
 
 	if (res == _FAIL) {
 		rtw_free_xmitframe(pxmitpriv, pxmitframe);
@@ -4252,17 +4228,6 @@ bool rtw_xmit_ac_blocked(_adapter *adapter)
 			goto exit;
 		}
 	}
-
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(adapter)) {
-		if (rtw_hal_check_mcc_status(adapter, MCC_STATUS_DOING_MCC)) {
-			if (MCC_STOP(adapter)) {
-				blocked = _TRUE;
-				goto exit;
-			}
-		}
-	}
-#endif /*  CONFIG_MCC_MODE */
 
 exit:
 	return blocked;

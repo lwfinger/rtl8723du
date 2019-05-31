@@ -29,14 +29,6 @@ enum _CHIP_TYPE {
 	MAX_CHIP_TYPE
 };
 
-#ifdef RTW_HALMAC
-enum fw_mem {
-	FW_EMEM,
-	FW_IMEM,
-	FW_DMEM,
-};
-#endif
-
 extern const u32 _chip_type_to_odm_ic_type[];
 #define chip_type_to_odm_ic_type(chip_type) (((chip_type) >= MAX_CHIP_TYPE) ? _chip_type_to_odm_ic_type[MAX_CHIP_TYPE] : _chip_type_to_odm_ic_type[(chip_type)])
 
@@ -307,32 +299,15 @@ struct hal_ops {
 	BOOLEAN(*Efuse_PgPacketWrite_BT)(_adapter *padapter, u8 offset, u8 word_en, u8 *data, BOOLEAN bPseudoTest);
 
 	void (*hal_notch_filter)(_adapter *adapter, bool enable);
-#ifdef RTW_HALMAC
-	void (*hal_mac_c2h_handler)(_adapter *adapter, u8 *pbuf, u16 length);
-#else
 	s32(*c2h_handler)(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload);
-#endif
 	void (*reqtxrpt)(_adapter *padapter, u8 macid);
 	s32(*fill_h2c_cmd)(PADAPTER, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer);
 	void (*fill_fake_txdesc)(PADAPTER, u8 *pDesc, u32 BufferLen,
 				 u8 IsPsPoll, u8 IsBTQosNull, u8 bDataFrame);
 	s32(*fw_dl)(_adapter *adapter, u8 wowlan);
-#ifdef RTW_HALMAC
-	s32 (*fw_mem_dl)(_adapter *adapter, enum fw_mem mem);
-#endif
 
 	u8(*hal_get_tx_buff_rsvd_page_num)(_adapter *adapter, bool wowlan);
 	void (*fw_correct_bcn)(PADAPTER padapter);
-
-#ifdef RTW_HALMAC
-	u8(*init_mac_register)(PADAPTER);
-	u8(*init_phy)(PADAPTER);
-#endif /* RTW_HALMAC */
-
-#ifdef CONFIG_RFKILL_POLL
-	bool (*hal_radio_onoff_check)(_adapter *adapter, u8 *valid);
-#endif
-
 };
 
 typedef	enum _RT_EEPROM_TYPE {
@@ -577,10 +552,8 @@ bool rtw_hal_c2h_pkt_hdr_parse(_adapter *adapter, u8 *buf, u16 len, u8 *id, u8 *
 #endif
 
 s32 c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload);
-#ifndef RTW_HALMAC
 s32 rtw_hal_c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload);
 s32 rtw_hal_c2h_id_handle_directly(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload);
-#endif
 
 s32 rtw_hal_is_disable_sw_channel_plan(PADAPTER padapter);
 
@@ -602,15 +575,5 @@ u8 rtw_hal_get_tx_power_index(PADAPTER adapter, enum rf_path
 	rfpath, u8 rate, u8 bandwidth, u8 channel, struct txpwr_idx_comp *tic);
 
 u8 rtw_hal_ops_check(_adapter *padapter);
-
-#ifdef RTW_HALMAC
-	u8 rtw_hal_init_mac_register(PADAPTER);
-	u8 rtw_hal_init_phy(PADAPTER);
-s32 rtw_hal_fw_mem_dl(_adapter *padapter, enum fw_mem mem);
-#endif /* RTW_HALMAC */
-
-#ifdef CONFIG_RFKILL_POLL
-bool rtw_hal_rfkill_poll(_adapter *adapter, u8 *valid);
-#endif
 
 #endif /* __HAL_INTF_H__ */

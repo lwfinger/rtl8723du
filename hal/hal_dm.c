@@ -623,10 +623,6 @@ void GetHalODMVar(
 	}
 }
 
-#ifdef RTW_HALMAC
-#include "../hal_halmac.h"
-#endif
-
 enum hal_status
 rtw_phydm_fw_iqk(
 	struct PHY_DM_STRUCT	*p_dm_odm,
@@ -634,12 +630,6 @@ rtw_phydm_fw_iqk(
 	u8 segment
 )
 {
-	#ifdef RTW_HALMAC
-	struct _ADAPTER *adapter = p_dm_odm->adapter;
-
-	if (rtw_halmac_iqk(adapter_to_dvobj(adapter), clear, segment) == 0)
-		return HAL_STATUS_SUCCESS;
-	#endif
 	return HAL_STATUS_FAILURE;
 }
 
@@ -653,96 +643,6 @@ rtw_phydm_cfg_phy_para(
 	enum rf_path e_rf_path,
 	u32 delay_time)
 {
-	#ifdef RTW_HALMAC
-	struct _ADAPTER *adapter = p_dm_odm->adapter;
-	struct rtw_phy_parameter para;
-
-	switch (config_type) {
-	case PHYDM_HALMAC_CMD_MAC_W8:
-		para.cmd = 0; /* MAC register */
-		para.data.mac.offset = offset;
-		para.data.mac.value = data;
-		para.data.mac.msk = mask;
-		para.data.mac.msk_en = 1;
-		para.data.mac.size = 1;
-	break;
-	case PHYDM_HALMAC_CMD_MAC_W16:
-		para.cmd = 0; /* MAC register */
-		para.data.mac.offset = offset;
-		para.data.mac.value = data;
-		para.data.mac.msk = mask;
-		para.data.mac.msk_en = 1;
-		para.data.mac.size = 2;
-	break;
-	case PHYDM_HALMAC_CMD_MAC_W32:
-		para.cmd = 0; /* MAC register */
-		para.data.mac.offset = offset;
-		para.data.mac.value = data;
-		para.data.mac.msk = mask;
-		para.data.mac.msk_en = 1;
-		para.data.mac.size = 4;
-	break;
-	case PHYDM_HALMAC_CMD_BB_W8:
-		para.cmd = 1; /* BB register */
-		para.data.bb.offset = offset;
-		para.data.bb.value = data;
-		para.data.bb.msk = mask;
-		para.data.bb.msk_en = 1;
-		para.data.bb.size = 1;
-	break;
-	case PHYDM_HALMAC_CMD_BB_W16:
-		para.cmd = 1; /* BB register */
-		para.data.bb.offset = offset;
-		para.data.bb.value = data;
-		para.data.bb.msk = mask;
-		para.data.bb.msk_en = 1;
-		para.data.bb.size = 2;
-	break;
-	case PHYDM_HALMAC_CMD_BB_W32:
-		para.cmd = 1; /* BB register */
-		para.data.bb.offset = offset;
-		para.data.bb.value = data;
-		para.data.bb.msk = mask;
-		para.data.bb.msk_en = 1;
-		para.data.bb.size = 4;
-	break;
-	case PHYDM_HALMAC_CMD_RF_W:
-		para.cmd = 2; /* RF register */
-		para.data.rf.offset = offset;
-		para.data.rf.value = data;
-		para.data.rf.msk = mask;
-		para.data.rf.msk_en = 1;
-		if (e_rf_path == RF_PATH_A)
-			para.data.rf.path = 0;
-		else if (e_rf_path == RF_PATH_B)
-			para.data.rf.path = 1;
-		else if (e_rf_path == RF_PATH_C)
-			para.data.rf.path = 2;
-		else if (e_rf_path == RF_PATH_D)
-			para.data.rf.path = 3;
-		else
-			para.data.rf.path = 0;
-	break;
-	case PHYDM_HALMAC_CMD_DELAY_US:
-		para.cmd = 3; /* Delay */
-		para.data.delay.unit = 0; /* microsecond */
-		para.data.delay.value = delay_time;
-	break;
-	case PHYDM_HALMAC_CMD_DELAY_MS:
-		para.cmd = 3; /* Delay */
-		para.data.delay.unit = 1; /* millisecond */
-		para.data.delay.value = delay_time;
-	break;
-	case PHYDM_HALMAC_CMD_END:
-		para.cmd = 0xFF; /* End command */
-	break;
-	default:
-		return HAL_STATUS_FAILURE;
-	}
-
-	if (rtw_halmac_cfg_phy_para(adapter_to_dvobj(adapter), &para))
-		return HAL_STATUS_FAILURE;
-	#endif /*RTW_HALMAC*/
 	return HAL_STATUS_SUCCESS;
 }
 
@@ -831,14 +731,9 @@ static u8 _rtw_phydm_rfk_condition_check(_adapter *adapter)
 	if (rtw_mi_stayin_union_ch_chk(adapter))
 		rst = _TRUE;
 
-	#ifdef CONFIG_MCC_MODE
-	/*not in MCC State*/
-	if (MCC_EN(adapter))
-		if (!rtw_hal_check_mcc_status(adapter, MCC_STATUS_DOING_MCC))
-			rst = _TRUE;
-	#endif
 	return rst;
 }
+
 /*check the tx low rate while unlinked to any AP;for pwr tracking */
 static u8 _rtw_phydm_pwr_tracking_rate_check(_adapter *adapter)
 {

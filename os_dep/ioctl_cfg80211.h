@@ -249,11 +249,6 @@ int rtw_cfg80211_set_mgnt_wpsp2pie(struct net_device *net, char *buf, int len, i
 
 bool rtw_cfg80211_pwr_mgmt(_adapter *adapter);
 
-#ifdef CONFIG_RFKILL_POLL
-void rtw_cfg80211_init_rfkill(struct wiphy *wiphy);
-void rtw_cfg80211_deinit_rfkill(struct wiphy *wiphy);
-#endif
-
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0))  && !defined(COMPAT_KERNEL_RELEASE)
 #define rtw_cfg80211_rx_mgmt(wdev, freq, sig_dbm, buf, len, gfp) cfg80211_rx_mgmt(wdev_to_ndev(wdev), freq, buf, len, gfp)
 #elif (LINUX_VERSION_CODE < KERNEL_VERSION(3, 6, 0))

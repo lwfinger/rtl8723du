@@ -103,10 +103,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 #include <rtw_btcoex_wifionly.h>
 #include <rtw_btcoex.h>
 
-#ifdef CONFIG_MCC_MODE
-	#include <rtw_mcc.h>
-#endif /*CONFIG_MCC_MODE */
-
 #define SPEC_DEV_ID_NONE BIT(0)
 #define SPEC_DEV_ID_DISABLE_HT BIT(1)
 #define SPEC_DEV_ID_ENABLE_PS BIT(2)
@@ -295,20 +291,6 @@ struct registry_priv {
 	u32	reg_rxgain_offset_5gl;
 	u32	reg_rxgain_offset_5gm;
 	u32	reg_rxgain_offset_5gh;
-
-#ifdef CONFIG_MCC_MODE
-	u8 en_mcc;
-	u32 rtw_mcc_single_tx_cri;
-	u32 rtw_mcc_ap_bw20_target_tx_tp;
-	u32 rtw_mcc_ap_bw40_target_tx_tp;
-	u32 rtw_mcc_ap_bw80_target_tx_tp;
-	u32 rtw_mcc_sta_bw20_target_tx_tp;
-	u32 rtw_mcc_sta_bw40_target_tx_tp;
-	u32 rtw_mcc_sta_bw80_target_tx_tp;
-	s8 rtw_mcc_policy_table_idx;
-	u8 rtw_mcc_duration;
-	u8 rtw_mcc_enable_runtime_duration;
-#endif /* CONFIG_MCC_MODE */
 
 #ifdef CONFIG_RTW_NAPI
 	u8 en_napi;
@@ -768,23 +750,6 @@ struct mbid_cam_cache {
 };
 #endif /*CONFIG_MBSSID_CAM*/
 
-#ifdef RTW_HALMAC
-struct halmac_indicator {
-	struct submit_ctx *sctx;
-	u8 *buffer;
-	u32 buf_size;
-	u32 ret_size;
-	u32 status;
-};
-
-struct halmacpriv {
-	/* flags */
-
-	/* For asynchronous functions */
-	struct halmac_indicator *indicator;
-};
-#endif /* RTW_HALMAC */
-
 struct dvobj_priv {
 	/*-------- below is common data --------*/
 	u8	chip_type;
@@ -867,11 +832,6 @@ struct dvobj_priv {
 	u8 en_napi_dynamic;
 #endif /* CONFIG_RTW_NAPI_DYNAMIC */
 
-#ifdef RTW_HALMAC
-	void *halmac;
-	struct halmacpriv hmpriv;
-#endif /* RTW_HALMAC */
-
 #ifdef CONFIG_FW_MULTI_PORT_SUPPORT
 	u8 default_port_id;
 #endif
@@ -907,10 +867,6 @@ struct dvobj_priv {
 
 	struct usb_interface *pusbintf;
 	struct usb_device *pusbdev;
-
-#ifdef CONFIG_MCC_MODE
-	struct mcc_obj_priv mcc_objpriv;
-#endif /*CONFIG_MCC_MODE */
 };
 
 #define DEV_STA_NUM(_dvobj)			MSTATE_STA_NUM(&((_dvobj)->iface_state))
@@ -1112,10 +1068,6 @@ struct _ADAPTER {
 	struct proc_dir_entry *dir_dev;/* for proc directory */
 	struct proc_dir_entry *dir_odm;
 
-#ifdef CONFIG_MCC_MODE
-	struct proc_dir_entry *dir_mcc;
-#endif /* CONFIG_MCC_MODE */
-
 #ifdef CONFIG_IOCTL_CFG80211
 	struct wireless_dev *rtw_wdev;
 	struct rtw_wdev_priv wdev_data;
@@ -1209,10 +1161,6 @@ struct _ADAPTER {
 	struct tx_logs tx_logs;
 	struct int_logs int_logs;
 #endif
-
-#ifdef CONFIG_MCC_MODE
-	struct mcc_adapter_priv mcc_adapterpriv;
-#endif /* CONFIG_MCC_MODE */
 };
 
 #define adapter_to_dvobj(adapter) ((adapter)->dvobj)

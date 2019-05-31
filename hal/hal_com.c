@@ -8,10 +8,6 @@
 
 #include "hal_data.h"
 
-#ifdef RTW_HALMAC
-#include "../../hal/hal_halmac.h"
-#endif
-
 void rtw_dump_fw_info(void *sel, _adapter *adapter)
 {
 	HAL_DATA_TYPE	*hal_data = NULL;
@@ -1127,39 +1123,6 @@ void rtw_hal_dump_macaddr(void *sel, _adapter *adapter)
 #endif
 }
 
-#ifdef RTW_HALMAC
-void rtw_hal_hw_port_enable(_adapter *adapter)
-{
-	u8 port_enable = _TRUE;
-
-	rtw_hal_set_hwreg(adapter, HW_VAR_PORT_CFG, &port_enable);
-}
-
-void rtw_hal_hw_port_disable(_adapter *adapter)
-{
-	u8 port_enable = _FALSE;
-
-	rtw_hal_set_hwreg(adapter, HW_VAR_PORT_CFG, &port_enable);
-}
-
-void rtw_restore_hw_port_cfg(_adapter *adapter)
-{
-#ifdef CONFIG_MI_WITH_MBSSID_CAM
-
-#else
-	int i;
-	_adapter *iface;
-	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
-
-	for (i = 0; i < dvobj->iface_nums; i++) {
-		iface = dvobj->padapters[i];
-		if (iface)
-			rtw_hal_hw_port_enable(iface);
-	}
-#endif
-}
-#endif
-
 void rtw_restore_mac_addr(_adapter *adapter)
 {
 #ifdef CONFIG_MI_WITH_MBSSID_CAM
@@ -1248,9 +1211,6 @@ exit:
 #endif
 void rtw_hal_c2h_pkt_pre_hdl(_adapter *adapter, u8 *buf, u16 len)
 {
-#ifdef RTW_HALMAC
-	/* TODO: extract hal_mac IC's code here*/
-#else
 	u8 parse_fail = 0;
 	u8 hdl_here = 0;
 	s32 ret = _FAIL;
@@ -1279,14 +1239,10 @@ exit:
 		if (DBG_C2H_PKT_PRE_HDL >= 2)
 			RTW_PRINT_DUMP("dump: ", buf, len);
 	}
-#endif
 }
 
 void rtw_hal_c2h_pkt_hdl(_adapter *adapter, u8 *buf, u16 len)
 {
-#ifdef RTW_HALMAC
-	adapter->hal_func.hal_mac_c2h_handler(adapter, buf, len);
-#else
 	u8 parse_fail = 0;
 	u8 bypass = 0;
 	s32 ret = _FAIL;
@@ -1311,7 +1267,6 @@ exit:
 		if (DBG_C2H_PKT_HDL >= 2)
 			RTW_PRINT_DUMP("dump: ", buf, len);
 	}
-#endif
 }
 #endif /* CONFIG_FW_C2H_PKT */
 
@@ -2533,9 +2488,6 @@ static void rtw_hal_set_macaddr_port(_adapter *adapter, u8 *val)
 	RTW_INFO("%s "ADPT_FMT"- hw port(%d) mac_addr ="MAC_FMT"\n",  __func__,
 		 ADPT_ARG(adapter), adapter->hw_port, MAC_ARG(val));
 
-#ifdef RTW_HALMAC
-	rtw_halmac_set_mac_address(adapter_to_dvobj(adapter), adapter->hw_port, val);
-#else /* !RTW_HALMAC */
 	switch (adapter->hw_port) {
 	case HW_PORT0:
 	default:
@@ -2548,7 +2500,6 @@ static void rtw_hal_set_macaddr_port(_adapter *adapter, u8 *val)
 
 	for (idx = 0; idx < 6; idx++)
 		rtw_write8(GET_PRIMARY_ADAPTER(adapter), (reg_macid + idx), val[idx]);
-#endif /* !RTW_HALMAC */
 }
 
 static void rtw_hal_get_macaddr_port(_adapter *adapter, u8 *mac_addr)
@@ -2560,9 +2511,6 @@ static void rtw_hal_get_macaddr_port(_adapter *adapter, u8 *mac_addr)
 		return;
 
 	_rtw_memset(mac_addr, 0, ETH_ALEN);
-#ifdef RTW_HALMAC
-	rtw_halmac_get_mac_address(adapter_to_dvobj(adapter), adapter->hw_port, mac_addr);
-#else /* !RTW_HALMAC */
 	switch (adapter->hw_port) {
 	case HW_PORT0:
 	default:
@@ -2575,7 +2523,6 @@ static void rtw_hal_get_macaddr_port(_adapter *adapter, u8 *mac_addr)
 
 	for (idx = 0; idx < 6; idx++)
 		mac_addr[idx] = rtw_read8(GET_PRIMARY_ADAPTER(adapter), (reg_macid + idx));
-#endif /* !RTW_HALMAC */
 
 	RTW_INFO("%s "ADPT_FMT"- hw port(%d) mac_addr ="MAC_FMT"\n",  __func__,
 		 ADPT_ARG(adapter), adapter->hw_port, MAC_ARG(mac_addr));
@@ -2583,9 +2530,6 @@ static void rtw_hal_get_macaddr_port(_adapter *adapter, u8 *mac_addr)
 
 static void rtw_hal_set_bssid(_adapter *adapter, u8 *val)
 {
-#ifdef RTW_HALMAC
-	rtw_halmac_set_bssid(adapter_to_dvobj(adapter), adapter->hw_port, val);
-#else /* !RTW_HALMAC */
 	u8	idx = 0;
 	u32 reg_bssid = 0;
 
@@ -2601,7 +2545,6 @@ static void rtw_hal_set_bssid(_adapter *adapter, u8 *val)
 
 	for (idx = 0 ; idx < 6; idx++)
 		rtw_write8(adapter, (reg_bssid + idx), val[idx]);
-#endif /* !RTW_HALMAC */
 
 	RTW_INFO("%s "ADPT_FMT"- hw port -%d BSSID: "MAC_FMT"\n", __func__, ADPT_ARG(adapter), adapter->hw_port, MAC_ARG(val));
 }
@@ -2758,10 +2701,6 @@ static void hw_var_set_rcr_am(_adapter *adapter, u8 enable)
 
 static void rtw_hal_get_msr(_adapter *adapter, u8 *net_type)
 {
-#ifdef RTW_HALMAC
-	rtw_halmac_get_network_type(adapter_to_dvobj(adapter),
-				adapter->hw_port, net_type);
-#else /* !RTW_HALMAC */
 	switch (adapter->hw_port) {
 	case HW_PORT0:
 		/*REG_CR - BIT[17:16]-Network Type for port 1*/
@@ -2777,7 +2716,6 @@ static void rtw_hal_get_msr(_adapter *adapter, u8 *net_type)
 		rtw_warn_on(1);
 		break;
 	}
-#endif /* !RTW_HALMAC */
 }
 
 #if defined(CONFIG_MI_WITH_MBSSID_CAM) && defined(CONFIG_MBSSID_CAM) /*For 2 hw ports - 88E/92E/8812/8821/8723B*/
@@ -2792,13 +2730,6 @@ static u8 rtw_hal_net_type_decision(_adapter *adapter, u8 net_type)
 #endif
 static void rtw_hal_set_msr(_adapter *adapter, u8 net_type)
 {
-#ifdef RTW_HALMAC
-	#if defined(CONFIG_MI_WITH_MBSSID_CAM) && defined(CONFIG_MBSSID_CAM)
-	net_type = rtw_hal_net_type_decision(adapter, net_type);
-	#endif
-	rtw_halmac_set_network_type(adapter_to_dvobj(adapter),
-				adapter->hw_port, net_type);
-#else /* !RTW_HALMAC */
 	u8 val8 = 0;
 
 	switch (adapter->hw_port) {
@@ -2823,17 +2754,12 @@ static void rtw_hal_set_msr(_adapter *adapter, u8 net_type)
 		rtw_warn_on(1);
 		break;
 	}
-#endif /* !RTW_HALMAC */
 }
 
 static void hw_var_set_bcn_interval(struct _ADAPTER *a, u16 interval)
 {
-#ifdef RTW_HALMAC
-	rtw_halmac_set_bcn_interval(adapter_to_dvobj(a), a->hw_port, interval);
-#else /* !RTW_HALMAC */
 	RTW_ERR(FUNC_ADPT_FMT ": Not implemented yet!!\n", FUNC_ADPT_ARG(a));
 	rtw_warn_on(1);
-#endif /* !RTW_HALMAC */
 }
 
 void hw_var_port_switch(_adapter *adapter)
@@ -3028,129 +2954,6 @@ s32 rtw_set_ps_rsvd_page(_adapter *adapter)
 
 #endif
 
-#ifdef RTW_HALMAC
-void rtw_set_p2p_ps_offload_cmd(_adapter *adapter, u8 p2p_ps_state)
-{
-	PHAL_DATA_TYPE hal = GET_HAL_DATA(adapter);
-	struct wifidirect_info *pwdinfo = &adapter->wdinfo;
-	struct mlme_ext_priv	*pmlmeext = &adapter->mlmeextpriv;
-	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
-	WLAN_BSSID_EX		*cur_network = &(pmlmeinfo->network);
-	struct sta_priv		*pstapriv = &adapter->stapriv;
-	struct sta_info		*psta;
-	HAL_P2P_PS_PARA p2p_ps_para;
-	int status = -1;
-	u8 i;
-
-	_rtw_memset(&p2p_ps_para, 0, sizeof(HAL_P2P_PS_PARA));
-	_rtw_memcpy((&p2p_ps_para) , &hal->p2p_ps_offload , sizeof(hal->p2p_ps_offload));
-
-	(&p2p_ps_para)->p2p_port_id = adapter->hw_port;
-	(&p2p_ps_para)->p2p_group = 0;
-	psta = rtw_get_stainfo(pstapriv, cur_network->MacAddress);
-	if (psta) {
-		(&p2p_ps_para)->p2p_macid = psta->cmn.mac_id;
-	} else {
-		if (p2p_ps_state != P2P_PS_DISABLE) {
-			RTW_ERR("%s , psta was NULL\n", __func__);
-			return;
-		}
-	}
-
-
-	switch (p2p_ps_state) {
-	case P2P_PS_DISABLE:
-		RTW_INFO("P2P_PS_DISABLE\n");
-		_rtw_memset(&p2p_ps_para , 0, sizeof(HAL_P2P_PS_PARA));
-		break;
-
-	case P2P_PS_ENABLE:
-		RTW_INFO("P2P_PS_ENABLE\n");
-		/* update CTWindow value. */
-		if (pwdinfo->ctwindow > 0) {
-			(&p2p_ps_para)->ctwindow_en = 1;
-			(&p2p_ps_para)->ctwindow_length = pwdinfo->ctwindow;
-			/*RTW_INFO("%s , ctwindow_length = %d\n" , __func__ , (&p2p_ps_para)->ctwindow_length);*/
-		}
-
-
-		if ((pwdinfo->opp_ps == 1) || (pwdinfo->noa_num > 0)) {
-			(&p2p_ps_para)->offload_en = 1;
-			if (pwdinfo->role == P2P_ROLE_GO) {
-				(&p2p_ps_para)->role = 1;
-				(&p2p_ps_para)->all_sta_sleep = 0;
-			} else
-				(&p2p_ps_para)->role = 0;
-
-			(&p2p_ps_para)->discovery = 0;
-		}
-		/* hw only support 2 set of NoA */
-		for (i = 0; i < pwdinfo->noa_num; i++) {
-			/* To control the register setting for which NOA */
-			(&p2p_ps_para)->noa_sel = i;
-			(&p2p_ps_para)->noa_en = 1;
-			/* config P2P NoA Descriptor Register */
-			/* config NOA duration */
-			(&p2p_ps_para)->noa_duration_para = pwdinfo->noa_duration[i];
-			/* config NOA interval */
-			(&p2p_ps_para)->noa_interval_para = pwdinfo->noa_interval[i];
-			/* config NOA start time */
-			(&p2p_ps_para)->noa_start_time_para = pwdinfo->noa_start_time[i];
-			/* config NOA count */
-			(&p2p_ps_para)->noa_count_para = pwdinfo->noa_count[i];
-			/*RTW_INFO("%s , noa_duration_para = %d , noa_interval_para = %d , noa_start_time_para = %d , noa_count_para = %d\n" , __func__ ,
-				(&p2p_ps_para)->noa_duration_para , (&p2p_ps_para)->noa_interval_para ,
-				(&p2p_ps_para)->noa_start_time_para , (&p2p_ps_para)->noa_count_para);*/
-			status = rtw_halmac_p2pps(adapter_to_dvobj(adapter) , (&p2p_ps_para));
-			if (status == -1)
-				RTW_ERR("%s , rtw_halmac_p2pps fail\n", __func__);
-		}
-
-		break;
-
-	case P2P_PS_SCAN:
-		/*This feature FW not ready 20161116 YiWei*/
-		return;
-		RTW_INFO("P2P_PS_SCAN\n");
-		(&p2p_ps_para)->discovery = 1;
-		/*
-		(&p2p_ps_para)->ctwindow_length = pwdinfo->ctwindow;
-		(&p2p_ps_para)->noa_duration_para = pwdinfo->noa_duration[0];
-		(&p2p_ps_para)->noa_interval_para = pwdinfo->noa_interval[0];
-		(&p2p_ps_para)->noa_start_time_para = pwdinfo->noa_start_time[0];
-		(&p2p_ps_para)->noa_count_para = pwdinfo->noa_count[0];
-		*/
-		break;
-
-	case P2P_PS_SCAN_DONE:
-		/*This feature FW not ready 20161116 YiWei*/
-		return;
-		RTW_INFO("P2P_PS_SCAN_DONE\n");
-		(&p2p_ps_para)->discovery = 0;
-		/*
-		pwdinfo->p2p_ps_state = P2P_PS_ENABLE;
-		(&p2p_ps_para)->ctwindow_length = pwdinfo->ctwindow;
-		(&p2p_ps_para)->noa_duration_para = pwdinfo->noa_duration[0];
-		(&p2p_ps_para)->noa_interval_para = pwdinfo->noa_interval[0];
-		(&p2p_ps_para)->noa_start_time_para = pwdinfo->noa_start_time[0];
-		(&p2p_ps_para)->noa_count_para = pwdinfo->noa_count[0];
-		*/
-		break;
-
-	default:
-		break;
-	}
-
-	if (p2p_ps_state != P2P_PS_ENABLE || (&p2p_ps_para)->noa_en == 0) {
-		status = rtw_halmac_p2pps(adapter_to_dvobj(adapter) , (&p2p_ps_para));
-		if (status == -1)
-			RTW_ERR("%s , rtw_halmac_p2pps fail\n", __func__);
-	}
-	_rtw_memcpy(&hal->p2p_ps_offload , (&p2p_ps_para) , sizeof(hal->p2p_ps_offload));
-
-}
-#endif /* RTW_HALMAC */
-
 /*
 * rtw_hal_set_FwMediaStatusRpt_cmd -
 *
@@ -3264,12 +3067,6 @@ int rtw_hal_get_rsvd_page(_adapter *adapter, u32 page_offset,
 			__func__, buffer_size, size);
 		return rst;
 	}
-#ifdef RTW_HALMAC
-	if (rtw_halmac_dump_fifo(adapter_to_dvobj(adapter), 2, addr, size, buffer) < 0)
-		rst = _FALSE;
-	else
-		rst = _TRUE;
-#else
 	txbndy = rtw_read8(adapter, REG_TDECTRL + 1);
 
 	offset = (txbndy + page_offset) * page_size / 8;
@@ -3288,7 +3085,6 @@ int rtw_hal_get_rsvd_page(_adapter *adapter, u32 page_offset,
 	}
 	rtw_write8(adapter, REG_PKT_BUFF_ACCESS_CTRL, 0x0);
 	rst = _TRUE;
-#endif /*RTW_HALMAC*/
 
 #ifdef DBG_GET_RSVD_PAGE
 	RTW_INFO("%s [page_offset:%d , page_num:%d][start_addr:0x%04x , size:%d]\n",
@@ -3651,10 +3447,6 @@ static void _rtw_hal_set_fw_rsvd_page(_adapter *adapter, bool finished, u8 *page
 	u32	TotalPacketLen = 0, MaxRsvdPageBufSize = 0, PageSize = 0;
 	RSVDPAGE_LOC	RsvdPageLoc;
 
-#ifdef CONFIG_MCC_MODE
-	u8 dl_mcc_page = _FAIL;
-#endif /* CONFIG_MCC_MODE */
-
 	pHalData = GET_HAL_DATA(adapter);
 	pxmitpriv = &adapter->xmitpriv;
 	pmlmeext = &adapter->mlmeextpriv;
@@ -3775,36 +3567,24 @@ static void _rtw_hal_set_fw_rsvd_page(_adapter *adapter, bool finished, u8 *page
 		BufIndex += (CurtPktPageNum * PageSize);
 	}
 
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(adapter)) {
-		dl_mcc_page = rtw_hal_dl_mcc_fw_rsvd_page(adapter, ReservedPagePacket,
-				&BufIndex, TxDescLen, PageSize, &TotalPageNum, &RsvdPageLoc, page_num);
-	} else {
-		dl_mcc_page = _FAIL;
-	}
+	/* null data * 1 page */
+	RsvdPageLoc.LocNullData = TotalPageNum;
+	RTW_INFO("LocNullData: %d\n", RsvdPageLoc.LocNullData);
+	rtw_hal_construct_NullFunctionData(
+		adapter,
+		&ReservedPagePacket[BufIndex],
+		&NullDataLength,
+		get_my_bssid(&pmlmeinfo->network),
+		_FALSE, 0, 0, _FALSE);
+	rtw_hal_fill_fake_txdesc(adapter,
+			 &ReservedPagePacket[BufIndex - TxDescLen],
+			 NullDataLength, _FALSE, _FALSE, _FALSE);
 
-	if (dl_mcc_page == _FAIL)
-#endif /* CONFIG_MCC_MODE */
-	{
-		/* null data * 1 page */
-		RsvdPageLoc.LocNullData = TotalPageNum;
-		RTW_INFO("LocNullData: %d\n", RsvdPageLoc.LocNullData);
-		rtw_hal_construct_NullFunctionData(
-			adapter,
-			&ReservedPagePacket[BufIndex],
-			&NullDataLength,
-			get_my_bssid(&pmlmeinfo->network),
-			_FALSE, 0, 0, _FALSE);
-		rtw_hal_fill_fake_txdesc(adapter,
-				 &ReservedPagePacket[BufIndex - TxDescLen],
-				 NullDataLength, _FALSE, _FALSE, _FALSE);
+	CurtPktPageNum = (u8)PageNum(TxDescLen + NullDataLength, PageSize);
 
-		CurtPktPageNum = (u8)PageNum(TxDescLen + NullDataLength, PageSize);
+	TotalPageNum += CurtPktPageNum;
 
-		TotalPageNum += CurtPktPageNum;
-
-		BufIndex += (CurtPktPageNum * PageSize);
-	}
+	BufIndex += (CurtPktPageNum * PageSize);
 
 	if (pwrctl->wowlan_mode == _FALSE ||
 		pwrctl->wowlan_in_resume == _TRUE) {
@@ -4407,22 +4187,6 @@ void GetHwReg(_adapter *adapter, u8 variable, u8 *val)
 
 static u32 _get_page_size(struct _ADAPTER *a)
 {
-#ifdef RTW_HALMAC
-	struct dvobj_priv *d;
-	u32 size = 0;
-	int err = 0;
-
-
-	d = adapter_to_dvobj(a);
-
-	err = rtw_halmac_get_page_size(d, &size);
-	if (!err)
-		return size;
-
-	RTW_WARN(FUNC_ADPT_FMT ": Fail to get Page size!!(err=%d)\n",
-		 FUNC_ADPT_ARG(a), err);
-#endif /* RTW_HALMAC */
-
 	return PAGE_SIZE_128;
 }
 
@@ -5579,12 +5343,6 @@ void ResumeTxBeacon(_adapter *padapter)
 #else
 	rtw_write8(padapter, REG_FWHW_TXQ_CTRL + 2,
 		rtw_read8(padapter, REG_FWHW_TXQ_CTRL + 2) | BIT(6));
-
-#ifdef RTW_HALMAC
-	/* Add this for driver using HALMAC because driver doesn't have setup time init by self */
-	/* TBTT setup time */
-	rtw_write8(padapter, REG_TBTT_PROHIBIT, TBTT_PROHIBIT_SETUP_TIME);
-#endif
 
 	/* TBTT hold time: 0x540[19:8] */
 	rtw_write8(padapter, REG_TBTT_PROHIBIT + 1, TBTT_PROHIBIT_HOLD_TIME & 0xFF);

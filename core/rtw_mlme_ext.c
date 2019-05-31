@@ -6830,10 +6830,6 @@ void update_mgntframe_attrib(_adapter *padapter, struct pkt_attrib *pattrib)
 	pattrib->mac_id = RTW_DEFAULT_MGMT_MACID;
 	pattrib->qsel = QSLT_MGNT;
 
-#ifdef CONFIG_MCC_MODE
-	update_mcc_mgntframe_attrib(padapter, pattrib);
-#endif
-
 	pattrib->pktlen = 0;
 
 	if (IS_CCK_RATE(pmlmeext->tx_rate))
@@ -6984,25 +6980,6 @@ static int update_hidden_ssid(u8 *ies, u32 ies_len, u8 hidden_ssid_mode)
 
 	return len_diff;
 }
-
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-u32 rtw_build_vendor_ie(_adapter *padapter , unsigned char *pframe , u8 mgmt_frame_tyte)
-{
-	int vendor_ie_num = 0;
-	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
-	u32 len = 0;
-
-	for (vendor_ie_num = 0 ; vendor_ie_num < WLAN_MAX_VENDOR_IE_NUM ; vendor_ie_num++) {
-		if (pmlmepriv->vendor_ielen[vendor_ie_num] > 0 && pmlmepriv->vendor_ie_mask[vendor_ie_num] & mgmt_frame_tyte) {
-			_rtw_memcpy(pframe , pmlmepriv->vendor_ie[vendor_ie_num] , pmlmepriv->vendor_ielen[vendor_ie_num]);
-			pframe +=  pmlmepriv->vendor_ielen[vendor_ie_num];
-			len += pmlmepriv->vendor_ielen[vendor_ie_num];
-		}
-	}
-
-	return len;
-}
-#endif
 
 void issue_beacon(_adapter *padapter, int timeout_ms)
 {
@@ -7201,17 +7178,10 @@ void issue_beacon(_adapter *padapter, int timeout_ms)
 			pframe += len;
 			pattrib->pktlen += len;
 
-#ifdef CONFIG_MCC_MODE
-			pframe = rtw_hal_mcc_append_go_p2p_ie(padapter, pframe, &pattrib->pktlen);
-#endif /* CONFIG_MCC_MODE*/
-
 			len = rtw_append_beacon_wfd_ie(padapter, pframe);
 			pframe += len;
 			pattrib->pktlen += len;
 		}
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-		pattrib->pktlen += rtw_build_vendor_ie(padapter , pframe , WIFI_BEACON_VENDOR_IE_BIT);
-#endif
 		goto _issue_bcn;
 
 	}
@@ -7419,9 +7389,6 @@ void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probe
 				pattrib->pktlen += ssid_ielen_diff;
 			}
 		}
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-		pattrib->pktlen += rtw_build_vendor_ie(padapter , pframe , WIFI_PROBERESP_VENDOR_IE_BIT);
-#endif
 	} else {
 		/* timestamp will be inserted by hardware */
 		pframe += 8;
@@ -7493,10 +7460,6 @@ void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probe
 
 		pframe += len;
 		pattrib->pktlen += len;
-
-#ifdef CONFIG_MCC_MODE
-		pframe = rtw_hal_mcc_append_go_p2p_ie(padapter, pframe, &pattrib->pktlen);
-#endif /* CONFIG_MCC_MODE*/
 
 		len = rtw_append_probe_resp_wfd_ie(padapter, pframe);
 		pframe += len;
@@ -7592,10 +7555,6 @@ static int _issue_probereq(_adapter *padapter, NDIS_802_11_SSID *pssid, u8 *da, 
 			/* pmlmepriv->wps_probe_req_ie_len = 0 ; */ /* reset to zero */
 		}
 	}
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-	pattrib->pktlen += rtw_build_vendor_ie(padapter , pframe , WIFI_PROBEREQ_VENDOR_IE_BIT);
-#endif
-
 	pattrib->last_txcmdsz = pattrib->pktlen;
 
 
@@ -7989,10 +7948,6 @@ void issue_asocrsp(_adapter *padapter, unsigned short status, struct sta_info *p
 		pframe += wfdielen;
 		pattrib->pktlen += wfdielen;
 	}
-
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-	pattrib->pktlen += rtw_build_vendor_ie(padapter , pframe , WIFI_ASSOCRESP_VENDOR_IE_BIT);
-#endif
 	pattrib->last_txcmdsz = pattrib->pktlen;
 
 	dump_mgntframe(padapter, pmgntframe);
@@ -8373,9 +8328,6 @@ void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
 	wfdielen = rtw_append_assoc_req_wfd_ie(padapter, pframe);
 	pframe += wfdielen;
 	pattrib->pktlen += wfdielen;
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-	pattrib->pktlen += rtw_build_vendor_ie(padapter , pframe , WIFI_ASSOCREQ_VENDOR_IE_BIT);
-#endif
 #ifdef CONFIG_RTW_80211R
 	rtw_ft_build_assoc_req_ies(padapter, is_reassoc, pattrib, &pframe);
 #endif
@@ -10882,11 +10834,6 @@ static void rtw_mlmeext_disconnect(_adapter *padapter)
 	}
 	pmlmeinfo->state = WIFI_FW_NULL_STATE;
 
-#ifdef CONFIG_MCC_MODE
-	/* mcc disconnect setting before download LPS rsvd page */
-	rtw_hal_set_mcc_setting_disconnect(padapter);
-#endif /* CONFIG_MCC_MODE */
-
 	if (state_backup == WIFI_FW_STATION_STATE) {
 		if (rtw_port_switch_chk(padapter) == _TRUE) {
 			rtw_hal_set_hwreg(padapter, HW_VAR_PORT_SWITCH, NULL);
@@ -11244,16 +11191,6 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 			} else
 				pmlmepriv->need_to_roam = _FALSE;
 		}
-#ifdef CONFIG_MCC_MODE
-		/*
-		 * due to tx ps null date to ao, so ap doest not tx pkt to driver
-		 * we may check chk_ap_is_alive fail, and may issue_probereq to wrong channel under sitesurvey
-		 * don't keep alive check under MCC
-		 */
-		if (rtw_hal_mcc_link_status_chk(padapter, __func__) == _FALSE)
-			return;
-#endif
-
 		rx_chk_limit = 4;
 #ifdef CONFIG_ARP_KEEP_ALIVE
 		if (!from_timer && pmlmepriv->bGetGateway == 1 && pmlmepriv->GetGatewayTryCnt < 3) {
@@ -11300,14 +11237,6 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 				u8 union_ch = 0, union_bw = 0, union_offset = 0;
 				u8 switch_channel_by_drv = _TRUE;
 
-				
-#ifdef CONFIG_MCC_MODE
-				if (MCC_EN(padapter)) {
-					/* driver doesn't switch channel under MCC */
-					if (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC))
-						switch_channel_by_drv = _FALSE;
-				}
-#endif
 				if (switch_channel_by_drv) {
 					if (!rtw_mi_get_ch_setting_union(padapter, &union_ch, &union_bw, &union_offset)
 						|| pmlmeext->cur_channel != union_ch)
@@ -11350,12 +11279,7 @@ bypass_active_keep_alive:
 					}
 				}
 
-				if (tx_chk != _SUCCESS && pmlmeinfo->link_count++ == link_count_limit
-#ifdef CONFIG_MCC_MODE
-				    /* FW tx nulldata under MCC mode, we just check  ap is alive */
-				    && (!rtw_hal_check_mcc_status(padapter, MCC_STATUS_NEED_MCC))
-#endif /* CONFIG_MCC_MODE */
-				) {
+				if (tx_chk != _SUCCESS && pmlmeinfo->link_count++ == link_count_limit) {
 					#ifdef DBG_EXPIRATION_CHK
 					RTW_INFO("%s issue_nulldata(%d)\n", __FUNCTION__, from_timer ? 1 : 0);
 					#endif
@@ -12856,11 +12780,6 @@ static void survey_done_set_ch_bw(_adapter *padapter)
 	u8 cur_bwmode;
 	u8 cur_ch_offset;
 
-#ifdef CONFIG_MCC_MODE
-	if (!rtw_hal_mcc_change_scan_flag(padapter, &cur_channel, &cur_bwmode, &cur_ch_offset))
-		goto exit;
-#endif
-
 	if (rtw_mi_get_ch_setting_union(padapter, &cur_channel, &cur_bwmode, &cur_ch_offset) != 0) {
 	} else {
 		struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
@@ -12916,16 +12835,6 @@ static u8 rtw_ps_annc(_adapter *adapter, bool ps)
 		if (MLME_IS_STA(iface)) {
 			if (is_client_associated_to_ap(iface) == _TRUE) {
 				/* TODO: TDLS peers */
-				#ifdef CONFIG_MCC_MODE
-				/* for two station case */
-				if (MCC_EN(adapter) && rtw_hal_check_mcc_status(adapter, MCC_STATUS_NEED_MCC)) {
-					u8 ch = iface->mlmeextpriv.cur_channel;
-					u8 offset = iface->mlmeextpriv.cur_ch_offset;
-					u8 bw = iface->mlmeextpriv.cur_bwmode;
-
-					set_channel_bwmode(iface, ch, offset, bw);
-				}
-				#endif /* CONFIG_MCC_MODE */
 				issue_nulldata(iface, NULL, ps, 3, 500);
 				ps_anc = 1;
 			}
@@ -12937,11 +12846,6 @@ static u8 rtw_ps_annc(_adapter *adapter, bool ps)
 void rtw_leave_opch(_adapter *adapter)
 {
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(adapter) && rtw_hal_check_mcc_status(adapter, MCC_STATUS_DOING_MCC))
-		return;
-#endif
 
 	_enter_critical_mutex(&rfctl->offch_mutex, NULL);
 
@@ -12965,11 +12869,6 @@ void rtw_leave_opch(_adapter *adapter)
 void rtw_back_opch(_adapter *adapter)
 {
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(adapter) && rtw_hal_check_mcc_status(adapter, MCC_STATUS_DOING_MCC))
-		return;
-#endif
 
 	_enter_critical_mutex(&rfctl->offch_mutex, NULL);
 
@@ -13130,10 +13029,6 @@ operation_by_state:
 		* prepare to leave operating channel
 		*/
 
-#ifdef CONFIG_MCC_MODE
-		rtw_hal_set_mcc_setting_scan_start(padapter);
-#endif /* CONFIG_MCC_MODE */
-
 		/* apply rx ampdu setting */
 		if (ss->rx_ampdu_accept != RX_AMPDU_ACCEPT_INVALID
 			|| ss->rx_ampdu_size != RX_AMPDU_SIZE_INVALID)
@@ -13229,11 +13124,6 @@ operation_by_state:
 	case SCAN_BACKING_OP: {
 		u8 back_ch, back_bw, back_ch_offset;
 		u8 need_ch_setting_union = _TRUE;
-
-#ifdef CONFIG_MCC_MODE
-		need_ch_setting_union = rtw_hal_mcc_change_scan_flag(padapter,
-				&back_ch, &back_bw, &back_ch_offset);
-#endif /* CONFIG_MCC_MODE */
 
 		if (need_ch_setting_union) {
 			if (rtw_mi_get_ch_setting_union(padapter, &back_ch, &back_bw, &back_ch_offset) == 0)
@@ -13387,14 +13277,8 @@ operation_by_state:
 
 		sitesurvey_set_igi(padapter);
 
-#ifdef CONFIG_MCC_MODE
-		/* start MCC fail, then tx null data */
-		if (!rtw_hal_set_mcc_setting_scan_complete(padapter))
-#endif
-		{
-			rtw_hal_macid_wakeup_all_used(padapter);
-			rtw_ps_annc(padapter, 0);
-		}
+		rtw_hal_macid_wakeup_all_used(padapter);
+		rtw_ps_annc(padapter, 0);
 
 		/* apply rx ampdu setting */
 		rtw_rx_ampdu_apply(padapter);
@@ -13980,13 +13864,6 @@ void rtw_join_done_chk_ch(_adapter *adapter, int join_res)
 	}
 
 	if (join_res >= 0) {
-
-#ifdef CONFIG_MCC_MODE
-		/* MCC setting success, don't go to ch union process */
-		if (rtw_hal_set_mcc_setting_join_done_chk_ch(adapter))
-			return;
-#endif /* CONFIG_MCC_MODE */
-
 		if (rtw_mi_get_ch_setting_union(adapter, &u_ch, &u_bw, &u_offset) <= 0) {
 			dump_adapters_status(RTW_DBGDUMP , dvobj);
 			rtw_warn_on(1);
@@ -14128,12 +14005,6 @@ int rtw_chk_start_clnt_join(_adapter *adapter, u8 *ch, u8 *bw, u8 *offset)
 
 		RTW_INFO(FUNC_ADPT_FMT" chbw_allow:%d\n"
 			 , FUNC_ADPT_ARG(adapter), chbw_allow);
-
-#ifdef CONFIG_MCC_MODE
-		/* check setting success, don't go to ch union process */
-		if (rtw_hal_set_mcc_setting_chk_start_clnt_join(adapter, &u_ch, &u_bw, &u_offset, chbw_allow))
-			goto exit;
-#endif
 
 		if (chbw_allow == _TRUE) {
 			rtw_sync_chbw(&cur_ch, &cur_bw, &cur_ch_offset, &u_ch, &u_bw, &u_offset);

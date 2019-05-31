@@ -5071,14 +5071,6 @@ static int _cfg80211_rtw_mgmt_tx(_adapter *padapter, u8 tx_ch, u8 no_cck, const 
 		#endif /* CONFIG_CONCURRENT_MODE */
 	}
 
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(padapter)) {
-		if (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC))
-			/* don't set channel, issue frame directly */
-			goto issue_mgmt_frame;
-	}
-#endif /* CONFIG_MCC_MODE */
-
 	if (rtw_mi_check_status(padapter, MI_LINKED)
 		&& tx_ch != u_ch
 	) {
@@ -6043,9 +6035,7 @@ static void rtw_cfg80211_preinit_wiphy(_adapter *adapter, struct wiphy *wiphy)
 	wiphy->interface_modes =	BIT(NL80211_IFTYPE_STATION)
 								| BIT(NL80211_IFTYPE_ADHOC)
 								| BIT(NL80211_IFTYPE_AP)
-								#ifdef CONFIG_WIFI_MONITOR
 								| BIT(NL80211_IFTYPE_MONITOR)
-								#endif
 #if ((LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE))
 								| BIT(NL80211_IFTYPE_P2P_CLIENT)
 								| BIT(NL80211_IFTYPE_P2P_GO)
@@ -6057,9 +6047,7 @@ static void rtw_cfg80211_preinit_wiphy(_adapter *adapter, struct wiphy *wiphy)
 #endif
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 0, 0))
-	#ifdef CONFIG_WIFI_MONITOR
 	wiphy->software_iftypes |= BIT(NL80211_IFTYPE_MONITOR);
-	#endif
 #endif
 
 #if defined(RTW_SINGLE_WIPHY) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 0, 0))
@@ -6107,40 +6095,6 @@ static void rtw_cfg80211_preinit_wiphy(_adapter *adapter, struct wiphy *wiphy)
 	else
 		wiphy->flags &= ~WIPHY_FLAG_PS_ON_BY_DEFAULT;
 }
-
-#ifdef CONFIG_RFKILL_POLL
-void rtw_cfg80211_init_rfkill(struct wiphy *wiphy)
-{
-	wiphy_rfkill_set_hw_state(wiphy, 0);
-	wiphy_rfkill_start_polling(wiphy);
-}
-
-void rtw_cfg80211_deinit_rfkill(struct wiphy *wiphy)
-{
-	wiphy_rfkill_stop_polling(wiphy);
-}
-
-static void cfg80211_rtw_rfkill_poll(struct wiphy *wiphy)
-{
-	_adapter *padapter = NULL;
-	bool blocked = _FALSE;
-	u8 valid = 0;
-
-	padapter = wiphy_to_adapter(wiphy);
-
-	if (adapter_to_dvobj(padapter)->processing_dev_remove == _TRUE) {
-		/*RTW_INFO("cfg80211_rtw_rfkill_poll: device is removed!\n");*/
-		return;
-	}
-
-	blocked = rtw_hal_rfkill_poll(padapter, &valid);
-	/*RTW_INFO("cfg80211_rtw_rfkill_poll: valid=%d, blocked=%d\n",
-			valid, blocked);*/
-
-	if (valid)
-		wiphy_rfkill_set_hw_state(wiphy, blocked);
-}
-#endif
 
 static struct cfg80211_ops rtw_cfg80211_ops = {
 	.change_virtual_intf = cfg80211_rtw_change_iface,
@@ -6220,9 +6174,6 @@ static struct cfg80211_ops rtw_cfg80211_ops = {
 	.suspend = cfg80211_rtw_suspend,
 	.resume = cfg80211_rtw_resume,
 #endif /* CONFIG_PNO_SUPPORT */
-#ifdef CONFIG_RFKILL_POLL
-	.rfkill_poll = cfg80211_rtw_rfkill_poll,
-#endif
 };
 
 struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
@@ -6456,11 +6407,7 @@ int rtw_cfg80211_ndev_res_register(_adapter *adapter)
 		goto exit;
 	}
 
-#ifdef CONFIG_RFKILL_POLL
-	rtw_cfg80211_init_rfkill(adapter_to_wiphy(adapter));
 #endif
-#endif
-
 	ret = _SUCCESS;
 
 exit:
@@ -6509,11 +6456,7 @@ int rtw_cfg80211_dev_res_register(struct dvobj_priv *dvobj)
 	if (rtw_wiphy_register(dvobj_to_wiphy(dvobj)) != 0)
 		goto exit;
 
-#ifdef CONFIG_RFKILL_POLL
-	rtw_cfg80211_init_rfkill(dvobj_to_wiphy(dvobj));
 #endif
-#endif
-
 	ret = _SUCCESS;
 
 exit:
@@ -6523,9 +6466,6 @@ exit:
 void rtw_cfg80211_dev_res_unregister(struct dvobj_priv *dvobj)
 {
 #if defined(RTW_SINGLE_WIPHY)
-#ifdef CONFIG_RFKILL_POLL
-	rtw_cfg80211_deinit_rfkill(dvobj_to_wiphy(dvobj));
-#endif
 	rtw_wiphy_unregister(dvobj_to_wiphy(dvobj));
 #endif
 }

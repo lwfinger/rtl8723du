@@ -357,18 +357,6 @@ void rtw_btcoex_pta_off_on_notify(PADAPTER padapter, u8 bBTON)
 	hal_btcoex_pta_off_on_notify(padapter, bBTON);
 }
 
-#ifdef CONFIG_RF4CE_COEXIST
-void rtw_btcoex_SetRf4ceLinkState(PADAPTER padapter, u8 state)
-{
-	hal_btcoex_set_rf4ce_link_state(state);
-}
-
-u8 rtw_btcoex_GetRf4ceLinkState(PADAPTER padapter)
-{
-	return hal_btcoex_get_rf4ce_link_state();
-}
-#endif
-
 /* ==================================================
  * Below Functions are called by BT-Coex
  * ================================================== */

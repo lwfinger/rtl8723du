@@ -524,9 +524,6 @@ typedef struct hal_com_data {
 
 	struct hal_iqk_reg_backup iqk_reg_backup[MAX_IQK_INFO_BACKUP_CHNL_NUM];
 
-#ifdef RTW_HALMAC
-	u8 drv_rsvd_page_number;
-#endif
 	u8 not_xmitframe_fw_dl; /*not use xmitframe to download fw*/
 	u8 phydm_op_mode;
 
@@ -557,10 +554,6 @@ typedef struct hal_com_data HAL_DATA_TYPE, *PHAL_DATA_TYPE;
 
 int recvbuf2recvframe(PADAPTER padapter, void *ptr);
 extern int new_bcn_max;
-
-#ifdef RTW_HALMAC
-int rtw_halmac_deinit_adapter(struct dvobj_priv *);
-#endif /* RTW_HALMAC */
 
 /* alias for phydm coding style */
 #define REG_OFDM_0_XA_TX_IQ_IMBALANCE	rOFDM0_XATxIQImbalance

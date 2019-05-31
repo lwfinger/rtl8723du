@@ -635,14 +635,8 @@ static inline s32 translate_percentage_to_dbm(u32 SignalStrengthIndex)
 {
 	s32	SignalPower; /* in dBm. */
 
-#ifdef CONFIG_SIGNAL_SCALE_MAPPING
-	/* Translate to dBm (x=0.5y-95). */
-	SignalPower = (s32)((SignalStrengthIndex + 1) >> 1);
-	SignalPower -= 95;
-#else
 	/* Translate to dBm (x=y-100) */
 	SignalPower = SignalStrengthIndex - 100;
-#endif
 
 	return SignalPower;
 }

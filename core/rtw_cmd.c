@@ -2423,10 +2423,6 @@ static void rtw_dynamic_chk_wk_hdl(_adapter *padapter)
 
 	/* BT-Coexist */
 	rtw_btcoex_Handler(padapter);
-
-#ifdef CONFIG_MCC_MODE
-	rtw_hal_mcc_sw_status_check(padapter);
-#endif /* CONFIG_MCC_MODE */
 }
 
 void lps_ctrl_wk_hdl(_adapter *padapter, u8 lps_ctrl_type);
@@ -3281,12 +3277,7 @@ static s32 rtw_mp_cmd_hdl(_adapter *padapter, u8 mp_cmd_id)
 				ret = H2C_REJECTED;
 				goto exit;
 			}
-#ifndef RTW_HALMAC
 			rtw_intf_start(padapter);
-#endif /* !RTW_HALMAC */
-#ifdef RTW_HALMAC /*for New IC*/
-			MPT_InitializeAdapter(padapter, 1);
-#endif /* CONFIG_MP_INCLUDED */
 		}
 
 		if (padapter->registrypriv.mp_mode == 0) {
@@ -3317,9 +3308,7 @@ static s32 rtw_mp_cmd_hdl(_adapter *padapter, u8 mp_cmd_id)
 				ret = H2C_REJECTED;
 				goto exit;
 			}
-#ifndef RTW_HALMAC
 			rtw_intf_start(padapter);
-#endif /* !RTW_HALMAC */
 		}
 
 		if (padapter->mppriv.mode != MP_OFF) {
@@ -3979,11 +3968,6 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapter, unsigned char *pbuf)
 		ret = rtw_mgnt_tx_handler(padapter, pdrvextra_cmd->pbuf);
 		break;
 #endif /* CONFIG_IOCTL_CFG80211 */
-#ifdef CONFIG_MCC_MODE
-	case MCC_SET_DURATION_WK_CID:
-		ret = rtw_set_mcc_duration_hdl(padapter, pdrvextra_cmd->type, pdrvextra_cmd->pbuf);
-		break;
-#endif /* CONFIG_MCC_MODE */
 	default:
 		break;
 	}

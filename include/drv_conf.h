@@ -6,18 +6,6 @@
 #include "autoconf.h"
 #include "hal_ic_cfg.h"
 
-#if defined(CONFIG_MCC_MODE) && (!defined(CONFIG_CONCURRENT_MODE))
-
-	#error "Enable CONCURRENT_MODE before enable MCC MODE\n"
-
-#endif
-
-#if defined(CONFIG_MCC_MODE)
-
-	#error "Disable BT COEXIST before enable MCC MODE\n"
-
-#endif
-
 /* About USB VENDOR REQ */
 #if defined(CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC) && !defined(CONFIG_USB_VENDOR_REQ_MUTEX)
 	#warning "define CONFIG_USB_VENDOR_REQ_MUTEX for CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC automatically"
@@ -99,15 +87,6 @@
 #if !defined(CONFIG_TXPWR_LIMIT) && CONFIG_TXPWR_LIMIT_EN
 	#define CONFIG_TXPWR_LIMIT
 #endif
-
-#ifdef CONFIG_RTW_IPCAM_APPLICATION
-	#undef CONFIG_TXPWR_BY_RATE_EN
-	#define CONFIG_TXPWR_BY_RATE_EN 1
-	#define CONFIG_RTW_CUSTOMIZE_BEEDCA		0x0000431C
-	#define CONFIG_RTW_CUSTOMIZE_BWMODE		0x00
-	#define CONFIG_RTW_CUSTOMIZE_RLSTA		0x7
-#endif
-
 
 #ifndef CONFIG_RTW_RX_AMPDU_SZ_LIMIT_1SS
 	#define CONFIG_RTW_RX_AMPDU_SZ_LIMIT_1SS {0xFF, 0xFF, 0xFF, 0xFF}

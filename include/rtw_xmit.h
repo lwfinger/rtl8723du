@@ -334,9 +334,6 @@ struct xmit_buf {
 
 	/* u32 sz[8]; */
 	u32	ff_hwaddr;
-#ifdef RTW_HALMAC
-	u8 bulkout_id; /* for halmac */
-#endif /* RTW_HALMAC */
 
 	PURB	pxmit_urb[8];
 	dma_addr_t dma_transfer_addr;	/* (in) dma addr for transfer_buffer */

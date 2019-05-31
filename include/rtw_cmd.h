@@ -212,9 +212,6 @@ enum rtw_drvextra_cmd_id {
 	MP_CMD_WK_CID,
 	CUSTOMER_STR_WK_CID,
 	MGNT_TX_WK_CID,
-#ifdef CONFIG_MCC_MODE
-	MCC_SET_DURATION_WK_CID,
-#endif /* CONFIG_MCC_MODE */
 	MAX_WK_CID
 };
 

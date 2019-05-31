@@ -96,11 +96,6 @@ u8 rtw_btcoex_IncreaseScanDeviceNum(PADAPTER);
 u8 rtw_btcoex_IsBtLinkExist(PADAPTER);
 void rtw_btcoex_pta_off_on_notify(PADAPTER padapter, u8 bBTON);
 
-#ifdef CONFIG_RF4CE_COEXIST
-void rtw_btcoex_SetRf4ceLinkState(PADAPTER padapter, u8 state);
-u8 rtw_btcoex_GetRf4ceLinkState(PADAPTER padapter);
-#endif
-
 u16 rtw_btcoex_btreg_read(PADAPTER padapter, u8 type, u16 addr, u32 *data);
 u16 rtw_btcoex_btreg_write(PADAPTER padapter, u8 type, u16 addr, u16 val);
 u8 rtw_btcoex_get_bt_coexist(PADAPTER padapter);

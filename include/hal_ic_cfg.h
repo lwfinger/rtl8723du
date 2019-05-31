@@ -7,9 +7,6 @@
 #define RATE_ADAPTIVE_SUPPORT			0
 #define POWER_TRAINING_ACTIVE			0
 
-#ifdef CONFIG_MULTIDRV
-#endif
-
 #ifndef CONFIG_FW_C2H_PKT
 	#define CONFIG_FW_C2H_PKT
 #endif

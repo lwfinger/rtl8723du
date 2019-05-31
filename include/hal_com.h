@@ -536,10 +536,6 @@ s32 rtw_set_default_port_id(_adapter *adapter);
 s32 rtw_set_ps_rsvd_page(_adapter *adapter);
 #endif
 
-#ifdef RTW_HALMAC
-void rtw_set_p2p_ps_offload_cmd(_adapter *adapter, u8 p2p_ps_state);
-#endif
-
 #ifdef RTW_CHANNEL_SWITCH_OFFLOAD
 void rtw_hal_switch_chnl_and_set_bw_offload(_adapter *adapter, u8 central_ch, u8 pri_ch_idx, u8 bw);
 #endif

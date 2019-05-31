@@ -16,34 +16,23 @@ EXTRA_CFLAGS += -I$(src)/include
 
 EXTRA_LDFLAGS += --strip-debug
 
-CONFIG_AUTOCFG_CP = n
-
 ########################## WIFI IC ############################
-CONFIG_MULTIDRV = n
 CONFIG_RTL8723D = y
 ######################### Interface ###########################
 CONFIG_USB_HCI = y
 ########################## Features ###########################
 CONFIG_MP_INCLUDED = y
-CONFIG_WIFI_TEST = n
 CONFIG_EFUSE_CONFIG_FILE = y
-CONFIG_XTAL_26M = n
 CONFIG_LOAD_PHY_PARA_FROM_FILE = y
 CONFIG_TXPWR_BY_RATE_EN = y
 CONFIG_TXPWR_LIMIT_EN = n
 CONFIG_RTW_CHPLAN = 0xFF
 CONFIG_RTW_ADAPTIVITY_EN = disable
 CONFIG_RTW_ADAPTIVITY_MODE = normal
-CONFIG_SIGNAL_SCALE_MAPPING = n
-CONFIG_80211W = n
 CONFIG_REDUCE_TX_CPU_LOADING = n
 CONFIG_BR_EXT = y
-CONFIG_WIFI_MONITOR = n
-CONFIG_MCC_MODE = n
-CONFIG_APPEND_VENDOR_IE_ENABLE = n
 CONFIG_RTW_NAPI = y
 CONFIG_RTW_GRO = y
-CONFIG_RTW_IPCAM_APPLICATION = n
 CONFIG_RTW_WIFI_HAL = y
 ########################## Debug ###########################
 CONFIG_RTW_DEBUG = y
@@ -95,7 +84,6 @@ _HAL_INTFS_FILES :=	hal/hal_intf.o \
 			hal/hal_btcoex_wifionly.o \
 			hal/hal_btcoex.o \
 			hal/hal_mp.o \
-			hal/hal_mcc.o \
 			hal/hal_$(HCI_NAME).o \
 			hal/hal_$(HCI_NAME)_led.o
 
@@ -143,27 +131,11 @@ _BTC_FILES += hal/halbtc8723d1ant.o \
 
 endif
 
-########### AUTO_CFG  #################################
-
-ifeq ($(CONFIG_AUTOCFG_CP), y)
-
-ifeq ($(CONFIG_MULTIDRV), y)
-$(shell cp $(TopDIR)/autoconf_multidrv_$(HCI_NAME)_linux.h $(TopDIR)/include/autoconf.h)
-else
-$(shell cp $(TopDIR)/autoconf_rtl8723d_$(HCI_NAME)_linux.h $(TopDIR)/include/autoconf.h)
-endif
-
-endif
-
 ########### END OF PATH  #################################
 
 ifeq ($(CONFIG_MP_INCLUDED), y)
 #MODULE_NAME := $(MODULE_NAME)_mp
 EXTRA_CFLAGS += -DCONFIG_MP_INCLUDED
-endif
-
-ifeq ($(CONFIG_WIFI_TEST), y)
-EXTRA_CFLAGS += -DCONFIG_WIFI_TEST
 endif
 
 ifeq ($(CONFIG_INTEL_WIDI), y)
@@ -189,10 +161,6 @@ else
 EXTRA_CFLAGS += -DWIFIMAC_PATH=\"/data/wifimac.txt\"
 endif
 
-endif
-
-ifeq ($(CONFIG_XTAL_26M), y)
-EXTRA_CFLAGS += -DCONFIG_XTAL_26M
 endif
 
 ifeq ($(CONFIG_LOAD_PHY_PARA_FROM_FILE), y)
@@ -241,14 +209,6 @@ else ifeq ($(CONFIG_RTW_ADAPTIVITY_MODE), carrier_sense)
 EXTRA_CFLAGS += -DCONFIG_RTW_ADAPTIVITY_MODE=1
 endif
 
-ifeq ($(CONFIG_SIGNAL_SCALE_MAPPING), y)
-EXTRA_CFLAGS += -DCONFIG_SIGNAL_SCALE_MAPPING
-endif
-
-ifeq ($(CONFIG_80211W), y)
-EXTRA_CFLAGS += -DCONFIG_IEEE80211W
-endif
-
 ifeq ($(CONFIG_PNO_SUPPORT), y)
 EXTRA_CFLAGS += -DCONFIG_PNO_SUPPORT
 ifeq ($(CONFIG_PNO_SET_DEBUG), y)
@@ -272,27 +232,12 @@ EXTRA_CFLAGS += -DCONFIG_BR_EXT
 EXTRA_CFLAGS += '-DCONFIG_BR_EXT_BRNAME="'$(BR_NAME)'"'
 endif
 
-ifeq ($(CONFIG_WIFI_MONITOR), y)
-EXTRA_CFLAGS += -DCONFIG_WIFI_MONITOR
-endif
-
-ifeq ($(CONFIG_MCC_MODE), y)
-EXTRA_CFLAGS += -DCONFIG_MCC_MODE
-endif
-
 ifeq ($(CONFIG_RTW_NAPI), y)
 EXTRA_CFLAGS += -DCONFIG_RTW_NAPI
 endif
 
 ifeq ($(CONFIG_RTW_GRO), y)
 EXTRA_CFLAGS += -DCONFIG_RTW_GRO
-endif
-
-ifeq ($(CONFIG_RTW_IPCAM_APPLICATION), y)
-EXTRA_CFLAGS += -DCONFIG_RTW_IPCAM_APPLICATION
-ifeq ($(CONFIG_WIFI_MONITOR), n)
-EXTRA_CFLAGS += -DCONFIG_WIFI_MONITOR
-endif
 endif
 
 ifeq ($(CONFIG_RTW_WIFI_HAL), y)
@@ -312,10 +257,6 @@ EXTRA_CFLAGS += -mfloat-abi=hard
 endif
 endif
 
-ifeq ($(CONFIG_APPEND_VENDOR_IE_ENABLE), y)
-EXTRA_CFLAGS += -DCONFIG_APPEND_VENDOR_IE_ENABLE
-endif
-
 ifeq ($(CONFIG_RTW_DEBUG), y)
 EXTRA_CFLAGS += -DCONFIG_RTW_DEBUG
 EXTRA_CFLAGS += -DRTW_LOG_LEVEL=$(CONFIG_RTW_LOG_LEVEL)
@@ -333,12 +274,6 @@ KSRC := /lib/modules/$(KVER)/build
 MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/net/wireless/
 INSTALL_PREFIX :=
 STAGINGMODDIR := /lib/modules/$(KVER)/kernel/drivers/staging
-endif
-
-ifeq ($(CONFIG_MULTIDRV), y)
-
-MODULE_NAME := rtw_usb
-
 endif
 
 USER_MODULE_NAME ?=

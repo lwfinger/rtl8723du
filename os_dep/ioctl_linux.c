@@ -7,9 +7,6 @@
 #include <rtw_mp.h>
 #include <rtw_mp_ioctl.h>
 #include "../../hal/phydm/phydm_precomp.h"
-#ifdef RTW_HALMAC
-#include "../../hal/hal_halmac.h"
-#endif
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 27))
 #define  iwe_stream_add_event(a, b, c, d, e)  iwe_stream_add_event(b, c, d, e)
@@ -600,6 +597,7 @@ static inline char   *iwe_stream_rssi_process(_adapter *padapter,
 	u8 ss, sq;
 	s16 noise = 0;
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
+	HAL_DATA_TYPE *pHal = GET_HAL_DATA(padapter);
 
 	/* Add quality statistics */
 	iwe->cmd = IWEVQUAL;
@@ -616,18 +614,9 @@ static inline char   *iwe_stream_rssi_process(_adapter *padapter,
 		sq = pnetwork->network.PhyInfo.SignalQuality;
 	}
 
+	/* Do signal scale mapping when using percentage as the unit of signal strength, since the scale mapping is skipped in odm */
 
-#ifdef CONFIG_SIGNAL_SCALE_MAPPING
-	iwe->u.qual.level = (u8)ss; /* % */
-#else
-	{
-		/* Do signal scale mapping when using percentage as the unit of signal strength, since the scale mapping is skipped in odm */
-
-		HAL_DATA_TYPE *pHal = GET_HAL_DATA(padapter);
-
-		iwe->u.qual.level = (u8)phydm_signal_scale_mapping(&pHal->odmpriv, ss);
-	}
-#endif
+	iwe->u.qual.level = (u8)phydm_signal_scale_mapping(&pHal->odmpriv, ss);
 
 	iwe->u.qual.qual = (u8)sq;   /* signal quality */
 
@@ -1450,7 +1439,6 @@ static int rtw_wx_get_range(struct net_device *dev,
 	 * If percentage range is 0~100
 	 * Signal strength dbm range logical is -100 ~ 0
 	 * but usually value is -90 ~ -20
-	 * When CONFIG_SIGNAL_SCALE_MAPPING is defined, dbm range is -95 ~ -45
 	 */
 	range->max_qual.qual = 100;
 	/* percent values between 0 and 100. */
@@ -1563,16 +1551,6 @@ static int rtw_wx_set_wap(struct net_device *dev,
 	_queue	*queue	= &(pmlmepriv->scanned_queue);
 	struct	wlan_network	*pnetwork = NULL;
 	NDIS_802_11_AUTHENTICATION_MODE	authmode;
-
-	/*
-	#ifdef CONFIG_CONCURRENT_MODE
-		if(padapter->adapter_type > PRIMARY_IFACE)
-		{
-			ret = -EINVAL;
-			goto exit;
-		}
-	#endif
-	*/
 
 #ifdef CONFIG_CONCURRENT_MODE
 	if (rtw_mi_buddy_check_fwstate(padapter, _FW_UNDER_SURVEY | _FW_UNDER_LINKING) == _TRUE) {
@@ -7059,198 +7037,6 @@ static int rtw_pm_set(struct net_device *dev,
 
 	return ret;
 }
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-
-int rtw_vendor_ie_get_raw_data(struct net_device *dev, u32 vendor_ie_num,
-							   char *extra, u32 length)
-{
-	int j;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
-	u32 vendor_ie_mask = 0;
-	char *pstring;
-
-	if (vendor_ie_num >= WLAN_MAX_VENDOR_IE_NUM) {
-		RTW_INFO("[%s] only support %d vendor ie\n", __func__ ,
-				 WLAN_MAX_VENDOR_IE_NUM);
-		return -EFAULT;
-	}
-
-	if (pmlmepriv->vendor_ielen[vendor_ie_num] == 0) {
-		RTW_INFO("[%s]  Fail, vendor_ie_num: %d is not set\n", __func__,
-				 vendor_ie_num);
-		return -EFAULT;
-	}
-
-	if (length < 2 * pmlmepriv->vendor_ielen[vendor_ie_num] + 5) {
-		RTW_INFO("[%s]  Fail, buffer size is too small\n", __func__);
-		return -EFAULT;
-	}
-
-	vendor_ie_mask = pmlmepriv->vendor_ie_mask[vendor_ie_num];
-	_rtw_memset(extra, 0, length);
-
-	pstring = extra;
-	pstring += sprintf(pstring, "%d,%x,", vendor_ie_num, vendor_ie_mask);
-
-	for (j = 0; j < pmlmepriv->vendor_ielen[vendor_ie_num]; j++)
-		pstring += sprintf(pstring, "%02x", pmlmepriv->vendor_ie[vendor_ie_num][j]);
-
-	length = pstring - extra;
-	return length;
-}
-
-int rtw_vendor_ie_get_data(struct net_device *dev, int vendor_ie_num, char *extra)
-{
-	int j;
-	char *pstring;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
-	u32 vendor_ie_mask = 0;
-	__u16 length = 0;
-
-	vendor_ie_mask = pmlmepriv->vendor_ie_mask[vendor_ie_num];
-	pstring = extra;
-	pstring += sprintf(pstring , "\nVendor IE num %d , Mask:%x " , vendor_ie_num , vendor_ie_mask);
-
-	if (vendor_ie_mask & WIFI_BEACON_VENDOR_IE_BIT)
-		pstring += sprintf(pstring , "[Beacon]");
-	if (vendor_ie_mask & WIFI_PROBEREQ_VENDOR_IE_BIT)
-		pstring += sprintf(pstring , "[Probe Req]");
-	if (vendor_ie_mask & WIFI_PROBERESP_VENDOR_IE_BIT)
-		pstring += sprintf(pstring , "[Probe Resp]");
-	if (vendor_ie_mask & WIFI_ASSOCREQ_VENDOR_IE_BIT)
-		pstring += sprintf(pstring , "[Assoc Req]");
-	if (vendor_ie_mask & WIFI_ASSOCRESP_VENDOR_IE_BIT)
-		pstring += sprintf(pstring , "[Assoc Resp]");
-
-	pstring += sprintf(pstring , "\nVendor IE:\n");
-	for (j = 0 ; j < pmlmepriv->vendor_ielen[vendor_ie_num]  ; j++)
-		pstring += sprintf(pstring , "%02x" , pmlmepriv->vendor_ie[vendor_ie_num][j]);
-
-	length = pstring - extra;
-	return length;
-
-}
-
-int rtw_vendor_ie_get(struct net_device *dev, struct iw_request_info *info, union iwreq_data *wrqu, char *extra)
-{
-	int ret = 0, vendor_ie_num = 0, cmdlen;
-	struct iw_point *p;
-	u8 *ptmp;
-
-	p = &wrqu->data;
-	cmdlen = p->length;
-	if (0 == cmdlen)
-		return -EINVAL;
-
-	ptmp = (u8 *)rtw_malloc(cmdlen);
-	if (NULL == ptmp)
-		return -ENOMEM;
-
-	if (copy_from_user(ptmp, p->pointer, cmdlen)) {
-		ret = -EFAULT;
-		goto exit;
-	}
-	ret = sscanf(ptmp , "%d", &vendor_ie_num);
-	if (vendor_ie_num > WLAN_MAX_VENDOR_IE_NUM - 1) {
-		ret = -EFAULT;
-		goto exit;
-	}
-
-	wrqu->data.length = rtw_vendor_ie_get_data(dev, vendor_ie_num, extra);
-
-exit:
-	rtw_mfree(ptmp, cmdlen);
-
-	return 0;
-}
-
-int rtw_vendor_ie_set(struct net_device *dev, struct iw_request_info *info, union iwreq_data *wrqu, char *extra)
-{
-	int ret = 0, i , len = 0 , totoal_ie_len = 0 , total_ie_len_byte = 0;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
-	u32 vendor_ie_mask = 0;
-	u32 vendor_ie_num = 0;
-	u32 id, elen;
-
-	ret = sscanf(extra, "%d,%x,%*s", &vendor_ie_num , &vendor_ie_mask);
-	if (strrchr(extra , ','))
-		extra = strrchr(extra , ',') + 1;
-	else
-		return -EINVAL;
-	totoal_ie_len = strlen(extra);
-	RTW_INFO("[%s] vendor_ie_num = %d , vendor_ie_mask = %x , vendor_ie = %s , len = %d\n", __func__ , vendor_ie_num , vendor_ie_mask , extra  , totoal_ie_len);
-
-	if (vendor_ie_num  > WLAN_MAX_VENDOR_IE_NUM - 1) {
-		RTW_INFO("[%s] only support %d vendor ie\n", __func__ , WLAN_MAX_VENDOR_IE_NUM);
-		return -EFAULT;
-	}
-
-	if (totoal_ie_len > WLAN_MAX_VENDOR_IE_LEN) {
-		RTW_INFO("[%s] Fail , not support ie length extend %d\n", __func__ , WLAN_MAX_VENDOR_IE_LEN);
-		return -EFAULT;
-	}
-
-	if (vendor_ie_mask == 0) {
-		RTW_INFO("[%s] Clear vendor_ie_num %d group\n", __func__ , vendor_ie_num);
-		goto _clear_path;
-	}
-
-	if (totoal_ie_len % 2 != 0) {
-		RTW_INFO("[%s]  Fail , IE length = %zu is odd\n" , __func__ , strlen(extra));
-		return -EFAULT;
-	}
-
-	if (totoal_ie_len > 0) {
-		for (i = 0  ; i < strlen(extra) ; i += 2) {
-			pmlmepriv->vendor_ie[vendor_ie_num][len] = key_2char2num(extra[i] , extra[i + 1]);
-			if (len == 0) {
-				id = pmlmepriv->vendor_ie[vendor_ie_num][len];
-				if (id != WLAN_EID_VENDOR_SPECIFIC) {
-					RTW_INFO("[%s] Fail , VENDOR SPECIFIC IE ID \"%x\" was not correct\n", __func__ , id);
-					goto _clear_path;
-				}
-			} else if (len == 1) {
-				total_ie_len_byte = (totoal_ie_len / 2) - 2;
-				elen = pmlmepriv->vendor_ie[vendor_ie_num][len];
-				if (elen != total_ie_len_byte) {
-					RTW_INFO("[%s] Fail , Input IE length = \"%d\"(hex:%x) bytes , not match input total IE context length \"%d\" bytes\n", __func__ , elen , elen ,
-						 total_ie_len_byte);
-					goto _clear_path;
-				}
-			}
-			len++;
-		}
-		pmlmepriv->vendor_ielen[vendor_ie_num] = len;
-	} else
-		pmlmepriv->vendor_ielen[vendor_ie_num] = 0;
-
-
-
-	if (vendor_ie_mask & WIFI_BEACON_VENDOR_IE_BIT)
-		RTW_INFO("[%s] Beacon append vendor ie\n", __func__);
-	if (vendor_ie_mask & WIFI_PROBEREQ_VENDOR_IE_BIT)
-		RTW_INFO("[%s] Probe Req append vendor ie\n", __func__);
-	if (vendor_ie_mask & WIFI_PROBERESP_VENDOR_IE_BIT)
-		RTW_INFO("[%s] Probe Resp  append vendor ie\n", __func__);
-	if (vendor_ie_mask & WIFI_ASSOCREQ_VENDOR_IE_BIT)
-		RTW_INFO("[%s] Assoc Req append vendor ie\n", __func__);
-	if (vendor_ie_mask & WIFI_ASSOCRESP_VENDOR_IE_BIT)
-		RTW_INFO("[%s] Assoc Resp append vendor ie\n", __func__);
-
-	pmlmepriv->vendor_ie_mask[vendor_ie_num] = vendor_ie_mask;
-
-	return ret;
-
-_clear_path:
-	_rtw_memset(pmlmepriv->vendor_ie[vendor_ie_num] , 0 , sizeof(u32) * WLAN_MAX_VENDOR_IE_LEN);
-	pmlmepriv->vendor_ielen[vendor_ie_num] = 0;
-	pmlmepriv->vendor_ie_mask[vendor_ie_num] = 0;
-	return -EFAULT;
-}
-#endif
 
 static int rtw_mp_efuse_get(struct net_device *dev,
 			    struct iw_request_info *info,
@@ -7478,13 +7264,6 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 		addr = 0;
 		EFUSE_GetEfuseDefinition(padapter, EFUSE_BT, TYPE_EFUSE_REAL_CONTENT_LEN, (PVOID)&mapLen, _FALSE);
 		RTW_INFO("Real content len = %d\n", mapLen);
-#ifdef RTW_HALMAC
-		if (rtw_efuse_bt_access(padapter, _FALSE, 0, mapLen, rawdata) == _FAIL) {
-			RTW_INFO("%s: rtw_efuse_access Fail!!\n", __func__);
-			err = -EFAULT;
-			goto exit;
-		}
-#else
 		rtw_write8(padapter, 0x35, 0x1);
 
 		if (rtw_efuse_access(padapter, _FALSE, addr, mapLen, rawdata) == _FAIL) {
@@ -7492,7 +7271,6 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 			err = -EFAULT;
 			goto exit;
 		}
-#endif
 		_rtw_memset(extra, '\0', strlen(extra));
 
 		shift = blksz * bt_raw_order;
@@ -7582,12 +7360,8 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 		}
 		/*		RTW_INFO("}\n"); */
 	} else if (strcmp(tmp[0], "ableraw") == 0) {
-#ifdef RTW_HALMAC
-		raw_maxsize = efuse_GetavailableSize(padapter);
-#else
 		efuse_GetCurrentSize(padapter, &raw_cursize);
 		raw_maxsize = efuse_GetMaxSize(padapter);
-#endif
 		sprintf(extra, "[available raw size]= %d bytes\n", raw_maxsize - raw_cursize);
 	} else if (strcmp(tmp[0], "btableraw") == 0) {
 		efuse_bt_GetCurrentSize(padapter, &raw_cursize);
@@ -7684,14 +7458,12 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 			goto exit;
 		}
 		RTW_INFO("%s: cnts=%d\n", __FUNCTION__, cnts);
-#ifndef RTW_HALMAC
 		EFUSE_GetEfuseDefinition(padapter, EFUSE_BT, TYPE_EFUSE_MAP_LEN, (PVOID)&max_available_len, _FALSE);
 		if ((addr + cnts) > max_available_len) {
 			RTW_INFO("%s: addr(0x%X)+cnts(%d) parameter error!\n", __FUNCTION__, addr, cnts);
 			err = -EFAULT;
 			goto exit;
 		}
-#endif
 		if (rtw_BT_efuse_map_read(padapter, addr, cnts, data) == _FAIL) {
 			RTW_INFO("%s: rtw_BT_efuse_map_read error!!\n", __FUNCTION__);
 			err = -EFAULT;
@@ -7952,7 +7724,6 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			goto exit;
 		}
 
-#ifndef RTW_HALMAC
 		/* unknown bug workaround, need to fix later */
 		addr = 0x1ff;
 		rtw_write8(padapter, EFUSE_CTRL + 1, (addr & 0xff));
@@ -7962,7 +7733,6 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 		rtw_write8(padapter, EFUSE_CTRL + 3, 0x72);
 		rtw_msleep_os(10);
 		rtw_read8(padapter, EFUSE_CTRL);
-#endif /* RTW_HALMAC */
 
 		addr = simple_strtoul(tmp[1], &ptmp, 16);
 		addr &= 0xFFF;
@@ -8071,13 +7841,6 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 
 		for (jj = 0, kk = 0; jj < cnts; jj++, kk += 2)
 			setrawdata[jj] = key_2char2num(tmp[2][kk], tmp[2][kk + 1]);
-#ifdef RTW_HALMAC
-		if (rtw_efuse_bt_access(padapter, _TRUE, addr, cnts, setrawdata) == _FAIL) {
-			RTW_INFO("%s: rtw_efuse_access error!!\n", __FUNCTION__);
-			err = -EFAULT;
-			goto exit;
-		}
-#else
 		rtw_write8(padapter, 0x35, 1); /* switch bank 1 (BT)*/
 		if (rtw_efuse_access(padapter, _TRUE, addr, cnts, setrawdata) == _FAIL) {
 			RTW_INFO("%s: rtw_efuse_access error!!\n", __FUNCTION__);
@@ -8086,7 +7849,6 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			goto exit;
 		}
 		rtw_write8(padapter, 0x35, 0); /* switch bank 0 (WiFi)*/
-#endif
 	} else if (strcmp(tmp[0], "mac") == 0) {
 		if (tmp[1] == NULL) {
 			err = -EINVAL;
@@ -8201,7 +7963,6 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			goto exit;
 		}
 
-#ifndef RTW_HALMAC
 		BTEfuse_PowerSwitch(padapter, 1, _TRUE);
 		addr = 0x1ff;
 		rtw_write8(padapter, EFUSE_CTRL + 1, (addr & 0xff));
@@ -8212,7 +7973,6 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 		rtw_msleep_os(10);
 		rtw_read8(padapter, EFUSE_CTRL);
 		BTEfuse_PowerSwitch(padapter, 1, _FALSE);
-#endif /* RTW_HALMAC */
 
 		addr = simple_strtoul(tmp[1], &ptmp, 16);
 		addr &= 0xFFF;
@@ -8234,14 +7994,12 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 
 		for (jj = 0, kk = 0; jj < cnts; jj++, kk += 2)
 			setdata[jj] = key_2char2num(tmp[2][kk], tmp[2][kk + 1]);
-#ifndef RTW_HALMAC
 		EFUSE_GetEfuseDefinition(padapter, EFUSE_BT, TYPE_EFUSE_MAP_LEN, (PVOID)&max_available_len, _FALSE);
 		if ((addr + cnts) > max_available_len) {
 			RTW_INFO("%s: addr(0x%X)+cnts(%d) parameter error!\n", __FUNCTION__, addr, cnts);
 			err = -EFAULT;
 			goto exit;
 		}
-#endif
 		if (rtw_BT_efuse_map_write(padapter, addr, cnts, setdata) == _FAIL) {
 			RTW_INFO("%s: rtw_BT_efuse_map_write error!!\n", __FUNCTION__);
 			err = -EFAULT;
@@ -8303,7 +8061,6 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			sprintf(extra, "BT Status not Active Write FAIL\n");
 			goto exit;
 		}
-#ifndef RTW_HALMAC
 		BTEfuse_PowerSwitch(padapter, 1, _TRUE);
 		addr = 0x1ff;
 		rtw_write8(padapter, EFUSE_CTRL + 1, (addr & 0xff));
@@ -8314,7 +8071,6 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 		rtw_msleep_os(10);
 		rtw_read8(padapter, EFUSE_CTRL);
 		BTEfuse_PowerSwitch(padapter, 1, _FALSE);
-#endif /* RTW_HALMAC */
 		_rtw_memcpy(pEfuseHal->BTEfuseModifiedMap, pEfuseHal->fakeBTEfuseModifiedMap, EFUSE_BT_MAX_MAP_LEN);
 
 		if (rtw_BT_efuse_map_write(padapter, 0x00, EFUSE_BT_MAX_MAP_LEN, pEfuseHal->fakeBTEfuseModifiedMap) == _FAIL) {
@@ -8865,19 +8621,7 @@ static int rtw_priv_set(struct net_device *dev,
 #endif
 		return 0;
 	}
-
-	switch (subcmd) {
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-	case VENDOR_IE_SET:
-		RTW_INFO("set case VENDOR_IE_SET\n");
-		rtw_vendor_ie_set(dev , info , wdata , extra);
-		break;
-#endif
-	default:
-		return -EIO;
-	}
-
-	return 0;
+	return -EIO;
 }
 
 
@@ -8914,23 +8658,8 @@ static int rtw_priv_get(struct net_device *dev,
 #endif		
 		return 0;
 	}
-
-	switch (subcmd) {
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-	case VENDOR_IE_GET:
-		RTW_INFO("get case VENDOR_IE_GET\n");
-		rtw_vendor_ie_get(dev , info , wdata , extra);
-		break;
-#endif
-	default:
-		return -EIO;
-	}
-
-	rtw_msleep_os(10); /* delay 5ms for sending pkt before exit adb shell operation */
-	return 0;
+	return -EIO;
 }
-
-
 
 static int rtw_wx_tdls_wfd_enable(struct net_device *dev,
 				  struct iw_request_info *info,
@@ -9980,11 +9709,6 @@ static const struct iw_priv_args rtw_private_args[] = {
 	{ SIOCIWFIRSTPRIV + 0x0E, IW_PRIV_TYPE_CHAR | 1024, 0 , ""},  /* set  */
 	{ SIOCIWFIRSTPRIV + 0x0F, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK , ""},/* get
  * --- sub-ioctls definitions --- */
-
-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
-	{ VENDOR_IE_SET, IW_PRIV_TYPE_CHAR | 1024 , 0 , "vendor_ie_set" },
-	{ VENDOR_IE_GET, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "vendor_ie_get" },
-#endif
 };
 
 
@@ -10114,17 +9838,11 @@ static struct iw_statistics *rtw_get_wireless_stats(struct net_device *dev)
 		piwstats->qual.noise = 0;
 		/* RTW_INFO("No link  level:%d, qual:%d, noise:%d\n", tmp_level, tmp_qual, tmp_noise); */
 	} else {
-#ifdef CONFIG_SIGNAL_SCALE_MAPPING
-		tmp_level = padapter->recvpriv.signal_strength;
-#else
-		{
-			/* Do signal scale mapping when using percentage as the unit of signal strength, since the scale mapping is skipped in odm */
+		/* Do signal scale mapping when using percentage as the unit of signal strength, since the scale mapping is skipped in odm */
 
-			HAL_DATA_TYPE *pHal = GET_HAL_DATA(padapter);
+		HAL_DATA_TYPE *pHal = GET_HAL_DATA(padapter);
 
-			tmp_level = (u8)phydm_signal_scale_mapping(&pHal->odmpriv, padapter->recvpriv.signal_strength);
-		}
-#endif
+		tmp_level = (u8)phydm_signal_scale_mapping(&pHal->odmpriv, padapter->recvpriv.signal_strength);
 
 		tmp_qual = padapter->recvpriv.signal_qual;
 		piwstats->qual.level = tmp_level;

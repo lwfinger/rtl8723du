@@ -565,9 +565,6 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 {
 	u8 center_ch, chnl_offset80 = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
 	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
-#if defined(CONFIG_MCC_MODE)
-	u8 iqk_info_backup = _FALSE;
-#endif
 
 	if (padapter->bNotifyChannelChange)
 		RTW_INFO("[%s] ch = %d, offset = %d, bwmode = %d\n", __FUNCTION__, channel, channel_offset, bwmode);
@@ -584,37 +581,14 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 	}
 	_enter_critical_mutex(&(adapter_to_dvobj(padapter)->setch_mutex), NULL);
 
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(padapter)) {
-		/* driver doesn't set channel setting reg under MCC */
-		if (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC))
-			RTW_INFO("Warning: Do not set channel setting reg MCC mode\n");
-	}
-#endif
-		/* set Channel */
-		/* saved channel/bw info */
-		rtw_set_oper_ch(padapter, channel);
-		rtw_set_oper_bw(padapter, bwmode);
-		rtw_set_oper_choffset(padapter, channel_offset);
+	/* set Channel */
+	/* saved channel/bw info */
+	rtw_set_oper_ch(padapter, channel);
+	rtw_set_oper_bw(padapter, bwmode);
+	rtw_set_oper_choffset(padapter, channel_offset);
 
-#if defined(CONFIG_MCC_MODE)
-		/* To check if we need to backup iqk info after switch chnl & bw */
-		{
-			u8 take_care_iqk, do_iqk;
+	rtw_hal_set_chnl_bw(padapter, center_ch, bwmode, channel_offset, chnl_offset80); /* set center channel */
 
-			rtw_hal_get_hwreg(padapter, HW_VAR_CH_SW_NEED_TO_TAKE_CARE_IQK_INFO, &take_care_iqk);
-			rtw_hal_get_hwreg(padapter, HW_VAR_DO_IQK, &do_iqk);
-			if ((take_care_iqk == _TRUE) && (do_iqk == _TRUE))
-				iqk_info_backup = _TRUE;
-		}
-#endif
-
-		rtw_hal_set_chnl_bw(padapter, center_ch, bwmode, channel_offset, chnl_offset80); /* set center channel */
-
-#if defined(CONFIG_MCC_MODE)
-		if (iqk_info_backup == _TRUE)
-			rtw_hal_ch_sw_iqk_info_backup(padapter);
-#endif
 	_exit_critical_mutex(&(adapter_to_dvobj(padapter)->setch_mutex), NULL);
 }
 
@@ -3111,16 +3085,6 @@ void rtw_alloc_macid(_adapter *padapter, struct sta_info *psta)
 	_enter_critical_bh(&macid_ctl->lock, &irqL);
 
 	for (i = last_id; i < macid_ctl->num; i++) {
-#ifdef CONFIG_MCC_MODE
-		/* macid 0/1 reserve for mcc for mgnt queue macid */
-		if (MCC_EN(padapter)) {
-			if (i == MCC_ROLE_STA_GC_MGMT_QUEUE_MACID)
-				continue;
-			if (i == MCC_ROLE_SOFTAP_GO_MGMT_QUEUE_MACID)
-				continue;
-		}
-#endif /* CONFIG_MCC_MODE */
-
 		if (is_bc_sta) {
 			struct cam_ctl_t *cam_ctl = dvobj_to_sec_camctl(dvobj);
 

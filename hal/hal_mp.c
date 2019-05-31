@@ -7,11 +7,7 @@
 
 #ifdef CONFIG_MP_INCLUDED
 
-#ifdef RTW_HALMAC
-	#include <hal_data.h>		/* struct HAL_DATA_TYPE, RF register definition and etc. */
-#else /* !RTW_HALMAC */
-	#include <rtl8723d_hal.h>
-#endif /* !RTW_HALMAC */
+#include <rtl8723d_hal.h>
 
 
 static u8 MgntQuery_NssTxRate(u16 Rate)

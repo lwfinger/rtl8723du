@@ -2945,7 +2945,7 @@ int rtw_get_phy_file_path(_adapter *adapter, const char *file_name)
 
 	if (file_name) {
 		len += snprintf(rtw_phy_para_file_path, PATH_LENGTH_MAX, "%s", rtw_phy_file_path);
-		#if defined(CONFIG_MULTIDRV) || defined(REALTEK_CONFIG_PATH_WITH_IC_NAME_FOLDER)
+		#if defined(REALTEK_CONFIG_PATH_WITH_IC_NAME_FOLDER)
 		len += snprintf(rtw_phy_para_file_path + len, PATH_LENGTH_MAX - len, "%s/", hal_spec->ic_name);
 		#endif
 		len += snprintf(rtw_phy_para_file_path + len, PATH_LENGTH_MAX - len, "%s", file_name);
