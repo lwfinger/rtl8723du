@@ -214,7 +214,7 @@ static void mp_init_xmit_attrib(struct mp_tx *pmptx, PADAPTER padapter)
 	pattrib->pktlen = 1500;
 }
 
-s32 init_mp_priv(PADAPTER padapter)
+int init_mp_priv(PADAPTER padapter)
 {
 	struct mp_priv *pmppriv = &padapter->mppriv;
 	PHAL_DATA_TYPE pHalData;
@@ -270,7 +270,7 @@ void free_mp_priv(struct mp_priv *pmp_priv)
 
 static void PHY_IQCalibrate_default(
 	PADAPTER	pAdapter,
-	BOOLEAN	bReCovery
+	bool	bReCovery
 )
 {
 	RTW_INFO("%s\n", __func__);
@@ -285,7 +285,7 @@ static void PHY_LCCalibrate_default(
 
 static void PHY_SetRFPathSwitch_default(
 	PADAPTER	pAdapter,
-	BOOLEAN		bMain
+	bool		bMain
 )
 {
 	RTW_INFO("%s\n", __func__);
@@ -312,7 +312,7 @@ static u8 PHY_QueryRFPathSwitch(PADAPTER padapter)
 	return bmain;
 }
 
-static void  PHY_SetRFPathSwitch(PADAPTER padapter , BOOLEAN bMain)
+static void  PHY_SetRFPathSwitch(PADAPTER padapter , bool bMain)
 {
 }
 
@@ -320,14 +320,14 @@ static void phy_switch_rf_path_set(PADAPTER padapter , u8 *prf_set_State)
 {
 }
 
-s32
+int
 MPT_InitializeAdapter(
 	PADAPTER			pAdapter,
 	u8				Channel
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
-	s32		rtStatus = _SUCCESS;
+	int		rtStatus = _SUCCESS;
 	PMPT_CONTEXT	pMptCtx = &pAdapter->mppriv.mpt_ctx;
 	u32		ledsetting;
 	struct mlme_priv *pmlmepriv = &pAdapter->mlmepriv;
@@ -408,7 +408,7 @@ static u8 mpt_ProStartTest(PADAPTER padapter)
 /*
  * General use
  */
-s32 SetPowerTracking(PADAPTER padapter, u8 enable)
+int SetPowerTracking(PADAPTER padapter, u8 enable)
 {
 
 	hal_mpt_SetPowerTracking(padapter, enable);
@@ -495,7 +495,7 @@ u32 mp_join(PADAPTER padapter, u8 mode)
 	u32 length;
 	u8 val8, join_type;
 	_irqL irqL;
-	s32 res = _SUCCESS;
+	int res = _SUCCESS;
 
 	struct mp_priv *pmppriv = &padapter->mppriv;
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
@@ -613,10 +613,10 @@ end_of_mp_start_test:
 	return res;
 }
 /* This function initializes the DUT to the MP test mode */
-s32 mp_start_test(PADAPTER padapter)
+int mp_start_test(PADAPTER padapter)
 {
 	struct mp_priv *pmppriv = &padapter->mppriv;
-	s32 res = _SUCCESS;
+	int res = _SUCCESS;
 
 	padapter->registrypriv.mp_mode = 1;
 
@@ -720,7 +720,7 @@ static void mpt_SwitchRfSetting(PADAPTER pAdapter)
 
 /*---------------------------hal\rtl8192c\MPT_Phy.c---------------------------*/
 /*---------------------------hal\rtl8192c\MPT_HelperFunc.c---------------------------*/
-static void MPT_CCKTxPowerAdjust(PADAPTER Adapter, BOOLEAN bInCH14)
+static void MPT_CCKTxPowerAdjust(PADAPTER Adapter, bool bInCH14)
 {
 	hal_mpt_CCKTxPowerAdjust(Adapter, bInCH14);
 }
@@ -778,7 +778,7 @@ void SetDataRate(PADAPTER pAdapter)
 	hal_mpt_SetDataRate(pAdapter);
 }
 
-void MP_PHY_SetRFPathSwitch(PADAPTER pAdapter , BOOLEAN bMain)
+void MP_PHY_SetRFPathSwitch(PADAPTER pAdapter , bool bMain)
 {
 
 	PHY_SetRFPathSwitch(pAdapter, bMain);
@@ -797,7 +797,7 @@ u8 MP_PHY_QueryRFPathSwitch(PADAPTER pAdapter)
 	return PHY_QueryRFPathSwitch(pAdapter);
 }
 
-s32 SetThermalMeter(PADAPTER pAdapter, u8 target_ther)
+int SetThermalMeter(PADAPTER pAdapter, u8 target_ther)
 {
 	return hal_mpt_SetThermalMeter(pAdapter, target_ther);
 }
@@ -998,7 +998,7 @@ void SetPacketTx(PADAPTER padapter)
 	u32 pkt_size, offset, startPlace, i;
 	struct rtw_ieee80211_hdr *hdr;
 	u8 payload;
-	s32 bmcast;
+	int bmcast;
 	struct pkt_attrib *pattrib;
 	struct mp_priv *pmp_priv;
 

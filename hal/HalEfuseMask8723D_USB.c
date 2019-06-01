@@ -62,7 +62,7 @@ EFUSE_GetMaskArray_MP_8723D_MUSB(
 	for (i = 0; i < len; ++i)
 		Array[i] = Array_MP_8723D_MUSB[i];
 }
-BOOLEAN
+bool
 EFUSE_IsAddressMasked_MP_8723D_MUSB(
 	u16  Offset
 )

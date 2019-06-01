@@ -495,7 +495,7 @@ static void hal_load_pg_txpwr_info(
 	TxPowerInfo24G *pwr_info_2g,
 	TxPowerInfo5G *pwr_info_5g,
 	u8 *pg_data,
-	BOOLEAN AutoLoadFail
+	bool AutoLoadFail
 )
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
@@ -847,7 +847,7 @@ phy_SetTxPowerByRateBase(
 		pHalData->TxPwrByRateBase5G[RfPath][RateSection - 1] = Value;
 }
 
-static inline BOOLEAN phy_is_txpwr_by_rate_undefined_of_band_path(_adapter *adapter, u8 band, u8 path)
+static inline bool phy_is_txpwr_by_rate_undefined_of_band_path(_adapter *adapter, u8 band, u8 path)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
@@ -1023,7 +1023,7 @@ PHY_GetRateValuesOfTxPowerByRate(
 		*RateNum = 4;
 		break;
 
-	case rTxAGC_A_CCK1_Mcs32:
+	case rTxAGC_A_CCK1_Mcint:
 		Rate[0] = MGN_1M;
 		PwrByRateVal[0] = (s8)((((Value >> (8 + 4)) & 0xF)) * 10 +
 				       ((Value >> 8) & 0xF));
@@ -1101,7 +1101,7 @@ PHY_GetRateValuesOfTxPowerByRate(
 
 		break;
 
-	case rTxAGC_B_CCK1_55_Mcs32:
+	case rTxAGC_B_CCK1_55_Mcint:
 		Rate[0] = MGN_1M;
 		Rate[1] = MGN_2M;
 		Rate[2] = MGN_5_5M;
@@ -1569,14 +1569,14 @@ exit:
 	return;
 }
 
-static BOOLEAN
+static bool
 phy_GetChnlIndex(
 	u8	Channel,
 	u8	*ChannelIdx
 )
 {
 	u8  i = 0;
-	BOOLEAN bIn24G = true;
+	bool bIn24G = true;
 
 	if (Channel <= 14) {
 		bIn24G = true;
@@ -1603,7 +1603,7 @@ PHY_GetTxPowerIndexBase(
 	u8 ntx_idx,
 	enum channel_width	BandWidth,
 	u8				Channel,
-	PBOOLEAN		bIn24G
+	bool *bIn24G
 )
 {
 	PHAL_DATA_TYPE		pHalData = GET_HAL_DATA(pAdapter);
@@ -2067,7 +2067,7 @@ phy_set_tx_power_level_by_path(
 )
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
-	BOOLEAN bIsIn24G = (pHalData->current_band_type == BAND_ON_2_4G);
+	bool bIsIn24G = (pHalData->current_band_type == BAND_ON_2_4G);
 
 	/* if ( pMgntInfo->RegNByteAccess == 0 ) */
 	{
@@ -2281,7 +2281,7 @@ PHY_GetTxPowerLimit(_adapter *adapter
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
 	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
-	BOOLEAN no_sc = false;
+	bool no_sc = false;
 	s8 tlrs = -1, rs = -1;
 	s8 lmt = MAX_POWER_INDEX;
 	u8 tmp_cch = 0;
@@ -2437,7 +2437,7 @@ static void phy_txpwr_lmt_post_hdl(_adapter *adapter)
 	_exit_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
 }
 
-BOOLEAN
+bool
 GetS1ByteIntegerFromStringInDecimal(
 		char	*str,
 	s8		*val
@@ -3175,7 +3175,7 @@ phy_ParseBBPgParaFile(
 	char	*szLine, *ptmp;
 	u32	u4bRegOffset, u4bRegMask, u4bRegValue;
 	u32	u4bMove;
-	BOOLEAN firstLine = true;
+	bool firstLine = true;
 	u8	tx_num = 0;
 	u8	band = 0, rf_path = 0;
 

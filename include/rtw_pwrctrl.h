@@ -303,7 +303,7 @@ struct pwrctrl_priv {
 	u8	org_power_mgnt;
 	u8	bFwCurrentInPSMode;
 	systime	DelayLPSLastTimeStamp;
-	s32		pnp_current_pwr_state;
+	int		pnp_current_pwr_state;
 	u8		pnp_bstop_trx;
 
 	#ifdef CONFIG_AUTOSUSPEND
@@ -386,7 +386,7 @@ rt_rf_power_state RfOnOffDetect(IN	PADAPTER pAdapter);
 
 int rtw_fw_ps_state(PADAPTER padapter);
 
-s32 LPS_RF_ON_check(PADAPTER padapter, u32 delay_ms);
+int LPS_RF_ON_check(PADAPTER padapter, u32 delay_ms);
 void LPS_Enter(PADAPTER padapter, const char *msg);
 void LPS_Leave(PADAPTER padapter, const char *msg);
 void traffic_check_for_leave_lps(PADAPTER padapter, u8 tx, u32 tx_packets);

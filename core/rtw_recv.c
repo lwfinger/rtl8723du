@@ -3152,11 +3152,11 @@ exit:
 }
 
 
-s32 rtw_recv_entry(union recv_frame *precvframe)
+int rtw_recv_entry(union recv_frame *precvframe)
 {
 	_adapter *padapter;
 	struct recv_priv *precvpriv;
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 
 
 
@@ -3525,9 +3525,9 @@ u8 adapter_allow_bmc_data_rx(_adapter *adapter)
 	return 1;
 }
 
-s32 pre_recv_entry(union recv_frame *precvframe, u8 *pphy_status)
+int pre_recv_entry(union recv_frame *precvframe, u8 *pphy_status)
 {
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 	u8 *pbuf = precvframe->u.hdr.rx_data;
 	u8 *pda = get_ra(pbuf);
 	u8 ra_is_bmc = IS_MCAST(pda);

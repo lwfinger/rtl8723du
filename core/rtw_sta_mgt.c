@@ -212,7 +212,7 @@ u32	_rtw_init_sta_priv(struct	sta_priv *pstapriv)
 	_adapter *adapter = container_of(pstapriv, _adapter, stapriv);
 	struct macid_ctl_t *macid_ctl = adapter_to_macidctl(adapter);
 	struct sta_info *psta;
-	s32 i;
+	int i;
 	u32 ret = _FAIL;
 	u16 sz = 0;
 
@@ -468,7 +468,7 @@ static void rtw_init_recv_timer(struct recv_reorder_ctrl *preorder_ctrl)
 struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 {
 	_irqL irqL, irqL2;
-	s32	index;
+	int	index;
 	_list	*phash_list;
 	struct sta_info	*psta;
 	_queue *pfree_sta_queue;
@@ -772,7 +772,7 @@ void rtw_free_all_stainfo(_adapter *padapter)
 {
 	_irqL	 irqL;
 	_list	*plist, *phead;
-	s32	index;
+	int	index;
 	struct sta_info *psta = NULL;
 	struct	sta_priv *pstapriv = &padapter->stapriv;
 	struct sta_info *pbcmc_stainfo = rtw_get_bcmc_stainfo(padapter);

@@ -17,7 +17,7 @@
 static void
 _FWDownloadEnable(
 	PADAPTER		padapter,
-	BOOLEAN			enable
+	bool			enable
 )
 {
 	u8	tmp, count = 0;
@@ -225,9 +225,9 @@ void _8051Reset8723(PADAPTER padapter)
 	RTW_INFO("%s: Finish\n", __FUNCTION__);
 }
 
-static s32 polling_fwdl_chksum(_adapter *adapter, u32 min_cnt, u32 timeout_ms)
+static int polling_fwdl_chksum(_adapter *adapter, u32 min_cnt, u32 timeout_ms)
 {
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 	u32 value32;
 	systime start = rtw_get_current_time();
 	u32 cnt = 0;
@@ -256,9 +256,9 @@ exit:
 	return ret;
 }
 
-static s32 _FWFreeToGo(_adapter *adapter, u32 min_cnt, u32 timeout_ms)
+static int _FWFreeToGo(_adapter *adapter, u32 min_cnt, u32 timeout_ms)
 {
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 	u32	value32;
 	systime start = rtw_get_current_time();
 	u32 cnt = 0;
@@ -533,7 +533,7 @@ SetFwBTPwrCmd(
 static int
 _CheckWLANFwPatchBTFwReady(
 	PADAPTER Adapter,
-	BOOLEAN bRecover
+	bool bRecover
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
@@ -678,14 +678,14 @@ static int ReservedPage_Compare(PADAPTER Adapter, struct rt_mp_firmware *pFirmwa
  * 32 bytes description of part4. Using this method, we can put the whole bt firmware to 0x30 and only
  * has 32 bytes descrption at the head of part 1.
 */
-s32 FirmwareDownloadBT(PADAPTER padapter, struct rt_mp_firmware *pFirmware)
+int FirmwareDownloadBT(PADAPTER padapter, struct rt_mp_firmware *pFirmware)
 {
-	s32 rtStatus;
+	int rtStatus;
 	u8 *pBTFirmwareBuf;
 	u32 BTFirmwareLen;
 	u8 download_time;
 	s8 i;
-	BOOLEAN bRecover = false;
+	bool bRecover = false;
 	u8 RegFwHwTxQCtrl;
 
 	rtStatus = _SUCCESS;
@@ -701,9 +701,9 @@ s32 FirmwareDownloadBT(PADAPTER padapter, struct rt_mp_firmware *pFirmware)
  *		Download 8192C firmware code.
  *
  *   */
-s32 rtl8723d_FirmwareDownload(PADAPTER padapter, BOOLEAN  bUsedWoWLANFw)
+int rtl8723d_FirmwareDownload(PADAPTER padapter, bool  bUsedWoWLANFw)
 {
-	s32	rtStatus = _SUCCESS;
+	int	rtStatus = _SUCCESS;
 	u8 write_fw = 0;
 	systime fwdl_start_time;
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(padapter);
@@ -1032,13 +1032,8 @@ hal_EfuseSwitchToBank(
 	return bRet;
 }
 
-static void
-Hal_GetEfuseDefinition(
-	PADAPTER	padapter,
-	u8			efuseType,
-	u8			type,
-	void		*pOut,
-	u8			bPseudoTest)
+static void Hal_GetEfuseDefinition(PADAPTER padapter, u8 efuseType, u8 type,
+				   void *pOut, bool bPseudoTest)
 {
 	switch (type) {
 	case TYPE_EFUSE_MAX_SECTION: {
@@ -1235,13 +1230,8 @@ Hal_EfusePowerSwitch(
 	}
 }
 
-static void
-hal_ReadEFuse_WiFi(
-	PADAPTER	padapter,
-	u16			_offset,
-	u16			_size_byte,
-	u8			*pbuf,
-	u8			bPseudoTest)
+static void hal_ReadEFuse_WiFi(PADAPTER padapter, u16 _offset, u16 _size_byte,
+			       u8 *pbuf, bool bPseudoTest)
 {
 #ifdef HAL_EFUSE_MEMORY
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(padapter);
@@ -1358,14 +1348,8 @@ hal_ReadEFuse_WiFi(
 		rtw_mfree(efuseTbl, EFUSE_MAX_MAP_LEN);
 }
 
-static void
-hal_ReadEFuse_BT(
-	PADAPTER	padapter,
-	u16			_offset,
-	u16			_size_byte,
-	u8			*pbuf,
-	u8			bPseudoTest
-)
+static void hal_ReadEFuse_BT(PADAPTER padapter, u16 _offset, u16 _size_byte,
+			     u8 *pbuf, bool bPseudoTest)
 {
 #ifdef HAL_EFUSE_MEMORY
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(padapter);
@@ -1498,14 +1482,8 @@ exit:
 		rtw_mfree(efuseTbl, EFUSE_BT_MAP_LEN);
 }
 
-static void
-Hal_ReadEFuse(
-	PADAPTER	padapter,
-	u8			efuseType,
-	u16			_offset,
-	u16			_size_byte,
-	u8			*pbuf,
-	u8			bPseudoTest)
+static void Hal_ReadEFuse(PADAPTER padapter, u8 efuseType, u16 _offset,
+			  u16 _size_byte, u8 *pbuf, bool bPseudoTest)
 {
 	if (efuseType == EFUSE_WIFI)
 		hal_ReadEFuse_WiFi(padapter, _offset, _size_byte, pbuf, bPseudoTest);
@@ -1513,10 +1491,7 @@ Hal_ReadEFuse(
 		hal_ReadEFuse_BT(padapter, _offset, _size_byte, pbuf, bPseudoTest);
 }
 
-static u16
-hal_EfuseGetCurrentSize_WiFi(
-	PADAPTER	padapter,
-	u8			bPseudoTest)
+static u16 hal_EfuseGetCurrentSize_WiFi(PADAPTER padapter, bool bPseudoTest)
 {
 #ifdef HAL_EFUSE_MEMORY
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(padapter);
@@ -1702,21 +1677,16 @@ hal_EfuseGetCurrentSize_BT(
 	retU2 = ((bank - 1) * EFUSE_BT_REAL_BANK_CONTENT_LEN) + efuse_addr;
 	if (bPseudoTest) {
 		pEfuseHal->fakeBTEfuseUsedBytes = retU2;
-		/* RT_DISP(FEEPROM, EFUSE_PG, ("Hal_EfuseGetCurrentSize_BT92C(), already use %u bytes\n", pEfuseHal->fakeBTEfuseUsedBytes)); */
 	} else {
 		pEfuseHal->BTEfuseUsedBytes = retU2;
-		/* RT_DISP(FEEPROM, EFUSE_PG, ("Hal_EfuseGetCurrentSize_BT92C(), already use %u bytes\n", pEfuseHal->BTEfuseUsedBytes)); */
 	}
 
 	RTW_INFO("%s: CurrentSize=%d\n", __FUNCTION__, retU2);
 	return retU2;
 }
 
-static u16
-Hal_EfuseGetCurrentSize(
-	PADAPTER	pAdapter,
-	u8			efuseType,
-	u8			bPseudoTest)
+static u16 Hal_EfuseGetCurrentSize(PADAPTER pAdapter, u8 efuseType,
+				   bool bPseudoTest)
 {
 	u16	ret = 0;
 
@@ -1734,7 +1704,7 @@ Hal_EfuseWordEnableDataWrite(
 	u16			efuse_addr,
 	u8			word_en,
 	u8			*data,
-	u8			bPseudoTest)
+	bool			bPseudoTest)
 {
 	u16	tmpaddr = 0;
 	u16	start_addr = efuse_addr;
@@ -1789,12 +1759,10 @@ Hal_EfuseWordEnableDataWrite(
 	return badworden;
 }
 
-static s32
-Hal_EfusePgPacketRead(
-	PADAPTER	padapter,
+static bool Hal_EfusePgPacketRead(PADAPTER	padapter,
 	u8			offset,
 	u8			*data,
-	u8			bPseudoTest)
+	bool			bPseudoTest)
 {
 	u8	bDataEmpty = true;
 	u8	efuse_data, word_cnts = 0;
@@ -1802,7 +1770,7 @@ Hal_EfusePgPacketRead(
 	u8	hoffset = 0, hworden = 0;
 	u8	i;
 	u8	max_section = 0;
-	s32	ret;
+	bool	ret;
 
 
 	if (data == NULL)
@@ -1870,7 +1838,7 @@ Hal_EfusePgPacketRead(
 	return ret;
 }
 
-static u8
+static bool
 hal_EfusePgCheckAvailableAddr(
 	PADAPTER	pAdapter,
 	u8			efuseType,
@@ -1969,7 +1937,7 @@ hal_EfusePartialWriteCheck(
 	return bRet;
 }
 
-static u8
+static bool
 hal_EfusePgPacketWrite1ByteHeader(
 	PADAPTER		pAdapter,
 	u8				efuseType,
@@ -2007,7 +1975,7 @@ hal_EfusePgPacketWrite1ByteHeader(
 	return true;
 }
 
-static u8
+static bool
 hal_EfusePgPacketWrite2ByteHeader(
 	PADAPTER		padapter,
 	u8				efuseType,
@@ -2091,7 +2059,7 @@ hal_EfusePgPacketWriteHeader(
 	return bRet;
 }
 
-static u8
+static bool
 hal_EfusePgPacketWriteData(
 	PADAPTER		pAdapter,
 	u8				efuseType,
@@ -2114,13 +2082,11 @@ hal_EfusePgPacketWriteData(
 	return true;
 }
 
-static s32
-Hal_EfusePgPacketWrite(
-	PADAPTER	padapter,
+static bool Hal_EfusePgPacketWrite(PADAPTER padapter,
 	u8			offset,
 	u8			word_en,
 	u8			*pData,
-	u8			bPseudoTest)
+	bool			bPseudoTest)
 {
 	PGPKT_STRUCT targetPkt;
 	u16 startAddr = 0;
@@ -2143,13 +2109,13 @@ Hal_EfusePgPacketWrite(
 	return true;
 }
 
-static u8
+static bool
 Hal_EfusePgPacketWrite_BT(
 	PADAPTER	pAdapter,
 	u8			offset,
 	u8			word_en,
 	u8			*pData,
-	u8			bPseudoTest)
+	bool			bPseudoTest)
 {
 	PGPKT_STRUCT targetPkt;
 	u16 startAddr = 0;
@@ -2610,12 +2576,12 @@ u8 GetEEPROMSize8723D(PADAPTER padapter)
  * LLT R/W/Init function
  *
  * ------------------------------------------------------------------------- */
-s32 rtl8723d_InitLLTTable(PADAPTER padapter)
+int rtl8723d_InitLLTTable(PADAPTER padapter)
 {
 	systime start;
 	u32 passing_time;
 	u32 val32;
-	s32 ret;
+	int ret;
 
 
 	ret = _FAIL;
@@ -2718,7 +2684,7 @@ static void _DisableRFAFEAndResetBB(PADAPTER padapter)
 	_DisableRFAFEAndResetBB8723D(padapter);
 }
 
-static void _ResetDigitalProcedure1_8723D(PADAPTER padapter, BOOLEAN bWithoutHWSM)
+static void _ResetDigitalProcedure1_8723D(PADAPTER padapter, bool bWithoutHWSM)
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
 
@@ -2815,7 +2781,7 @@ static void _ResetDigitalProcedure1_8723D(PADAPTER padapter, BOOLEAN bWithoutHWS
 
 }
 
-static void _ResetDigitalProcedure1(PADAPTER padapter, BOOLEAN bWithoutHWSM)
+static void _ResetDigitalProcedure1(PADAPTER padapter, bool bWithoutHWSM)
 {
 	_ResetDigitalProcedure1_8723D(padapter, bWithoutHWSM);
 }
@@ -2834,7 +2800,7 @@ static void _ResetDigitalProcedure2(PADAPTER padapter)
 	rtw_write8(padapter, REG_SYS_ISO_CTRL + 1, 0x82); /* modify to 0x82 by Scott. */
 }
 
-static void _DisableAnalog(PADAPTER padapter, BOOLEAN bWithoutHWSM)
+static void _DisableAnalog(PADAPTER padapter, bool bWithoutHWSM)
 {
 	HAL_DATA_TYPE	*pHalData	= GET_HAL_DATA(padapter);
 	u16 value16 = 0;
@@ -2878,7 +2844,7 @@ static void _DisableAnalog(PADAPTER padapter, BOOLEAN bWithoutHWSM)
 }
 
 /* HW Auto state machine */
-s32 CardDisableHWSM(PADAPTER padapter, u8 resetMCU)
+int CardDisableHWSM(PADAPTER padapter, u8 resetMCU)
 {
 	int rtStatus = _SUCCESS;
 
@@ -2903,9 +2869,9 @@ s32 CardDisableHWSM(PADAPTER padapter, u8 resetMCU)
 }
 
 /* without HW Auto state machine */
-s32 CardDisableWithoutHWSM(PADAPTER padapter)
+int CardDisableWithoutHWSM(PADAPTER padapter)
 {
-	s32 rtStatus = _SUCCESS;
+	int rtStatus = _SUCCESS;
 
 
 	if (RTW_CANNOT_RUN(padapter))
@@ -3020,7 +2986,7 @@ void
 Hal_EfuseParseTxPowerInfo_8723D(
 	PADAPTER		padapter,
 	u8			*PROMContent,
-	BOOLEAN			AutoLoadFail
+	bool			AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
@@ -3041,7 +3007,7 @@ void
 Hal_EfuseParseBoardType_8723D(
 	PADAPTER	Adapter,
 	u8			*PROMContent,
-	BOOLEAN		AutoloadFail
+	bool		AutoloadFail
 )
 {
 
@@ -3061,7 +3027,7 @@ void
 Hal_EfuseParseBTCoexistInfo_8723D(
 	PADAPTER padapter,
 	u8 *hwinfo,
-	BOOLEAN AutoLoadFail
+	bool AutoLoadFail
 )
 {
 	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(padapter);
@@ -3131,7 +3097,7 @@ void
 Hal_EfuseParseEEPROMVer_8723D(
 	PADAPTER		padapter,
 	u8			*hwinfo,
-	BOOLEAN			AutoLoadFail
+	bool			AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
@@ -3147,7 +3113,7 @@ void
 Hal_EfuseParsePackageType_8723D(
 	PADAPTER		pAdapter,
 	u8				*hwinfo,
-	BOOLEAN		AutoLoadFail
+	bool		AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
@@ -3186,7 +3152,7 @@ void
 Hal_EfuseParseVoltage_8723D(
 	PADAPTER		pAdapter,
 	u8			*hwinfo,
-	BOOLEAN	AutoLoadFail
+	bool	AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
@@ -3201,7 +3167,7 @@ void
 Hal_EfuseParseChnlPlan_8723D(
 	PADAPTER		padapter,
 	u8			*hwinfo,
-	BOOLEAN			AutoLoadFail
+	bool			AutoLoadFail
 )
 {
 	hal_com_config_channel_plan(
@@ -3219,7 +3185,7 @@ void
 Hal_EfuseParseCustomerID_8723D(
 	PADAPTER		padapter,
 	u8			*hwinfo,
-	BOOLEAN			AutoLoadFail
+	bool			AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
@@ -3234,7 +3200,7 @@ void
 Hal_EfuseParseAntennaDiversity_8723D(
 	PADAPTER		pAdapter,
 	u8				*hwinfo,
-	BOOLEAN			AutoLoadFail
+	bool			AutoLoadFail
 )
 {
 }
@@ -3243,7 +3209,7 @@ void
 Hal_EfuseParseXtal_8723D(
 	PADAPTER		pAdapter,
 	u8			*hwinfo,
-	BOOLEAN		AutoLoadFail
+	bool		AutoLoadFail
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
@@ -3257,12 +3223,8 @@ Hal_EfuseParseXtal_8723D(
 }
 
 
-void
-Hal_EfuseParseThermalMeter_8723D(
-	PADAPTER	padapter,
-	u8			*PROMContent,
-	u8			AutoLoadFail
-)
+void Hal_EfuseParseThermalMeter_8723D(PADAPTER padapter, u8 *PROMContent,
+				      bool AutoLoadFail)
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(padapter);
 
@@ -3278,14 +3240,12 @@ Hal_EfuseParseThermalMeter_8723D(
 		pHalData->odmpriv.rf_calibrate_info.is_apk_thermal_meter_ignore = true;
 		pHalData->eeprom_thermal_meter = EEPROM_Default_ThermalMeter_8723D;
 	}
-
 }
-
 
 void Hal_ReadRFGainOffset(
 		PADAPTER		Adapter,
 		u8			*PROMContent,
-		BOOLEAN		AutoloadFail)
+		bool		AutoloadFail)
 {
 #ifdef CONFIG_RF_POWER_TRIM
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
@@ -3497,7 +3457,7 @@ static void rtl8723d_fill_default_txdesc(
 	struct mlme_ext_priv *pmlmeext;
 	struct mlme_ext_info *pmlmeinfo;
 	struct pkt_attrib *pattrib;
-	s32 bmcst;
+	int bmcst;
 
 	_rtw_memset(pbuf, 0, TXDESC_SIZE);
 
@@ -4068,9 +4028,9 @@ void CCX_FwC2HTxRpt_8723d(PADAPTER padapter, u8 *pdata, u8 len)
 #endif
 }
 
-static s32 c2h_handler_8723d(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
+static int c2h_handler_8723d(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 {
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 
 	switch (id) {
 	case C2H_CCX_TX_RPT:

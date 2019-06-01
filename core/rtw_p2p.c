@@ -4197,7 +4197,7 @@ void rtw_init_cfg80211_wifidirect_info(_adapter	*padapter)
 }
 #endif /* CONFIG_IOCTL_CFG80211	 */
 
-s32 p2p_protocol_wk_hdl(_adapter *padapter, int intCmdType, u8 *buf)
+int p2p_protocol_wk_hdl(_adapter *padapter, int intCmdType, u8 *buf)
 {
 	int ret = H2C_SUCCESS;
 	struct wifidirect_info	*pwdinfo = &(padapter->wdinfo);

@@ -336,13 +336,13 @@ static inline void SET_8723D_H2CCMD_BT_FW_PATCH_ADDR3(u8 *__pH2CCmd, u8 __Value)
 /* host message to firmware cmd */
 void rtl8723d_set_FwPwrMode_cmd(PADAPTER padapter, u8 Mode);
 void rtl8723d_set_FwJoinBssRpt_cmd(PADAPTER padapter, u8 mstatus);
-/* s32 rtl8723d_set_lowpwr_lps_cmd(PADAPTER padapter, u8 enable); */
+/* int rtl8723d_set_lowpwr_lps_cmd(PADAPTER padapter, u8 enable); */
 void rtl8723d_set_FwPsTuneParam_cmd(PADAPTER padapter);
 void rtl8723d_download_rsvd_page(PADAPTER padapter, u8 mstatus);
 void rtl8723d_download_BTCoex_AP_mode_rsvd_page(PADAPTER padapter);
 void rtl8723d_set_p2p_ps_offload_cmd(PADAPTER padapter, u8 p2p_ps_state);
 
-s32 FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer);
+int FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer);
 u8 GetTxBufferRsvdPageNum8723D(_adapter *padapter, bool wowlan);
 
 #endif

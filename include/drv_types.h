@@ -221,7 +221,7 @@ struct registry_priv {
 	u8	bt_ampdu;
 	u8	ant_num;
 	u8	single_ant_path;
-	BOOLEAN	bAcceptAddbaReq;
+	bool	bAcceptAddbaReq;
 
 	u8	antdiv_cfg;
 	u8	antdiv_type;
@@ -285,7 +285,7 @@ struct registry_priv {
 	s8 adaptivity_th_edcca_hl_diff;
 
 	u8 boffefusemask;
-	BOOLEAN bFileMaskEfuse;
+	bool bFileMaskEfuse;
 
 	u32	reg_rxgain_offset_2g;
 	u32	reg_rxgain_offset_5gl;
@@ -759,7 +759,7 @@ struct dvobj_priv {
 	ATOMIC_T	bSurpriseRemoved;
 	ATOMIC_T	bDriverStopped;
 
-	s32	processing_dev_remove;
+	int	processing_dev_remove;
 
 	struct debug_priv drv_dbg;
 

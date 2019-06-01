@@ -294,7 +294,7 @@ static int rtw_mlcst2unicst(_adapter *padapter, struct sk_buff *skb)
 	u8 null_addr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 	int i;
-	s32	res;
+	int	res;
 
 	DBG_COUNTER(padapter->tx_logs.os_tx_m2u);
 
@@ -361,7 +361,7 @@ int _rtw_xmit_entry(_pkt *pkt, _nic_hdl pnetdev)
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(pnetdev);
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
-	s32 res = 0;
+	int res = 0;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
 	u16 queue;
 #endif

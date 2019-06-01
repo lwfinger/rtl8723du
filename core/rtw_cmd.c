@@ -3253,7 +3253,7 @@ exit:
 }
 
 #ifdef CONFIG_MP_INCLUDED
-static s32 rtw_mp_cmd_hdl(_adapter *padapter, u8 mp_cmd_id)
+static int rtw_mp_cmd_hdl(_adapter *padapter, u8 mp_cmd_id)
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
 	int ret = H2C_SUCCESS;
@@ -3385,7 +3385,7 @@ exit:
 #endif	/*CONFIG_MP_INCLUDED*/
 
 #ifdef CONFIG_RTW_CUSTOMER_STR
-static s32 rtw_customer_str_cmd_hdl(_adapter *adapter, u8 write, const u8 *cstr)
+static int rtw_customer_str_cmd_hdl(_adapter *adapter, u8 write, const u8 *cstr)
 {
 	int ret = H2C_SUCCESS;
 
@@ -3533,7 +3533,7 @@ u8 rtw_run_in_thread_cmd(PADAPTER padapter, void (*func)(void *), void *context)
 	struct cmd_priv *pcmdpriv;
 	struct cmd_obj *ph2c;
 	struct RunInThread_param *parm;
-	s32 res = _SUCCESS;
+	int res = _SUCCESS;
 
 
 	pcmdpriv = &padapter->cmdpriv;
@@ -3563,9 +3563,9 @@ exit:
 }
 
 #ifdef CONFIG_FW_C2H_REG
-s32 c2h_evt_hdl(_adapter *adapter, u8 *c2h_evt, c2h_id_filter filter)
+int c2h_evt_hdl(_adapter *adapter, u8 *c2h_evt, c2h_id_filter filter)
 {
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 	u8 buf[C2H_REG_LEN] = {0};
 	u8 id, seq, plen;
 	u8 *payload;

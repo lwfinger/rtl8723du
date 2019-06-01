@@ -216,8 +216,8 @@ extern u32	rtw_end_of_queue_search(_list *queue, _list *pelement);
 extern systime _rtw_get_current_time(void);
 extern u32	_rtw_systime_to_ms(systime stime);
 extern systime _rtw_ms_to_systime(u32 ms);
-extern s32	_rtw_get_passing_time_ms(systime start);
-extern s32	_rtw_get_time_interval_ms(systime start, systime end);
+extern int	_rtw_get_passing_time_ms(systime start);
+extern int	_rtw_get_time_interval_ms(systime start, systime end);
 
 #ifdef DBG_SYSTIME
 #define rtw_get_current_time() ({systime __stime = _rtw_get_current_time(); __stime;})
@@ -555,12 +555,12 @@ u8 map_read8(const struct map_t *map, u16 offset);
 
 /* String handler */
 
-BOOLEAN is_null(char c);
-BOOLEAN is_all_null(char *c, int len);
-BOOLEAN is_eol(char c);
-BOOLEAN is_space(char c);
-BOOLEAN IsHexDigit(char chTmp);
-BOOLEAN is_alpha(char chTmp);
+bool is_null(char c);
+bool is_all_null(char *c, int len);
+bool is_eol(char c);
+bool is_space(char c);
+bool IsHexDigit(char chTmp);
+bool is_alpha(char chTmp);
 char alpha_to_upper(char c);
 
 int hex2num_i(char c);

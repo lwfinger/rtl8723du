@@ -212,15 +212,15 @@ struct btc_board_info {
 	u8				btdm_ant_num_by_ant_det;	/* ant number for btdm after antenna detection */
 	u8				btdm_ant_pos;		/* Bryant Add to indicate Antenna Position for (pg_ant_num = 2) && (btdm_ant_num =1)  (DPDT+1Ant case) */
 	u8				single_ant_path;	/* current used for 8723b only, 1=>s0,  0=>s1 */
-	boolean			tfbga_package;    /* for Antenna detect threshold */
-	boolean			btdm_ant_det_finish;
-	boolean			btdm_ant_det_already_init_phydm;
+	bool			tfbga_package;    /* for Antenna detect threshold */
+	bool			btdm_ant_det_finish;
+	bool			btdm_ant_det_already_init_phydm;
 	u8				ant_type;
 	u8				rfe_type;
 	u8				ant_div_cfg;
-	boolean			btdm_ant_det_complete_fail;
+	bool			btdm_ant_det_complete_fail;
 	u8				ant_det_result;
-	boolean			ant_det_result_five_complete;
+	bool			ant_det_result_five_complete;
 	u32				antdetval;
 	u8				customerID;
 };
@@ -336,7 +336,7 @@ typedef enum _BTC_VENDOR {
 
 /* defined for BFP_BTC_GET */
 typedef enum _BTC_GET_TYPE {
-	/* type BOOLEAN */
+	/* type bool */
 	BTC_GET_BL_HS_OPERATION,
 	BTC_GET_BL_HS_CONNECTING,
 	BTC_GET_BL_WIFI_FW_READY,
@@ -356,7 +356,7 @@ typedef enum _BTC_GET_TYPE {
 	BTC_GET_BL_IS_ASUS_8723B,
 	BTC_GET_BL_RF4CE_CONNECTED,
 
-	/* type s32 */
+	/* type int */
 	BTC_GET_S4_WIFI_RSSI,
 	BTC_GET_S4_HS_RSSI,
 
@@ -396,7 +396,7 @@ typedef enum _BTC_GET_TYPE {
 
 /* defined for BFP_BTC_SET */
 typedef enum _BTC_SET_TYPE {
-	/* type BOOLEAN */
+	/* type bool */
 	BTC_SET_BL_BT_DISABLE,
 	BTC_SET_BL_BT_ENABLE_DISABLE_CHANGE,
 	BTC_SET_BL_BT_TRAFFIC_BUSY,
@@ -417,7 +417,7 @@ typedef enum _BTC_SET_TYPE {
 	BTC_SET_ACT_AGGREGATE_CTRL,
 	BTC_SET_ACT_ANTPOSREGRISTRY_CTRL,
 	/*===== for 1Ant ======*/
-	/* type BOOLEAN */
+	/* type bool */
 
 	/* type u8 */
 	BTC_SET_U1_RSSI_ADJ_VAL_FOR_1ANT_COEX_TYPE,
@@ -699,14 +699,14 @@ typedef void
 	u8 *			pCmdBuffer
 	);
 
-typedef	BOOLEAN
+typedef	u8
 (*BFP_BTC_GET)(
 	void *			pBtCoexist,
 	u8			getType,
 	void *			pOutBuf
 	);
 
-typedef	BOOLEAN
+typedef	u8
 (*BFP_BTC_SET)(
 	void *			pBtCoexist,
 	u8			setType,
@@ -719,14 +719,14 @@ typedef u16
 	u32			offset,
 	u32			value
 	);
-typedef BOOLEAN
+typedef bool
 (*BFP_BTC_SET_BT_ANT_DETECTION)(
 	void *			pBtcContext,
 	u8			txTime,
 	u8			btChnl
 	);
 
-typedef BOOLEAN
+typedef bool
 (*BFP_BTC_SET_BT_TRX_MASK)(
 	void *			pBtcContext,
 	u8			bt_trx_mask
@@ -804,7 +804,7 @@ typedef u32
 	u8			scanType
 	);
 
-typedef BOOLEAN
+typedef u8
 (*BFP_BTC_GET_BT_AFH_MAP_FROM_BT)(
 	void *			pBtcContext,
 	u8			mapType,
@@ -812,65 +812,65 @@ typedef BOOLEAN
 	);
 
 struct  btc_bt_info {
-	boolean					bt_disabled;
-	boolean				bt_enable_disable_change;
+	bool					bt_disabled;
+	bool				bt_enable_disable_change;
 	u8					rssi_adjust_for_agc_table_on;
 	u8					rssi_adjust_for_1ant_coex_type;
-	boolean					pre_bt_ctrl_agg_buf_size;
-	boolean					bt_ctrl_agg_buf_size;
-	boolean					pre_reject_agg_pkt;
-	boolean					reject_agg_pkt;
-	boolean					increase_scan_dev_num;
-	boolean					bt_tx_rx_mask;
+	bool					pre_bt_ctrl_agg_buf_size;
+	bool					bt_ctrl_agg_buf_size;
+	bool					pre_reject_agg_pkt;
+	bool					reject_agg_pkt;
+	bool					increase_scan_dev_num;
+	bool					bt_tx_rx_mask;
 	u8					pre_agg_buf_size;
 	u8					agg_buf_size;
-	boolean					bt_busy;
-	boolean					limited_dig;
+	bool					bt_busy;
+	bool					limited_dig;
 	u16					bt_hci_ver;
 	u16					bt_real_fw_ver;
 	u8					bt_fw_ver;
 	u32					get_bt_fw_ver_cnt;
 	u32					bt_get_fw_ver;
-	boolean					miracast_plus_bt;
+	bool					miracast_plus_bt;
 
-	boolean					bt_disable_low_pwr;
+	bool					bt_disable_low_pwr;
 
-	boolean					bt_ctrl_lps;
-	boolean					bt_lps_on;
-	boolean					force_to_roam;	/* for 1Ant solution */
+	bool					bt_ctrl_lps;
+	bool					bt_lps_on;
+	bool					force_to_roam;	/* for 1Ant solution */
 	u8					lps_val;
 	u8					rpwm_val;
 	u32					ra_mask;
 };
 
 struct btc_stack_info {
-	boolean					profile_notified;
+	bool					profile_notified;
 	u16					hci_version;	/* stack hci version */
 	u8					num_of_link;
-	boolean					bt_link_exist;
-	boolean					sco_exist;
-	boolean					acl_exist;
-	boolean					a2dp_exist;
-	boolean					hid_exist;
+	bool					bt_link_exist;
+	bool					sco_exist;
+	bool					acl_exist;
+	bool					a2dp_exist;
+	bool					hid_exist;
 	u8					num_of_hid;
-	boolean					pan_exist;
-	boolean					unknown_acl_exist;
+	bool					pan_exist;
+	bool					unknown_acl_exist;
 	s8					min_bt_rssi;
 };
 
 struct btc_bt_link_info {
-	boolean					bt_link_exist;
-	boolean					bt_hi_pri_link_exist;
-	boolean					sco_exist;
-	boolean					sco_only;
-	boolean					a2dp_exist;
-	boolean					a2dp_only;
-	boolean					hid_exist;
-	boolean					hid_only;
-	boolean					pan_exist;
-	boolean					pan_only;
-	boolean					slave_role;
-	boolean					acl_busy;
+	bool					bt_link_exist;
+	bool					bt_hi_pri_link_exist;
+	bool					sco_exist;
+	bool					sco_only;
+	bool					a2dp_exist;
+	bool					a2dp_only;
+	bool					hid_exist;
+	bool					hid_only;
+	bool					pan_exist;
+	bool					pan_only;
+	bool					slave_role;
+	bool					acl_busy;
 };
 
 struct btc_statistics {
@@ -895,7 +895,7 @@ struct btc_statistics {
 };
 
 struct btc_coexist {
-	BOOLEAN				bBinded;		/*make sure only one adapter can bind the data context*/
+	bool				bBinded;		/*make sure only one adapter can bind the data context*/
 	void *				Adapter;		/*default adapter*/
 	struct  btc_board_info		board_info;
 	struct  btc_bt_info			bt_info;		/*some bt info referenced by non-bt module*/
@@ -904,10 +904,10 @@ struct btc_coexist {
 	BTC_CHIP_INTERFACE		chip_interface;
 	void *					odm_priv;
 
-	BOOLEAN					initilized;
-	BOOLEAN					stop_coex_dm;
-	BOOLEAN					manual_control;
-	BOOLEAN					bdontenterLPS;
+	bool					initilized;
+	bool					stop_coex_dm;
+	bool					manual_control;
+	bool					bdontenterLPS;
 	u8 *					cli_buf;
 	struct btc_statistics		statistics;
 	u8				pwrModeVal[10];
@@ -960,7 +960,7 @@ typedef struct btc_coexist *PBTC_COEXIST;
 
 extern struct btc_coexist	GLBtCoexist;
 
-BOOLEAN
+bool
 EXhalbtcoutsrc_InitlizeVariables(
 	void *		Adapter
 	);
@@ -975,7 +975,7 @@ EXhalbtcoutsrc_PreLoadFirmware(
 void
 EXhalbtcoutsrc_InitHwConfig(
 	PBTC_COEXIST		pBtCoexist,
-	BOOLEAN				bWifiOnly
+	bool				bWifiOnly
 	);
 void
 EXhalbtcoutsrc_InitCoexDm(
@@ -1036,7 +1036,7 @@ EXhalbtcoutsrc_WlFwDbgInfoNotify(
 void
 EXhalbtcoutsrc_rx_rate_change_notify(
 	PBTC_COEXIST	pBtCoexist,
-	BOOLEAN			is_data_frame,
+	bool			is_data_frame,
 	u8			btc_rate_id
 	);
 void

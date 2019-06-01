@@ -5500,7 +5500,7 @@ exit:
 	return ret;
 }
 
-static s32 rtw_action_public_decache(union recv_frame *rframe, u8 token_offset)
+static int rtw_action_public_decache(union recv_frame *rframe, u8 token_offset)
 {
 	_adapter *adapter = rframe->u.hdr.adapter;
 	struct mlme_ext_priv *mlmeext = &(adapter->mlmeextpriv);
@@ -6878,9 +6878,9 @@ void dump_mgntframe(_adapter *padapter, struct xmit_frame *pmgntframe)
 	rtw_hal_mgnt_xmit(padapter, pmgntframe);
 }
 
-s32 dump_mgntframe_and_wait(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms)
+int dump_mgntframe_and_wait(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms)
 {
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 	_irqL irqL;
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
 	struct xmit_buf *pxmitbuf = pmgntframe->pxmitbuf;
@@ -6907,11 +6907,11 @@ s32 dump_mgntframe_and_wait(_adapter *padapter, struct xmit_frame *pmgntframe, i
 	return ret;
 }
 
-s32 dump_mgntframe_and_wait_ack_timeout(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms)
+int dump_mgntframe_and_wait_ack_timeout(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms)
 {
 #ifdef CONFIG_XMIT_ACK
 	static u8 seq_no = 0;
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 	struct xmit_priv	*pxmitpriv = &(GET_PRIMARY_ADAPTER(padapter))->xmitpriv;
 
 	if (RTW_CANNOT_RUN(padapter)) {
@@ -6939,7 +6939,7 @@ s32 dump_mgntframe_and_wait_ack_timeout(_adapter *padapter, struct xmit_frame *p
 #endif /* !CONFIG_XMIT_ACK */
 }
 
-s32 dump_mgntframe_and_wait_ack(_adapter *padapter, struct xmit_frame *pmgntframe)
+int dump_mgntframe_and_wait_ack(_adapter *padapter, struct xmit_frame *pmgntframe)
 {
 	/* In this case, use 500 ms as the default wait_ack timeout */
 	return dump_mgntframe_and_wait_ack_timeout(padapter, pmgntframe, 500);
@@ -9656,7 +9656,7 @@ Following are some utitity fuctions for WiFi MLME
 
 *****************************************************************************/
 
-BOOLEAN IsLegal5GChannel(
+bool IsLegal5GChannel(
 	PADAPTER			Adapter,
 	u8			channel)
 {

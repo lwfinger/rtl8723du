@@ -538,57 +538,57 @@ extern struct xmit_frame *__rtw_alloc_cmdxmitframe(struct xmit_priv *pxmitpriv,
 #define rtw_alloc_bcnxmitframe(p) __rtw_alloc_cmdxmitframe(p, CMDBUF_BEACON)
 
 extern struct xmit_buf *rtw_alloc_xmitbuf_ext(struct xmit_priv *pxmitpriv);
-extern s32 rtw_free_xmitbuf_ext(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf);
+extern int rtw_free_xmitbuf_ext(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf);
 
 extern struct xmit_buf *rtw_alloc_xmitbuf(struct xmit_priv *pxmitpriv);
-extern s32 rtw_free_xmitbuf(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf);
+extern int rtw_free_xmitbuf(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf);
 
 void rtw_count_tx_stats(_adapter *padapter, struct xmit_frame *pxmitframe, int sz);
 extern void rtw_update_protection(_adapter *padapter, u8 *ie, uint ie_len);
-static s32 update_attrib_sec_info(_adapter *padapter, struct pkt_attrib *pattrib, struct sta_info *psta);
+static int update_attrib_sec_info(_adapter *padapter, struct pkt_attrib *pattrib, struct sta_info *psta);
 static void update_attrib_phy_info(_adapter *padapter, struct pkt_attrib *pattrib, struct sta_info *psta);
 
 #ifdef CONFIG_WMMPS_STA
 static void update_attrib_trigger_frame_info(_adapter *padapter, struct pkt_attrib *pattrib);
 #endif /* CONFIG_WMMPS_STA */
 
-extern s32 rtw_make_wlanhdr(_adapter *padapter, u8 *hdr, struct pkt_attrib *pattrib);
-extern s32 rtw_put_snap(u8 *data, u16 h_proto);
+extern int rtw_make_wlanhdr(_adapter *padapter, u8 *hdr, struct pkt_attrib *pattrib);
+extern int rtw_put_snap(u8 *data, u16 h_proto);
 
 extern struct xmit_frame *rtw_alloc_xmitframe(struct xmit_priv *pxmitpriv);
 struct xmit_frame *rtw_alloc_xmitframe_ext(struct xmit_priv *pxmitpriv);
 struct xmit_frame *rtw_alloc_xmitframe_once(struct xmit_priv *pxmitpriv);
-extern s32 rtw_free_xmitframe(struct xmit_priv *pxmitpriv, struct xmit_frame *pxmitframe);
+extern int rtw_free_xmitframe(struct xmit_priv *pxmitpriv, struct xmit_frame *pxmitframe);
 extern void rtw_free_xmitframe_queue(struct xmit_priv *pxmitpriv, _queue *pframequeue);
 struct tx_servq *rtw_get_sta_pending(_adapter *padapter, struct sta_info *psta, sint up, u8 *ac);
-extern s32 rtw_xmitframe_enqueue(_adapter *padapter, struct xmit_frame *pxmitframe);
+extern int rtw_xmitframe_enqueue(_adapter *padapter, struct xmit_frame *pxmitframe);
 extern struct xmit_frame *rtw_dequeue_xframe(struct xmit_priv *pxmitpriv, struct hw_xmit *phwxmit_i, sint entry);
 
-extern s32 rtw_xmit_classifier(_adapter *padapter, struct xmit_frame *pxmitframe);
+extern int rtw_xmit_classifier(_adapter *padapter, struct xmit_frame *pxmitframe);
 extern u32 rtw_calculate_wlan_pkt_size_by_attribue(struct pkt_attrib *pattrib);
 #define rtw_wlan_pkt_size(f) rtw_calculate_wlan_pkt_size_by_attribue(&f->attrib)
-extern s32 rtw_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxmitframe);
+extern int rtw_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxmitframe);
 #if defined(CONFIG_IEEE80211W) || defined(CONFIG_RTW_MESH)
-extern s32 rtw_mgmt_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxmitframe);
+extern int rtw_mgmt_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxmitframe);
 #endif
-s32 _rtw_init_hw_txqueue(struct hw_txqueue *phw_txqueue, u8 ac_tag);
+int _rtw_init_hw_txqueue(struct hw_txqueue *phw_txqueue, u8 ac_tag);
 void _rtw_init_sta_xmit_priv(struct sta_xmit_priv *psta_xmitpriv);
 
-s32 rtw_txframes_pending(_adapter *padapter);
-s32 rtw_txframes_sta_ac_pending(_adapter *padapter, struct pkt_attrib *pattrib);
+int rtw_txframes_pending(_adapter *padapter);
+int rtw_txframes_sta_ac_pending(_adapter *padapter, struct pkt_attrib *pattrib);
 void rtw_init_hwxmits(struct hw_xmit *phwxmit, sint entry);
 
 
-s32 _rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, _adapter *padapter);
+int _rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, _adapter *padapter);
 void _rtw_free_xmit_priv(struct xmit_priv *pxmitpriv);
 
 
 void rtw_alloc_hwxmits(_adapter *padapter);
 void rtw_free_hwxmits(_adapter *padapter);
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 24))
-s32 rtw_monitor_xmit_entry(struct sk_buff *skb, struct net_device *ndev);
+int rtw_monitor_xmit_entry(struct sk_buff *skb, struct net_device *ndev);
 #endif
-s32 rtw_xmit(_adapter *padapter, _pkt **pkt);
+int rtw_xmit(_adapter *padapter, _pkt **pkt);
 bool xmitframe_hiq_filter(struct xmit_frame *xmitframe);
 sint xmitframe_enqueue_for_sleeping_sta(_adapter *padapter, struct xmit_frame *pxmitframe);
 void stop_sta_xmit(_adapter *padapter, struct sta_info *psta);
@@ -620,9 +620,9 @@ extern void rtw_amsdu_set_timer_status(_adapter *padapter, u8 priority, u8 statu
 extern void rtw_amsdu_set_timer(_adapter *padapter, u8 priority);
 extern void rtw_amsdu_cancel_timer(_adapter *padapter, u8 priority);
 
-extern s32 rtw_xmitframe_coalesce_amsdu(_adapter *padapter, struct xmit_frame *pxmitframe, struct xmit_frame *pxmitframe_queue);	
-extern s32 check_amsdu(struct xmit_frame *pxmitframe);
-extern s32 check_amsdu_tx_support(_adapter *padapter);
+extern int rtw_xmitframe_coalesce_amsdu(_adapter *padapter, struct xmit_frame *pxmitframe, struct xmit_frame *pxmitframe_queue);	
+extern int check_amsdu(struct xmit_frame *pxmitframe);
+extern int check_amsdu_tx_support(_adapter *padapter);
 extern struct xmit_frame *rtw_get_xframe(struct xmit_priv *pxmitpriv, int *num_frame);
 #endif
 

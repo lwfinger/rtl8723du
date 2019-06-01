@@ -3838,7 +3838,7 @@ void	rtw_ht_use_default_setting(_adapter *padapter)
 	struct mlme_priv		*pmlmepriv = &padapter->mlmepriv;
 	struct ht_priv		*phtpriv = &pmlmepriv->htpriv;
 	struct registry_priv	*pregistrypriv = &padapter->registrypriv;
-	BOOLEAN		bHwLDPCSupport = false, bHwSTBCSupport = false;
+	bool		bHwLDPCSupport = false, bHwSTBCSupport = false;
 
 	if (pregistrypriv->wifi_spec)
 		phtpriv->bss_coexist = 1;
@@ -4221,7 +4221,7 @@ void rtw_issue_addbareq_cmd(_adapter *padapter, struct xmit_frame *pxmitframe)
 	struct sta_info *psta = NULL;
 	struct ht_priv	*phtpriv;
 	struct pkt_attrib *pattrib = &pxmitframe->attrib;
-	s32 bmcst = IS_MCAST(pattrib->ra);
+	int bmcst = IS_MCAST(pattrib->ra);
 
 	/* if(bmcst || (padapter->mlmepriv.LinkDetectInfo.bTxBusyTraffic == false)) */
 	if (bmcst || (padapter->mlmepriv.LinkDetectInfo.NumTxOkInPeriod < 100))

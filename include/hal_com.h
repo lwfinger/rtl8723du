@@ -330,12 +330,12 @@ void hal_com_config_channel_plan(
 	char *sw_alpha2,
 	u8 sw_chplan,
 	u8 def_chplan,
-	BOOLEAN AutoLoadFail
+	bool AutoLoadFail
 );
 
 int hal_config_macaddr(_adapter *adapter, bool autoload_fail);
 
-BOOLEAN
+bool
 HAL_IsLegalChannel(
 	PADAPTER	Adapter,
 	u32			Channel
@@ -350,7 +350,7 @@ void	HalSetBrateCfg(
 	u8			*mBratesOS,
 	u16			*pBrateCfg);
 
-BOOLEAN
+bool
 Hal_MappingOutPipe(
 	PADAPTER	pAdapter,
 	u8		NumOutPipe
@@ -365,7 +365,7 @@ void rtw_init_hal_com_default_value(PADAPTER Adapter);
 
 #ifdef CONFIG_FW_C2H_REG
 void c2h_evt_clear(_adapter *adapter);
-s32 c2h_evt_read_88xx(_adapter *adapter, u8 *buf);
+int c2h_evt_read_88xx(_adapter *adapter, u8 *buf);
 #endif
 
 #ifdef CONFIG_FW_C2H_PKT
@@ -404,7 +404,7 @@ void rtw_hal_reqtxrpt(_adapter *padapter, u8 macid);
 u8 SetHalDefVar(_adapter *adapter, HAL_DEF_VARIABLE variable, void *value);
 u8 GetHalDefVar(_adapter *adapter, HAL_DEF_VARIABLE variable, void *value);
 
-BOOLEAN
+bool
 eqNByte(
 	u8	*str1,
 	u8	*str2,
@@ -416,14 +416,14 @@ MapCharToHexDigit(
 	char	chTmp
 );
 
-BOOLEAN
+bool
 GetHexValueFromString(
 		char			*szStr,
 	u32			*pu4bVal,
 	u32			*pu4bMove
 );
 
-BOOLEAN
+bool
 GetFractionValueFromString(
 		char		*szStr,
 	u8			*pInteger,
@@ -431,12 +431,12 @@ GetFractionValueFromString(
 	u32		*pu4bMove
 );
 
-BOOLEAN
+bool
 IsCommentString(
 		char		*szStr
 );
 
-BOOLEAN
+bool
 ParseQualifiedString(
 	char *In,
 	u32 *Start,
@@ -445,13 +445,13 @@ ParseQualifiedString(
 	char  RightQualifier
 );
 
-BOOLEAN
+bool
 GetU1ByteIntegerFromStringInDecimal(
 		char *Str,
 	u8 *pInt
 );
 
-BOOLEAN
+bool
 isAllSpaceOrTab(
 	u8	*data,
 	u8	size
@@ -489,7 +489,7 @@ int rtw_hal_reset_tsf(_adapter *adapter, u8 reset_port);
 #endif
 
 #if defined(CONFIG_FW_MULTI_PORT_SUPPORT)
-s32 rtw_hal_set_wifi_port_id_cmd(_adapter *adapter);
+int rtw_hal_set_wifi_port_id_cmd(_adapter *adapter);
 #endif
 
 s8 rtw_hal_ch_sw_iqk_info_search(_adapter *padapter, u8 central_chnl, u8 bw_mode);
@@ -531,9 +531,9 @@ void rtw_dump_fifo(void *sel, _adapter *adapter, u8 fifo_sel, u32 fifo_addr, u32
 #endif
 
 #ifdef CONFIG_FW_MULTI_PORT_SUPPORT
-s32 rtw_hal_set_default_port_id_cmd(_adapter *adapter, u8 mac_id);
-s32 rtw_set_default_port_id(_adapter *adapter);
-s32 rtw_set_ps_rsvd_page(_adapter *adapter);
+int rtw_hal_set_default_port_id_cmd(_adapter *adapter, u8 mac_id);
+int rtw_set_default_port_id(_adapter *adapter);
+int rtw_set_ps_rsvd_page(_adapter *adapter);
 #endif
 
 #ifdef RTW_CHANNEL_SWITCH_OFFLOAD

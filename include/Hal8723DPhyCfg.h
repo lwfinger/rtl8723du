@@ -59,7 +59,7 @@ int PHY_BBConfig8723D(PADAPTER	Adapter);
 
 int PHY_RFConfig8723D(PADAPTER	Adapter);
 
-s32 PHY_MACConfig8723D(PADAPTER padapter);
+int PHY_MACConfig8723D(PADAPTER padapter);
 
 int
 PHY_ConfigRFWithParaFile_8723D(
@@ -89,7 +89,7 @@ PHY_GetTxPowerIndex_8723D(
 void
 PHY_GetTxPowerLevel8723D(
 	PADAPTER		Adapter,
-	s32				*powerlevel
+	int				*powerlevel
 );
 
 void

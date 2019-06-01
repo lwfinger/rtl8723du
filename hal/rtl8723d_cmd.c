@@ -42,7 +42,7 @@ static u8 _is_fw_read_cmd_down(_adapter *padapter, u8 msgbox_num)
 *| Ext msg					|
 *
 ******************************************/
-s32 FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer)
+int FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer)
 {
 	u8 h2c_box_num;
 	u8 h2c[RTL8723D_MAX_CMD_LEN + 1] = {0};
@@ -50,7 +50,7 @@ s32 FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer)
 	u32 msgbox_ex_addr = 0;
 	u32	h2c_cmd = 0;
 	u32	h2c_cmd_ex = 0;
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 	PHAL_DATA_TYPE pHalData;		
 	struct dvobj_priv *psdpriv = padapter->dvobj;
 	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
@@ -281,7 +281,7 @@ void rtl8723d_download_rsvd_page(PADAPTER padapter, u8 mstatus)
 	struct mlme_ext_priv	*pmlmeext = &(padapter->mlmeextpriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
-	BOOLEAN		bcn_valid = false;
+	bool		bcn_valid = false;
 	u8	DLBcnCount = 0;
 	u32 poll = 0;
 	u8 val8, RegFwHwTxQCtrl;
@@ -291,7 +291,7 @@ void rtl8723d_download_rsvd_page(PADAPTER padapter, u8 mstatus)
 		 FUNC_ADPT_ARG(padapter), get_hw_port(padapter), mstatus);
 
 	if (mstatus == RT_MEDIA_CONNECT) {
-		BOOLEAN bRecover = false;
+		bool bRecover = false;
 		u8 v8;
 
 		/* We should set AID, correct TSF, HW seq enable before set JoinBssReport to Fw in 88/92C. */

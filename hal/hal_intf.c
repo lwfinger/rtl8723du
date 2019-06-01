@@ -268,7 +268,7 @@ u8 rtw_hal_get_def_var(_adapter *padapter, HAL_DEF_VARIABLE eVariable, void * pV
 	return padapter->hal_func.get_hal_def_var_handler(padapter, eVariable, pValue);
 }
 
-void rtw_hal_set_odm_var(_adapter *padapter, HAL_ODM_VARIABLE eVariable, void * pValue1, BOOLEAN bSet)
+void rtw_hal_set_odm_var(_adapter *padapter, HAL_ODM_VARIABLE eVariable, void * pValue1, bool bSet)
 {
 	padapter->hal_func.SetHalODMVarHandler(padapter, eVariable, pValue1, bSet);
 }
@@ -298,7 +298,7 @@ u8 rtw_hal_check_ips_status(_adapter *padapter)
 	return val;
 }
 
-s32 rtw_hal_fw_dl(_adapter *padapter, u8 wowlan)
+int rtw_hal_fw_dl(_adapter *padapter, bool wowlan)
 {
 	return padapter->hal_func.fw_dl(padapter, wowlan);
 }
@@ -326,12 +326,12 @@ u8	rtw_hal_intf_ps_func(_adapter *padapter, HAL_INTF_PS_FUNC efunc_id, u8 *val)
 	return _FAIL;
 }
 
-s32	rtw_hal_xmitframe_enqueue(_adapter *padapter, struct xmit_frame *pxmitframe)
+int	rtw_hal_xmitframe_enqueue(_adapter *padapter, struct xmit_frame *pxmitframe)
 {
 	return padapter->hal_func.hal_xmitframe_enqueue(padapter, pxmitframe);
 }
 
-s32	rtw_hal_xmit(_adapter *padapter, struct xmit_frame *pxmitframe)
+int	rtw_hal_xmit(_adapter *padapter, struct xmit_frame *pxmitframe)
 {
 	return padapter->hal_func.hal_xmit(padapter, pxmitframe);
 }
@@ -339,9 +339,9 @@ s32	rtw_hal_xmit(_adapter *padapter, struct xmit_frame *pxmitframe)
 /*
  * [IMPORTANT] This function would be run in interrupt context.
  */
-s32	rtw_hal_mgnt_xmit(_adapter *padapter, struct xmit_frame *pmgntframe)
+int	rtw_hal_mgnt_xmit(_adapter *padapter, struct xmit_frame *pmgntframe)
 {
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 
 	update_mgntframe_attrib_addr(padapter, pmgntframe);
 
@@ -359,7 +359,7 @@ no_mgmt_coalesce:
 	return ret;
 }
 
-s32	rtw_hal_init_xmit_priv(_adapter *padapter)
+int	rtw_hal_init_xmit_priv(_adapter *padapter)
 {
 	return padapter->hal_func.init_xmit_priv(padapter);
 }
@@ -368,7 +368,7 @@ void	rtw_hal_free_xmit_priv(_adapter *padapter)
 	padapter->hal_func.free_xmit_priv(padapter);
 }
 
-s32	rtw_hal_init_recv_priv(_adapter *padapter)
+int	rtw_hal_init_recv_priv(_adapter *padapter)
 {
 	return padapter->hal_func.init_recv_priv(padapter);
 }
@@ -501,7 +501,7 @@ void	rtw_hal_set_tx_power_level(_adapter *padapter, u8 channel)
 		padapter->hal_func.set_tx_power_level_handler(padapter, channel);
 }
 
-void	rtw_hal_get_tx_power_level(_adapter *padapter, s32 *powerlevel)
+void	rtw_hal_get_tx_power_level(_adapter *padapter, int *powerlevel)
 {
 	if (padapter->hal_func.get_tx_power_level_handler)
 		padapter->hal_func.get_tx_power_level_handler(padapter, powerlevel);
@@ -541,11 +541,11 @@ inline bool rtw_hal_c2h_valid(_adapter *adapter, u8 *buf)
 	return ret;
 }
 
-inline s32 rtw_hal_c2h_evt_read(_adapter *adapter, u8 *buf)
+inline int rtw_hal_c2h_evt_read(_adapter *adapter, u8 *buf)
 {
 	HAL_DATA_TYPE *HalData = GET_HAL_DATA(adapter);
 	HAL_VERSION *hal_ver = &HalData->version_id;
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 
 	ret = c2h_evt_read_88xx(adapter, buf);
 
@@ -589,10 +589,10 @@ exit:
 }
 #endif /* CONFIG_FW_C2H_PKT */
 
-s32 c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
+int c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 {
 	u8 sub_id = 0;
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 
 	switch (id) {
 	case C2H_FW_SCAN_COMPLETE:
@@ -659,9 +659,9 @@ exit:
 	return ret;
 }
 
-s32 rtw_hal_c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
+int rtw_hal_c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 {
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 
 	ret = adapter->hal_func.c2h_handler(adapter, id, seq, plen, payload);
 	if (ret != _SUCCESS)
@@ -670,7 +670,7 @@ s32 rtw_hal_c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 	return ret;
 }
 
-s32 rtw_hal_c2h_id_handle_directly(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
+int rtw_hal_c2h_id_handle_directly(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 {
 	switch (id) {
 	case C2H_CCX_TX_RPT:
@@ -687,18 +687,18 @@ s32 rtw_hal_c2h_id_handle_directly(_adapter *adapter, u8 id, u8 seq, u8 plen, u8
 	}
 }
 
-s32 rtw_hal_is_disable_sw_channel_plan(PADAPTER padapter)
+int rtw_hal_is_disable_sw_channel_plan(PADAPTER padapter)
 {
 	return GET_HAL_DATA(padapter)->bDisableSWChannelPlan;
 }
 
-static s32 _rtw_hal_macid_sleep(_adapter *adapter, u8 macid, u8 sleep)
+static int _rtw_hal_macid_sleep(_adapter *adapter, u8 macid, u8 sleep)
 {
 	struct macid_ctl_t *macid_ctl = adapter_to_macidctl(adapter);
 	u16 reg_sleep;
 	u8 bit_shift;
 	u32 val32;
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 
 	if (macid >= macid_ctl->num) {
 		RTW_ERR(ADPT_FMT" %s invalid macid(%u)\n"
@@ -757,17 +757,17 @@ exit:
 	return ret;
 }
 
-inline s32 rtw_hal_macid_sleep(_adapter *adapter, u8 macid)
+inline int rtw_hal_macid_sleep(_adapter *adapter, u8 macid)
 {
 	return _rtw_hal_macid_sleep(adapter, macid, 1);
 }
 
-inline s32 rtw_hal_macid_wakeup(_adapter *adapter, u8 macid)
+inline int rtw_hal_macid_wakeup(_adapter *adapter, u8 macid)
 {
 	return _rtw_hal_macid_sleep(adapter, macid, 0);
 }
 
-static s32 _rtw_hal_macid_bmp_sleep(_adapter *adapter, struct macid_bmp *bmp, u8 sleep)
+static int _rtw_hal_macid_bmp_sleep(_adapter *adapter, struct macid_bmp *bmp, u8 sleep)
 {
 	struct macid_ctl_t *macid_ctl = adapter_to_macidctl(adapter);
 	u16 reg_sleep;
@@ -828,21 +828,21 @@ move_next:
 	return _SUCCESS;
 }
 
-inline s32 rtw_hal_macid_sleep_all_used(_adapter *adapter)
+inline int rtw_hal_macid_sleep_all_used(_adapter *adapter)
 {
 	struct macid_ctl_t *macid_ctl = adapter_to_macidctl(adapter);
 
 	return _rtw_hal_macid_bmp_sleep(adapter, &macid_ctl->used, 1);
 }
 
-inline s32 rtw_hal_macid_wakeup_all_used(_adapter *adapter)
+inline int rtw_hal_macid_wakeup_all_used(_adapter *adapter)
 {
 	struct macid_ctl_t *macid_ctl = adapter_to_macidctl(adapter);
 
 	return _rtw_hal_macid_bmp_sleep(adapter, &macid_ctl->used, 0);
 }
 
-s32 rtw_hal_fill_h2c_cmd(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer)
+int rtw_hal_fill_h2c_cmd(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer)
 {
 	_adapter *pri_adapter = GET_PRIMARY_ADAPTER(padapter);
 

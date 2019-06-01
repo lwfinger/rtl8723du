@@ -242,18 +242,18 @@ void rtw_btcoex_Handler(PADAPTER padapter)
 	hal_btcoex_Hanlder(padapter);
 }
 
-s32 rtw_btcoex_IsBTCoexRejectAMPDU(PADAPTER padapter)
+int rtw_btcoex_IsBTCoexRejectAMPDU(PADAPTER padapter)
 {
-	s32 coexctrl;
+	int coexctrl;
 
 	coexctrl = hal_btcoex_IsBTCoexRejectAMPDU(padapter);
 
 	return coexctrl;
 }
 
-s32 rtw_btcoex_IsBTCoexCtrlAMPDUSize(PADAPTER padapter)
+int rtw_btcoex_IsBTCoexCtrlAMPDUSize(PADAPTER padapter)
 {
-	s32 coexctrl;
+	int coexctrl;
 
 	coexctrl = hal_btcoex_IsBTCoexCtrlAMPDUSize(padapter);
 

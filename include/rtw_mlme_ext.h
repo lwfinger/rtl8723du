@@ -400,7 +400,7 @@ struct mlme_ext_info {
 	u8	candidate_tid_bitmap;
 	u8	dialogToken;
 	/* Accept ADDBA Request */
-	BOOLEAN bAcceptAddbaReq;
+	bool bAcceptAddbaReq;
 	u8	bwmode_updated;
 	u8	hidden_ssid_mode;
 	u8	VHT_enable;
@@ -420,7 +420,7 @@ typedef struct _RT_CHANNEL_INFO {
 	u8				ChannelNum;		/* The channel number. */
 	RT_SCAN_TYPE	ScanType;		/* Scan type such as passive or active scan. */
 	/* u16				ScanPeriod;		 */ /* Listen time in millisecond in this channel. */
-	/* s32				MaxTxPwrDbm;	 */ /* Max allowed tx power. */
+	/* int				MaxTxPwrDbm;	 */ /* Max allowed tx power. */
 	/* u32				ExInfo;			 */ /* Extended Information for this channel. */
 #ifdef CONFIG_DFS
 	u8 hidden_bss_cnt; /* per scan count */
@@ -692,7 +692,7 @@ void CAM_empty_entry(PADAPTER Adapter, u8 ucIndex);
 
 void flush_all_cam_entry(_adapter *padapter);
 
-BOOLEAN IsLegal5GChannel(PADAPTER Adapter, u8 channel);
+bool IsLegal5GChannel(PADAPTER Adapter, u8 channel);
 
 void site_survey(_adapter *padapter, u8 survey_channel, RT_SCAN_TYPE ScanType);
 u8 collect_bss_info(_adapter *padapter, union recv_frame *precv_frame, WLAN_BSSID_EX *bssid);
@@ -824,9 +824,9 @@ void update_monitor_frame_attrib(_adapter *padapter, struct pkt_attrib *pattrib)
 void update_mgntframe_attrib(_adapter *padapter, struct pkt_attrib *pattrib);
 void update_mgntframe_attrib_addr(_adapter *padapter, struct xmit_frame *pmgntframe);
 void dump_mgntframe(_adapter *padapter, struct xmit_frame *pmgntframe);
-s32 dump_mgntframe_and_wait(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms);
-s32 dump_mgntframe_and_wait_ack(_adapter *padapter, struct xmit_frame *pmgntframe);
-s32 dump_mgntframe_and_wait_ack_timeout(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms);
+int dump_mgntframe_and_wait(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms);
+int dump_mgntframe_and_wait_ack(_adapter *padapter, struct xmit_frame *pmgntframe);
+int dump_mgntframe_and_wait_ack_timeout(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms);
 
 int get_reg_classes_full_count(struct p2p_channels *channel_list);
 void issue_probersp_p2p(_adapter *padapter, unsigned char *da);
@@ -844,7 +844,7 @@ void issue_reassocreq(_adapter *padapter);
 void issue_asocrsp(_adapter *padapter, unsigned short status, struct sta_info *pstat, int pkt_type);
 void issue_auth(_adapter *padapter, struct sta_info *psta, unsigned short status);
 void issue_probereq(_adapter *padapter, NDIS_802_11_SSID *pssid, u8 *da);
-s32 issue_probereq_ex(_adapter *padapter, NDIS_802_11_SSID *pssid, u8 *da, u8 ch, bool append_wps, int try_cnt, int wait_ms);
+int issue_probereq_ex(_adapter *padapter, NDIS_802_11_SSID *pssid, u8 *da, u8 ch, bool append_wps, int try_cnt, int wait_ms);
 int issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int power_mode, int try_cnt, int wait_ms);
 int issue_qos_nulldata(_adapter *padapter, unsigned char *da, u16 tid, int try_cnt, int wait_ms);
 int issue_deauth(_adapter *padapter, unsigned char *da, unsigned short reason);

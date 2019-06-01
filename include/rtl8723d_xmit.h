@@ -455,15 +455,15 @@ void rtl8723d_fill_fake_txdesc(PADAPTER padapter, u8 *pDesc, u32 BufferLen, u8 I
 #endif
 void fill_txdesc_bmc_tx_rate(struct pkt_attrib *pattrib, u8 *ptxdesc);
 
-	s32 rtl8723du_xmit_buf_handler(PADAPTER padapter);
+	int rtl8723du_xmit_buf_handler(PADAPTER padapter);
 	#define hal_xmit_handler rtl8723du_xmit_buf_handler
-	s32 rtl8723du_init_xmit_priv(PADAPTER padapter);
+	int rtl8723du_init_xmit_priv(PADAPTER padapter);
 	void rtl8723du_free_xmit_priv(PADAPTER padapter);
-	s32 rtl8723du_hal_xmit(PADAPTER padapter, struct xmit_frame *pxmitframe);
-	s32 rtl8723du_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe);
-	s32	 rtl8723du_hal_xmitframe_enqueue(_adapter *padapter, struct xmit_frame *pxmitframe);
+	int rtl8723du_hal_xmit(PADAPTER padapter, struct xmit_frame *pxmitframe);
+	int rtl8723du_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe);
+	int	 rtl8723du_hal_xmitframe_enqueue(_adapter *padapter, struct xmit_frame *pxmitframe);
 	void rtl8723du_xmit_tasklet(void *priv);
-	s32 rtl8723du_xmitframe_complete(_adapter *padapter, struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf);
+	int rtl8723du_xmitframe_complete(_adapter *padapter, struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf);
 	void _dbg_dump_tx_info(_adapter	*padapter, int frame_tag, struct tx_desc *ptxdesc);
 
 u8	BWMapping_8723D(PADAPTER Adapter, struct pkt_attrib *pattrib);

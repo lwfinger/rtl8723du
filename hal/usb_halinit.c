@@ -51,14 +51,14 @@ _ConfigChipOutEP_8723(
 	}
 }
 
-static BOOLEAN HalUsbSetQueuePipeMapping8723DUsb(
+static bool HalUsbSetQueuePipeMapping8723DUsb(
 	PADAPTER padapter,
 	u8 NumInPipe,
 	u8 NumOutPipe
 )
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-	BOOLEAN result = false;
+	bool result = false;
 
 	_ConfigChipOutEP_8723(padapter, NumOutPipe);
 
@@ -203,7 +203,7 @@ static void _InitQueueReservedPage(PADAPTER padapter)
 	u32 numPubQ;
 	u32 value32;
 	u8 value8;
-	BOOLEAN bWiFiConfig = pregistrypriv->wifi_spec;
+	bool bWiFiConfig = pregistrypriv->wifi_spec;
 
 	if (pHalData->OutEpQueueSel & TX_SELE_HQ)
 		numHQ = bWiFiConfig ? WMM_NORMAL_PAGE_NUM_HPQ_8723D : NORMAL_PAGE_NUM_HPQ_8723D;
@@ -703,7 +703,7 @@ enum {
 };
 
 /* 2010/08/09 MH Add for power down check. */
-static BOOLEAN
+static bool
 HalDetectPwrDownMode(
 	PADAPTER padapter
 )
@@ -1238,7 +1238,7 @@ _DisableRFAFEAndResetBB(
 static void
 _ResetDigitalProcedure1(
 	PADAPTER padapter,
-	BOOLEAN bWithoutHWSM
+	bool bWithoutHWSM
 )
 {
 
@@ -1345,7 +1345,7 @@ _ResetDigitalProcedure2(
 static void
 _DisableAnalog(
 	PADAPTER padapter,
-	BOOLEAN bWithoutHWSM
+	bool bWithoutHWSM
 )
 {
 	u16 value16 = 0;
@@ -1558,7 +1558,7 @@ static void
 hal_EfuseParseLEDSetting(
 	PADAPTER padapter,
 	u8 *PROMContent,
-	BOOLEAN AutoloadFail
+	bool AutoloadFail
 )
 {
 }
@@ -1567,7 +1567,7 @@ static void
 hal_EfuseParseRFSetting(
 	PADAPTER padapter,
 	u8 *PROMContent,
-	BOOLEAN AutoloadFail
+	bool AutoloadFail
 )
 {
 }
@@ -1618,7 +1618,7 @@ static void
 hal_EfuseParseIDs(
 	PADAPTER padapter,
 	u8 *hwinfo,
-	BOOLEAN AutoLoadFail
+	bool AutoLoadFail
 )
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);

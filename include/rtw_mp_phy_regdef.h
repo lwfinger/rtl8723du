@@ -283,7 +283,7 @@
  *   */
 #define		rTxAGC_Rate18_06				0xe00
 #define		rTxAGC_Rate54_24				0xe04
-#define		rTxAGC_CCK_Mcs32				0xe08
+#define		rTxAGC_CCK_Mcint				0xe08
 #define		rTxAGC_Mcs03_Mcs00			0xe10
 #define		rTxAGC_Mcs07_Mcs04			0xe14
 #define		rTxAGC_Mcs11_Mcs08			0xe18

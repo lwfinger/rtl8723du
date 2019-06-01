@@ -665,11 +665,11 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
  *	-1:	Timeout
  *	-2:	Other error
  */
-s32 LPS_RF_ON_check(PADAPTER padapter, u32 delay_ms)
+int LPS_RF_ON_check(PADAPTER padapter, u32 delay_ms)
 {
 	systime start_time;
 	u8 bAwake = false;
-	s32 err = 0;
+	int err = 0;
 
 
 	start_time = rtw_get_current_time();
@@ -1234,7 +1234,7 @@ int rtw_pm_set_ips(_adapter *padapter, u8 mode)
 void rtw_ps_deny(PADAPTER padapter, PS_DENY_REASON reason)
 {
 	struct pwrctrl_priv *pwrpriv;
-	s32 ret;
+	int ret;
 
 
 	/* 	RTW_INFO("+" FUNC_ADPT_FMT ": Request PS deny for %d (0x%08X)\n",

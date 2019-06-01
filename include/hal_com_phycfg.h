@@ -149,7 +149,7 @@ PHY_GetTxPowerIndexBase(
 	u8 ntx_idx,
 	enum channel_width	BandWidth,
 	u8				Channel,
-	PBOOLEAN		bIn24G
+	bool *		bIn24G
 );
 
 #ifdef CONFIG_TXPWR_LIMIT

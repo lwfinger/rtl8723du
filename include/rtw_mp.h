@@ -108,18 +108,18 @@ typedef struct _RT_PMAC_TX_INFO {
 typedef void (*MPT_WORK_ITEM_HANDLER)(void * Adapter);
 typedef struct _MPT_CONTEXT {
 	/* Indicate if we have started Mass Production Test. */
-	BOOLEAN			bMassProdTest;
+	bool			bMassProdTest;
 
 	/* Indicate if the driver is unloading or unloaded. */
-	BOOLEAN			bMptDrvUnload;
+	bool			bMptDrvUnload;
 
 	_sema			MPh2c_Sema;
 	_timer			MPh2c_timeout_timer;
 	/* Event used to sync H2c for BT control */
 
-	BOOLEAN		MptH2cRspEvent;
-	BOOLEAN		MptBtC2hEvent;
-	BOOLEAN		bMPh2c_timeout;
+	bool		MptH2cRspEvent;
+	bool		MptBtC2hEvent;
+	bool		bMPh2c_timeout;
 
 	/* 8190 PCI does not support NDIS_WORK_ITEM. */
 	/* Work Item for Mass Production Test. */
@@ -130,7 +130,7 @@ typedef struct _MPT_CONTEXT {
 	/* To protect the following variables.
 	*	NDIS_SPIN_LOCK		MptWorkItemSpinLock; */
 	/* Indicate a MptWorkItem is scheduled and not yet finished. */
-	BOOLEAN			bMptWorkItemInProgress;
+	bool			bMptWorkItemInProgress;
 	/* An instance which implements function and context of MptWorkItem. */
 	MPT_WORK_ITEM_HANDLER	CurrMptAct;
 
@@ -167,39 +167,39 @@ typedef struct _MPT_CONTEXT {
 	/* Content of RCR Regsiter for Mass Production Test. */
 	u32			MptRCR;
 	/* true if we only receive packets with specific pattern. */
-	BOOLEAN			bMptFilterPattern;
+	bool			bMptFilterPattern;
 	/* Rx OK count, statistics used in Mass Production Test. */
 	u32			MptRxOkCnt;
 	/* Rx CRC32 error count, statistics used in Mass Production Test. */
 	u32			MptRxCrcErrCnt;
 
-	BOOLEAN			bCckContTx;	/* true if we are in CCK Continuous Tx test. */
-	BOOLEAN			bOfdmContTx;	/* true if we are in OFDM Continuous Tx test. */
+	bool			bCckContTx;	/* true if we are in CCK Continuous Tx test. */
+	bool			bOfdmContTx;	/* true if we are in OFDM Continuous Tx test. */
 		/* true if we have start Continuous Tx test. */
-	BOOLEAN			is_start_cont_tx;
+	bool			is_start_cont_tx;
 
 	/* true if we are in Single Carrier Tx test. */
-	BOOLEAN			bSingleCarrier;
+	bool			bSingleCarrier;
 	/* true if we are in Carrier Suppression Tx Test. */
 
-	BOOLEAN			is_carrier_suppression;
+	bool			is_carrier_suppression;
 
 	/* true if we are in Single Tone Tx test. */
 
-	BOOLEAN			is_single_tone;
+	bool			is_single_tone;
 
 
 	/* ACK counter asked by K.Y.. */
-	BOOLEAN			bMptEnableAckCounter;
+	bool			bMptEnableAckCounter;
 	u32			MptAckCounter;
 
 	/* SD3 Willis For 8192S to save 1T/2T RF table for ACUT	Only fro ACUT delete later ~~~! */
 	/* s8		BufOfLines[2][MAX_LINES_HWCONFIG_TXT][MAX_BYTES_LINE_HWCONFIG_TXT]; */
 	/* s8			BufOfLines[2][MP_MAX_LINES][MP_MAX_LINES_BYTES]; */
-	/* s32			RfReadLine[2]; */
+	/* int			RfReadLine[2]; */
 
 	u8		APK_bound[2];	/* for APK	path A/path B */
-	BOOLEAN		bMptIndexEven;
+	bool		bMptIndexEven;
 
 	u8		backup0xc50;
 	u8		backup0xc58;
@@ -220,8 +220,8 @@ typedef struct _MPT_CONTEXT {
 	RT_PMAC_PKT_INFO	PMacPktInfo;
 	u8 HWTxmode;
 
-	BOOLEAN			bldpc;
-	BOOLEAN			bstbc;
+	bool			bldpc;
+	bool			bstbc;
 } MPT_CONTEXT, *PMPT_CONTEXT;
 /* #endif */
 
@@ -303,7 +303,7 @@ struct mp_priv {
 	u32 rx_pktcount_filter_out;
 	u32 rx_crcerrpktcount;
 	u32 rx_pktloss;
-	BOOLEAN  rx_bindicatePkt;
+	bool  rx_bindicatePkt;
 	struct recv_stat rxstat;
 
 	/* RF/BB relative */
@@ -339,12 +339,12 @@ struct mp_priv {
 	u8 *pmp_xmtframe_buf;
 	_queue free_mp_xmitqueue;
 	u32 free_mp_xmitframe_cnt;
-	BOOLEAN bSetRxBssid;
-	BOOLEAN bTxBufCkFail;
-	BOOLEAN bRTWSmbCfg;
-	BOOLEAN bloopback;
-	BOOLEAN bloadefusemap;
-	BOOLEAN bloadBTefusemap;
+	bool bSetRxBssid;
+	bool bTxBufCkFail;
+	bool bRTWSmbCfg;
+	bool bloopback;
+	bool bloadefusemap;
+	bool bloadBTefusemap;
 
 	MPT_CONTEXT	mpt_ctx;
 
@@ -587,11 +587,11 @@ typedef enum	_MPT_TXPWR_DEF {
 #define IS_MPT_CCK_RATE(_rate)			(_rate >= MPT_RATE_1M && _rate <= MPT_RATE_11M)
 #define IS_MPT_OFDM_RATE(_rate)			(_rate >= MPT_RATE_6M && _rate <= MPT_RATE_54M)
 /*************************************************************************/
-extern s32 init_mp_priv(PADAPTER padapter);
+extern int init_mp_priv(PADAPTER padapter);
 extern void free_mp_priv(struct mp_priv *pmp_priv);
-extern s32 MPT_InitializeAdapter(PADAPTER padapter, u8 Channel);
+extern int MPT_InitializeAdapter(PADAPTER padapter, u8 Channel);
 extern void MPT_DeInitAdapter(PADAPTER padapter);
-extern s32 mp_start_test(PADAPTER padapter);
+extern int mp_start_test(PADAPTER padapter);
 extern void mp_stop_test(PADAPTER padapter);
 
 extern u32 _read_rfreg(PADAPTER padapter, u8 rfpath, u32 addr, u32 bitmask);
@@ -609,7 +609,7 @@ int	SetTxPower(PADAPTER pAdapter);
 void	SetAntenna(PADAPTER pAdapter);
 void	SetDataRate(PADAPTER pAdapter);
 void	SetAntenna(PADAPTER pAdapter);
-s32	SetThermalMeter(PADAPTER pAdapter, u8 target_ther);
+int	SetThermalMeter(PADAPTER pAdapter, u8 target_ther);
 void	GetThermalMeter(PADAPTER pAdapter, u8 *value);
 void	SetContinuousTx(PADAPTER pAdapter, u8 bStart);
 void	SetSingleCarrierTx(PADAPTER pAdapter, u8 bStart);
@@ -622,7 +622,7 @@ void	SetPacketRx(PADAPTER pAdapter, u8 bStartRx, u8 bAB);
 void	ResetPhyRxPktCount(PADAPTER pAdapter);
 u32	GetPhyRxPktReceived(PADAPTER pAdapter);
 u32	GetPhyRxPktCRC32Error(PADAPTER pAdapter);
-s32	SetPowerTracking(PADAPTER padapter, u8 enable);
+int	SetPowerTracking(PADAPTER padapter, u8 enable);
 void	GetPowerTracking(PADAPTER padapter, u8 *enable);
 u32	mp_query_psd(PADAPTER pAdapter, u8 *data);
 void	rtw_mp_trigger_iqk(PADAPTER padapter);
@@ -631,15 +631,15 @@ u8 rtw_mp_mode_check(PADAPTER padapter);
 
 
 void hal_mpt_SwitchRfSetting(PADAPTER pAdapter);
-s32 hal_mpt_SetPowerTracking(PADAPTER padapter, u8 enable);
+int hal_mpt_SetPowerTracking(PADAPTER padapter, u8 enable);
 void hal_mpt_GetPowerTracking(PADAPTER padapter, u8 *enable);
-void hal_mpt_CCKTxPowerAdjust(PADAPTER Adapter, BOOLEAN bInCH14);
+void hal_mpt_CCKTxPowerAdjust(PADAPTER Adapter, bool bInCH14);
 void hal_mpt_SetChannel(PADAPTER pAdapter);
 void hal_mpt_SetBandwidth(PADAPTER pAdapter);
 void hal_mpt_SetTxPower(PADAPTER pAdapter);
 void hal_mpt_SetDataRate(PADAPTER pAdapter);
 void hal_mpt_SetAntenna(PADAPTER pAdapter);
-s32 hal_mpt_SetThermalMeter(PADAPTER pAdapter, u8 target_ther);
+int hal_mpt_SetThermalMeter(PADAPTER pAdapter, u8 target_ther);
 void hal_mpt_TriggerRFThermalMeter(PADAPTER pAdapter);
 u8 hal_mpt_ReadRFThermalMeter(PADAPTER pAdapter);
 void hal_mpt_GetThermalMeter(PADAPTER pAdapter, u8 *value);
@@ -648,7 +648,7 @@ void hal_mpt_SetSingleCarrierTx(PADAPTER pAdapter, u8 bStart);
 void hal_mpt_SetSingleToneTx(PADAPTER pAdapter, u8 bStart);
 void hal_mpt_SetCarrierSuppressionTx(PADAPTER pAdapter, u8 bStart);
 void mpt_ProSetPMacTx(PADAPTER	Adapter);
-void MP_PHY_SetRFPathSwitch(PADAPTER pAdapter , BOOLEAN bMain);
+void MP_PHY_SetRFPathSwitch(PADAPTER pAdapter , bool bMain);
 void mp_phy_switch_rf_path_set(PADAPTER pAdapter , u8 *pstate);
 u8 MP_PHY_QueryRFPathSwitch(PADAPTER pAdapter);
 u32 mpt_ProQueryCalTxPower(PADAPTER	pAdapter, u8 RfPath);

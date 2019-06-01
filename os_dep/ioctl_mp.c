@@ -1034,7 +1034,7 @@ int rtw_mp_pwrtrk(struct net_device *dev,
 {
 	u8 enable;
 	u32 thermal;
-	s32 ret;
+	int ret;
 	PADAPTER padapter = rtw_netdev_priv(dev);
 	HAL_DATA_TYPE			*pHalData = GET_HAL_DATA(padapter);
 	u8 input[129];

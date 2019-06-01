@@ -411,12 +411,12 @@ inline systime _rtw_ms_to_systime(u32 ms)
 }
 
 /* the input parameter start use the same unit as returned by rtw_get_current_time */
-inline s32 _rtw_get_passing_time_ms(systime start)
+inline int _rtw_get_passing_time_ms(systime start)
 {
 	return _rtw_systime_to_ms(_rtw_get_current_time() - start);
 }
 
-inline s32 _rtw_get_time_interval_ms(systime start, systime end)
+inline int _rtw_get_time_interval_ms(systime start, systime end)
 {
 	return _rtw_systime_to_ms(end - start);
 }
@@ -1270,7 +1270,7 @@ exit:
 * Return	true if c is null character
 *		false otherwise.
 */
-inline BOOLEAN is_null(char c)
+inline bool is_null(char c)
 {
 	if (c == '\0')
 		return true;
@@ -1278,7 +1278,7 @@ inline BOOLEAN is_null(char c)
 		return false;
 }
 
-inline BOOLEAN is_all_null(char *c, int len)
+inline bool is_all_null(char *c, int len)
 {
 	for (; len > 0; len--)
 		if (c[len - 1] != '\0')
@@ -1293,7 +1293,7 @@ inline BOOLEAN is_all_null(char *c, int len)
 * Return	true if c is represent for EOL (end of line)
 *		false otherwise.
 */
-inline BOOLEAN is_eol(char c)
+inline bool is_eol(char c)
 {
 	if (c == '\r' || c == '\n')
 		return true;
@@ -1307,7 +1307,7 @@ inline BOOLEAN is_eol(char c)
 * Return	true if c is represent for space
 *		false otherwise.
 */
-inline BOOLEAN is_space(char c)
+inline bool is_space(char c)
 {
 	if (c == ' ' || c == '\t')
 		return true;
@@ -1321,7 +1321,7 @@ inline BOOLEAN is_space(char c)
 * Return	true if chTmp is represent for hex digit
 *		false otherwise.
 */
-inline BOOLEAN IsHexDigit(char chTmp)
+inline bool IsHexDigit(char chTmp)
 {
 	if ((chTmp >= '0' && chTmp <= '9') ||
 		(chTmp >= 'a' && chTmp <= 'f') ||
@@ -1337,7 +1337,7 @@ inline BOOLEAN IsHexDigit(char chTmp)
 * Return	true if chTmp is represent for alphabet
 *		false otherwise.
 */
-inline BOOLEAN is_alpha(char chTmp)
+inline bool is_alpha(char chTmp)
 {
 	if ((chTmp >= 'a' && chTmp <= 'z') ||
 		(chTmp >= 'A' && chTmp <= 'Z'))

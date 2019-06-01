@@ -1225,9 +1225,9 @@ static void rtw_dbg_skb_process(_adapter *padapter, union recv_frame *precvframe
 }
 #endif
 
-static s32 _rtw_mi_buddy_clone_bcmc_packet(_adapter *adapter, union recv_frame *precvframe, u8 *pphy_status, union recv_frame *pcloneframe)
+static int _rtw_mi_buddy_clone_bcmc_packet(_adapter *adapter, union recv_frame *precvframe, u8 *pphy_status, union recv_frame *pcloneframe)
 {
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 	u8 *pbuf = precvframe->u.hdr.rx_data;
 	struct rx_pkt_attrib *pattrib = NULL;
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(adapter);
@@ -1272,7 +1272,7 @@ static s32 _rtw_mi_buddy_clone_bcmc_packet(_adapter *adapter, union recv_frame *
 void rtw_mi_buddy_clone_bcmc_packet(_adapter *padapter, union recv_frame *precvframe, u8 *pphy_status)
 {
 	int i;
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 	_adapter *iface = NULL;
 	union recv_frame *pcloneframe = NULL;
 	struct recv_priv *precvpriv = &padapter->recvpriv;/*primary_padapter*/

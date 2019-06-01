@@ -49,7 +49,7 @@ void _dbg_dump_tx_info(PADAPTER padapter, int frame_tag, struct tx_desc *ptxdesc
 	}
 }
 
-s32 rtl8723du_init_xmit_priv(PADAPTER padapter)
+int rtl8723du_init_xmit_priv(PADAPTER padapter)
 {
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
 
@@ -73,7 +73,7 @@ static int urb_zero_packet_chk(PADAPTER padapter, int sz)
 	return blnSetTxDescOffset;
 }
 
-static s32 update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, s32 sz, u8 bagg_pkt)
+static int update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, int sz, u8 bagg_pkt)
 {
 	int pull = 0;
 
@@ -95,10 +95,10 @@ static s32 update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, s32 sz, u8 bag
 	return pull;
 }
 
-static s32 rtw_dump_xframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
+static int rtw_dump_xframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 {
-	s32 ret = _SUCCESS;
-	s32 inner_ret = _SUCCESS;
+	int ret = _SUCCESS;
+	int inner_ret = _SUCCESS;
 	int t, sz, w_sz, pull = 0;
 	u8 *mem_addr;
 	u32 ff_hwaddr;
@@ -157,7 +157,7 @@ static s32 rtw_dump_xframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 	return ret;
 }
 
-s32 rtl8723du_xmitframe_complete(PADAPTER padapter, struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf)
+int rtl8723du_xmitframe_complete(PADAPTER padapter, struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf)
 {
 
 	struct hw_xmit *phwxmits;
@@ -218,9 +218,9 @@ s32 rtl8723du_xmitframe_complete(PADAPTER padapter, struct xmit_priv *pxmitpriv,
 
 }
 
-static s32 xmitframe_direct(PADAPTER padapter, struct xmit_frame *pxmitframe)
+static int xmitframe_direct(PADAPTER padapter, struct xmit_frame *pxmitframe)
 {
-	s32 res = _SUCCESS;
+	int res = _SUCCESS;
 
 
 	res = rtw_xmitframe_coalesce(padapter, pxmitframe->pkt, pxmitframe);
@@ -235,10 +235,10 @@ static s32 xmitframe_direct(PADAPTER padapter, struct xmit_frame *pxmitframe)
  *	true	dump packet directly
  *	false	enqueue packet
  */
-static s32 pre_xmitframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
+static int pre_xmitframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 {
 	_irqL irqL;
-	s32 res;
+	int res;
 	struct xmit_buf *pxmitbuf = NULL;
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
 	struct pkt_attrib *pattrib = &pxmitframe->attrib;
@@ -286,7 +286,7 @@ enqueue:
 	return false;
 }
 
-s32 rtl8723du_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe)
+int rtl8723du_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe)
 {
 	return rtw_dump_xframe(padapter, pmgntframe);
 }
@@ -296,15 +296,15 @@ s32 rtl8723du_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe)
  *	true	dump packet directly ok
  *	false	temporary can't transmit packets to hardware
  */
-s32 rtl8723du_hal_xmit(PADAPTER padapter, struct xmit_frame *pxmitframe)
+int rtl8723du_hal_xmit(PADAPTER padapter, struct xmit_frame *pxmitframe)
 {
 	return pre_xmitframe(padapter, pxmitframe);
 }
 
-s32 rtl8723du_hal_xmitframe_enqueue(PADAPTER padapter, struct xmit_frame *pxmitframe)
+int rtl8723du_hal_xmitframe_enqueue(PADAPTER padapter, struct xmit_frame *pxmitframe)
 {
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
-	s32 err;
+	int err;
 
 	err = rtw_xmitframe_enqueue(padapter, pxmitframe);
 	if (err != _SUCCESS) {

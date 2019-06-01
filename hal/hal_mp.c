@@ -64,7 +64,7 @@ void hal_mpt_SwitchRfSetting(PADAPTER	pAdapter)
 	}
 }
 
-s32 hal_mpt_SetPowerTracking(PADAPTER padapter, u8 enable)
+int hal_mpt_SetPowerTracking(PADAPTER padapter, u8 enable)
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
@@ -95,7 +95,7 @@ void hal_mpt_GetPowerTracking(PADAPTER padapter, u8 *enable)
 }
 
 
-void hal_mpt_CCKTxPowerAdjust(PADAPTER Adapter, BOOLEAN bInCH14)
+void hal_mpt_CCKTxPowerAdjust(PADAPTER Adapter, bool bInCH14)
 {
 	u32		TempVal = 0, TempVal2 = 0, TempVal3 = 0;
 	u32		CurrCCKSwingVal = 0, CCKSwingIndex = 12;
@@ -316,14 +316,14 @@ static void mpt_SetTxPower_Old(PADAPTER pAdapter, MPT_TXPWR_DEF Rate, u8 *pTxPow
 		pwr = pTxPower[RF_PATH_A];
 		if (pwr < 0x3f) {
 			TxAGC = (pwr << 16) | (pwr << 8) | (pwr);
-			phy_set_bb_reg(pAdapter, rTxAGC_A_CCK1_Mcs32, bMaskByte1, pTxPower[RF_PATH_A]);
+			phy_set_bb_reg(pAdapter, rTxAGC_A_CCK1_Mcint, bMaskByte1, pTxPower[RF_PATH_A]);
 			phy_set_bb_reg(pAdapter, rTxAGC_B_CCK11_A_CCK2_11, 0xffffff00, TxAGC);
 		}
 		pwr = pTxPower[RF_PATH_B];
 		if (pwr < 0x3f) {
 			TxAGC = (pwr << 16) | (pwr << 8) | (pwr);
 			phy_set_bb_reg(pAdapter, rTxAGC_B_CCK11_A_CCK2_11, bMaskByte0, pTxPower[RF_PATH_B]);
-			phy_set_bb_reg(pAdapter, rTxAGC_B_CCK1_55_Mcs32, 0xffffff00, TxAGC);
+			phy_set_bb_reg(pAdapter, rTxAGC_B_CCK1_55_Mcint, 0xffffff00, TxAGC);
 		}
 	}
 	break;
@@ -711,7 +711,7 @@ void hal_mpt_SetAntenna(PADAPTER	pAdapter)
 	RTW_INFO("mpt_SetRFPath_819X Do %s\n", __func__);
 }
 
-s32 hal_mpt_SetThermalMeter(PADAPTER pAdapter, u8 target_ther)
+int hal_mpt_SetThermalMeter(PADAPTER pAdapter, u8 target_ther)
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(pAdapter);
 
@@ -749,7 +749,7 @@ u8 hal_mpt_ReadRFThermalMeter(PADAPTER pAdapter)
 {
 	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(pAdapter);
 	u32 ThermalValue = 0;
-	s32 thermal_value_temp = 0;
+	int thermal_value_temp = 0;
 	s8 thermal_offset = 0;
 
 	ThermalValue = (u8)phy_query_rf_reg(pAdapter, RF_PATH_A, 0x42, 0xfc00);	/*0x42: RF Reg[15:10]*/

@@ -239,9 +239,9 @@ extern const char *const _h2c_msr_role_str[];
 	h2c_msr_role_str(GET_H2CCMD_MSRRPT_PARM_ROLE((h2c_msr))), \
 	GET_H2CCMD_MSRRPT_PARM_MIRACAST((h2c_msr)) ? (GET_H2CCMD_MSRRPT_PARM_MIRACAST_SINK((h2c_msr)) ? " MSINK" : " MSRC") : ""
 
-s32 rtw_hal_set_FwMediaStatusRpt_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, bool macid_ind, u8 macid_end);
-s32 rtw_hal_set_FwMediaStatusRpt_single_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid);
-s32 rtw_hal_set_FwMediaStatusRpt_range_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, u8 macid_end);
+int rtw_hal_set_FwMediaStatusRpt_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, bool macid_ind, u8 macid_end);
+int rtw_hal_set_FwMediaStatusRpt_single_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid);
+int rtw_hal_set_FwMediaStatusRpt_range_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, u8 macid_end);
 
 /* _KEEP_ALIVE_CMD_0x03 */
 static inline void SET_H2CCMD_KEEPALIVE_PARM_ENABLE(u8 *__pH2CCmd, u8 __Value)
@@ -309,8 +309,8 @@ static inline void SET_H2CCMD_CUSTOMER_STR_REQ_EN(u8 *__pH2CCmd, u8 __Value)
 	u8p_replace_bits(__pH2CCmd, __Value, BIT(0));
 }
 
-s32 rtw_hal_h2c_customer_str_req(_adapter *adapter);
-s32 rtw_hal_customer_str_read(_adapter *adapter, u8 *cs);
+int rtw_hal_h2c_customer_str_req(_adapter *adapter);
+int rtw_hal_customer_str_read(_adapter *adapter, u8 *cs);
 
 /* H2C_CUSTOMER_STR_W1 0xC6 */
 #define H2C_CUSTOMER_STR_W1_LEN 7
@@ -338,8 +338,8 @@ static inline void SET_H2CCMD_CUSTOMER_STR_W3_EN(u8 *__pH2CCmd, u8 __Value)
 }
 
 #define H2CCMD_CUSTOMER_STR_W3_BYTE12(__pH2CCmd)			(((u8 *)(__pH2CCmd)) + 1)
-s32 rtw_hal_h2c_customer_str_write(_adapter *adapter, const u8 *cs);
-s32 rtw_hal_customer_str_write(_adapter *adapter, const u8 *cs);
+int rtw_hal_h2c_customer_str_write(_adapter *adapter, const u8 *cs);
+int rtw_hal_customer_str_write(_adapter *adapter, const u8 *cs);
 #endif /* CONFIG_RTW_CUSTOMER_STR */
 
 /* _AP_Offload 0x08 */

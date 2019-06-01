@@ -73,7 +73,7 @@
 #define		rFPGA0_XB_HSSIParameter2		0x82c
 #define		rTxAGC_B_Rate18_06				0x830
 #define		rTxAGC_B_Rate54_24				0x834
-#define		rTxAGC_B_CCK1_55_Mcs32		0x838
+#define		rTxAGC_B_CCK1_55_Mcint		0x838
 #define		rTxAGC_B_Mcs03_Mcs00			0x83c
 
 #define		rTxAGC_B_Mcs07_Mcs04			0x848
@@ -305,7 +305,7 @@
  *   */
 #define		rTxAGC_A_Rate18_06			0xe00
 #define		rTxAGC_A_Rate54_24			0xe04
-#define		rTxAGC_A_CCK1_Mcs32			0xe08
+#define		rTxAGC_A_CCK1_Mcint			0xe08
 #define		rTxAGC_A_Mcs03_Mcs00			0xe10
 #define		rTxAGC_A_Mcs07_Mcs04			0xe14
 #define		rTxAGC_A_Mcs11_Mcs08			0xe18

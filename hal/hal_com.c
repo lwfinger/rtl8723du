@@ -221,7 +221,7 @@ void hal_com_config_channel_plan(
 	char *sw_alpha2,
 	u8 sw_chplan,
 	u8 def_chplan,
-	BOOLEAN AutoLoadFail
+	bool AutoLoadFail
 )
 {
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(padapter);
@@ -303,13 +303,13 @@ done:
 	pHalData->bDisableSWChannelPlan = force_hw_chplan;
 }
 
-BOOLEAN
+bool
 HAL_IsLegalChannel(
 	PADAPTER	Adapter,
 	u32			Channel
 )
 {
-	BOOLEAN bLegalChannel = true;
+	bool bLegalChannel = true;
 
 	if (Channel > 14) {
 		if (is_supported_5g(Adapter->registrypriv.wireless_mode) == false) {
@@ -937,7 +937,7 @@ _OneOutPipeMapping(
 static void
 _TwoOutPipeMapping(
 	PADAPTER	pAdapter,
-	BOOLEAN		bWIFICfg
+	bool		bWIFICfg
 )
 {
 	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(pAdapter);
@@ -981,7 +981,7 @@ _TwoOutPipeMapping(
 
 static void _ThreeOutPipeMapping(
 	PADAPTER	pAdapter,
-	BOOLEAN		bWIFICfg
+	bool		bWIFICfg
 )
 {
 	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(pAdapter);
@@ -1023,7 +1023,7 @@ static void _ThreeOutPipeMapping(
 }
 static void _FourOutPipeMapping(
 	PADAPTER	pAdapter,
-	BOOLEAN		bWIFICfg
+	bool		bWIFICfg
 )
 {
 	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(pAdapter);
@@ -1064,7 +1064,7 @@ static void _FourOutPipeMapping(
 
 }
 
-BOOLEAN
+bool
 Hal_MappingOutPipe(
 	PADAPTER	pAdapter,
 	u8		NumOutPipe
@@ -1072,9 +1072,9 @@ Hal_MappingOutPipe(
 {
 	struct registry_priv *pregistrypriv = &pAdapter->registrypriv;
 
-	BOOLEAN	 bWIFICfg = (pregistrypriv->wifi_spec) ? true : false;
+	bool	 bWIFICfg = (pregistrypriv->wifi_spec) ? true : false;
 
-	BOOLEAN result = true;
+	bool result = true;
 
 	switch (NumOutPipe) {
 	case 2:
@@ -1158,9 +1158,9 @@ void c2h_evt_clear(_adapter *adapter)
 	rtw_write8(adapter, REG_C2HEVT_CLEAR, C2H_EVT_HOST_CLOSE);
 }
 
-s32 c2h_evt_read_88xx(_adapter *adapter, u8 *buf)
+int c2h_evt_read_88xx(_adapter *adapter, u8 *buf)
 {
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 	int i;
 	u8 trigger;
 
@@ -1213,7 +1213,7 @@ void rtw_hal_c2h_pkt_pre_hdl(_adapter *adapter, u8 *buf, u16 len)
 {
 	u8 parse_fail = 0;
 	u8 hdl_here = 0;
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 	u8 id, seq, plen;
 	u8 *payload;
 
@@ -1245,7 +1245,7 @@ void rtw_hal_c2h_pkt_hdl(_adapter *adapter, u8 *buf, u16 len)
 {
 	u8 parse_fail = 0;
 	u8 bypass = 0;
-	s32 ret = _FAIL;
+	int ret = _FAIL;
 	u8 id, seq, plen;
 	u8 *payload;
 
@@ -1533,7 +1533,7 @@ exit:
 #endif
 
 #ifdef CONFIG_RTW_CUSTOMER_STR
-s32 rtw_hal_h2c_customer_str_req(_adapter *adapter)
+int rtw_hal_h2c_customer_str_req(_adapter *adapter)
 {
 	u8 h2c_data[H2C_CUSTOMER_STR_REQ_LEN] = {0};
 
@@ -1609,11 +1609,11 @@ exit:
 }
 
 /* read customer str */
-s32 rtw_hal_customer_str_read(_adapter *adapter, u8 *cs)
+int rtw_hal_customer_str_read(_adapter *adapter, u8 *cs)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct submit_ctx sctx;
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 
 	_enter_critical_mutex(&dvobj->customer_str_mutex, NULL);
 	if (dvobj->customer_str_sctx != NULL)
@@ -1653,12 +1653,12 @@ exit:
 	return ret;
 }
 
-s32 rtw_hal_h2c_customer_str_write(_adapter *adapter, const u8 *cs)
+int rtw_hal_h2c_customer_str_write(_adapter *adapter, const u8 *cs)
 {
 	u8 h2c_data_w1[H2C_CUSTOMER_STR_W1_LEN] = {0};
 	u8 h2c_data_w2[H2C_CUSTOMER_STR_W2_LEN] = {0};
 	u8 h2c_data_w3[H2C_CUSTOMER_STR_W3_LEN] = {0};
-	s32 ret;
+	int ret;
 
 	SET_H2CCMD_CUSTOMER_STR_W1_EN(h2c_data_w1, 1);
 	_rtw_memcpy(H2CCMD_CUSTOMER_STR_W1_BYTE0(h2c_data_w1), cs, 6);
@@ -1692,11 +1692,11 @@ exit:
 }
 
 /* write customer str and check if value reported is the same as requested */
-s32 rtw_hal_customer_str_write(_adapter *adapter, const u8 *cs)
+int rtw_hal_customer_str_write(_adapter *adapter, const u8 *cs)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct submit_ctx sctx;
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 
 	_enter_critical_mutex(&dvobj->customer_str_mutex, NULL);
 	if (dvobj->customer_str_sctx != NULL)
@@ -2899,9 +2899,9 @@ const char *const _h2c_msr_role_str[] = {
 };
 
 #ifdef CONFIG_FW_MULTI_PORT_SUPPORT
-s32 rtw_hal_set_default_port_id_cmd(_adapter *adapter, u8 mac_id)
+int rtw_hal_set_default_port_id_cmd(_adapter *adapter, u8 mac_id)
 {
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 	u8 parm[H2C_DEFAULT_PORT_ID_LEN] = {0};
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 
@@ -2916,9 +2916,9 @@ s32 rtw_hal_set_default_port_id_cmd(_adapter *adapter, u8 mac_id)
 
 	return ret;
 }
-s32 rtw_set_default_port_id(_adapter *adapter)
+int rtw_set_default_port_id(_adapter *adapter)
 {
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 	struct sta_info		*psta;
 	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
@@ -2937,9 +2937,9 @@ s32 rtw_set_default_port_id(_adapter *adapter)
 
 	return ret;
 }
-s32 rtw_set_ps_rsvd_page(_adapter *adapter)
+int rtw_set_ps_rsvd_page(_adapter *adapter)
 {
-	s32 ret = _SUCCESS;
+	int ret = _SUCCESS;
 	u16 media_status_rpt = RT_MEDIA_CONNECT;
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 
@@ -2966,12 +2966,12 @@ s32 rtw_set_ps_rsvd_page(_adapter *adapter)
 * @macid_ind:  0:update Media Status to macid.  1:update Media Status from macid to macid_end
 * @macid_end:
 */
-s32 rtw_hal_set_FwMediaStatusRpt_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, bool macid_ind, u8 macid_end)
+int rtw_hal_set_FwMediaStatusRpt_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, bool macid_ind, u8 macid_end)
 {
 	struct macid_ctl_t *macid_ctl = &adapter->dvobj->macid_ctl;
 	u8 parm[H2C_MEDIA_STATUS_RPT_LEN] = {0};
 	int i;
-	s32 ret;
+	int ret;
 
 	SET_H2CCMD_MSRRPT_PARM_OPMODE(parm, opmode);
 	SET_H2CCMD_MSRRPT_PARM_MACID_IND(parm, macid_ind);
@@ -3009,12 +3009,12 @@ exit:
 	return ret;
 }
 
-inline s32 rtw_hal_set_FwMediaStatusRpt_single_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid)
+inline int rtw_hal_set_FwMediaStatusRpt_single_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid)
 {
 	return rtw_hal_set_FwMediaStatusRpt_cmd(adapter, opmode, miracast, miracast_sink, role, macid, 0, 0);
 }
 
-inline s32 rtw_hal_set_FwMediaStatusRpt_range_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, u8 macid_end)
+inline int rtw_hal_set_FwMediaStatusRpt_range_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, u8 macid_end)
 {
 	return rtw_hal_set_FwMediaStatusRpt_cmd(adapter, opmode, miracast, miracast_sink, role, macid, 1, macid_end);
 }
@@ -3365,7 +3365,7 @@ void rtw_hal_construct_NullFunctionData(
 }
 
 static void rtw_hal_construct_ProbeRsp(_adapter *padapter, u8 *pframe, u32 *pLength,
-				u8 *StaAddr, BOOLEAN bHideSSID)
+				u8 *StaAddr, bool bHideSSID)
 {
 	struct rtw_ieee80211_hdr	*pwlanhdr;
 	__le16 *fctrl;
@@ -3932,7 +3932,7 @@ void rtw_hal_update_uapsd_tid(_adapter *adapter)
 
 #if defined(CONFIG_FW_MULTI_PORT_SUPPORT)
 /* For multi-port support, driver needs to inform the port ID to FW for btc operations */
-s32 rtw_hal_set_wifi_port_id_cmd(_adapter *adapter)
+int rtw_hal_set_wifi_port_id_cmd(_adapter *adapter)
 {
 	u8 port_id = 0;
 	u8 h2c_buf[H2C_BTC_WL_PORT_ID_LEN] = {0};
@@ -4269,7 +4269,7 @@ GetHalDefVar(_adapter *adapter, HAL_DEF_VARIABLE variable, void *value)
 }
 
 
-BOOLEAN
+bool
 eqNByte(
 	u8	*str1,
 	u8	*str2,
@@ -4311,7 +4311,7 @@ MapCharToHexDigit(
  *	Description:
  *		Parse hex number from the string pucStr.
  *   */
-BOOLEAN
+bool
 GetHexValueFromString(
 	char			*szStr,
 	u32			*pu4bVal,
@@ -4360,7 +4360,7 @@ GetHexValueFromString(
 	return true;
 }
 
-BOOLEAN
+bool
 GetFractionValueFromString(
 	char			*szStr,
 	u8				*pInteger,
@@ -4411,7 +4411,7 @@ GetFractionValueFromString(
  *	Description:
  * Return true if szStr is comment out with leading " */ /* ".
  *   */
-BOOLEAN
+bool
 IsCommentString(
 	char			*szStr
 )
@@ -4422,7 +4422,7 @@ IsCommentString(
 		return false;
 }
 
-BOOLEAN
+bool
 GetU1ByteIntegerFromStringInDecimal(
 	char	*Str,
 	u8		*pInt
@@ -4446,7 +4446,7 @@ GetU1ByteIntegerFromStringInDecimal(
 /* <20121004, Kordan> For example,
  * ParseQualifiedString(inString, 0, outString, '[', ']') gets "Kordan" from a string "Hello [Kordan]".
  * If RightQualifier does not exist, it will hang on in the while loop */
-BOOLEAN
+bool
 ParseQualifiedString(
 	char	*In,
 	u32	*Start,
@@ -4475,7 +4475,7 @@ ParseQualifiedString(
 	return true;
 }
 
-BOOLEAN
+bool
 isAllSpaceOrTab(
 	u8	*data,
 	u8	size

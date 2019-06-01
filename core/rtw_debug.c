@@ -1098,7 +1098,7 @@ int proc_get_survey_info(struct seq_file *m, void *v)
 	_queue	*queue	= &(pmlmepriv->scanned_queue);
 	struct wlan_network	*pnetwork = NULL;
 	_list	*plist, *phead;
-	s32 notify_signal;
+	int notify_signal;
 	s16 notify_noise = 0;
 	u16  index = 0, ie_cap = 0;
 	unsigned char *ie_wpa = NULL, *ie_wpa2 = NULL, *ie_wps = NULL;

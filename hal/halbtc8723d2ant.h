@@ -154,32 +154,32 @@ struct coex_dm_8723d_2ant {
 	u8		cur_bt_dec_pwr_lvl;
 	u8		pre_fw_dac_swing_lvl;
 	u8		cur_fw_dac_swing_lvl;
-	boolean		cur_ignore_wlan_act;
-	boolean		pre_ignore_wlan_act;
+	bool		cur_ignore_wlan_act;
+	bool		pre_ignore_wlan_act;
 	u8		pre_ps_tdma;
 	u8		cur_ps_tdma;
 	u8		ps_tdma_para[5];
 	u8		ps_tdma_du_adj_type;
-	boolean		reset_tdma_adjust;
-	boolean		pre_ps_tdma_on;
-	boolean		cur_ps_tdma_on;
-	boolean		pre_bt_auto_report;
-	boolean		cur_bt_auto_report;
+	bool		reset_tdma_adjust;
+	bool		pre_ps_tdma_on;
+	bool		cur_ps_tdma_on;
+	bool		pre_bt_auto_report;
+	bool		cur_bt_auto_report;
 
 	/* sw mechanism */
-	boolean		pre_rf_rx_lpf_shrink;
-	boolean		cur_rf_rx_lpf_shrink;
+	bool		pre_rf_rx_lpf_shrink;
+	bool		cur_rf_rx_lpf_shrink;
 	u32		bt_rf_0x1e_backup;
-	boolean	pre_low_penalty_ra;
-	boolean		cur_low_penalty_ra;
-	boolean		pre_dac_swing_on;
+	bool	pre_low_penalty_ra;
+	bool		cur_low_penalty_ra;
+	bool		pre_dac_swing_on;
 	u32		pre_dac_swing_lvl;
-	boolean		cur_dac_swing_on;
+	bool		cur_dac_swing_on;
 	u32		cur_dac_swing_lvl;
-	boolean		pre_adc_back_off;
-	boolean		cur_adc_back_off;
-	boolean	pre_agc_table_en;
-	boolean		cur_agc_table_en;
+	bool		pre_adc_back_off;
+	bool		cur_adc_back_off;
+	bool	pre_agc_table_en;
+	bool		cur_agc_table_en;
 	u32		pre_val0x6c0;
 	u32		cur_val0x6c0;
 	u32		pre_val0x6c4;
@@ -188,7 +188,7 @@ struct coex_dm_8723d_2ant {
 	u32		cur_val0x6c8;
 	u8		pre_val0x6cc;
 	u8		cur_val0x6cc;
-	boolean		limited_dig;
+	bool		limited_dig;
 
 	/* algorithm related */
 	u8		pre_algorithm;
@@ -196,7 +196,7 @@ struct coex_dm_8723d_2ant {
 	u8		bt_status;
 	u8		wifi_chnl_info[3];
 
-	boolean		need_recover0x948;
+	bool		need_recover0x948;
 	u32		backup0x948;
 
 	u8		pre_lps;
@@ -204,7 +204,7 @@ struct coex_dm_8723d_2ant {
 	u8		pre_rpwm;
 	u8		cur_rpwm;
 
-	boolean		is_switch_to_1dot5_ant;
+	bool		is_switch_to_1dot5_ant;
 	u8		switch_thres_offset;
 	u32					arp_cnt;
 
@@ -213,29 +213,29 @@ struct coex_dm_8723d_2ant {
 };
 
 struct coex_sta_8723d_2ant {
-	boolean				bt_disabled;
-	boolean				bt_link_exist;
-	boolean				sco_exist;
-	boolean				a2dp_exist;
-	boolean				hid_exist;
-	boolean				pan_exist;
+	bool				bt_disabled;
+	bool				bt_link_exist;
+	bool				sco_exist;
+	bool				a2dp_exist;
+	bool				hid_exist;
+	bool				pan_exist;
 
-	boolean				under_lps;
-	boolean				under_ips;
+	bool				under_lps;
+	bool				under_ips;
 	u32					high_priority_tx;
 	u32					high_priority_rx;
 	u32					low_priority_tx;
 	u32					low_priority_rx;
-	boolean             is_hiPri_rx_overhead;
+	bool             is_hiPri_rx_overhead;
 	u8					bt_rssi;
-	boolean				bt_tx_rx_mask;
+	bool				bt_tx_rx_mask;
 	u8					pre_bt_rssi_state;
 	u8					pre_wifi_rssi_state[4];
 	u8					bt_info_c2h[BT_INFO_SRC_8723D_2ANT_MAX][10];
 	u32					bt_info_c2h_cnt[BT_INFO_SRC_8723D_2ANT_MAX];
-	boolean				bt_whck_test;
-	boolean				c2h_bt_inquiry_page;
-	boolean				c2h_bt_remote_name_req;
+	bool				bt_whck_test;
+	bool				c2h_bt_inquiry_page;
+	bool				c2h_bt_remote_name_req;
 	u8					bt_retry_cnt;
 	u8					bt_info_ext;
 	u8					bt_info_ext2;
@@ -256,19 +256,19 @@ struct coex_sta_8723d_2ant {
 	u32					now_crc_ratio;
 	u32					cnt_crcok_max_in_10s;
 
-	boolean				cck_lock;
-	boolean				cck_lock_ever;
-	boolean				cck_lock_warn;
+	bool				cck_lock;
+	bool				cck_lock_ever;
+	bool				cck_lock_warn;
 
 	u8					coex_table_type;
-	boolean				force_lps_ctrl;
+	bool				force_lps_ctrl;
 
 	u8					dis_ver_info_cnt;
 
 	u8					a2dp_bit_pool;
 	u8					cut_version;
 
-	boolean				concurrent_rx_mode_on;
+	bool				concurrent_rx_mode_on;
 
 	u16					score_board;
 	u8					isolation_btween_wb;   /* 0~ 50 */
@@ -278,9 +278,9 @@ struct coex_sta_8723d_2ant {
 	u8					bt_coex_thres2;
 
 	u8					num_of_profile;
-	boolean				acl_busy;
-	boolean				bt_create_connection;
-	boolean				wifi_is_high_pri_task;
+	bool				acl_busy;
+	bool				bt_create_connection;
+	bool				wifi_is_high_pri_task;
 	u32					specific_pkt_period_cnt;
 	u32					bt_coex_supported_feature;
 	u32					bt_coex_supported_version;
@@ -288,13 +288,13 @@ struct coex_sta_8723d_2ant {
 	u8					bt_ble_scan_type;
 	u32					bt_ble_scan_para[3];
 
-	boolean				run_time_state;
-	boolean				freeze_coexrun_by_btinfo;
+	bool				run_time_state;
+	bool				freeze_coexrun_by_btinfo;
 
-	boolean				is_A2DP_3M;
-	boolean				voice_over_HOGP;
+	bool				is_A2DP_3M;
+	bool				voice_over_HOGP;
 	u8                  bt_info;
-	boolean				is_autoslot;
+	bool				is_autoslot;
 	u8					forbidden_slot;
 	u8					hid_busy_num;
 	u8					hid_pair_cnt;
@@ -309,38 +309,38 @@ struct coex_sta_8723d_2ant {
 	u16					bt_reg_vendor_ac;
 	u16					bt_reg_vendor_ae;
 
-	boolean				is_setupLink;
-	boolean				wl_noisy_level;
+	bool				is_setupLink;
+	bool				wl_noisy_level;
 	u32                 gnt_error_cnt;
 
 	u8					bt_afh_map[10];
 	u8					bt_relink_downcount;
-	boolean				is_tdma_btautoslot;
-	boolean				is_tdma_btautoslot_hang;
+	bool				is_tdma_btautoslot;
+	bool				is_tdma_btautoslot_hang;
 
-	boolean             is_eSCO_mode;
+	bool             is_eSCO_mode;
 
-	boolean				is_rf_state_off;
+	bool				is_rf_state_off;
 
-	boolean				is_hid_low_pri_tx_overhead;
-	boolean				is_bt_multi_link;
-	boolean				is_bt_a2dp_sink;
+	bool				is_hid_low_pri_tx_overhead;
+	bool				is_bt_multi_link;
+	bool				is_bt_a2dp_sink;
 
 	u8					wl_fw_dbg_info[10];
 	u8					wl_rx_rate;
 	u8					wl_rts_rx_rate;
 
 	u16					score_board_WB;
-	boolean				is_2g_freerun;
+	bool				is_2g_freerun;
 
-	boolean				is_hid_rcu;
-	boolean				is_ble_scan_toggle;
+	bool				is_hid_rcu;
+	bool				is_ble_scan_toggle;
 
 	u16					legacy_forbidden_slot;
 	u16					le_forbidden_slot;
 	u8					bt_a2dp_vendor_id;
 	u32					bt_a2dp_device_name;
-	boolean				is_bt_opp_exist;
+	bool				is_bt_opp_exist;
 };
 
 #define BT_8723D_2ANT_ANTDET_PSD_POINTS			256	/* MAX:1024 */
@@ -352,9 +352,9 @@ struct psdscan_sta_8723d_2ant {
 	u32			ant_det_bt_le_channel;  /* BT LE Channel ex:2412 */
 	u32			ant_det_bt_tx_time;
 	u32			ant_det_pre_psdscan_peak_val;
-	boolean			ant_det_is_ant_det_available;
+	bool			ant_det_is_ant_det_available;
 	u32			ant_det_psd_scan_peak_val;
-	boolean			ant_det_is_btreply_available;
+	bool			ant_det_is_btreply_available;
 	u32			ant_det_psd_scan_peak_freq;
 
 	u8			ant_det_result;
@@ -366,7 +366,7 @@ struct psdscan_sta_8723d_2ant {
 	u32			ant_det_thres_offset;
 
 	u32			real_cent_freq;
-	s32			real_offset;
+	int			real_offset;
 	u32			real_span;
 
 	u32			psd_band_width;  /* unit: Hz */
@@ -383,8 +383,8 @@ struct psdscan_sta_8723d_2ant {
 	u32			psd_start_base;
 	u32			psd_avg_num;	/* 1/8/16/32 */
 	u32			psd_gen_count;
-	boolean			is_AntDet_running;
-	boolean			is_psd_show_max_only;
+	bool			is_AntDet_running;
+	bool			is_psd_show_max_only;
 };
 
 
@@ -394,7 +394,7 @@ struct psdscan_sta_8723d_2ant {
 void ex_halbtc8723d2ant_power_on_setting(struct btc_coexist *btcoexist);
 void ex_halbtc8723d2ant_pre_load_firmware(struct btc_coexist *btcoexist);
 void ex_halbtc8723d2ant_init_hw_config(struct btc_coexist *btcoexist,
-				       boolean wifi_only);
+				       bool wifi_only);
 void ex_halbtc8723d2ant_init_coex_dm(struct btc_coexist *btcoexist);
 void ex_halbtc8723d2ant_ips_notify(struct btc_coexist *btcoexist,
 				   u8 type);
@@ -413,7 +413,7 @@ void ex_halbtc8723d2ant_bt_info_notify(struct btc_coexist *btcoexist,
 void ex_halbtc8723d2ant_wl_fwdbginfo_notify(struct btc_coexist *btcoexist,
 				       u8 *tmp_buf, u8 length);
 void ex_halbtc8723d2ant_rx_rate_change_notify(struct btc_coexist *btcoexist,
-		BOOLEAN is_data_frame, u8 btc_rate_id);
+		bool is_data_frame, u8 btc_rate_id);
 void ex_halbtc8723d2ant_rf_status_notify(struct btc_coexist *btcoexist,
 		u8 type);
 void ex_halbtc8723d2ant_halt_notify(struct btc_coexist *btcoexist);

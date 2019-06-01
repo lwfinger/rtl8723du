@@ -10,7 +10,7 @@ int recvbuf2recvframe(PADAPTER padapter, void *ptr)
 	u8 *pbuf;
 	u8 pkt_cnt = 0;
 	u32 pkt_offset;
-	s32 transfer_len;
+	int transfer_len;
 	u8 *pdata;
 	union recv_frame *precvframe = NULL;
 	struct rx_pkt_attrib *pattrib = NULL;
@@ -25,7 +25,7 @@ int recvbuf2recvframe(PADAPTER padapter, void *ptr)
 	pfree_recv_queue = &precvpriv->free_recv_queue;
 
 	pskb = (_pkt *)ptr;
-	transfer_len = (s32)pskb->len;
+	transfer_len = (int)pskb->len;
 	pbuf = pskb->data;
 
 	do {

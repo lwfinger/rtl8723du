@@ -328,7 +328,7 @@ void rtw_wep_decrypt(_adapter  *padapter, u8 *precvframe)
 static u32 secmicgetuint32(u8 *p)
 /* Convert from Byte[] to u32 in a portable way */
 {
-	s32 i;
+	int i;
 	u32 res = 0;
 	for (i = 0; i < 4; i++)
 		res |= ((u32)(*p++)) << (8 * i);

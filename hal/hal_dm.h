@@ -19,7 +19,7 @@ void SetHalODMVar(
 	PADAPTER				Adapter,
 	HAL_ODM_VARIABLE		eVariable,
 	void *					pValue1,
-	BOOLEAN					bSet);
+	bool					bSet);
 
 void rtw_phydm_ra_registed(_adapter *adapter, struct sta_info *psta);
 

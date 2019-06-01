@@ -379,7 +379,7 @@ static void halbtcoutsrc_DisableLowPower(PBTC_COEXIST pBtCoexist, u8 bLowPwrDisa
 static void halbtcoutsrc_AggregationCheck(PBTC_COEXIST pBtCoexist)
 {
 	PADAPTER padapter;
-	BOOLEAN bNeedToAct = false;
+	bool bNeedToAct = false;
 	static u32 preTime = 0;
 	u32 curTime = 0;
 
@@ -551,7 +551,7 @@ static u8 _btmpoper_cmd(PBTC_COEXIST pBtCoexist, u8 opcode, u8 opcodever, u8 *cm
 	u8 buf[H2C_BTMP_OPER_LEN] = {0};
 	u8 buflen;
 	u8 seq;
-	s32 ret;
+	int ret;
 
 
 	if (!cmd && size)
@@ -653,7 +653,7 @@ exit:
 	return pBtCoexist->bt_info.bt_real_fw_ver;
 }
 
-static s32 halbtcoutsrc_GetWifiRssi(PADAPTER padapter)
+static int halbtcoutsrc_GetWifiRssi(PADAPTER padapter)
 {
 	return rtw_phydm_get_min_rssi(padapter);
 }
@@ -810,7 +810,7 @@ static u8 halbtcoutsrc_Get(void *pBtcContext, u8 getType, void *pOutBuf)
 	struct mlme_ext_priv *mlmeext;
 	u8 bSoftApExist, bVwifiExist;
 	u8 *pu8;
-	s32 *pS4Tmp;
+	int *pS4Tmp;
 	u32 *pU4Tmp;
 	u8 *pU1Tmp;
 	u16 *pU2Tmp;
@@ -827,7 +827,7 @@ static u8 halbtcoutsrc_Get(void *pBtcContext, u8 getType, void *pOutBuf)
 	bSoftApExist = false;
 	bVwifiExist = false;
 	pu8 = (u8 *)pOutBuf;
-	pS4Tmp = (s32 *)pOutBuf;
+	pS4Tmp = (int *)pOutBuf;
 	pU4Tmp = (u32 *)pOutBuf;
 	pU1Tmp = (u8 *)pOutBuf;
 	pU2Tmp = (u16*)pOutBuf;
@@ -1316,11 +1316,11 @@ static void halbtcoutsrc_DisplayWifiStatus(PBTC_COEXIST pBtCoexist)
 	PADAPTER	padapter = pBtCoexist->Adapter;
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
 	u8			*cliBuf = pBtCoexist->cli_buf;
-	s32			wifiRssi = 0, btHsRssi = 0;
-	BOOLEAN	bScan = false, bLink = false, bRoam = false, bWifiBusy = false, bWifiUnderBMode = false;
+	int			wifiRssi = 0, btHsRssi = 0;
+	bool	bScan = false, bLink = false, bRoam = false, bWifiBusy = false, bWifiUnderBMode = false;
 	u32			wifiBw = BTC_WIFI_BW_HT20, wifiTrafficDir = BTC_WIFI_TRAFFIC_TX, wifiFreq = BTC_FREQ_2_4G;
 	u32			wifiLinkStatus = 0x0;
-	BOOLEAN	bBtHsOn = false, bLowPower = false;
+	bool	bBtHsOn = false, bLowPower = false;
 	u8			wifiChnl = 0, wifiP2PChnl = 0, nScanAPNum = 0, FwPSState;
 	u32			iqk_cnt_total = 0, iqk_cnt_ok = 0, iqk_cnt_fail = 0;
 	u16			wifiBcnInterval = 0;
@@ -1612,13 +1612,13 @@ static u16 halbtcoutsrc_SetBtReg(void *pBtcContext, u8 RegType, u32 RegAddr, u32
 	return ret;
 }
 
-static u8 halbtcoutsrc_SetBtAntDetection(void *pBtcContext, u8 txTime, u8 btChnl)
+static bool halbtcoutsrc_SetBtAntDetection(void *pBtcContext, u8 txTime, u8 btChnl)
 {
 	/* Always return false since we don't implement this yet */
 	return false;
 }
 
-static BOOLEAN
+static bool
 halbtcoutsrc_SetBtTRXMASK(
 	void *			pBtcContext,
 	u8			bt_trx_mask
@@ -1993,7 +1993,7 @@ static void EXhalbtcoutsrc_AntInfoSetting(void *padapter)
 
 }
 
-u8 EXhalbtcoutsrc_InitlizeVariables(void *padapter)
+bool EXhalbtcoutsrc_InitlizeVariables(void *padapter)
 {
 	PBTC_COEXIST pBtCoexist = &GLBtCoexist;
 
@@ -2334,7 +2334,7 @@ void EXhalbtcoutsrc_WlFwDbgInfoNotify(PBTC_COEXIST pBtCoexist, u8* tmpBuf, u8 le
 	}
 }
 
-void EXhalbtcoutsrc_rx_rate_change_notify(PBTC_COEXIST pBtCoexist, u8 is_data_frame, u8 btc_rate_id)
+void EXhalbtcoutsrc_rx_rate_change_notify(PBTC_COEXIST pBtCoexist, bool is_data_frame, u8 btc_rate_id)
 {
 	if (!halbtcoutsrc_IsBtCoexistAvailable(pBtCoexist))
 		return;
@@ -3173,14 +3173,14 @@ void hal_btcoex_Hanlder(PADAPTER padapter)
 	}
 }
 
-s32 hal_btcoex_IsBTCoexRejectAMPDU(PADAPTER padapter)
+int hal_btcoex_IsBTCoexRejectAMPDU(PADAPTER padapter)
 {
-	return (s32)GLBtCoexist.bt_info.reject_agg_pkt;
+	return (int)GLBtCoexist.bt_info.reject_agg_pkt;
 }
 
-s32 hal_btcoex_IsBTCoexCtrlAMPDUSize(PADAPTER padapter)
+int hal_btcoex_IsBTCoexCtrlAMPDUSize(PADAPTER padapter)
 {
-	return (s32)GLBtCoexist.bt_info.bt_ctrl_agg_buf_size;
+	return (int)GLBtCoexist.bt_info.bt_ctrl_agg_buf_size;
 }
 
 u32 hal_btcoex_GetAMPDUSize(PADAPTER padapter)
@@ -3296,7 +3296,7 @@ void hal_btcoex_SetDBG(PADAPTER padapter, u32 *pDbgModule)
 
 u32 hal_btcoex_GetDBG(PADAPTER padapter, u8 *pStrBuf, u32 bufSize)
 {
-	s32 count;
+	int count;
 	u8 *pstr;
 	u32 leftSize;
 
@@ -3594,7 +3594,7 @@ void hal_btcoex_WlFwDbgInfoNotify(PADAPTER padapter, u8* tmpBuf, u8 length)
 	EXhalbtcoutsrc_WlFwDbgInfoNotify(&GLBtCoexist, tmpBuf, length);
 }
 
-void hal_btcoex_rx_rate_change_notify(PADAPTER padapter, u8 is_data_frame, u8 rate_id)
+void hal_btcoex_rx_rate_change_notify(PADAPTER padapter, bool is_data_frame, u8 rate_id)
 {
 	EXhalbtcoutsrc_rx_rate_change_notify(&GLBtCoexist, is_data_frame, EXhalbtcoutsrc_rate_id_to_btc_rate_id(rate_id));
 }

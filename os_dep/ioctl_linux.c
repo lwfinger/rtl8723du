@@ -8910,7 +8910,7 @@ static int rtw_widi_set_probe_request(struct net_device *dev,
 /* extern void rtl8723d_fill_default_txdesc(struct xmit_frame *pxmitframe, u8 *pbuf); */
 #define fill_default_txdesc rtl8723d_fill_default_txdesc
 
-static s32 initLoopback(PADAPTER padapter)
+static int initLoopback(PADAPTER padapter)
 {
 	PLOOPBACKDATA ploopback;
 
@@ -8944,10 +8944,10 @@ static void freeLoopback(PADAPTER padapter)
 	}
 }
 
-static s32 initpseudoadhoc(PADAPTER padapter)
+static int initpseudoadhoc(PADAPTER padapter)
 {
 	NDIS_802_11_NETWORK_INFRASTRUCTURE networkType;
-	s32 err;
+	int err;
 
 	networkType = Ndis802_11IBSS;
 	err = rtw_set_802_11_infrastructure_mode(padapter, networkType);
@@ -8961,7 +8961,7 @@ static s32 initpseudoadhoc(PADAPTER padapter)
 	return _SUCCESS;
 }
 
-static s32 createpseudoadhoc(PADAPTER padapter)
+static int createpseudoadhoc(PADAPTER padapter)
 {
 	NDIS_802_11_AUTHENTICATION_MODE authmode;
 	struct mlme_priv *pmlmepriv;
@@ -8969,7 +8969,7 @@ static s32 createpseudoadhoc(PADAPTER padapter)
 	WLAN_BSSID_EX *pdev_network;
 	u8 *pibss;
 	u8 ssid[] = "pseduo_ad-hoc";
-	s32 err;
+	int err;
 	_irqL irqL;
 
 
@@ -9037,7 +9037,7 @@ static struct xmit_frame *createloopbackpkt(PADAPTER padapter, u32 size)
 	struct tx_desc *desc;
 	u8 *pkt_start, *pkt_end, *ptr;
 	struct rtw_ieee80211_hdr *hdr;
-	s32 bmcast;
+	int bmcast;
 	_irqL irqL;
 
 
@@ -9268,7 +9268,7 @@ static u8 pktcmp(PADAPTER padapter, u8 *txbuf, u32 txsz, u8 *rxbuf, u32 rxsz)
 
 thread_return lbk_thread(thread_context context)
 {
-	s32 err;
+	int err;
 	PADAPTER padapter;
 	PLOOPBACKDATA ploopback;
 	struct xmit_frame *pxmitframe;
@@ -9351,7 +9351,7 @@ static void loopbackTest(PADAPTER padapter, u32 cnt, u32 size, u8 *pmsg)
 {
 	PLOOPBACKDATA ploopback;
 	u32 len;
-	s32 err;
+	int err;
 
 
 	ploopback = padapter->ploopback;
@@ -9455,7 +9455,7 @@ static int rtw_test(
 
 #ifdef CONFIG_MAC_LOOPBACK_DRIVER
 	if (strcmp(pch, "loopback") == 0) {
-		s32 cnt = 0;
+		int cnt = 0;
 		u32 size = 64;
 
 		pch = strsep(&ptmp, delim);
@@ -9920,11 +9920,11 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 	char *ptr = NULL;
 	u8 cmdname[17] = {0}; /* IFNAMSIZ+1 */
 	u32 cmdlen;
-	s32 len;
+	int len;
 	u8 *extra = NULL;
 	u32 extra_size = 0;
 
-	s32 k;
+	int k;
 	const iw_handler *priv;		/* Private ioctl */
 	const struct iw_priv_args *priv_args;	/* Private ioctl description */
 	const struct iw_priv_args *mp_priv_args;	/*MP Private ioctl description */
@@ -10075,9 +10075,9 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 				if (NULL == str)
 					break;
 				sscanf(str, "%i", &temp);
-				((s32 *)buffer)[count++] = (s32)temp;
+				((int *)buffer)[count++] = (int)temp;
 			} while (1);
-			buffer_len = count * sizeof(s32);
+			buffer_len = count * sizeof(int);
 
 			/* Number of args to fetch */
 			wdata.data.length = count;
@@ -10214,7 +10214,7 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 		case IW_PRIV_TYPE_INT:
 			/* Display args */
 			for (j = 0; j < n; j++) {
-				sprintf(str, "%d  ", ((__s32 *)extra)[j]);
+				sprintf(str, "%d  ", ((int *)extra)[j]);
 				len = strlen(str);
 				output_len = strlen(output);
 				if ((output_len + len + 1) > 4096) {

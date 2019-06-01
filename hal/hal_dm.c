@@ -521,7 +521,7 @@ void SetHalODMVar(
 	PADAPTER				Adapter,
 	HAL_ODM_VARIABLE		eVariable,
 	void *					pValue1,
-	BOOLEAN					bSet)
+	bool					bSet)
 {
 	struct PHY_DM_STRUCT *podmpriv = adapter_to_phydm(Adapter);
 	/* _irqL irqL; */

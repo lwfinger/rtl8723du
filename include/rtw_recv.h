@@ -292,7 +292,7 @@ struct recv_priv {
 #endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
 	u16 sink_udpport, pre_rtp_rxseq, cur_rtp_rxseq;
 
-	BOOLEAN store_law_data_flag;
+	bool store_law_data_flag;
 };
 
 #define RX_BH_STG_UNKNOWN		0
@@ -631,9 +631,9 @@ static inline sint get_recvframe_len(union recv_frame *precvframe)
 }
 
 
-static inline s32 translate_percentage_to_dbm(u32 SignalStrengthIndex)
+static inline int translate_percentage_to_dbm(u32 SignalStrengthIndex)
 {
-	s32	SignalPower; /* in dBm. */
+	int	SignalPower; /* in dBm. */
 
 	/* Translate to dBm (x=y-100) */
 	SignalPower = SignalStrengthIndex - 100;
@@ -648,6 +648,6 @@ extern void _rtw_init_sta_recv_priv(struct sta_recv_priv *psta_recvpriv);
 extern void  mgt_dispatcher(_adapter *padapter, union recv_frame *precv_frame);
 
 u8 adapter_allow_bmc_data_rx(_adapter *adapter);
-s32 pre_recv_entry(union recv_frame *precvframe, u8 *pphy_status);
+int pre_recv_entry(union recv_frame *precvframe, u8 *pphy_status);
 
 #endif

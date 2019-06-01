@@ -14,7 +14,7 @@ EFUSE_GetMaskArray_MP_8723D_MUSB(
 	u8 *Array
 );
 
-BOOLEAN
+bool
 EFUSE_IsAddressMasked_MP_8723D_MUSB(/* TC: Test Chip, MP: MP Chip */
 	u16  Offset
 );

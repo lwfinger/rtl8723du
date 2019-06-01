@@ -46,8 +46,8 @@ void hal_btcoex_SwitchBtTRxMask(PADAPTER padapter);
 
 void hal_btcoex_Hanlder(PADAPTER padapter);
 
-s32 hal_btcoex_IsBTCoexRejectAMPDU(PADAPTER padapter);
-s32 hal_btcoex_IsBTCoexCtrlAMPDUSize(PADAPTER padapter);
+int hal_btcoex_IsBTCoexRejectAMPDU(PADAPTER padapter);
+int hal_btcoex_IsBTCoexCtrlAMPDUSize(PADAPTER padapter);
 u32 hal_btcoex_GetAMPDUSize(PADAPTER padapter);
 void hal_btcoex_SetManualControl(PADAPTER padapter, u8 bmanual);
 u8 hal_btcoex_1Ant(PADAPTER padapter);
@@ -77,6 +77,6 @@ u16 hal_btcoex_btreg_write(PADAPTER padapter, u8 type, u16 addr, u16 val);
 void hal_btcoex_set_rfe_type(u8 type);
 void hal_btcoex_switchband_notify(u8 under_scan, u8 band_type);
 void hal_btcoex_WlFwDbgInfoNotify(PADAPTER padapter, u8* tmpBuf, u8 length);
-void hal_btcoex_rx_rate_change_notify(PADAPTER padapter, u8 is_data_frame, u8 rate_id);
+void hal_btcoex_rx_rate_change_notify(PADAPTER padapter, bool is_data_frame, u8 rate_id);
 
 #endif /* !__HAL_BTCOEX_H__ */

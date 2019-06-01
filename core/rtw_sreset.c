@@ -21,7 +21,7 @@ void sreset_set_wifi_error_status(_adapter *padapter, u32 status)
 {
 }
 
-void sreset_set_trigger_point(_adapter *padapter, s32 tgp)
+void sreset_set_trigger_point(_adapter *padapter, int tgp)
 {
 }
 

@@ -452,7 +452,7 @@ PHY_SetRFReg_8723D(
  *  08/12/2008	MHC		Create Version 0.
  *
  *---------------------------------------------------------------------------*/
-s32 PHY_MACConfig8723D(PADAPTER Adapter)
+int PHY_MACConfig8723D(PADAPTER Adapter)
 {
 	int		rtStatus = _SUCCESS;
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
@@ -675,7 +675,7 @@ PHY_SetTxPowerIndex_8723D(
 	if (RFPath == RF_PATH_A || RFPath == RF_PATH_B) {
 		switch (Rate) {
 		case MGN_1M:
-			phy_set_bb_reg(Adapter, rTxAGC_A_CCK1_Mcs32,      bMaskByte1, PowerIndex);
+			phy_set_bb_reg(Adapter, rTxAGC_A_CCK1_Mcint,      bMaskByte1, PowerIndex);
 			break;
 		case MGN_2M:
 			phy_set_bb_reg(Adapter, rTxAGC_B_CCK11_A_CCK2_11, bMaskByte1, PowerIndex);
@@ -760,7 +760,7 @@ PHY_GetTxPowerIndex_8723D(
 	s16 power_idx;
 	u8 base_idx = 0;
 	s8 by_rate_diff = 0, limit = 0, tpt_offset = 0, extra_bias = 0;
-	BOOLEAN bIn24G = false;
+	bool bIn24G = false;
 
 	base_idx = PHY_GetTxPowerIndexBase(pAdapter, RFPath, Rate, RF_1TX, BandWidth, Channel, &bIn24G);
 
@@ -806,7 +806,7 @@ PHY_SetTxPowerLevel8723D(
 void
 PHY_GetTxPowerLevel8723D(
 	PADAPTER		Adapter,
-	s32				*powerlevel
+	int				*powerlevel
 )
 {
 }
@@ -1101,8 +1101,8 @@ phy_SwChnlAndSetBwMode8723D(
 static void
 PHY_HandleSwChnlAndSetBW8723D(
 	PADAPTER			Adapter,
-	BOOLEAN				bSwitchChannel,
-	BOOLEAN				bSetBandWidth,
+	bool				bSwitchChannel,
+	bool				bSetBandWidth,
 	u8					ChannelNum,
 	enum channel_width	ChnlWidth,
 	EXTCHNL_OFFSET	ExtChnlOffsetOf40MHz,
@@ -1110,7 +1110,7 @@ PHY_HandleSwChnlAndSetBW8723D(
 	u8					CenterFrequencyIndex1
 )
 {
-	/* static BOOLEAN		bInitialzed = false; */
+	/* static bool		bInitialzed = false; */
 	PHAL_DATA_TYPE		pHalData = GET_HAL_DATA(Adapter);
 	u8					tmpChannel = pHalData->current_channel;
 	enum channel_width	tmpBW = pHalData->current_channel_bw;

@@ -607,7 +607,7 @@ struct cfg80211_bss *rtw_cfg80211_inform_bss(_adapter *padapter, struct wlan_net
 	u16 notify_interval;
 	u8 *notify_ie;
 	size_t notify_ielen;
-	s32 notify_signal;
+	int notify_signal;
 	/* u8 buf[MAX_BSSINFO_LEN]; */
 
 	u8 *pbuf;
@@ -3398,7 +3398,7 @@ static int cfg80211_rtw_flush_pmksa(struct wiphy *wiphy,
 
 void rtw_cfg80211_indicate_sta_assoc(_adapter *padapter, u8 *pmgmt_frame, uint frame_len)
 {
-	s32 freq;
+	int freq;
 	int channel;
 	struct wireless_dev *pwdev = padapter->rtw_wdev;
 	struct mlme_ext_priv *pmlmeext = &(padapter->mlmeextpriv);
@@ -3424,7 +3424,7 @@ void rtw_cfg80211_indicate_sta_assoc(_adapter *padapter, u8 *pmgmt_frame, uint f
 
 void rtw_cfg80211_indicate_sta_disassoc(_adapter *padapter, unsigned char *da, unsigned short reason)
 {
-	s32 freq;
+	int freq;
 	int channel;
 	u8 *pmgmt_frame;
 	uint frame_len;
@@ -4429,7 +4429,7 @@ void rtw_cfg80211_rx_probe_request(_adapter *adapter, union recv_frame *rframe)
 	struct rtw_wdev_priv *pwdev_priv = adapter_wdev_data(adapter);
 	u8 *frame = get_recvframe_data(rframe);
 	uint frame_len = rframe->u.hdr.len;
-	s32 freq;
+	int freq;
 	u8 ch, sch = rtw_get_oper_ch(adapter);
 
 	ch = rframe->u.hdr.attrib.ch ? rframe->u.hdr.attrib.ch : sch;
@@ -4447,7 +4447,7 @@ void rtw_cfg80211_rx_action_p2p(_adapter *adapter, union recv_frame *rframe)
 	struct wireless_dev *wdev = adapter->rtw_wdev;
 	u8 *frame = get_recvframe_data(rframe);
 	uint frame_len = rframe->u.hdr.len;
-	s32 freq;
+	int freq;
 	u8 ch, sch = rtw_get_oper_ch(adapter);
 	u8 category, action;
 	int type;
@@ -4479,7 +4479,7 @@ void rtw_cfg80211_rx_p2p_action_public(_adapter *adapter, union recv_frame *rfra
 	struct rtw_wdev_priv *pwdev_priv = adapter_wdev_data(adapter);
 	u8 *frame = get_recvframe_data(rframe);
 	uint frame_len = rframe->u.hdr.len;
-	s32 freq;
+	int freq;
 	u8 ch, sch = rtw_get_oper_ch(adapter);
 	u8 category, action;
 	int type;
@@ -4533,7 +4533,7 @@ void rtw_cfg80211_rx_action(_adapter *adapter, union recv_frame *rframe, const c
 	struct rtw_wdev_priv *pwdev_priv = adapter_wdev_data(adapter);
 	u8 *frame = get_recvframe_data(rframe);
 	uint frame_len = rframe->u.hdr.len;
-	s32 freq;
+	int freq;
 	u8 ch, sch = rtw_get_oper_ch(adapter);
 	u8 category, action;
 
@@ -4773,7 +4773,7 @@ void rtw_cfg80211_issue_p2p_provision_request(_adapter *padapter, const u8 *buf,
 }
 
 #ifdef CONFIG_RTW_80211R
-static s32 cfg80211_rtw_update_ft_ies(struct wiphy *wiphy,
+static int cfg80211_rtw_update_ft_ies(struct wiphy *wiphy,
 	struct net_device *ndev,
 	struct cfg80211_update_ft_ies_params *ftie)
 {
@@ -4824,7 +4824,7 @@ inline bool rtw_cfg80211_get_is_roch(_adapter *adapter)
 	return adapter->cfg80211_wdinfo.is_ro_ch;
 }
 
-static s32 cfg80211_rtw_remain_on_channel(struct wiphy *wiphy,
+static int cfg80211_rtw_remain_on_channel(struct wiphy *wiphy,
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
 	struct wireless_dev *wdev,
 #else
@@ -4836,7 +4836,7 @@ static s32 cfg80211_rtw_remain_on_channel(struct wiphy *wiphy,
 #endif
 	unsigned int duration, u64 *cookie)
 {
-	s32 err = 0;
+	int err = 0;
 	u8 remain_ch = (u8) ieee80211_frequency_to_channel(channel->center_freq);
 	u8 union_ch = 0, union_bw = 0, union_offset = 0;
 	u8 i;
@@ -4961,7 +4961,7 @@ exit:
 	return err;
 }
 
-static s32 cfg80211_rtw_cancel_remain_on_channel(struct wiphy *wiphy,
+static int cfg80211_rtw_cancel_remain_on_channel(struct wiphy *wiphy,
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
 	struct wireless_dev *wdev,
 #else
@@ -4969,7 +4969,7 @@ static s32 cfg80211_rtw_cancel_remain_on_channel(struct wiphy *wiphy,
 #endif
 	u64 cookie)
 {
-	s32 err = 0;
+	int err = 0;
 	_adapter *padapter;
 	struct rtw_wdev_priv *pwdev_priv;
 	struct wifidirect_info *pwdinfo;
