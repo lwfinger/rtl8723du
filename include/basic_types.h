@@ -8,26 +8,14 @@
 #define SUCCESS	0
 #define FAIL	(-1)
 
-#ifndef TRUE
-	#define _TRUE	1
-#else
-	#define _TRUE	TRUE
-#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/utsname.h>
 
-#ifndef FALSE
-	#define _FALSE	0
-#else
-	#define _FALSE	FALSE
-#endif
-
-	#include <linux/version.h>
-	#include <linux/types.h>
-	#include <linux/module.h>
-	#include <linux/kernel.h>
-	#include <linux/init.h>
-	#include <linux/utsname.h>
-
-	typedef	signed int sint;
+typedef	signed int sint;
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19))
 typedef _Bool bool;

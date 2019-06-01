@@ -35,8 +35,8 @@ u8 HalPwrSeqCmdParsing(
 	WLAN_PWR_CFG	PwrSeqCmd[])
 {
 	WLAN_PWR_CFG	PwrCfgCmd = {0};
-	u8				bPollingBit = _FALSE;
-	u8				bHWICSupport = _FALSE;
+	u8				bPollingBit = false;
+	u8				bHWICSupport = false;
 	u32				AryIdx = 0;
 	u8				value = 0;
 	u32				offset = 0;
@@ -68,7 +68,7 @@ u8 HalPwrSeqCmdParsing(
 				rtw_write8(padapter, offset, value);
 				break;
 			case PWR_CMD_POLLING:
-				bPollingBit = _FALSE;
+				bPollingBit = false;
 				offset = GET_PWR_CFG_OFFSET(PwrCfgCmd);
 
 				rtw_hal_get_hwreg(padapter, HW_VAR_PWR_CMD, &bHWICSupport);
@@ -83,7 +83,7 @@ u8 HalPwrSeqCmdParsing(
 
 					value = value & GET_PWR_CFG_MASK(PwrCfgCmd);
 					if (value == (GET_PWR_CFG_VALUE(PwrCfgCmd) & GET_PWR_CFG_MASK(PwrCfgCmd)))
-						bPollingBit = _TRUE;
+						bPollingBit = true;
 					else
 						rtw_udelay_os(10);
 
@@ -107,7 +107,7 @@ u8 HalPwrSeqCmdParsing(
 							pollingCount = 0;
 							flag = 1;
 						} else {
-							return _FALSE;
+							return false;
 						}
 					}
 				} while (!bPollingBit);
@@ -121,7 +121,7 @@ u8 HalPwrSeqCmdParsing(
 
 			case PWR_CMD_END:
 				/* When this command is parsed, end the process */
-				return _TRUE;
+				return true;
 				break;
 
 			default:
@@ -132,5 +132,5 @@ u8 HalPwrSeqCmdParsing(
 		AryIdx++;/* Add Array Index */
 	} while (1);
 
-	return _TRUE;
+	return true;
 }

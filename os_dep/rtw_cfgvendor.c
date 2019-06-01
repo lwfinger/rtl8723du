@@ -485,7 +485,7 @@ static int rtw_cfgvendor_enable_full_scan_result(struct wiphy *wiphy,
 	int err = 0;
 	struct bcm_cfg80211 *cfg = wiphy_priv(wiphy);
 	int type;
-	bool real_time = FALSE;
+	bool real_time = false;
 
 	type = nla_type(data);
 
@@ -1007,17 +1007,17 @@ static void LinkLayerStats(_adapter *padapter)
 	ps_time = 0;
 	trx_total_time = 0;
 
-	if ( padapter->netif_up == _TRUE ) {
+	if ( padapter->netif_up == true ) {
 
 		pwrpriv->on_time = rtw_get_passing_time_ms(pwrpriv->radio_on_start_time);
 
 		if (rtw_mi_check_fwstate(padapter, _FW_LINKED)) {
-			if ( pwrpriv->bpower_saving == _TRUE ) {
+			if ( pwrpriv->bpower_saving == true ) {
 				pwrpriv->pwr_saving_time += rtw_get_passing_time_ms(pwrpriv->pwr_saving_start_time);
 				pwrpriv->pwr_saving_start_time = rtw_get_current_time();
 			}
 		} else {		
-			if ( pwrpriv->bpower_saving == _TRUE ) {
+			if ( pwrpriv->bpower_saving == true ) {
 				pwrpriv->pwr_saving_time += rtw_get_passing_time_ms(pwrpriv->pwr_saving_start_time);
 				pwrpriv->pwr_saving_start_time = rtw_get_current_time();
 			}

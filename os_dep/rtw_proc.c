@@ -490,7 +490,7 @@ static int proc_get_rx_info_msg(struct seq_file *m, void *v)
 	struct net_device *dev = m->private;
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
 
-	rtw_hal_set_odm_var(padapter, HAL_ODM_RX_Dframe_INFO, m, _FALSE);
+	rtw_hal_set_odm_var(padapter, HAL_ODM_RX_Dframe_INFO, m, false);
 	return 0;
 }
 static int proc_get_tx_info_msg(struct seq_file *m, void *v)
@@ -526,15 +526,15 @@ static int proc_get_tx_info_msg(struct seq_file *m, void *v)
 		phead = &(pstapriv->sta_hash[i]);
 		plist = get_next(phead);
 
-		while ((rtw_end_of_queue_search(phead, plist)) == _FALSE) {
+		while ((rtw_end_of_queue_search(phead, plist)) == false) {
 
 			psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
 
 			plist = get_next(plist);
 
-			if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)  !=  _TRUE)
-				&& (_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6) != _TRUE)
-				&& (_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(padapter), 6) != _TRUE)) {
+			if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)  !=  true)
+				&& (_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6) != true)
+				&& (_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(padapter), 6) != true)) {
 
 				switch (psta->cmn.bw_mode) {
 
@@ -880,7 +880,7 @@ static ssize_t proc_set_macaddr_acl(struct file *file, const char __user *buffer
 			if (sscanf(c, MAC_SFMT, MAC_SARG(addr)) != 6)
 				break;
 
-			if (rtw_check_invalid_mac_address(addr, 0) == _FALSE)
+			if (rtw_check_invalid_mac_address(addr, 0) == false)
 				rtw_acl_add_sta(adapter, addr);
 
 			c = strsep(&next, " \t");
@@ -965,7 +965,7 @@ ssize_t proc_set_pre_link_sta(struct file *file, const char __user *buffer, size
 			if (sscanf(c, MAC_SFMT, MAC_SARG(addr)) != 6)
 				break;
 
-			if (rtw_check_invalid_mac_address(addr, 0) == _FALSE) {
+			if (rtw_check_invalid_mac_address(addr, 0) == false) {
 				if (cmd_id == PRE_LINK_STA_CMD_ADD)
 					rtw_pre_link_sta_add(&adapter->stapriv, addr);
 				else
@@ -1204,7 +1204,7 @@ static ssize_t proc_set_sec_cam(struct file *file, const char __user *buffer, si
 
 		if (strcmp("c", cmd) == 0) {
 			_clear_cam_entry(adapter, id_1);
-			adapter->securitypriv.hw_decrypted = _FALSE; /* temporarily set this for TX path to use SW enc */
+			adapter->securitypriv.hw_decrypted = false; /* temporarily set this for TX path to use SW enc */
 		} else if (strcmp("wfc", cmd) == 0)
 			write_cam_from_cache(adapter, id_1);
 		else if (strcmp("sw", cmd) == 0)
@@ -1296,7 +1296,7 @@ static ssize_t proc_set_tx_bw_mode(struct file *file, const char __user *buffer,
 
 	if (buffer && !copy_from_user(tmp, buffer, count)) {
 
-		u8 update = _FALSE;
+		u8 update = false;
 		int num = sscanf(tmp, "%hhx", &bw_mode);
 
 		if (num < 1 || bw_mode == adapter->driver_tx_bw_mode)
@@ -1305,11 +1305,11 @@ static ssize_t proc_set_tx_bw_mode(struct file *file, const char __user *buffer,
 		if ((MLME_STATE(adapter) & WIFI_ASOC_STATE)
 			&& ((mlmeext->cur_channel <= 14 && BW_MODE_2G(bw_mode) != ADAPTER_TX_BW_2G(adapter)))) {
 			/* RA mask update needed */
-			update = _TRUE;
+			update = true;
 		}
 		adapter->driver_tx_bw_mode = bw_mode;
 
-		if (update == _TRUE) {
+		if (update == true) {
 			struct sta_info *sta;
 			int i;
 
@@ -1404,7 +1404,7 @@ static ssize_t proc_set_tx_power_ext_info(struct file *file, const char __user *
 		#endif
 
 		rtw_ps_deny(adapter, PS_DENY_IOCTL);
-		if (rtw_pwr_wakeup(adapter) == _FALSE)
+		if (rtw_pwr_wakeup(adapter) == false)
 			goto clear_ps_deny;
 
 		if (strcmp("default", cmd) == 0)

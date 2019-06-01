@@ -8,8 +8,8 @@
 static bool test_st_match_rule(_adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port)
 {
 	if (ntohs(*((__be16 *)local_port)) == 5001 || ntohs(*((__be16 *)remote_port)) == 5001)
-		return _TRUE;
-	return _FALSE;
+		return true;
+	return false;
 }
 
 static struct st_register test_st_reg = {
@@ -32,7 +32,7 @@ inline void rtw_st_ctl_clear_tracker_q(struct st_ctl_t *st_ctl)
 	_enter_critical_bh(&st_ctl->tracker_q.lock, &irqL);
 	phead = &st_ctl->tracker_q.queue;
 	plist = get_next(phead);
-	while (rtw_end_of_queue_search(phead, plist) == _FALSE) {
+	while (rtw_end_of_queue_search(phead, plist) == false) {
 		st = LIST_CONTAINOR(plist, struct session_tracker, list);
 		plist = get_next(plist);
 		rtw_list_delete(&st->list);
@@ -80,12 +80,12 @@ inline void rtw_st_ctl_unregister(struct st_ctl_t *st_ctl, u8 st_reg_id)
 
 inline bool rtw_st_ctl_chk_reg_s_proto(struct st_ctl_t *st_ctl, u8 s_proto)
 {
-	bool ret = _FALSE;
+	bool ret = false;
 	int i;
 
 	for (i = 0; i < SESSION_TRACKER_REG_ID_NUM; i++) {
 		if (st_ctl->reg[i].s_proto == s_proto) {
-			ret = _TRUE;
+			ret = true;
 			break;
 		}
 	}
@@ -95,14 +95,14 @@ inline bool rtw_st_ctl_chk_reg_s_proto(struct st_ctl_t *st_ctl, u8 s_proto)
 
 inline bool rtw_st_ctl_chk_reg_rule(struct st_ctl_t *st_ctl, _adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port)
 {
-	bool ret = _FALSE;
+	bool ret = false;
 	int i;
 	st_match_rule rule;
 
 	for (i = 0; i < SESSION_TRACKER_REG_ID_NUM; i++) {
 		rule = st_ctl->reg[i].rule;
-		if (rule && rule(adapter, local_naddr, local_port, remote_naddr, remote_port) == _TRUE) {
-			ret = _TRUE;
+		if (rule && rule(adapter, local_naddr, local_port, remote_naddr, remote_port) == true) {
+			ret = true;
 			break;
 		}
 	}
@@ -119,11 +119,11 @@ void rtw_st_ctl_rx(struct sta_info *sta, u8 *ehdr_pos)
 		u8 *ip = ehdr_pos + ETH_HLEN;
 
 		if (GET_IPV4_PROTOCOL(ip) == 0x06  /* TCP */
-			&& rtw_st_ctl_chk_reg_s_proto(&sta->st_ctl, 0x06) == _TRUE
+			&& rtw_st_ctl_chk_reg_s_proto(&sta->st_ctl, 0x06) == true
 		) {
 			u8 *tcp = ip + GET_IPV4_IHL(ip) * 4;
 
-			if (rtw_st_ctl_chk_reg_rule(&sta->st_ctl, adapter, IPV4_DST(ip), TCP_DST(tcp), IPV4_SRC(ip), TCP_SRC(tcp)) == _TRUE) {
+			if (rtw_st_ctl_chk_reg_rule(&sta->st_ctl, adapter, IPV4_DST(ip), TCP_DST(tcp), IPV4_SRC(ip), TCP_SRC(tcp)) == true) {
 				if (GET_TCP_SYN(tcp) && GET_TCP_ACK(tcp)) {
 					session_tracker_add_cmd(adapter, sta
 						, IPV4_DST(ip), TCP_DST(tcp)
@@ -169,7 +169,7 @@ void dump_st_ctl(void *sel, struct st_ctl_t *st_ctl)
 	_enter_critical_bh(&st_ctl->tracker_q.lock, &irqL);
 	phead = &st_ctl->tracker_q.queue;
 	plist = get_next(phead);
-	while (rtw_end_of_queue_search(phead, plist) == _FALSE) {
+	while (rtw_end_of_queue_search(phead, plist) == false) {
 		st = LIST_CONTAINOR(plist, struct session_tracker, list);
 		plist = get_next(plist);
 
@@ -198,10 +198,10 @@ void _rtw_init_stainfo(struct sta_info *psta)
 
 	_rtw_init_listhead(&psta->asoc_list);
 	_rtw_init_listhead(&psta->auth_list);
-	psta->bpairwise_key_installed = _FALSE;
+	psta->bpairwise_key_installed = false;
 
 #ifdef CONFIG_RTW_80211R
-	psta->ft_pairwise_key_installed = _FALSE;
+	psta->ft_pairwise_key_installed = false;
 #endif
 
 	rtw_st_ctl_init(&psta->st_ctl);
@@ -371,7 +371,7 @@ void rtw_mfree_all_stainfo(struct sta_priv *pstapriv)
 	phead = get_list_head(&pstapriv->free_sta_queue);
 	plist = get_next(phead);
 
-	while ((rtw_end_of_queue_search(phead, plist)) == _FALSE) {
+	while ((rtw_end_of_queue_search(phead, plist)) == false) {
 		psta = LIST_CONTAINOR(plist, struct sta_info , list);
 		plist = get_next(plist);
 
@@ -415,7 +415,7 @@ u32	_rtw_free_sta_priv(struct	sta_priv *pstapriv)
 			phead = &(pstapriv->sta_hash[index]);
 			plist = get_next(phead);
 
-			while ((rtw_end_of_queue_search(phead, plist)) == _FALSE) {
+			while ((rtw_end_of_queue_search(phead, plist)) == false) {
 				int i;
 				psta = LIST_CONTAINOR(plist, struct sta_info , hash_list);
 				plist = get_next(plist);
@@ -480,7 +480,7 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 	pfree_sta_queue = &pstapriv->free_sta_queue;
 
 	_enter_critical_bh(&(pstapriv->sta_hash_lock), &irqL2);
-	if (_rtw_queue_empty(pfree_sta_queue) == _TRUE) {
+	if (_rtw_queue_empty(pfree_sta_queue) == true) {
 		psta = NULL;
 	} else {
 		psta = LIST_CONTAINOR(get_next(&pfree_sta_queue->queue), struct sta_info, list);
@@ -532,7 +532,7 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 			preorder_ctrl = &psta->recvreorder_ctrl[i];
 			preorder_ctrl->padapter = pstapriv->padapter;
 			preorder_ctrl->tid = i;
-			preorder_ctrl->enable = _FALSE;
+			preorder_ctrl->enable = false;
 			preorder_ctrl->indicate_seq = 0xffff;
 			preorder_ctrl->wend_b = 0xffff;
 			/* preorder_ctrl->wsize_b = (NR_RECVBUFF-2); */
@@ -583,14 +583,14 @@ u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta)
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
 	int pending_qcnt[4];
-	u8 is_pre_link_sta = _FALSE;
+	u8 is_pre_link_sta = false;
 
 	if (psta == NULL)
 		goto exit;
 
 	is_pre_link_sta = rtw_is_pre_link_sta(pstapriv, psta->cmn.mac_addr);
 
-	if (is_pre_link_sta == _FALSE) {
+	if (is_pre_link_sta == false) {
 		_enter_critical_bh(&(pstapriv->sta_hash_lock), &irqL0);
 		rtw_list_delete(&psta->hash_list);
 		pstapriv->asoc_sta_count--;
@@ -707,12 +707,12 @@ u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta)
 
 	}
 
-	if (!((psta->state & WIFI_AP_STATE) || MacAddr_isBcst(psta->cmn.mac_addr)) && is_pre_link_sta == _FALSE)
-		rtw_hal_set_odm_var(padapter, HAL_ODM_STA_INFO, psta, _FALSE);
+	if (!((psta->state & WIFI_AP_STATE) || MacAddr_isBcst(psta->cmn.mac_addr)) && is_pre_link_sta == false)
+		rtw_hal_set_odm_var(padapter, HAL_ODM_STA_INFO, psta, false);
 
 
 	/* release mac id for non-bc/mc station, */
-	if (is_pre_link_sta == _FALSE)
+	if (is_pre_link_sta == false)
 		rtw_release_macid(pstapriv->padapter, psta);
 
 	_enter_critical_bh(&pstapriv->auth_list_lock, &irqL0);
@@ -753,7 +753,7 @@ u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta)
 
 	rtw_st_ctl_deinit(&psta->st_ctl);
 
-	if (is_pre_link_sta == _FALSE) {
+	if (is_pre_link_sta == false) {
 		_rtw_spinlock_free(&psta->lock);
 
 		/* _enter_critical_bh(&(pfree_sta_queue->lock), &irqL0); */
@@ -790,13 +790,13 @@ void rtw_free_all_stainfo(_adapter *padapter)
 		phead = &(pstapriv->sta_hash[index]);
 		plist = get_next(phead);
 
-		while ((rtw_end_of_queue_search(phead, plist)) == _FALSE) {
+		while ((rtw_end_of_queue_search(phead, plist)) == false) {
 			psta = LIST_CONTAINOR(plist, struct sta_info , hash_list);
 
 			plist = get_next(plist);
 
 			if (pbcmc_stainfo != psta) {
-				if (rtw_is_pre_link_sta(pstapriv, psta->cmn.mac_addr) == _FALSE)
+				if (rtw_is_pre_link_sta(pstapriv, psta->cmn.mac_addr) == false)
 					rtw_list_delete(&psta->hash_list);
 
 				stainfo_offset = rtw_stainfo_offset(pstapriv, psta);
@@ -852,11 +852,11 @@ struct sta_info *rtw_get_stainfo(struct sta_priv *pstapriv, const u8 *hwaddr)
 	plist = get_next(phead);
 
 
-	while ((rtw_end_of_queue_search(phead, plist)) == _FALSE) {
+	while ((rtw_end_of_queue_search(phead, plist)) == false) {
 
 		psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
 
-		if ((_rtw_memcmp(psta->cmn.mac_addr, addr, ETH_ALEN)) == _TRUE) {
+		if ((_rtw_memcmp(psta->cmn.mac_addr, addr, ETH_ALEN)) == true) {
 			/* if found the matched address */
 			break;
 		}
@@ -968,11 +968,11 @@ const char *const _acl_mode_str[] = {
 
 u8 rtw_access_ctrl(_adapter *adapter, u8 *mac_addr)
 {
-	u8 res = _TRUE;
+	u8 res = true;
 	_irqL irqL;
 	_list *list, *head;
 	struct rtw_wlan_acl_node *acl_node;
-	u8 match = _FALSE;
+	u8 match = false;
 	struct sta_priv *stapriv = &adapter->stapriv;
 	struct wlan_acl_pool *acl = &stapriv->acl_list;
 	_queue	*acl_node_q = &acl->acl_node_q;
@@ -980,13 +980,13 @@ u8 rtw_access_ctrl(_adapter *adapter, u8 *mac_addr)
 	_enter_critical_bh(&(acl_node_q->lock), &irqL);
 	head = get_list_head(acl_node_q);
 	list = get_next(head);
-	while (rtw_end_of_queue_search(head, list) == _FALSE) {
+	while (rtw_end_of_queue_search(head, list) == false) {
 		acl_node = LIST_CONTAINOR(list, struct rtw_wlan_acl_node, list);
 		list = get_next(list);
 
 		if (_rtw_memcmp(acl_node->addr, mac_addr, ETH_ALEN)) {
-			if (acl_node->valid == _TRUE) {
-				match = _TRUE;
+			if (acl_node->valid == true) {
+				match = true;
 				break;
 			}
 		}
@@ -994,11 +994,11 @@ u8 rtw_access_ctrl(_adapter *adapter, u8 *mac_addr)
 	_exit_critical_bh(&(acl_node_q->lock), &irqL);
 
 	if (acl->mode == RTW_ACL_MODE_ACCEPT_UNLESS_LISTED)
-		res = (match == _TRUE) ?  _FALSE : _TRUE;
+		res = (match == true) ?  false : true;
 	else if (acl->mode == RTW_ACL_MODE_DENY_UNLESS_LISTED)
-		res = (match == _TRUE) ?  _TRUE : _FALSE;
+		res = (match == true) ?  true : false;
 	else
-		res = _TRUE;
+		res = true;
 
 	return res;
 }
@@ -1012,7 +1012,7 @@ void dump_macaddr_acl(void *sel, _adapter *adapter)
 	RTW_PRINT_SEL(sel, "mode:%s(%d)\n", acl_mode_str(acl->mode), acl->mode);
 	RTW_PRINT_SEL(sel, "num:%d/%d\n", acl->num, NUM_ACL);
 	for (i = 0; i < NUM_ACL; i++) {
-		if (acl->aclnode[i].valid == _FALSE)
+		if (acl->aclnode[i].valid == false)
 			continue;
 		RTW_PRINT_SEL(sel, MAC_FMT"\n", MAC_ARG(acl->aclnode[i].addr));
 	}
@@ -1024,16 +1024,16 @@ bool rtw_is_pre_link_sta(struct sta_priv *stapriv, u8 *addr)
 #if CONFIG_RTW_PRE_LINK_STA
 	struct pre_link_sta_ctl_t *pre_link_sta_ctl = &stapriv->pre_link_sta_ctl;
 	struct sta_info *sta = NULL;
-	u8 exist = _FALSE;
+	u8 exist = false;
 	int i;
 	_irqL irqL;
 
 	_enter_critical_bh(&(pre_link_sta_ctl->lock), &irqL);
 	for (i = 0; i < RTW_PRE_LINK_STA_NUM; i++) {
-		if (pre_link_sta_ctl->node[i].valid == _TRUE
-			&& _rtw_memcmp(pre_link_sta_ctl->node[i].addr, addr, ETH_ALEN) == _TRUE
+		if (pre_link_sta_ctl->node[i].valid == true
+			&& _rtw_memcmp(pre_link_sta_ctl->node[i].addr, addr, ETH_ALEN) == true
 		) {
-			exist = _TRUE;
+			exist = true;
 			break;
 		}
 	}
@@ -1041,7 +1041,7 @@ bool rtw_is_pre_link_sta(struct sta_priv *stapriv, u8 *addr)
 
 	return exist;
 #else
-	return _FALSE;
+	return false;
 #endif
 }
 
@@ -1051,30 +1051,30 @@ struct sta_info *rtw_pre_link_sta_add(struct sta_priv *stapriv, u8 *hwaddr)
 	struct pre_link_sta_ctl_t *pre_link_sta_ctl = &stapriv->pre_link_sta_ctl;
 	struct pre_link_sta_node_t *node = NULL;
 	struct sta_info *sta = NULL;
-	u8 exist = _FALSE;
+	u8 exist = false;
 	int i;
 	_irqL irqL;
 
-	if (rtw_check_invalid_mac_address(hwaddr, _FALSE) == _TRUE)
+	if (rtw_check_invalid_mac_address(hwaddr, false) == true)
 		goto exit;
 
 	_enter_critical_bh(&(pre_link_sta_ctl->lock), &irqL);
 	for (i = 0; i < RTW_PRE_LINK_STA_NUM; i++) {
-		if (pre_link_sta_ctl->node[i].valid == _TRUE
-			&& _rtw_memcmp(pre_link_sta_ctl->node[i].addr, hwaddr, ETH_ALEN) == _TRUE
+		if (pre_link_sta_ctl->node[i].valid == true
+			&& _rtw_memcmp(pre_link_sta_ctl->node[i].addr, hwaddr, ETH_ALEN) == true
 		) {
 			node = &pre_link_sta_ctl->node[i];
-			exist = _TRUE;
+			exist = true;
 			break;
 		}
 
-		if (node == NULL && pre_link_sta_ctl->node[i].valid == _FALSE)
+		if (node == NULL && pre_link_sta_ctl->node[i].valid == false)
 			node = &pre_link_sta_ctl->node[i];
 	}
 
-	if (exist == _FALSE && node) {
+	if (exist == false && node) {
 		_rtw_memcpy(node->addr, hwaddr, ETH_ALEN);
-		node->valid = _TRUE;
+		node->valid = true;
 		pre_link_sta_ctl->num++;
 	}
 	_exit_critical_bh(&(pre_link_sta_ctl->lock), &irqL);
@@ -1093,7 +1093,7 @@ struct sta_info *rtw_pre_link_sta_add(struct sta_priv *stapriv, u8 *hwaddr)
 	sta->state = WIFI_FW_PRE_LINK;
 
 odm_hook:
-	rtw_hal_set_odm_var(stapriv->padapter, HAL_ODM_STA_INFO, sta, _TRUE);
+	rtw_hal_set_odm_var(stapriv->padapter, HAL_ODM_STA_INFO, sta, true);
 
 exit:
 	return sta;
@@ -1104,31 +1104,31 @@ void rtw_pre_link_sta_del(struct sta_priv *stapriv, u8 *hwaddr)
 	struct pre_link_sta_ctl_t *pre_link_sta_ctl = &stapriv->pre_link_sta_ctl;
 	struct pre_link_sta_node_t *node = NULL;
 	struct sta_info *sta = NULL;
-	u8 exist = _FALSE;
+	u8 exist = false;
 	int i;
 	_irqL irqL;
 
-	if (rtw_check_invalid_mac_address(hwaddr, _FALSE) == _TRUE)
+	if (rtw_check_invalid_mac_address(hwaddr, false) == true)
 		goto exit;
 
 	_enter_critical_bh(&(pre_link_sta_ctl->lock), &irqL);
 	for (i = 0; i < RTW_PRE_LINK_STA_NUM; i++) {
-		if (pre_link_sta_ctl->node[i].valid == _TRUE
-			&& _rtw_memcmp(pre_link_sta_ctl->node[i].addr, hwaddr, ETH_ALEN) == _TRUE
+		if (pre_link_sta_ctl->node[i].valid == true
+			&& _rtw_memcmp(pre_link_sta_ctl->node[i].addr, hwaddr, ETH_ALEN) == true
 		) {
 			node = &pre_link_sta_ctl->node[i];
-			exist = _TRUE;
+			exist = true;
 			break;
 		}
 	}
 
-	if (exist == _TRUE && node) {
-		node->valid = _FALSE;
+	if (exist == true && node) {
+		node->valid = false;
 		pre_link_sta_ctl->num--;
 	}
 	_exit_critical_bh(&(pre_link_sta_ctl->lock), &irqL);
 
-	if (exist == _FALSE)
+	if (exist == false)
 		goto exit;
 
 	sta = rtw_get_stainfo(stapriv, hwaddr);
@@ -1156,10 +1156,10 @@ void rtw_pre_link_sta_ctl_reset(struct sta_priv *stapriv)
 
 	_enter_critical_bh(&(pre_link_sta_ctl->lock), &irqL);
 	for (i = 0; i < RTW_PRE_LINK_STA_NUM; i++) {
-		if (pre_link_sta_ctl->node[i].valid == _FALSE)
+		if (pre_link_sta_ctl->node[i].valid == false)
 			continue;
 		_rtw_memcpy(&(addrs[j][0]), pre_link_sta_ctl->node[i].addr, ETH_ALEN);
-		pre_link_sta_ctl->node[i].valid = _FALSE;
+		pre_link_sta_ctl->node[i].valid = false;
 		pre_link_sta_ctl->num--;
 		j++;
 	}
@@ -1183,7 +1183,7 @@ void rtw_pre_link_sta_ctl_init(struct sta_priv *stapriv)
 	_rtw_spinlock_init(&pre_link_sta_ctl->lock);
 	pre_link_sta_ctl->num = 0;
 	for (i = 0; i < RTW_PRE_LINK_STA_NUM; i++)
-		pre_link_sta_ctl->node[i].valid = _FALSE;
+		pre_link_sta_ctl->node[i].valid = false;
 }
 
 void rtw_pre_link_sta_ctl_deinit(struct sta_priv *stapriv)
@@ -1204,7 +1204,7 @@ void dump_pre_link_sta_ctl(void *sel, struct sta_priv *stapriv)
 	RTW_PRINT_SEL(sel, "num:%d/%d\n", pre_link_sta_ctl->num, RTW_PRE_LINK_STA_NUM);
 
 	for (i = 0; i < RTW_PRE_LINK_STA_NUM; i++) {
-		if (pre_link_sta_ctl->node[i].valid == _FALSE)
+		if (pre_link_sta_ctl->node[i].valid == false)
 			continue;
 		RTW_PRINT_SEL(sel, MAC_FMT"\n", MAC_ARG(pre_link_sta_ctl->node[i].addr));
 	}

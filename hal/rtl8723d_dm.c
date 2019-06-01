@@ -31,7 +31,7 @@ dm_CheckProtection(
 static void dm_CheckPbcGPIO(_adapter *padapter)
 {
 	u8	tmp1byte;
-	u8	bPbcPressed = _FALSE;
+	u8	bPbcPressed = false;
 
 	if (!padapter->registrypriv.hw_wps_pbc)
 		return;
@@ -53,8 +53,8 @@ static void dm_CheckPbcGPIO(_adapter *padapter)
 		return;
 
 	if (tmp1byte & HAL_8192C_HW_GPIO_WPS_BIT)
-		bPbcPressed = _TRUE;
-	if (_TRUE == bPbcPressed) {
+		bPbcPressed = true;
+	if (true == bPbcPressed) {
 		/* Here we only set bPbcPressed to true */
 		/* After trigger PBC, the variable will be set to false */
 		RTW_INFO("CheckPbcGPIO - PBC is pressed\n");
@@ -119,8 +119,8 @@ rtl8723d_HalDmWatchDog(
 	PADAPTER	Adapter
 )
 {
-	BOOLEAN		bFwCurrentInPSMode = _FALSE;
-	u8 bFwPSAwake = _TRUE;
+	BOOLEAN		bFwCurrentInPSMode = false;
+	u8 bFwPSAwake = true;
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
 
 #ifdef CONFIG_MP_INCLUDED
@@ -139,7 +139,7 @@ rtl8723d_HalDmWatchDog(
 	/* Fw is under p2p powersaving mode, driver should stop dynamic mechanism. */
 	/* modifed by thomas. 2011.06.11. */
 	if (Adapter->wdinfo.p2p_ps_mode)
-		bFwPSAwake = _FALSE;
+		bFwPSAwake = false;
 
 	if ((rtw_is_hw_init_completed(Adapter)) &&
 	    ((!bFwCurrentInPSMode) && bFwPSAwake))

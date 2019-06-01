@@ -37,7 +37,7 @@ SwLedOn_8723DU(
 	if (RTW_CANNOT_RUN(padapter))
 		return;
 
-	pLed->bLedOn = _TRUE;
+	pLed->bLedOn = true;
 
 }
 
@@ -58,7 +58,7 @@ SwLedOff_8723DU(
 		goto exit;
 
 exit:
-	pLed->bLedOn = _FALSE;
+	pLed->bLedOn = false;
 
 }
 

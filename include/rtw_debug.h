@@ -105,16 +105,16 @@ extern uint rtw_drv_log_level;
 
 #undef RTW_INFO_DUMP
 #define RTW_INFO_DUMP(_TitleString, _HexData, _HexDataLen)	\
-	RTW_BUF_DUMP_SEL(_DRV_INFO_, RTW_DBGDUMP, _TitleString, _FALSE, _HexData, _HexDataLen)
+	RTW_BUF_DUMP_SEL(_DRV_INFO_, RTW_DBGDUMP, _TitleString, false, _HexData, _HexDataLen)
 
 #undef RTW_DBG_DUMP
 #define RTW_DBG_DUMP(_TitleString, _HexData, _HexDataLen)	\
-	RTW_BUF_DUMP_SEL(_DRV_DEBUG_, RTW_DBGDUMP, _TitleString, _FALSE, _HexData, _HexDataLen)
+	RTW_BUF_DUMP_SEL(_DRV_DEBUG_, RTW_DBGDUMP, _TitleString, false, _HexData, _HexDataLen)
 
 
 #undef RTW_PRINT_DUMP
 #define RTW_PRINT_DUMP(_TitleString, _HexData, _HexDataLen)	\
-	RTW_BUF_DUMP_SEL(_DRV_INFO_, RTW_DBGDUMP, _TitleString, _FALSE, _HexData, _HexDataLen)
+	RTW_BUF_DUMP_SEL(_DRV_INFO_, RTW_DBGDUMP, _TitleString, false, _HexData, _HexDataLen)
 
 /* without driver-defined prefix */
 #undef _RTW_PRINT
@@ -193,10 +193,10 @@ extern uint rtw_drv_log_level;
 /* dump message to selected 'stream' */
 #undef RTW_DUMP_SEL
 #define RTW_DUMP_SEL(sel, _HexData, _HexDataLen) \
-	RTW_BUF_DUMP_SEL(_DRV_INFO_, sel, NULL, _FALSE, _HexData, _HexDataLen)
+	RTW_BUF_DUMP_SEL(_DRV_INFO_, sel, NULL, false, _HexData, _HexDataLen)
 
 #define RTW_MAP_DUMP_SEL(sel, _TitleString, _HexData, _HexDataLen) \
-	RTW_BUF_DUMP_SEL(_DRV_INFO_, sel, _TitleString, _TRUE, _HexData, _HexDataLen)
+	RTW_BUF_DUMP_SEL(_DRV_INFO_, sel, _TitleString, true, _HexData, _HexDataLen)
 #endif /* defined(_seqdump) */
 
 

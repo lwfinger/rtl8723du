@@ -169,7 +169,7 @@ phy_FwRFSerialRead(
 	u32				Offset)
 {
 	u32		retValue = 0;
-	/* RT_ASSERT(FALSE,("deprecate!\n")); */
+	/* RT_ASSERT(false,("deprecate!\n")); */
 	return	retValue;
 
 }	/* phy_FwRFSerialRead */
@@ -198,7 +198,7 @@ phy_FwRFSerialWrite(
 	u32				Offset,
 	u32				Data)
 {
-	/* RT_ASSERT(FALSE,("deprecate!\n")); */
+	/* RT_ASSERT(false,("deprecate!\n")); */
 }
 
 static	u32
@@ -760,7 +760,7 @@ PHY_GetTxPowerIndex_8723D(
 	s16 power_idx;
 	u8 base_idx = 0;
 	s8 by_rate_diff = 0, limit = 0, tpt_offset = 0, extra_bias = 0;
-	BOOLEAN bIn24G = _FALSE;
+	BOOLEAN bIn24G = false;
 
 	base_idx = PHY_GetTxPowerIndexBase(pAdapter, RFPath, Rate, RF_1TX, BandWidth, Channel, &bIn24G);
 
@@ -821,7 +821,7 @@ phy_SpurCalibration_8723D(
 {
 	u32		freq[2] = {0xFCCD, 0xFF9A}; /* {chnl 13, 14} */
 	u8		idx = 0xFF;
-	u8		b_doNotch = FALSE;
+	u8		b_doNotch = false;
 	u8		initial_gain;
 
 	/* add for notch */
@@ -852,7 +852,7 @@ phy_SpurCalibration_8723D(
 		rtw_msleep_os(30);
 
 		if (phy_query_bb_reg(pAdapter, rFPGA0_PSDReport, bMaskDWord) >= threshold)
-			b_doNotch = TRUE;
+			b_doNotch = true;
 
 		phy_set_bb_reg(pAdapter, rFPGA0_PSDFunction, bMaskDWord, freq[idx]); /* turn off PSD */
 		phy_set_bb_reg(pAdapter, rFPGA0_AnalogParameter4, bMaskDWord, 0xccc000c0);	/* enable 3-wire */
@@ -1047,17 +1047,17 @@ phy_SwChnl8723D(
 	/* 2.4G CCK TX DFIR */
 	/* 2016.01.20 Suggest from RS BB mingzhi*/
 	if (channelToSW >= 1 && channelToSW <= 13) {
-		if (pHalData->need_restore == _TRUE) {
+		if (pHalData->need_restore == true) {
 			for (i = 0 ; i < 3 ; i++) {
 				phy_set_bb_reg(pAdapter,
 					     pHalData->RegForRecover[i].offset,
 					     bMaskDWord,
 					     pHalData->RegForRecover[i].value);
 			}
-			pHalData->need_restore = _FALSE;
+			pHalData->need_restore = false;
 		}
 	} else if (channelToSW == 14) {
-		pHalData->need_restore = _TRUE;
+		pHalData->need_restore = true;
 		phy_set_bb_reg(pAdapter, rCCK0_TxFilter2, bMaskDWord, 0x0000B81C);
 		phy_set_bb_reg(pAdapter, rCCK0_DebugPort, bMaskDWord, 0x00000000);
 		phy_set_bb_reg(pAdapter, 0xAAC, bMaskDWord, 0x00003667);
@@ -1087,12 +1087,12 @@ phy_SwChnlAndSetBwMode8723D(
 
 	if (pHalData->bSwChnl) {
 		phy_SwChnl8723D(Adapter);
-		pHalData->bSwChnl = _FALSE;
+		pHalData->bSwChnl = false;
 	}
 
 	if (pHalData->bSetChnlBW) {
 		phy_PostSetBwMode8723D(Adapter);
-		pHalData->bSetChnlBW = _FALSE;
+		pHalData->bSetChnlBW = false;
 	}
 
 	PHY_SetTxPowerLevel8723D(Adapter, pHalData->current_channel);
@@ -1110,7 +1110,7 @@ PHY_HandleSwChnlAndSetBW8723D(
 	u8					CenterFrequencyIndex1
 )
 {
-	/* static BOOLEAN		bInitialzed = _FALSE; */
+	/* static BOOLEAN		bInitialzed = false; */
 	PHAL_DATA_TYPE		pHalData = GET_HAL_DATA(Adapter);
 	u8					tmpChannel = pHalData->current_channel;
 	enum channel_width	tmpBW = pHalData->current_channel_bw;
@@ -1132,12 +1132,12 @@ PHY_HandleSwChnlAndSetBW8723D(
 		/* if(pHalData->current_channel != ChannelNum) */
 		{
 			if (HAL_IsLegalChannel(Adapter, ChannelNum))
-				pHalData->bSwChnl = _TRUE;
+				pHalData->bSwChnl = true;
 		}
 	}
 
 	if (bSetBandWidth)
-		pHalData->bSetChnlBW = _TRUE;
+		pHalData->bSetChnlBW = true;
 
 	if (!pHalData->bSetChnlBW && !pHalData->bSwChnl)
 		return;
@@ -1191,7 +1191,7 @@ PHY_SetSwChnlBWMode8723D(
 {
 	/* RTW_INFO("%s()===>\n",__FUNCTION__); */
 
-	PHY_HandleSwChnlAndSetBW8723D(Adapter, _TRUE, _TRUE, channel, Bandwidth, Offset40, Offset80, channel);
+	PHY_HandleSwChnlAndSetBW8723D(Adapter, true, true, channel, Bandwidth, Offset40, Offset80, channel);
 
 	/* RTW_INFO("<==%s()\n",__FUNCTION__); */
 }

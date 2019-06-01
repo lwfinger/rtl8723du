@@ -91,7 +91,7 @@ void rtw_wfd_st_switch(struct sta_info *sta, bool on);
 #define MLME_IS_WPS(adapter) CHK_MLME_STATE(adapter, WIFI_UNDER_WPS)
 
 #if defined(CONFIG_IOCTL_CFG80211)
-#define MLME_IS_ROCH(adapter) (rtw_cfg80211_get_is_roch(adapter) == _TRUE)
+#define MLME_IS_ROCH(adapter) (rtw_cfg80211_get_is_roch(adapter) == true)
 #else
 #define MLME_IS_ROCH(adapter) 0
 #endif
@@ -406,7 +406,7 @@ struct wifidirect_info {
 struct tdls_ss_record {	/* signal strength record */
 	u8		macaddr[ETH_ALEN];
 	u8		RxPWDBAll;
-	u8		is_tdls_sta;	/* _TRUE: direct link sta, _FALSE: else */
+	u8		is_tdls_sta;	/* true: direct link sta, false: else */
 };
 
 struct tdls_temp_mgmt {
@@ -540,7 +540,7 @@ enum rtw_ft_capability {
 
 #define rtw_ft_otd_roam_en(a)	\
 	((rtw_ft_chk_flags(a, RTW_FT_OTD_EN))	\
-	&& ((a)->mlmepriv.ft_roam.ft_roam_on_expired == _FALSE)	\
+	&& ((a)->mlmepriv.ft_roam.ft_roam_on_expired == false)	\
 	&& ((a)->mlmepriv.ft_roam.ft_cap & 0x01))
 	
 #define rtw_ft_otd_roam(a) \
@@ -575,21 +575,21 @@ struct ft_roam_info {
 #define RTW_MAX_NB_RPT_NUM	8
 
 #define rtw_roam_busy_scan(a, nb)	\
-	(((a)->mlmepriv.LinkDetectInfo.bBusyTraffic == _TRUE) && \
+	(((a)->mlmepriv.LinkDetectInfo.bBusyTraffic == true) && \
 	(((a)->mlmepriv.ch_cnt) < ((nb)->nb_rpt_ch_list_num)))
 
 #define rtw_wnm_btm_preference_cap(a) \
-	((a)->mlmepriv.nb_info.preference_en == _TRUE)
+	((a)->mlmepriv.nb_info.preference_en == true)
 
 #define rtw_wnm_btm_diff_bss(a) \
 	((rtw_wnm_btm_preference_cap(a)) && \
-	(is_zero_mac_addr((a)->mlmepriv.nb_info.roam_target_addr) == _FALSE) && \
+	(is_zero_mac_addr((a)->mlmepriv.nb_info.roam_target_addr) == false) && \
 	(_rtw_memcmp((a)->mlmepriv.nb_info.roam_target_addr,\
-		(a)->mlmepriv.cur_network.network.MacAddress, ETH_ALEN) == _FALSE))
+		(a)->mlmepriv.cur_network.network.MacAddress, ETH_ALEN) == false))
 
 #define rtw_wnm_btm_roam_candidate(a, c) \
 	((rtw_wnm_btm_preference_cap(a)) && \
-	(is_zero_mac_addr((a)->mlmepriv.nb_info.roam_target_addr) == _FALSE) && \
+	(is_zero_mac_addr((a)->mlmepriv.nb_info.roam_target_addr) == false) && \
 	(_rtw_memcmp((a)->mlmepriv.nb_info.roam_target_addr,\
 		(c)->network.MacAddress, ETH_ALEN)))
 
@@ -965,12 +965,12 @@ __inline static sint check_fwstate(struct mlme_priv *pmlmepriv, sint state)
 {
 	if ((state == WIFI_NULL_STATE) &&
 		(pmlmepriv->fw_state == WIFI_NULL_STATE))
-		return _TRUE;
+		return true;
 
 	if (pmlmepriv->fw_state & state)
-		return _TRUE;
+		return true;
 
-	return _FALSE;
+	return false;
 }
 
 __inline static sint get_fwstate(struct mlme_priv *pmlmepriv)

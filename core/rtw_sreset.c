@@ -27,7 +27,7 @@ void sreset_set_trigger_point(_adapter *padapter, s32 tgp)
 
 bool sreset_inprogress(_adapter *padapter)
 {
-	return _FALSE;
+	return false;
 }
 
 static void sreset_restore_security_station(_adapter *padapter)
@@ -56,9 +56,9 @@ static void sreset_restore_security_station(_adapter *padapter)
 			/* DEBUG_ERR( ("Set wpa_set_encryption: Obtain Sta_info fail\n")); */
 		} else {
 			/* pairwise key */
-			rtw_setstakey_cmd(padapter, psta, UNICAST_KEY, _FALSE);
+			rtw_setstakey_cmd(padapter, psta, UNICAST_KEY, false);
 			/* group key */
-			rtw_set_key(padapter, &padapter->securitypriv, padapter->securitypriv.dot118021XGrpKeyid, 0, _FALSE);
+			rtw_set_key(padapter, &padapter->securitypriv, padapter->securitypriv.dot118021XGrpKeyid, 0, false);
 		}
 	}
 }
@@ -68,7 +68,7 @@ static void sreset_restore_network_station(_adapter *padapter)
 	struct mlme_priv *mlmepriv = &padapter->mlmepriv;
 	struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
-	u8 doiqk = _FALSE;
+	u8 doiqk = false;
 
 	rtw_setopmode_cmd(padapter, Ndis802_11Infrastructure, RTW_CMDF_DIRECTLY);
 
@@ -88,12 +88,12 @@ static void sreset_restore_network_station(_adapter *padapter)
 		}
 	}
 
-	doiqk = _TRUE;
+	doiqk = true;
 	rtw_hal_set_hwreg(padapter, HW_VAR_DO_IQK , &doiqk);
 
 	set_channel_bwmode(padapter, pmlmeext->cur_channel, pmlmeext->cur_ch_offset, pmlmeext->cur_bwmode);
 
-	doiqk = _FALSE;
+	doiqk = false;
 	rtw_hal_set_hwreg(padapter , HW_VAR_DO_IQK , &doiqk);
 	/* disable dynamic functions, such as high power, DIG */
 	/*rtw_phydm_func_disable_all(padapter);*/

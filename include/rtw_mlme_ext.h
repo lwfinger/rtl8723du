@@ -439,8 +439,8 @@ void rtw_rfctl_init(_adapter *adapter);
 void rtw_rfctl_deinit(_adapter *adapter);
 
 #define CH_IS_NON_OCP(rt_ch_info) 0
-#define rtw_chset_is_ch_non_ocp(ch_set, ch, bw, offset) _FALSE
-#define rtw_rfctl_is_tx_blocked_by_ch_waiting(rfctl) _FALSE
+#define rtw_chset_is_ch_non_ocp(ch_set, ch, bw, offset) false
+#define rtw_rfctl_is_tx_blocked_by_ch_waiting(rfctl) false
 
 enum {
 	RTW_CHF_2G = BIT0,
@@ -575,9 +575,9 @@ struct mlme_ext_priv {
 static inline u8 check_mlmeinfo_state(struct mlme_ext_priv *plmeext, sint state)
 {
 	if ((plmeext->mlmext_info.state & 0x03) == state)
-		return _TRUE;
+		return true;
 
-	return _FALSE;
+	return false;
 }
 
 void sitesurvey_set_offch_state(_adapter *adapter, u8 scan_state);

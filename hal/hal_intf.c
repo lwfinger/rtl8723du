@@ -156,7 +156,7 @@ u32 rtw_hal_power_on(_adapter *padapter)
 
 	ret = padapter->hal_func.hal_power_on(padapter);
 
-	if ((ret == _SUCCESS) && (pHalData->EEPROMBluetoothCoexist == _TRUE))
+	if ((ret == _SUCCESS) && (pHalData->EEPROMBluetoothCoexist == true))
 		rtw_btcoex_PowerOnSetting(padapter);
 	return ret;
 }
@@ -202,7 +202,7 @@ uint	 rtw_hal_init(_adapter *padapter)
 	status = padapter->hal_func.hal_init(padapter);
 
 	if (status == _SUCCESS) {
-		pHalData->hw_init_completed = _TRUE;
+		pHalData->hw_init_completed = true;
 		rtw_restore_mac_addr(padapter);
 		if (padapter->registrypriv.notch_filter == 1)
 			rtw_hal_notch_filter(padapter, 1);
@@ -221,7 +221,7 @@ uint	 rtw_hal_init(_adapter *padapter)
 #endif /*CONFIG_RF_POWER_TRIM*/
 
 	} else {
-		pHalData->hw_init_completed = _FALSE;
+		pHalData->hw_init_completed = false;
 		RTW_INFO("rtw_hal_init: hal_init fail\n");
 	}
 
@@ -241,7 +241,7 @@ uint rtw_hal_deinit(_adapter *padapter)
 
 	if (status == _SUCCESS) {
 		rtw_led_control(padapter, LED_CTL_POWER_OFF);
-		pHalData->hw_init_completed = _FALSE;
+		pHalData->hw_init_completed = false;
 	} else
 		RTW_INFO("\n rtw_hal_deinit: hal_init fail\n");
 
@@ -289,7 +289,7 @@ void rtw_hal_disable_interrupt(_adapter *padapter)
 
 u8 rtw_hal_check_ips_status(_adapter *padapter)
 {
-	u8 val = _FALSE;
+	u8 val = false;
 	if (padapter->hal_func.check_ips_status)
 		val = padapter->hal_func.check_ips_status(padapter);
 	else
@@ -346,7 +346,7 @@ s32	rtw_hal_mgnt_xmit(_adapter *padapter, struct xmit_frame *pmgntframe)
 	update_mgntframe_attrib_addr(padapter, pmgntframe);
 
 #if defined(CONFIG_IEEE80211W) || defined(CONFIG_RTW_MESH)
-	if ((!MLME_IS_MESH(padapter) && SEC_IS_BIP_KEY_INSTALLED(&padapter->securitypriv) == _TRUE)
+	if ((!MLME_IS_MESH(padapter) && SEC_IS_BIP_KEY_INSTALLED(&padapter->securitypriv) == true)
 		#ifdef CONFIG_RTW_MESH
 		|| (MLME_IS_MESH(padapter) && padapter->mesh_info.mesh_auth_id)
 		#endif
@@ -479,7 +479,7 @@ void	rtw_hal_set_chnl_bw(_adapter *padapter, u8 channel, enum channel_width Band
 
 #ifdef CONFIG_MP_INCLUDED
 	/* MP mode channel don't use secondary channel */
-	if (rtw_mp_mode_check(padapter) == _FALSE)
+	if (rtw_mp_mode_check(padapter) == false)
 #endif
 	{
 		if (cch_80 != 0)
@@ -643,7 +643,7 @@ s32 c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 		/* no handle, goto default */
 
 	default:
-		if (phydm_c2H_content_parsing(adapter_to_phydm(adapter), id, plen, payload) != TRUE)
+		if (phydm_c2H_content_parsing(adapter_to_phydm(adapter), id, plen, payload) != true)
 			ret = _FAIL;
 		break;
 	}
@@ -681,9 +681,9 @@ s32 rtw_hal_c2h_id_handle_directly(_adapter *adapter, u8 id, u8 seq, u8 plen, u8
 	case C2H_BCN_EARLY_RPT:
 	case C2H_AP_REQ_TXRPT:
 	case C2H_SPC_STAT:
-		return _TRUE;
+		return true;
 	default:
-		return _FALSE;
+		return false;
 	}
 }
 
@@ -846,7 +846,7 @@ s32 rtw_hal_fill_h2c_cmd(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBu
 {
 	_adapter *pri_adapter = GET_PRIMARY_ADAPTER(padapter);
 
-	if (GET_HAL_DATA(pri_adapter)->bFWReady == _TRUE)
+	if (GET_HAL_DATA(pri_adapter)->bFWReady == true)
 		return padapter->hal_func.fill_h2c_cmd(padapter, ElementID, CmdLen, pCmdBuffer);
 	else if (padapter->registrypriv.mp_mode == 0)
 		RTW_PRINT(FUNC_ADPT_FMT" FW doesn't exit when no MP mode, by pass H2C id:0x%02x\n"

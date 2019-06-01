@@ -8,18 +8,18 @@
 void _dbg_dump_tx_info(PADAPTER padapter, int frame_tag, struct tx_desc *ptxdesc)
 {
 	u8 bDumpTxPkt;
-	u8 bDumpTxDesc = _FALSE;
+	u8 bDumpTxDesc = false;
 
 	rtw_hal_get_def_var(padapter, HAL_DEF_DBG_DUMP_TXPKT, &(bDumpTxPkt));
 
 	if (bDumpTxPkt == 1) { /* dump txdesc for data frame */
 		RTW_INFO("dump tx_desc for data frame\n");
 		if ((frame_tag & 0x0f) == DATA_FRAMETAG)
-			bDumpTxDesc = _TRUE;
+			bDumpTxDesc = true;
 	} else if (bDumpTxPkt == 2) { /* dump txdesc for mgnt frame */
 		RTW_INFO("dump tx_desc for mgnt frame\n");
 		if ((frame_tag & 0x0f) == MGNT_FRAMETAG)
-			bDumpTxDesc = _TRUE;
+			bDumpTxDesc = true;
 	} else if (bDumpTxPkt == 3) { /* dump early info */
 	}
 
@@ -81,7 +81,7 @@ static s32 update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, s32 sz, u8 bag
 	struct tx_desc *ptxdesc = (struct tx_desc *)pmem;
 
 	if ((PACKET_OFFSET_SZ != 0)
-	    && (_FALSE == bagg_pkt)
+	    && (false == bagg_pkt)
 	    && (urb_zero_packet_chk(padapter, sz) == 0)) {
 		ptxdesc = (struct tx_desc *)(pmem + PACKET_OFFSET_SZ);
 		pull = 1;
@@ -127,7 +127,7 @@ static s32 rtw_dump_xframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 		} else /* no frag */
 			sz = pattrib->last_txcmdsz;
 
-		pull = update_txdesc(pxmitframe, mem_addr, sz, _FALSE);
+		pull = update_txdesc(pxmitframe, mem_addr, sz, false);
 		/* rtl8723d_update_txdesc(pxmitframe, mem_addr+PACKET_OFFSET_SZ); */
 
 		if (pull) {
@@ -172,7 +172,7 @@ s32 rtl8723du_xmitframe_complete(PADAPTER padapter, struct xmit_priv *pxmitpriv,
 	if (pxmitbuf == NULL) {
 		pxmitbuf = rtw_alloc_xmitbuf(pxmitpriv);
 		if (!pxmitbuf)
-			return _FALSE;
+			return false;
 	}
 
 
@@ -207,14 +207,14 @@ s32 rtl8723du_xmitframe_complete(PADAPTER padapter, struct xmit_priv *pxmitpriv,
 
 		} else {
 			rtw_free_xmitbuf(pxmitpriv, pxmitbuf);
-			return _FALSE;
+			return false;
 		}
 
 		break;
 
 	} while (0/*xcnt < (NR_XMITFRAME >> 3)*/);
 
-	return _TRUE;
+	return true;
 
 }
 
@@ -232,8 +232,8 @@ static s32 xmitframe_direct(PADAPTER padapter, struct xmit_frame *pxmitframe)
 
 /*
  * Return
- *	_TRUE	dump packet directly
- *	_FALSE	enqueue packet
+ *	true	dump packet directly
+ *	false	enqueue packet
  */
 static s32 pre_xmitframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 {
@@ -249,7 +249,7 @@ static s32 pre_xmitframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 	if (rtw_txframes_sta_ac_pending(padapter, pattrib) > 0)
 		goto enqueue;
 
-	if (rtw_xmit_ac_blocked(padapter) == _TRUE)
+	if (rtw_xmit_ac_blocked(padapter) == true)
 		goto enqueue;
 
 	if (DEV_STA_LG_NUM(padapter->dvobj))
@@ -270,7 +270,7 @@ static s32 pre_xmitframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 		rtw_free_xmitframe(pxmitpriv, pxmitframe);
 	}
 
-	return _TRUE;
+	return true;
 
 enqueue:
 	res = rtw_xmitframe_enqueue(padapter, pxmitframe);
@@ -280,10 +280,10 @@ enqueue:
 		rtw_free_xmitframe(pxmitpriv, pxmitframe);
 
 		pxmitpriv->tx_drop++;
-		return _TRUE;
+		return true;
 	}
 
-	return _FALSE;
+	return false;
 }
 
 s32 rtl8723du_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe)
@@ -293,8 +293,8 @@ s32 rtl8723du_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe)
 
 /*
  * Return
- *	_TRUE	dump packet directly ok
- *	_FALSE	temporary can't transmit packets to hardware
+ *	true	dump packet directly ok
+ *	false	temporary can't transmit packets to hardware
  */
 s32 rtl8723du_hal_xmit(PADAPTER padapter, struct xmit_frame *pxmitframe)
 {

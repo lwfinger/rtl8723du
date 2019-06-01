@@ -58,7 +58,7 @@ static BOOLEAN HalUsbSetQueuePipeMapping8723DUsb(
 )
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
-	BOOLEAN result = _FALSE;
+	BOOLEAN result = false;
 
 	_ConfigChipOutEP_8723(padapter, NumOutPipe);
 
@@ -101,7 +101,7 @@ static u32 _InitPowerOn_8723du(PADAPTER padapter)
 	u8 value8 = 0;
 
 	rtw_hal_get_hwreg(padapter, HW_VAR_APFM_ON_MAC, &value8);
-	if (value8 == _TRUE)
+	if (value8 == true)
 		return _SUCCESS;
 	/* HW Power on sequence */
 	if (!HalPwrSeqCmdParsing(padapter, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_USB_MSK, rtl8723D_card_enable_flow))
@@ -116,7 +116,7 @@ static u32 _InitPowerOn_8723du(PADAPTER padapter)
 		    | PROTOCOL_EN | SCHEDULE_EN | ENSEC | CALTMR_EN);
 	rtw_write16(padapter, REG_CR, value16);
 
-	value8 = _TRUE;
+	value8 = true;
 	rtw_hal_set_hwreg(padapter, HW_VAR_APFM_ON_MAC, &value8);
 
 	return status;
@@ -324,7 +324,7 @@ _InitNormalChipTwoOutEpPriority(
 		valueLow = QUEUE_NORMAL;
 		break;
 	default:
-		/* RT_ASSERT(FALSE,("Shall not reach here!\n")); */
+		/* RT_ASSERT(false,("Shall not reach here!\n")); */
 		break;
 	}
 
@@ -387,7 +387,7 @@ static void _InitQueuePriority(PADAPTER padapter)
 		_InitNormalChipThreeOutEpPriority(padapter);
 		break;
 	default:
-		/* RT_ASSERT(FALSE,("Shall not reach here!\n")); */
+		/* RT_ASSERT(false,("Shall not reach here!\n")); */
 		break;
 	}
 
@@ -570,7 +570,7 @@ static void _InitBurstPktLen(PADAPTER padapter)
 	tmp8 |= BIT(1) | BIT(2) | BIT(3);
 	rtw_write8(padapter, REG_RXDMA_MODE_CTRL_8723D, tmp8);
 
-	pHalData->bSupportUSB3 = _FALSE;
+	pHalData->bSupportUSB3 = false;
 
 	tmp8 = rtw_read8(padapter, REG_HT_SINGLE_AMPDU_8723D);
 	tmp8 |= BIT(7); /* enable single pkt ampdu */
@@ -660,7 +660,7 @@ static void _initUsbAggregationSetting(PADAPTER padapter)
 	usb_AggSettingRxUpdate(padapter);
 
 	/* 201/12/10 MH Add for USB agg mode dynamic switch. */
-	pHalData->UsbRxHighSpeedMode = _FALSE;
+	pHalData->UsbRxHighSpeedMode = false;
 }
 
 static void PHY_InitAntennaSelection8723D(PADAPTER padapter)
@@ -715,9 +715,9 @@ HalDetectPwrDownMode(
 	EFUSE_ShadowRead(padapter, 1, EEPROM_FEATURE_OPTION_8723D, (u32 *)&tmpvalue);
 
 	if (tmpvalue & BIT(4) && pwrctrlpriv->reg_pdnmode)
-		pHalData->pwrdown = _TRUE;
+		pHalData->pwrdown = true;
 	else
-		pHalData->pwrdown = _FALSE;
+		pHalData->pwrdown = false;
 
 	RTW_INFO("%s(): PDN=%d\n", __func__, pHalData->pwrdown);
 	return pHalData->pwrdown;
@@ -774,7 +774,7 @@ HwSuspendModeEnable(
 	 * We need to enable HW suspend mode when enter S3/S4 or disable. We need
 	 * to disable HW suspend mode for IPS/radio_off.
 	 */
-	if (Type == _FALSE) {
+	if (Type == false) {
 		reg |= BIT(14);
 		rtw_write16(padapter, REG_GPIO_MUXCFG, reg);
 		reg |= BIT(12);
@@ -887,18 +887,18 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 		|| padapter->registrypriv.mp_customer_str
 		#endif
 	) {
-		status = rtl8723d_FirmwareDownload(padapter, _FALSE);
+		status = rtl8723d_FirmwareDownload(padapter, false);
 		if (status != _SUCCESS) {
-			pHalData->bFWReady = _FALSE;
-			pHalData->fw_ractrl = _FALSE;
+			pHalData->bFWReady = false;
+			pHalData->fw_ractrl = false;
 			goto exit;
 		} else {
-			pHalData->bFWReady = _TRUE;
-			pHalData->fw_ractrl = _TRUE;
+			pHalData->bFWReady = true;
+			pHalData->fw_ractrl = true;
 		}
 	}
 
-	if (pwrctrlpriv->reg_rfoff == _TRUE)
+	if (pwrctrlpriv->reg_rfoff == true)
 		pwrctrlpriv->rf_pwrstate = rf_off;
 
 	/* Set RF type for BB/RF configuration */
@@ -965,7 +965,7 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 	_InitRetryFunction(padapter);
 	/* _InitOperationMode(padapter);*/ /*todo */
 	rtl8723d_InitBeaconParameters(padapter);
-	rtl8723d_InitBeaconMaxError(padapter, _TRUE);
+	rtl8723d_InitBeaconMaxError(padapter, true);
 
 	_InitBurstPktLen(padapter);
 	_initUsbAggregationSetting(padapter);
@@ -1035,13 +1035,13 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 				rtw_msleep_os(50);
 			} while (rtw_get_passing_time_ms(start_time) <= 400);
 
-			rtw_btcoex_IQKNotify(padapter, _TRUE);
-			restore_iqk_rst = (pwrpriv->bips_processing == _TRUE) ? _TRUE : _FALSE;
-			b2Ant = pHalData->EEPROMBluetoothAntNum == Ant_x2 ? _TRUE : _FALSE;
-			halrf_iqk_trigger(&pHalData->odmpriv, _FALSE);
-			/*phy_iq_calibrate_8723d(padapter, _FALSE);*/
-			pHalData->bIQKInitialized = _TRUE;
-			rtw_btcoex_IQKNotify(padapter, _FALSE);
+			rtw_btcoex_IQKNotify(padapter, true);
+			restore_iqk_rst = (pwrpriv->bips_processing == true) ? true : false;
+			b2Ant = pHalData->EEPROMBluetoothAntNum == Ant_x2 ? true : false;
+			halrf_iqk_trigger(&pHalData->odmpriv, false);
+			/*phy_iq_calibrate_8723d(padapter, false);*/
+			pHalData->bIQKInitialized = true;
+			rtw_btcoex_IQKNotify(padapter, false);
 
 			/* Inform WiFi FW that it is the finish of IQK */
 			h2cCmdBuf = 0;
@@ -1053,9 +1053,9 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 
 	/* Init BT hw config. */
 	if (padapter->registrypriv.mp_mode == 1)
-		rtw_btcoex_HAL_Initialize(padapter, _TRUE);
+		rtw_btcoex_HAL_Initialize(padapter, true);
 	else
-		rtw_btcoex_HAL_Initialize(padapter, _FALSE);
+		rtw_btcoex_HAL_Initialize(padapter, false);
 
 	rtw_hal_set_hwreg(padapter, HW_VAR_NAV_UPPER, (u8 *)&NavUpper);
 
@@ -1425,9 +1425,9 @@ CardDisableRTL8723du(
 
 	rtw_hal_get_hwreg(padapter, HW_VAR_APFM_ON_MAC, &u1bTmp);
 	RTW_INFO(FUNC_ADPT_FMT ": bMacPwrCtrlOn=%d\n", FUNC_ADPT_ARG(padapter), u1bTmp);
-	if (u1bTmp == _FALSE)
+	if (u1bTmp == false)
 		return;
-	u1bTmp = _FALSE;
+	u1bTmp = false;
 	rtw_hal_set_hwreg(padapter, HW_VAR_APFM_ON_MAC, &u1bTmp);
 
 	/* Stop Tx Report Timer. 0x4EC[Bit1]=b'0 */
@@ -1454,7 +1454,7 @@ CardDisableRTL8723du(
 	/* Card disable power action flow */
 	HalPwrSeqCmdParsing(padapter, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_USB_MSK, rtl8723D_card_disable_flow);
 
-	GET_HAL_DATA(padapter)->bFWReady = _FALSE;
+	GET_HAL_DATA(padapter)->bFWReady = false;
 }
 
 
@@ -1490,7 +1490,7 @@ static u32 rtl8723du_hal_deinit(PADAPTER padapter)
 			if ((pwrctl->bHWPwrPindetect) && (pwrctl->bHWPowerdown))
 				rtl8723du_hw_power_down(padapter);
 		}
-		pHalData->bMacPwrCtrlOn = _FALSE;
+		pHalData->bMacPwrCtrlOn = false;
 	}
 	return _SUCCESS;
 }
@@ -1516,7 +1516,7 @@ static unsigned int rtl8723du_inirp_init(PADAPTER padapter)
 	/* issue Rx irp to receive data */
 	precvbuf = (struct recv_buf *)precvpriv->precv_buf;
 	for (i = 0; i < NR_RECVBUFF; i++) {
-		if (_read_port(pintfhdl, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf) == _FALSE) {
+		if (_read_port(pintfhdl, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf) == false) {
 			status = _FAIL;
 			goto exit;
 		}
@@ -1583,13 +1583,13 @@ hal_EfuseParsePowerSavingSetting(
 	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(padapter);
 
 	if (AutoloadFail) {
-		pwrctl->bHWPowerdown = _FALSE;
-		pwrctl->bSupportRemoteWakeup = _FALSE;
+		pwrctl->bHWPowerdown = false;
+		pwrctl->bSupportRemoteWakeup = false;
 	} else {
 		/*if(SUPPORT_HW_RADIO_DETECT(padapter)) */
 		pwrctl->bHWPwrPindetect = padapter->registrypriv.hwpwrp_detect;
 		/*else */
-		/*pwrctl->bHWPwrPindetect = _FALSE; */ /*dongle not support new */
+		/*pwrctl->bHWPwrPindetect = false; */ /*dongle not support new */
 
 
 		/*hw power down mode selection , 0:rf-off / 1:power down */
@@ -1601,7 +1601,7 @@ hal_EfuseParsePowerSavingSetting(
 
 		/* decide hw if support remote wakeup function */
 		/* if hw supported, 8051 (SIE) will generate WeakUP signal( D+/D- toggle) when autoresume */
-		pwrctl->bSupportRemoteWakeup = (PROMContent[EEPROM_USB_OPTIONAL_FUNCTION0] & BIT(1)) ? _TRUE : _FALSE;
+		pwrctl->bSupportRemoteWakeup = (PROMContent[EEPROM_USB_OPTIONAL_FUNCTION0] & BIT(1)) ? true : false;
 
 		/*if(SUPPORT_HW_RADIO_DETECT(padapter)) */
 		/*padapter->registrypriv.usbss_enable = pwrctl->bSupportRemoteWakeup ; */
@@ -1714,8 +1714,8 @@ hal_EfuseParsePROMContent(
 
 	eeValue = rtw_read8(padapter, REG_9346CR);
 	/* To check system boot selection. */
-	pHalData->EepromOrEfuse = (eeValue & BOOT_FROM_EEPROM) ? _TRUE : _FALSE;
-	pHalData->bautoload_fail_flag = (eeValue & EEPROM_EN) ? _FALSE : _TRUE;
+	pHalData->EepromOrEfuse = (eeValue & BOOT_FROM_EEPROM) ? true : false;
+	pHalData->bautoload_fail_flag = (eeValue & EEPROM_EN) ? false : true;
 
 	RTW_INFO("Boot from %s, Autoload %s !\n", (pHalData->EepromOrEfuse ? "EEPROM" : "EFUSE"),
 		 (pHalData->bautoload_fail_flag ? "Fail" : "OK"));
@@ -1922,7 +1922,7 @@ static void rtl8723du_init_default_value(PADAPTER padapter)
 
 static u8 rtl8723du_ps_func(PADAPTER padapter, HAL_INTF_PS_FUNC efunc_id, u8 *val)
 {
-	u8 bResult = _TRUE;
+	u8 bResult = true;
 
 	switch (efunc_id) {
 

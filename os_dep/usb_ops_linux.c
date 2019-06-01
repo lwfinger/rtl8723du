@@ -109,7 +109,7 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 				}
 			}
 
-			if (rtw_inc_and_chk_continual_io_error(pdvobjpriv) == _TRUE) {
+			if (rtw_inc_and_chk_continual_io_error(pdvobjpriv) == true) {
 				rtw_set_surprise_removed(padapter);
 				break;
 			}
@@ -376,7 +376,7 @@ static void usb_write_port_complete(struct urb *purb, struct pt_regs *regs)
 			goto check_completion;
 		} else {
 			rtw_set_surprise_removed(padapter);
-			RTW_INFO("bSurpriseRemoved=TRUE\n");
+			RTW_INFO("bSurpriseRemoved=true\n");
 
 			goto check_completion;
 		}
@@ -403,7 +403,7 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 	_irqL irqL;
 	unsigned int pipe;
 	int status;
-	u32 ret = _FAIL, bwritezero = _FALSE;
+	u32 ret = _FAIL, bwritezero = false;
 	PURB	purb = NULL;
 	_adapter *padapter = (_adapter *)pintfhdl->padapter;
 	struct dvobj_priv	*pdvobj = adapter_to_dvobj(padapter);
@@ -486,7 +486,7 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 	/* Commented by Albert 2009/10/13
 	 * We add the URB_ZERO_PACKET flag to urb so that the host will send the zero packet automatically. */
 	/*
-		if(bwritezero == _TRUE)
+		if(bwritezero == true)
 		{
 			usb_bulkout_zero(pintfhdl, addr);
 		}
@@ -616,7 +616,7 @@ static void usb_read_port_complete(struct urb *purb, struct pt_regs *regs)
 
 		RTW_INFO("###=> usb_read_port_complete => urb.status(%d)\n", purb->status);
 
-		if (rtw_inc_and_chk_continual_io_error(adapter_to_dvobj(padapter)) == _TRUE)
+		if (rtw_inc_and_chk_continual_io_error(adapter_to_dvobj(padapter)) == true)
 			rtw_set_surprise_removed(padapter);
 
 		switch (purb->status) {

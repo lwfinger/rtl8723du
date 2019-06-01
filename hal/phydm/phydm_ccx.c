@@ -961,7 +961,7 @@ phydm_ccx_monitor_trigger(
 		phydm_clm_setting(p_dm);
 		phydm_clm_trigger(p_dm);
 	} else if (ccx_info->clm_mntr_mode == CLM_FW_MNTR){
-		phydm_clm_h2c(p_dm, monitor_time_4us, TRUE);
+		phydm_clm_h2c(p_dm, monitor_time_4us, true);
 	} else {
 		PHYDM_DBG(p_dm, DBG_ENV_MNTR, ("CLM_ECHO_DBG_MODE\n"));
 	}

@@ -40,7 +40,7 @@ void rtw_btcoex_IpsNotify(PADAPTER padapter, u8 type)
 	PHAL_DATA_TYPE	pHalData;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
 	hal_btcoex_IpsNotify(padapter, type);
@@ -51,7 +51,7 @@ void rtw_btcoex_LpsNotify(PADAPTER padapter, u8 type)
 	PHAL_DATA_TYPE	pHalData;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
 	hal_btcoex_LpsNotify(padapter, type);
@@ -62,10 +62,10 @@ void rtw_btcoex_ScanNotify(PADAPTER padapter, u8 type)
 	PHAL_DATA_TYPE	pHalData;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
-	if (_FALSE == type) {
+	if (false == type) {
 		#ifdef CONFIG_CONCURRENT_MODE
 		if (rtw_mi_buddy_check_fwstate(padapter, WIFI_SITE_MONITOR))
 			return;
@@ -83,11 +83,11 @@ void rtw_btcoex_ConnectNotify(PADAPTER padapter, u8 action)
 	PHAL_DATA_TYPE	pHalData;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
 #ifdef CONFIG_CONCURRENT_MODE
-	if (_FALSE == action) {
+	if (false == action) {
 		if (rtw_mi_buddy_check_fwstate(padapter, WIFI_UNDER_LINKING))
 			return;
 	}
@@ -101,7 +101,7 @@ void rtw_btcoex_MediaStatusNotify(PADAPTER padapter, u8 mediaStatus)
 	PHAL_DATA_TYPE	pHalData;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
 #ifdef CONFIG_CONCURRENT_MODE
@@ -112,7 +112,7 @@ void rtw_btcoex_MediaStatusNotify(PADAPTER padapter, u8 mediaStatus)
 #endif /* CONFIG_CONCURRENT_MODE */
 
 	if ((RT_MEDIA_CONNECT == mediaStatus)
-	    && (check_fwstate(&padapter->mlmepriv, WIFI_AP_STATE) == _TRUE))
+	    && (check_fwstate(&padapter->mlmepriv, WIFI_AP_STATE) == true))
 		rtw_hal_set_hwreg(padapter, HW_VAR_DL_RSVD_PAGE, NULL);
 
 	hal_btcoex_MediaStatusNotify(padapter, mediaStatus);
@@ -123,7 +123,7 @@ void rtw_btcoex_SpecialPacketNotify(PADAPTER padapter, u8 pktType)
 	PHAL_DATA_TYPE	pHalData;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
 	hal_btcoex_SpecialPacketNotify(padapter, pktType);
@@ -134,7 +134,7 @@ void rtw_btcoex_IQKNotify(PADAPTER padapter, u8 state)
 	PHAL_DATA_TYPE	pHalData;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
 	hal_btcoex_IQKNotify(padapter, state);
@@ -145,7 +145,7 @@ void rtw_btcoex_BtInfoNotify(PADAPTER padapter, u8 length, u8 *tmpBuf)
 	PHAL_DATA_TYPE	pHalData;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
 	hal_btcoex_BtInfoNotify(padapter, length, tmpBuf);
@@ -156,7 +156,7 @@ void rtw_btcoex_BtMpRptNotify(PADAPTER padapter, u8 length, u8 *tmpBuf)
 	PHAL_DATA_TYPE	pHalData;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
 	if (padapter->registrypriv.mp_mode == 1)
@@ -170,7 +170,7 @@ void rtw_btcoex_SuspendNotify(PADAPTER padapter, u8 state)
 	PHAL_DATA_TYPE	pHalData;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
 	hal_btcoex_SuspendNotify(padapter, state);
@@ -182,10 +182,10 @@ void rtw_btcoex_HaltNotify(PADAPTER padapter)
 	u8 do_halt = 1;
 
 	pHalData = GET_HAL_DATA(padapter);
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		do_halt = 0;
 
-	if (_FALSE == padapter->bup) {
+	if (false == padapter->bup) {
 		RTW_INFO(FUNC_ADPT_FMT ": bup=%d Skip!\n",
 			 FUNC_ADPT_ARG(padapter), padapter->bup);
 		do_halt = 0;
@@ -236,7 +236,7 @@ void rtw_btcoex_Handler(PADAPTER padapter)
 
 	pHalData = GET_HAL_DATA(padapter);
 
-	if (_FALSE == pHalData->EEPROMBluetoothCoexist)
+	if (false == pHalData->EEPROMBluetoothCoexist)
 		return;
 
 	hal_btcoex_Hanlder(padapter);
@@ -271,10 +271,10 @@ u32 rtw_btcoex_GetAMPDUSize(PADAPTER padapter)
 
 void rtw_btcoex_SetManualControl(PADAPTER padapter, u8 manual)
 {
-	if (_TRUE == manual)
-		hal_btcoex_SetManualControl(padapter, _TRUE);
+	if (true == manual)
+		hal_btcoex_SetManualControl(padapter, true);
 	else
-		hal_btcoex_SetManualControl(padapter, _FALSE);
+		hal_btcoex_SetManualControl(padapter, false);
 }
 
 u8 rtw_btcoex_1Ant(PADAPTER padapter)
@@ -373,7 +373,7 @@ void rtw_btcoex_LPS_Enter(PADAPTER padapter)
 
 	pwrpriv = adapter_to_pwrctl(padapter);
 
-	pwrpriv->bpower_saving = _TRUE;
+	pwrpriv->bpower_saving = true;
 	lpsVal = rtw_btcoex_LpsVal(padapter);
 	rtw_set_ps_mode(padapter, PS_MODE_MIN, 0, lpsVal, "BTCOEX");
 }
@@ -388,10 +388,10 @@ u8 rtw_btcoex_LPS_Leave(PADAPTER padapter)
 	if (pwrpriv->pwr_mode != PS_MODE_ACTIVE) {
 		rtw_set_ps_mode(padapter, PS_MODE_ACTIVE, 0, 0, "BTCOEX");
 		LPS_RF_ON_check(padapter, 100);
-		pwrpriv->bpower_saving = _FALSE;
+		pwrpriv->bpower_saving = false;
 	}
 
-	return _TRUE;
+	return true;
 }
 
 u16 rtw_btcoex_btreg_read(PADAPTER padapter, u8 type, u16 addr, u32 *data)
@@ -441,7 +441,7 @@ u8 rtw_btcoex_get_pg_rfe_type(PADAPTER padapter)
 
 u8 rtw_btcoex_is_tfbga_package_type(PADAPTER padapter)
 {
-	return _FALSE;
+	return false;
 }
 
 u8 rtw_btcoex_get_ant_div_cfg(PADAPTER padapter)
@@ -450,7 +450,7 @@ u8 rtw_btcoex_get_ant_div_cfg(PADAPTER padapter)
 
 	pHalData = GET_HAL_DATA(padapter);
 	
-	return (pHalData->AntDivCfg == 0) ? _FALSE : _TRUE;
+	return (pHalData->AntDivCfg == 0) ? false : true;
 }
 
 /* ==================================================
@@ -461,12 +461,12 @@ void rtw_btcoex_set_ant_info(PADAPTER padapter)
 {
 	PHAL_DATA_TYPE hal = GET_HAL_DATA(padapter);
 
-	if (hal->EEPROMBluetoothCoexist == _TRUE) {
-		u8 bMacPwrCtrlOn = _FALSE;
+	if (hal->EEPROMBluetoothCoexist == true) {
+		u8 bMacPwrCtrlOn = false;
 
 		rtw_btcoex_AntInfoSetting(padapter);
 		rtw_hal_get_hwreg(padapter, HW_VAR_APFM_ON_MAC, &bMacPwrCtrlOn);
-		if (bMacPwrCtrlOn == _TRUE)
+		if (bMacPwrCtrlOn == true)
 			rtw_btcoex_PowerOnSetting(padapter);
 	} else {
 		rtw_btcoex_wifionly_AntInfoSetting(padapter);
