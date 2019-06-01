@@ -386,13 +386,13 @@ void rtw_efuse_analyze(PADAPTER	padapter, u8 Type, u8 Fake)
 
 static void efuse_PreUpdateAction(
 	PADAPTER	pAdapter,
-	pu4Byte	BackupRegs)
+	u32 *	BackupRegs)
 {
 }
 
 static void efuse_PostUpdateAction(
 	PADAPTER	pAdapter,
-	pu4Byte	BackupRegs)
+	u32 *	BackupRegs)
 {
 }
 

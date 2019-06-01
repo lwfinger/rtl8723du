@@ -326,7 +326,7 @@ void rtw_wep_decrypt(_adapter  *padapter, u8 *precvframe)
 /* 3		=====TKIP related===== */
 
 static u32 secmicgetuint32(u8 *p)
-/* Convert from Byte[] to Us4Byte32 in a portable way */
+/* Convert from Byte[] to u32 in a portable way */
 {
 	s32 i;
 	u32 res = 0;
@@ -336,7 +336,7 @@ static u32 secmicgetuint32(u8 *p)
 }
 
 static void secmicputuint32(u8 *p, u32 val)
-/* Convert from Us4Byte32 to Byte[] in a portable way */
+/* Convert from u32 to Byte[] in a portable way */
 {
 	long i;
 	for (i = 0; i < 4; i++) {

@@ -149,16 +149,16 @@ __inline static void _set_workitem(_workitem *pwork)
 
 #define ACQUIRE_GLOBAL_MUTEX(_MutexCounter)                              \
 {                                                               \
-    while (NdisInterlockedIncrement((Pu32)&(_MutexCounter)) != 1)\
+    while (NdisInterlockedIncrement((u32 *)&(_MutexCounter)) != 1)\
     {                                                           \
-        NdisInterlockedDecrement((Pu32)&(_MutexCounter));        \
+        NdisInterlockedDecrement((u32 *)&(_MutexCounter));        \
         NdisMSleep(10000);                          \
     }                                                           \
 }
 
 #define RELEASE_GLOBAL_MUTEX(_MutexCounter)                              \
 {                                                               \
-    NdisInterlockedDecrement((Pu32)&(_MutexCounter));              \
+    NdisInterlockedDecrement((u32 *)&(_MutexCounter));              \
 }
 
 // limitation of path length

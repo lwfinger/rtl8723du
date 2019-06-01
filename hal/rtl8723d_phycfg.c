@@ -37,10 +37,10 @@
 * OverView:	Get shifted position of the BitMask
 *
 * Input:
-*			u4Byte		BitMask,
+*			u32		BitMask,
 *
 * Output:	none
-* Return:		u4Byte		Return the shift bit bit position of the mask
+* Return:		u32		Return the shift bit bit position of the mask
 */
 static	u32
 phy_CalculateBitShift(
@@ -65,11 +65,11 @@ phy_CalculateBitShift(
 *
 * Input:
 *			PADAPTER		Adapter,
-*			u4Byte			RegAddr,
-*			u4Byte			BitMask
+*			u32			RegAddr,
+*			u32			BitMask
 *
 * Output:	None
-* Return:		u4Byte			Data
+* Return:		u32			Data
 * Note:		This function is equal to "GetRegSetting" in PHY programming guide
 */
 u32
@@ -103,10 +103,10 @@ PHY_QueryBBReg_8723D(
 *
 * Input:
 *			PADAPTER		Adapter,
-*			u4Byte			RegAddr,
-*			u4Byte			BitMask
+*			u32			RegAddr,
+*			u32			BitMask
 *
-*			u4Byte			Data
+*			u32			Data
 *
 *
 * Output:	None
@@ -214,7 +214,7 @@ phy_RFSerialRead_8723D(
 	u32						NewOffset;
 	u32						tmplong, tmplong2;
 	u8					RfPiEnable = 0;
-	u4Byte						MaskforPhySet = 0;
+	u32						MaskforPhySet = 0;
 	int i = 0;
 
 	_enter_critical_mutex(&(adapter_to_dvobj(Adapter)->rf_read_reg_mutex) , NULL);
@@ -246,9 +246,9 @@ phy_RFSerialRead_8723D(
 	rtw_udelay_os(10);
 
 	if (eRFPath == RF_PATH_A)
-		RfPiEnable = (u1Byte)phy_query_bb_reg(Adapter, rFPGA0_XA_HSSIParameter1 | MaskforPhySet, BIT(8));
+		RfPiEnable = (u8)phy_query_bb_reg(Adapter, rFPGA0_XA_HSSIParameter1 | MaskforPhySet, BIT(8));
 	else if (eRFPath == RF_PATH_B)
-		RfPiEnable = (u1Byte)phy_query_bb_reg(Adapter, rFPGA0_XB_HSSIParameter1 | MaskforPhySet, BIT(8));
+		RfPiEnable = (u8)phy_query_bb_reg(Adapter, rFPGA0_XB_HSSIParameter1 | MaskforPhySet, BIT(8));
 
 	if (RfPiEnable) {
 		/* Read from BBreg8b8, 12 bits for 8190, 20bits for T65 RF */
@@ -274,8 +274,8 @@ phy_RFSerialRead_8723D(
 * Input:
 *			PADAPTER		Adapter,
 			enum rf_path		eRFPath,
-*			u4Byte			Offset,
-*			u4Byte			Data
+*			u32			Offset,
+*			u32			Data
 *
 *
 * Output:	None
@@ -357,12 +357,12 @@ phy_RFSerialWrite_8723D(
 * Input:
 *			PADAPTER		Adapter,
 			enum rf_path			eRFPath,
-*			u4Byte			RegAddr,
-*			u4Byte			BitMask
+*			u32			RegAddr,
+*			u32			BitMask
 *
 *
 * Output:	None
-* Return:		u4Byte			Readback value
+* Return:		u32			Readback value
 * Note:		This function is equal to "GetRFRegSetting" in PHY programming guide
 */
 u32
@@ -395,10 +395,10 @@ PHY_QueryRFReg_8723D(
 * Input:
 *			PADAPTER		Adapter,
 *			RF_PATH			eRFPath,
-*			u4Byte			RegAddr,
-*			u4Byte			BitMask
+*			u32			RegAddr,
+*			u32			BitMask
 *
-*			u4Byte			Data
+*			u32			Data
 *
 *
 * Output:	None
@@ -638,7 +638,7 @@ PHY_RFConfig8723D(
  * Overview:    This function read RF parameters from general file format, and do RF 3-wire
  *
  * Input:	PADAPTER			Adapter
- *			ps1Byte				pFileName
+ *			u8 *pFileName
  *			enum rf_path				eRFPath
  *
  * Output:      NONE
@@ -815,17 +815,17 @@ PHY_GetTxPowerLevel8723D(
 static void
 phy_SpurCalibration_8723D(
 	PADAPTER					pAdapter,
-	u1Byte						ToChannel,
-	u1Byte						threshold
+	u8						ToChannel,
+	u8						threshold
 )
 {
-	u4Byte		freq[2] = {0xFCCD, 0xFF9A}; /* {chnl 13, 14} */
-	u1Byte		idx = 0xFF;
-	u1Byte		b_doNotch = FALSE;
-	u1Byte		initial_gain;
+	u32		freq[2] = {0xFCCD, 0xFF9A}; /* {chnl 13, 14} */
+	u8		idx = 0xFF;
+	u8		b_doNotch = FALSE;
+	u8		initial_gain;
 
 	/* add for notch */
-	u4Byte				wlan_channel, CurrentChannel;
+	u32				wlan_channel, CurrentChannel;
 	HAL_DATA_TYPE		*pHalData	= GET_HAL_DATA(pAdapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
 
@@ -842,7 +842,7 @@ phy_SpurCalibration_8723D(
 
 	/* If current channel=13,14 */
 	if (idx < 0xFF) {
-		initial_gain = (u1Byte)(odm_get_bb_reg(pDM_Odm, rOFDM0_XAAGCCore1, bMaskByte0) & 0x7f);
+		initial_gain = (u8)(odm_get_bb_reg(pDM_Odm, rOFDM0_XAAGCCore1, bMaskByte0) & 0x7f);
 		odm_pause_dig(pDM_Odm, PHYDM_PAUSE, PHYDM_PAUSE_LEVEL_1, 0x30);
 		phy_set_bb_reg(pAdapter, rFPGA0_AnalogParameter4, bMaskDWord, 0xccf000c0);		/* disable 3-wire */
 
@@ -972,7 +972,7 @@ phy_PostSetBwMode8723D(
 	PADAPTER padapter
 )
 {
-	u1Byte SubChnlNum = 0;
+	u8 SubChnlNum = 0;
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
 
 	/* 2 Set Reg668 Reg440 BW */

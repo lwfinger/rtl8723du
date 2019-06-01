@@ -45,7 +45,7 @@ u32 rtw_phydm_ability_ops(_adapter *adapter, HAL_PHYDM_OPS ops, u32 ability)
 void rtw_odm_init_ic_type(_adapter *adapter)
 {
 	struct PHY_DM_STRUCT *odm = adapter_to_phydm(adapter);
-	u4Byte ic_type = chip_type_to_odm_ic_type(rtw_get_chip_type(adapter));
+	u32 ic_type = chip_type_to_odm_ic_type(rtw_get_chip_type(adapter));
 
 	rtw_warn_on(!ic_type);
 

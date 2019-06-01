@@ -4818,9 +4818,9 @@ void rtw_bb_rf_gain_offset(_adapter *padapter)
 	u8		value = pHalData->EEPROMRFGainOffset;
 	u8		tmp = 0x3e;
 	u32		res, i = 0;
-	u4Byte		ArrayLen	= sizeof(Array_kfreemap) / sizeof(u32);
-	pu4Byte		Array	= Array_kfreemap;
-	u4Byte		v1 = 0, v2 = 0, GainValue = 0, target = 0;
+	u32		ArrayLen	= sizeof(Array_kfreemap) / sizeof(u32);
+	u32 *		Array	= Array_kfreemap;
+	u32		v1 = 0, v2 = 0, GainValue = 0, target = 0;
 
 	if (registry_par->RegPwrTrimEnable == 2) {
 		RTW_INFO("Registry kfree default force disable.\n");

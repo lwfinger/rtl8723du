@@ -337,26 +337,26 @@ void rtl8723d_FirmwareSelfReset(PADAPTER padapter)
 static int _WriteBTFWtoTxPktBuf8723D(
 		PADAPTER		Adapter,
 		void *			buffer,
-		u4Byte			FwBufLen,
-		u1Byte			times
+		u32			FwBufLen,
+		u8			times
 )
 {
 	int			rtStatus = _SUCCESS;
-	/* u4Byte				value32; */
-	/* u1Byte				numHQ, numLQ, numPubQ;//, txpktbuf_bndy; */
+	/* u32				value32; */
+	/* u8				numHQ, numLQ, numPubQ;//, txpktbuf_bndy; */
 	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
 	/* PMGNT_INFO		pMgntInfo = &(Adapter->MgntInfo); */
-	u1Byte				BcnValidReg;
-	u1Byte				count = 0, DLBcnCount = 0;
-	pu1Byte			FwbufferPtr = (pu1Byte)buffer;
+	u8				BcnValidReg;
+	u8				count = 0, DLBcnCount = 0;
+	u8 *			FwbufferPtr = (u8 *)buffer;
 	/* PRT_TCB			pTcb, ptempTcb; */
 	/* PRT_TX_LOCAL_BUFFER pBuf; */
 
-	pu1Byte			ReservedPagePacket = NULL;
-	pu1Byte			pGenBufReservedPagePacket = NULL;
-	u4Byte				TotalPktLen, txpktbuf_bndy;
-	/* u1Byte				tmpReg422; */
-	/* u1Byte				u1bTmp; */
+	u8 *			ReservedPagePacket = NULL;
+	u8 *			pGenBufReservedPagePacket = NULL;
+	u32				TotalPktLen, txpktbuf_bndy;
+	/* u8				tmpReg422; */
+	/* u8				u1bTmp; */
 	u8			*pframe;
 	struct xmit_priv	*pxmitpriv = &(Adapter->xmitpriv);
 	struct xmit_frame	*pmgntframe;
@@ -375,7 +375,7 @@ static int _WriteBTFWtoTxPktBuf8723D(
 	if (!pGenBufReservedPagePacket)
 		return _FAIL;
 
-	ReservedPagePacket = (u1Byte *)pGenBufReservedPagePacket;
+	ReservedPagePacket = (u8 *)pGenBufReservedPagePacket;
 
 	_rtw_memset(ReservedPagePacket, 0, TotalPktLen);
 
@@ -514,10 +514,10 @@ SetFwBTFwPatchCmd(
 static void
 SetFwBTPwrCmd(
 	PADAPTER	Adapter,
-	u1Byte	PwrIdx
+	u8	PwrIdx
 )
 {
-	u1Byte		u1BTPwrIdxParm[H2C_FORCE_BT_TXPWR_LEN] = {0};
+	u8		u1BTPwrIdxParm[H2C_FORCE_BT_TXPWR_LEN] = {0};
 
 	SET_8723D_H2CCMD_BT_PWR_IDX(u1BTPwrIdxParm, PwrIdx);
 
@@ -537,8 +537,8 @@ _CheckWLANFwPatchBTFwReady(
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
-	u4Byte	count = 0;
-	u1Byte	u1bTmp;
+	u32	count = 0;
+	u8	u1bTmp;
 	int ret = _FAIL;
 
 	/* --------------------------------------------------------- */
@@ -2946,7 +2946,7 @@ Hal_InitPGData(
 		if (_TRUE == pHalData->EepromOrEfuse) {
 			/* Read all Content from EEPROM or EFUSE. */
 			for (i = 0; i < HWSET_MAX_SIZE_8723D; i += 2) {
-				/*				value16 = EF2Byte(ReadEEprom(pAdapter, (u2Byte) (i>>1)));
+				/*				value16 = EF2Byte(ReadEEprom(pAdapter, (u16) (i>>1)));
 				 *				*((u16*)(&PROMContent[i])) = value16; */
 			}
 		} else {
@@ -3151,7 +3151,7 @@ Hal_EfuseParsePackageType_8723D(
 )
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
-	u1Byte			package;
+	u8			package;
 	u8 efuseContent;
 
 	Efuse_PowerSwitch(pAdapter, _FALSE, _TRUE);

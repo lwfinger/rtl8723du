@@ -188,7 +188,7 @@ static u8 GLBtcBtMpRptBTOK;
  */
 u32 GLBtcDbgType[COMP_MAX];
 static u8 GLBtcDbgBuf[BT_TMP_BUF_SIZE];  /* TODO - Remove Global */
-u1Byte	gl_btc_trace_buf[BT_TMP_BUF_SIZE];
+u8	gl_btc_trace_buf[BT_TMP_BUF_SIZE];
 
 typedef struct _btcoexdbginfo {
 	u8 *info;
@@ -1039,24 +1039,24 @@ static u8 halbtcoutsrc_Get(void *pBtcContext, u8 getType, void *pOutBuf)
 	case BTC_GET_U1_ANT_TYPE:
 		switch (pHalData->bt_coexist.btAntisolation) {
 		case 0:
-			*pU1Tmp = (u1Byte)BTC_ANT_TYPE_0;
-			pBtCoexist->board_info.ant_type = (u1Byte)BTC_ANT_TYPE_0;
+			*pU1Tmp = (u8)BTC_ANT_TYPE_0;
+			pBtCoexist->board_info.ant_type = (u8)BTC_ANT_TYPE_0;
 			break;
 		case 1:
-			*pU1Tmp = (u1Byte)BTC_ANT_TYPE_1;
-			pBtCoexist->board_info.ant_type = (u1Byte)BTC_ANT_TYPE_1;
+			*pU1Tmp = (u8)BTC_ANT_TYPE_1;
+			pBtCoexist->board_info.ant_type = (u8)BTC_ANT_TYPE_1;
 			break;
 		case 2:
-			*pU1Tmp = (u1Byte)BTC_ANT_TYPE_2;
-			pBtCoexist->board_info.ant_type = (u1Byte)BTC_ANT_TYPE_2;
+			*pU1Tmp = (u8)BTC_ANT_TYPE_2;
+			pBtCoexist->board_info.ant_type = (u8)BTC_ANT_TYPE_2;
 			break;
 		case 3:
-			*pU1Tmp = (u1Byte)BTC_ANT_TYPE_3;
-			pBtCoexist->board_info.ant_type = (u1Byte)BTC_ANT_TYPE_3;
+			*pU1Tmp = (u8)BTC_ANT_TYPE_3;
+			pBtCoexist->board_info.ant_type = (u8)BTC_ANT_TYPE_3;
 			break;
 		case 4:
-			*pU1Tmp = (u1Byte)BTC_ANT_TYPE_4;
-			pBtCoexist->board_info.ant_type = (u1Byte)BTC_ANT_TYPE_4;
+			*pU1Tmp = (u8)BTC_ANT_TYPE_4;
+			pBtCoexist->board_info.ant_type = (u8)BTC_ANT_TYPE_4;
 			break;
 		}
 		break;
@@ -1621,7 +1621,7 @@ static u8 halbtcoutsrc_SetBtAntDetection(void *pBtcContext, u8 txTime, u8 btChnl
 static BOOLEAN
 halbtcoutsrc_SetBtTRXMASK(
 	void *			pBtcContext,
-	u1Byte			bt_trx_mask
+	u8			bt_trx_mask
 	)
 {
 	/* Always return _FALSE since we don't implement this yet */
@@ -1682,7 +1682,7 @@ static void halbtcoutsrc_FillH2cCmd(void *pBtcContext, u8 elementId, u32 cmdLen,
 
 static void halbtcoutsrc_coex_offload_init(void)
 {
-	u1Byte	i;
+	u8	i;
 
 	gl_coex_offload.h2c_req_num = 0;
 	gl_coex_offload.cnt_h2c_sent = 0;
@@ -2352,7 +2352,7 @@ void EXhalbtcoutsrc_rx_rate_change_notify(PBTC_COEXIST pBtCoexist, u8 is_data_fr
 void
 EXhalbtcoutsrc_RfStatusNotify(
 	PBTC_COEXIST		pBtCoexist,
-	u1Byte				type
+	u8				type
 )
 {
 	if (!halbtcoutsrc_IsBtCoexistAvailable(pBtCoexist))
@@ -3400,19 +3400,19 @@ void hal_btcoex_SetAntIsolationType(PADAPTER padapter, u8 anttype)
 
 	switch (pHalData->bt_coexist.btAntisolation) {
 	case 0:
-		pBtCoexist->board_info.ant_type = (u1Byte)BTC_ANT_TYPE_0;
+		pBtCoexist->board_info.ant_type = (u8)BTC_ANT_TYPE_0;
 		break;
 	case 1:
-		pBtCoexist->board_info.ant_type = (u1Byte)BTC_ANT_TYPE_1;
+		pBtCoexist->board_info.ant_type = (u8)BTC_ANT_TYPE_1;
 		break;
 	case 2:
-		pBtCoexist->board_info.ant_type = (u1Byte)BTC_ANT_TYPE_2;
+		pBtCoexist->board_info.ant_type = (u8)BTC_ANT_TYPE_2;
 		break;
 	case 3:
-		pBtCoexist->board_info.ant_type = (u1Byte)BTC_ANT_TYPE_3;
+		pBtCoexist->board_info.ant_type = (u8)BTC_ANT_TYPE_3;
 		break;
 	case 4:
-		pBtCoexist->board_info.ant_type = (u1Byte)BTC_ANT_TYPE_4;
+		pBtCoexist->board_info.ant_type = (u8)BTC_ANT_TYPE_4;
 		break;
 	}
 

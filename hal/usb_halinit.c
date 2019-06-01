@@ -269,7 +269,7 @@ _InitTransferPageSize_8723du(
 )
 {
 
-	u1Byte value8;
+	u8 value8;
 
 	value8 = _PSRX(PBP_256) | _PSTX(PBP_256);
 

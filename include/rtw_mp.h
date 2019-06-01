@@ -194,9 +194,9 @@ typedef struct _MPT_CONTEXT {
 	u32			MptAckCounter;
 
 	/* SD3 Willis For 8192S to save 1T/2T RF table for ACUT	Only fro ACUT delete later ~~~! */
-	/* s1Byte		BufOfLines[2][MAX_LINES_HWCONFIG_TXT][MAX_BYTES_LINE_HWCONFIG_TXT]; */
-	/* s1Byte			BufOfLines[2][MP_MAX_LINES][MP_MAX_LINES_BYTES]; */
-	/* s4Byte			RfReadLine[2]; */
+	/* s8		BufOfLines[2][MAX_LINES_HWCONFIG_TXT][MAX_BYTES_LINE_HWCONFIG_TXT]; */
+	/* s8			BufOfLines[2][MP_MAX_LINES][MP_MAX_LINES_BYTES]; */
+	/* s32			RfReadLine[2]; */
 
 	u8		APK_bound[2];	/* for APK	path A/path B */
 	BOOLEAN		bMptIndexEven;
@@ -207,15 +207,15 @@ typedef struct _MPT_CONTEXT {
 	u8		backup0x52_RF_A;
 	u8		backup0x52_RF_B;
 
-	u4Byte			backup0x58_RF_A;
-	u4Byte			backup0x58_RF_B;
+	u32			backup0x58_RF_A;
+	u32			backup0x58_RF_B;
 
-	u1Byte			h2cReqNum;
-	u1Byte			c2hBuf[32];
+	u8			h2cReqNum;
+	u8			c2hBuf[32];
 
-	u1Byte          btInBuf[100];
+	u8          btInBuf[100];
 	u32			mptOutLen;
-	u1Byte          mptOutBuf[100];
+	u8          mptOutBuf[100];
 	RT_PMAC_TX_INFO	PMacTxInfo;
 	RT_PMAC_PKT_INFO	PMacPktInfo;
 	u8 HWTxmode;

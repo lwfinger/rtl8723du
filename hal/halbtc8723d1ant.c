@@ -6147,7 +6147,7 @@ void ex_halbtc8723d1ant_periodical(struct btc_coexist *btcoexist)
 
 	struct  btc_board_info	*board_info = &btcoexist->board_info;
 	boolean wifi_busy = FALSE;
-	u4Byte	value = 0;
+	u32	value = 0;
 	u32	bt_patch_ver;
 	static u8 cnt = 0;
 	boolean bt_relink_finish = FALSE, special_pkt_finish = FALSE;
