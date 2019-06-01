@@ -158,13 +158,13 @@ MPTBT_Test(
 	IN	u1Byte		byte3
 );
 
-NDIS_STATUS
+uint
 MPTBT_SendOidBT(
 	IN	PADAPTER		pAdapter,
 	IN	void *			InformationBuffer,
-	IN	ULONG			InformationBufferLength,
-	OUT	PULONG			BytesRead,
-	OUT	PULONG			BytesNeeded
+	IN	u32			InformationBufferLength,
+	OUT	Pu32			BytesRead,
+	OUT	Pu32			BytesNeeded
 );
 
 void
@@ -185,16 +185,16 @@ void mptbt_BtControlProcess(
 #define	BT_MAX_C2H_LEN								20
 
 typedef struct _BT_REQ_CMD {
-	UCHAR       opCodeVer;
-	UCHAR       OpCode;
-	USHORT      paraLength;
-	UCHAR       pParamStart[100];
+	u8       opCodeVer;
+	u8       OpCode;
+	u16      paraLength;
+	u8       pParamStart[100];
 } BT_REQ_CMD, *PBT_REQ_CMD;
 
 typedef struct _BT_RSP_CMD {
-	USHORT      status;
-	USHORT      paraLength;
-	UCHAR       pParamStart[100];
+	u16      status;
+	u16      paraLength;
+	u8       pParamStart[100];
 } BT_RSP_CMD, *PBT_RSP_CMD;
 
 

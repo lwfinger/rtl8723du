@@ -1260,7 +1260,7 @@ u32 mp_query_psd(PADAPTER pAdapter, u8 *data)
 	return strlen(data) + 1;
 }
 
-u8 mpt_to_mgnt_rate(ULONG MptRateIdx)
+u8 mpt_to_mgnt_rate(u32 MptRateIdx)
 {
 	/* Mapped to MGN_XXX defined in MgntGen.h */
 	switch (MptRateIdx) {
@@ -1754,7 +1754,7 @@ u8 rtw_mp_mode_check(PADAPTER pAdapter)
 }
 
 
-ULONG mpt_ProQueryCalTxPower(
+u32 mpt_ProQueryCalTxPower(
 	PADAPTER	pAdapter,
 	u8		RfPath
 )
@@ -1763,7 +1763,7 @@ ULONG mpt_ProQueryCalTxPower(
 	HAL_DATA_TYPE	*pHalData	= GET_HAL_DATA(pAdapter);
 	PMPT_CONTEXT		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 
-	ULONG			TxPower = 1;
+	u32			TxPower = 1;
 	u1Byte			rate = 0;
 	struct txpwr_idx_comp tic;
 	u8 mgn_rate = mpt_to_mgnt_rate(pMptCtx->mpt_rate_index);
@@ -1796,11 +1796,11 @@ static inline void dump_buf(u8 *buf, u32 len)
 }
 
 void ByteToBit(
-	UCHAR	*out,
+	u8	*out,
 	bool	*in,
-	UCHAR	in_size)
+	u8	in_size)
 {
-	UCHAR i = 0, j = 0;
+	u8 i = 0, j = 0;
 
 	for (i = 0; i < in_size; i++) {
 		for (j = 0; j < 8; j++) {
@@ -1814,10 +1814,10 @@ void ByteToBit(
 void CRC16_generator(
 	bool *out,
 	bool *in,
-	UCHAR in_size
+	u8 in_size
 )
 {
-	UCHAR i = 0;
+	u8 i = 0;
 	bool temp = 0, reg[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 	for (i = 0; i < in_size; i++) {/* take one's complement and bit reverse*/
@@ -1862,8 +1862,8 @@ void CCK_generator(
 	bool LengthExtBit;
 	double LengthExact;
 	double LengthPSDU;
-	UCHAR i;
-	UINT PacketLength = pPMacTxInfo->PacketLength;
+	u8 i;
+	u32 PacketLength = pPMacTxInfo->PacketLength;
 
 	if (pPMacTxInfo->bSPreamble)
 		pPMacTxInfo->SFD = 0x05CF;
@@ -1907,7 +1907,7 @@ void CCK_generator(
 		LengthExtBit = 0;
 
 
-	pPMacTxInfo->LENGTH = (UINT)LengthPSDU;
+	pPMacTxInfo->LENGTH = (u32)LengthPSDU;
 	/* CRC16_in(1,16:31) = LengthPSDU[0:15]*/
 	for (i = 0; i < 16; i++)
 		crc16_in[i + 16] = (pPMacTxInfo->LENGTH >> i) & 0x1;
@@ -1934,8 +1934,8 @@ void PMAC_Get_Pkt_Param(
 	PRT_PMAC_PKT_INFO	pPMacPktInfo)
 {
 
-	UCHAR		TX_RATE_HEX = 0, MCS = 0;
-	UCHAR		TX_RATE = pPMacTxInfo->TX_RATE;
+	u8		TX_RATE_HEX = 0, MCS = 0;
+	u8		TX_RATE = pPMacTxInfo->TX_RATE;
 
 	/*	TX_RATE & Nss	*/
 	if (MPT_IS_2SS_RATE(TX_RATE))
@@ -2001,13 +2001,13 @@ void PMAC_Get_Pkt_Param(
 }
 
 
-UINT LDPC_parameter_generator(
-	UINT N_pld_int,
-	UINT N_CBPSS,
-	UINT N_SS,
-	UINT R,
-	UINT m_STBC,
-	UINT N_TCB_int
+u32 LDPC_parameter_generator(
+	u32 N_pld_int,
+	u32 N_CBPSS,
+	u32 N_SS,
+	u32 R,
+	u32 m_STBC,
+	u32 N_TCB_int
 )
 {
 	double	CR = 0.;
@@ -2017,7 +2017,7 @@ UINT LDPC_parameter_generator(
 	double	L_LDPC = 0., K_LDPC = 0., L_LDPC_info = 0.;
 	double	N_punc = 0., N_ppcw = 0., N_fpunc = 0., N_rep = 0., N_rpcw = 0., N_frep = 0.;
 	double	R_eff = 0.;
-	UINT	VHTSIGA2B3  = 0;/* extra symbol from VHT-SIG-A2 Bit 3*/
+	u32	VHTSIGA2B3  = 0;/* extra symbol from VHT-SIG-A2 Bit 3*/
 
 	if (R == 0)
 		CR	= 0.5;
@@ -2085,13 +2085,13 @@ void PMAC_Nsym_generator(
 	PRT_PMAC_TX_INFO	pPMacTxInfo,
 	PRT_PMAC_PKT_INFO	pPMacPktInfo)
 {
-	UINT	SIGA2B3 = 0;
-	UCHAR	TX_RATE = pPMacTxInfo->TX_RATE;
+	u32	SIGA2B3 = 0;
+	u8	TX_RATE = pPMacTxInfo->TX_RATE;
 
-	UINT R, R_list[10] = {0, 0, 2, 0, 2, 1, 2, 3, 2, 3};
+	u32 R, R_list[10] = {0, 0, 2, 0, 2, 1, 2, 3, 2, 3};
 	double CR = 0;
-	UINT N_SD, N_BPSC_list[10] = {1, 2, 2, 4, 4, 6, 6, 6, 8, 8};
-	UINT N_BPSC = 0, N_CBPS = 0, N_DBPS = 0, N_ES = 0, N_SYM = 0, N_pld = 0, N_TCB = 0;
+	u32 N_SD, N_BPSC_list[10] = {1, 2, 2, 4, 4, 6, 6, 6, 8, 8};
+	u32 N_BPSC = 0, N_CBPS = 0, N_DBPS = 0, N_ES = 0, N_SYM = 0, N_pld = 0, N_TCB = 0;
 	int D_R = 0;
 
 	RTW_INFO("TX_RATE = %d\n", TX_RATE);
@@ -2104,7 +2104,7 @@ void PMAC_Nsym_generator(
 		N_SD = 234;
 
 	if (MPT_IS_HT_RATE(TX_RATE)) {
-		UCHAR MCS_temp;
+		u8 MCS_temp;
 
 		if (pPMacPktInfo->MCS > 23)
 			MCS_temp = pPMacPktInfo->MCS - 24;
@@ -2134,14 +2134,14 @@ void PMAC_Nsym_generator(
 
 		N_BPSC = N_BPSC_list[MCS_temp];
 		N_CBPS = N_BPSC * N_SD * pPMacPktInfo->Nss;
-		N_DBPS = (UINT)((double)N_CBPS * CR);
+		N_DBPS = (u32)((double)N_CBPS * CR);
 
 		if (pPMacTxInfo->bLDPC == FALSE) {
-			N_ES = (UINT)ceil((double)(N_DBPS * pPMacPktInfo->Nss) / 4. / 300.);
+			N_ES = (u32)ceil((double)(N_DBPS * pPMacPktInfo->Nss) / 4. / 300.);
 			RTW_INFO("N_ES = %d\n", N_ES);
 
 			/*	N_SYM = m_STBC* (8*length+16+6*N_ES) / (m_STBC*N_DBPS)*/
-			N_SYM = pPMacTxInfo->m_STBC * (UINT)ceil((double)(pPMacTxInfo->PacketLength * 8 + 16 + N_ES * 6) /
+			N_SYM = pPMacTxInfo->m_STBC * (u32)ceil((double)(pPMacTxInfo->PacketLength * 8 + 16 + N_ES * 6) /
 					(double)(N_DBPS * pPMacTxInfo->m_STBC));
 
 		} else {
@@ -2149,7 +2149,7 @@ void PMAC_Nsym_generator(
 			/*	N_pld = length * 8 + 16*/
 			N_pld = pPMacTxInfo->PacketLength * 8 + 16;
 			RTW_INFO("N_pld = %d\n", N_pld);
-			N_SYM = pPMacTxInfo->m_STBC * (UINT)ceil((double)(N_pld) /
+			N_SYM = pPMacTxInfo->m_STBC * (u32)ceil((double)(N_pld) /
 					(double)(N_DBPS * pPMacTxInfo->m_STBC));
 			RTW_INFO("N_SYM = %d\n", N_SYM);
 			/*	N_avbits = N_CBPS *m_STBC *(N_pld/N_CBPS*R*m_STBC)*/
@@ -2179,19 +2179,19 @@ void PMAC_Nsym_generator(
 		}
 		N_BPSC = N_BPSC_list[pPMacPktInfo->MCS];
 		N_CBPS = N_BPSC * N_SD * pPMacPktInfo->Nss;
-		N_DBPS = (UINT)((double)N_CBPS * CR);
+		N_DBPS = (u32)((double)N_CBPS * CR);
 		if (pPMacTxInfo->bLDPC == FALSE) {
 			if (pPMacTxInfo->bSGI)
-				N_ES = (UINT)ceil((double)(N_DBPS) / 3.6 / 600.);
+				N_ES = (u32)ceil((double)(N_DBPS) / 3.6 / 600.);
 			else
-				N_ES = (UINT)ceil((double)(N_DBPS) / 4. / 600.);
+				N_ES = (u32)ceil((double)(N_DBPS) / 4. / 600.);
 			/*	N_SYM = m_STBC* (8*length+16+6*N_ES) / (m_STBC*N_DBPS)*/
-			N_SYM = pPMacTxInfo->m_STBC * (UINT)ceil((double)(pPMacTxInfo->PacketLength * 8 + 16 + N_ES * 6) / (double)(N_DBPS * pPMacTxInfo->m_STBC));
+			N_SYM = pPMacTxInfo->m_STBC * (u32)ceil((double)(pPMacTxInfo->PacketLength * 8 + 16 + N_ES * 6) / (double)(N_DBPS * pPMacTxInfo->m_STBC));
 			SIGA2B3 = 0;
 		} else {
 			N_ES = 1;
 			/*	N_SYM = m_STBC* (8*length+N_service) / (m_STBC*N_DBPS)*/
-			N_SYM = pPMacTxInfo->m_STBC * (UINT)ceil((double)(pPMacTxInfo->PacketLength * 8 + 16) / (double)(N_DBPS * pPMacTxInfo->m_STBC));
+			N_SYM = pPMacTxInfo->m_STBC * (u32)ceil((double)(pPMacTxInfo->PacketLength * 8 + 16) / (double)(N_DBPS * pPMacTxInfo->m_STBC));
 			/*	N_avbits = N_sys_init * N_CBPS*/
 			N_TCB = N_CBPS * N_SYM;
 			/*	N_pld = N_sys_init * N_DBPS*/
@@ -2233,21 +2233,21 @@ void PMAC_Nsym_generator(
 ========================================*/
 
 void L_SIG_generator(
-	UINT	N_SYM,		/* Max: 750*/
+	u32	N_SYM,		/* Max: 750*/
 	PRT_PMAC_TX_INFO	pPMacTxInfo,
 	PRT_PMAC_PKT_INFO	pPMacPktInfo)
 {
 	u8	sig_bi[24] = {0};	/* 24 BIT*/
-	UINT	mode, LENGTH;
+	u32	mode, LENGTH;
 	int i;
 
 	if (MPT_IS_OFDM_RATE(pPMacTxInfo->TX_RATE)) {
 		mode = pPMacPktInfo->MCS;
 		LENGTH = pPMacTxInfo->PacketLength;
 	} else {
-		UCHAR	N_LTF;
+		u8	N_LTF;
 		double	T_data;
-		UINT	OFDM_symbol;
+		u32	OFDM_symbol;
 
 		mode = 0;
 
@@ -2264,9 +2264,9 @@ void L_SIG_generator(
 
 		/*(L-SIG, HT-SIG, HT-STF, HT-LTF....HT-LTF, Data)*/
 		if (MPT_IS_VHT_RATE(pPMacTxInfo->TX_RATE))
-			OFDM_symbol = (UINT)ceil((double)(8 + 4 + N_LTF * 4 + N_SYM * T_data + 4) / 4.);
+			OFDM_symbol = (u32)ceil((double)(8 + 4 + N_LTF * 4 + N_SYM * T_data + 4) / 4.);
 		else
-			OFDM_symbol = (UINT)ceil((double)(8 + 4 + N_LTF * 4 + N_SYM * T_data) / 4.);
+			OFDM_symbol = (u32)ceil((double)(8 + 4 + N_LTF * 4 + N_SYM * T_data) / 4.);
 
 		RTW_INFO("%s , OFDM_symbol =%d\n", __func__, OFDM_symbol);
 		LENGTH = OFDM_symbol * 3 - 3;
@@ -2351,10 +2351,10 @@ void L_SIG_generator(
 void CRC8_generator(
 	bool	*out,
 	bool	*in,
-	UCHAR	in_size
+	u8	in_size
 )
 {
-	UCHAR i = 0;
+	u8 i = 0;
 	bool temp = 0, reg[] = {1, 1, 1, 1, 1, 1, 1, 1};
 
 	for (i = 0; i < in_size; i++) { /* take one's complement and bit reverse*/
@@ -2383,7 +2383,7 @@ void HT_SIG_generator(
 	PRT_PMAC_PKT_INFO	pPMacPktInfo
 )
 {
-	UINT i;
+	u32 i;
 	bool sig_bi[48] = {0}, crc8[8] = {0};
 	/*	MCS Field*/
 	for (i = 0; i < 7; i++)
@@ -2450,7 +2450,7 @@ void VHT_SIG_A_generator(
 	PRT_PMAC_TX_INFO	pPMacTxInfo,
 	PRT_PMAC_PKT_INFO	pPMacPktInfo)
 {
-	UINT i;
+	u32 i;
 	bool sig_bi[48], crc8[8];
 
 	_rtw_memset(sig_bi, 0, 48);
@@ -2514,8 +2514,8 @@ void VHT_SIG_B_generator(
 	PRT_PMAC_TX_INFO	pPMacTxInfo)
 {
 	bool sig_bi[32], crc8_bi[8];
-	UINT i, len, res, tail = 6, total_len, crc8_in_len;
-	UINT sigb_len;
+	u32 i, len, res, tail = 6, total_len, crc8_in_len;
+	u32 sigb_len;
 
 	_rtw_memset(sig_bi, 0, 32);
 	_rtw_memset(crc8_bi, 0, 8);
@@ -2585,8 +2585,8 @@ void VHT_Delimiter_generator(
 )
 {
 	bool sig_bi[32] = {0}, crc8[8] = {0};
-	UINT crc8_in_len = 16;
-	UINT PacketLength = pPMacTxInfo->PacketLength;
+	u32 crc8_in_len = 16;
+	u32 PacketLength = pPMacTxInfo->PacketLength;
 	int j;
 
 	/* Delimiter[0]: EOF*/

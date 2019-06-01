@@ -26,15 +26,8 @@
 	#include <linux/kernel.h>
 	#include <linux/init.h>
 	#include <linux/utsname.h>
-	#define NDIS_OID uint
-	#define NDIS_STATUS uint
 
 	typedef	signed int sint;
-
-	#define UCHAR u8
-	#define USHORT u16
-	#define UINT u32
-	#define ULONG u32
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19))
 typedef _Bool bool;
@@ -75,11 +68,11 @@ enum {
 #define s8Byte		s64
 #define ps8Byte		s64*
 
-#define UCHAR u8
-#define USHORT u16
-#define UINT u32
-#define ULONG u32
-#define PULONG u32*
+#define u8 u8
+#define u16 u16
+#define u32 u32
+#define u32 u32
+#define Pu32 u32*
 
 #define MEM_ALIGNMENT_OFFSET	(sizeof (SIZE_T))
 #define MEM_ALIGNMENT_PADDING	(sizeof(SIZE_T) - 1)

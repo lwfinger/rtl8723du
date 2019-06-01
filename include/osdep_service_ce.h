@@ -13,7 +13,7 @@
 
 typedef HANDLE 	_sema;
 typedef	LIST_ENTRY	_list;
-typedef NDIS_STATUS _OS_STATUS;
+typedef uint _OS_STATUS;
 
 typedef NDIS_SPIN_LOCK	_lock;
 
@@ -149,16 +149,16 @@ __inline static void _set_workitem(_workitem *pwork)
 
 #define ACQUIRE_GLOBAL_MUTEX(_MutexCounter)                              \
 {                                                               \
-    while (NdisInterlockedIncrement((PULONG)&(_MutexCounter)) != 1)\
+    while (NdisInterlockedIncrement((Pu32)&(_MutexCounter)) != 1)\
     {                                                           \
-        NdisInterlockedDecrement((PULONG)&(_MutexCounter));        \
+        NdisInterlockedDecrement((Pu32)&(_MutexCounter));        \
         NdisMSleep(10000);                          \
     }                                                           \
 }
 
 #define RELEASE_GLOBAL_MUTEX(_MutexCounter)                              \
 {                                                               \
-    NdisInterlockedDecrement((PULONG)&(_MutexCounter));              \
+    NdisInterlockedDecrement((Pu32)&(_MutexCounter));              \
 }
 
 // limitation of path length
