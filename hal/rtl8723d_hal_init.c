@@ -14,7 +14,7 @@
 #define FW_DOWNLOAD_SIZE_8723D 8192
 #endif
 
-static VOID
+static void
 _FWDownloadEnable(
 	PADAPTER		padapter,
 	BOOLEAN			enable
@@ -53,7 +53,7 @@ _FWDownloadEnable(
 static int
 _BlockWrite(
 	PADAPTER		padapter,
-	PVOID		buffer,
+	void *		buffer,
 	u32			buffSize
 )
 {
@@ -122,7 +122,7 @@ static int
 _PageWrite(
 		PADAPTER	padapter,
 		u32			page,
-		PVOID		buffer,
+		void *		buffer,
 		u32			size
 )
 {
@@ -135,7 +135,7 @@ _PageWrite(
 	return _BlockWrite(padapter, buffer, size);
 }
 
-static VOID
+static void
 _FillDummy(
 	u8		*pFwBuf,
 	u32	*pFwLen
@@ -158,7 +158,7 @@ _FillDummy(
 static int
 _WriteFW(
 	PADAPTER padapter,
-	PVOID buffer,
+	void * buffer,
 	u32 size
 )
 {
@@ -336,7 +336,7 @@ void rtl8723d_FirmwareSelfReset(PADAPTER padapter)
 #ifdef CONFIG_MP_INCLUDED
 static int _WriteBTFWtoTxPktBuf8723D(
 		PADAPTER		Adapter,
-		PVOID			buffer,
+		void *			buffer,
 		u4Byte			FwBufLen,
 		u1Byte			times
 )
@@ -1358,7 +1358,7 @@ hal_ReadEFuse_WiFi(
 		rtw_mfree(efuseTbl, EFUSE_MAX_MAP_LEN);
 }
 
-static VOID
+static void
 hal_ReadEFuse_BT(
 	PADAPTER	padapter,
 	u16			_offset,
@@ -2994,8 +2994,8 @@ Hal_EfuseParseIDCode(
 static void
 Hal_EEValueCheck(
 	u8		EEType,
-	PVOID		pInValue,
-	PVOID		pOutValue
+	void *		pInValue,
+	void *		pOutValue
 )
 {
 	switch (EEType) {
@@ -3037,7 +3037,7 @@ Hal_EfuseParseTxPowerInfo_8723D(
 		pHalData->EEPROMRegulatory = 0;
 }
 
-VOID
+void
 Hal_EfuseParseBoardType_8723D(
 	PADAPTER	Adapter,
 	u8			*PROMContent,
@@ -3057,7 +3057,7 @@ Hal_EfuseParseBoardType_8723D(
 
 }
 
-VOID
+void
 Hal_EfuseParseBTCoexistInfo_8723D(
 	PADAPTER padapter,
 	u8 *hwinfo,
@@ -3127,7 +3127,7 @@ Hal_EfuseParseBTCoexistInfo_8723D(
 		 , pHalData->EEPROMBluetoothAntNum == Ant_x2 ? 2 : 1);
 }
 
-VOID
+void
 Hal_EfuseParseEEPROMVer_8723D(
 	PADAPTER		padapter,
 	u8			*hwinfo,
@@ -3143,7 +3143,7 @@ Hal_EfuseParseEEPROMVer_8723D(
 }
 
 
-VOID
+void
 Hal_EfuseParsePackageType_8723D(
 	PADAPTER		pAdapter,
 	u8				*hwinfo,
@@ -3182,7 +3182,7 @@ Hal_EfuseParsePackageType_8723D(
 	RTW_INFO("PackageType = 0x%X\n", pHalData->PackageType);
 }
 
-VOID
+void
 Hal_EfuseParseVoltage_8723D(
 	PADAPTER		pAdapter,
 	u8			*hwinfo,
@@ -3197,7 +3197,7 @@ Hal_EfuseParseVoltage_8723D(
 	RTW_INFO("%s pHalData->adjuseVoltageVal =%x\n", __func__, pHalData->adjuseVoltageVal);
 }
 
-VOID
+void
 Hal_EfuseParseChnlPlan_8723D(
 	PADAPTER		padapter,
 	u8			*hwinfo,
@@ -3215,7 +3215,7 @@ Hal_EfuseParseChnlPlan_8723D(
 	);
 }
 
-VOID
+void
 Hal_EfuseParseCustomerID_8723D(
 	PADAPTER		padapter,
 	u8			*hwinfo,
@@ -3230,7 +3230,7 @@ Hal_EfuseParseCustomerID_8723D(
 		pHalData->EEPROMCustomerID = 0;
 }
 
-VOID
+void
 Hal_EfuseParseAntennaDiversity_8723D(
 	PADAPTER		pAdapter,
 	u8				*hwinfo,
@@ -3239,7 +3239,7 @@ Hal_EfuseParseAntennaDiversity_8723D(
 {
 }
 
-VOID
+void
 Hal_EfuseParseXtal_8723D(
 	PADAPTER		pAdapter,
 	u8			*hwinfo,

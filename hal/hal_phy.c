@@ -77,7 +77,7 @@ PHY_RFShadowRead(
 }	/* PHY_RFShadowRead */
 
 
-VOID
+void
 PHY_RFShadowWrite(
 	PADAPTER		Adapter,
 	enum rf_path		eRFPath,
@@ -111,7 +111,7 @@ PHY_RFShadowCompare(
 }	/* PHY_RFShadowCompare */
 
 
-VOID
+void
 PHY_RFShadowRecorver(
 	PADAPTER		Adapter,
 	enum rf_path		eRFPath,
@@ -129,7 +129,7 @@ PHY_RFShadowRecorver(
 }	/* PHY_RFShadowRecorver */
 
 
-VOID
+void
 PHY_RFShadowCompareAll(
 	PADAPTER			Adapter)
 {
@@ -144,7 +144,7 @@ PHY_RFShadowCompareAll(
 }	/* PHY_RFShadowCompareAll */
 
 
-VOID
+void
 PHY_RFShadowRecorverAll(
 	PADAPTER			Adapter)
 {
@@ -159,7 +159,7 @@ PHY_RFShadowRecorverAll(
 }	/* PHY_RFShadowRecorverAll */
 
 
-VOID
+void
 PHY_RFShadowCompareFlagSet(
 	PADAPTER		Adapter,
 	enum rf_path		eRFPath,
@@ -172,7 +172,7 @@ PHY_RFShadowCompareFlagSet(
 }	/* PHY_RFShadowCompareFlagSet */
 
 
-VOID
+void
 PHY_RFShadowRecorverFlagSet(
 	PADAPTER		Adapter,
 	enum rf_path		eRFPath,
@@ -185,7 +185,7 @@ PHY_RFShadowRecorverFlagSet(
 }	/* PHY_RFShadowRecorverFlagSet */
 
 
-VOID
+void
 PHY_RFShadowCompareFlagSetAll(
 	PADAPTER			Adapter)
 {
@@ -205,7 +205,7 @@ PHY_RFShadowCompareFlagSetAll(
 }	/* PHY_RFShadowCompareFlagSetAll */
 
 
-VOID
+void
 PHY_RFShadowRecorverFlagSetAll(
 	PADAPTER			Adapter)
 {
@@ -224,7 +224,7 @@ PHY_RFShadowRecorverFlagSetAll(
 
 }	/* PHY_RFShadowCompareFlagSetAll */
 
-VOID
+void
 PHY_RFShadowRefresh(
 	PADAPTER			Adapter)
 {

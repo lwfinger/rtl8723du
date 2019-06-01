@@ -9,7 +9,7 @@
 
 struct  wifi_only_cfg GLBtCoexistWifiOnly;
 
-void halwifionly_write1byte(PVOID pwifionlyContext, u32 RegAddr, u8 Data)
+void halwifionly_write1byte(void * pwifionlyContext, u32 RegAddr, u8 Data)
 {
 	struct wifi_only_cfg *pwifionlycfg = (struct wifi_only_cfg *)pwifionlyContext;
 	PADAPTER		Adapter = pwifionlycfg->Adapter;
@@ -17,7 +17,7 @@ void halwifionly_write1byte(PVOID pwifionlyContext, u32 RegAddr, u8 Data)
 	rtw_write8(Adapter, RegAddr, Data);
 }
 
-void halwifionly_write2byte(PVOID pwifionlyContext, u32 RegAddr, u16 Data)
+void halwifionly_write2byte(void * pwifionlyContext, u32 RegAddr, u16 Data)
 {
 	struct wifi_only_cfg *pwifionlycfg = (struct wifi_only_cfg *)pwifionlyContext;
 	PADAPTER		Adapter = pwifionlycfg->Adapter;
@@ -25,7 +25,7 @@ void halwifionly_write2byte(PVOID pwifionlyContext, u32 RegAddr, u16 Data)
 	rtw_write16(Adapter, RegAddr, Data);
 }
 
-void halwifionly_write4byte(PVOID pwifionlyContext, u32 RegAddr, u32 Data)
+void halwifionly_write4byte(void * pwifionlyContext, u32 RegAddr, u32 Data)
 {
 	struct wifi_only_cfg *pwifionlycfg = (struct wifi_only_cfg *)pwifionlyContext;
 	PADAPTER		Adapter = pwifionlycfg->Adapter;
@@ -33,7 +33,7 @@ void halwifionly_write4byte(PVOID pwifionlyContext, u32 RegAddr, u32 Data)
 	rtw_write32(Adapter, RegAddr, Data);
 }
 
-u8 halwifionly_read1byte(PVOID pwifionlyContext, u32 RegAddr)
+u8 halwifionly_read1byte(void * pwifionlyContext, u32 RegAddr)
 {
 	struct wifi_only_cfg *pwifionlycfg = (struct wifi_only_cfg *)pwifionlyContext;
 	PADAPTER		Adapter = pwifionlycfg->Adapter;
@@ -41,7 +41,7 @@ u8 halwifionly_read1byte(PVOID pwifionlyContext, u32 RegAddr)
 	return rtw_read8(Adapter, RegAddr);
 }
 
-u16 halwifionly_read2byte(PVOID pwifionlyContext, u32 RegAddr)
+u16 halwifionly_read2byte(void * pwifionlyContext, u32 RegAddr)
 {
 	struct wifi_only_cfg *pwifionlycfg = (struct wifi_only_cfg *)pwifionlyContext;
 	PADAPTER		Adapter = pwifionlycfg->Adapter;
@@ -49,7 +49,7 @@ u16 halwifionly_read2byte(PVOID pwifionlyContext, u32 RegAddr)
 	return rtw_read16(Adapter, RegAddr);
 }
 
-u32 halwifionly_read4byte(PVOID pwifionlyContext, u32 RegAddr)
+u32 halwifionly_read4byte(void * pwifionlyContext, u32 RegAddr)
 {
 	struct wifi_only_cfg *pwifionlycfg = (struct wifi_only_cfg *)pwifionlyContext;
 	PADAPTER		Adapter = pwifionlycfg->Adapter;
@@ -57,7 +57,7 @@ u32 halwifionly_read4byte(PVOID pwifionlyContext, u32 RegAddr)
 	return rtw_read32(Adapter, RegAddr);
 }
 
-void halwifionly_bitmaskwrite1byte(PVOID pwifionlyContext, u32 regAddr, u8 bitMask, u8 data)
+void halwifionly_bitmaskwrite1byte(void * pwifionlyContext, u32 regAddr, u8 bitMask, u8 data)
 {
 	u8 originalValue, bitShift = 0;
 	u8 i;
@@ -77,7 +77,7 @@ void halwifionly_bitmaskwrite1byte(PVOID pwifionlyContext, u32 regAddr, u8 bitMa
 	rtw_write8(Adapter, regAddr, data);
 }
 
-void halwifionly_phy_set_rf_reg(PVOID pwifionlyContext, enum rf_path eRFPath, u32 RegAddr, u32 BitMask, u32 Data)
+void halwifionly_phy_set_rf_reg(void * pwifionlyContext, enum rf_path eRFPath, u32 RegAddr, u32 BitMask, u32 Data)
 {
 	struct wifi_only_cfg *pwifionlycfg = (struct wifi_only_cfg *)pwifionlyContext;
 	PADAPTER		Adapter = pwifionlycfg->Adapter;
@@ -85,7 +85,7 @@ void halwifionly_phy_set_rf_reg(PVOID pwifionlyContext, enum rf_path eRFPath, u3
 	phy_set_rf_reg(Adapter, eRFPath, RegAddr, BitMask, Data);
 }
 
-void halwifionly_phy_set_bb_reg(PVOID pwifionlyContext, u32 RegAddr, u32 BitMask, u32 Data)
+void halwifionly_phy_set_bb_reg(void * pwifionlyContext, u32 RegAddr, u32 BitMask, u32 Data)
 {
 	struct wifi_only_cfg *pwifionlycfg = (struct wifi_only_cfg *)pwifionlyContext;
 	PADAPTER		Adapter = pwifionlycfg->Adapter;

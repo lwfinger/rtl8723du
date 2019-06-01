@@ -114,7 +114,7 @@ PHY_QueryBBReg_8723D(
 * Note:		This function is equal to "PutRegSetting" in PHY programming guide
 */
 
-VOID
+void
 PHY_SetBBReg_8723D(
 	PADAPTER	Adapter,
 	u32		RegAddr,
@@ -191,7 +191,7 @@ phy_FwRFSerialRead(
  *	01/21/2008	MHC		Create Version 0.
  *
  *---------------------------------------------------------------------------*/
-static	VOID
+static	void
 phy_FwRFSerialWrite(
 	PADAPTER			Adapter,
 	enum rf_path			eRFPath,
@@ -309,7 +309,7 @@ phy_RFSerialRead_8723D(
  *
  *
 */
-static	VOID
+static	void
 phy_RFSerialWrite_8723D(
 	PADAPTER			Adapter,
 	enum rf_path			eRFPath,
@@ -405,7 +405,7 @@ PHY_QueryRFReg_8723D(
 * Return:		None
 * Note:		This function is equal to "PutRFRegSetting" in PHY programming guide
 */
-VOID
+void
 PHY_SetRFReg_8723D(
 	PADAPTER			Adapter,
 	enum rf_path			eRFPath,
@@ -486,7 +486,7 @@ s32 PHY_MACConfig8723D(PADAPTER Adapter)
 * Return:		None
 * Note:		The initialization value is constant and it should never be changes
 */
-static	VOID
+static	void
 phy_InitBBRFRegisterDefinition(
 	PADAPTER		Adapter
 )
@@ -664,7 +664,7 @@ PHY_ConfigRFWithParaFile_8723D(
  *                                                                                    <20120830, Kordan>
  **************************************************************************************************************/
 
-VOID
+void
 PHY_SetTxPowerIndex_8723D(
 	PADAPTER			Adapter,
 	u32					PowerIndex,
@@ -789,7 +789,7 @@ PHY_GetTxPowerIndex_8723D(
 	return power_idx;
 }
 
-VOID
+void
 PHY_SetTxPowerLevel8723D(
 	PADAPTER		Adapter,
 	u8				Channel
@@ -803,7 +803,7 @@ PHY_SetTxPowerLevel8723D(
 	phy_set_tx_power_level_by_path(Adapter, Channel, RFPath);
 }
 
-VOID
+void
 PHY_GetTxPowerLevel8723D(
 	PADAPTER		Adapter,
 	s32				*powerlevel
@@ -812,7 +812,7 @@ PHY_GetTxPowerLevel8723D(
 }
 
 /* <20160217, Jessica> A workaround to eliminate the 2472MHz & 2484MHz spur of 8723D. */
-static VOID
+static void
 phy_SpurCalibration_8723D(
 	PADAPTER					pAdapter,
 	u1Byte						ToChannel,
@@ -900,7 +900,7 @@ phy_SpurCalibration_8723D(
 	odm_set_bb_reg(pDM_Odm, 0xD2C, BIT(28), 0x0);                    /* disable CSI mask */
 }
 
-static VOID
+static void
 phy_SetRegBW_8723D(
 	PADAPTER		Adapter,
 	enum channel_width	CurrentBW
@@ -1021,7 +1021,7 @@ phy_PostSetBwMode8723D(
 	PHY_RF6052SetBandwidth8723D(padapter, pHalData->current_channel_bw);
 }
 
-static VOID
+static void
 phy_SwChnl8723D(
 	PADAPTER					pAdapter
 )
@@ -1066,7 +1066,7 @@ phy_SwChnl8723D(
 	RTW_DBG("===>phy_SwChnl8723D: Channel = %d\n", channelToSW);
 }
 
-static VOID
+static void
 phy_SwChnlAndSetBwMode8723D(
 	PADAPTER		Adapter
 )
@@ -1098,7 +1098,7 @@ phy_SwChnlAndSetBwMode8723D(
 	PHY_SetTxPowerLevel8723D(Adapter, pHalData->current_channel);
 }
 
-static VOID
+static void
 PHY_HandleSwChnlAndSetBW8723D(
 	PADAPTER			Adapter,
 	BOOLEAN				bSwitchChannel,
@@ -1180,7 +1180,7 @@ PHY_HandleSwChnlAndSetBW8723D(
 
 }
 
-VOID
+void
 PHY_SetSwChnlBWMode8723D(
 	PADAPTER			Adapter,
 	u8					channel,
@@ -1196,7 +1196,7 @@ PHY_SetSwChnlBWMode8723D(
 	/* RTW_INFO("<==%s()\n",__FUNCTION__); */
 }
 
-static VOID
+static void
 _PHY_DumpRFReg_8723D(PADAPTER	pAdapter)
 {
 	u32 rfRegValue, rfRegOffset;

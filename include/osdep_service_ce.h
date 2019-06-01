@@ -103,10 +103,10 @@ __inline static void rtw_list_delete(_list *plist)
 }
 
 static inline void timer_hdl(
-	PVOID SystemSpecific1,
-	PVOID FunctionContext,
-	PVOID SystemSpecific2,
-	PVOID SystemSpecific3)
+	void * SystemSpecific1,
+	void * FunctionContext,
+	void * SystemSpecific2,
+	void * SystemSpecific3)
 {
 	_timer *timer = (_timer *)FunctionContext;
 
@@ -130,7 +130,7 @@ static inline void _cancel_timer(_timer *ptimer, u8 *bcancelled)
 	NdisMCancelTimer(ptimer, bcancelled);
 }
 
-__inline static void _init_workitem(_workitem *pwork, void *pfunc, PVOID cntx)
+__inline static void _init_workitem(_workitem *pwork, void *pfunc, void * cntx)
 {
 
 	NdisInitializeWorkItem(pwork, pfunc, cntx);

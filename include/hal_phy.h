@@ -166,7 +166,7 @@ PHY_RFShadowRead(
 	enum rf_path		eRFPath,
 	u32				Offset);
 
-VOID
+void
 PHY_RFShadowWrite(
 	PADAPTER		Adapter,
 	enum rf_path		eRFPath,
@@ -179,43 +179,43 @@ PHY_RFShadowCompare(
 	enum rf_path		eRFPath,
 	u32				Offset);
 
-VOID
+void
 PHY_RFShadowRecorver(
 	PADAPTER		Adapter,
 	enum rf_path		eRFPath,
 	u32				Offset);
 
-VOID
+void
 PHY_RFShadowCompareAll(
 	PADAPTER		Adapter);
 
-VOID
+void
 PHY_RFShadowRecorverAll(
 	PADAPTER		Adapter);
 
-VOID
+void
 PHY_RFShadowCompareFlagSet(
 	PADAPTER		Adapter,
 	enum rf_path		eRFPath,
 	u32				Offset,
 	u8				Type);
 
-VOID
+void
 PHY_RFShadowRecorverFlagSet(
 	PADAPTER		Adapter,
 	enum rf_path		eRFPath,
 	u32				Offset,
 	u8				Type);
 
-VOID
+void
 PHY_RFShadowCompareFlagSetAll(
 	PADAPTER		Adapter);
 
-VOID
+void
 PHY_RFShadowRecorverFlagSetAll(
 	PADAPTER		Adapter);
 
-VOID
+void
 PHY_RFShadowRefresh(
 	PADAPTER		Adapter);
 

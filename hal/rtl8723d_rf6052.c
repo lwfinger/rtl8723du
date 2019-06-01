@@ -53,7 +53,7 @@ static	RF_SHADOW_T	RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG];
  *
  * Note:		For RF type 0222D
  *---------------------------------------------------------------------------*/
-VOID
+void
 PHY_RF6052SetBandwidth8723D(
 	PADAPTER padapter,
 	enum channel_width Bandwidth)	/* 20M or 40M */
@@ -82,7 +82,7 @@ PHY_RF6052SetBandwidth8723D(
 	}
 }
 
-static VOID
+static void
 phy_RF6052_Config_HardCode(
 	PADAPTER		Adapter
 )

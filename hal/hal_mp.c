@@ -544,7 +544,7 @@ static void mpt_SetRFPath_8723D(PADAPTER pAdapter)
 	}
 }
 
-static VOID mpt_SetRFPath_819X(PADAPTER	pAdapter)
+static void mpt_SetRFPath_819X(PADAPTER	pAdapter)
 {
 	HAL_DATA_TYPE			*pHalData	= GET_HAL_DATA(pAdapter);
 	PMPT_CONTEXT		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
@@ -997,7 +997,7 @@ u32 hal_mpt_query_phytxok(PADAPTER	pAdapter)
 
 }
 
-static	VOID mpt_StopCckContTx(
+static	void mpt_StopCckContTx(
 	PADAPTER	pAdapter
 )
 {
@@ -1028,7 +1028,7 @@ static	VOID mpt_StopCckContTx(
 }	/* mpt_StopCckContTx */
 
 
-static	VOID mpt_StopOfdmContTx(
+static	void mpt_StopOfdmContTx(
 	PADAPTER	pAdapter
 )
 {
@@ -1056,7 +1056,7 @@ static	VOID mpt_StopOfdmContTx(
 }	/* mpt_StopOfdmContTx */
 
 
-static	VOID mpt_StartCckContTx(
+static	void mpt_StartCckContTx(
 	PADAPTER		pAdapter
 )
 {
@@ -1093,7 +1093,7 @@ static	VOID mpt_StartCckContTx(
 }	/* mpt_StartCckContTx */
 
 
-static	VOID mpt_StartOfdmContTx(
+static	void mpt_StartOfdmContTx(
 	PADAPTER		pAdapter
 )
 {

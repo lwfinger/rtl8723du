@@ -812,7 +812,7 @@ PHY_GetTxPowerByRateBase(
 	return value;
 }
 
-static VOID
+static void
 phy_SetTxPowerByRateBase(
 	PADAPTER		Adapter,
 	u8				Band,
@@ -929,7 +929,7 @@ static void phy_txpwr_by_rate_chk_for_path_dup(_adapter *adapter)
 	}
 }
 
-static VOID
+static void
 phy_StoreTxPowerByRateBase(
 	PADAPTER	pAdapter
 )
@@ -981,7 +981,7 @@ phy_StoreTxPowerByRateBase(
 	}
 }
 
-VOID
+void
 PHY_GetRateValuesOfTxPowerByRate(
 	PADAPTER pAdapter,
 	u32 RegAddr,
@@ -1404,7 +1404,7 @@ PHY_StoreTxPowerByRateNew(
 	}
 }
 
-VOID
+void
 PHY_InitTxPowerByRate(
 	PADAPTER	pAdapter
 )
@@ -1418,7 +1418,7 @@ PHY_InitTxPowerByRate(
 					pHalData->TxPwrByRateOffset[band][rfPath][rate] = 0;
 }
 
-VOID
+void
 phy_store_tx_power_by_rate(
 	PADAPTER	pAdapter,
 	u32			Band,
@@ -1439,7 +1439,7 @@ phy_store_tx_power_by_rate(
 
 }
 
-static VOID
+static void
 phy_ConvertTxPowerByRateInDbmToRelativeValues(
 	PADAPTER	pAdapter
 )
@@ -1531,7 +1531,7 @@ phy_ConvertTxPowerByRateInDbmToRelativeValues(
   * This function must be called if the value in the PHY_REG_PG.txt(or header)
   * is exact dBm values
   */
-VOID
+void
 PHY_TxPowerByRateConfiguration(
 	PADAPTER			pAdapter
 )
@@ -1543,7 +1543,7 @@ PHY_TxPowerByRateConfiguration(
 	phy_ConvertTxPowerByRateInDbmToRelativeValues(pAdapter);
 }
 
-VOID
+void
 phy_set_tx_power_index_by_rate_section(
 	PADAPTER		pAdapter,
 	enum rf_path		RFPath,
@@ -2031,7 +2031,7 @@ PHY_GetTxPowerByRate(
 	return _PHY_GetTxPowerByRate(pAdapter, Band, RFPath, Rate);
 }
 
-VOID
+void
 PHY_SetTxPowerByRate(
 	PADAPTER	pAdapter,
 	u8			Band,
@@ -2059,7 +2059,7 @@ PHY_SetTxPowerByRate(
 	pHalData->TxPwrByRateOffset[Band][RFPath][rateIndex] = Value;
 }
 
-VOID
+void
 phy_set_tx_power_level_by_path(
 	PADAPTER	Adapter,
 	u8			channel,
@@ -2088,7 +2088,7 @@ phy_set_tx_power_level_by_path(
 	}
 }
 
-VOID
+void
 PHY_SetTxPowerIndexByRateArray(
 	PADAPTER			pAdapter,
 	enum rf_path			RFPath,
@@ -2470,7 +2470,7 @@ GetS1ByteIntegerFromStringInDecimal(
 /*
 * phy_set_tx_power_limit - Parsing TX power limit from phydm array, called by odm_ConfigBB_TXPWR_LMT_XXX in phydm
 */
-VOID
+void
 phy_set_tx_power_limit(
 	struct PHY_DM_STRUCT		*pDM_Odm,
 	u8				*Regulation,
@@ -2575,7 +2575,7 @@ phy_get_tx_power_index(
 	return rtw_hal_get_tx_power_index(pAdapter, RFPath, Rate, BandWidth, Channel, NULL);
 }
 
-VOID
+void
 PHY_SetTxPowerIndex(
 	PADAPTER		pAdapter,
 	u32				PowerIndex,
@@ -3126,7 +3126,7 @@ phy_ConfigBBWithParaFile(
 	return rtStatus;
 }
 
-static VOID
+static void
 phy_DecryptBBPgParaFile(
 	PADAPTER		Adapter,
 	char			*buffer
@@ -3669,7 +3669,7 @@ PHY_ConfigRFWithParaFile(
 	return rtStatus;
 }
 
-static VOID
+static void
 initDeltaSwingIndexTables(
 	PADAPTER	Adapter,
 	char		*Band,
@@ -4008,10 +4008,10 @@ phy_ParsePowerLimitTableFile(
 			szLine[--i] = ' '; /* return the space in front of the regulation info */
 
 			/* Parse the label of the table */
-			_rtw_memset((PVOID) band, 0, 10);
-			_rtw_memset((PVOID) bandwidth, 0, 10);
-			_rtw_memset((PVOID) ntx, 0, 10);
-			_rtw_memset((PVOID) rateSection, 0, 10);
+			_rtw_memset((void *) band, 0, 10);
+			_rtw_memset((void *) bandwidth, 0, 10);
+			_rtw_memset((void *) ntx, 0, 10);
+			_rtw_memset((void *) rateSection, 0, 10);
 			if (!ParseQualifiedString(szLine, &i, band, ' ', ',')) {
 				RTW_ERR("Fail to parse band!\n");
 				goto exit;
@@ -4056,7 +4056,7 @@ phy_ParsePowerLimitTableFile(
 			while (szLine[i] == ' ' || szLine[i] == '\t')
 				++i;
 
-			_rtw_memset((PVOID) colNumBuf, 0, 10);
+			_rtw_memset((void *) colNumBuf, 0, 10);
 			if (!ParseQualifiedString(szLine, &i, colNumBuf, '#', '#')) {
 				RTW_ERR("Fail to parse column number!\n");
 				goto exit;
@@ -4154,7 +4154,7 @@ phy_ParsePowerLimitTableFile(
 				cnt = 0;
 				fraction = 0;
 				negative = 0;
-				_rtw_memset((PVOID) powerLimit, 0, 10);
+				_rtw_memset((void *) powerLimit, 0, 10);
 
 				while ((szLine[i] >= '0' && szLine[i] <= '9') || szLine[i] == '.'
 					|| szLine[i] == '+' || szLine[i] == '-'

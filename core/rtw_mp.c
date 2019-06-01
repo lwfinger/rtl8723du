@@ -268,7 +268,7 @@ void free_mp_priv(struct mp_priv *pmp_priv)
 }
 
 
-static VOID PHY_IQCalibrate_default(
+static void PHY_IQCalibrate_default(
 	PADAPTER	pAdapter,
 	BOOLEAN	bReCovery
 )
@@ -276,14 +276,14 @@ static VOID PHY_IQCalibrate_default(
 	RTW_INFO("%s\n", __func__);
 }
 
-static VOID PHY_LCCalibrate_default(
+static void PHY_LCCalibrate_default(
 	PADAPTER	pAdapter
 )
 {
 	RTW_INFO("%s\n", __func__);
 }
 
-static VOID PHY_SetRFPathSwitch_default(
+static void PHY_SetRFPathSwitch_default(
 	PADAPTER	pAdapter,
 	BOOLEAN		bMain
 )
@@ -379,7 +379,7 @@ MPT_InitializeAdapter(
  *	05/18/2007	MHC		Add normal driver MPHalt code.
  *
  *---------------------------------------------------------------------------*/
-VOID
+void
 MPT_DeInitAdapter(
 	PADAPTER	pAdapter
 )

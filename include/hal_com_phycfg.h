@@ -54,7 +54,7 @@ PHY_GetTxPowerByRateBase(
 	RATE_SECTION	RateSection
 );
 
-VOID
+void
 PHY_GetRateValuesOfTxPowerByRate(
 	PADAPTER pAdapter,
 	u32 RegAddr,
@@ -70,7 +70,7 @@ PHY_GetRateIndexOfTxPowerByRate(
 	u8	Rate
 );
 
-VOID
+void
 phy_set_tx_power_index_by_rate_section(
 	PADAPTER		pAdapter,
 	enum rf_path		RFPath,
@@ -94,7 +94,7 @@ PHY_GetTxPowerByRate(
 	u8			RateIndex
 );
 
-VOID
+void
 PHY_SetTxPowerByRate(
 	PADAPTER	pAdapter,
 	u8			Band,
@@ -103,14 +103,14 @@ PHY_SetTxPowerByRate(
 	s8			Value
 );
 
-VOID
+void
 phy_set_tx_power_level_by_path(
 	PADAPTER	Adapter,
 	u8			channel,
 	u8			path
 );
 
-VOID
+void
 PHY_SetTxPowerIndexByRateArray(
 	PADAPTER		pAdapter,
 	enum rf_path		RFPath,
@@ -120,12 +120,12 @@ PHY_SetTxPowerIndexByRateArray(
 	u8				RateArraySize
 );
 
-VOID
+void
 PHY_InitTxPowerByRate(
 	PADAPTER	pAdapter
 );
 
-VOID
+void
 phy_store_tx_power_by_rate(
 	PADAPTER	pAdapter,
 	u32			Band,
@@ -136,7 +136,7 @@ phy_store_tx_power_by_rate(
 	u32			Data
 );
 
-VOID
+void
 PHY_TxPowerByRateConfiguration(
 	 PADAPTER			pAdapter
 );
@@ -201,7 +201,7 @@ phy_get_tx_power_index(
 	u8					Channel
 );
 
-VOID
+void
 PHY_SetTxPowerIndex(
 	PADAPTER		pAdapter,
 	u32				PowerIndex,

@@ -1466,7 +1466,7 @@ SwLedBlink12(
 
 }
 
-static VOID
+static void
 SwLedBlink13(
 	PLED_USB			pLed
 )
@@ -1527,7 +1527,7 @@ SwLedBlink13(
 
 }
 
-static VOID
+static void
 SwLedBlink14(
 	PLED_USB			pLed
 )
@@ -1584,7 +1584,7 @@ SwLedBlink14(
 
 }
 
-static VOID
+static void
 SwLedBlink15(
 	PLED_USB			pLed
 )
@@ -1831,7 +1831,7 @@ void BlinkTimerCallback(void *data)
 		return;
 	}
 
-	rtw_led_blink_cmd(padapter, (PVOID)pLed);
+	rtw_led_blink_cmd(padapter, (void *)pLed);
 }
 
 /*
@@ -3658,7 +3658,7 @@ SwLedControlMode11(
 
 /* page added for NEC */
 
-static VOID
+static void
 SwLedControlMode12(
 	PADAPTER			Adapter,
 	LED_CTL_MODE		LedAction
@@ -3739,7 +3739,7 @@ SwLedControlMode12(
 
 /* Maddest add for NETGEAR R6100 */
 
-static VOID
+static void
 SwLedControlMode13(
 	PADAPTER			Adapter,
 	LED_CTL_MODE		LedAction
@@ -3885,7 +3885,7 @@ SwLedControlMode13(
 
 /* Maddest add for DNI Buffalo */
 
-static VOID
+static void
 SwLedControlMode14(
 	PADAPTER			Adapter,
 	LED_CTL_MODE		LedAction
@@ -3944,7 +3944,7 @@ SwLedControlMode14(
 
 /* Maddest add for Dlink */
 
-static VOID
+static void
 SwLedControlMode15(
 	PADAPTER			Adapter,
 	LED_CTL_MODE		LedAction

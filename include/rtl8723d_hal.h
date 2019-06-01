@@ -223,9 +223,9 @@ void Hal_EfuseParseXtal_8723D(PADAPTER pAdapter,
 			      u8 *hwinfo, u8 AutoLoadFail);
 void Hal_EfuseParseThermalMeter_8723D(PADAPTER padapter,
 				      u8 *hwinfo, u8 AutoLoadFail);
-VOID Hal_EfuseParseVoltage_8723D(PADAPTER pAdapter,
+void Hal_EfuseParseVoltage_8723D(PADAPTER pAdapter,
 				 u8 *hwinfo, BOOLEAN	AutoLoadFail);
-VOID Hal_EfuseParseBoardType_8723D(PADAPTER Adapter,
+void Hal_EfuseParseBoardType_8723D(PADAPTER Adapter,
 				   u8	*PROMContent, BOOLEAN AutoloadFail);
 
 void rtl8723d_set_hal_ops(struct hal_ops *pHalFunc);

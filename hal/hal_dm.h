@@ -13,12 +13,12 @@ u8 rtw_phydm_is_iqk_in_progress(_adapter *adapter);
 void GetHalODMVar(
 	PADAPTER				Adapter,
 	HAL_ODM_VARIABLE		eVariable,
-	PVOID					pValue1,
-	PVOID					pValue2);
+	void *					pValue1,
+	void *					pValue2);
 void SetHalODMVar(
 	PADAPTER				Adapter,
 	HAL_ODM_VARIABLE		eVariable,
-	PVOID					pValue1,
+	void *					pValue1,
 	BOOLEAN					bSet);
 
 void rtw_phydm_ra_registed(_adapter *adapter, struct sta_info *psta);

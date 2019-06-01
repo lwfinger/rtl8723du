@@ -20,7 +20,7 @@
  * ************************************************************ */
 
 
-static VOID
+static void
 dm_CheckProtection(
 	PADAPTER	Adapter
 )
@@ -114,7 +114,7 @@ rtl8723d_InitHalDm(
 
 }
 
-VOID
+void
 rtl8723d_HalDmWatchDog(
 	PADAPTER	Adapter
 )

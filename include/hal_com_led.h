@@ -203,7 +203,7 @@ typedef struct _LED_USB {
 typedef struct _LED_USB	LED_DATA, *PLED_DATA;
 typedef enum _LED_STRATEGY_USB	LED_STRATEGY, *PLED_STRATEGY;
 
-VOID LedControlUSB(
+void LedControlUSB(
 	PADAPTER		Adapter,
 	LED_CTL_MODE		LedAction
 );
