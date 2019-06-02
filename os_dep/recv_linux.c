@@ -195,14 +195,9 @@ int rtw_os_recvbuf_resource_free(_adapter *padapter, struct recv_buf *precvbuf)
 		/* usb_kill_urb(precvbuf->purb); */
 		usb_free_urb(precvbuf->purb);
 	}
-	if (precvbuf->pskb) {
-#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
-		if (rtw_free_skb_premem(precvbuf->pskb) != 0)
-#endif
+	if (precvbuf->pskb)
 			rtw_skb_free(precvbuf->pskb);
-	}
 	return ret;
-
 }
 
 _pkt *rtw_os_alloc_msdu_pkt(union recv_frame *prframe, u16 nSubframe_Length, u8 *pdata)
@@ -214,15 +209,12 @@ _pkt *rtw_os_alloc_msdu_pkt(union recv_frame *prframe, u16 nSubframe_Length, u8 
 
 	pattrib = &prframe->u.hdr.attrib;
 
-#ifdef CONFIG_SKB_COPY
 	sub_skb = rtw_skb_alloc(nSubframe_Length + 14);
 	if (sub_skb) {
 		skb_reserve(sub_skb, 14);
 		data_ptr = (u8 *)skb_put(sub_skb, nSubframe_Length);
 		_rtw_memcpy(data_ptr, (pdata + ETH_HLEN), nSubframe_Length);
-	} else
-#endif /* CONFIG_SKB_COPY */
-	{
+	} else {
 		sub_skb = rtw_skb_clone(prframe->u.hdr.pkt);
 		if (sub_skb) {
 			sub_skb->data = pdata + ETH_HLEN;

@@ -114,10 +114,8 @@ typedef enum _RX_AGG_MODE {
 #define Mac_HT_FasleAlarm	0x90000000
 #define Mac_DropPacket		0xA0000000
 
-#ifdef CONFIG_RF_POWER_TRIM
 #define REG_RF_BB_GAIN_OFFSET	0x55
 #define RF_GAIN_OFFSET_MASK		0xfffff
-#endif /*CONFIG_RF_POWER_TRIM*/
 
 /* For store initial value of BB register */
 typedef struct _BB_INIT_REGISTER {
@@ -355,11 +353,9 @@ typedef struct hal_com_data {
 	u8	efuse0x3d7;	/* efuse[0x3D7] */
 	u8	efuse0x3d8;	/* efuse[0x3D8] */
 
-#ifdef CONFIG_RF_POWER_TRIM
 	u8	EEPROMRFGainOffset;
 	u8	EEPROMRFGainVal;
 	struct kfree_data_t kfree_data;
-#endif /*CONFIG_RF_POWER_TRIM*/
 
 	u8      adjuseVoltageVal;
 	u8      need_restore;

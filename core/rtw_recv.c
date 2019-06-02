@@ -6,7 +6,6 @@
 #include <drv_types.h>
 #include <hal_data.h>
 
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 void rtw_signal_stat_timer_hdl(struct timer_list *t);
 #else
@@ -27,8 +26,6 @@ static u8 signal_stat_calc_profile[SIGNAL_STAT_CALC_PROFILE_MAX][2] = {
 #ifndef RTW_SIGNAL_STATE_CALC_PROFILE
 	#define RTW_SIGNAL_STATE_CALC_PROFILE SIGNAL_STAT_CALC_PROFILE_1
 #endif
-
-#endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
 
 void _rtw_init_sta_recv_priv(struct sta_recv_priv *psta_recvpriv)
 {
@@ -108,7 +105,6 @@ sint _rtw_init_recv_priv(struct recv_priv *precvpriv, _adapter *padapter)
 
 	res = rtw_hal_init_recv_priv(padapter);
 
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 	timer_setup(&precvpriv->signal_stat_timer, rtw_signal_stat_timer_hdl, 0);
 #else
@@ -119,16 +115,12 @@ sint _rtw_init_recv_priv(struct recv_priv *precvpriv, _adapter *padapter)
 	/* precvpriv->signal_stat_converging_constant = 5000; */ /* ms */
 
 	rtw_set_signal_stat_timer(precvpriv);
-#endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
 
 exit:
 
-
 	return res;
-
 }
 
-void rtw_mfree_recv_priv_lock(struct recv_priv *precvpriv);
 void rtw_mfree_recv_priv_lock(struct recv_priv *precvpriv)
 {
 	_rtw_spinlock_free(&precvpriv->lock);
@@ -2064,22 +2056,6 @@ static int rtw_recv_indicatepkt_check(union recv_frame *rframe, u8 *ehdr_pos, u3
 	if (recvpriv->sink_udpport > 0)
 		rtw_sink_rtp_seq_dbg(adapter, ehdr_pos);
 
-#ifdef DBG_UDP_PKT_LOSE_11AC
-	#define PAYLOAD_LEN_LOC_OF_IP_HDR 0x10 /*ethernet payload length location of ip header (DA + SA+eth_type+(version&hdr_len)) */
-
-	if (ntohs(ehdr->h_proto) == ETH_P_ARP) {
-		/* ARP Payload length will be 42bytes or 42+18(tailer)=60bytes*/
-		if (pkt_len != 42 && pkt_len != 60)
-			RTW_INFO("Error !!%s,ARP Payload length %u not correct\n" , __func__ , pkt_len);
-	} else if (ntohs(ehdr->h_proto) == ETH_P_IP) {
-		if (be16_to_cpu(*((u16 *)(ehdr_pos + PAYLOAD_LEN_LOC_OF_IP_HDR))) != (pkt_len) - ETH_HLEN) {
-			RTW_INFO("Error !!%s,Payload length not correct\n" , __func__);
-			RTW_INFO("%s, IP header describe Total length=%u\n" , __func__ , be16_to_cpu(*((u16 *)(ehdr_pos + PAYLOAD_LEN_LOC_OF_IP_HDR))));
-			RTW_INFO("%s, Pkt real length=%u\n" , __func__ , (pkt_len) - ETH_HLEN);
-		}
-	}
-#endif
-
 	ret = _SUCCESS;
 
 exit:
@@ -3188,7 +3164,6 @@ _recv_entry_drop:
 	return ret;
 }
 
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 void rtw_signal_stat_timer_hdl(struct timer_list *t)
 #else
@@ -3277,79 +3252,14 @@ void rtw_signal_stat_timer_hdl(void *FunctionContext)
 
 set_timer:
 	rtw_set_signal_stat_timer(recvpriv);
-
 }
-#endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
 
 static void rx_process_rssi(_adapter *padapter, union recv_frame *prframe)
 {
 	u32	last_rssi, tmp_val;
 	struct rx_pkt_attrib *pattrib = &prframe->u.hdr.attrib;
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	struct signal_stat *signal_stat = &padapter->recvpriv.signal_strength_data;
-#endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
 
-	/* RTW_INFO("process_rssi=> pattrib->rssil(%d) signal_strength(%d)\n ",pattrib->recv_signal_power,pattrib->signal_strength); */
-	/* if(pRfd->Status.bPacketToSelf || pRfd->Status.bPacketBeacon) */
-	{
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
-		if (signal_stat->update_req) {
-			signal_stat->total_num = 0;
-			signal_stat->total_val = 0;
-			signal_stat->update_req = 0;
-		}
-
-		signal_stat->total_num++;
-		signal_stat->total_val  += pattrib->phy_info.signal_strength;
-		signal_stat->avg_val = signal_stat->total_val / signal_stat->total_num;
-#else /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
-
-		/* Adapter->RxStats.RssiCalculateCnt++;	 */ /* For antenna Test */
-		if (padapter->recvpriv.signal_strength_data.total_num++ >= PHY_RSSI_SLID_WIN_MAX) {
-			padapter->recvpriv.signal_strength_data.total_num = PHY_RSSI_SLID_WIN_MAX;
-			last_rssi = padapter->recvpriv.signal_strength_data.elements[padapter->recvpriv.signal_strength_data.index];
-			padapter->recvpriv.signal_strength_data.total_val -= last_rssi;
-		}
-		padapter->recvpriv.signal_strength_data.total_val  += pattrib->phy_info.signal_strength;
-
-		padapter->recvpriv.signal_strength_data.elements[padapter->recvpriv.signal_strength_data.index++] = pattrib->phy_info.signal_strength;
-		if (padapter->recvpriv.signal_strength_data.index >= PHY_RSSI_SLID_WIN_MAX)
-			padapter->recvpriv.signal_strength_data.index = 0;
-
-
-		tmp_val = padapter->recvpriv.signal_strength_data.total_val / padapter->recvpriv.signal_strength_data.total_num;
-
-		if (padapter->recvpriv.is_signal_dbg) {
-			padapter->recvpriv.signal_strength = padapter->recvpriv.signal_strength_dbg;
-			padapter->recvpriv.rssi = (s8)translate_percentage_to_dbm(padapter->recvpriv.signal_strength_dbg);
-		} else {
-			padapter->recvpriv.signal_strength = tmp_val;
-			padapter->recvpriv.rssi = (s8)translate_percentage_to_dbm(tmp_val);
-		}
-
-#endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
-	}
-}
-
-static void rx_process_link_qual(_adapter *padapter, union recv_frame *prframe)
-{
-	u32	last_evm = 0, tmpVal;
-	struct rx_pkt_attrib *pattrib;
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
-	struct signal_stat *signal_stat;
-#endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
-
-	if (prframe == NULL || padapter == NULL)
-		return;
-
-	pattrib = &prframe->u.hdr.attrib;
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
-	signal_stat = &padapter->recvpriv.signal_qual_data;
-#endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
-
-	/* RTW_INFO("process_link_qual=> pattrib->signal_qual(%d)\n ",pattrib->signal_qual); */
-
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	if (signal_stat->update_req) {
 		signal_stat->total_num = 0;
 		signal_stat->total_val = 0;
@@ -3357,43 +3267,36 @@ static void rx_process_link_qual(_adapter *padapter, union recv_frame *prframe)
 	}
 
 	signal_stat->total_num++;
+	signal_stat->total_val  += pattrib->phy_info.signal_strength;
+	signal_stat->avg_val = signal_stat->total_val / signal_stat->total_num;
+}
+
+static void rx_process_link_qual(_adapter *padapter, union recv_frame *prframe)
+{
+	u32	last_evm = 0, tmpVal;
+	struct rx_pkt_attrib *pattrib;
+	struct signal_stat *signal_stat;
+
+	if (prframe == NULL || padapter == NULL)
+		return;
+
+	pattrib = &prframe->u.hdr.attrib;
+	signal_stat = &padapter->recvpriv.signal_qual_data;
+
+	if (signal_stat->update_req) {
+		signal_stat->total_num = 0;
+		signal_stat->total_val = 0;
+		signal_stat->update_req = 0;
+	}
+	signal_stat->total_num++;
 	signal_stat->total_val  += pattrib->phy_info.signal_quality;
 	signal_stat->avg_val = signal_stat->total_val / signal_stat->total_num;
-
-#else /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
-	if (pattrib->phy_info.signal_quality != 0) {
-		/*  */
-		/* 1. Record the general EVM to the sliding window. */
-		/*  */
-		if (padapter->recvpriv.signal_qual_data.total_num++ >= PHY_LINKQUALITY_SLID_WIN_MAX) {
-			padapter->recvpriv.signal_qual_data.total_num = PHY_LINKQUALITY_SLID_WIN_MAX;
-			last_evm = padapter->recvpriv.signal_qual_data.elements[padapter->recvpriv.signal_qual_data.index];
-			padapter->recvpriv.signal_qual_data.total_val -= last_evm;
-		}
-		padapter->recvpriv.signal_qual_data.total_val += pattrib->phy_info.signal_quality;
-
-		padapter->recvpriv.signal_qual_data.elements[padapter->recvpriv.signal_qual_data.index++] = pattrib->phy_info.signal_quality;
-		if (padapter->recvpriv.signal_qual_data.index >= PHY_LINKQUALITY_SLID_WIN_MAX)
-			padapter->recvpriv.signal_qual_data.index = 0;
-
-
-		/* <1> Showed on UI for user, in percentage. */
-		tmpVal = padapter->recvpriv.signal_qual_data.total_val / padapter->recvpriv.signal_qual_data.total_num;
-		padapter->recvpriv.signal_qual = (u8)tmpVal;
-
-	}
-#endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
 }
 
 static void rx_process_phy_info(_adapter *padapter, union recv_frame *rframe)
 {
 	/* Check RSSI */
 	rx_process_rssi(padapter, rframe);
-
-	/* Check PWDB */
-	/* process_PWDB(padapter, rframe); */
-
-	/* UpdateRxSignalStatistics8192C(Adapter, pRfd); */
 
 	/* Check EVM */
 	rx_process_link_qual(padapter, rframe);

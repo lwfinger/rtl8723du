@@ -1532,7 +1532,6 @@ exit:
 #define DBG_CUSTOMER_STR_RPT_HANDLE 0
 #endif
 
-#ifdef CONFIG_RTW_CUSTOMER_STR
 int rtw_hal_h2c_customer_str_req(_adapter *adapter)
 {
 	u8 h2c_data[H2C_CUSTOMER_STR_REQ_LEN] = {0};
@@ -1749,7 +1748,6 @@ int rtw_hal_customer_str_write(_adapter *adapter, const u8 *cs)
 exit:
 	return ret;
 }
-#endif /* CONFIG_RTW_CUSTOMER_STR */
 
 void rtw_hal_update_sta_wset(_adapter *adapter, struct sta_info *psta)
 {
@@ -3124,41 +3122,6 @@ void rtw_dump_rsvd_page(void *sel, _adapter *adapter, u8 page_offset, u8 page_nu
 	RTW_PRINT_SEL(sel, "==========================\n");
 }
 
-#ifdef CONFIG_SUPPORT_FIFO_DUMP
-void rtw_dump_fifo(void *sel, _adapter *adapter, u8 fifo_sel, u32 fifo_addr, u32 fifo_size)
-{
-	u8 *buffer = NULL;
-	u8 buff_size = 0;
-	static const char * const fifo_sel_str[] = {
-		"TX", "RX", "RSVD_PAGE", "REPORT", "LLT", "RXBUF_FW"
-	};
-
-	if (fifo_sel > 5) {
-		RTW_ERR("fifo_sel:%d invalid\n", fifo_sel);
-		return;
-	}
-
-	RTW_PRINT_SEL(sel, "========= FIFO DUMP =========\n");
-	RTW_PRINT_SEL(sel, "%s FIFO DUMP [start_addr:0x%04x , size:%d]\n", fifo_sel_str[fifo_sel], fifo_addr, fifo_size);
-
-	if (fifo_size) {
-		buff_size = RND4(fifo_size);
-		buffer = rtw_zvmalloc(buff_size);
-		if (buffer == NULL)
-			buff_size = 0;
-	}
-
-	rtw_halmac_dump_fifo(adapter_to_dvobj(adapter), fifo_sel, fifo_addr, buff_size, buffer);
-
-	if (buffer) {
-		RTW_DUMP_SEL(sel, buffer, fifo_size);
-		rtw_vmfree(buffer, buff_size);
-	}
-
-	RTW_PRINT_SEL(sel, "==========================\n");
-}
-#endif
-
 void rtw_hal_construct_beacon(_adapter *padapter,
 				     u8 *pframe, u32 *pLength)
 {
@@ -3425,7 +3388,6 @@ static void rtw_hal_construct_ProbeRsp(_adapter *padapter, u8 *pframe, u32 *pLen
  * Page Size = 512: 8812a
  */
 
-/*#define DBG_DUMP_SET_RSVD_PAGE*/
 static void _rtw_hal_set_fw_rsvd_page(_adapter *adapter, bool finished, u8 *page_num)
 {
 	PHAL_DATA_TYPE pHalData;
@@ -3640,23 +3602,8 @@ download_page:
 
 	RTW_INFO("%s: Set RSVD page location to Fw ,TotalPacketLen(%d), TotalPageNum(%d)\n",
 		 __func__, TotalPacketLen, TotalPageNum);
-#ifdef DBG_DUMP_SET_RSVD_PAGE
-	RTW_INFO(" ==================================================\n");
-	RTW_INFO_DUMP("\n", ReservedPagePacket, TotalPacketLen);
-	RTW_INFO(" ==================================================\n");
-#endif
 	if (check_fwstate(pmlmepriv, _FW_LINKED) == true) {
 		rtw_hal_set_FwRsvdPage_cmd(adapter, &RsvdPageLoc);
-	} else if (pwrctl->wowlan_pno_enable) {
-#ifdef CONFIG_PNO_SUPPORT
-		rtw_hal_set_FwAoacRsvdPage_cmd(adapter, &RsvdPageLoc);
-		if (pwrctl->wowlan_in_resume)
-			rtw_hal_set_scan_offload_info_cmd(adapter,
-							  &RsvdPageLoc, 0);
-		else
-			rtw_hal_set_scan_offload_info_cmd(adapter,
-							  &RsvdPageLoc, 1);
-#endif /* CONFIG_PNO_SUPPORT */
 	}
 
 	return;
@@ -3696,10 +3643,6 @@ static void hw_var_set_mlme_sitesurvey(_adapter *adapter, u8 variable, u8 *val)
 	u16 value_rxfltmap2;
 	int i;
 	_adapter *iface;
-
-#ifdef DBG_IFACE_STATUS
-	DBG_IFACE_STATUS_DUMP(adapter);
-#endif
 
 	/* not to receive data frame */
 	value_rxfltmap2 = 0;
@@ -4796,7 +4739,6 @@ exit:
 	return ret;
 }
 
-#ifdef CONFIG_RF_POWER_TRIM
 static u32 Array_kfreemap[] = {
 	0x08, 0xe,
 	0x06, 0xc,
@@ -4831,18 +4773,14 @@ void rtw_bb_rf_gain_offset(_adapter *padapter)
 	if (kfree_data->flag & KFREE_FLAG_ON)
 		rtw_rf_apply_tx_gain_offset(padapter, 6); /* input ch6 to select BB_GAIN_2G */
 }
-#endif /*CONFIG_RF_POWER_TRIM */
-
 bool kfree_data_is_bb_gain_empty(struct kfree_data_t *data)
 {
-#ifdef CONFIG_RF_POWER_TRIM
 	int i, j;
 
 	for (i = 0; i < BB_GAIN_NUM; i++)
 		for (j = 0; j < RF_PATH_MAX; j++)
 			if (data->bb_gain[i][j] != 0)
 				return 0;
-#endif
 	return 1;
 }
 

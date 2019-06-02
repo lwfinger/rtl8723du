@@ -13,8 +13,5 @@
 #ifndef CONFIG_RTW_MAC_HIDDEN_RPT
 	#define CONFIG_RTW_MAC_HIDDEN_RPT
 #endif
-#ifndef CONFIG_RTW_CUSTOMER_STR
-	#define CONFIG_RTW_CUSTOMER_STR
-#endif
 
 #endif /*__HAL_IC_CFG_H__*/

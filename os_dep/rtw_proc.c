@@ -432,7 +432,6 @@ static int proc_get_dump_adapters_status(struct seq_file *m, void *v)
 	return 0;
 }
 
-#ifdef CONFIG_RTW_CUSTOMER_STR
 static int proc_get_customer_str(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -452,7 +451,6 @@ exit:
 	rtw_ps_deny_cancel(adapter, PS_DENY_IOCTL);
 	return 0;
 }
-#endif /* CONFIG_RTW_CUSTOMER_STR */
 
 static ssize_t proc_set_rx_info_msg(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
@@ -1480,7 +1478,6 @@ static struct seq_operations seq_ops_tx_power_idx = {
 	.show  = proc_get_tx_power_idx,
 };
 
-#ifdef CONFIG_RF_POWER_TRIM
 static int proc_get_kfree_flag(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -1667,7 +1664,6 @@ static ssize_t proc_set_tx_gain_offset(struct file *file, const char __user *buf
 
 	return count;
 }
-#endif /* CONFIG_RF_POWER_TRIM */
 
 static ssize_t proc_set_btinfo_evt(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
@@ -2084,46 +2080,6 @@ static ssize_t proc_set_rsvd_page_info(struct file *file, const char __user *buf
 	return count;
 }
 
-#ifdef CONFIG_SUPPORT_FIFO_DUMP
-static int proc_dump_fifo(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
-
-	rtw_dump_fifo(m, adapter, adapter->fifo_sel, adapter->fifo_addr, adapter->fifo_size);
-	return 0;
-}
-static ssize_t proc_set_fifo_info(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	char tmp[32];
-	u8 fifo_sel = 0;
-	u32 fifo_addr = 0;
-	u32 fifo_size = 0;
-
-	if (count < 3)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-
-		int num = sscanf(tmp, "%hhu %x %d", &fifo_sel, &fifo_addr, &fifo_size);
-
-		if (num < 3)
-			return -EINVAL;
-
-		padapter->fifo_sel = fifo_sel;
-		padapter->fifo_addr = fifo_addr;
-		padapter->fifo_size = fifo_size;
-	}
-	return count;
-}
-#endif
-
 #ifdef CONFIG_WOW_PATTERN_HW_CAM
 int proc_dump_pattern_cam(struct seq_file *m, void *v)
 {
@@ -2282,9 +2238,7 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("read_reg", proc_get_read_reg, proc_set_read_reg),
 	RTW_PROC_HDL_SSEQ("tx_rate_bmp", proc_get_dump_tx_rate_bmp, NULL),
 	RTW_PROC_HDL_SSEQ("adapters_status", proc_get_dump_adapters_status, NULL),
-#ifdef CONFIG_RTW_CUSTOMER_STR
 	RTW_PROC_HDL_SSEQ("customer_str", proc_get_customer_str, NULL),
-#endif
 	RTW_PROC_HDL_SSEQ("fwstate", proc_get_fwstate, NULL),
 	RTW_PROC_HDL_SSEQ("sec_info", proc_get_sec_info, NULL),
 	RTW_PROC_HDL_SSEQ("mlmext_state", proc_get_mlmext_state, NULL),
@@ -2401,21 +2355,15 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 #endif
 	RTW_PROC_HDL_SSEQ("tx_power_ext_info", proc_get_tx_power_ext_info, proc_set_tx_power_ext_info),
 	RTW_PROC_HDL_SEQ("tx_power_idx", &seq_ops_tx_power_idx, NULL),
-#ifdef CONFIG_RF_POWER_TRIM
 	RTW_PROC_HDL_SSEQ("tx_gain_offset", NULL, proc_set_tx_gain_offset),
 	RTW_PROC_HDL_SSEQ("kfree_flag", proc_get_kfree_flag, proc_set_kfree_flag),
 	RTW_PROC_HDL_SSEQ("kfree_bb_gain", proc_get_kfree_bb_gain, proc_set_kfree_bb_gain),
 	RTW_PROC_HDL_SSEQ("kfree_thermal", proc_get_kfree_thermal, proc_set_kfree_thermal),
-#endif
 	RTW_PROC_HDL_SSEQ("ps_info", proc_get_ps_info, NULL),
 #ifdef CONFIG_WMMPS_STA
 	RTW_PROC_HDL_SSEQ("wmmps_info", proc_get_wmmps_info, proc_set_wmmps_info),
 #endif /* CONFIG_WMMPS_STA */	
 	RTW_PROC_HDL_SSEQ("monitor", proc_get_monitor, proc_set_monitor),
-
-#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
-	RTW_PROC_HDL_SSEQ("rtkm_info", proc_get_rtkm_info, NULL),
-#endif
 	RTW_PROC_HDL_SSEQ("efuse_map", proc_get_efuse_map, NULL),
 #ifdef CONFIG_IEEE80211W
 	RTW_PROC_HDL_SSEQ("11w_tx_sa_query", proc_get_tx_sa_query, proc_set_tx_sa_query),
@@ -2450,9 +2398,6 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 
 	RTW_PROC_HDL_SSEQ("rsvd_page", proc_dump_rsvd_page, proc_set_rsvd_page_info),
 
-#ifdef CONFIG_SUPPORT_FIFO_DUMP
-	RTW_PROC_HDL_SSEQ("fifo_dump", proc_dump_fifo, proc_set_fifo_info),
-#endif
 	RTW_PROC_HDL_SSEQ("fw_info", proc_get_fw_info, NULL),
 
 	RTW_PROC_HDL_SSEQ("ack_timeout", proc_get_ack_timeout, proc_set_ack_timeout),

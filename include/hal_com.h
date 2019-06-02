@@ -471,9 +471,7 @@ int hal_efuse_macaddr_offset(_adapter *adapter);
 int Hal_GetPhyEfuseMACAddr(PADAPTER padapter, u8 *mac_addr);
 void rtw_dump_cur_efuse(PADAPTER padapter);
 
-#ifdef CONFIG_RF_POWER_TRIM
-	void rtw_bb_rf_gain_offset(_adapter *padapter);
-#endif /*CONFIG_RF_POWER_TRIM*/
+void rtw_bb_rf_gain_offset(_adapter *padapter);
 
 void dm_DynamicUsbTxAgg(_adapter *padapter, u8 from_timer);
 u8 rtw_hal_busagg_qsel_check(_adapter *padapter, u8 pre_qsel, u8 next_qsel);
@@ -526,9 +524,6 @@ void rtw_hal_construct_NullFunctionData(PADAPTER, u8 *pframe, u32 *pLength,
 
 void rtw_dump_phy_cap(void *sel, _adapter *adapter);
 void rtw_dump_rsvd_page(void *sel, _adapter *adapter, u8 page_offset, u8 page_num);
-#ifdef CONFIG_SUPPORT_FIFO_DUMP
-void rtw_dump_fifo(void *sel, _adapter *adapter, u8 fifo_sel, u32 fifo_addr, u32 fifo_size);
-#endif
 
 #ifdef CONFIG_FW_MULTI_PORT_SUPPORT
 int rtw_hal_set_default_port_id_cmd(_adapter *adapter, u8 mac_id);

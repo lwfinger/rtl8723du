@@ -169,9 +169,6 @@ enum {
 u8 rtw_mi_check_status(_adapter *adapter, u8 type);
 
 void dump_dvobj_mi_status(void *sel, const char *fun_name, _adapter *adapter);
-#ifdef DBG_IFACE_STATUS
-#define DBG_IFACE_STATUS_DUMP(adapter)	dump_dvobj_mi_status(RTW_DBGDUMP, __func__, adapter)
-#endif
 void dump_mi_status(void *sel, struct dvobj_priv *dvobj);
 
 u8 rtw_mi_traffic_statistics(_adapter *padapter);

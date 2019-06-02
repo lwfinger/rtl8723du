@@ -532,12 +532,6 @@ void rtw_set_fw_in_ips_mode(PADAPTER padapter, u8 enable)
 		RTW_INFO("%s: issue H2C to FW when entering IPS\n", __func__);
 
 		parm[0] = 0x1;/* suggest by Isaac.Hsu*/
-#ifdef CONFIG_PNO_SUPPORT
-		if (pwrpriv->pno_inited) {
-			parm[1] = pwrpriv->pnlo_info->fast_scan_iterations;
-			parm[2] = pwrpriv->pnlo_info->slow_scan_period;
-		}
-#endif
 
 		rtw_hal_fill_h2c_cmd(padapter, /* H2C_FWLPS_IN_IPS_, */
 				     H2C_INACTIVE_PS_,
@@ -562,7 +556,7 @@ void rtw_set_fw_in_ips_mode(PADAPTER padapter, u8 enable)
 		rtw_btcoex_IpsNotify(padapter, IPS_NONE);
 	}
 }
-#endif /* CONFIG_PNO_SUPPORT */
+#endif
 
 void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode, const char *msg)
 {

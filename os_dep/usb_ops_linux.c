@@ -25,14 +25,7 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 	u8 reqtype;
 	u8 *pIo_buf;
 	int vendorreq_times = 0;
-
-#ifdef CONFIG_USB_VENDOR_REQ_BUFFER_DYNAMIC_ALLOCATE
 	u8 *tmp_buf;
-#else /* use stack memory */
-	u8 tmp_buf[MAX_USB_IO_CTL_SIZE];
-#endif
-
-	/* RTW_INFO("%s %s:%d\n",__FUNCTION__, current->comm, current->pid); */
 
 	if (RTW_CANNOT_IO(padapter)) {
 		status = -EPERM;
@@ -45,29 +38,11 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 		goto exit;
 	}
 
-#ifdef CONFIG_USB_VENDOR_REQ_MUTEX
 	_enter_critical_mutex(&pdvobjpriv->usb_vendor_req_mutex, NULL);
-#endif
-
-
 	/* Acquire IO memory for vendorreq */
-#ifdef CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC
 	pIo_buf = pdvobjpriv->usb_vendor_req_buf;
-#else
-	#ifdef CONFIG_USB_VENDOR_REQ_BUFFER_DYNAMIC_ALLOCATE
-	tmp_buf = rtw_malloc((u32) len + ALIGNMENT_UNIT);
-	tmp_buflen = (u32)len + ALIGNMENT_UNIT;
-	#else /* use stack memory */
-	tmp_buflen = MAX_USB_IO_CTL_SIZE;
-	#endif
 
-	/* Added by Albert 2010/02/09 */
-	/* For mstar platform, mstar suggests the address for USB IO should be 16 bytes alignment. */
-	/* Trying to fix it here. */
-	pIo_buf = (tmp_buf == NULL) ? NULL : tmp_buf + ALIGNMENT_UNIT - ((SIZE_PTR)(tmp_buf) & 0x0f);
-#endif
-
-	if (pIo_buf == NULL) {
+	if (!pIo_buf) {
 		RTW_INFO("[%s] pIo_buf == NULL\n", __FUNCTION__);
 		status = -ENOMEM;
 		goto release_mutex;
@@ -122,15 +97,8 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 
 	}
 
-	/* release IO memory used by vendorreq */
-#ifdef CONFIG_USB_VENDOR_REQ_BUFFER_DYNAMIC_ALLOCATE
-	rtw_mfree(tmp_buf, tmp_buflen);
-#endif
-
 release_mutex:
-#ifdef CONFIG_USB_VENDOR_REQ_MUTEX
 	_exit_critical_mutex(&pdvobjpriv->usb_vendor_req_mutex, NULL);
-#endif
 exit:
 	return status;
 
@@ -550,14 +518,12 @@ void usb_recv_tasklet(void *priv)
 	struct recv_buf	*precvbuf = NULL;
 
 	while (NULL != (pskb = skb_dequeue(&precvpriv->rx_skb_queue))) {
-
 		if (RTW_CANNOT_RUN(padapter)) {
-			RTW_INFO("recv_tasklet => bDriverStopped(%s) OR bSurpriseRemoved(%s)\n"
-				, rtw_is_drv_stopped(padapter) ? "True" : "False"
-				, rtw_is_surprise_removed(padapter) ? "True" : "False");
-			#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
-			if (rtw_free_skb_premem(pskb) != 0)
-			#endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
+			RTW_INFO("recv_tasklet => bDriverStopped(%s) OR bSurpriseRemoved(%s)\n",
+				 rtw_is_drv_stopped(padapter) ?
+				 "True" : "False",
+				 rtw_is_surprise_removed(padapter) ?
+				 "True" : "False");
 				rtw_skb_free(pskb);
 			break;
 		}
@@ -570,7 +536,7 @@ void usb_recv_tasklet(void *priv)
 		skb_queue_tail(&precvpriv->free_recv_skb_queue, pskb);
 
 		precvbuf = rtw_dequeue_recvbuf(&precvpriv->recv_buf_pending_queue);
-		if (NULL != precvbuf) {
+		if (precvbuf) {
 			precvbuf->pskb = NULL;
 			rtw_read_port(padapter, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
 		}

@@ -50,19 +50,6 @@ u8 rtw_mi_stayin_union_ch_chk(_adapter *adapter)
 
 	if ((u_ch != o_ch) || (u_bw != o_bw) || (u_offset != o_offset))
 		rst = false;
-
-	#ifdef DBG_IFACE_STATUS
-	if (rst == false) {
-		RTW_ERR("%s Not stay in union channel\n", __func__);
-		if (GET_HAL_DATA(adapter)->bScanInProcess == true)
-			RTW_ERR("ScanInProcess\n");
-		if (_rtw_mi_p2p_listen_scan_chk(adapter))
-			RTW_ERR("P2P in listen or scan state\n");
-		RTW_ERR("union ch, bw, offset: %u,%u,%u\n", u_ch, u_bw, u_offset);
-		RTW_ERR("oper ch, bw, offset: %u,%u,%u\n", o_ch, o_bw, o_offset);
-		RTW_ERR("=========================\n");
-	}
-	#endif
 	return rst;
 }
 
@@ -80,12 +67,6 @@ u8 rtw_mi_stayin_union_band_chk(_adapter *adapter)
 	if (u_ch != o_ch)
 		if(u_band != o_band)
 			rst = false;
-
-	#ifdef DBG_IFACE_STATUS
-	if (rst == false)
-		RTW_ERR("%s Not stay in union band\n", __func__);
-	#endif
-
 	return rst;
 }
 
@@ -332,21 +313,13 @@ inline void rtw_mi_update_iface_status(struct mlme_priv *pmlmepriv, sint state)
 
 	if (rtw_mi_get_ch_setting_union(adapter, &u_ch, &u_bw, &u_offset))
 		rtw_mi_update_union_chan_inf(adapter , u_ch, u_offset , u_bw);
-
-#ifdef DBG_IFACE_STATUS
-	DBG_IFACE_STATUS_DUMP(adapter);
-#endif
 }
+
 u8 rtw_mi_check_status(_adapter *adapter, u8 type)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct mi_state *iface_state = &dvobj->iface_state;
 	u8 ret = false;
-
-#ifdef DBG_IFACE_STATUS
-	DBG_IFACE_STATUS_DUMP(adapter);
-	RTW_INFO("%s-"ADPT_FMT" check type:%d\n", __func__, ADPT_ARG(adapter), type);
-#endif
 
 	switch (type) {
 	case MI_LINKED:

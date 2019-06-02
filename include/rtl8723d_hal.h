@@ -98,21 +98,11 @@ struct rt_8723d_firmware_hdr {
 	#define BCNQ1_PAGE_NUM_8723D		0x00
 #endif
 
-#ifdef CONFIG_PNO_SUPPORT
-	#undef BCNQ1_PAGE_NUM_8723D
-	#define BCNQ1_PAGE_NUM_8723D		0x00 /* 0x04 */
-#endif
-
 /* For WoWLan , more reserved page
  * ARP Rsp:1, RWC:1, GTK Info:1,GTK RSP:2,GTK EXT MEM:2, AOAC rpt 1, PNO: 6
  * NS offload: 2 NDP info: 1
  */
 #define WOWLAN_PAGE_NUM_8723D	0x00
-
-#ifdef CONFIG_PNO_SUPPORT
-	#undef WOWLAN_PAGE_NUM_8723D
-	#define WOWLAN_PAGE_NUM_8723D	0x15
-#endif
 
 #define TX_TOTAL_PAGE_NUMBER_8723D\
 	(0xFF - BCNQ_PAGE_NUM_8723D - BCNQ1_PAGE_NUM_8723D - WOWLAN_PAGE_NUM_8723D)

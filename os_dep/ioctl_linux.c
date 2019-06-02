@@ -3260,9 +3260,7 @@ static int rtw_set_pid(struct net_device *dev,
 	selector = *pdata;
 	if (selector < 3 && selector >= 0) {
 		padapter->pid[selector] = *(pdata + 1);
-#ifdef CONFIG_GLOBAL_UI_PID
 		ui_pid[selector] = *(pdata + 1);
-#endif
 		RTW_INFO("%s set pid[%d]=%d\n", __FUNCTION__, selector , padapter->pid[selector]);
 	} else
 		RTW_INFO("%s selector %d error\n", __FUNCTION__, selector);
@@ -3270,7 +3268,6 @@ static int rtw_set_pid(struct net_device *dev,
 exit:
 
 	return ret;
-
 }
 
 static int rtw_wps_start(struct net_device *dev,
@@ -5751,31 +5748,17 @@ static int rtw_dbg_port(struct net_device *dev,
 		}
 			break;
 		case 0x20:
-			{
-				if (arg == 0xAA) {
-					u8 page_offset, page_num;
-					u32 page_size = 0;
-					u8 *buffer = NULL;
-					u32 buf_size = 0;
+			if (arg == 0xAA) {
+				u8 page_offset, page_num;
+				u32 page_size = 0;
+				u8 *buffer = NULL;
+				u32 buf_size = 0;
 
-					page_offset = (u8)(extra_arg >> 16);
-					page_num = (u8)(extra_arg & 0xFF);
-					rtw_dump_rsvd_page(RTW_DBGDUMP, padapter, page_offset, page_num);
-				}
-#ifdef CONFIG_SUPPORT_FIFO_DUMP
-				else {
-					u8 fifo_sel;
-					u32 addr, size;
-
-					fifo_sel = (u8)(arg & 0x0F);
-					addr = (extra_arg >> 16) & 0xFFFF;
-					size = extra_arg & 0xFFFF;
-					rtw_dump_fifo(RTW_DBGDUMP, padapter, fifo_sel, addr, size);
-				}
-#endif
+				page_offset = (u8)(extra_arg >> 16);
+				page_num = (u8)(extra_arg & 0xFF);
+				rtw_dump_rsvd_page(RTW_DBGDUMP, padapter, page_offset, page_num);
 			}
-			break;
-
+		break;
 		case 0x23: {
 			RTW_INFO("turn %s the bNotifyChannelChange Variable\n", (extra_arg == 1) ? "on" : "off");
 			padapter->bNotifyChannelChange = extra_arg;
@@ -8270,7 +8253,6 @@ exit:
 	return err;
 }
 
-#ifdef CONFIG_RTW_CUSTOMER_STR
 static int rtw_mp_customer_str(
 	struct net_device *dev,
 	struct iw_request_info *info,
@@ -8367,7 +8349,6 @@ free_buf:
 	rtw_mfree(pbuf, len);
 	return 0;
 }
-#endif /* CONFIG_RTW_CUSTOMER_STR */
 
 static int rtw_priv_mp_set(struct net_device *dev,
 			   struct iw_request_info *info,
@@ -8558,12 +8539,10 @@ static int rtw_priv_mp_get(struct net_device *dev,
 		RTW_INFO("mp_get MP_HW_TX_MODE\n");
 		rtw_mp_hwtx(dev, info, wdata, extra);
 		break;
-#ifdef CONFIG_RTW_CUSTOMER_STR
 	case MP_CUSTOMER_STR:
 		RTW_INFO("customer str\n");
 		rtw_mp_customer_str(dev, info, wdata, extra);
 		break;
-#endif
 	case MP_PWRLMT:
 		RTW_INFO("mp_get MP_SETPWRLMT\n");
 		rtw_mp_pwrlmt(dev, info, wdata, extra);
@@ -9758,9 +9737,7 @@ static const struct iw_priv_args rtw_mp_private_args[] = {
 	{ MP_LCK, IW_PRIV_TYPE_CHAR | 1024, 0, "mp_lck"},
 	{ BT_EFUSE_FILE, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "bt_efuse_file" },
 	{ MP_SWRFPath, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "mp_swrfpath" },
-#ifdef CONFIG_RTW_CUSTOMER_STR
 	{ MP_CUSTOMER_STR, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "customer_str" },
-#endif
 
 #endif /* CONFIG_MP_INCLUDED */
 };

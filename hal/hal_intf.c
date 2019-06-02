@@ -216,18 +216,12 @@ uint	 rtw_hal_init(_adapter *padapter)
 
 		rtw_hal_init_opmode(padapter);
 
-#ifdef CONFIG_RF_POWER_TRIM
 		rtw_bb_rf_gain_offset(padapter);
-#endif /*CONFIG_RF_POWER_TRIM*/
-
 	} else {
 		pHalData->hw_init_completed = false;
 		RTW_INFO("rtw_hal_init: hal_init fail\n");
 	}
-
-
 	return status;
-
 }
 
 uint rtw_hal_deinit(_adapter *padapter)
@@ -629,15 +623,12 @@ int c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 		c2h_defeature_dbg_hdl(adapter, payload, plen);
 		break;
 
-#ifdef CONFIG_RTW_CUSTOMER_STR
 	case C2H_CUSTOMER_STR_RPT:
 		c2h_customer_str_rpt_hdl(adapter, payload, plen);
 		break;
 	case C2H_CUSTOMER_STR_RPT_2:
 		c2h_customer_str_rpt_2_hdl(adapter, payload, plen);
 		break;
-#endif
-
 	case C2H_EXTEND:
 		sub_id = payload[0];
 		/* no handle, goto default */

@@ -32,13 +32,6 @@ enum ANDROID_WIFI_CMD {
 
 	ANDROID_WIFI_CMD_MIRACAST,
 
-#ifdef CONFIG_PNO_SUPPORT
-	ANDROID_WIFI_CMD_PNOSSIDCLR_SET,
-	ANDROID_WIFI_CMD_PNOSETUP_SET,
-	ANDROID_WIFI_CMD_PNOENABLE_SET,
-	ANDROID_WIFI_CMD_PNODEBUG_SET,
-#endif
-
 	ANDROID_WIFI_CMD_MACADDR,
 
 	ANDROID_WIFI_CMD_BLOCK_SCAN,
@@ -64,12 +57,6 @@ enum ANDROID_WIFI_CMD {
 
 int rtw_android_cmdstr_to_num(char *cmdstr);
 int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd);
-
-#if defined(CONFIG_PNO_SUPPORT) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 0, 0))
-int rtw_android_pno_enable(struct net_device *net, int pno_enable);
-int rtw_android_cfg80211_pno_setup(struct net_device *net,
-		   struct cfg80211_ssid *ssid, int n_ssids, int interval);
-#endif
 
 #if defined(RTW_ENABLE_WIFI_CONTROL_FUNC)
 int rtw_android_wifictrl_func_add(void);

@@ -97,9 +97,7 @@ void dump_drv_cfg(struct seq_file *sel)
 #ifdef CONFIG_RTW_WIFI_HAL
 	RTW_PRINT_SEL(sel, "CONFIG_RTW_WIFI_HAL\n");
 #endif
-#ifdef CONFIG_PREALLOC_RECV_SKB
 	RTW_PRINT_SEL(sel, "CONFIG_PREALLOC_RECV_SKB\n");
-#endif
 
 	RTW_PRINT_SEL(sel, "\n=== XMIT-INFO ===\n");
 	RTW_PRINT_SEL(sel, "NR_XMITFRAME = %d\n", NR_XMITFRAME);
@@ -2978,28 +2976,6 @@ int proc_get_all_sta_info(struct seq_file *m, void *v)
 	return 0;
 }
 
-#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
-int proc_get_rtkm_info(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct recv_priv	*precvpriv = &padapter->recvpriv;
-	struct recv_buf *precvbuf;
-
-	precvbuf = (struct recv_buf *)precvpriv->precv_buf;
-
-	RTW_PRINT_SEL(m, "============[RTKM Info]============\n");
-	RTW_PRINT_SEL(m, "MAX_RTKM_NR_PREALLOC_RECV_SKB: %d\n", rtw_rtkm_get_nr_recv_skb());
-	RTW_PRINT_SEL(m, "MAX_RTKM_RECVBUF_SZ: %d\n", rtw_rtkm_get_buff_size());
-
-	RTW_PRINT_SEL(m, "============[Driver Info]============\n");
-	RTW_PRINT_SEL(m, "NR_PREALLOC_RECV_SKB: %d\n", NR_PREALLOC_RECV_SKB);
-	RTW_PRINT_SEL(m, "MAX_RECVBUF_SZ: %d\n", precvbuf->alloc_sz);
-
-	return 0;
-}
-#endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
-
 int proc_get_btcoex_dbg(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -3023,23 +2999,18 @@ ssize_t proc_set_btcoex_dbg(struct file *file, const char __user *buffer, size_t
 	u32 num;
 
 	padapter = (PADAPTER)rtw_netdev_priv(dev);
-
-	/*	RTW_INFO("+" FUNC_ADPT_FMT "\n", FUNC_ADPT_ARG(padapter)); */
-
 	if (NULL == buffer) {
 		RTW_INFO(FUNC_ADPT_FMT ": input buffer is NULL!\n",
 			 FUNC_ADPT_ARG(padapter));
 
 		return -EFAULT;
 	}
-
 	if (count < 1) {
 		RTW_INFO(FUNC_ADPT_FMT ": input length is 0!\n",
 			 FUNC_ADPT_ARG(padapter));
 
 		return -EFAULT;
 	}
-
 	num = count;
 	if (num > (sizeof(tmp) - 1))
 		num = (sizeof(tmp) - 1);

@@ -959,10 +959,8 @@ extern u8 rtw_tdls_cmd(_adapter *padapter, u8 *addr, u8 option);
 
 u8 rtw_mp_cmd(_adapter *adapter, u8 mp_cmd_id, u8 flags);
 
-#ifdef CONFIG_RTW_CUSTOMER_STR
 u8 rtw_customer_str_req_cmd(_adapter *adapter);
 u8 rtw_customer_str_write_cmd(_adapter *adapter, const u8 *cstr);
-#endif
 
 #ifdef CONFIG_FW_C2H_REG
 u8 rtw_c2h_reg_wk_cmd(_adapter *adapter, u8 *c2h_evt);

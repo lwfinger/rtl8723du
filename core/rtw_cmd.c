@@ -3265,12 +3265,10 @@ static int rtw_mp_cmd_hdl(_adapter *padapter, u8 mp_cmd_id)
 			rtw_intf_stop(padapter);
 			rtw_hal_deinit(padapter);
 			padapter->registrypriv.mp_mode = 1;
-#ifdef CONFIG_RF_POWER_TRIM
 			if (!IS_HARDWARE_TYPE_8814A(padapter) && !IS_HARDWARE_TYPE_8822B(padapter)) {
 				padapter->registrypriv.RegPwrTrimEnable = 1;
 				rtw_hal_read_chip_info(padapter);
 			}
-#endif /*CONFIG_RF_POWER_TRIM*/
 			rtw_reset_drv_sw(padapter);
 			status = rtw_hal_init(padapter);
 			if (status == _FAIL) {
@@ -3384,7 +3382,6 @@ exit:
 }
 #endif	/*CONFIG_MP_INCLUDED*/
 
-#ifdef CONFIG_RTW_CUSTOMER_STR
 static int rtw_customer_str_cmd_hdl(_adapter *adapter, u8 write, const u8 *cstr)
 {
 	int ret = H2C_SUCCESS;
@@ -3469,7 +3466,6 @@ inline u8 rtw_customer_str_write_cmd(_adapter *adapter, const u8 *cstr)
 {
 	return rtw_customer_str_cmd(adapter, 1, cstr);
 }
-#endif /* CONFIG_RTW_CUSTOMER_STR */
 
 static u8 rtw_c2h_wk_cmd(PADAPTER padapter, u8 *pbuf, u16 length, u8 type)
 {
@@ -3957,11 +3953,9 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapter, unsigned char *pbuf)
 		ret = rtw_mp_cmd_hdl(padapter, pdrvextra_cmd->type);
 #endif
 		break;
-#ifdef CONFIG_RTW_CUSTOMER_STR
 	case CUSTOMER_STR_WK_CID:
 		ret = rtw_customer_str_cmd_hdl(padapter, pdrvextra_cmd->type, pdrvextra_cmd->pbuf);
 		break;
-#endif
 
 #ifdef CONFIG_IOCTL_CFG80211
 	case MGNT_TX_WK_CID:

@@ -11,10 +11,7 @@
 
 extern int rtw_ht_enable;
 
-#ifdef CONFIG_GLOBAL_UI_PID
 int ui_pid[3] = {0, 0, 0};
-#endif
-
 
 extern int pm_netdev_open(struct net_device *pnetdev, u8 bnormal);
 static int rtw_suspend(struct usb_interface *intf, pm_message_t message);
@@ -205,12 +202,7 @@ static u8 rtw_init_intf_priv(struct dvobj_priv *dvobj)
 {
 	u8 rst = _SUCCESS;
 
-#ifdef CONFIG_USB_VENDOR_REQ_MUTEX
 	_rtw_mutex_init(&dvobj->usb_vendor_req_mutex);
-#endif
-
-
-#ifdef CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC
 	dvobj->usb_alloc_vendor_req_buf = rtw_zmalloc(MAX_USB_IO_CTL_SIZE);
 	if (dvobj->usb_alloc_vendor_req_buf == NULL) {
 		RTW_INFO("alloc usb_vendor_req_buf failed... /n");
@@ -220,24 +212,18 @@ static u8 rtw_init_intf_priv(struct dvobj_priv *dvobj)
 	dvobj->usb_vendor_req_buf  =
 		(u8 *)N_BYTE_ALIGMENT((SIZE_PTR)(dvobj->usb_alloc_vendor_req_buf), ALIGNMENT_UNIT);
 exit:
-#endif
 
 	return rst;
-
 }
 
 static u8 rtw_deinit_intf_priv(struct dvobj_priv *dvobj)
 {
 	u8 rst = _SUCCESS;
 
-#ifdef CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC
 	if (dvobj->usb_vendor_req_buf)
 		rtw_mfree(dvobj->usb_alloc_vendor_req_buf, MAX_USB_IO_CTL_SIZE);
-#endif
 
-#ifdef CONFIG_USB_VENDOR_REQ_MUTEX
 	_rtw_mutex_free(&dvobj->usb_vendor_req_mutex);
-#endif
 
 	return rst;
 }
@@ -855,10 +841,6 @@ error_exit:
 }
 #endif
 
-#ifdef CONFIG_PLATFORM_RTD2880B
-extern void rtd2885_wlan_netlink_sendMsg(char *action_string, char *name);
-#endif
-
 /*
  * drv_init() - a device potentially for us
  *
@@ -1035,12 +1017,6 @@ static void rtw_usb_primary_adapter_deinit(_adapter *padapter)
 	rtw_os_ndev_free(padapter);
 
 	rtw_vmfree((u8 *)padapter, sizeof(_adapter));
-
-#ifdef CONFIG_PLATFORM_RTD2880B
-	RTW_INFO("wlan link down\n");
-	rtd2885_wlan_netlink_sendMsg("linkdown", "8712");
-#endif
-
 }
 
 static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device_id *pdid)
@@ -1051,8 +1027,6 @@ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device
 #ifdef CONFIG_CONCURRENT_MODE
 	int i;
 #endif
-
-	/* RTW_INFO("+rtw_drv_init\n"); */
 
 	/* step 0. */
 	process_spec_devid(pdid);
@@ -1084,22 +1058,14 @@ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device
 	}
 #endif
 
-#ifdef CONFIG_GLOBAL_UI_PID
 	if (ui_pid[1] != 0) {
 		RTW_INFO("ui_pid[1]:%d\n", ui_pid[1]);
 		rtw_signal_process(ui_pid[1], SIGUSR2);
 	}
-#endif
 
 	/* dev_alloc_name && register_netdev */
 	if (rtw_os_ndevs_init(dvobj) != _SUCCESS)
 		goto free_if_vir;
-
-#ifdef CONFIG_PLATFORM_RTD2880B
-	RTW_INFO("wlan link up\n");
-	rtd2885_wlan_netlink_sendMsg("linkup", "8712");
-#endif
-
 
 	status = _SUCCESS;
 

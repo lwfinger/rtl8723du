@@ -268,11 +268,9 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, _adapter *padapter)
 	pxmitpriv->viq_cnt = 0;
 	pxmitpriv->voq_cnt = 0;
 
-#ifdef CONFIG_XMIT_ACK
 	pxmitpriv->ack_tx = false;
 	_rtw_mutex_init(&pxmitpriv->ack_tx_mutex);
 	rtw_sctx_init(&pxmitpriv->ack_tx_ops, 0);
-#endif
 
 #ifdef CONFIG_TX_AMSDU
 	rtw_init_timer(&(pxmitpriv->amsdu_vo_timer), padapter,
@@ -390,9 +388,7 @@ void _rtw_free_xmit_priv(struct xmit_priv *pxmitpriv)
 
 	rtw_free_hwxmits(padapter);
 
-#ifdef CONFIG_XMIT_ACK
 	_rtw_mutex_free(&pxmitpriv->ack_tx_mutex);
-#endif
 	rtw_free_xmit_block(padapter);
 out:
 	return;
@@ -2656,37 +2652,30 @@ static void rtw_init_xmitframe(struct xmit_frame *pxframe)
 		pxframe->pkt_offset = 1;/* default use pkt_offset to fill tx desc */
 #endif
 
-#ifdef CONFIG_XMIT_ACK
 		pxframe->ack_report = 0;
-#endif
-
 	}
 }
 
-/*
-Calling context:
-1. OS_TXENTRY
-2. RXENTRY (rx_thread or RX_ISR/RX_CallBack)
+/* Calling context:
+ * 1. OS_TXENTRY
+ * 2. RXENTRY (rx_thread or RX_ISR/RX_CallBack)
 
-If we turn on USE_RXTHREAD, then, no need for critical section.
-Otherwise, we must use _enter/_exit critical to protect free_xmit_queue...
+ * If we turn on USE_RXTHREAD, then, no need for critical section.
+ * Otherwise, we must use _enter/_exit critical to protect free_xmit_queue...
 
-Must be very very cautious...
-
-*/
+ * Be very very cautious...
+ */
 struct xmit_frame *rtw_alloc_xmitframe(struct xmit_priv *pxmitpriv)/* (_queue *pfree_xmit_queue) */
 {
-	/*
-		Please remember to use all the osdep_service api,
-		and lock/unlock or _enter/_exit critical to protect
-		pfree_xmit_queue
-	*/
+/* Please remember to use all the osdep_service api,
+ * and lock/unlock or _enter/_exit critical to protect
+ * pfree_xmit_queue
+ */
 
 	_irqL irqL;
 	struct xmit_frame *pxframe = NULL;
 	_list *plist, *phead;
 	_queue *pfree_xmit_queue = &pxmitpriv->free_xmit_queue;
-
 
 	_enter_critical_bh(&pfree_xmit_queue->lock, &irqL);
 
@@ -4445,7 +4434,6 @@ void rtw_sctx_done(struct submit_ctx **sctx)
 	rtw_sctx_done_err(sctx, RTW_SCTX_DONE_SUCCESS);
 }
 
-#ifdef CONFIG_XMIT_ACK
 int rtw_ack_tx_wait(struct xmit_priv *pxmitpriv, u32 timeout_ms)
 {
 	struct submit_ctx *pack_tx_ops = &pxmitpriv->ack_tx_ops;
@@ -4466,4 +4454,3 @@ void rtw_ack_tx_done(struct xmit_priv *pxmitpriv, int status)
 	else
 		RTW_INFO("%s ack_tx not set\n", __func__);
 }
-#endif /* CONFIG_XMIT_ACK */

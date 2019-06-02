@@ -4,20 +4,16 @@
 #ifndef _RTW_RECV_H_
 #define _RTW_RECV_H_
 
-	#ifdef CONFIG_SINGLE_RECV_BUF
-		#define NR_RECVBUFF (1)
-	#else
-		#define NR_RECVBUFF (8)
-	#endif /* CONFIG_SINGLE_RECV_BUF */
-	#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
-		#define NR_PREALLOC_RECV_SKB (rtw_rtkm_get_nr_recv_skb()>>1)
-	#else /*!CONFIG_PREALLOC_RX_SKB_BUFFER */
-		#define NR_PREALLOC_RECV_SKB 8
-	#endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
+#ifdef CONFIG_SINGLE_RECV_BUF
+	#define NR_RECVBUFF (1)
+#else
+	#define NR_RECVBUFF (8)
+#endif /* CONFIG_SINGLE_RECV_BUF */
+#define NR_PREALLOC_RECV_SKB 8
 
-	#ifdef CONFIG_RTW_NAPI
-		#define RTL_NAPI_WEIGHT (32)
-	#endif
+#ifdef CONFIG_RTW_NAPI
+	#define RTL_NAPI_WEIGHT (32)
+#endif
 
 #define NR_RECVFRAME 256
 
@@ -280,16 +276,11 @@ struct recv_priv {
 	/* int FalseAlmCnt_all; */
 
 
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	_timer signal_stat_timer;
 	u32 signal_stat_sampling_interval;
 	/* u32 signal_stat_converging_constant; */
 	struct signal_stat signal_qual_data;
 	struct signal_stat signal_strength_data;
-#else /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
-	struct smooth_rssi_data signal_qual_data;
-	struct smooth_rssi_data signal_strength_data;
-#endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
 	u16 sink_udpport, pre_rtp_rxseq, cur_rtp_rxseq;
 
 	bool store_law_data_flag;
@@ -311,26 +302,16 @@ struct recv_priv {
 #define rx_bh_tk_set_frame(recv, frame) do {} while (0)
 #define dump_rx_bh_tk(sel, recv) do {} while (0)
 
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
-#define rtw_set_signal_stat_timer(recvpriv) _set_timer(&(recvpriv)->signal_stat_timer, (recvpriv)->signal_stat_sampling_interval)
-#endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
+#define rtw_set_signal_stat_timer(recvpriv)		\
+	_set_timer(&(recvpriv)->signal_stat_timer,	\
+		   (recvpriv)->signal_stat_sampling_interval)
 
 struct sta_recv_priv {
-
 	_lock	lock;
 	sint	option;
-
-	/* _queue	blk_strms[MAX_RX_NUMBLKS]; */
 	_queue defrag_q;	 /* keeping the fragment frame until defrag */
-
 	struct	stainfo_rxcache rxcache;
-
-	/* uint	sta_rx_bytes; */
-	/* uint	sta_rx_pkts; */
-	/* uint	sta_rx_fail; */
-
 };
-
 
 struct recv_buf {
 	_list list;

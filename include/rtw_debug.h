@@ -375,10 +375,6 @@ ssize_t proc_set_wmmps_info(struct file *file, const char __user *buffer, size_t
 int proc_get_monitor(struct seq_file *m, void *v);
 ssize_t proc_set_monitor(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 
-#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
-int proc_get_rtkm_info(struct seq_file *m, void *v);
-#endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
-
 #ifdef CONFIG_IEEE80211W
 ssize_t proc_set_tx_sa_query(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 int proc_get_tx_sa_query(struct seq_file *m, void *v);

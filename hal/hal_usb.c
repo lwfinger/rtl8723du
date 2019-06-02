@@ -62,7 +62,6 @@ int	usb_init_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
 	mtx_init(&precvpriv->rx_indicate_queue.ifq_mtx, "rx_indicate_queue", NULL, MTX_DEF);
 #endif /* CONFIG_RX_INDICATE_QUEUE */
 
-#ifdef CONFIG_PREALLOC_RECV_SKB
 	{
 		int i;
 		SIZE_PTR tmpaddr = 0;
@@ -72,25 +71,17 @@ int	usb_init_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
 		RTW_INFO("NR_PREALLOC_RECV_SKB: %d\n", NR_PREALLOC_RECV_SKB);
 
 		for (i = 0; i < NR_PREALLOC_RECV_SKB; i++) {
-#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
-			pskb = rtw_alloc_skb_premem(MAX_RECVBUF_SZ);
-#else
 			pskb = rtw_skb_alloc(MAX_RECVBUF_SZ + RECVBUFF_ALIGN_SZ);
-#endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
-
 			if (pskb) {
 				pskb->dev = padapter->pnetdev;
 
-#ifndef CONFIG_PREALLOC_RX_SKB_BUFFER
 				tmpaddr = (SIZE_PTR)pskb->data;
 				alignment = tmpaddr & (RECVBUFF_ALIGN_SZ - 1);
 				skb_reserve(pskb, (RECVBUFF_ALIGN_SZ - alignment));
-#endif
 				skb_queue_tail(&precvpriv->free_recv_skb_queue, pskb);
 			}
 		}
 	}
-#endif /* CONFIG_PREALLOC_RECV_SKB */
 
 exit:
 
@@ -121,18 +112,7 @@ void usb_free_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
 	if (skb_queue_len(&precvpriv->free_recv_skb_queue))
 		RTW_WARN("free_recv_skb_queue not empty, %d\n", skb_queue_len(&precvpriv->free_recv_skb_queue));
 
-#if defined(CONFIG_PREALLOC_RECV_SKB) && defined(CONFIG_PREALLOC_RX_SKB_BUFFER)
-	{
-		struct sk_buff *skb;
-
-		while ((skb = skb_dequeue(&precvpriv->free_recv_skb_queue)) != NULL) {
-			if (rtw_free_skb_premem(skb) != 0)
-				rtw_skb_free(skb);
-		}
-	}
-#else
 	rtw_skb_queue_purge(&precvpriv->free_recv_skb_queue);
-#endif /* defined(CONFIG_PREALLOC_RX_SKB_BUFFER) && defined(CONFIG_PREALLOC_RECV_SKB) */
 }
 
 #ifdef CONFIG_FW_C2H_REG

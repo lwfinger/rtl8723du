@@ -48,17 +48,10 @@ enum lps_level {
 	LPS_LEVEL_MAX,
 };
 
-#ifdef CONFIG_PNO_SUPPORT
-#define MAX_PNO_LIST_COUNT 16
-#define MAX_SCAN_LIST_COUNT 14	/* 2.4G only */
-#define MAX_HIDDEN_AP 8		/* 8 hidden AP */
-#endif
-
-/*
-	BIT[2:0] = HW state
-	BIT[3] = Protocol PS state,   0: register active state , 1: register sleep state
-	BIT[4] = sub-state
-*/
+/* BIT[2:0] = HW state
+ * BIT[3] = Protocol PS state, 0: register active state, 1: register sleep state
+ * BIT[4] = sub-state
+ */
 
 #define PS_DPS				BIT(0)
 #define PS_LCLK				(PS_DPS)
@@ -188,49 +181,6 @@ typedef enum _PS_DENY_REASON {
 	PS_DENY_DRV_REMOVE = 30,
 	PS_DENY_OTHERS = 31
 } PS_DENY_REASON;
-
-#ifdef CONFIG_PNO_SUPPORT
-typedef struct pno_nlo_info {
-	u32 fast_scan_period;				/* Fast scan period */
-	u8	ssid_num;				/* number of entry */
-	u8	hidden_ssid_num;
-	u32	slow_scan_period;			/* slow scan period */
-	u32	fast_scan_iterations;			/* Fast scan iterations */
-	u8	ssid_length[MAX_PNO_LIST_COUNT];	/* SSID Length Array */
-	u8	ssid_cipher_info[MAX_PNO_LIST_COUNT];	/* Cipher information for security */
-	u8	ssid_channel_info[MAX_PNO_LIST_COUNT];	/* channel information */
-	u8	loc_probe_req[MAX_HIDDEN_AP];		/* loc_probeReq */
-} pno_nlo_info_t;
-
-typedef struct pno_ssid {
-	u32		SSID_len;
-	u8		SSID[32];
-} pno_ssid_t;
-
-typedef struct pno_ssid_list {
-	pno_ssid_t	node[MAX_PNO_LIST_COUNT];
-} pno_ssid_list_t;
-
-typedef struct pno_scan_channel_info {
-	u8	channel;
-	u8	tx_power;
-	u8	timeout;
-	u8	active;				/* set 1 means active scan, or pasivite scan. */
-} pno_scan_channel_info_t;
-
-typedef struct pno_scan_info {
-	u8	enableRFE;			/* Enable RFE */
-	u8	period_scan_time;		/* exclusive with fast_scan_period and slow_scan_period */
-	u8	periodScan;			/* exclusive with fast_scan_period and slow_scan_period */
-	u8	orig_80_offset;			/* original channel 80 offset */
-	u8	orig_40_offset;			/* original channel 40 offset */
-	u8	orig_bw;			/* original bandwidth */
-	u8	orig_ch;			/* original channel */
-	u8	channel_num;			/* number of channel */
-	u64	rfe_type;			/* rfe_type && 0x00000000000000ff */
-	pno_scan_channel_info_t ssid_channel_info[MAX_SCAN_LIST_COUNT];
-} pno_scan_info_t;
-#endif /* CONFIG_PNO_SUPPORT */
 
 struct aoac_report {
 	u8 iv[8];

@@ -373,18 +373,6 @@
 #define REG_LTECOEX_READ_DATA		0x07C8
 #define REG_LTECOEX_PATH_CONTROL	0x70
 
-/* ************************************************************
- * SDIO Bus Specification
- * ************************************************************ */
-
-/* -----------------------------------------------------
- * SDIO CMD Address Mapping
- * ----------------------------------------------------- */
-
-/* -----------------------------------------------------
- * I/O bus domain (Host)
- * ----------------------------------------------------- */
-
 /* -----------------------------------------------------
  * SDIO register
  * ----------------------------------------------------- */
@@ -406,10 +394,8 @@
 		HSISR_PDNINT |\
 		HSISR_GPIO9_INT)
 
-#ifdef CONFIG_RF_POWER_TRIM
-	#define EEPROM_RF_GAIN_OFFSET			0xC1
+#define EEPROM_RF_GAIN_OFFSET			0xC1
 
-	#define EEPROM_RF_GAIN_VAL				0x1F6
-#endif /*CONFIG_RF_POWER_TRIM*/
+#define EEPROM_RF_GAIN_VAL				0x1F6
 
 #endif /* __RTL8723D_SPEC_H__ */

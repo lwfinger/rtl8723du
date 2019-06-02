@@ -327,7 +327,6 @@ _InitNormalChipTwoOutEpPriority(
 		/* RT_ASSERT(false,("Shall not reach here!\n")); */
 		break;
 	}
-
 	if (!pregistrypriv->wifi_spec) {
 		beQ = valueLow;
 		bkQ = valueLow;
@@ -335,7 +334,7 @@ _InitNormalChipTwoOutEpPriority(
 		voQ = valueHi;
 		mgtQ = valueHi;
 		hiQ = valueHi;
-	} else { /* for WMM ,CONFIG_OUT_EP_WIFI_MODE */
+	} else { /* for WMM */
 		beQ = valueLow;
 		bkQ = valueHi;
 		viQ = valueHi;
@@ -345,7 +344,6 @@ _InitNormalChipTwoOutEpPriority(
 	}
 
 	_InitNormalChipRegPriority(padapter, beQ, bkQ, viQ, voQ, mgtQ, hiQ);
-
 }
 
 static void
@@ -883,7 +881,7 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 	rtw_write8(padapter, REG_EARLY_MODE_CONTROL_8723D, 0);
 
 	if (padapter->registrypriv.mp_mode == 0
-		#if defined(CONFIG_MP_INCLUDED) && defined(CONFIG_RTW_CUSTOMER_STR)
+		#if defined(CONFIG_MP_INCLUDED)
 		|| padapter->registrypriv.mp_customer_str
 		#endif
 	) {
@@ -970,9 +968,7 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 	_InitBurstPktLen(padapter);
 	_initUsbAggregationSetting(padapter);
 
-#ifdef ENABLE_USB_DROP_INCORRECT_OUT
 	_InitHardwareDropIncorrectBulkOut(padapter);
-#endif
 
 	rtw_write16(padapter, REG_PKT_VO_VI_LIFE_TIME, 0x0400); /* unit: 256us. 256ms */
 	rtw_write16(padapter, REG_PKT_BE_BK_LIFE_TIME, 0x0400); /* unit: 256us. 256ms */
@@ -1059,10 +1055,8 @@ static u32 rtl8723du_hal_init(PADAPTER padapter)
 
 	rtw_hal_set_hwreg(padapter, HW_VAR_NAV_UPPER, (u8 *)&NavUpper);
 
-#ifdef CONFIG_XMIT_ACK
 	/* ack for xmit mgmt frames. */
 	rtw_write32(padapter, REG_FWHW_TXQ_CTRL, rtw_read32(padapter, REG_FWHW_TXQ_CTRL) | BIT(12));
-#endif /*CONFIG_XMIT_ACK */
 
 	phy_set_bb_reg(padapter, rOFDM0_XAAGCCore1, bMaskByte0, 0x50);
 	phy_set_bb_reg(padapter, rOFDM0_XAAGCCore1, bMaskByte0, 0x20);

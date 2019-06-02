@@ -295,7 +295,6 @@ static inline void SET_H2CCMD_DISCONDECISION_PARM_TRY_PKT_NUM(u8 *__pH2CCmd, u8 
 	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(7, 0));
 }
 
-#ifdef CONFIG_RTW_CUSTOMER_STR
 #define RTW_CUSTOMER_STR_LEN 16
 #define RTW_CUSTOMER_STR_FMT "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x"
 #define RTW_CUSTOMER_STR_ARG(x) ((u8 *)(x))[0], ((u8 *)(x))[1], ((u8 *)(x))[2], ((u8 *)(x))[3], ((u8 *)(x))[4], ((u8 *)(x))[5], \
@@ -340,7 +339,6 @@ static inline void SET_H2CCMD_CUSTOMER_STR_W3_EN(u8 *__pH2CCmd, u8 __Value)
 #define H2CCMD_CUSTOMER_STR_W3_BYTE12(__pH2CCmd)			(((u8 *)(__pH2CCmd)) + 1)
 int rtw_hal_h2c_customer_str_write(_adapter *adapter, const u8 *cs);
 int rtw_hal_customer_str_write(_adapter *adapter, const u8 *cs);
-#endif /* CONFIG_RTW_CUSTOMER_STR */
 
 /* _AP_Offload 0x08 */
 static inline void SET_H2CCMD_AP_WOWLAN_EN(u8 *__pH2CCmd, u8 __Value)
@@ -686,46 +684,10 @@ static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_NDP_INFO(u8 *__pH2CCmd, u8 __Val
 /* AOAC_RSVDPAGE_2_0x84 */
 
 /* AOAC_RSVDPAGE_3_0x88 */
-#ifdef CONFIG_PNO_SUPPORT
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_NLO_INFO(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 0));
-}
-
-#endif
 static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_AOAC_REPORT(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
 }
-
-#ifdef CONFIG_PNO_SUPPORT
-/* D0_Scan_Offload_Info_0x86 */
-static inline void SET_H2CCMD_AOAC_NLO_FUN_EN(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 0, __Value, BIT(3));
-}
-
-static inline void SET_H2CCMD_AOAC_NLO_IPS_EN(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 0, __Value, BIT(4));
-}
-
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_PROBE_PACKET(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
-}
-
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_SCAN_INFO(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(7, 0));
-}
-
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_SSID_INFO(u8 *__pH2CCmd, u8 __Value)
-{
-	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
-}
-
-#endif /* CONFIG_PNO_SUPPORT */
 
 /* ---------------------------------------------------------------------------------------------------------
  * -------------------------------------------    Structure    --------------------------------------------------

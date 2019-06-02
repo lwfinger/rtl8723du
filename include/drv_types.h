@@ -79,10 +79,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 #include <rtw_version.h>
 #include <rtw_odm.h>
 
-#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
-	#include <rtw_mem.h>
-#endif
-
 #include <rtw_p2p.h>
 
 #ifdef CONFIG_MP_INCLUDED
@@ -151,7 +147,7 @@ struct registry_priv {
 	u16	busy_thresh;
 	u8	ack_policy;
 	u8	mp_mode;
-#if defined(CONFIG_MP_INCLUDED) && defined(CONFIG_RTW_CUSTOMER_STR)
+#if defined(CONFIG_MP_INCLUDED)
 	u8 mp_customer_str;
 #endif
 	u8  mp_dm;
@@ -766,11 +762,9 @@ struct dvobj_priv {
 	_mutex hw_init_mutex;
 	_mutex h2c_fwcmd_mutex;
 
-#ifdef CONFIG_RTW_CUSTOMER_STR
 	_mutex customer_str_mutex;
 	struct submit_ctx *customer_str_sctx;
 	u8 customer_str[RTW_CUSTOMER_STR_LEN];
-#endif
 
 	_mutex setch_mutex;
 	_mutex setbw_mutex;
@@ -856,15 +850,9 @@ struct dvobj_priv {
 
 	_sema	usb_suspend_sema;
 
-#ifdef CONFIG_USB_VENDOR_REQ_MUTEX
 	_mutex  usb_vendor_req_mutex;
-#endif
-
-#ifdef CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC
 	u8 *usb_alloc_vendor_req_buf;
 	u8 *usb_vendor_req_buf;
-#endif
-
 	struct usb_interface *pusbintf;
 	struct usb_device *pusbdev;
 };
@@ -1137,11 +1125,6 @@ struct _ADAPTER {
 	u8 driver_tx_bw_mode;
 	u8 rsvd_page_offset;
 	u8 rsvd_page_num;
-#ifdef CONFIG_SUPPORT_FIFO_DUMP
-	u8 fifo_sel;
-	u32 fifo_addr;
-	u32 fifo_size;
-#endif
 
 	u8 driver_vcs_en; /* Enable=1, Disable=0 driver control vrtl_carrier_sense for tx */
 	u8 driver_vcs_type;/* force 0:disable VCS, 1:RTS-CTS, 2:CTS-to-self when vcs_en=1. */
@@ -1248,15 +1231,6 @@ __inline static void RTW_ENABLE_FUNC(_adapter *padapter, int func_bit)
 	(RTW_CANNOT_RUN(padapter) || \
 	 RTW_IS_FUNC_DISABLED((padapter), DF_TX_BIT))
 
-#ifdef CONFIG_PNO_SUPPORT
-int rtw_parse_ssid_list_tlv(char **list_str, pno_ssid_t *ssid, int max, int *bytes_left);
-int rtw_dev_pno_set(struct net_device *net, pno_ssid_t *ssid, int num,
-		    int pno_time, int pno_repeat, int pno_freq_expo_max);
-#ifdef CONFIG_PNO_SET_DEBUG
-	void rtw_dev_pno_debug(struct net_device *net);
-#endif /* CONFIG_PNO_SET_DEBUG */
-#endif /* CONFIG_PNO_SUPPORT */
-
 int rtw_suspend_free_assoc_resource(_adapter *padapter);
 int rtw_change_ifname(_adapter *padapter, const char *ifname);
 void nat25_db_expire(_adapter *priv);
@@ -1281,9 +1255,6 @@ extern int rtw_mc2u_disable;
 #ifdef CONFIG_BR_EXT
 void netdev_br_init(struct net_device *netdev);
 #endif
-#ifdef CONFIG_GLOBAL_UI_PID
 extern int ui_pid[3];
-#endif
-
 
 #endif /* __DRV_TYPES_H__ */

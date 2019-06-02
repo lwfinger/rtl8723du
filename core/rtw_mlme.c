@@ -1176,9 +1176,7 @@ void rtw_surveydone_event_callback(_adapter	*adapter, u8 *pbuf)
 
 	_enter_critical_bh(&pmlmepriv->lock, &irqL);
 
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	rtw_set_signal_stat_timer(&adapter->recvpriv);
-#endif
 
 	if (pmlmepriv->to_join == true) {
 		if ((check_fwstate(pmlmepriv, WIFI_ADHOC_STATE) == true)) {
@@ -1741,35 +1739,26 @@ static void rtw_joinbss_update_network(_adapter *padapter, struct wlan_network *
 	cur_network->aid = pnetwork->join_res;
 
 
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	rtw_set_signal_stat_timer(&padapter->recvpriv);
-#endif
 	padapter->recvpriv.signal_strength = ptarget_wlan->network.PhyInfo.SignalStrength;
 	padapter->recvpriv.signal_qual = ptarget_wlan->network.PhyInfo.SignalQuality;
 	/* the ptarget_wlan->network.Rssi is raw data, we use ptarget_wlan->network.PhyInfo.SignalStrength instead (has scaled) */
 	padapter->recvpriv.rssi = translate_percentage_to_dbm(ptarget_wlan->network.PhyInfo.SignalStrength);
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	rtw_set_signal_stat_timer(&padapter->recvpriv);
-#endif
 
 	/* update fw_state */ /* will clr _FW_UNDER_LINKING here indirectly */
-
 	switch (pnetwork->network.InfrastructureMode) {
 	case Ndis802_11Infrastructure:
 
 		if (pmlmepriv->fw_state & WIFI_UNDER_WPS)
-			/*pmlmepriv->fw_state = WIFI_STATION_STATE|WIFI_UNDER_WPS;*/
 			init_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_UNDER_WPS);
 		else
-			/*pmlmepriv->fw_state = WIFI_STATION_STATE;*/
 			init_fwstate(pmlmepriv, WIFI_STATION_STATE);
 		break;
 	case Ndis802_11IBSS:
-		/*pmlmepriv->fw_state = WIFI_ADHOC_STATE;*/
 		init_fwstate(pmlmepriv, WIFI_ADHOC_STATE);
 		break;
 	default:
-		/*pmlmepriv->fw_state = WIFI_NULL_STATE;*/
 		init_fwstate(pmlmepriv, WIFI_NULL_STATE);
 		break;
 	}

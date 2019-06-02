@@ -7,15 +7,6 @@
 #include "hal_ic_cfg.h"
 
 /* About USB VENDOR REQ */
-#if defined(CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC) && !defined(CONFIG_USB_VENDOR_REQ_MUTEX)
-	#warning "define CONFIG_USB_VENDOR_REQ_MUTEX for CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC automatically"
-	#define CONFIG_USB_VENDOR_REQ_MUTEX
-#endif
-#if defined(CONFIG_VENDOR_REQ_RETRY) &&  !defined(CONFIG_USB_VENDOR_REQ_MUTEX)
-	#warning "define CONFIG_USB_VENDOR_REQ_MUTEX for CONFIG_VENDOR_REQ_RETRY automatically"
-	#define CONFIG_USB_VENDOR_REQ_MUTEX
-#endif
-
 #if !defined(CONFIG_SCAN_BACKOP)
 #define CONFIG_SCAN_BACKOP
 #endif

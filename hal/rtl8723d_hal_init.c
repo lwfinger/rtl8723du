@@ -3247,7 +3247,6 @@ void Hal_ReadRFGainOffset(
 		u8			*PROMContent,
 		bool		AutoloadFail)
 {
-#ifdef CONFIG_RF_POWER_TRIM
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
 	struct kfree_data_t *kfree_data = &pHalData->kfree_data;
 	u8 pg_pwrtrim = 0xFF, pg_therm = 0xFF;
@@ -3281,14 +3280,9 @@ void Hal_ReadRFGainOffset(
 	}
 	if (kfree_data->flag & KFREE_FLAG_THERMAL_K_ON)
 		RTW_INFO("thermal:%d\n", kfree_data->thermal);
-#endif /*CONFIG_RF_POWER_TRIM */
 }
 
-u8
-BWMapping_8723D(
-	PADAPTER		Adapter,
-	struct pkt_attrib	*pattrib
-)
+u8 BWMapping_8723D(PADAPTER Adapter, struct pkt_attrib *pattrib)
 {
 	u8	BWSettingOfDesc = 0;
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
@@ -3316,52 +3310,48 @@ BWMapping_8723D(
 	return BWSettingOfDesc;
 }
 
-u8	SCMapping_8723D(PADAPTER Adapter, struct pkt_attrib *pattrib)
+u8 SCMapping_8723D(PADAPTER Adapter, struct pkt_attrib *pattrib)
 {
-	u8	SCSettingOfDesc = 0;
+	u8 desc_setting = 0;
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
-
-	/* RTW_INFO("SCMapping: pHalData->current_channel_bw %d, pHalData->nCur80MhzPrimeSC %d, pHalData->nCur40MhzPrimeSC %d\n",pHalData->current_channel_bw,pHalData->nCur80MhzPrimeSC,pHalData->nCur40MhzPrimeSC); */
 
 	if (pHalData->current_channel_bw == CHANNEL_WIDTH_80) {
 		if (pattrib->bwmode == CHANNEL_WIDTH_80)
-			SCSettingOfDesc = VHT_DATA_SC_DONOT_CARE;
+			desc_setting = VHT_DATA_SC_DONOT_CARE;
 		else if (pattrib->bwmode == CHANNEL_WIDTH_40) {
 			if (pHalData->nCur80MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_LOWER)
-				SCSettingOfDesc = VHT_DATA_SC_40_LOWER_OF_80MHZ;
+				desc_setting = VHT_DATA_SC_40_LOWER_OF_80MHZ;
 			else if (pHalData->nCur80MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_UPPER)
-				SCSettingOfDesc = VHT_DATA_SC_40_UPPER_OF_80MHZ;
+				desc_setting = VHT_DATA_SC_40_UPPER_OF_80MHZ;
 			else
 				RTW_INFO("SCMapping: DONOT CARE Mode Setting\n");
 		} else {
 			if ((pHalData->nCur40MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_LOWER) && (pHalData->nCur80MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_LOWER))
-				SCSettingOfDesc = VHT_DATA_SC_20_LOWEST_OF_80MHZ;
+				desc_setting = VHT_DATA_SC_20_LOWEST_OF_80MHZ;
 			else if ((pHalData->nCur40MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_UPPER) && (pHalData->nCur80MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_LOWER))
-				SCSettingOfDesc = VHT_DATA_SC_20_LOWER_OF_80MHZ;
+				desc_setting = VHT_DATA_SC_20_LOWER_OF_80MHZ;
 			else if ((pHalData->nCur40MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_LOWER) && (pHalData->nCur80MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_UPPER))
-				SCSettingOfDesc = VHT_DATA_SC_20_UPPER_OF_80MHZ;
+				desc_setting = VHT_DATA_SC_20_UPPER_OF_80MHZ;
 			else if ((pHalData->nCur40MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_UPPER) && (pHalData->nCur80MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_UPPER))
-				SCSettingOfDesc = VHT_DATA_SC_20_UPPERST_OF_80MHZ;
+				desc_setting = VHT_DATA_SC_20_UPPERST_OF_80MHZ;
 			else
 				RTW_INFO("SCMapping: DONOT CARE Mode Setting\n");
 		}
 	} else if (pHalData->current_channel_bw == CHANNEL_WIDTH_40) {
-		/* RTW_INFO("SCMapping: HT Case: pHalData->current_channel_bw %d, pHalData->nCur40MhzPrimeSC %d\n",pHalData->current_channel_bw,pHalData->nCur40MhzPrimeSC); */
-
 		if (pattrib->bwmode == CHANNEL_WIDTH_40)
-			SCSettingOfDesc = VHT_DATA_SC_DONOT_CARE;
+			desc_setting = VHT_DATA_SC_DONOT_CARE;
 		else if (pattrib->bwmode == CHANNEL_WIDTH_20) {
 			if (pHalData->nCur40MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_UPPER)
-				SCSettingOfDesc = VHT_DATA_SC_20_UPPER_OF_80MHZ;
+				desc_setting = VHT_DATA_SC_20_UPPER_OF_80MHZ;
 			else if (pHalData->nCur40MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_LOWER)
-				SCSettingOfDesc = VHT_DATA_SC_20_LOWER_OF_80MHZ;
+				desc_setting = VHT_DATA_SC_20_LOWER_OF_80MHZ;
 			else
-				SCSettingOfDesc = VHT_DATA_SC_DONOT_CARE;
+				desc_setting = VHT_DATA_SC_DONOT_CARE;
 		}
-	} else
-		SCSettingOfDesc = VHT_DATA_SC_DONOT_CARE;
-
-	return SCSettingOfDesc;
+	} else {
+		desc_setting = VHT_DATA_SC_DONOT_CARE;
+	}
+	return desc_setting;
 }
 
 #if defined(CONFIG_CONCURRENT_MODE)
@@ -3568,7 +3558,6 @@ static void rtl8723d_fill_default_txdesc(
 
 		SET_TX_DESC_TX_RATE_8723D(pbuf, MRateToHwRate(pattrib->rate));
 
-#ifdef CONFIG_XMIT_ACK
 		/* CCX-TXRPT ack for xmit mgmt frames. */
 		if (pxmitframe->ack_report) {
 #ifdef DBG_CCX
@@ -3577,7 +3566,6 @@ static void rtl8723d_fill_default_txdesc(
 			SET_TX_DESC_CCX_8723D(pbuf, 1);
 			SET_TX_DESC_SW_DEFINE_8723D(pbuf, (u8)(GET_PRIMARY_ADAPTER(padapter)->xmitpriv.seq_no));
 		}
-#endif /* CONFIG_XMIT_ACK */
 	} else if (pxmitframe->frame_tag == TXAGG_FRAMETAG) {
 	}
 #ifdef CONFIG_MP_INCLUDED
@@ -4014,18 +4002,10 @@ void CCX_FwC2HTxRpt_8723d(PADAPTER padapter, u8 *pdata, u8 len)
 
 	seq_no = *(pdata + 6);
 
-#ifdef CONFIG_XMIT_ACK
 	if (GET_8723D_C2H_TX_RPT_RETRY_OVER(pdata) | GET_8723D_C2H_TX_RPT_LIFE_TIME_OVER(pdata))
 		rtw_ack_tx_done(&padapter->xmitpriv, RTW_SCTX_DONE_CCX_PKT_FAIL);
-	/*
-	else if(seq_no != padapter->xmitpriv.seq_no) {
-		RTW_INFO("tx_seq_no=%d, rpt_seq_no=%d\n", padapter->xmitpriv.seq_no, seq_no);
-		rtw_ack_tx_done(&padapter->xmitpriv, RTW_SCTX_DONE_CCX_PKT_FAIL);
-	}
-	*/
 	else
 		rtw_ack_tx_done(&padapter->xmitpriv, RTW_SCTX_DONE_SUCCESS);
-#endif
 }
 
 static int c2h_handler_8723d(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)

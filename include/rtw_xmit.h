@@ -345,28 +345,16 @@ struct xmit_buf {
 
 struct xmit_frame {
 	_list	list;
-
 	struct pkt_attrib attrib;
-
 	_pkt *pkt;
-
-	int	frame_tag;
-
-	_adapter *padapter;
-
-	u8	*buf_addr;
-
 	struct xmit_buf *pxmitbuf;
-
-	s8	pkt_offset;
-
-#ifdef CONFIG_XMIT_ACK
-	u8 ack_report;
-#endif
-
+	int	frame_tag;
+	_adapter *padapter;
+	u8	*buf_addr;
 	u8 *alloc_addr; /* the actual address this xmitframe allocated */
+	s8	pkt_offset;
+	u8 ack_report;
 	u8 ext_tag; /* 0:data, 1:mgmt */
-
 };
 
 struct tx_servq {
@@ -374,7 +362,6 @@ struct tx_servq {
 	_queue	sta_pending;
 	int qcnt;
 };
-
 
 struct sta_xmit_priv {
 	_lock	lock;
@@ -502,12 +489,10 @@ struct	xmit_priv	{
 	struct xmit_buf	pcmd_xmitbuf[CMDBUF_MAX];
 	u8   hw_ssn_seq_no;/* mapping to REG_HW_SEQ 0,1,2,3 */
 	u16	nqos_ssn;
-#ifdef CONFIG_XMIT_ACK
 	int	ack_tx;
 	_mutex ack_tx_mutex;
 	struct submit_ctx ack_tx_ops;
 	u8 seq_no;
-#endif
 
 #ifdef CONFIG_TX_AMSDU
 	_timer amsdu_vo_timer;
@@ -628,11 +613,8 @@ extern struct xmit_frame *rtw_get_xframe(struct xmit_priv *pxmitpriv, int *num_f
 
 static void do_queue_select(_adapter *padapter, struct pkt_attrib *pattrib);
 u32	rtw_get_ff_hwaddr(struct xmit_frame	*pxmitframe);
-
-#ifdef CONFIG_XMIT_ACK
 int rtw_ack_tx_wait(struct xmit_priv *pxmitpriv, u32 timeout_ms);
 void rtw_ack_tx_done(struct xmit_priv *pxmitpriv, int status);
-#endif /* CONFIG_XMIT_ACK */
 
 enum XMIT_BLOCK_REASON {
 	XMIT_BLOCK_NONE = 0,

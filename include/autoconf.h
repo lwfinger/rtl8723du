@@ -4,7 +4,6 @@
 /*
  * Public General Configure
  */
-#define AUTOCONF_INCLUDED
 
 #define RTL871X_MODULE_NAME "8723DU"
 #define DRV_NAME "rtl8723du"
@@ -24,41 +23,13 @@
  * Hareware/Firmware Related Configure
  */
 
-#define CONFIG_XMIT_ACK
-
-#define CONFIG_RF_POWER_TRIM
-
 #define DISABLE_BB_RF	0
 
 #define RTW_NOTCH_FILTER 0 /* 0:Disable, 1:Enable, */
 
 /*
- * Interface Related Configure
- */
-#define USB_INTERFERENCE_ISSUE /* this should be checked in all usb interface */
-
-#define CONFIG_GLOBAL_UI_PID
-
-#define CONFIG_OUT_EP_WIFI_MODE
-
-#define ENABLE_USB_DROP_INCORRECT_OUT
-
-/*
- * USB VENDOR REQ BUFFER ALLOCATION METHOD
- * if not set we'll use function local variable (stack memory)
- */
-/* #define CONFIG_USB_VENDOR_REQ_BUFFER_DYNAMIC_ALLOCATE */
-#define CONFIG_USB_VENDOR_REQ_BUFFER_PREALLOC
-#define CONFIG_USB_VENDOR_REQ_MUTEX
-#define CONFIG_VENDOR_REQ_RETRY
-
-/*
  * Others
  */
-#define CONFIG_SKB_COPY	/* for amsdu */
-
-#define CONFIG_NEW_SIGNAL_STAT_PROCESS
-
 #define CONFIG_EMBEDDED_FWIMG
 
 #ifdef CONFIG_EMBEDDED_FWIMG
@@ -75,8 +46,6 @@
 #else /* !CONFIG_MP_INCLUDED */
 	#define MP_DRIVER	0
 #endif /* !CONFIG_MP_INCLUDED */
-
-#define CONFIG_PREALLOC_RECV_SKB
 
 /*
  * Debug Related Configure

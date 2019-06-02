@@ -86,7 +86,7 @@ static int rtw_ack_policy = NORMAL_ACK;
 
 static int rtw_mp_mode = 0;
 
-#if defined(CONFIG_MP_INCLUDED) && defined(CONFIG_RTW_CUSTOMER_STR)
+#if defined(CONFIG_MP_INCLUDED)
 static uint rtw_mp_customer_str = 0;
 module_param(rtw_mp_customer_str, uint, 0644);
 MODULE_PARM_DESC(rtw_mp_customer_str, "Whether or not to enable customer str support on MP mode");
@@ -650,7 +650,7 @@ uint loadparam(_adapter *padapter)
 	/* registry_par->qos_enable = (u8)rtw_qos_enable; */
 	registry_par->ack_policy = (u8)rtw_ack_policy;
 	registry_par->mp_mode = (u8)rtw_mp_mode;
-#if defined(CONFIG_MP_INCLUDED) && defined(CONFIG_RTW_CUSTOMER_STR)
+#if defined(CONFIG_MP_INCLUDED)
 	registry_par->mp_customer_str = (u8)rtw_mp_customer_str;
 #endif
 	registry_par->software_encrypt = (u8)rtw_software_encrypt;
@@ -1574,10 +1574,8 @@ struct dvobj_priv *devobj_init(void)
 	_rtw_mutex_init(&pdvobj->setbw_mutex);
 	_rtw_mutex_init(&pdvobj->rf_read_reg_mutex);
 
-#ifdef CONFIG_RTW_CUSTOMER_STR
 	_rtw_mutex_init(&pdvobj->customer_str_mutex);
 	_rtw_memset(pdvobj->customer_str, 0xFF, RTW_CUSTOMER_STR_LEN);
-#endif
 
 	pdvobj->processing_dev_remove = false;
 
@@ -1622,9 +1620,7 @@ void devobj_deinit(struct dvobj_priv *pdvobj)
 	_rtw_mutex_free(&pdvobj->hw_init_mutex);
 	_rtw_mutex_free(&pdvobj->h2c_fwcmd_mutex);
 
-#ifdef CONFIG_RTW_CUSTOMER_STR
 	_rtw_mutex_free(&pdvobj->customer_str_mutex);
-#endif
 
 	_rtw_mutex_free(&pdvobj->setch_mutex);
 	_rtw_mutex_free(&pdvobj->setbw_mutex);
@@ -1717,9 +1713,7 @@ u8 rtw_reset_drv_sw(_adapter *padapter)
 	/* mlmeextpriv */
 	mlmeext_set_scan_state(&padapter->mlmeextpriv, SCAN_DISABLE);
 
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	rtw_set_signal_stat_timer(&padapter->recvpriv);
-#endif
 
 	return ret8;
 }
@@ -1727,10 +1721,7 @@ u8 rtw_reset_drv_sw(_adapter *padapter)
 
 u8 rtw_init_drv_sw(_adapter *padapter)
 {
-
 	u8	ret8 = _SUCCESS;
-
-
 
 	_rtw_init_listhead(&padapter->list);
 
@@ -1861,10 +1852,7 @@ void rtw_cancel_all_timer(_adapter *padapter)
 
 	_cancel_timer_ex(&padapter->mlmepriv.set_scan_deny_timer);
 	rtw_clear_scan_deny(padapter);
-
-#ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	_cancel_timer_ex(&padapter->recvpriv.signal_stat_timer);
-#endif
 
 	/* cancel dm timer */
 	rtw_hal_dm_deinit(padapter);
@@ -2176,15 +2164,10 @@ void rtw_drv_stop_vir_if(_adapter *padapter)
 	}
 
 	if (padapter->bup == true) {
-		#ifdef CONFIG_XMIT_ACK
 		if (padapter->xmitpriv.ack_tx)
 			rtw_ack_tx_done(&padapter->xmitpriv, RTW_SCTX_DONE_DRV_STOP);
-		#endif
-
 		rtw_intf_stop(padapter);
-
 		rtw_stop_drv_threads(padapter);
-
 		padapter->bup = false;
 	}
 	/* cancel timer after thread stop */
@@ -3142,11 +3125,8 @@ void rtw_dev_unload(PADAPTER padapter)
 		RTW_INFO("==> "FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(padapter));
 
 		rtw_set_drv_stopped(padapter);
-#ifdef CONFIG_XMIT_ACK
 		if (padapter->xmitpriv.ack_tx)
 			rtw_ack_tx_done(&padapter->xmitpriv, RTW_SCTX_DONE_DRV_STOP);
-#endif
-
 		rtw_intf_stop(padapter);
 
 		#ifdef CONFIG_AUTOSUSPEND
