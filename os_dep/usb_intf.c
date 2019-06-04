@@ -204,7 +204,7 @@ static u8 rtw_init_intf_priv(struct dvobj_priv *dvobj)
 
 	_rtw_mutex_init(&dvobj->usb_vendor_req_mutex);
 	dvobj->usb_alloc_vendor_req_buf = rtw_zmalloc(MAX_USB_IO_CTL_SIZE);
-	if (dvobj->usb_alloc_vendor_req_buf == NULL) {
+	if (!dvobj->usb_alloc_vendor_req_buf) {
 		RTW_INFO("alloc usb_vendor_req_buf failed... /n");
 		rst = _FAIL;
 		goto exit;
@@ -253,7 +253,7 @@ static struct dvobj_priv *usb_dvobj_init(struct usb_interface *usb_intf, const s
 
 
 	pdvobjpriv = devobj_init();
-	if (pdvobjpriv == NULL)
+	if (!pdvobjpriv)
 		goto exit;
 
 
@@ -857,7 +857,7 @@ static _adapter *rtw_usb_primary_adapter_init(struct dvobj_priv *dvobj,
 	int status = _FAIL;
 
 	padapter = (_adapter *)rtw_zvmalloc(sizeof(*padapter));
-	if (padapter == NULL)
+	if (!padapter)
 		goto exit;
 
 	if (loadparam(padapter) != _SUCCESS)
@@ -1033,12 +1033,10 @@ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device
 
 	/* Initialize dvobj_priv */
 	dvobj = usb_dvobj_init(pusb_intf, pdid);
-	if (dvobj == NULL) {
+	if (!dvobj)
 		goto exit;
-	}
-
 	padapter = rtw_usb_primary_adapter_init(dvobj, pusb_intf);
-	if (padapter == NULL) {
+	if (!padapter) {
 		RTW_INFO("rtw_usb_primary_adapter_init Failed!\n");
 		goto free_dvobj;
 	}
@@ -1051,7 +1049,7 @@ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device
 		padapter->registrypriv.virtual_iface_num = (CONFIG_IFACE_NUMBER - 1);
 
 	for (i = 0; i < padapter->registrypriv.virtual_iface_num; i++) {
-		if (rtw_drv_add_vir_if(padapter, usb_set_intf_ops) == NULL) {
+		if (!rtw_drv_add_vir_if(padapter, usb_set_intf_ops)) {
 			RTW_INFO("rtw_drv_add_iface failed! (%d)\n", i);
 			goto free_if_vir;
 		}

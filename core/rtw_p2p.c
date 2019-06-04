@@ -143,7 +143,7 @@ static void issue_group_disc_req(struct wifidirect_info *pwdinfo, u8 *da)
 	RTW_INFO("[%s]\n", __FUNCTION__);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -203,7 +203,7 @@ static void issue_p2p_devdisc_resp(struct wifidirect_info *pwdinfo, u8 *da, u8 s
 	RTW_INFO("[%s]\n", __FUNCTION__);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -278,7 +278,7 @@ static void issue_p2p_provision_resp(struct wifidirect_info *pwdinfo, u8 *raddr,
 
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -365,7 +365,7 @@ static void issue_p2p_presence_resp(struct wifidirect_info *pwdinfo, u8 *da, u8 
 	RTW_INFO("[%s]\n", __FUNCTION__);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -2227,13 +2227,13 @@ u32 process_probe_req_p2p_ie(struct wifidirect_info *pwdinfo, u8 *pframe, uint l
 	if (rtw_p2p_chk_role(pwdinfo, P2P_ROLE_DEVICE) || rtw_p2p_chk_role(pwdinfo, P2P_ROLE_GO)) {
 		p2pie = rtw_get_p2p_ie(pframe + WLAN_HDR_A3_LEN + _PROBEREQ_IE_OFFSET_ , len - WLAN_HDR_A3_LEN - _PROBEREQ_IE_OFFSET_ , NULL, &p2pielen);
 		if (p2pie) {
-			if ((p != NULL) && _rtw_memcmp((void *)(p + 2), (void *) pwdinfo->p2p_wildcard_ssid , 7)) {
+			if ((p) && _rtw_memcmp((void *)(p + 2), (void *) pwdinfo->p2p_wildcard_ssid , 7)) {
 				/* todo: */
 				/* Check Requested Device Type attributes in WSC IE. */
 				/* Check Device ID attribute in P2P IE */
 
 				ret = true;
-			} else if ((p != NULL) && (ssid_len == 0))
+			} else if ((p) && (ssid_len == 0))
 				ret = true;
 		} else {
 			/* non -p2p device */
@@ -3413,7 +3413,7 @@ static void rtw_change_p2pie_op_ch(_adapter *padapter, const u8 *frame_body, u32
 		attr_contentlen = 0;
 		pattr = NULL;
 		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_OPERATING_CH, NULL, (uint *)&attr_contentlen);
-		if (pattr != NULL)
+		if (pattr)
 			*(pattr + 4) = ch;
 
 		/* Get the next P2P IE */
@@ -3437,7 +3437,7 @@ static void rtw_change_p2pie_ch_list(_adapter *padapter, const u8 *frame_body, u
 
 		/* Check P2P_ATTR_CH_LIST */
 		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_CH_LIST, NULL, (uint *)&attr_contentlen);
-		if (pattr != NULL) {
+		if (pattr) {
 			int i;
 			u32 num_of_ch;
 			u8 *pattr_temp = pattr + 3 ;
@@ -3479,7 +3479,7 @@ static bool rtw_chk_p2pie_ch_list_with_buddy(_adapter *padapter, const u8 *frame
 
 		/* Check P2P_ATTR_CH_LIST */
 		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_CH_LIST, NULL, (uint *)&attr_contentlen);
-		if (pattr != NULL) {
+		if (pattr) {
 			int i;
 			u32 num_of_ch;
 			u8 *pattr_temp = pattr + 3 ;
@@ -3530,7 +3530,7 @@ static bool rtw_chk_p2pie_op_ch_with_buddy(_adapter *padapter, const u8 *frame_b
 		attr_contentlen = 0;
 		pattr = NULL;
 		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_OPERATING_CH, NULL, (uint *)&attr_contentlen);
-		if (pattr != NULL) {
+		if (pattr) {
 			if (*(pattr + 4) == union_ch) {
 				RTW_INFO(FUNC_ADPT_FMT" op_ch fit buddy_ch:%u\n", FUNC_ADPT_ARG(padapter), union_ch);
 				fit = true;
@@ -3563,7 +3563,7 @@ static void rtw_cfg80211_adjust_p2pie_channel(_adapter *padapter, const u8 *fram
 
 		/* Check P2P_ATTR_CH_LIST */
 		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_CH_LIST, NULL, (uint *)&attr_contentlen);
-		if (pattr != NULL) {
+		if (pattr) {
 			int i;
 			u32 num_of_ch;
 			u8 *pattr_temp = pattr + 3 ;
@@ -3591,7 +3591,7 @@ static void rtw_cfg80211_adjust_p2pie_channel(_adapter *padapter, const u8 *fram
 		attr_contentlen = 0;
 		pattr = NULL;
 		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_OPERATING_CH, NULL, (uint *)&attr_contentlen);
-		if (pattr != NULL) {
+		if (pattr) {
 			if (*(pattr + 4) && *(pattr + 4) != union_ch) {
 				#ifdef RTW_SINGLE_WIPHY
 				RTW_ERR("replace op_ch:%u with:%u\n", *(pattr + 4), union_ch);
@@ -3765,7 +3765,7 @@ static u8 *dump_p2p_attr_ch_list(u8 *p2p_ie, uint p2p_ielen, u8 *buf, u32 buf_le
 	bool continuous = false;
 
 	pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_CH_LIST, NULL, &attr_contentlen);
-	if (pattr != NULL) {
+	if (pattr) {
 		int i, j;
 		u32 num_of_ch;
 		u8 *pattr_temp = pattr + 3 ;
@@ -4478,13 +4478,13 @@ u8 p2p_ps_wk_cmd(_adapter *padapter, u8 p2p_ps_state, u8 enqueue)
 
 	if (enqueue) {
 		ph2c = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-		if (ph2c == NULL) {
+		if (!ph2c) {
 			res = _FAIL;
 			goto exit;
 		}
 
 		pdrvextra_cmd_parm = (struct drvextra_cmd_parm *)rtw_zmalloc(sizeof(struct drvextra_cmd_parm));
-		if (pdrvextra_cmd_parm == NULL) {
+		if (!pdrvextra_cmd_parm) {
 			rtw_mfree((unsigned char *)ph2c, sizeof(struct cmd_obj));
 			res = _FAIL;
 			goto exit;

@@ -97,7 +97,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, _adapter *padapter)
 
 	pxmitpriv->pallocated_frame_buf = rtw_zvmalloc(NR_XMITFRAME * sizeof(struct xmit_frame) + 4);
 
-	if (pxmitpriv->pallocated_frame_buf  == NULL) {
+	if (!pxmitpriv->pallocated_frame_buf ) {
 		pxmitpriv->pxmit_frame_buf = NULL;
 		res = _FAIL;
 		goto exit;
@@ -135,7 +135,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, _adapter *padapter)
 
 	pxmitpriv->pallocated_xmitbuf = rtw_zvmalloc(NR_XMITBUFF * sizeof(struct xmit_buf) + 4);
 
-	if (pxmitpriv->pallocated_xmitbuf  == NULL) {
+	if (!pxmitpriv->pallocated_xmitbuf ) {
 		res = _FAIL;
 		goto exit;
 	}
@@ -174,7 +174,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, _adapter *padapter)
 
 	pxmitpriv->xframe_ext_alloc_addr = rtw_zvmalloc(NR_XMIT_EXTBUFF * sizeof(struct xmit_frame) + 4);
 
-	if (pxmitpriv->xframe_ext_alloc_addr  == NULL) {
+	if (!pxmitpriv->xframe_ext_alloc_addr ) {
 		pxmitpriv->xframe_ext = NULL;
 		res = _FAIL;
 		goto exit;
@@ -206,7 +206,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, _adapter *padapter)
 
 	pxmitpriv->pallocated_xmit_extbuf = rtw_zvmalloc(NR_XMIT_EXTBUFF * sizeof(struct xmit_buf) + 4);
 
-	if (pxmitpriv->pallocated_xmit_extbuf  == NULL) {
+	if (!pxmitpriv->pallocated_xmit_extbuf ) {
 		res = _FAIL;
 		goto exit;
 	}
@@ -334,7 +334,7 @@ void _rtw_free_xmit_priv(struct xmit_priv *pxmitpriv)
 
 	rtw_mfree_xmit_priv_lock(pxmitpriv);
 
-	if (pxmitpriv->pxmit_frame_buf == NULL)
+	if (!pxmitpriv->pxmit_frame_buf)
 		goto out;
 
 	for (i = 0; i < NR_XMITFRAME; i++) {
@@ -382,7 +382,7 @@ void _rtw_free_xmit_priv(struct xmit_priv *pxmitpriv)
 
 	for (i = 0; i < CMDBUF_MAX; i++) {
 		pxmitbuf = &pxmitpriv->pcmd_xmitbuf[i];
-		if (pxmitbuf != NULL)
+		if (pxmitbuf)
 			rtw_os_xmit_resource_free(padapter, pxmitbuf, MAX_CMDBUF_SZ + XMITBUF_ALIGN_SZ , true);
 	}
 
@@ -1113,14 +1113,14 @@ static int update_attrib(_adapter *padapter, _pkt *pkt, struct pkt_attrib *pattr
 	bmcast = IS_MCAST(pattrib->ra);
 	if (bmcast) {
 		psta = rtw_get_bcmc_stainfo(padapter);
-		if (psta == NULL) { /* if we cannot get psta => drop the pkt */
+		if (!psta) { /* if we cannot get psta => drop the pkt */
 			DBG_COUNTER(padapter->tx_logs.core_tx_upd_attrib_err_sta);
 			res = _FAIL;
 			goto exit;
 		}
 	} else {
 		psta = rtw_get_stainfo(pstapriv, pattrib->ra);
-		if (psta == NULL) { /* if we cannot get psta => drop the pkt */
+		if (!psta) { /* if we cannot get psta => drop the pkt */
 			DBG_COUNTER(padapter->tx_logs.core_tx_upd_attrib_err_ucast_sta);
 			res = _FAIL;
 			goto exit;
@@ -1521,7 +1521,7 @@ int rtw_make_wlanhdr(_adapter *padapter , u8 *hdr, struct pkt_attrib *pattrib)
 				return _FAIL;
 			}
 
-			if (psta == NULL) {
+			if (!psta) {
 				RTW_INFO("%s, psta==NUL\n", __func__);
 				return _FAIL;
 			}
@@ -1601,7 +1601,7 @@ int rtw_txframes_sta_ac_pending(_adapter *padapter, struct pkt_attrib *pattrib)
 		return 0;
 	}
 
-	if (psta == NULL) {
+	if (!psta) {
 		RTW_INFO("%s, psta==NUL\n", __func__);
 		return 0;
 	}
@@ -1733,7 +1733,7 @@ int rtw_xmitframe_coalesce_amsdu(_adapter *padapter, struct xmit_frame *pxmitfra
 	u8 *pbuf_start;
 	int res = _SUCCESS;
 
-	if (pxmitframe->buf_addr == NULL) {
+	if (!pxmitframe->buf_addr) {
 		RTW_INFO("==> %s buf_addr==NULL\n", __FUNCTION__);
 		return _FAIL;
 	}
@@ -1906,7 +1906,7 @@ int rtw_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxm
 	int bmcst = IS_MCAST(pattrib->ra);
 	int res = _SUCCESS;
 
-	if (pxmitframe->buf_addr == NULL) {
+	if (!pxmitframe->buf_addr) {
 		RTW_INFO("==> %s buf_addr==NULL\n", __FUNCTION__);
 		return _FAIL;
 	}
@@ -2048,7 +2048,7 @@ int rtw_mgmt_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame
 	union pn48 *pn = NULL;
 	u8 kid;
 
-	if (pxmitframe->buf_addr == NULL) {
+	if (!pxmitframe->buf_addr) {
 		RTW_WARN(FUNC_ADPT_FMT" pxmitframe->buf_addr\n"
 			, FUNC_ADPT_ARG(padapter));
 		return _FAIL;
@@ -2071,8 +2071,8 @@ int rtw_mgmt_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame
 			psta = pattrib->psta;
 		else
 			pattrib->psta = psta = rtw_get_stainfo(&padapter->stapriv, pattrib->ra);
-		if (psta == NULL) {
-			RTW_INFO(FUNC_ADPT_FMT" unicast sta == NULL\n", FUNC_ADPT_ARG(padapter));
+		if (!psta) {
+			RTW_INFO(FUNC_ADPT_FMT" unicast sta is NULL\n", FUNC_ADPT_ARG(padapter));
 			return _FAIL;
 		}
 		if (!(psta->flags & WLAN_STA_MFP)) {
@@ -2088,7 +2088,7 @@ int rtw_mgmt_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame
 
 	ori_len = BIP_AAD_SIZE + pattrib->pktlen;
 	tmp_buf = BIP_AAD = rtw_zmalloc(ori_len);
-	if (BIP_AAD == NULL)
+	if (!BIP_AAD)
 		return _FAIL;
 
 	_enter_critical_bh(&padapter->security_key_mutex, &irqL);
@@ -2105,8 +2105,8 @@ int rtw_mgmt_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame
 				psta = pattrib->psta;
 			else
 				pattrib->psta = psta = rtw_get_bcmc_stainfo(padapter);
-			if (psta == NULL) {
-				RTW_INFO(FUNC_ADPT_FMT" broadcast sta == NULL\n"
+			if (!psta) {
+				RTW_INFO(FUNC_ADPT_FMT" broadcast sta is NULL\n"
 					, FUNC_ADPT_ARG(padapter));
 				goto xmitframe_coalesce_fail;
 			}
@@ -2390,7 +2390,7 @@ void rtw_update_protection(_adapter *padapter, u8 *ie, uint ie_len)
 	case AUTO_VCS:
 	default:
 		perp = rtw_get_ie(ie, _ERPINFO_IE_, &erp_len, ie_len);
-		if (perp == NULL)
+		if (!perp)
 			pxmitpriv->vcs = NONE_VCS;
 		else {
 			protection = (*(perp + 2)) & BIT(1);
@@ -2471,13 +2471,13 @@ struct xmit_frame *__rtw_alloc_cmdxmitframe(struct xmit_priv *pxmitpriv,
 	struct xmit_buf		*pxmitbuf;
 
 	pcmdframe = rtw_alloc_xmitframe(pxmitpriv);
-	if (pcmdframe == NULL) {
+	if (!pcmdframe) {
 		RTW_INFO("%s, alloc xmitframe fail\n", __FUNCTION__);
 		return NULL;
 	}
 
 	pxmitbuf = __rtw_alloc_cmd_xmitbuf(pxmitpriv, buf_type);
-	if (pxmitbuf == NULL) {
+	if (!pxmitbuf) {
 		RTW_INFO("%s, alloc xmitbuf fail\n", __FUNCTION__);
 		rtw_free_xmitframe(pxmitpriv, pcmdframe);
 		return NULL;
@@ -2544,7 +2544,7 @@ int rtw_free_xmitbuf_ext(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf)
 	_queue *pfree_queue = &pxmitpriv->free_xmit_extbuf_queue;
 
 
-	if (pxmitbuf == NULL)
+	if (!pxmitbuf)
 		return _FAIL;
 
 	_enter_critical(&pfree_queue->lock, &irqL);
@@ -2610,7 +2610,7 @@ int rtw_free_xmitbuf(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf)
 
 	/* RTW_INFO("+rtw_free_xmitbuf\n"); */
 
-	if (pxmitbuf == NULL)
+	if (!pxmitbuf)
 		return _FAIL;
 
 	if (pxmitbuf->sctx) {
@@ -2736,7 +2736,7 @@ struct xmit_frame *rtw_alloc_xmitframe_once(struct xmit_priv *pxmitpriv)
 
 	alloc_addr = rtw_zmalloc(sizeof(struct xmit_frame) + 4);
 
-	if (alloc_addr == NULL)
+	if (!alloc_addr)
 		goto exit;
 
 	pxframe = (struct xmit_frame *)N_BYTE_ALIGMENT((SIZE_PTR)(alloc_addr), 4);
@@ -2766,7 +2766,7 @@ int rtw_free_xmitframe(struct xmit_priv *pxmitpriv, struct xmit_frame *pxmitfram
 	_pkt *pndis_pkt = NULL;
 
 
-	if (pxmitframe == NULL) {
+	if (!pxmitframe) {
 		goto exit;
 	}
 
@@ -3083,10 +3083,10 @@ int rtw_xmit_classifier(_adapter *padapter, struct xmit_frame *pxmitframe)
 		return _FAIL;
 	}
 
-	if (psta == NULL) {
+	if (!psta) {
 		DBG_COUNTER(padapter->tx_logs.core_tx_enqueue_class_err_nosta);
 		res = _FAIL;
-		RTW_INFO("rtw_xmit_classifier: psta == NULL\n");
+		RTW_INFO("rtw_xmit_classifier: psta is NULL\n");
 		goto exit;
 	}
 
@@ -3130,7 +3130,7 @@ void rtw_alloc_hwxmits(_adapter *padapter)
 
 	pxmitpriv->hwxmits = (struct hw_xmit *)rtw_zmalloc(sizeof(struct hw_xmit) * pxmitpriv->hwxmit_entry);
 
-	if (pxmitpriv->hwxmits == NULL) {
+	if (!pxmitpriv->hwxmits) {
 		RTW_INFO("alloc hwxmits fail!...\n");
 		return;
 	}
@@ -3256,7 +3256,7 @@ static int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 				if (memcmp(padapter->scdb_mac, skb->data + MACADDRLEN, MACADDRLEN)) {
 					padapter->scdb_entry = (struct nat25_network_db_entry *)scdb_findEntry(padapter,
 						skb->data + MACADDRLEN, skb->data + WLAN_ETHHDR_LEN + 12);
-					if (padapter->scdb_entry != NULL) {
+					if (padapter->scdb_entry) {
 						memcpy(padapter->scdb_mac, skb->data + MACADDRLEN, MACADDRLEN);
 						memcpy(padapter->scdb_ip, skb->data + WLAN_ETHHDR_LEN + 12, 4);
 						padapter->scdb_entry->ageing_timer = jiffies;
@@ -3286,7 +3286,7 @@ static int rtw_br_client_tx(_adapter *padapter, struct sk_buff **pskb)
 					}
 
 					newskb = rtw_skb_copy(skb);
-					if (newskb == NULL) {
+					if (!newskb) {
 						/* priv->ext_stats.tx_drops++; */
 						DEBUG_ERR("TX DROP: rtw_skb_copy fail!\n");
 						/* goto stop_proc; */
@@ -3473,7 +3473,7 @@ int rtw_monitor_xmit_entry(struct sk_buff *skb, struct net_device *ndev)
 		int type = -1;
 
 		pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-		if (pmgntframe == NULL) {
+		if (!pmgntframe) {
 			rtw_udelay_os(500);
 			goto fail;
 		}
@@ -3517,7 +3517,7 @@ int rtw_monitor_xmit_entry(struct sk_buff *skb, struct net_device *ndev)
 		int type = -1;
 
 		pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-		if (pmgntframe == NULL)
+		if (!pmgntframe)
 			goto fail;
 
 		pattrib = &pmgntframe->attrib;
@@ -3590,7 +3590,7 @@ int rtw_xmit(_adapter *padapter, _pkt **ppkt)
 		drop_cnt = 0;
 	}
 
-	if (pxmitframe == NULL) {
+	if (!pxmitframe) {
 		drop_cnt++;
 		/*RTW_INFO("%s-"ADPT_FMT" no more xmitframe\n", __func__, ADPT_ARG(padapter));*/
 		DBG_COUNTER(padapter->tx_logs.core_tx_err_pxmitframe);
@@ -3696,7 +3696,7 @@ sint xmitframe_enqueue_for_sleeping_sta(_adapter *padapter, struct xmit_frame *p
 		return false;
 	}
 
-	if (psta == NULL) {
+	if (!psta) {
 		DBG_COUNTER(padapter->tx_logs.core_tx_ap_enqueue_warn_nosta);
 		RTW_INFO("%s, psta==NUL\n", __func__);
 		return false;

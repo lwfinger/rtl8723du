@@ -25,7 +25,7 @@ int	usb_init_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
 	RTW_INFO("NR_RECVBUFF: %d\n", NR_RECVBUFF);
 	RTW_INFO("MAX_RECVBUF_SZ: %d\n", MAX_RECVBUF_SZ);
 	precvpriv->pallocated_recv_buf = rtw_zmalloc(NR_RECVBUFF * sizeof(struct recv_buf) + 4);
-	if (precvpriv->pallocated_recv_buf == NULL) {
+	if (!precvpriv->pallocated_recv_buf) {
 		res = _FAIL;
 		goto exit;
 	}
@@ -134,7 +134,7 @@ void usb_c2h_hisr_hdl(_adapter *adapter, u8 *buf)
 			RTW_ERR("%s rtw_cbuf_push fail\n", __func__);
 	} else {
 		c2h_evt = rtw_malloc(C2H_REG_LEN);
-		if (c2h_evt != NULL) {
+		if (c2h_evt) {
 			_rtw_memcpy(c2h_evt, buf, C2H_REG_LEN);
 			if (rtw_cbuf_push(adapter->evtpriv.c2h_queue, (void*)c2h_evt) != _SUCCESS)
 				RTW_ERR("%s rtw_cbuf_push fail\n", __func__);

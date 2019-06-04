@@ -71,7 +71,7 @@ static sint	_rtw_init_mlme_priv(_adapter *padapter)
 
 	pbuf = rtw_zvmalloc(MAX_BSS_CNT * (sizeof(struct wlan_network)));
 
-	if (pbuf == NULL) {
+	if (!pbuf) {
 		res = _FAIL;
 		goto exit;
 	}
@@ -239,7 +239,7 @@ int rtw_mlme_update_wfd_ie_data(struct mlme_priv *mlme, u8 type, u8 *ie, u32 ie_
 
 	if (!clear) {
 		*t_ie = rtw_malloc(ie_len);
-		if (*t_ie == NULL) {
+		if (!(*t_ie)) {
 			RTW_ERR(FUNC_ADPT_FMT" type:%u, rtw_malloc() fail\n"
 				, FUNC_ADPT_ARG(adapter), type);
 			goto exit;
@@ -293,7 +293,7 @@ static sint	_rtw_enqueue_network(_queue *queue, struct wlan_network *pnetwork)
 	_irqL irqL;
 
 
-	if (pnetwork == NULL)
+	if (!pnetwork)
 		goto exit;
 
 	_enter_critical_bh(&queue->lock, &irqL);
@@ -379,7 +379,7 @@ void _rtw_free_network(struct	mlme_priv *pmlmepriv , struct wlan_network *pnetwo
 	_queue *free_queue = &(pmlmepriv->free_bss_pool);
 
 
-	if (pnetwork == NULL)
+	if (!pnetwork)
 		goto exit;
 
 	if (pnetwork->fixed == true)
@@ -418,7 +418,7 @@ void _rtw_free_network_nolock(struct	mlme_priv *pmlmepriv, struct wlan_network *
 	_queue *free_queue = &(pmlmepriv->free_bss_pool);
 
 
-	if (pnetwork == NULL)
+	if (!pnetwork)
 		goto exit;
 
 	if (pnetwork->fixed == true)
@@ -739,7 +739,7 @@ struct wlan_network *rtw_find_same_network(_queue *scanned_queue, struct wlan_ne
 	_irqL irqL;
 	struct wlan_network *found = NULL;
 
-	if (scanned_queue == NULL || network == NULL)
+	if (!scanned_queue || !network)
 		goto exit;
 
 	_enter_critical_bh(&scanned_queue->lock, &irqL);
@@ -769,7 +769,7 @@ struct	wlan_network	*rtw_get_oldest_wlan_network(_queue *scanned_queue)
 		pwlan = LIST_CONTAINOR(plist, struct wlan_network, list);
 
 		if (pwlan->fixed != true) {
-			if (oldest == NULL || time_after(oldest->last_scanned, pwlan->last_scanned))
+			if (!oldest || time_after(oldest->last_scanned, pwlan->last_scanned))
 				oldest = pwlan;
 		}
 
@@ -903,10 +903,10 @@ bool rtw_update_scanned_network(_adapter *adapter, WLAN_BSSID_EX *target)
 			/* TODO: don't  select netowrk in the same ess as oldest if it's new enough*/
 		}
 #ifdef CONFIG_RSSI_PRIORITY
-		if ((oldest == NULL) || (pnetwork->network.PhyInfo.SignalStrength < oldest->network.PhyInfo.SignalStrength))
+		if ((!oldest) || (pnetwork->network.PhyInfo.SignalStrength < oldest->network.PhyInfo.SignalStrength))
 			oldest = pnetwork;
 #else
-		if (oldest == NULL || time_after(oldest->last_scanned, pnetwork->last_scanned))
+		if (!oldest || time_after(oldest->last_scanned, pnetwork->last_scanned))
 			oldest = pnetwork;
 #endif
 		plist = get_next(plist);
@@ -922,7 +922,7 @@ bool rtw_update_scanned_network(_adapter *adapter, WLAN_BSSID_EX *target)
 			/* If there are no more slots, expire the oldest */
 			/* list_del_init(&oldest->list); */
 			pnetwork = oldest;
-			if (pnetwork == NULL) {
+			if (!pnetwork) {
 				goto exit;
 			}
 #ifdef CONFIG_RSSI_PRIORITY
@@ -951,7 +951,7 @@ bool rtw_update_scanned_network(_adapter *adapter, WLAN_BSSID_EX *target)
 
 			pnetwork = rtw_alloc_network(pmlmepriv); /* will update scan_time */
 
-			if (pnetwork == NULL) {
+			if (!pnetwork) {
 				goto exit;
 			}
 
@@ -1046,7 +1046,7 @@ int rtw_is_desired_network(_adapter *adapter, struct wlan_network *pnetwork)
 	privacy = pnetwork->network.Privacy;
 
 	if (check_fwstate(pmlmepriv, WIFI_UNDER_WPS)) {
-		if (rtw_get_wps_ie(pnetwork->network.IEs + _FIXED_IE_LENGTH_, pnetwork->network.IELength - _FIXED_IE_LENGTH_, NULL, &wps_ielen) != NULL)
+		if (rtw_get_wps_ie(pnetwork->network.IEs + _FIXED_IE_LENGTH_, pnetwork->network.IELength - _FIXED_IE_LENGTH_, NULL, &wps_ielen))
 			return true;
 		else
 			return false;
@@ -1383,7 +1383,7 @@ void rtw_free_assoc_resources(_adapter *adapter, int lock_scanned_queue)
 		if (!rtw_p2p_chk_state(&adapter->wdinfo, P2P_STATE_NONE))
 			rtw_mi_set_scan_deny(adapter, 2000);
 	} else {
-		if (pwlan == NULL)
+		if (!pwlan)
 			RTW_INFO("free disconnecting network of scanned_queue failed due to pwlan== NULL\n\n");
 		if (check_fwstate(pmlmepriv, WIFI_UNDER_WPS))
 			RTW_INFO("donot free disconnecting network of scanned_queue when WIFI_UNDER_WPS\n\n");
@@ -1641,7 +1641,7 @@ static struct sta_info *rtw_joinbss_update_stainfo(_adapter *padapter, struct wl
 	struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
 
 	psta = rtw_get_stainfo(pstapriv, pnetwork->network.MacAddress);
-	if (psta == NULL)
+	if (!psta)
 		psta = rtw_alloc_stainfo(pstapriv, pnetwork->network.MacAddress);
 
 	if (psta) { /* update ptarget_sta */
@@ -1850,7 +1850,7 @@ void rtw_joinbss_event_prehandle(_adapter *adapter, u8 *pbuf)
 			/* s3. find ptarget_sta & update ptarget_sta after update cur_network only for station mode */
 			if (check_fwstate(pmlmepriv, WIFI_STATION_STATE) == true) {
 				ptarget_sta = rtw_joinbss_update_stainfo(adapter, pnetwork);
-				if (ptarget_sta == NULL) {
+				if (!ptarget_sta) {
 					RTW_ERR("Can't update stainfo when joinbss_event callback\n");
 					goto ignore_joinbss_callback;
 				}
@@ -1930,7 +1930,7 @@ void rtw_sta_media_status_rpt(_adapter *adapter, struct sta_info *sta, bool conn
 	bool miracast_sink = 0;
 	u8 role = H2C_MSR_ROLE_RSVD;
 
-	if (sta == NULL) {
+	if (!sta) {
 		RTW_PRINT(FUNC_ADPT_FMT" sta is NULL\n"
 			  , FUNC_ADPT_ARG(adapter));
 		rtw_warn_on(1);
@@ -1999,20 +1999,20 @@ u8 rtw_sta_media_status_rpt_cmd(_adapter *adapter, struct sta_info *sta, bool co
 	u8	res = _SUCCESS;
 
 	cmdobj = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (cmdobj == NULL) {
+	if (!cmdobj) {
 		res = _FAIL;
 		goto exit;
 	}
 
 	cmd_parm = (struct drvextra_cmd_parm *)rtw_zmalloc(sizeof(struct drvextra_cmd_parm));
-	if (cmd_parm == NULL) {
+	if (!cmd_parm) {
 		rtw_mfree((u8 *)cmdobj, sizeof(struct cmd_obj));
 		res = _FAIL;
 		goto exit;
 	}
 
 	rpt_parm = (struct sta_media_status_rpt_cmd_parm *)rtw_zmalloc(sizeof(struct sta_media_status_rpt_cmd_parm));
-	if (rpt_parm == NULL) {
+	if (!rpt_parm) {
 		rtw_mfree((u8 *)cmdobj, sizeof(struct cmd_obj));
 		rtw_mfree((u8 *)cmd_parm, sizeof(struct drvextra_cmd_parm));
 		res = _FAIL;
@@ -2098,7 +2098,7 @@ void rtw_stassoc_event_callback(_adapter *adapter, u8 *pbuf)
 
 	/* for AD-HOC mode */
 	psta = rtw_get_stainfo(&adapter->stapriv, pstassoc->macaddr);
-	if (psta == NULL) {
+	if (!psta) {
 		RTW_ERR(FUNC_ADPT_FMT" get no sta_info with "MAC_FMT"\n"
 			, FUNC_ADPT_ARG(adapter), MAC_ARG(pstassoc->macaddr));
 		rtw_warn_on(1);
@@ -2214,7 +2214,7 @@ void rtw_ft_update_stainfo(_adapter *padapter, WLAN_BSSID_EX *pnetwork)
 	struct sta_info		*psta = NULL;
 
 	psta = rtw_get_stainfo(pstapriv, pnetwork->MacAddress);
-	if (psta == NULL)
+	if (!psta)
 		psta = rtw_alloc_stainfo(pstapriv, pnetwork->MacAddress);
 
 	if (padapter->securitypriv.dot11AuthAlgrthm == dot11AuthAlgrthm_8021X) {
@@ -2409,7 +2409,7 @@ void rtw_stadel_event_callback(_adapter *adapter, u8 *pbuf)
 
 	psta = rtw_get_stainfo(&adapter->stapriv, pstadel->macaddr);
 
-	if (psta == NULL) {
+	if (!psta) {
 		RTW_INFO("%s(mac_id=%d)=" MAC_FMT " psta == NULL\n", __func__, pstadel->mac_id, MAC_ARG(pstadel->macaddr));
 		/*rtw_warn_on(1);*/
 	}
@@ -3049,7 +3049,7 @@ static int rtw_check_roaming_candidate(struct mlme_priv *mlme
 	if (competitor->network.Rssi - mlme->cur_network_scanned->network.Rssi < mlme->roam_rssi_diff_th)
 		goto exit;
 
-	if (*candidate != NULL && (*candidate)->network.Rssi >= competitor->network.Rssi)
+	if (*candidate && (*candidate)->network.Rssi >= competitor->network.Rssi)
 		goto exit;
 update:
 	*candidate = competitor;
@@ -3071,7 +3071,7 @@ int rtw_select_roaming_candidate(struct mlme_priv *mlme)
 	u8		bSupportAntDiv = false;
 
 
-	if (mlme->cur_network_scanned == NULL) {
+	if (!mlme->cur_network_scanned) {
 		rtw_warn_on(1);
 		return ret;
 	}
@@ -3085,7 +3085,7 @@ int rtw_select_roaming_candidate(struct mlme_priv *mlme)
 	while (!rtw_end_of_queue_search(phead, mlme->pscanned)) {
 
 		pnetwork = LIST_CONTAINOR(mlme->pscanned, struct wlan_network, list);
-		if (pnetwork == NULL) {
+		if (!pnetwork) {
 			ret = _FAIL;
 			goto exit;
 		}
@@ -3095,8 +3095,8 @@ int rtw_select_roaming_candidate(struct mlme_priv *mlme)
 		rtw_check_roaming_candidate(mlme, &candidate, pnetwork);
 	}
 
-	if (candidate == NULL) {
-		RTW_INFO("%s: return _FAIL(candidate == NULL)\n", __FUNCTION__);
+	if (!candidate) {
+		RTW_INFO("%s: return _FAIL(candidate is NULL)\n", __FUNCTION__);
 		ret = _FAIL;
 		goto exit;
 	} else {
@@ -3154,7 +3154,7 @@ static int rtw_check_join_candidate(struct mlme_priv *mlme
 			goto exit;
 	}
 
-	if (*candidate == NULL || (*candidate)->network.Rssi < competitor->network.Rssi) {
+	if (!*candidate || (*candidate)->network.Rssi < competitor->network.Rssi) {
 		*candidate = competitor;
 		updated = true;
 	}
@@ -3215,7 +3215,7 @@ int rtw_select_and_join_from_scanned_queue(struct mlme_priv *pmlmepriv)
 	while (!rtw_end_of_queue_search(phead, pmlmepriv->pscanned)) {
 
 		pnetwork = LIST_CONTAINOR(pmlmepriv->pscanned, struct wlan_network, list);
-		if (pnetwork == NULL) {
+		if (!pnetwork) {
 			ret = _FAIL;
 			goto exit;
 		}
@@ -3226,8 +3226,8 @@ int rtw_select_and_join_from_scanned_queue(struct mlme_priv *pmlmepriv)
 
 	}
 
-	if (candidate == NULL) {
-		RTW_INFO("%s: return _FAIL(candidate == NULL)\n", __FUNCTION__);
+	if (!candidate) {
+		RTW_INFO("%s: return _FAIL(candidate is NULL)\n", __FUNCTION__);
 		ret = _FAIL;
 		goto exit;
 	} else {
@@ -3267,13 +3267,13 @@ sint rtw_set_auth(_adapter *adapter, struct security_priv *psecuritypriv)
 
 
 	pcmd = (struct	cmd_obj *)rtw_zmalloc(sizeof(struct	cmd_obj));
-	if (pcmd == NULL) {
+	if (!pcmd) {
 		res = _FAIL; /* try again */
 		goto exit;
 	}
 
 	psetauthparm = (struct setauth_parm *)rtw_zmalloc(sizeof(struct setauth_parm));
-	if (psetauthparm == NULL) {
+	if (!psetauthparm) {
 		rtw_mfree((unsigned char *)pcmd, sizeof(struct	cmd_obj));
 		res = _FAIL;
 		goto exit;
@@ -3313,7 +3313,7 @@ sint rtw_set_key(_adapter *adapter, struct security_priv *psecuritypriv, sint ke
 
 
 	psetkeyparm = (struct setkey_parm *)rtw_zmalloc(sizeof(struct setkey_parm));
-	if (psetkeyparm == NULL) {
+	if (!psetkeyparm) {
 		res = _FAIL;
 		goto exit;
 	}
@@ -3359,7 +3359,7 @@ sint rtw_set_key(_adapter *adapter, struct security_priv *psecuritypriv, sint ke
 
 	if (enqueue) {
 		pcmd = (struct	cmd_obj *)rtw_zmalloc(sizeof(struct	cmd_obj));
-		if (pcmd == NULL) {
+		if (!pcmd) {
 			rtw_mfree((unsigned char *)psetkeyparm, sizeof(struct setkey_parm));
 			res = _FAIL; /* try again */
 			goto exit;
@@ -3914,7 +3914,7 @@ unsigned int rtw_restructure_ht_ie(_adapter *padapter, u8 *in_ie, u8 *out_ie, ui
 		ht_capie.cap_info |= cpu_to_le16(IEEE80211_HT_CAP_SGI_20);
 
 	/* Get HT BW */
-	if (in_ie == NULL) {
+	if (!in_ie) {
 		/* TDLS: TODO 20/40 issue */
 		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE)) {
 			operation_bw = padapter->mlmeextpriv.cur_bwmode;
@@ -4053,16 +4053,14 @@ unsigned int rtw_restructure_ht_ie(_adapter *padapter, u8 *in_ie, u8 *out_ie, ui
 
 	phtpriv->ht_option = true;
 
-	if (in_ie != NULL) {
+	if (in_ie) {
 		p = rtw_get_ie(in_ie, _HT_ADD_INFO_IE_, &ielen, in_len);
 		if (p && (ielen == sizeof(struct ieee80211_ht_addt_info))) {
 			out_len = *pout_len;
 			pframe = rtw_set_ie(out_ie + out_len, _HT_ADD_INFO_IE_, ielen, p + 2 , pout_len);
 		}
 	}
-
 	return phtpriv->ht_option;
-
 }
 
 /* the fucntion is > passive_level (in critical_section) */
@@ -4224,7 +4222,7 @@ void rtw_issue_addbareq_cmd(_adapter *padapter, struct xmit_frame *pxmitframe)
 		return;
 	}
 
-	if (psta == NULL) {
+	if (!psta) {
 		RTW_INFO("%s, psta==NUL\n", __func__);
 		return;
 	}
@@ -4381,7 +4379,7 @@ sint rtw_linked_check(_adapter *padapter)
 /*#define DBG_ADAPTER_STATE_CHK*/
 u8 rtw_is_adapter_up(_adapter *padapter)
 {
-	if (padapter == NULL)
+	if (!padapter)
 		return false;
 
 	if (RTW_CANNOT_RUN(padapter)) {

@@ -84,7 +84,7 @@ static void update_BCNTIM(_adapter *padapter)
 		uint offset, tmp_len, tim_ielen, tim_ie_offset, remainder_ielen;
 
 		p = rtw_get_ie(pie + _FIXED_IE_LENGTH_, _TIM_IE_, &tim_ielen, pnetwork_mlmeext->IELength - _FIXED_IE_LENGTH_);
-		if (p != NULL && tim_ielen > 0) {
+		if (p && tim_ielen > 0) {
 			tim_ielen += 2;
 
 			premainder_ie = p + tim_ielen;
@@ -103,7 +103,7 @@ static void update_BCNTIM(_adapter *padapter)
 
 			/* get ssid_ie len */
 			p = rtw_get_ie(pie + _BEACON_IE_OFFSET_, _SSID_IE_, &tmp_len, (pnetwork_mlmeext->IELength - _BEACON_IE_OFFSET_));
-			if (p != NULL)
+			if (p)
 				offset += tmp_len + 2;
 
 			/*get supported rates len*/
@@ -170,7 +170,7 @@ void rtw_add_bcn_ie(_adapter *padapter, WLAN_BSSID_EX *pnetwork, u8 index, u8 *d
 		i += (pIE->Length + 2);
 	}
 
-	if (p != NULL && ielen > 0) {
+	if (p && ielen > 0) {
 		ielen += 2;
 
 		premainder_ie = p + ielen;
@@ -185,7 +185,7 @@ void rtw_add_bcn_ie(_adapter *padapter, WLAN_BSSID_EX *pnetwork, u8 index, u8 *d
 			dst_ie = (p + ielen);
 	}
 
-	if (dst_ie == NULL)
+	if (!dst_ie)
 		return;
 
 	if (remainder_ielen > 0) {
@@ -218,7 +218,7 @@ void rtw_remove_bcn_ie(_adapter *padapter, WLAN_BSSID_EX *pnetwork, u8 index)
 	u8	*pie = pnetwork->IEs;
 
 	p = rtw_get_ie(pie + _FIXED_IE_LENGTH_, index, &ielen, pnetwork->IELength - _FIXED_IE_LENGTH_);
-	if (p != NULL && ielen > 0) {
+	if (p && ielen > 0) {
 		ielen += 2;
 
 		premainder_ie = p + ielen;
@@ -667,7 +667,7 @@ void rtw_update_bmc_sta_tx_rate(_adapter *adapter)
 	u8 tx_rate;
 
 	psta = rtw_get_bcmc_stainfo(adapter);
-	if (psta == NULL) {
+	if (!psta) {
 		RTW_ERR(ADPT_FMT "could not get bmc_sta !!\n", ADPT_ARG(adapter));
 		return;
 	}
@@ -1172,7 +1172,7 @@ static void rtw_ap_check_scan(_adapter *padapter)
 
 				/*check if HT CAP INFO IE exists or not*/
 				pbuf = rtw_get_ie(ie + _BEACON_IE_OFFSET_, _HT_CAPABILITY_IE_, &ie_len, (pbss->IELength - _BEACON_IE_OFFSET_));
-				if (pbuf == NULL) {
+				if (!pbuf) {
 					/* HT CAP INFO IE don't exist, it is b/g mode bss.*/
 
 					if (false == ATOMIC_READ(&pmlmepriv->olbc))
@@ -1571,7 +1571,7 @@ int rtw_check_beacon_data(_adapter *padapter, u8 *pbuf,  int len)
 			break;
 		}
 
-		if ((p == NULL) || (ie_len == 0))
+		if ((!p) || (ie_len == 0))
 			break;
 	}
 
@@ -1601,7 +1601,7 @@ int rtw_check_beacon_data(_adapter *padapter, u8 *pbuf,  int len)
 				break;
 			}
 
-			if ((p == NULL) || (ie_len == 0))
+			if ((!p) || (ie_len == 0))
 				break;
 		}
 	}
@@ -1757,7 +1757,7 @@ int rtw_check_beacon_data(_adapter *padapter, u8 *pbuf,  int len)
 		sta = rtw_get_stainfo(&padapter->stapriv, pbss_network->MacAddress);
 		if (!sta) {
 			sta = rtw_alloc_stainfo(&padapter->stapriv, pbss_network->MacAddress);
-			if (sta == NULL)
+			if (!sta)
 				return _FAIL;
 		}
 	}
@@ -1956,13 +1956,13 @@ u8 rtw_ap_set_pairwise_key(_adapter *padapter, struct sta_info *psta)
 	u8	res = _SUCCESS;
 
 	ph2c = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (ph2c == NULL) {
+	if (!ph2c) {
 		res = _FAIL;
 		goto exit;
 	}
 
 	psetstakey_para = (struct set_stakey_parm *)rtw_zmalloc(sizeof(struct set_stakey_parm));
-	if (psetstakey_para == NULL) {
+	if (!psetstakey_para) {
 		rtw_mfree((u8 *) ph2c, sizeof(struct cmd_obj));
 		res = _FAIL;
 		goto exit;
@@ -1997,12 +1997,12 @@ static int rtw_ap_set_key(_adapter *padapter, u8 *key, u8 alg, int keyid, u8 set
 	/* RTW_INFO("%s\n", __FUNCTION__); */
 
 	pcmd = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (pcmd == NULL) {
+	if (!pcmd) {
 		res = _FAIL;
 		goto exit;
 	}
 	psetkeyparm = (struct setkey_parm *)rtw_zmalloc(sizeof(struct setkey_parm));
-	if (psetkeyparm == NULL) {
+	if (!psetkeyparm) {
 		rtw_mfree((unsigned char *)pcmd, sizeof(struct cmd_obj));
 		res = _FAIL;
 		goto exit;
@@ -2385,11 +2385,11 @@ static void update_bcn_wps_ie(_adapter *padapter)
 
 	pwps_ie = rtw_get_wps_ie(ie + _FIXED_IE_LENGTH_, ielen - _FIXED_IE_LENGTH_, NULL, &wps_ielen);
 
-	if (pwps_ie == NULL || wps_ielen == 0)
+	if (!pwps_ie || wps_ielen == 0)
 		return;
 
 	pwps_ie_src = pmlmepriv->wps_beacon_ie;
-	if (pwps_ie_src == NULL)
+	if (!pwps_ie_src)
 		return;
 
 	wps_offset = (uint)(pwps_ie - ie);
@@ -2514,7 +2514,7 @@ void rtw_process_public_act_bsscoex(_adapter *padapter, u8 *pframe, uint frame_l
 	u8 category, action;
 
 	psta = rtw_get_stainfo(pstapriv, get_addr2_ptr(pframe));
-	if (psta == NULL)
+	if (!psta)
 		return;
 
 
@@ -2570,7 +2570,7 @@ void rtw_process_ht_action_smps(_adapter *padapter, u8 *ta, u8 ctrl_field)
 	struct sta_priv *pstapriv = &padapter->stapriv;
 
 	psta = rtw_get_stainfo(pstapriv, ta);
-	if (psta == NULL)
+	if (!psta)
 		return;
 
 	e_field = (ctrl_field & BIT(0)) ? 1 : 0;
@@ -3165,7 +3165,7 @@ void rtw_ap_restore_network(_adapter *padapter)
 	for (i = 0; i < chk_alive_num; i++) {
 		psta = rtw_get_stainfo_by_offset(pstapriv, chk_alive_list[i]);
 
-		if (psta == NULL)
+		if (!psta)
 			RTW_INFO(FUNC_ADPT_FMT" sta_info is null\n", FUNC_ADPT_ARG(padapter));
 		else if (psta->state & _FW_LINKED) {
 			rtw_sta_media_status_rpt(padapter, psta, 1);
@@ -3701,8 +3701,8 @@ u16 rtw_ap_parse_sta_security_ie(_adapter *adapter, struct sta_info *sta, struct
 		goto exit;
 
 	sta->flags &= ~(WLAN_STA_WPS | WLAN_STA_MAYBE_WPS);
-	/* if (hapd->conf->wps_state && wpa_ie == NULL) { */ /* todo: to check ap if supporting WPS */
-	if (wpa_ie == NULL) {
+	/* if (!hapd->conf->wps_state && wpa_ie) { */ /* todo: to check ap if supporting WPS */
+	if (!wpa_ie) {
 		if (elems->wps_ie) {
 			RTW_INFO("STA included WPS IE in "
 				 "(Re)Association Request - assume WPS is "

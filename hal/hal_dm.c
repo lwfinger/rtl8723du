@@ -710,7 +710,7 @@ void rtw_phydm_ra_registed(_adapter *adapter, struct sta_info *psta)
 {
 	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
 
-	if (psta == NULL) {
+	if (!psta) {
 		RTW_ERR(FUNC_ADPT_FMT" sta is NULL\n", FUNC_ADPT_ARG(adapter));
 		rtw_warn_on(1);
 		return;

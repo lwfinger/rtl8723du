@@ -88,7 +88,7 @@ u8 rtw_hal_data_init(_adapter *padapter)
 	if (is_primary_adapter(padapter)) {
 		padapter->hal_data_sz = sizeof(HAL_DATA_TYPE);
 		padapter->HalData = rtw_zvmalloc(padapter->hal_data_sz);
-		if (padapter->HalData == NULL) {
+		if (!padapter->HalData) {
 			RTW_INFO("cant not alloc memory for HAL DATA\n");
 			return _FAIL;
 		}
@@ -376,7 +376,7 @@ static void rtw_sta_ra_registed(_adapter *padapter, struct sta_info *psta)
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
 	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(padapter);
 
-	if (psta == NULL) {
+	if (!psta) {
 		RTW_ERR(FUNC_ADPT_FMT" sta is NULL\n", FUNC_ADPT_ARG(padapter));
 		rtw_warn_on(1);
 		return;

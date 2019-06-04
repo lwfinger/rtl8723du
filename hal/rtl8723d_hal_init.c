@@ -417,7 +417,7 @@ static int _WriteBTFWtoTxPktBuf8723D(
 		tx reserved_page_packet
 		----------------------------------------------------------*/
 		pmgntframe = rtw_alloc_cmdxmitframe(pxmitpriv);
-		if (pmgntframe == NULL) {
+		if (!pmgntframe) {
 			rtStatus = _FAIL;
 			goto exit;
 		}
@@ -590,7 +590,7 @@ static int ReservedPage_Compare(PADAPTER Adapter, struct rt_mp_firmware *pFirmwa
 	u8	*myBTFwBuffer = NULL;
 
 	myBTFwBuffer = rtw_zmalloc(BTPatchSize);
-	if (myBTFwBuffer == NULL) {
+	if (!myBTFwBuffer) {
 		RTW_INFO("%s can't be executed due to the failed malloc.\n", __FUNCTION__);
 		Adapter->mppriv.bTxBufCkFail = true;
 		return false;
@@ -661,7 +661,7 @@ static int ReservedPage_Compare(PADAPTER Adapter, struct rt_mp_firmware *pFirmwa
 		}
 	}
 
-	if (myBTFwBuffer != NULL)
+	if (myBTFwBuffer)
 		rtw_mfree(myBTFwBuffer, BTPatchSize);
 
 	return true;
@@ -1254,7 +1254,7 @@ static void hal_ReadEFuse_WiFi(PADAPTER padapter, u16 _offset, u16 _size_byte,
 	}
 
 	efuseTbl = (u8 *)rtw_malloc(EFUSE_MAX_MAP_LEN);
-	if (efuseTbl == NULL) {
+	if (!efuseTbl) {
 		RTW_INFO("%s: alloc efuseTbl fail!\n", __FUNCTION__);
 		return;
 	}
@@ -1373,7 +1373,7 @@ static void hal_ReadEFuse_BT(PADAPTER padapter, u16 _offset, u16 _size_byte,
 	}
 
 	efuseTbl = rtw_malloc(EFUSE_BT_MAP_LEN);
-	if (efuseTbl == NULL) {
+	if (!efuseTbl) {
 		RTW_INFO("%s: efuseTbl malloc fail!\n", __FUNCTION__);
 		return;
 	}
@@ -1773,7 +1773,7 @@ static bool Hal_EfusePgPacketRead(PADAPTER	padapter,
 	bool	ret;
 
 
-	if (data == NULL)
+	if (!data)
 		return false;
 
 	EFUSE_GetEfuseDefinition(padapter, EFUSE_WIFI, TYPE_EFUSE_MAX_SECTION, &max_section, bPseudoTest);

@@ -937,7 +937,7 @@ static int rtw_cfgvendor_rtt_cancel_config(struct wiphy *wiphy, struct wireless_
 		case RTT_ATTRIBUTE_TARGET_CNT:
 			target_cnt = nla_get_u8(iter);
 			mac_list = (struct ether_addr *)kzalloc(target_cnt * ETHER_ADDR_LEN , GFP_KERNEL);
-			if (mac_list == NULL) {
+			if (!mac_list) {
 				WL_ERR(("failed to allocate mem for mac list\n"));
 				goto exit;
 			}
@@ -1082,7 +1082,7 @@ static int rtw_cfgvendor_lstats_get_info(struct wiphy *wiphy,
 	char *output;
 
 	output = rtw_malloc(sizeof(wifi_radio_stat) + sizeof(wifi_iface_stat)+1);
-	if (output == NULL) {
+	if (!output) {
 		RTW_DBG("Allocate lstats info buffer fail!\n");
 	}
 

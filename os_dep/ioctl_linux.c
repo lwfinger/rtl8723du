@@ -807,7 +807,7 @@ static int wpa_set_encryption(struct net_device *dev, struct ieee_param *param, 
 
 		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_MP_STATE) == true) { /* sta mode */
 			psta = rtw_get_stainfo(pstapriv, get_bssid(pmlmepriv));
-			if (psta == NULL) {
+			if (!psta) {
 				/* DEBUG_ERR( ("Set wpa_set_encryption: Obtain Sta_info fail\n")); */
 			} else {
 				/* Jeff: don't disable ieee8021x_blocked while clearing key */
@@ -868,7 +868,7 @@ static int wpa_set_encryption(struct net_device *dev, struct ieee_param *param, 
 			}
 
 			pbcmc_sta = rtw_get_bcmc_stainfo(padapter);
-			if (pbcmc_sta == NULL) {
+			if (!pbcmc_sta) {
 				/* DEBUG_ERR( ("Set OID_802_11_ADD_KEY: bcmc stainfo is null\n")); */
 			} else {
 				/* Jeff: don't disable ieee8021x_blocked while clearing key */
@@ -898,9 +898,9 @@ static int rtw_set_wpa_ie(_adapter *padapter, char *pie, unsigned short ielen)
 	u8 null_addr[] = {0, 0, 0, 0, 0, 0};
 	struct wifidirect_info *pwdinfo = &padapter->wdinfo;
 
-	if ((ielen > MAX_WPA_IE_LEN) || (pie == NULL)) {
+	if ((ielen > MAX_WPA_IE_LEN) || (!pie)) {
 		_clr_fwstate_(&padapter->mlmepriv, WIFI_UNDER_WPS);
-		if (pie == NULL)
+		if (!pie)
 			return ret;
 		else
 			return -EINVAL;
@@ -908,7 +908,7 @@ static int rtw_set_wpa_ie(_adapter *padapter, char *pie, unsigned short ielen)
 
 	if (ielen) {
 		buf = rtw_zmalloc(ielen);
-		if (buf == NULL) {
+		if (!buf) {
 			ret =  -ENOMEM;
 			goto exit;
 		}
@@ -1662,7 +1662,7 @@ static int rtw_wx_set_mlme(struct net_device *dev,
 	struct iw_mlme *mlme = (struct iw_mlme *) extra;
 
 
-	if (mlme == NULL)
+	if (!mlme)
 		return -1;
 
 	RTW_INFO("%s\n", __FUNCTION__);
@@ -2644,7 +2644,7 @@ static int rtw_wx_set_enc_ext(struct net_device *dev,
 
 	param_len = sizeof(struct ieee_param) + pext->key_len;
 	param = (struct ieee_param *)rtw_malloc(param_len);
-	if (param == NULL)
+	if (!param)
 		return -1;
 
 	_rtw_memset(param, 0, param_len);
@@ -3060,7 +3060,7 @@ static int rtw_mp_ioctl_hdl(struct net_device *dev, struct iw_request_info *info
 	bset = (u8)(p->flags & 0xFFFF);
 	len = p->length;
 	pparmbuf = (u8 *)rtw_malloc(len);
-	if (pparmbuf == NULL) {
+	if (!pparmbuf) {
 		ret = -ENOMEM;
 		goto _rtw_mp_ioctl_hdl_exit;
 	}
@@ -3161,7 +3161,7 @@ static int rtw_get_ap_info(struct net_device *dev,
 
 	RTW_INFO("+rtw_get_aplist_info\n");
 
-	if (rtw_is_drv_stopped(padapter) || (pdata == NULL)) {
+	if (rtw_is_drv_stopped(padapter) || (!pdata)) {
 		ret = -EINVAL;
 		goto exit;
 	}
@@ -3252,7 +3252,7 @@ static int rtw_set_pid(struct net_device *dev,
 	int *pdata = (int *)wrqu;
 	int selector;
 
-	if (rtw_is_drv_stopped(padapter) || (pdata == NULL)) {
+	if (rtw_is_drv_stopped(padapter) || (!pdata)) {
 		ret = -EINVAL;
 		goto exit;
 	}
@@ -5208,7 +5208,7 @@ static int rtw_p2p_get2(struct net_device *dev,
 	int length = wrqu->data.length;
 	char *buffer = (u8 *)rtw_malloc(length);
 
-	if (buffer == NULL) {
+	if (!buffer) {
 		ret = -ENOMEM;
 		goto bad;
 	}
@@ -5983,7 +5983,7 @@ static int wpa_supplicant_ioctl(struct net_device *dev, struct iw_point *p)
 	}
 
 	param = (struct ieee_param *)rtw_malloc(p->length);
-	if (param == NULL) {
+	if (!param) {
 		ret = -ENOMEM;
 		goto out;
 	}
@@ -6076,7 +6076,7 @@ static int rtw_set_encryption(struct net_device *dev, struct ieee_param *param, 
 		}
 	}
 
-	if (strcmp(param->u.crypt.alg, "none") == 0 && (psta == NULL)) {
+	if (strcmp(param->u.crypt.alg, "none") == 0 && (!psta)) {
 		/* todo:clear default encryption keys */
 
 		psecuritypriv->dot11AuthAlgrthm = dot11AuthAlgrthm_Open;
@@ -6090,7 +6090,7 @@ static int rtw_set_encryption(struct net_device *dev, struct ieee_param *param, 
 	}
 
 
-	if (strcmp(param->u.crypt.alg, "WEP") == 0 && (psta == NULL)) {
+	if (strcmp(param->u.crypt.alg, "WEP") == 0 && (!psta)) {
 		RTW_INFO("r871x_set_encryption, crypt.alg = WEP\n");
 
 		wep_key_idx = param->u.crypt.idx;
@@ -6108,7 +6108,7 @@ static int rtw_set_encryption(struct net_device *dev, struct ieee_param *param, 
 			wep_key_len = wep_key_len <= 5 ? 5 : 13;
 			wep_total_len = wep_key_len + FIELD_OFFSET(NDIS_802_11_WEP, KeyMaterial);
 			pwep = (NDIS_802_11_WEP *)rtw_malloc(wep_total_len);
-			if (pwep == NULL) {
+			if (!pwep) {
 				RTW_INFO(" r871x_set_encryption: pwep allocate fail !!!\n");
 				goto exit;
 			}
@@ -6574,7 +6574,7 @@ static int rtw_set_wps_beacon(struct net_device *dev, struct ieee_param *param, 
 	if (ie_len > 0) {
 		pmlmepriv->wps_beacon_ie = rtw_malloc(ie_len);
 		pmlmepriv->wps_beacon_ie_len = ie_len;
-		if (pmlmepriv->wps_beacon_ie == NULL) {
+		if (!pmlmepriv->wps_beacon_ie) {
 			RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
 			return -EINVAL;
 		}
@@ -6615,7 +6615,7 @@ static int rtw_set_wps_probe_resp(struct net_device *dev, struct ieee_param *par
 	if (ie_len > 0) {
 		pmlmepriv->wps_probe_resp_ie = rtw_malloc(ie_len);
 		pmlmepriv->wps_probe_resp_ie_len = ie_len;
-		if (pmlmepriv->wps_probe_resp_ie == NULL) {
+		if (!pmlmepriv->wps_probe_resp_ie) {
 			RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
 			return -EINVAL;
 		}
@@ -6650,7 +6650,7 @@ static int rtw_set_wps_assoc_resp(struct net_device *dev, struct ieee_param *par
 	if (ie_len > 0) {
 		pmlmepriv->wps_assoc_resp_ie = rtw_malloc(ie_len);
 		pmlmepriv->wps_assoc_resp_ie_len = ie_len;
-		if (pmlmepriv->wps_assoc_resp_ie == NULL) {
+		if (!pmlmepriv->wps_assoc_resp_ie) {
 			RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
 			return -EINVAL;
 		}
@@ -6788,7 +6788,7 @@ static int rtw_hostapd_ioctl(struct net_device *dev, struct iw_point *p)
 	}
 
 	param = (struct ieee_param *)rtw_malloc(p->length);
-	if (param == NULL) {
+	if (!param) {
 		ret = -ENOMEM;
 		goto out;
 	}
@@ -6962,7 +6962,7 @@ static int rtw_wx_set_priv(struct net_device *dev,
 			}
 
 			pmlmepriv->wps_probe_req_ie = rtw_malloc(cp_sz);
-			if (pmlmepriv->wps_probe_req_ie == NULL) {
+			if (!pmlmepriv->wps_probe_req_ie) {
 				printk("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
 				ret =  -EINVAL;
 				goto FREE_EXT;
@@ -7051,12 +7051,12 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 
 	err = 0;
 	data = rtw_zmalloc(EFUSE_BT_MAX_MAP_LEN);
-	if (data == NULL) {
+	if (!data) {
 		err = -ENOMEM;
 		goto exit;
 	}
 	rawdata = rtw_zmalloc(EFUSE_BT_MAX_MAP_LEN);
-	if (rawdata == NULL) {
+	if (!rawdata) {
 		err = -ENOMEM;
 		goto exit;
 	}
@@ -7079,7 +7079,7 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 
 	i = 0;
 	/* mac 16 "00e04c871200" rmap,00,2 */
-	while ((token = strsep(&pch, ",")) != NULL) {
+	while ((token = strsep(&pch, ","))) {
 		if (i > 2)
 			break;
 		tmp[i] = token;
@@ -7160,7 +7160,7 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 		if ((shift + cnt) < mapLen)
 			pextra += sprintf(pextra, "\t...more (left:%d/%d)\n", mapLen-(shift + cnt), mapLen);
 	} else if (strcmp(tmp[0], "rmap") == 0) {
-		if ((tmp[1] == NULL) || (tmp[2] == NULL)) {
+		if ((!tmp[1]) || (!tmp[2])) {
 			RTW_INFO("%s: rmap Fail!! Parameters error!\n", __FUNCTION__);
 			err = -EINVAL;
 			goto exit;
@@ -7423,7 +7423,7 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 			goto exit;
 		}
 
-		if ((tmp[1] == NULL) || (tmp[2] == NULL)) {
+		if ((!tmp[1]) || (!tmp[2])) {
 			err = -EINVAL;
 			goto exit;
 		}
@@ -7537,7 +7537,7 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 			pextra += sprintf(pextra, "\t...more\n");
 
 	} else if (strcmp(tmp[0], "wlrfkrmap") == 0) {
-		if ((tmp[1] == NULL) || (tmp[2] == NULL)) {
+		if ((!tmp[1]) || (!tmp[2])) {
 			RTW_INFO("%s: rmap Fail!! Parameters error!\n", __FUNCTION__);
 			err = -EINVAL;
 			goto exit;
@@ -7562,7 +7562,7 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 			pextra += sprintf(pextra, "0x%02X ", pEfuseHal->fakeEfuseModifiedMap[addr+i]);
 		}
 	} else if (strcmp(tmp[0], "btrfkrmap") == 0) {
-		if ((tmp[1] == NULL) || (tmp[2] == NULL)) {
+		if ((!tmp[1]) || (!tmp[2])) {
 			RTW_INFO("%s: rmap Fail!! Parameters error!\n", __FUNCTION__);
 			err = -EINVAL;
 			goto exit;
@@ -7662,22 +7662,22 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 	EFUSE_GetEfuseDefinition(padapter, EFUSE_WIFI, TYPE_EFUSE_MAP_LEN , (void *)&wifimaplen, false);
 
 	setdata = rtw_zmalloc(1024);
-	if (setdata == NULL) {
+	if (!setdata) {
 		err = -ENOMEM;
 		goto exit;
 	}
 	ShadowMapBT = rtw_malloc(EFUSE_BT_MAX_MAP_LEN);
-	if (ShadowMapBT == NULL) {
+	if (!ShadowMapBT) {
 		err = -ENOMEM;
 		goto exit;
 	}
 	ShadowMapWiFi = rtw_malloc(wifimaplen);
-	if (ShadowMapWiFi == NULL) {
+	if (!ShadowMapWiFi) {
 		err = -ENOMEM;
 		goto exit;
 	}
 	setrawdata = rtw_malloc(EFUSE_MAX_SIZE);
-	if (setrawdata == NULL) {
+	if (!setrawdata) {
 		err = -ENOMEM;
 		goto exit;
 	}
@@ -7692,7 +7692,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 	RTW_INFO("%s: in=%s\n", __FUNCTION__, extra);
 
 	i = 0;
-	while ((token = strsep(&pch, ",")) != NULL) {
+	while ((token = strsep(&pch, ","))) {
 		if (i > 2)
 			break;
 		tmp[i] = token;
@@ -7702,7 +7702,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 	/* tmp[0],[1],[2] */
 	/* wmap,addr,00e04c871200 */
 	if (strcmp(tmp[0], "wmap") == 0) {
-		if ((tmp[1] == NULL) || (tmp[2] == NULL)) {
+		if ((!tmp[1]) || (!tmp[2])) {
 			err = -EINVAL;
 			goto exit;
 		}
@@ -7767,7 +7767,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			}
 		}
 	} else if (strcmp(tmp[0], "wraw") == 0) {
-		if ((tmp[1] == NULL) || (tmp[2] == NULL)) {
+		if ((!tmp[1]) || (!tmp[2])) {
 			err = -EINVAL;
 			goto exit;
 		}
@@ -7799,7 +7799,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			goto exit;
 		}
 	} else if (strcmp(tmp[0], "btwraw") == 0) {
-		if ((tmp[1] == NULL) || (tmp[2] == NULL)) {
+		if ((!tmp[1]) || (!tmp[2])) {
 			err = -EINVAL;
 			goto exit;
 		}
@@ -7833,7 +7833,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 		}
 		rtw_write8(padapter, 0x35, 0); /* switch bank 0 (WiFi)*/
 	} else if (strcmp(tmp[0], "mac") == 0) {
-		if (tmp[1] == NULL) {
+		if (!tmp[1]) {
 			err = -EINVAL;
 			goto exit;
 		}
@@ -7883,7 +7883,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			goto exit;
 		}
 	} else if (strcmp(tmp[0], "vidpid") == 0) {
-		if (tmp[1] == NULL) {
+		if (!tmp[1]) {
 			err = -EINVAL;
 			goto exit;
 		}
@@ -7941,7 +7941,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			goto exit;
 		}
 
-		if ((tmp[1] == NULL) || (tmp[2] == NULL)) {
+		if ((!tmp[1]) || (!tmp[2])) {
 			err = -EINVAL;
 			goto exit;
 		}
@@ -8004,7 +8004,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			}
 		}
 	} else if (strcmp(tmp[0], "btwfake") == 0) {
-		if ((tmp[1] == NULL) || (tmp[2] == NULL)) {
+		if ((!tmp[1]) || (!tmp[2])) {
 			err = -EINVAL;
 			goto exit;
 		}
@@ -8139,7 +8139,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 			}
 		}
 	} else if (strcmp(tmp[0], "wlwfake") == 0) {
-		if ((tmp[1] == NULL) || (tmp[2] == NULL)) {
+		if ((!tmp[1]) || (!tmp[2])) {
 			err = -EINVAL;
 			goto exit;
 		}
@@ -8169,7 +8169,7 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 
 	}
 	else if (strcmp(tmp[0], "wfakemac") == 0) {
-		if (tmp[1] == NULL) {
+		if (!tmp[1]) {
 			err = -EINVAL;
 			goto exit;
 		}
@@ -8277,7 +8277,7 @@ static int rtw_mp_customer_str(
 	len = wrqu->data.length;
 
 	pbuf = (u8 *)rtw_zmalloc(len);
-	if (pbuf == NULL) {
+	if (!pbuf) {
 		RTW_WARN("%s: no memory!\n", __func__);
 		return -ENOMEM;
 	}
@@ -8291,7 +8291,7 @@ static int rtw_mp_customer_str(
 
 	ptmp = (char *)pbuf;
 	pch = strsep(&ptmp, ",");
-	if ((pch == NULL) || (strlen(pch) == 0)) {
+	if ((!pch) || (strlen(pch) == 0)) {
 		rtw_mfree(pbuf, len);
 		RTW_INFO("%s: parameter error(no cmd)!\n", __func__);
 		return -EFAULT;
@@ -8306,7 +8306,7 @@ static int rtw_mp_customer_str(
 	} else if (strcmp(pch, "write") == 0) {
 		do {
 			pch = strsep(&ptmp, ":");
-			if ((pch == NULL) || (strlen(pch) == 0))
+			if ((!pch) || (strlen(pch) == 0))
 				break;
 			if (strlen(pch) != 2
 				|| IsHexDigit(*pch) == false
@@ -8576,7 +8576,7 @@ static int rtw_priv_set(struct net_device *dev,
 	u32 subcmd = wrqu->flags;
 	PADAPTER padapter = rtw_netdev_priv(dev);
 
-	if (padapter == NULL)
+	if (!padapter)
 		return -ENETDOWN;
 
 	if (padapter->bup == false) {
@@ -8589,7 +8589,7 @@ static int rtw_priv_set(struct net_device *dev,
 		return -ENETDOWN;
 	}
 
-	if (extra == NULL) {
+	if (!extra) {
 		wrqu->length = 0;
 		return -EIO;
 	}
@@ -8613,7 +8613,7 @@ static int rtw_priv_get(struct net_device *dev,
 	PADAPTER padapter = rtw_netdev_priv(dev);
 
 
-	if (padapter == NULL)
+	if (!padapter)
 		return -ENETDOWN;
 
 	if (padapter->bup == false) {
@@ -8626,7 +8626,7 @@ static int rtw_priv_get(struct net_device *dev,
 		return -ENETDOWN;
 	}
 
-	if (extra == NULL) {
+	if (!extra) {
 		wrqu->length = 0;
 		return -EIO;
 	}
@@ -8894,9 +8894,9 @@ static int initLoopback(PADAPTER padapter)
 	PLOOPBACKDATA ploopback;
 
 
-	if (padapter->ploopback == NULL) {
+	if (!padapter->ploopback) {
 		ploopback = (PLOOPBACKDATA)rtw_zmalloc(sizeof(LOOPBACKDATA));
-		if (ploopback == NULL)
+		if (!ploopback)
 			return -ENOMEM;
 
 		_rtw_init_sema(&ploopback->sema, 0);
@@ -8990,7 +8990,7 @@ static int createpseudoadhoc(PADAPTER padapter)
 			rtw_free_stainfo(padapter, psta);
 
 		psta = rtw_alloc_stainfo(&padapter->stapriv, pibss);
-		if (psta == NULL)
+		if (!psta)
 			return _FAIL;
 
 		/* 3  join psudo AdHoc */
@@ -9028,7 +9028,7 @@ static struct xmit_frame *createloopbackpkt(PADAPTER padapter, u32 size)
 
 	/* 2 1. allocate xmit frame */
 	pframe = rtw_alloc_xmitframe(pxmitpriv);
-	if (pframe == NULL)
+	if (!pframe)
 		return NULL;
 	pframe->padapter = padapter;
 
@@ -9036,7 +9036,7 @@ static struct xmit_frame *createloopbackpkt(PADAPTER padapter, u32 size)
 	_enter_critical_bh(&pxmitpriv->lock, &irqL);
 	pxmitbuf = rtw_alloc_xmitbuf(pxmitpriv);
 	_exit_critical_bh(&pxmitpriv->lock, &irqL);
-	if (pxmitbuf == NULL) {
+	if (!pxmitbuf) {
 		rtw_free_xmitframe(pxmitpriv, pframe);
 		return NULL;
 	}
@@ -9258,7 +9258,7 @@ thread_return lbk_thread(thread_context context)
 
 	padapter = (PADAPTER)context;
 	ploopback = padapter->ploopback;
-	if (ploopback == NULL)
+	if (!ploopback)
 		return -1;
 	cnt = 0;
 	ok = 0;
@@ -9275,7 +9275,7 @@ thread_return lbk_thread(thread_context context)
 			pktsize = ploopback->size;
 
 		pxmitframe = createloopbackpkt(padapter, pktsize);
-		if (pxmitframe == NULL) {
+		if (!pxmitframe) {
 			sprintf(ploopback->msg, "loopback FAIL! 3. create Packet FAIL!");
 			break;
 		}
@@ -9409,7 +9409,7 @@ static int rtw_test(
 	len = wrqu->data.length;
 
 	pbuf = (u8 *)rtw_zmalloc(len + 1);
-	if (pbuf == NULL) {
+	if (!pbuf) {
 		RTW_INFO("%s: no memory!\n", __func__);
 		return -ENOMEM;
 	}
@@ -9426,7 +9426,7 @@ static int rtw_test(
 
 	ptmp = (char *)pbuf;
 	pch = strsep(&ptmp, delim);
-	if ((pch == NULL) || (strlen(pch) == 0)) {
+	if ((!pch) || (strlen(pch) == 0)) {
 		rtw_mfree(pbuf, len);
 		RTW_INFO("%s: parameter error(level 1)!\n", __func__);
 		return -EFAULT;
@@ -9438,7 +9438,7 @@ static int rtw_test(
 		u32 size = 64;
 
 		pch = strsep(&ptmp, delim);
-		if ((pch == NULL) || (strlen(pch) == 0)) {
+		if ((!pch) || (strlen(pch) == 0)) {
 			rtw_mfree(pbuf, len);
 			RTW_INFO("%s: parameter error(level 2)!\n", __func__);
 			return -EFAULT;
@@ -9448,7 +9448,7 @@ static int rtw_test(
 		RTW_INFO("%s: loopback cnt=%d\n", __func__, cnt);
 
 		pch = strsep(&ptmp, delim);
-		if ((pch == NULL) || (strlen(pch) == 0)) {
+		if ((!pch) || (strlen(pch) == 0)) {
 			rtw_mfree(pbuf, len);
 			RTW_INFO("%s: parameter error(level 2)!\n", __func__);
 			return -EFAULT;
@@ -9482,7 +9482,7 @@ static int rtw_test(
 
 		do {
 			pch = strsep(&ptmp, delim);
-			if ((pch == NULL) || (strlen(pch) == 0))
+			if ((!pch) || (strlen(pch) == 0))
 				break;
 
 			sscanf(pch, "%x", &tmp);
@@ -9933,7 +9933,7 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 	ptr = input;
 	len = input_len;
 
-	if (ptr == NULL) {
+	if (!ptr) {
 		err = -EOPNOTSUPP;
 		goto exit;
 	}

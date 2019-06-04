@@ -235,7 +235,7 @@ static void rtw_reg_notifier(struct wiphy *wiphy, struct regulatory_request *req
 
 void rtw_reg_notify_by_driver(_adapter *adapter)
 {
-	if ((adapter->rtw_wdev != NULL) && (adapter->rtw_wdev->wiphy)) {
+	if ((adapter->rtw_wdev) && (adapter->rtw_wdev->wiphy)) {
 		struct regulatory_request request;
 		request.initiator = NL80211_REGDOM_SET_BY_DRIVER;
 		rtw_reg_notifier(adapter->rtw_wdev->wiphy, &request);

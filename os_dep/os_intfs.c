@@ -1015,7 +1015,7 @@ static int rtw_ndev_notifier_call(struct notifier_block *nb, unsigned long state
 {
 	struct net_device *ndev;
 
-	if (ptr == NULL)
+	if (!ptr)
 		return NOTIFY_DONE;
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0))
@@ -1024,7 +1024,7 @@ static int rtw_ndev_notifier_call(struct notifier_block *nb, unsigned long state
 	ndev = ptr;
 #endif
 
-	if (ndev == NULL)
+	if (!ndev)
 		return NOTIFY_DONE;
 
 	if (!is_rtw_ndev(ndev))
@@ -1129,7 +1129,7 @@ struct net_device *rtw_init_netdev(_adapter *old_padapter)
 	_adapter *padapter;
 	struct net_device *pnetdev;
 
-	if (old_padapter != NULL) {
+	if (old_padapter) {
 		rtw_os_ndev_free(old_padapter);
 		pnetdev = rtw_alloc_etherdev_with_old_priv(sizeof(_adapter), (void *)old_padapter);
 	} else
@@ -1176,7 +1176,7 @@ static int rtw_os_ndev_alloc(_adapter *adapter)
 	struct net_device *ndev = NULL;
 
 	ndev = rtw_init_netdev(adapter);
-	if (ndev == NULL) {
+	if (!ndev) {
 		rtw_warn_on(1);
 		goto exit;
 	}
@@ -1270,7 +1270,7 @@ void rtw_os_ndev_unregister(_adapter *adapter)
 {
 	struct net_device *netdev = NULL;
 
-	if (adapter == NULL || adapter->registered == 0)
+	if (!adapter || adapter->registered == 0)
 		return;
 
 	adapter->ndev_unregistering = 1;
@@ -1411,7 +1411,7 @@ static void rtw_os_ndevs_free(struct dvobj_priv *dvobj)
 
 		adapter = dvobj->padapters[i];
 
-		if (adapter == NULL)
+		if (!adapter)
 			continue;
 
 		rtw_os_ndev_free(adapter);
@@ -1427,7 +1427,7 @@ u32 rtw_start_drv_threads(_adapter *padapter)
 	u32 _status = _SUCCESS;
 
 	if (is_primary_adapter(padapter)) {
-		if (padapter->cmdThread == NULL) {
+		if (!padapter->cmdThread) {
 			RTW_INFO(FUNC_ADPT_FMT " start RTW_CMD_THREAD\n", FUNC_ADPT_ARG(padapter));
 			padapter->cmdThread = kthread_run(rtw_cmd_thread, padapter, "RTW_CMD_THREAD");
 			if (IS_ERR(padapter->cmdThread)) {
@@ -1441,7 +1441,7 @@ u32 rtw_start_drv_threads(_adapter *padapter)
 
 
 #ifdef CONFIG_EVENT_THREAD_MODE
-	if (padapter->evtThread == NULL) {
+	if (!padapter->evtThread) {
 		RTW_INFO(FUNC_ADPT_FMT " start RTW_EVENT_THREAD\n", FUNC_ADPT_ARG(padapter));
 		padapter->evtThread = kthread_run(event_thread, padapter, "RTW_EVENT_THREAD");
 		if (IS_ERR(padapter->evtThread)) {
@@ -1565,7 +1565,7 @@ struct dvobj_priv *devobj_init(void)
 	struct dvobj_priv *pdvobj = NULL;
 
 	pdvobj = (struct dvobj_priv *)rtw_zmalloc(sizeof(*pdvobj));
-	if (pdvobj == NULL)
+	if (!pdvobj)
 		return NULL;
 
 	_rtw_mutex_init(&pdvobj->hw_init_mutex);
@@ -2071,7 +2071,7 @@ _adapter *rtw_drv_add_vir_if(_adapter *primary_padapter,
 
 	/****** init adapter ******/
 	padapter = (_adapter *)rtw_zvmalloc(sizeof(*padapter));
-	if (padapter == NULL)
+	if (!padapter)
 		goto exit;
 
 	if (loadparam(padapter) != _SUCCESS)
@@ -2151,7 +2151,7 @@ void rtw_drv_stop_vir_if(_adapter *padapter)
 	struct net_device *pnetdev = NULL;
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 
-	if (padapter == NULL)
+	if (!padapter)
 		return;
 
 	pnetdev = padapter->pnetdev;
@@ -2176,7 +2176,7 @@ void rtw_drv_stop_vir_if(_adapter *padapter)
 
 void rtw_drv_free_vir_if(_adapter *padapter)
 {
-	if (padapter == NULL)
+	if (!padapter)
 		return;
 
 	RTW_INFO(FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(padapter));
@@ -2243,7 +2243,7 @@ static int rtw_inetaddr_notifier_call(struct notifier_block *nb,
 
 	adapter = (_adapter *)rtw_netdev_priv(ifa->ifa_dev->dev);
 
-	if (adapter == NULL)
+	if (!adapter)
 		return NOTIFY_DONE;
 
 	pmlmeext = &adapter->mlmeextpriv;
@@ -2290,7 +2290,7 @@ static int rtw_inet6addr_notifier_call(struct notifier_block *nb,
 
 	adapter = (_adapter *)rtw_netdev_priv(inet6_ifa->idev->dev);
 
-	if (adapter == NULL)
+	if (!adapter)
 		return NOTIFY_DONE;
 
 	pmlmeext =  &adapter->mlmeextpriv;
@@ -2419,7 +2419,7 @@ void rtw_os_ndevs_unregister(struct dvobj_priv *dvobj)
 	for (i = 0; i < dvobj->iface_nums; i++) {
 		adapter = dvobj->padapters[i];
 
-		if (adapter == NULL)
+		if (!adapter)
 			continue;
 
 		rtw_os_ndev_unregister(adapter);
@@ -2922,7 +2922,7 @@ static int route_dump(u32 *gw_addr , int *gw_index)
 		goto out_sock;
 
 	pg = (char *) __get_free_page(GFP_KERNEL);
-	if (pg == NULL) {
+	if (!pg) {
 		err = -ENOMEM;
 		goto out_sock;
 	}
@@ -3045,7 +3045,7 @@ static int arp_query(unsigned char *haddr, u32 paddr,
 
 	neighbor_entry = neigh_lookup(&arp_tbl, &paddr, dev);
 
-	if (neighbor_entry != NULL) {
+	if (neighbor_entry) {
 		neighbor_entry->used = jiffies;
 		if (neighbor_entry->nud_state & NUD_VALID) {
 			_rtw_memcpy(haddr, neighbor_entry->ha, dev->addr_len);
@@ -3070,7 +3070,7 @@ static int get_defaultgw(u32 *ip_addr , char mac[])
 
 	gw_dev = dev_get_by_index(&init_net, gw_index);
 
-	if (gw_dev == NULL) {
+	if (!gw_dev) {
 		/* RTW_INFO("get Oif Device Fail\n"); */
 		return -1;
 	}

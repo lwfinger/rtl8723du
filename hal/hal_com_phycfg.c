@@ -248,7 +248,7 @@ const struct map_t *hal_pg_txpwr_def_info(_adapter *adapter)
 		break;
 	}
 
-	if (map == NULL) {
+	if (!map) {
 		RTW_ERR("%s: unknown chip_type:%u\n"
 			, __func__, rtw_get_chip_type(adapter));
 		rtw_warn_on(1);
@@ -262,7 +262,7 @@ static u8 hal_chk_pg_txpwr_info_2g(_adapter *adapter, TxPowerInfo24G *pwr_info)
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	u8 path, group, tx_idx;
 
-	if (pwr_info == NULL || !hal_chk_band_cap(adapter, BAND_CAP_2G))
+	if (!pwr_info || !hal_chk_band_cap(adapter, BAND_CAP_2G))
 		return _SUCCESS;
 
 	for (path = 0; path < MAX_RF_PATH; path++) {
@@ -297,7 +297,7 @@ static inline void hal_init_pg_txpwr_info_2g(_adapter *adapter, TxPowerInfo24G *
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	u8 path, group, tx_idx;
 
-	if (pwr_info == NULL)
+	if (!pwr_info)
 		return;
 
 	_rtw_memset(pwr_info, 0, sizeof(TxPowerInfo24G));
@@ -356,7 +356,7 @@ static u16 hal_load_pg_txpwr_info_path_2g(
 	u8 tmp_base;
 	s8 tmp_diff;
 
-	if (pwr_info == NULL || !hal_chk_band_cap(adapter, BAND_CAP_2G)) {
+	if (!pwr_info || !hal_chk_band_cap(adapter, BAND_CAP_2G)) {
 		offset += PG_TXPWR_1PATH_BYTE_NUM_2G;
 		goto exit;
 	}
@@ -525,7 +525,7 @@ select_src:
 		break;
 	};
 
-	if (txpwr_map == NULL)
+	if (!txpwr_map)
 		goto end_parse;
 
 	for (path = 0; path < MAX_RF_PATH ; path++) {
@@ -2973,7 +2973,7 @@ phy_ConfigMACWithParaFile(
 
 	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
-	if ((pHalData->mac_reg_len == 0) && (pHalData->mac_reg == NULL)) {
+	if ((pHalData->mac_reg_len == 0) && (!pHalData->mac_reg)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
 		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
@@ -2988,7 +2988,7 @@ phy_ConfigMACWithParaFile(
 			}
 		}
 	} else {
-		if ((pHalData->mac_reg_len != 0) && (pHalData->mac_reg != NULL)) {
+		if ((pHalData->mac_reg_len != 0) && (pHalData->mac_reg)) {
 			_rtw_memcpy(pHalData->para_file_buf, pHalData->mac_reg, pHalData->mac_reg_len);
 			rtStatus = _SUCCESS;
 		} else
@@ -2997,7 +2997,7 @@ phy_ConfigMACWithParaFile(
 
 	if (rtStatus == _SUCCESS) {
 		ptmp = pHalData->para_file_buf;
-		for (szLine = GetLineFromBuffer(ptmp); szLine != NULL; szLine = GetLineFromBuffer(ptmp)) {
+		for (szLine = GetLineFromBuffer(ptmp); szLine; szLine = GetLineFromBuffer(ptmp)) {
 			if (!IsCommentString(szLine)) {
 				/* Get 1st hex value as register offset */
 				if (GetHexValueFromString(szLine, &u4bRegOffset, &u4bMove)) {
@@ -3052,7 +3052,7 @@ phy_ConfigBBWithParaFile(
 
 	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
-	if ((pBufLen != NULL) && (*pBufLen == 0) && (pBuf == NULL)) {
+	if ((pBufLen) && (*pBufLen == 0) && (!pBuf)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
 		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
@@ -3076,7 +3076,7 @@ phy_ConfigBBWithParaFile(
 			}
 		}
 	} else {
-		if ((pBufLen != NULL) && (*pBufLen != 0) && (pBuf != NULL)) {
+		if ((pBufLen) && (*pBufLen != 0) && (pBuf)) {
 			_rtw_memcpy(pHalData->para_file_buf, pBuf, *pBufLen);
 			rtStatus = _SUCCESS;
 		} else
@@ -3085,7 +3085,7 @@ phy_ConfigBBWithParaFile(
 
 	if (rtStatus == _SUCCESS) {
 		ptmp = pHalData->para_file_buf;
-		for (szLine = GetLineFromBuffer(ptmp); szLine != NULL; szLine = GetLineFromBuffer(ptmp)) {
+		for (szLine = GetLineFromBuffer(ptmp); szLine; szLine = GetLineFromBuffer(ptmp)) {
 			if (!IsCommentString(szLine)) {
 				/* Get 1st hex value as register offset. */
 				if (GetHexValueFromString(szLine, &u4bRegOffset, &u4bMove)) {
@@ -3144,7 +3144,7 @@ phy_DecryptBBPgParaFile(
 
 	ptmp = buffer;
 	i = 0;
-	for (BufOfLines = GetLineFromBuffer(ptmp); BufOfLines != NULL; BufOfLines = GetLineFromBuffer(ptmp)) {
+	for (BufOfLines = GetLineFromBuffer(ptmp); BufOfLines; BufOfLines = GetLineFromBuffer(ptmp)) {
 		/* RTW_INFO("Encrypted Line: %s\n", BufOfLines); */
 
 		for (j = 0; j < strlen(BufOfLines); ++j) {
@@ -3185,7 +3185,7 @@ phy_ParseBBPgParaFile(
 		phy_DecryptBBPgParaFile(Adapter, buffer);
 
 	ptmp = buffer;
-	for (szLine = GetLineFromBuffer(ptmp); szLine != NULL; szLine = GetLineFromBuffer(ptmp)) {
+	for (szLine = GetLineFromBuffer(ptmp); szLine; szLine = GetLineFromBuffer(ptmp)) {
 		if (isAllSpaceOrTab(szLine, sizeof(*szLine)))
 			continue;
 
@@ -3434,7 +3434,7 @@ phy_ConfigBBWithPgParaFile(
 
 	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
-	if (pHalData->bb_phy_reg_pg == NULL) {
+	if (!pHalData->bb_phy_reg_pg) {
 		rtw_get_phy_file_path(Adapter, pFileName);
 		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
@@ -3449,7 +3449,7 @@ phy_ConfigBBWithPgParaFile(
 			}
 		}
 	} else {
-		if ((pHalData->bb_phy_reg_pg_len != 0) && (pHalData->bb_phy_reg_pg != NULL)) {
+		if ((pHalData->bb_phy_reg_pg_len != 0) && (pHalData->bb_phy_reg_pg)) {
 			_rtw_memcpy(pHalData->para_file_buf, pHalData->bb_phy_reg_pg, pHalData->bb_phy_reg_pg_len);
 			rtStatus = _SUCCESS;
 		} else
@@ -3483,7 +3483,7 @@ phy_ConfigBBWithMpParaFile(
 
 	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
-	if ((pHalData->bb_phy_reg_mp_len == 0) && (pHalData->bb_phy_reg_mp == NULL)) {
+	if ((pHalData->bb_phy_reg_mp_len == 0) && (!pHalData->bb_phy_reg_mp)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
 		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
@@ -3498,7 +3498,7 @@ phy_ConfigBBWithMpParaFile(
 			}
 		}
 	} else {
-		if ((pHalData->bb_phy_reg_mp_len != 0) && (pHalData->bb_phy_reg_mp != NULL)) {
+		if ((pHalData->bb_phy_reg_mp_len != 0) && (pHalData->bb_phy_reg_mp)) {
 			_rtw_memcpy(pHalData->para_file_buf, pHalData->bb_phy_reg_mp, pHalData->bb_phy_reg_mp_len);
 			rtStatus = _SUCCESS;
 		} else
@@ -3509,7 +3509,7 @@ phy_ConfigBBWithMpParaFile(
 		/* RTW_INFO("phy_ConfigBBWithMpParaFile(): read %s ok\n", pFileName); */
 
 		ptmp = pHalData->para_file_buf;
-		for (szLine = GetLineFromBuffer(ptmp); szLine != NULL; szLine = GetLineFromBuffer(ptmp)) {
+		for (szLine = GetLineFromBuffer(ptmp); szLine; szLine = GetLineFromBuffer(ptmp)) {
 			if (!IsCommentString(szLine)) {
 				/* Get 1st hex value as register offset. */
 				if (GetHexValueFromString(szLine, &u4bRegOffset, &u4bMove)) {
@@ -3583,7 +3583,7 @@ PHY_ConfigRFWithParaFile(
 
 	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
-	if ((pBufLen != NULL) && (*pBufLen == 0) && (pBuf == NULL)) {
+	if ((pBufLen) && (*pBufLen == 0) && (!pBuf)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
 		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
@@ -3610,7 +3610,7 @@ PHY_ConfigRFWithParaFile(
 			}
 		}
 	} else {
-		if ((pBufLen != NULL) && (*pBufLen != 0) && (pBuf != NULL)) {
+		if ((pBufLen) && (*pBufLen != 0) && (pBuf)) {
 			_rtw_memcpy(pHalData->para_file_buf, pBuf, *pBufLen);
 			rtStatus = _SUCCESS;
 		} else
@@ -3621,7 +3621,7 @@ PHY_ConfigRFWithParaFile(
 		/* RTW_INFO("%s(): read %s successfully\n", __FUNCTION__, pFileName); */
 
 		ptmp = pHalData->para_file_buf;
-		for (szLine = GetLineFromBuffer(ptmp); szLine != NULL; szLine = GetLineFromBuffer(ptmp)) {
+		for (szLine = GetLineFromBuffer(ptmp); szLine; szLine = GetLineFromBuffer(ptmp)) {
 			if (!IsCommentString(szLine)) {
 				/* Get 1st hex value as register offset. */
 				if (GetHexValueFromString(szLine, &u4bRegOffset, &u4bMove)) {
@@ -3691,7 +3691,7 @@ initDeltaSwingIndexTables(
 
 #define STORE_SWING_TABLE(_array, _iteratedIdx) \
 	do {	\
-	for (token = strsep(&Data, delim); token != NULL; token = strsep(&Data, delim)) {\
+	for (token = strsep(&Data, delim); token; token = strsep(&Data, delim)) {\
 		sscanf(token, "%d", &idx);\
 		_array[_iteratedIdx++] = (u8)idx;\
 	} } while (0)\
@@ -3778,7 +3778,7 @@ PHY_ConfigRFWithTxPwrTrackParaFile(
 
 	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
-	if ((pHalData->rf_tx_pwr_track_len == 0) && (pHalData->rf_tx_pwr_track == NULL)) {
+	if ((pHalData->rf_tx_pwr_track_len == 0) && (!pHalData->rf_tx_pwr_track)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
 		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
@@ -3793,7 +3793,7 @@ PHY_ConfigRFWithTxPwrTrackParaFile(
 			}
 		}
 	} else {
-		if ((pHalData->rf_tx_pwr_track_len != 0) && (pHalData->rf_tx_pwr_track != NULL)) {
+		if ((pHalData->rf_tx_pwr_track_len != 0) && (pHalData->rf_tx_pwr_track)) {
 			_rtw_memcpy(pHalData->para_file_buf, pHalData->rf_tx_pwr_track, pHalData->rf_tx_pwr_track_len);
 			rtStatus = _SUCCESS;
 		} else
@@ -3804,7 +3804,7 @@ PHY_ConfigRFWithTxPwrTrackParaFile(
 		/* RTW_INFO("%s(): read %s successfully\n", __FUNCTION__, pFileName); */
 
 		ptmp = pHalData->para_file_buf;
-		for (szLine = GetLineFromBuffer(ptmp); szLine != NULL; szLine = GetLineFromBuffer(ptmp)) {
+		for (szLine = GetLineFromBuffer(ptmp); szLine; szLine = GetLineFromBuffer(ptmp)) {
 			if (!IsCommentString(szLine)) {
 				char	band[5] = "", path[5] = "", sign[5]  = "";
 				char	chnl[5] = "", rate[10] = "";
@@ -3977,7 +3977,7 @@ phy_ParsePowerLimitTableFile(
 		phy_DecryptBBPgParaFile(Adapter, buffer);
 
 	ptmp = buffer;
-	for (szLine = GetLineFromBuffer(ptmp); szLine != NULL; szLine = GetLineFromBuffer(ptmp)) {
+	for (szLine = GetLineFromBuffer(ptmp); szLine; szLine = GetLineFromBuffer(ptmp)) {
 		if (isAllSpaceOrTab(szLine, sizeof(*szLine)))
 			continue;
 		if (IsCommentString(szLine))
@@ -4295,7 +4295,7 @@ PHY_ConfigRFWithPowerLimitTableParaFile(
 
 	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
-	if (pHalData->rf_tx_pwr_lmt == NULL) {
+	if (!pHalData->rf_tx_pwr_lmt) {
 		rtw_get_phy_file_path(Adapter, pFileName);
 		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
@@ -4310,17 +4310,16 @@ PHY_ConfigRFWithPowerLimitTableParaFile(
 			}
 		}
 	} else {
-		if ((pHalData->rf_tx_pwr_lmt_len != 0) && (pHalData->rf_tx_pwr_lmt != NULL)) {
+		if ((pHalData->rf_tx_pwr_lmt_len != 0) && (pHalData->rf_tx_pwr_lmt)) {
 			_rtw_memcpy(pHalData->para_file_buf, pHalData->rf_tx_pwr_lmt, pHalData->rf_tx_pwr_lmt_len);
 			rtStatus = _SUCCESS;
 		} else
 			RTW_INFO("%s(): Critical Error !!!\n", __FUNCTION__);
 	}
 
-	if (rtStatus == _SUCCESS) {
-		/* RTW_INFO("%s(): read %s ok\n", __FUNCTION__, pFileName); */
+	if (rtStatus == _SUCCESS)
 		rtStatus = phy_ParsePowerLimitTableFile(Adapter, pHalData->para_file_buf);
-	} else
+	else
 		RTW_INFO("%s(): No File %s, Load from HWImg Array!\n", __FUNCTION__, pFileName);
 
 	return rtStatus;

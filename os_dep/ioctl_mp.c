@@ -44,14 +44,14 @@ int rtw_mp_write_reg(struct net_device *dev,
 	pch = input;
 
 	pnext = strpbrk(pch, " ,.-");
-	if (pnext == NULL)
+	if (!pnext)
 		return -EINVAL;
 	*pnext = 0;
 	width_str = pch;
 
 	pch = pnext + 1;
 	pnext = strpbrk(pch, " ,.-");
-	if (pnext == NULL)
+	if (!pnext)
 		return -EINVAL;
 	*pnext = 0;
 	/*addr = simple_strtoul(pch, &ptmp, 16);
@@ -139,7 +139,7 @@ int rtw_mp_read_reg(struct net_device *dev,
 	_rtw_memset(tmp, '\0', sizeof(tmp));
 	pch = input;
 	pnext = strpbrk(pch, " ,.-");
-	if (pnext == NULL)
+	if (!pnext)
 		return -EINVAL;
 	*pnext = 0;
 	width_str = pch;
@@ -889,13 +889,13 @@ int rtw_mp_arx(struct net_device *dev,
 
 	if (bSetBssid == 1) {
 		pch = input;
-		while ((token = strsep(&pch, "=")) != NULL) {
+		while ((token = strsep(&pch, "="))) {
 			if (i > 1)
 				break;
 			tmp[i] = token;
 			i++;
 		}
-		if ((tmp[0] != NULL) && (tmp[1] != NULL)) {
+		if ((tmp[0]) && (tmp[1])) {
 			cnts = strlen(tmp[1]) / 2;
 			if (cnts < 1)
 				return -EFAULT;
@@ -914,13 +914,13 @@ int rtw_mp_arx(struct net_device *dev,
 	if (bmac_filter) {
 		pmppriv->bmac_filter = bmac_filter;
 		pch = input;
-		while ((token = strsep(&pch, "=")) != NULL) {
+		while ((token = strsep(&pch, "="))) {
 			if (i > 1)
 				break;
 			tmp[i] = token;
 			i++;
 		}
-		if ((tmp[0] != NULL) && (tmp[1] != NULL)) {
+		if ((tmp[0]) && (tmp[1])) {
 			cnts = strlen(tmp[1]) / 2;
 			if (cnts < 1)
 				return -EFAULT;
@@ -2058,14 +2058,14 @@ int rtw_efuse_mask_file(struct net_device *dev,
 		ptmp = extra;
 		pch = strsep(&ptmp, ",");
 
-		if ((pch == NULL) || (strlen(pch) == 0)) {
+		if ((!pch) || (strlen(pch) == 0)) {
 			RTW_INFO("%s: parameter error(no cmd)!\n", __func__);
 			return -EFAULT;
 		}
 
 		do {
 			pch = strsep(&ptmp, ":");
-			if ((pch == NULL) || (strlen(pch) == 0))
+			if ((!pch) || (strlen(pch) == 0))
 				break;
 			if (strlen(pch) != 2
 				|| IsHexDigit(*pch) == false

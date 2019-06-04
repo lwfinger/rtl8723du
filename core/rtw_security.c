@@ -229,9 +229,7 @@ void rtw_wep_encrypt(_adapter *padapter, u8 *pxmitframe)
 	struct	security_priv	*psecuritypriv = &padapter->securitypriv;
 	struct	xmit_priv		*pxmitpriv = &padapter->xmitpriv;
 
-
-
-	if (((struct xmit_frame *)pxmitframe)->buf_addr == NULL)
+	if (!((struct xmit_frame *)pxmitframe)->buf_addr)
 		return;
 
 	hw_hdr_offset = TXDESC_OFFSET;
@@ -673,7 +671,7 @@ u32	rtw_tkip_encrypt(_adapter *padapter, u8 *pxmitframe)
 	struct	xmit_priv		*pxmitpriv = &padapter->xmitpriv;
 	u32	res = _SUCCESS;
 
-	if (((struct xmit_frame *)pxmitframe)->buf_addr == NULL)
+	if (!((struct xmit_frame *)pxmitframe)->buf_addr)
 		return _FAIL;
 
 	hw_hdr_offset = TXDESC_OFFSET;
@@ -789,7 +787,7 @@ u32 rtw_tkip_decrypt(_adapter *padapter, u8 *precvframe)
 	if (prxattrib->encrypt == _TKIP_) {
 
 		stainfo = rtw_get_stainfo(&padapter->stapriv , &prxattrib->ta[0]);
-		if (stainfo != NULL) {
+		if (stainfo) {
 
 			if (IS_MCAST(prxattrib->ra)) {
 				static systime start = 0;
@@ -1536,7 +1534,7 @@ u32	rtw_aes_encrypt(_adapter *padapter, u8 *pxmitframe)
 	/*	uint	offset = 0; */
 	u32 res = _SUCCESS;
 
-	if (((struct xmit_frame *)pxmitframe)->buf_addr == NULL)
+	if (!((struct xmit_frame *)pxmitframe)->buf_addr)
 		return _FAIL;
 
 	hw_hdr_offset = TXDESC_OFFSET;
@@ -1858,11 +1856,10 @@ u32	rtw_aes_decrypt(_adapter *padapter, u8 *precvframe)
 	u32	res = _SUCCESS;
 	pframe = (unsigned char *)((union recv_frame *)precvframe)->u.hdr.rx_data;
 	/* 4 start to encrypt each fragment */
+
 	if ((prxattrib->encrypt == _AES_)) {
-
 		stainfo = rtw_get_stainfo(&padapter->stapriv , &prxattrib->ta[0]);
-		if (stainfo != NULL) {
-
+		if (stainfo) {
 			if (IS_MCAST(prxattrib->ra)) {
 				static systime start = 0;
 				static u32 no_gkey_bc_cnt = 0;
@@ -1960,7 +1957,7 @@ u32	rtw_BIP_verify(_adapter *padapter, u8 *whdr_pos, sint flen
 
 	ori_len = flen - WLAN_HDR_A3_LEN + BIP_AAD_SIZE;
 	BIP_AAD = rtw_zmalloc(ori_len);
-	if (BIP_AAD == NULL) {
+	if (!BIP_AAD) {
 		RTW_INFO("BIP AAD allocate fail\n");
 		return _FAIL;
 	}
@@ -2593,7 +2590,7 @@ static void *aes_encrypt_init(const u8 *key, size_t len)
 	if (len != 16)
 		return NULL;
 	rk = (u32 *)rtw_malloc(AES_PRIV_SIZE);
-	if (rk == NULL)
+	if (!rk)
 		return NULL;
 	rijndaelKeySetupEnc(rk, key);
 	return rk;
@@ -2646,7 +2643,7 @@ static int omac1_aes_128_vector(const u8 *key, size_t num_elem,
 	size_t i, e, left, total_len;
 
 	ctx = aes_encrypt_init(key, 16);
-	if (ctx == NULL)
+	if (!ctx)
 		return -1;
 	_rtw_memset(cbc, 0, AES_BLOCK_SIZE);
 

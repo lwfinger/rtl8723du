@@ -57,7 +57,7 @@ inline void *_rtw_zvmalloc(u32 sz)
 {
 	void *pbuf;
 	pbuf = _rtw_vmalloc(sz);
-	if (pbuf != NULL)
+	if (pbuf)
 		memset(pbuf, 0, sz);
 	return pbuf;
 }
@@ -84,7 +84,7 @@ void *_rtw_zmalloc(u32 sz)
 {
 	void *pbuf = _rtw_malloc(sz);
 
-	if (pbuf != NULL) {
+	if (pbuf) {
 		memset(pbuf, 0, sz);
 	}
 
@@ -155,7 +155,7 @@ void _rtw_skb_queue_purge(struct sk_buff_head *list)
 {
 	struct sk_buff *skb;
 
-	while ((skb = skb_dequeue(list)) != NULL)
+	while ((skb = skb_dequeue(list)))
 		_rtw_skb_free(skb);
 }
 
@@ -181,7 +181,7 @@ void *rtw_malloc2d(int h, int w, size_t size)
 	int j;
 
 	void **a = (void **) rtw_zmalloc(h * sizeof(void *) + h * w * size);
-	if (a == NULL) {
+	if (!a) {
 		RTW_INFO("%s: alloc memory fail!\n", __FUNCTION__);
 		return NULL;
 	}

@@ -181,7 +181,7 @@ union recv_frame *_rtw_alloc_recvframe(_queue *pfree_recv_queue)
 
 		rtw_list_delete(&precvframe->u.hdr.list);
 		padapter = precvframe->u.hdr.adapter;
-		if (padapter != NULL) {
+		if (padapter) {
 			precvpriv = &padapter->recvpriv;
 			if (pfree_recv_queue == &precvpriv->free_recv_queue)
 				precvpriv->free_recvframe_cnt--;
@@ -241,7 +241,7 @@ int rtw_free_recvframe(union recv_frame *precvframe, _queue *pfree_recv_queue)
 
 	rtw_list_insert_tail(&(precvframe->u.hdr.list), get_list_head(pfree_recv_queue));
 
-	if (padapter != NULL) {
+	if (padapter) {
 		if (pfree_recv_queue == &precvpriv->free_recv_queue)
 			precvpriv->free_recvframe_cnt++;
 	}
@@ -269,7 +269,7 @@ sint _rtw_enqueue_recvframe(union recv_frame *precvframe, _queue *queue)
 
 	rtw_list_insert_tail(&(precvframe->u.hdr.list), get_list_head(queue));
 
-	if (padapter != NULL) {
+	if (padapter) {
 		if (queue == &precvpriv->free_recv_queue)
 			precvpriv->free_recvframe_cnt++;
 	}
@@ -428,7 +428,7 @@ sint recvframe_chkmic(_adapter *adapter,  union recv_frame *precvframe)
 	if (prxattrib->encrypt == _TKIP_) {
 
 		/* calculate mic code */
-		if (stainfo != NULL) {
+		if (stainfo) {
 			if (IS_MCAST(prxattrib->ra)) {
 				/* mickey=&psecuritypriv->dot118021XGrprxmickey.skey[0]; */
 				/* iv = precvframe->u.hdr.rx_data+prxattrib->hdrlen; */
@@ -616,7 +616,7 @@ union recv_frame *portctrl(_adapter *adapter, union recv_frame *precv_frame)
 
 
 	if (auth_alg == dot11AuthAlgrthm_8021X) {
-		if ((psta != NULL) && (psta->ieee8021x_blocked)) {
+		if ((psta) && (psta->ieee8021x_blocked)) {
 			/* blocked */
 			/* only accept EAPOL frame */
 
@@ -1977,7 +1977,7 @@ union recv_frame *recvframe_chk_defrag(PADAPTER padapter, union recv_frame *prec
 	if (ismfrag == 1) {
 		/* 0~(n-1) fragment frame */
 		/* enqueue to defraf_g */
-		if (pdefrag_q != NULL) {
+		if (pdefrag_q) {
 			if (fragnum == 0) {
 				/* the first fragment */
 				if (_rtw_queue_empty(pdefrag_q) == false) {
@@ -2008,7 +2008,7 @@ union recv_frame *recvframe_chk_defrag(PADAPTER padapter, union recv_frame *prec
 	if ((ismfrag == 0) && (fragnum != 0)) {
 		/* the last fragment frame */
 		/* enqueue the last fragment */
-		if (pdefrag_q != NULL) {
+		if (pdefrag_q) {
 			/* _rtw_spinlock(&pdefrag_q->lock); */
 			phead = get_list_head(pdefrag_q);
 			rtw_list_insert_tail(&pfhdr->list, phead);
@@ -2027,7 +2027,7 @@ union recv_frame *recvframe_chk_defrag(PADAPTER padapter, union recv_frame *prec
 	}
 
 
-	if ((prtnframe != NULL) && (prtnframe->u.hdr.attrib.privacy)) {
+	if ((prtnframe) && (prtnframe->u.hdr.attrib.privacy)) {
 		/* after defrag we must check tkip mic code */
 		if (recvframe_chkmic(padapter,  prtnframe) == _FAIL) {
 			rtw_free_recvframe(prtnframe, pfree_recv_queue);

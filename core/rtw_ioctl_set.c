@@ -614,7 +614,7 @@ u16 rtw_get_cur_max_rate(_adapter *adapter)
 		return 0;
 
 	psta = rtw_get_stainfo(&adapter->stapriv, get_bssid(pmlmepriv));
-	if (psta == NULL)
+	if (!psta)
 		return 0;
 
 	short_GI = query_ra_short_GI(psta, rtw_get_tx_bw_mode(adapter, psta));

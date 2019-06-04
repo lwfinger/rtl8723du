@@ -72,7 +72,7 @@ static void c2h_wk_callback(_workitem *work)
 
 	while (!rtw_cbuf_empty(evtpriv->c2h_queue)) {
 		c2h_evt = (u8 *)rtw_cbuf_pop(evtpriv->c2h_queue);
-		if (c2h_evt != NULL) {
+		if (c2h_evt) {
 			/* This C2H event is read, clear it */
 			c2h_evt_clear(adapter);
 		} else {
@@ -177,7 +177,7 @@ void _rtw_free_evt_priv(struct	evt_priv *pevtpriv)
 	while (!rtw_cbuf_empty(pevtpriv->c2h_queue)) {
 		void *c2h;
 		c2h = rtw_cbuf_pop(pevtpriv->c2h_queue);
-		if (c2h != NULL && c2h != (void *)pevtpriv)
+		if (c2h && c2h != (void *)pevtpriv)
 			rtw_mfree(c2h, 16);
 	}
 	rtw_cbuf_free(pevtpriv->c2h_queue);
@@ -468,11 +468,11 @@ void rtw_free_cmd_obj(struct cmd_obj *pcmd)
 {
 	struct drvextra_cmd_parm *extra_parm = NULL;
 
-	if (pcmd->parmbuf != NULL) {
+	if (pcmd->parmbuf) {
 		/* free parmbuf in cmd_obj */
 		rtw_mfree((unsigned char *)pcmd->parmbuf, pcmd->cmdsz);
 	}
-	if (pcmd->rsp != NULL) {
+	if (pcmd->rsp) {
 		if (pcmd->rspsz != 0) {
 			/* free rsp in cmd_obj */
 			rtw_mfree((unsigned char *)pcmd->rsp, pcmd->rspsz);
@@ -1314,7 +1314,7 @@ u8 rtw_joinbss_cmd(_adapter  *padapter, struct wlan_network *pnetwork)
 	*/
 	psecnetwork = (WLAN_BSSID_EX *)rtw_zmalloc(sizeof(WLAN_BSSID_EX));
 	if (psecnetwork == NULL) {
-		if (pcmd != NULL)
+		if (pcmd)
 			rtw_mfree((unsigned char *)pcmd, sizeof(struct	cmd_obj));
 
 		res = _FAIL;

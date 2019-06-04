@@ -2329,7 +2329,7 @@ char *strsep(char **s, const char *ct)
 	char *sbegin = *s;
 	char *end;
 
-	if (sbegin == NULL)
+	if (!sbegin)
 		return NULL;
 
 	end = strpbrk(sbegin, ct);

@@ -43,7 +43,7 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 	pIo_buf = pdvobjpriv->usb_vendor_req_buf;
 
 	if (!pIo_buf) {
-		RTW_INFO("[%s] pIo_buf == NULL\n", __FUNCTION__);
+		RTW_INFO("[%s] pIo_buf is NULL\n", __FUNCTION__);
 		status = -ENOMEM;
 		goto release_mutex;
 	}
@@ -170,7 +170,7 @@ static u32 usb_bulkout_zero(struct intf_hdl *pintfhdl, u32 addr)
 
 
 	pcontext = (struct zero_bulkout_context *)rtw_zmalloc(sizeof(struct zero_bulkout_context));
-	if (pcontext == NULL)
+	if (!pcontext)
 		return _FAIL;
 
 	pbuf = (unsigned char *)rtw_zmalloc(sizeof(int));
@@ -626,13 +626,13 @@ u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
 	struct usb_device	*pusbd = pdvobj->pusbdev;
 
 
-	if (RTW_CANNOT_RX(adapter) || (precvbuf == NULL)) {
+	if (RTW_CANNOT_RX(adapter) || (!precvbuf)) {
 		goto exit;
 	}
 
 	usb_init_recvbuf(adapter, precvbuf);
 
-	if (precvbuf->pskb == NULL) {
+	if (!precvbuf->pskb) {
 		SIZE_PTR tmpaddr = 0;
 		SIZE_PTR alignment = 0;
 
@@ -642,7 +642,7 @@ u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
 
 		precvbuf->pskb = rtw_skb_alloc(MAX_RECVBUF_SZ + RECVBUFF_ALIGN_SZ);
 
-		if (precvbuf->pskb == NULL) {
+		if (!precvbuf->pskb) {
 			/* enqueue precvbuf and wait for free skb */
 			rtw_enqueue_recvbuf(precvbuf, &precvpriv->recv_buf_pending_queue);
 			goto exit;

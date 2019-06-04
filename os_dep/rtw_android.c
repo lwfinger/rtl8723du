@@ -271,9 +271,9 @@ int rtw_gtk_offload(struct net_device *net, u8 *cmd_ptr)
 	psta = rtw_get_stainfo(pstapriv, get_bssid(pmlmepriv));
 
 
-	if (psta == NULL)
+	if (!psta) {
 		RTW_INFO("%s, : Obtain Sta_info fail\n", __func__);
-	else {
+	} else {
 		/* string command length of "GTK_REKEY_OFFLOAD" */
 		cmd_ptr += 18;
 
@@ -741,7 +741,7 @@ static int wifi_probe(struct platform_device *pdev)
 	RTW_INFO("## %s\n", __FUNCTION__);
 	wifi_irqres = platform_get_resource_byname(pdev, IORESOURCE_IRQ, "bcmdhd_wlan_irq");
 
-	if (wifi_irqres == NULL)
+	if (!wifi_irqres)
 		wifi_irqres = platform_get_resource_byname(pdev,
 				IORESOURCE_IRQ, "bcm4329_wlan_irq");
 	else

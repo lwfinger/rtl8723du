@@ -169,7 +169,7 @@ int rtl8723du_xmitframe_complete(PADAPTER padapter, struct xmit_priv *pxmitpriv,
 	hwentry = pxmitpriv->hwxmit_entry;
 
 
-	if (pxmitbuf == NULL) {
+	if (!pxmitbuf) {
 		pxmitbuf = rtw_alloc_xmitbuf(pxmitpriv);
 		if (!pxmitbuf)
 			return false;
@@ -256,7 +256,7 @@ static int pre_xmitframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 		goto enqueue;
 
 	pxmitbuf = rtw_alloc_xmitbuf(pxmitpriv);
-	if (pxmitbuf == NULL)
+	if (!pxmitbuf)
 		goto enqueue;
 
 	_exit_critical_bh(&pxmitpriv->lock, &irqL);

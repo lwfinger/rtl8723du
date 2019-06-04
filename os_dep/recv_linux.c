@@ -11,13 +11,13 @@ int rtw_os_recvframe_duplicate_skb(_adapter *padapter, union recv_frame *pclonef
 	_pkt	*pkt_copy = NULL;
 	struct rx_pkt_attrib *pattrib = &pcloneframe->u.hdr.attrib;
 
-	if (pskb == NULL) {
-		RTW_INFO("%s [WARN] skb == NULL, drop frag frame\n", __func__);
+	if (!pskb) {
+		RTW_INFO("%s [WARN] skb is NULL, drop frag frame\n", __func__);
 		return _FAIL;
 	}
 	pkt_copy = rtw_skb_copy(pskb);
 
-	if (pkt_copy == NULL) {
+	if (!pkt_copy) {
 		RTW_INFO("%s [WARN] rtw_skb_copy fail , drop frag frame\n", __func__);
 		return _FAIL;
 	}
@@ -42,7 +42,7 @@ int rtw_os_alloc_recvframe(_adapter *padapter, union recv_frame *precvframe, u8 
 	struct rx_pkt_attrib *pattrib = &precvframe->u.hdr.attrib;
 
 
-	if (pdata == NULL) {
+	if (!pdata) {
 		precvframe->u.hdr.pkt = NULL;
 		res = _FAIL;
 		return res;
@@ -87,7 +87,7 @@ int rtw_os_alloc_recvframe(_adapter *padapter, union recv_frame *precvframe, u8 
 			goto exit_rtw_os_recv_resource_alloc;
 		}
 
-		if (pskb == NULL) {
+		if (!pskb) {
 			res = _FAIL;
 			goto exit_rtw_os_recv_resource_alloc;
 		}
@@ -171,7 +171,7 @@ int rtw_os_recvbuf_resource_alloc(_adapter *padapter, struct recv_buf *precvbuf)
 
 	precvbuf->irp_pending = false;
 	precvbuf->purb = usb_alloc_urb(0, GFP_KERNEL);
-	if (precvbuf->purb == NULL)
+	if (!precvbuf->purb)
 		res = _FAIL;
 
 	precvbuf->pskb = NULL;
@@ -353,7 +353,7 @@ void rtw_os_recv_indicate_pkt(_adapter *padapter, _pkt *pkt, union recv_frame *r
 
 					_rtw_xmit_entry(pkt, pnetdev);
 
-					if (bmcast && (pskb2 != NULL)) {
+					if (bmcast && (pskb2)) {
 						pkt = pskb2;
 						DBG_COUNTER(padapter->rx_logs.os_indicate_ap_mcast);
 					} else {
@@ -484,7 +484,7 @@ int rtw_recv_monitor(_adapter *padapter, union recv_frame *precv_frame)
 	pfree_recv_queue = &(precvpriv->free_recv_queue);
 
 	skb = precv_frame->u.hdr.pkt;
-	if (skb == NULL) {
+	if (!skb) {
 		RTW_INFO("%s :skb==NULL something wrong!!!!\n", __func__);
 		goto _recv_drop;
 	}
@@ -524,7 +524,7 @@ int rtw_recv_indicatepkt(_adapter *padapter, union recv_frame *precv_frame)
 	pfree_recv_queue = &(precvpriv->free_recv_queue);
 
 	skb = precv_frame->u.hdr.pkt;
-	if (skb == NULL)
+	if (!skb)
 		goto _recv_indicatepkt_drop;
 
 	skb->data = precv_frame->u.hdr.rx_data;

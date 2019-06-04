@@ -30,7 +30,7 @@ int recvbuf2recvframe(PADAPTER padapter, void *ptr)
 
 	do {
 		precvframe = rtw_alloc_recvframe(pfree_recv_queue);
-		if (precvframe == NULL) {
+		if (!precvframe) {
 			RTW_INFO("%s: rtw_alloc_recvframe() failed! RX Drop!\n", __func__);
 			goto _exit_recvbuf2recvframe;
 		}

@@ -484,7 +484,7 @@ static void init_channel_list(_adapter *padapter, RT_CHANNEL_INFO *channel_set
 			    ((o->bw == BW40MINUS) || (o->bw == BW40PLUS)))
 				continue;
 
-			if (reg == NULL) {
+			if (!reg) {
 				reg = &channel_list->reg_class[cla];
 				cla++;
 				reg->reg_class = o->op_class;
@@ -1297,8 +1297,8 @@ static u32 p2p_listen_state_process(_adapter *padapter, unsigned char *da)
 		    rtw_get_oper_ch(padapter) !=
 				 padapter->wdinfo.listen_channel ||
 		    adapter_wdev_data(padapter)->p2p_enabled == false ||
-		    padapter->mlmepriv.wps_probe_resp_ie == NULL ||
-		    padapter->mlmepriv.p2p_probe_resp_ie == NULL) {
+		    !padapter->mlmepriv.wps_probe_resp_ie ||
+		    !padapter->mlmepriv.p2p_probe_resp_ie) {
 			response = false;
 		}
 	} else
@@ -1436,7 +1436,7 @@ _continue:
 
 
 	/* check (wildcard) SSID */
-	if (p != NULL) {
+	if (p) {
 		if (is_valid_p2p_probereq == true)
 			goto _issue_probersp;
 
@@ -1544,7 +1544,7 @@ static void rtw_check_legacy_ap(_adapter *padapter, u8 *pframe, u32 len)
 		cur_op_mode = pmlmepriv->ht_op_mode & HT_INFO_OPERATION_MODE_OP_MODE_MASK;
 
 		/* for legacy ap */
-		if (elems.ht_capabilities == NULL && elems.ht_capabilities_len == 0) {
+		if (!elems.ht_capabilities && elems.ht_capabilities_len == 0) {
 			ATOMIC_SET(&pmlmepriv->olbc, true);
 			ATOMIC_SET(&pmlmepriv->olbc_ht, true);
 		}
@@ -1570,7 +1570,7 @@ unsigned int OnBeacon(_adapter *padapter, union recv_frame *precv_frame)
 		return _SUCCESS;
 	p = rtw_get_ie(pframe + sizeof(struct rtw_ieee80211_hdr_3addr) + _BEACON_IE_OFFSET_, _EXT_SUPPORTEDRATES_IE_, &ielen,
 		precv_frame->u.hdr.len - sizeof(struct rtw_ieee80211_hdr_3addr) - _BEACON_IE_OFFSET_);
-	if ((p != NULL) && (ielen > 0)) {
+	if ((p) && (ielen > 0)) {
 		if ((*(p + 1 + ielen) == 0x2D) && (*(p + 2 + ielen) != 0x2D)) {
 			/* Invalid value 0x2D is detected in Extended Supported Rates (ESR) IE. Try to fix the IE length to avoid failed Beacon parsing. */
 			RTW_INFO("[WIFIDBG] Error in ESR IE is detected in Beacon of BSSID:"MAC_FMT". Fix the length of ESR IE to avoid failed Beacon parsing.\n", MAC_ARG(GetAddr3Ptr(pframe)));
@@ -1651,7 +1651,7 @@ unsigned int OnBeacon(_adapter *padapter, union recv_frame *precv_frame)
 
 		if (((pmlmeinfo->state & 0x03) == WIFI_FW_STATION_STATE) && (pmlmeinfo->state & WIFI_FW_ASSOC_SUCCESS)) {
 			psta = rtw_get_stainfo(pstapriv, get_addr2_ptr(pframe));
-			if (psta != NULL) {
+			if (psta) {
 #ifdef CONFIG_PATCH_JOIN_WRONG_CHANNEL
 				/* Merge from 8712 FW code */
 				if (cmp_pkt_chnl_diff(padapter, pframe, len) != 0) {
@@ -1699,7 +1699,7 @@ unsigned int OnBeacon(_adapter *padapter, union recv_frame *precv_frame)
 			u8 rate_num = 0;
 
 			psta = rtw_get_stainfo(pstapriv, get_addr2_ptr(pframe));
-			if (psta != NULL) {
+			if (psta) {
 				/*
 				* update WMM, ERP in the beacon
 				* todo: the timer is used instead of the number of the beacon received
@@ -1717,7 +1717,7 @@ unsigned int OnBeacon(_adapter *padapter, union recv_frame *precv_frame)
 				}
 
 				psta = rtw_alloc_stainfo(pstapriv, get_addr2_ptr(pframe));
-				if (psta == NULL) {
+				if (!psta) {
 					RTW_INFO(FUNC_ADPT_FMT" Exceed the upper limit of supported clients\n", FUNC_ADPT_ARG(padapter));
 					goto _END_ONBEACON_;
 				}
@@ -1822,12 +1822,12 @@ unsigned int OnAuth(_adapter *padapter, union recv_frame *precv_frame)
 #endif
 
 	pstat = rtw_get_stainfo(pstapriv, sa);
-	if (pstat == NULL) {
+	if (!pstat) {
 
 		/* allocate a new one */
 		RTW_INFO("going to alloc stainfo for sa="MAC_FMT"\n",  MAC_ARG(sa));
 		pstat = rtw_alloc_stainfo(pstapriv, sa);
-		if (pstat == NULL) {
+		if (!pstat) {
 			RTW_INFO(" Exceed the upper limit of supported clients...\n");
 			status = _STATS_UNABLE_HANDLE_STA_;
 			goto auth_fail;
@@ -1922,7 +1922,7 @@ unsigned int OnAuth(_adapter *padapter, union recv_frame *precv_frame)
 			p = rtw_get_ie(pframe + WLAN_HDR_A3_LEN + 4 + _AUTH_IE_OFFSET_ , _CHLGETXT_IE_, (int *)&ie_len,
 				len - WLAN_HDR_A3_LEN - _AUTH_IE_OFFSET_ - 4);
 
-			if ((p == NULL) || (ie_len <= 0)) {
+			if ((!p) || (ie_len <= 0)) {
 				RTW_INFO("auth rejected because challenge failure!(1)\n");
 				status = _STATS_CHALLENGE_FAIL_;
 				goto auth_fail;
@@ -2023,7 +2023,7 @@ unsigned int OnAuthClient(_adapter *padapter, union recv_frame *precv_frame)
 			p = rtw_get_ie(pframe + WLAN_HDR_A3_LEN + _AUTH_IE_OFFSET_, _CHLGETXT_IE_, (int *)&len,
 				pkt_len - WLAN_HDR_A3_LEN - _AUTH_IE_OFFSET_);
 
-			if (p == NULL) {
+			if (!p) {
 				/* RTW_INFO("marc: no challenge text?\n"); */
 				goto authclnt_fail;
 			}
@@ -2153,7 +2153,7 @@ unsigned int OnAssocReq(_adapter *padapter, union recv_frame *precv_frame)
 	listen_interval = RTW_GET_LE16(pframe + WLAN_HDR_A3_LEN + 2);
 	/* now we should check all the fields... */
 	/* checking SSID */
-	if (elems.ssid == NULL
+	if (!elems.ssid
 		|| elems.ssid_len == 0
 		|| elems.ssid_len != cur->Ssid.SsidLength
 		|| _rtw_memcmp(elems.ssid, cur->Ssid.Ssid, cur->Ssid.SsidLength) == false
@@ -3074,7 +3074,7 @@ unsigned int OnAction_back(_adapter *padapter, union recv_frame *precv_frame)
 	addr = get_addr2_ptr(pframe);
 	psta = rtw_get_stainfo(pstapriv, addr);
 
-	if (psta == NULL)
+	if (!psta)
 		return _SUCCESS;
 
 	frame_body = (unsigned char *)(pframe + sizeof(struct rtw_ieee80211_hdr_3addr));
@@ -3187,7 +3187,7 @@ void issue_p2p_GO_request(_adapter *padapter, u8 *raddr)
 	struct wifidirect_info	*pwdinfo = &(padapter->wdinfo);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	RTW_INFO("[%s] In\n", __FUNCTION__);
@@ -3579,7 +3579,7 @@ static void issue_p2p_GO_response(_adapter *padapter, u8 *raddr, u8 *frame_body,
 	u32					wfdielen = 0;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	RTW_INFO("[%s] In, result = %d\n", __FUNCTION__,  result);
@@ -3987,7 +3987,7 @@ static void issue_p2p_GO_confirm(_adapter *padapter, u8 *raddr, u8 result)
 	u32					wfdielen = 0;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	RTW_INFO("[%s] In\n", __FUNCTION__);
@@ -4220,7 +4220,7 @@ void issue_p2p_invitation_request(_adapter *padapter, u8 *raddr)
 
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -4513,7 +4513,7 @@ void issue_p2p_invitation_response(_adapter *padapter, u8 *raddr, u8 dialogToken
 
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -4743,7 +4743,7 @@ void issue_p2p_provision_request(_adapter *padapter, u8 *pssid, u8 ussidlen, u8 
 
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	RTW_INFO("[%s] In\n", __FUNCTION__);
@@ -4871,7 +4871,7 @@ void issue_probersp_p2p(_adapter *padapter, unsigned char *da)
 	/* RTW_INFO("%s\n", __FUNCTION__); */
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -4938,7 +4938,7 @@ void issue_probersp_p2p(_adapter *padapter, unsigned char *da)
 
 #ifdef CONFIG_IOCTL_CFG80211
 	if (adapter_wdev_data(padapter)->p2p_enabled && pwdinfo->driver_interface == DRIVER_CFG80211) {
-		if (pmlmepriv->wps_probe_resp_ie != NULL && pmlmepriv->p2p_probe_resp_ie != NULL) {
+		if (pmlmepriv->wps_probe_resp_ie && pmlmepriv->p2p_probe_resp_ie) {
 			/* WPS IE */
 			_rtw_memcpy(pframe, pmlmepriv->wps_probe_resp_ie, pmlmepriv->wps_probe_resp_ie_len);
 			pattrib->pktlen += pmlmepriv->wps_probe_resp_ie_len;
@@ -5191,7 +5191,7 @@ static int _issue_probereq_p2p(_adapter *padapter, u8 *da, int wait_ack)
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		goto exit;
 
 	/* update attribute */
@@ -5246,7 +5246,7 @@ static int _issue_probereq_p2p(_adapter *padapter, u8 *da, int wait_ack)
 
 #ifdef CONFIG_IOCTL_CFG80211
 	if (adapter_wdev_data(padapter)->p2p_enabled && pwdinfo->driver_interface == DRIVER_CFG80211) {
-		if (pmlmepriv->wps_probe_req_ie != NULL && pmlmepriv->p2p_probe_req_ie != NULL) {
+		if (pmlmepriv->wps_probe_req_ie && pmlmepriv->p2p_probe_req_ie) {
 			/* WPS IE */
 			_rtw_memcpy(pframe, pmlmepriv->wps_probe_req_ie, pmlmepriv->wps_probe_req_ie_len);
 			pattrib->pktlen += pmlmepriv->wps_probe_req_ie_len;
@@ -5282,7 +5282,7 @@ static int _issue_probereq_p2p(_adapter *padapter, u8 *da, int wait_ack)
 		/*	Value: */
 		wpsie[wpsielen++] = WPS_VERSION_1;	/*	Version 1.0 */
 
-		if (pmlmepriv->wps_probe_req_ie == NULL) {
+		if (!pmlmepriv->wps_probe_req_ie) {
 			/*	UUID-E */
 			/*	Type: */
 			*(__be16 *)(wpsie + wpsielen) = cpu_to_be16(WPS_ATTR_UUID_E);
@@ -5702,7 +5702,7 @@ static unsigned int on_action_public_p2p(union recv_frame *precv_frame)
 				merged_p2p_ielen = rtw_get_p2p_merged_ies_len(frame_body + _PUBLIC_ACTION_IE_OFFSET_, len - _PUBLIC_ACTION_IE_OFFSET_);
 
 				merged_p2pie = rtw_zmalloc(merged_p2p_ielen + 2);	/* 2 is for EID and Length */
-				if (merged_p2pie == NULL) {
+				if (!merged_p2pie) {
 					RTW_INFO("[%s] Malloc p2p ie fail\n", __FUNCTION__);
 					goto exit;
 				}
@@ -6206,7 +6206,7 @@ u32 rtw_wnm_btm_candidates_survey(
 	if (from_btm) {
 		u32 mlen = sizeof(struct wnm_btm_cant) * RTW_MAX_NB_RPT_NUM;
 		pcandidate_list = (struct wnm_btm_cant *)rtw_malloc(mlen);
-		if (pcandidate_list == NULL) 
+		if (!pcandidate_list) 
 			goto exit;				
 	}
 
@@ -6511,8 +6511,9 @@ void rtw_wnm_issue_action(_adapter *padapter, u8 action, u8 reason)
 	u8 category, dialog_token, termination_delay, *pframe;
 	__le16 *fctrl;
 
-	if ((pmgntframe = alloc_mgtxmitframe(pxmitpriv)) == NULL)
-		return ;
+	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
+	if (!pmgntframe)
+		return;
 	
 	pattrib = &(pmgntframe->attrib);
 	update_mgntframe_attrib(padapter, pattrib);
@@ -6624,7 +6625,7 @@ unsigned int OnAction_sa_query(_adapter *padapter, union recv_frame *precv_frame
 
 	case 1: /* SA Query rsp */
 		psta = rtw_get_stainfo(pstapriv, get_addr2_ptr(pframe));
-		if (psta != NULL)
+		if (psta)
 			_cancel_timer_ex(&psta->dot11w_expire_timer);
 
 		_rtw_memcpy(&tid, &pframe[WLAN_HDR_A3_LEN + 2], sizeof(u16));
@@ -6755,13 +6756,13 @@ static struct xmit_frame *_alloc_mgtxmitframe(struct xmit_priv *pxmitpriv, bool 
 	else
 		pmgntframe = rtw_alloc_xmitframe_ext(pxmitpriv);
 
-	if (pmgntframe == NULL) {
+	if (!pmgntframe) {
 		RTW_INFO(FUNC_ADPT_FMT" alloc xmitframe fail, once:%d\n", FUNC_ADPT_ARG(pxmitpriv->adapter), once);
 		goto exit;
 	}
 
 	pxmitbuf = rtw_alloc_xmitbuf_ext(pxmitpriv);
-	if (pxmitbuf == NULL) {
+	if (!pxmitbuf) {
 		RTW_INFO(FUNC_ADPT_FMT" alloc xmitbuf fail\n", FUNC_ADPT_ARG(pxmitpriv->adapter));
 		rtw_free_xmitframe(pxmitpriv, pmgntframe);
 		pmgntframe = NULL;
@@ -7028,10 +7029,10 @@ void issue_beacon(_adapter *padapter, int timeout_ms)
 
 #ifdef CONFIG_BCN_ICF
 	pmgntframe = rtw_alloc_bcnxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 #else
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 #endif
 	{
 		RTW_INFO("%s, alloc mgnt frame fail\n", __FUNCTION__);
@@ -7305,14 +7306,14 @@ void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probe
 	struct wifidirect_info	*pwdinfo = &(padapter->wdinfo);
 	u32					wfdielen = 0;
 
-	if (da == NULL)
+	if (!da)
 		return;
 
 	if (rtw_rfctl_is_tx_blocked_by_ch_waiting(adapter_to_rfctl(padapter)))
 		return;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL) {
+	if (!pmgntframe) {
 		RTW_INFO("%s, alloc mgnt frame fail\n", __FUNCTION__);
 		return;
 	}
@@ -7352,7 +7353,7 @@ void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probe
 		pwps_ie = rtw_get_wps_ie(cur_network->IEs + _FIXED_IE_LENGTH_, cur_network->IELength - _FIXED_IE_LENGTH_, NULL, &wps_ielen);
 
 		/* inerset & update wps_probe_resp_ie */
-		if ((pmlmepriv->wps_probe_resp_ie != NULL) && pwps_ie && (wps_ielen > 0)) {
+		if ((pmlmepriv->wps_probe_resp_ie) && pwps_ie && (wps_ielen > 0)) {
 			uint wps_offset, remainder_ielen;
 			u8 *premainder_ie;
 
@@ -7521,7 +7522,7 @@ static int _issue_probereq(_adapter *padapter, NDIS_802_11_SSID *pssid, u8 *da, 
 		goto exit;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		goto exit;
 
 	/* update attribute */
@@ -7649,7 +7650,7 @@ exit:
 	return ret;
 }
 
-/* if psta == NULL, indiate we are station(client) now... */
+/* if psta is NULL, indiate we are station(client) now... */
 void issue_auth(_adapter *padapter, struct sta_info *psta, unsigned short status)
 {
 	struct xmit_frame			*pmgntframe;
@@ -7669,7 +7670,7 @@ void issue_auth(_adapter *padapter, struct sta_info *psta, unsigned short status
 		return;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -7827,7 +7828,7 @@ void issue_asocrsp(_adapter *padapter, unsigned short status, struct sta_info *p
 	RTW_INFO("%s\n", __FUNCTION__);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -7938,7 +7939,7 @@ void issue_asocrsp(_adapter *padapter, unsigned short status, struct sta_info *p
 				break;
 			}
 
-			if ((pbuf == NULL) || (ie_len == 0))
+			if ((!pbuf) || (ie_len == 0))
 				break;
 		}
 
@@ -8018,7 +8019,7 @@ void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
 		goto exit;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		goto exit;
 
 	/* update attribute */
@@ -8408,7 +8409,7 @@ static int _issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int p
 	pmlmeinfo = &(pmlmeext->mlmext_info);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		goto exit;
 
 	/* update attribute */
@@ -8461,7 +8462,7 @@ exit:
  * wait_ms == 0 means that there is no need to wait ack through C2H_CCX_TX_RPT
  * wait_ms > 0 means you want to wait ack through C2H_CCX_TX_RPT, and the value of wait_ms means the interval between each TX
  * try_cnt means the maximal TX count to try
- * da == NULL for station mode
+ * da is NULL for station mode
  */
 int issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int power_mode, int try_cnt, int wait_ms)
 {
@@ -8474,8 +8475,8 @@ int issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int power_mod
 	if (rtw_rfctl_is_tx_blocked_by_ch_waiting(adapter_to_rfctl(padapter)))
 		goto exit;
 
-	/* da == NULL, assum it's null data for sta to ap */
-	if (da == NULL)
+	/* da is NULL, assum it's null data for sta to ap */
+	if (!da)
 		da = get_my_bssid(&(pmlmeinfo->network));
 
 	do {
@@ -8530,7 +8531,7 @@ static int _issue_qos_nulldata(_adapter *padapter, unsigned char *da, u16 tid, i
 	RTW_INFO("%s\n", __FUNCTION__);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		goto exit;
 
 	/* update attribute */
@@ -8596,7 +8597,7 @@ exit:
  * wait_ms == 0 means that there is no need to wait ack through C2H_CCX_TX_RPT
  * wait_ms > 0 means you want to wait ack through C2H_CCX_TX_RPT, and the value of wait_ms means the interval between each TX
  * try_cnt means the maximal TX count to try
- * da == NULL for station mode
+ * da is NULL for station mode
  */
 int issue_qos_nulldata(_adapter *padapter, unsigned char *da, u16 tid, int try_cnt, int wait_ms)
 {
@@ -8609,8 +8610,8 @@ int issue_qos_nulldata(_adapter *padapter, unsigned char *da, u16 tid, int try_c
 	if (rtw_rfctl_is_tx_blocked_by_ch_waiting(adapter_to_rfctl(padapter)))
 		goto exit;
 
-	/* da == NULL, assum it's null data for sta to ap*/
-	if (da == NULL)
+	/* da is NULL, assum it's null data for sta to ap*/
+	if (!da)
 		da = get_my_bssid(&(pmlmeinfo->network));
 
 	do {
@@ -8667,7 +8668,7 @@ static int _issue_deauth(_adapter *padapter, unsigned char *da, unsigned short r
 		goto exit;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		goto exit;
 
 	/* update attribute */
@@ -8793,7 +8794,7 @@ void issue_action_spct_ch_switch(_adapter *padapter, u8 *ra, u8 new_ch, u8 ch_of
 		FUNC_NDEV_ARG(padapter->pnetdev), MAC_ARG(ra), new_ch, ch_offset);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -8863,7 +8864,7 @@ void issue_action_SA_Query(_adapter *padapter, unsigned char *raddr, unsigned ch
 	RTW_INFO("%s, %04x\n", __FUNCTION__, tid);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL) {
+	if (!pmgntframe) {
 		RTW_INFO("%s: alloc_mgtxmitframe fail\n", __FUNCTION__);
 		return;
 	}
@@ -8904,7 +8905,7 @@ void issue_action_SA_Query(_adapter *padapter, unsigned char *raddr, unsigned ch
 		/* send sa query request to AP, AP should reply sa query response in 1 second */
 		if (pattrib->key_type == IEEE80211W_RIGHT_KEY) {
 			psta = rtw_get_stainfo(pstapriv, pwlanhdr->addr1);
-			if (psta != NULL) {
+			if (psta) {
 				_set_timer(&psta->dot11w_expire_timer, 1000);
 			}
 		}
@@ -8964,7 +8965,7 @@ static int issue_action_ba(_adapter *padapter, unsigned char *raddr, unsigned ch
 		goto exit;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		goto exit;
 
 	/* update attribute */
@@ -9018,9 +9019,9 @@ static int issue_action_ba(_adapter *padapter, unsigned char *raddr, unsigned ch
 			le_tmp = cpu_to_le16(BA_timeout_value);
 			pframe = rtw_set_fixed_ie(pframe, 2, (unsigned char *)(&le_tmp), &(pattrib->pktlen));
 
-			/* if ((psta = rtw_get_stainfo(pstapriv, pmlmeinfo->network.MacAddress)) != NULL) */
+			/* if ((psta = rtw_get_stainfo(pstapriv, pmlmeinfo->network.MacAddress))) */
 			psta = rtw_get_stainfo(pstapriv, raddr);
-			if (psta != NULL) {
+			if (psta) {
 				start_seq = (psta->sta_xmitpriv.txseq_tid[tid & 0x07] & 0xfff) + 1;
 
 				RTW_INFO("BA_starting_seqctrl = %d for TID=%d\n", start_seq, tid & 0x07);
@@ -9292,7 +9293,7 @@ void issue_action_BSSCoexistPacket(_adapter *padapter)
 	action = ACT_PUBLIC_BSSCOEXIST;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	/* update attribute */
@@ -9358,7 +9359,7 @@ void issue_action_BSSCoexistPacket(_adapter *padapter)
 			pbss_network = (WLAN_BSSID_EX *)&pnetwork->network;
 
 			p = rtw_get_ie(pbss_network->IEs + _FIXED_IE_LENGTH_, _HT_CAPABILITY_IE_, &len, pbss_network->IELength - _FIXED_IE_LENGTH_);
-			if ((p == NULL) || (len == 0)) { /* non-HT */
+			if ((!p) || (len == 0)) { /* non-HT */
 				if ((pbss_network->Configuration.DSConfig <= 0) || (pbss_network->Configuration.DSConfig > 14))
 					continue;
 
@@ -9441,7 +9442,7 @@ static int _issue_action_SM_PS(_adapter *padapter ,  unsigned char *raddr , u8 N
 	RTW_INFO("%s, sm_power_control=%u, NewMimoPsMode=%u\n", __FUNCTION__ , sm_power_control , NewMimoPsMode);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return ret;
 
 	/* update attribute */
@@ -9560,7 +9561,7 @@ static unsigned int _send_delba_sta_tid(_adapter *adapter, u8 initiator, struct 
 {
 	int ret = _SUCCESS;
 
-	if (sta == NULL) {
+	if (!sta) {
 		ret = _FAIL;
 		goto exit;
 	}
@@ -9621,7 +9622,7 @@ unsigned int send_delba(_adapter *padapter, u8 initiator, u8 *addr)
 			return _SUCCESS;
 
 	psta = rtw_get_stainfo(pstapriv, addr);
-	if (psta == NULL)
+	if (!psta)
 		return _SUCCESS;
 
 	for (tid = 0; tid < TID_NUM; tid++)
@@ -9770,7 +9771,7 @@ u8 collect_bss_info(_adapter *padapter, union recv_frame *precv_frame, WLAN_BSSI
 
 	/* checking SSID */
 	p = rtw_get_ie(bssid->IEs + ie_offset, _SSID_IE_, &len, bssid->IELength - ie_offset);
-	if (p == NULL) {
+	if (!p) {
 		RTW_INFO("marc: cannot find SSID for survey event\n");
 		return _FAIL;
 	}
@@ -9790,7 +9791,7 @@ u8 collect_bss_info(_adapter *padapter, union recv_frame *precv_frame, WLAN_BSSI
 	/* checking rate info... */
 	i = 0;
 	p = rtw_get_ie(bssid->IEs + ie_offset, _SUPPORTEDRATES_IE_, &len, bssid->IELength - ie_offset);
-	if (p != NULL) {
+	if (p) {
 		if (len > NDIS_802_11_LENGTH_RATES_EX) {
 			RTW_INFO("%s()-%d: IE too long (%d) for survey event\n", __FUNCTION__, __LINE__, len);
 			return _FAIL;
@@ -9800,7 +9801,7 @@ u8 collect_bss_info(_adapter *padapter, union recv_frame *precv_frame, WLAN_BSSI
 	}
 
 	p = rtw_get_ie(bssid->IEs + ie_offset, _EXT_SUPPORTEDRATES_IE_, &len, bssid->IELength - ie_offset);
-	if (p != NULL) {
+	if (p) {
 		if (len > (NDIS_802_11_LENGTH_RATES_EX - i)) {
 			RTW_INFO("%s()-%d: IE too long (%d) for survey event\n", __FUNCTION__, __LINE__, len);
 			return _FAIL;
@@ -10373,12 +10374,12 @@ void report_survey_event(_adapter *padapter, union recv_frame *precv_frame)
 
 
 	pcmd_obj = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (pcmd_obj == NULL)
+	if (!pcmd_obj)
 		return;
 
 	cmdsz = (sizeof(struct survey_event) + sizeof(struct C2HEvent_Header));
 	pevtcmd = (u8 *)rtw_zmalloc(cmdsz);
-	if (pevtcmd == NULL) {
+	if (!pevtcmd) {
 		rtw_mfree((u8 *)pcmd_obj, sizeof(struct cmd_obj));
 		return;
 	}
@@ -10436,12 +10437,12 @@ void report_surveydone_event(_adapter *padapter)
 	struct cmd_priv *pcmdpriv = &padapter->cmdpriv;
 
 	pcmd_obj = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (pcmd_obj == NULL)
+	if (!pcmd_obj)
 		return;
 
 	cmdsz = (sizeof(struct surveydone_event) + sizeof(struct C2HEvent_Header));
 	pevtcmd = (u8 *)rtw_zmalloc(cmdsz);
-	if (pevtcmd == NULL) {
+	if (!pevtcmd) {
 		rtw_mfree((u8 *)pcmd_obj, sizeof(struct cmd_obj));
 		return;
 	}
@@ -10484,12 +10485,12 @@ u32 report_join_res(_adapter *padapter, int res)
 	u32 ret = _FAIL;
 
 	pcmd_obj = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (pcmd_obj == NULL)
+	if (!pcmd_obj)
 		goto exit;
 
 	cmdsz = (sizeof(struct joinbss_event) + sizeof(struct C2HEvent_Header));
 	pevtcmd = (u8 *)rtw_zmalloc(cmdsz);
-	if (pevtcmd == NULL) {
+	if (!pevtcmd) {
 		rtw_mfree((u8 *)pcmd_obj, sizeof(struct cmd_obj));
 		goto exit;
 	}
@@ -10536,12 +10537,12 @@ void report_wmm_edca_update(_adapter *padapter)
 	struct cmd_priv *pcmdpriv = &padapter->cmdpriv;
 
 	pcmd_obj = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (pcmd_obj == NULL)
+	if (!pcmd_obj)
 		return;
 
 	cmdsz = (sizeof(struct wmm_event) + sizeof(struct C2HEvent_Header));
 	pevtcmd = (u8 *)rtw_zmalloc(cmdsz);
-	if (pevtcmd == NULL) {
+	if (!pevtcmd) {
 		rtw_mfree((u8 *)pcmd_obj, sizeof(struct cmd_obj));
 		return;
 	}
@@ -10585,7 +10586,7 @@ u32 report_del_sta_event(_adapter *padapter, unsigned char *MacAddr, unsigned sh
 	/* prepare cmd parameter */
 	cmdsz = (sizeof(struct stadel_event) + sizeof(struct C2HEvent_Header));
 	pevtcmd = (u8 *)rtw_zmalloc(cmdsz);
-	if (pevtcmd == NULL) {
+	if (!pevtcmd) {
 		res = _FAIL;
 		goto exit;
 	}
@@ -10612,7 +10613,7 @@ u32 report_del_sta_event(_adapter *padapter, unsigned char *MacAddr, unsigned sh
 		rtw_mfree(pevtcmd, cmdsz);
 	} else {
 		pcmd_obj = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-		if (pcmd_obj == NULL) {
+		if (!pcmd_obj) {
 			rtw_mfree(pevtcmd, cmdsz);
 			res = _FAIL;
 			goto exit;
@@ -10648,12 +10649,12 @@ void report_add_sta_event(_adapter *padapter, unsigned char *MacAddr)
 	struct cmd_priv *pcmdpriv = &padapter->cmdpriv;
 
 	pcmd_obj = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (pcmd_obj == NULL)
+	if (!pcmd_obj)
 		return;
 
 	cmdsz = (sizeof(struct stassoc_event) + sizeof(struct C2HEvent_Header));
 	pevtcmd = (u8 *)rtw_zmalloc(cmdsz);
-	if (pevtcmd == NULL) {
+	if (!pevtcmd) {
 		rtw_mfree((u8 *)pcmd_obj, sizeof(struct cmd_obj));
 		return;
 	}
@@ -10706,12 +10707,12 @@ bool rtw_port_switch_chk(_adapter *adapter)
 		}
 	}
 
-	if (if_port0 == NULL) {
+	if (!if_port0) {
 		rtw_warn_on(1);
 		goto exit;
 	}
 
-	if (if_port1 == NULL) {
+	if (!if_port1) {
 		rtw_warn_on(1);
 		goto exit;
 	}
@@ -11241,7 +11242,7 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 				link_count_limit = 29; /* 60 sec */
 		}
 		psta = rtw_get_stainfo(pstapriv, pmlmeinfo->network.MacAddress);
-		if (psta != NULL) {
+		if (psta) {
 			bool is_p2p_enable = false;
 			is_p2p_enable = !rtw_p2p_chk_state(&padapter->wdinfo, P2P_STATE_NONE);
 
@@ -11333,7 +11334,7 @@ bypass_active_keep_alive:
 				pmlmeinfo->link_count = 0;
 			}
 
-		} /* end of if ((psta = rtw_get_stainfo(pstapriv, passoc_res->network.MacAddress)) != NULL) */
+		} /* end of if ((psta = rtw_get_stainfo(pstapriv, passoc_res->network.MacAddress))) */
 
 	} else if (is_client_associated_to_ibss(padapter)) {
 		_irqL irqL;
@@ -11400,13 +11401,13 @@ void survey_timer_hdl (void *FunctionContext)
 
 	if (mlmeext_scan_state(pmlmeext) > SCAN_DISABLE) {
 		cmd = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-		if (cmd == NULL) {
+		if (!cmd) {
 			rtw_warn_on(1);
 			goto exit;
 		}
 
 		psurveyPara = (struct sitesurvey_parm *)rtw_zmalloc(sizeof(struct sitesurvey_parm));
-		if (psurveyPara == NULL) {
+		if (!psurveyPara) {
 			rtw_warn_on(1);
 			rtw_mfree((unsigned char *)cmd, sizeof(struct cmd_obj));
 			goto exit;
@@ -11550,12 +11551,12 @@ void report_sta_timeout_event(_adapter *padapter, u8 *MacAddr, unsigned short re
 	struct cmd_priv *pcmdpriv = &padapter->cmdpriv;
 
 	pcmd_obj = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (pcmd_obj == NULL)
+	if (!pcmd_obj)
 		return;
 
 	cmdsz = (sizeof(struct stadel_event) + sizeof(struct C2HEvent_Header));
 	pevtcmd = (u8 *)rtw_zmalloc(cmdsz);
-	if (pevtcmd == NULL) {
+	if (!pevtcmd) {
 		rtw_mfree((u8 *)pcmd_obj, sizeof(struct cmd_obj));
 		return;
 	}
@@ -11754,7 +11755,7 @@ static u8 rtw_ft_update_ftie(
 	u32 len;
 
 	if ((pie = rtw_get_ie(pft_roam->updated_ft_ies, _FTIE_, &len, 
-				pft_roam->updated_ft_ies_len)) != NULL) {
+				pft_roam->updated_ft_ies_len))) {
 		*pframe = rtw_set_ie(*pframe, _FTIE_, len , 
 					(pie+2), &(pattrib->pktlen));
 	} else
@@ -11865,7 +11866,7 @@ void rtw_ft_issue_action_req(_adapter *padapter, u8 *pTargetAddr)
 	u8 action = RTW_WLAN_ACTION_FT_REQ;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	if (pmgntframe == NULL)
+	if (!pmgntframe)
 		return;
 
 	pattrib = &pmgntframe->attrib;
@@ -11959,12 +11960,12 @@ void rtw_ft_report_reassoc_evt(_adapter *padapter, u8 *pMacAddr)
 	u32 cmdsz = 0;
 
 	pcmd_obj = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (pcmd_obj == NULL)
+	if (!pcmd_obj)
 		return;
 
 	cmdsz = (sizeof(struct stassoc_event) + sizeof(struct C2HEvent_Header));
 	pevtcmd = (u8 *)rtw_zmalloc(cmdsz);
-	if (pevtcmd == NULL) {
+	if (!pevtcmd) {
 		rtw_mfree((u8 *)pcmd_obj, sizeof(struct cmd_obj));
 		return;
 	}
@@ -13628,7 +13629,7 @@ u8 chk_bmc_sleepq_cmd(_adapter *padapter)
 
 
 	ph2c = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (ph2c == NULL) {
+	if (!ph2c) {
 		res = _FAIL;
 		goto exit;
 	}
@@ -13655,13 +13656,13 @@ u8 set_tx_beacon_cmd(_adapter *padapter)
 
 
 	ph2c = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
-	if (ph2c == NULL) {
+	if (!ph2c) {
 		res = _FAIL;
 		goto exit;
 	}
 
 	ptxBeacon_parm = (struct Tx_Beacon_param *)rtw_zmalloc(sizeof(struct Tx_Beacon_param));
-	if (ptxBeacon_parm == NULL) {
+	if (!ptxBeacon_parm) {
 		rtw_mfree((unsigned char *)ph2c, sizeof(struct	cmd_obj));
 		res = _FAIL;
 		goto exit;
@@ -13696,7 +13697,7 @@ u8 mlme_evt_hdl(_adapter *padapter, unsigned char *pbuf)
 	void (*event_callback)(_adapter *dev, u8 *pbuf);
 	struct evt_priv *pevt_priv = &(padapter->evtpriv);
 
-	if (pbuf == NULL)
+	if (!pbuf)
 		goto _abort_event_;
 
 	peventbuf = (uint *)pbuf;

@@ -549,7 +549,7 @@ int proc_get_rx_stat(struct seq_file *m, void *v)
 			plist = get_next(plist);
 			pstats = &psta->sta_stats;
 
-			if (pstats == NULL)
+			if (!pstats)
 				continue;
 			if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6) !=  true)
 				&& (_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6) != true)
@@ -607,7 +607,7 @@ int proc_get_tx_stat(struct seq_file *m, void *v)
 	_exit_critical_bh(&pstapriv->sta_hash_lock, &irqL);
 	for (i = 0; i < macid_rec_idx; i++) {
 		pstats = &(sta_rec[i]->sta_stats);
-		if (pstats == NULL)
+		if (!pstats)
 			continue;
 		pstapriv->c2h_sta = sta_rec[i];
 		rtw_hal_reqtxrpt(adapter, sta_rec[i]->cmn.mac_id);
@@ -3644,7 +3644,7 @@ ssize_t proc_set_fw_offload(struct file *file, const char __user *buffer, size_t
 	char tmp[32];
 	u32 iqk_offload_enable = 0, ch_switch_offload_enable = 0;
 
-	if (buffer == NULL) {
+	if (!buffer) {
 		RTW_INFO("input buffer is NULL!\n");
 		return -EFAULT;
 	}

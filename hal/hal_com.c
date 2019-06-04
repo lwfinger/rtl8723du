@@ -37,7 +37,7 @@ void rtw_hal_move_sta_gk_to_dk(_adapter *adapter)
 
 	addr = get_bssid(pmlmepriv);
 
-	if (addr == NULL) {
+	if (!addr) {
 		RTW_INFO("%s: get bssid MAC addr fail!!\n", __func__);
 		return;
 	}
@@ -1164,7 +1164,7 @@ int c2h_evt_read_88xx(_adapter *adapter, u8 *buf)
 	int i;
 	u8 trigger;
 
-	if (buf == NULL)
+	if (!buf)
 		goto exit;
 
 	trigger = rtw_read8(adapter, REG_C2HEVT_CLEAR);
@@ -1559,7 +1559,7 @@ int c2h_customer_str_rpt_hdl(_adapter *adapter, u8 *data, u8 len)
 
 	_enter_critical_mutex(&dvobj->customer_str_mutex, NULL);
 
-	if (dvobj->customer_str_sctx != NULL) {
+	if (dvobj->customer_str_sctx) {
 		if (dvobj->customer_str_sctx->status != RTW_SCTX_SUBMITTED)
 			RTW_WARN("%s invalid sctx.status:%d\n", __func__, dvobj->customer_str_sctx->status);
 		_rtw_memcpy(dvobj->customer_str,  C2H_CUSTOMER_STR_RPT_BYTE0(data), CUSTOMER_STR_RPT_LEN);
@@ -1591,7 +1591,7 @@ int c2h_customer_str_rpt_2_hdl(_adapter *adapter, u8 *data, u8 len)
 
 	_enter_critical_mutex(&dvobj->customer_str_mutex, NULL);
 
-	if (dvobj->customer_str_sctx != NULL) {
+	if (dvobj->customer_str_sctx) {
 		if (dvobj->customer_str_sctx->status != RTX_SCTX_CSTR_WAIT_RPT2)
 			RTW_WARN("%s rpt not ready\n", __func__);
 		_rtw_memcpy(dvobj->customer_str + CUSTOMER_STR_RPT_LEN,  C2H_CUSTOMER_STR_RPT_2_BYTE8(data), CUSTOMER_STR_RPT_2_LEN);
@@ -1615,7 +1615,7 @@ int rtw_hal_customer_str_read(_adapter *adapter, u8 *cs)
 	int ret = _SUCCESS;
 
 	_enter_critical_mutex(&dvobj->customer_str_mutex, NULL);
-	if (dvobj->customer_str_sctx != NULL)
+	if (dvobj->customer_str_sctx)
 		ret = _FAIL;
 	else {
 		rtw_sctx_init(&sctx, 2 * 1000);
@@ -1698,9 +1698,9 @@ int rtw_hal_customer_str_write(_adapter *adapter, const u8 *cs)
 	int ret = _SUCCESS;
 
 	_enter_critical_mutex(&dvobj->customer_str_mutex, NULL);
-	if (dvobj->customer_str_sctx != NULL)
+	if (dvobj->customer_str_sctx) {
 		ret = _FAIL;
-	else {
+	} else {
 		rtw_sctx_init(&sctx, 2 * 1000);
 		dvobj->customer_str_sctx = &sctx;
 	}
@@ -1826,7 +1826,7 @@ static void rtw_hal_update_sta_rate_mask(PADAPTER padapter, struct sta_info *pst
 	u8 i, rf_type, tx_nss;
 	u64 tx_ra_bitmap = 0;
 
-	if (psta == NULL)
+	if (!psta)
 		return;
 
 	/* b/g mode ra_bitmap  */
@@ -2480,7 +2480,7 @@ static void rtw_hal_set_macaddr_port(_adapter *adapter, u8 *val)
 	u8 idx = 0;
 	u32 reg_macid = 0;
 
-	if (val == NULL)
+	if (!val)
 		return;
 
 	RTW_INFO("%s "ADPT_FMT"- hw port(%d) mac_addr ="MAC_FMT"\n",  __func__,
@@ -2505,7 +2505,7 @@ static void rtw_hal_get_macaddr_port(_adapter *adapter, u8 *mac_addr)
 	u8 idx = 0;
 	u32 reg_macid = 0;
 
-	if (mac_addr == NULL)
+	if (!mac_addr)
 		return;
 
 	_rtw_memset(mac_addr, 0, ETH_ALEN);
@@ -3447,7 +3447,7 @@ static void _rtw_hal_set_fw_rsvd_page(_adapter *adapter, bool finished, u8 *page
 		}
 
 		pcmdframe = rtw_alloc_cmdxmitframe(pxmitpriv);
-		if (pcmdframe == NULL) {
+		if (!pcmdframe) {
 			RTW_ERR("%s: alloc ReservedPagePacket fail!\n", __FUNCTION__);
 			return;
 		}
@@ -4264,8 +4264,8 @@ GetHexValueFromString(
 	char		*szScan = szStr;
 
 	/* Check input parameter. */
-	if (szStr == NULL || pu4bVal == NULL || pu4bMove == NULL) {
-		RTW_INFO("GetHexValueFromString(): Invalid inpur argumetns! szStr: %p, pu4bVal: %p, pu4bMove: %p\n", szStr, pu4bVal, pu4bMove);
+	if (!szStr || !pu4bVal || !pu4bMove) {
+		RTW_INFO("GetHexValueFromString(): Invalid input argumetns! szStr: %p, pu4bVal: %p, pu4bMove: %p\n", szStr, pu4bVal, pu4bMove);
 		return false;
 	}
 

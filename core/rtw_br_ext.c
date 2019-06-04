@@ -357,7 +357,7 @@ static __inline__ void __network_hash_link(_adapter *priv,
 	/* _enter_critical_bh(&priv->br_ext_lock, &irqL); */
 
 	ent->next_hash = priv->nethash[hash];
-	if (ent->next_hash != NULL)
+	if (ent->next_hash)
 		ent->next_hash->pprev_hash = &ent->next_hash;
 	priv->nethash[hash] = ent;
 	ent->pprev_hash = &priv->nethash[hash];
@@ -373,7 +373,7 @@ static __inline__ void __network_hash_unlink(struct nat25_network_db_entry *ent)
 	/* _enter_critical_bh(&priv->br_ext_lock, &irqL); */
 
 	*(ent->pprev_hash) = ent->next_hash;
-	if (ent->next_hash != NULL)
+	if (ent->next_hash)
 		ent->next_hash->pprev_hash = ent->pprev_hash;
 	ent->next_hash = NULL;
 	ent->pprev_hash = NULL;
@@ -390,7 +390,7 @@ static int __nat25_db_network_lookup_and_replace(_adapter *priv,
 	_enter_critical_bh(&priv->br_ext_lock, &irqL);
 
 	db = priv->nethash[__nat25_network_hash(networkAddr)];
-	while (db != NULL) {
+	while (db) {
 		if (!memcmp(db->networkAddr, networkAddr, MAX_NETWORK_ADDR_LEN)) {
 			if (!__nat25_has_expired(priv, db)) {
 				/* replace the destination mac address */
@@ -466,7 +466,7 @@ static void __nat25_db_network_insert(_adapter *priv,
 
 	hash = __nat25_network_hash(networkAddr);
 	db = priv->nethash[hash];
-	while (db != NULL) {
+	while (db) {
 		if (!memcmp(db->networkAddr, networkAddr, MAX_NETWORK_ADDR_LEN)) {
 			memcpy(db->macAddr, macAddr, ETH_ALEN);
 			db->ageing_timer = jiffies;
@@ -511,7 +511,7 @@ static void __nat25_db_print(_adapter *priv)
 	for (i = 0, j = 0; i < NAT25_HASH_SIZE; i++) {
 		db = priv->nethash[i];
 
-		while (db != NULL) {
+		while (db) {
 #ifdef CL_IPV6_PASS
 			panic_printk("NAT25: DB(%d) H(%02d) C(%d) M:%02x%02x%02x%02x%02x%02x N:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x"
 				     "%02x%02x%02x%02x%02x%02x\n",
@@ -590,7 +590,7 @@ void nat25_db_cleanup(_adapter *priv)
 	for (i = 0; i < NAT25_HASH_SIZE; i++) {
 		struct nat25_network_db_entry *f;
 		f = priv->nethash[i];
-		while (f != NULL) {
+		while (f) {
 			struct nat25_network_db_entry *g;
 
 			g = f->next_hash;
@@ -622,7 +622,7 @@ void nat25_db_expire(_adapter *priv)
 			struct nat25_network_db_entry *f;
 			f = priv->nethash[i];
 
-			while (f != NULL) {
+			while (f) {
 				struct nat25_network_db_entry *g;
 				g = f->next_hash;
 
@@ -924,7 +924,7 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 		}
 
 		/*   IPX  */
-		if (ipx != NULL) {
+		if (ipx) {
 			switch (method) {
 			case NAT25_CHECK:
 				if (!memcmp(skb->data + ETH_ALEN, ipx->ipx_source.node, ETH_ALEN)) {
@@ -992,7 +992,7 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 		}
 
 		/*   AARP  */
-		else if (ea != NULL) {
+		else if (ea) {
 			/* Sanity check fields. */
 			if (ea->hw_len != ETH_ALEN || ea->pa_len != AARP_PA_ALEN) {
 				DEBUG_WARN("NAT25: Appletalk AARP Sanity check fail!\n");
@@ -1043,7 +1043,7 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 		}
 
 		/*   DDP  */
-		else if (ddp != NULL) {
+		else if (ddp) {
 			switch (method) {
 			case NAT25_CHECK:
 				return -1;
@@ -1509,7 +1509,7 @@ void *scdb_findEntry(_adapter *priv, unsigned char *macAddr,
 	__nat25_generate_ipv4_network_addr(networkAddr, (unsigned int *)ipAddr);
 	hash = __nat25_network_hash(networkAddr);
 	db = priv->nethash[hash];
-	while (db != NULL) {
+	while (db) {
 		if (!memcmp(db->networkAddr, networkAddr, MAX_NETWORK_ADDR_LEN)) {
 			/* _exit_critical_bh(&priv->br_ext_lock, &irqL); */
 			return (void *)db;

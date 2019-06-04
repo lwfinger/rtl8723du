@@ -3452,14 +3452,14 @@ hal_btcoex_ParseAntIsolationConfigFile(
 	/* RTW_INFO("===>Hal_ParseAntIsolationConfigFile()\n" ); */
 
 	ptmp = buffer;
-	for (szLine = GetLineFromBuffer(ptmp) ; szLine != NULL; szLine = GetLineFromBuffer(ptmp)) {
+	for (szLine = GetLineFromBuffer(ptmp) ; szLine; szLine = GetLineFromBuffer(ptmp)) {
 		/* skip comment */
 		if (IsCommentString(szLine))
 			continue;
 
 		/* RTW_INFO("%s : szLine = %s , strlen(szLine) = %d\n" , __func__ , szLine , strlen(szLine));*/
-		for (j = 0 ; ant_isolation_param[j].param_name != NULL ; j++) {
-			if (strstr(szLine , ant_isolation_param[j].param_name) != NULL) {
+		for (j = 0 ; ant_isolation_param[j].param_name ; j++) {
+			if (strstr(szLine , ant_isolation_param[j].param_name)) {
 				i = 0;
 				while (i < strlen(szLine)) {
 					if (szLine[i] != '"')

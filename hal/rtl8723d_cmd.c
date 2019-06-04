@@ -415,7 +415,7 @@ static void SetFwRsvdPagePkt_BTCoex(PADAPTER padapter)
 	MaxRsvdPageBufSize = RsvdPageNum * PageSize;
 
 	pcmdframe = rtw_alloc_cmdxmitframe(pxmitpriv);
-	if (pcmdframe == NULL) {
+	if (!pcmdframe) {
 		RTW_INFO("%s: alloc ReservedPagePacket fail!\n", __FUNCTION__);
 		return;
 	}
