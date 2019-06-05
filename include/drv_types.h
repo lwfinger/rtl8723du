@@ -36,7 +36,7 @@ enum _NIC_VERSION {
 typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 
 #include <rtw_debug.h>
-#include <cmn_info/rtw_sta_info.h>
+#include <rtw_sta_info.h>
 #include <rtw_rf.h>
 #include <rtw_ht.h>
 
