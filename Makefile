@@ -292,7 +292,7 @@ rtk_core :=	core/rtw_cmd.o \
 		core/rtw_btcoex.o \
 		core/rtw_odm.o \
 		core/rtw_rm.o \
-		core/efuse/rtw_efuse.o 
+		core//rtw_efuse.o 
 
 $(MODULE_NAME)-y += $(rtk_core)
 
@@ -375,7 +375,6 @@ clean:
 	cd hal ; rm -fr */*/*.mod.c */*/*.mod */*/*.o */*/.*.cmd */*/*.ko
 	cd hal ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko
 	cd hal ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
-	cd core/efuse ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
 	cd core ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
 	cd os_dep ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
 	cd os_dep/linux ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
