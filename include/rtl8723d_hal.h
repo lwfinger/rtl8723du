@@ -7,7 +7,6 @@
 #include "hal_data.h"
 
 #include "rtl8723d_spec.h"
-#include "rtl8723d_rf.h"
 #include "rtl8723d_dm.h"
 #include "rtl8723d_recv.h"
 #include "rtl8723d_xmit.h"
@@ -255,6 +254,9 @@ void Hal_ReadRFGainOffset(PADAPTER pAdapter, u8 *hwinfo, bool AutoLoadFail);
 	void check_bt_status_work(void *data);
 #endif
 
-	void rtl8723d_cal_txdesc_chksum(struct tx_desc *ptxdesc);
+void rtl8723d_cal_txdesc_chksum(struct tx_desc *ptxdesc);
+int PHY_RF6052_Config8723D(PADAPTER pdapter);
+
+void PHY_RF6052SetBandwidth8723D(PADAPTER Adapter, enum channel_width Bandwidth);
 
 #endif

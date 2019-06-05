@@ -22,8 +22,6 @@ static const char *rtw_log_level_str[] = {
 	u64 GlobalDebugComponents = 0;
 #endif /* CONFIG_DEBUG_RTL871X */
 
-#include <rtw_version.h>
-
 void dump_drv_version(void *sel)
 {
 	RTW_PRINT_SEL(sel, "%s %s\n", DRV_NAME, DRIVERVERSION);

@@ -7,7 +7,6 @@
 #include "HalVerDef.h"
 #include "hal_pg.h"
 #include "hal_phy.h"
-#include "hal_phy_reg.h"
 #include "hal_com_reg.h"
 #include "hal_com_phycfg.h"
 #include "../hal/hal_com_c2h.h"

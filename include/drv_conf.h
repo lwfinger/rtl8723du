@@ -4,7 +4,15 @@
 #ifndef __DRV_CONF_H__
 #define __DRV_CONF_H__
 #include "autoconf.h"
-#include "hal_ic_cfg.h"
+
+#define RATE_ADAPTIVE_SUPPORT			0
+
+#ifndef CONFIG_FW_C2H_PKT
+	#define CONFIG_FW_C2H_PKT
+#endif
+#ifndef CONFIG_RTW_MAC_HIDDEN_RPT
+	#define CONFIG_RTW_MAC_HIDDEN_RPT
+#endif
 
 /* About USB VENDOR REQ */
 #if !defined(CONFIG_SCAN_BACKOP)

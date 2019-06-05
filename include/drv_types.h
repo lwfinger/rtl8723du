@@ -22,7 +22,8 @@
 	#include <net/arp.h>
 #endif
 
-	#include <drv_types_linux.h>
+#define DRIVERVERSION	"v5.2.15.2_27977.20180529_COEX20171212-2222"
+#define BTCOEXVERSION	"COEX20171212-2222"
 
 enum _NIC_VERSION {
 
@@ -76,7 +77,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 #include <rtw_mi.h>
 #include <rtw_ap.h>
 #include <rtw_efuse.h>
-#include <rtw_version.h>
 #include <rtw_odm.h>
 
 #include <rtw_p2p.h>
@@ -92,7 +92,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 #include <ip.h>
 #include <if_ether.h>
 #include <ethernet.h>
-#include <circ_buf.h>
 
 #include <rtw_android.h>
 
@@ -105,6 +104,8 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 #define SPEC_DEV_ID_RF_CONFIG_1T1R BIT(3)
 #define SPEC_DEV_ID_RF_CONFIG_2T2R BIT(4)
 #define SPEC_DEV_ID_ASSIGN_IFNAME BIT(5)
+
+#define bRFRegOffsetMask		0xfffff
 
 struct specific_device_id {
 
@@ -1243,9 +1244,9 @@ int nat25_handle_frame(_adapter *priv, struct sk_buff *skb);
 int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method);
 
 /* HCI Related header file */
-#include <usb_osintf.h>
 #include <usb_ops.h>
 #include <usb_hal.h>
+#include <usb_vendor_req.h>
 
 extern char *rtw_initmac;
 extern int rtw_ht_enable;

@@ -16,8 +16,6 @@
 #define strnicmp	strncasecmp
 #endif /* Linux kernel >= 4.0.0 */
 
-#include "rtw_version.h"
-
 extern void macstr2num(u8 *dst, u8 *src);
 
 static const char *android_wifi_cmd_str[ANDROID_WIFI_CMD_MAX] = {
