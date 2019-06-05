@@ -6,7 +6,7 @@
 ============================================================*/
 
 #include "mp_precomp.h"
-#include "../phydm_precomp.h"
+#include "phydm_precomp.h"
 
 s8
 odm_cckrssi_8723d(

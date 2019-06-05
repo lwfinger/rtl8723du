@@ -35,9 +35,9 @@ _PHYDM_FILES := hal/phydm/phydm_debug.o	\
 			hal/phydm/halrf/halrf_kfree.o
 	
 RTL871X = rtl8723d
-_PHYDM_FILES += hal/phydm/$(RTL871X)/halhwimg8723d_bb.o\
-			hal/phydm/$(RTL871X)/halhwimg8723d_mac.o\
-			hal/phydm/$(RTL871X)/halhwimg8723d_rf.o\
-			hal/phydm/$(RTL871X)/phydm_regconfig8723d.o\
-			hal/phydm/$(RTL871X)/phydm_rtl8723d.o\
-			hal/phydm/halrf/$(RTL871X)/halrf_8723d.o
+_PHYDM_FILES += hal/phydm/halhwimg8723d_bb.o\
+			hal/phydm/halhwimg8723d_mac.o\
+			hal/phydm/halhwimg8723d_rf.o\
+			hal/phydm/phydm_regconfig8723d.o\
+			hal/phydm/phydm_rtl8723d.o\
+			hal/phydm/halrf/halrf_8723d.o

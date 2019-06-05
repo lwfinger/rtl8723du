@@ -2,7 +2,7 @@
 /* Copyright(c) 2007 - 2017 Realtek Corporation */
 
 #include "mp_precomp.h"
-#include "../phydm_precomp.h"
+#include "phydm_precomp.h"
 
 void
 odm_config_rf_reg_8723d(

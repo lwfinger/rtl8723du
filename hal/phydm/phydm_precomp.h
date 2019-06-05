@@ -55,14 +55,14 @@ rtw_phydm_cfg_phy_para(
 	u32 delay_time
 );
 
-#include "rtl8723d/halhwimg8723d_bb.h"
-#include "rtl8723d/halhwimg8723d_mac.h"
-#include "rtl8723d/halhwimg8723d_rf.h"
-#include "rtl8723d/phydm_regconfig8723d.h"
-#include "rtl8723d/hal8723dreg.h"
-#include "rtl8723d/phydm_rtl8723d.h"
-#include "halrf/rtl8723d/halrf_8723d.h"
-#include "rtl8723d/version_rtl8723d.h"
+#include "halhwimg8723d_bb.h"
+#include "halhwimg8723d_mac.h"
+#include "halhwimg8723d_rf.h"
+#include "phydm_regconfig8723d.h"
+#include "hal8723dreg.h"
+#include "phydm_rtl8723d.h"
+#include "halrf/halrf_8723d.h"
+#include "version_rtl8723d.h"
 #include "rtl8723d_hal.h"
 
 #endif /* __ODM_PRECOMP_H__ */

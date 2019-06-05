@@ -3,7 +3,7 @@
 
 /*Image2HeaderVersion: 3.5.2*/
 #include "mp_precomp.h"
-#include "../phydm_precomp.h"
+#include "phydm_precomp.h"
 
 static boolean
 check_positive(
