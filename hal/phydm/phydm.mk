@@ -18,7 +18,7 @@ _PHYDM_FILES := hal/phydm/phydm_debug.o	\
 			hal/phydm/phydm_noisemonitor.o\
 			hal/phydm/phydm_acs.o\
 			hal/phydm/phydm_dfs.o\
-			hal/phydm/txbf/phydm_hal_txbf_api.o\
+			hal/phydm/phydm_hal_txbf_api.o\
 			hal/phydm/phydm_ccx.o\
 			hal/phydm/phydm_psd.o\
 			hal/phydm/phydm_primary_cca.o\

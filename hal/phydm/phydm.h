@@ -22,7 +22,7 @@
 #include "phydm_adaptivity.h"
 #include "phydm_dfs.h"
 #include "phydm_ccx.h"
-#include "txbf/phydm_hal_txbf_api.h"
+#include "phydm_hal_txbf_api.h"
 #include "phydm_dynamic_rx_path.h"
 #include "phydm_psd.h"
 #include "phydm_primary_cca.h"

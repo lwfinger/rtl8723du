@@ -5,9 +5,9 @@
 #define __INC_PHYDM_BEAMFORMING_H
 
 /*Beamforming Related*/
-#include "txbf/halcomtxbf.h"
-#include "txbf/haltxbfjaguar.h"
-#include "txbf/haltxbfinterface.h"
+#include "halcomtxbf.h"
+#include "haltxbfjaguar.h"
+#include "haltxbfinterface.h"
 
 #define beamforming_gid_paid(adapter, p_tcb)
 #define	phydm_acting_determine(p_dm, type)	false
