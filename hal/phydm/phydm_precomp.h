@@ -61,7 +61,7 @@ rtw_phydm_cfg_phy_para(
 #include "phydm_regconfig8723d.h"
 #include "hal8723dreg.h"
 #include "phydm_rtl8723d.h"
-#include "halrf/halrf_8723d.h"
+#include "halrf_8723d.h"
 #include "version_rtl8723d.h"
 #include "rtl8723d_hal.h"
 

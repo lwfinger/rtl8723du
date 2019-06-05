@@ -28,11 +28,11 @@ _PHYDM_FILES := hal/phydm/phydm_debug.o	\
 			hal/phydm/phydm_math_lib.o\
 			hal/phydm/phydm_api.o\
 			hal/phydm/phydm_pow_train.o\
-			hal/phydm/halrf/halrf.o\
-			hal/phydm/halrf/halphyrf_ce.o\
-			hal/phydm/halrf/halrf_powertracking_ce.o\
-			hal/phydm/halrf/halrf_powertracking.o\
-			hal/phydm/halrf/halrf_kfree.o
+			hal/phydm/halrf.o\
+			hal/phydm/halphyrf_ce.o\
+			hal/phydm/halrf_powertracking_ce.o\
+			hal/phydm/halrf_powertracking.o\
+			hal/phydm/halrf_kfree.o
 	
 RTL871X = rtl8723d
 _PHYDM_FILES += hal/phydm/halhwimg8723d_bb.o\
@@ -40,4 +40,4 @@ _PHYDM_FILES += hal/phydm/halhwimg8723d_bb.o\
 			hal/phydm/halhwimg8723d_rf.o\
 			hal/phydm/phydm_regconfig8723d.o\
 			hal/phydm/phydm_rtl8723d.o\
-			hal/phydm/halrf/halrf_8723d.o
+			hal/phydm/halrf_8723d.o

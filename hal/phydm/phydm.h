@@ -36,10 +36,10 @@
 #include "phydm_beamforming.h"
 
 /*HALRF header*/
-#include "halrf/halrf_iqk.h"
-#include "halrf/halrf.h"
-#include "halrf/halrf_powertracking.h"
-#include "halrf/halphyrf_ce.h"
+#include "halrf_iqk.h"
+#include "halrf.h"
+#include "halrf_powertracking.h"
+#include "halphyrf_ce.h"
 
 extern const u16 phy_rate_table[28];
 
