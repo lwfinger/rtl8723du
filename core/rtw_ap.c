@@ -279,7 +279,7 @@ u8 chk_sta_is_alive(struct sta_info *psta)
 void	expire_timeout_chk(_adapter *padapter)
 {
 	_irqL irqL;
-	_list	*phead, *plist;
+	struct list_head	*phead, *plist;
 	u8 updated = false;
 	struct sta_info *psta = NULL;
 	struct sta_priv *pstapriv = &padapter->stapriv;
@@ -556,7 +556,7 @@ void rtw_ap_update_sta_ra_info(_adapter *padapter, struct sta_info *psta)
 u8 rtw_ap_find_mini_tx_rate(_adapter *adapter)
 {
 	_irqL irqL;
-	_list	*phead, *plist;
+	struct list_head	*phead, *plist;
 	u8 miini_tx_rate = ODM_RATEVHTSS4MCS9, sta_tx_rate;
 	struct sta_info *psta = NULL;
 	struct sta_priv *pstapriv = &adapter->stapriv;
@@ -1118,7 +1118,7 @@ static void update_hw_ht_param(_adapter *padapter)
 static void rtw_ap_check_scan(_adapter *padapter)
 {
 	_irqL	irqL;
-	_list		*plist, *phead;
+	struct list_head		*plist, *phead;
 	u32	delta_time, lifetime;
 	struct	wlan_network	*pnetwork = NULL;
 	WLAN_BSSID_EX *pbss = NULL;
@@ -1807,7 +1807,7 @@ static void rtw_macaddr_acl_deinit(_adapter *adapter)
 	struct wlan_acl_pool *acl = &stapriv->acl_list;
 	_queue *acl_node_q = &acl->acl_node_q;
 	_irqL irqL;
-	_list *head, *list;
+	struct list_head *head, *list;
 	struct rtw_wlan_acl_node *acl_node;
 
 	_enter_critical_bh(&(acl_node_q->lock), &irqL);
@@ -1845,7 +1845,7 @@ void rtw_set_macaddr_acl(_adapter *adapter, int mode)
 int rtw_acl_add_sta(_adapter *adapter, const u8 *addr)
 {
 	_irqL irqL;
-	_list *list, *head;
+	struct list_head *list, *head;
 	u8 existed = 0;
 	int i = -1, ret = 0;
 	struct rtw_wlan_acl_node *acl_node;
@@ -1909,7 +1909,7 @@ release_lock:
 int rtw_acl_remove_sta(_adapter *adapter, const u8 *addr)
 {
 	_irqL irqL;
-	_list *list, *head;
+	struct list_head *list, *head;
 	int ret = 0;
 	struct rtw_wlan_acl_node *acl_node;
 	struct sta_priv *stapriv = &adapter->stapriv;
@@ -2082,7 +2082,7 @@ static u8 rtw_ap_bmc_frames_hdl(_adapter *padapter)
 #define HIQ_XMIT_COUNTS (6)
 	_irqL irqL;
 	struct sta_info *psta_bmc;
-	_list	*xmitframe_plist, *xmitframe_phead;
+	struct list_head	*xmitframe_plist, *xmitframe_phead;
 	struct xmit_frame *pxmitframe = NULL;
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
 	struct sta_priv  *pstapriv = &padapter->stapriv;
@@ -2682,7 +2682,7 @@ void associated_clients_update(_adapter *padapter, u8 updated, u32 sta_info_type
 	/* update associcated stations cap. */
 	if (updated == true) {
 		_irqL irqL;
-		_list	*phead, *plist;
+		struct list_head	*phead, *plist;
 		struct sta_info *psta = NULL;
 		struct sta_priv *pstapriv = &padapter->stapriv;
 
@@ -2993,7 +2993,7 @@ u8 ap_free_sta(_adapter *padapter, struct sta_info *psta, bool active, u16 reaso
 int rtw_ap_inform_ch_switch(_adapter *padapter, u8 new_ch, u8 ch_offset)
 {
 	_irqL irqL;
-	_list	*phead, *plist;
+	struct list_head	*phead, *plist;
 	int ret = 0;
 	struct sta_info *psta = NULL;
 	struct sta_priv *pstapriv = &padapter->stapriv;
@@ -3029,7 +3029,7 @@ int rtw_ap_inform_ch_switch(_adapter *padapter, u8 new_ch, u8 ch_offset)
 int rtw_sta_flush(_adapter *padapter, bool enqueue)
 {
 	_irqL irqL;
-	_list	*phead, *plist;
+	struct list_head	*phead, *plist;
 	int ret = 0;
 	struct sta_info *psta = NULL;
 	struct sta_priv *pstapriv = &padapter->stapriv;
@@ -3127,7 +3127,7 @@ void rtw_ap_restore_network(_adapter *padapter)
 	struct sta_info *psta;
 	struct security_priv *psecuritypriv = &(padapter->securitypriv);
 	_irqL irqL;
-	_list	*phead, *plist;
+	struct list_head	*phead, *plist;
 	u8 chk_alive_num = 0;
 	char chk_alive_list[NUM_STA];
 	int i;
@@ -3558,7 +3558,7 @@ u8 rtw_ap_sta_linking_state_check(_adapter *adapter)
 	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
 	struct sta_priv *pstapriv = &adapter->stapriv;
 	int i;
-	_list *plist, *phead;
+	struct list_head *plist, *phead;
 	_irqL irqL;
 	u8 rst = false;
 

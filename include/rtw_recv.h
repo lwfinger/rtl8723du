@@ -314,7 +314,7 @@ struct sta_recv_priv {
 };
 
 struct recv_buf {
-	_list list;
+	struct list_head list;
 
 	_lock recvbuf_lock;
 
@@ -357,7 +357,7 @@ struct recv_buf {
 
 */
 struct recv_frame_hdr {
-	_list	list;
+	struct list_head	list;
 	_pkt *pkt;
 
 	_adapter  *adapter;
@@ -387,7 +387,7 @@ struct recv_frame_hdr {
 union recv_frame {
 
 	union {
-		_list list;
+		struct list_head list;
 		struct recv_frame_hdr hdr;
 		uint mem[RECVFRAME_HDR_ALIGN >> 2];
 	} u;

@@ -61,7 +61,7 @@ enum sta_info_update_type {
 };
 
 struct rtw_wlan_acl_node {
-	_list		        list;
+	struct list_head		        list;
 	u8       addr[ETH_ALEN];
 	u8       valid;
 };
@@ -138,7 +138,7 @@ struct	stainfo_stats	{
 #define ST_EXPIRE_MS (10 * 1000)
 
 struct session_tracker {
-	_list list; /* session_tracker_queue */
+	struct list_head list; /* session_tracker_queue */
 	u32 local_naddr;
 	__be16 local_port;
 	__be16 remote_port;
@@ -188,8 +188,8 @@ void dump_st_ctl(void *sel, struct st_ctl_t *st_ctl);
 struct sta_info {
 
 	_lock	lock;
-	_list	list; /* free_sta_queue */
-	_list	hash_list; /* sta_hash */
+	struct list_head	list; /* free_sta_queue */
+	struct list_head	hash_list; /* sta_hash */
 	/* _list asoc_list; */ /* 20061114 */
 	/* _list sleep_list; */ /* sleep_q */
 	/* _list wakeup_list; */ /* wakeup_q */
@@ -248,8 +248,8 @@ struct sta_info {
 	/* curr_network(mlme_priv/security_priv/qos/ht) : AP CAP/INFO */
 	/* sta_info: (AP & STA) CAP/INFO */
 	unsigned int expire_to;
-	_list asoc_list;
-	_list auth_list;
+	struct list_head asoc_list;
+	struct list_head auth_list;
 	unsigned int auth_seq;
 	unsigned int authalg;
 	unsigned char chg_txt[128];
@@ -435,7 +435,7 @@ struct	sta_priv {
 	_queue	free_sta_queue;
 
 	_lock sta_hash_lock;
-	_list   sta_hash[NUM_STA];
+	struct list_head   sta_hash[NUM_STA];
 	int asoc_sta_count;
 	_queue sleep_q;
 	_queue wakeup_q;
@@ -444,8 +444,8 @@ struct	sta_priv {
 
 	u32 adhoc_expire_to;
 
-	_list asoc_list;
-	_list auth_list;
+	struct list_head asoc_list;
+	struct list_head auth_list;
 	_lock asoc_list_lock;
 	_lock auth_list_lock;
 	u8 asoc_list_cnt;

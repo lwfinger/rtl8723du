@@ -182,7 +182,7 @@ extern const char *const _regd_str[];
 
 #ifdef CONFIG_TXPWR_LIMIT
 struct regd_exc_ent {
-	_list list;
+	struct list_head list;
 	char country[2];
 	u8 domain;
 	char regd_name[0];

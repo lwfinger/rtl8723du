@@ -528,7 +528,7 @@ ssize_t proc_set_read_reg(struct file *file, const char __user *buffer, size_t c
 int proc_get_rx_stat(struct seq_file *m, void *v)
 {
 	_irqL	 irqL;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	struct net_device *dev = m->private;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
 	struct sta_info *psta = NULL;
@@ -576,7 +576,7 @@ int proc_get_rx_stat(struct seq_file *m, void *v)
 int proc_get_tx_stat(struct seq_file *m, void *v)
 {
 	_irqL	irqL;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	struct net_device *dev = m->private;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
 	struct sta_info *psta = NULL, *sta_rec[NUM_STA];
@@ -1093,7 +1093,7 @@ int proc_get_survey_info(struct seq_file *m, void *v)
 	struct mlme_priv	*pmlmepriv = &(padapter->mlmepriv);
 	_queue	*queue	= &(pmlmepriv->scanned_queue);
 	struct wlan_network	*pnetwork = NULL;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	int notify_signal;
 	s16 notify_noise = 0;
 	u16  index = 0, ie_cap = 0;
@@ -2901,7 +2901,7 @@ int proc_get_all_sta_info(struct seq_file *m, void *v)
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
 	struct sta_priv *pstapriv = &padapter->stapriv;
 	int i;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 
 	RTW_MAP_DUMP_SEL(m, "sta_dz_bitmap=", pstapriv->sta_dz_bitmap, pstapriv->aid_bmp_len);
 	RTW_MAP_DUMP_SEL(m, "tim_bitmap=", pstapriv->tim_bitmap, pstapriv->aid_bmp_len);
@@ -3359,7 +3359,7 @@ ssize_t proc_set_tx_sa_query(struct file *file, const char __user *buffer, size_
 	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
 	struct macid_ctl_t *macid_ctl = dvobj_to_macidctl(dvobj);
 	struct sta_info *psta;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	_irqL	 irqL;
 	char tmp[16];
 	u8	mac_addr[NUM_STA][ETH_ALEN];
@@ -3438,7 +3438,7 @@ ssize_t proc_set_tx_deauth(struct file *file, const char __user *buffer, size_t 
 	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
 	struct macid_ctl_t *macid_ctl = dvobj_to_macidctl(dvobj);
 	struct sta_info *psta;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	_irqL	 irqL;
 	char tmp[16];
 	u8	mac_addr[NUM_STA][ETH_ALEN];
@@ -3543,7 +3543,7 @@ ssize_t proc_set_tx_auth(struct file *file, const char __user *buffer, size_t co
 	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
 	struct macid_ctl_t *macid_ctl = dvobj_to_macidctl(dvobj);
 	struct sta_info *psta;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	_irqL	 irqL;
 	char tmp[16];
 	u8	mac_addr[NUM_STA][ETH_ALEN];

@@ -249,7 +249,7 @@ extern const char *const _txpwr_lmt_rs_str[];
 #define txpwr_lmt_rs_str(rs) (((rs) >= TXPWR_LMT_RS_NUM) ? _txpwr_lmt_rs_str[TXPWR_LMT_RS_NUM] : _txpwr_lmt_rs_str[(rs)])
 
 struct txpwr_lmt_ent {
-	_list list;
+	struct list_head list;
 
 	s8 lmt_2g[MAX_2_4G_BANDWIDTH_NUM]
 		[TXPWR_LMT_RS_NUM_2G]

@@ -35,7 +35,7 @@ enum RM_EV_ID {
 struct rm_event {
 	u32 rmid;
 	enum RM_EV_ID evid;
-	_list list;
+	struct list_head list;
 };
 
 #endif /* __RTW_RM_H_ */

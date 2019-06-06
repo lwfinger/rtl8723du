@@ -858,7 +858,7 @@ const char *const _regd_str[] = {
 void _dump_regd_exc_list(void *sel, struct rf_ctl_t *rfctl)
 {
 	struct regd_exc_ent *ent;
-	_list *cur, *head;
+	struct list_head *cur, *head;
 
 	RTW_PRINT_SEL(sel, "regd_exc_num:%u\n", rfctl->regd_exc_num);
 
@@ -937,7 +937,7 @@ inline void rtw_regd_exc_add(struct rf_ctl_t *rfctl, const char *country, u8 dom
 struct regd_exc_ent *_rtw_regd_exc_search(struct rf_ctl_t *rfctl, const char *country, u8 domain)
 {
 	struct regd_exc_ent *ent;
-	_list *cur, *head;
+	struct list_head *cur, *head;
 	u8 match = 0;
 
 	head = &rfctl->reg_exc_list;
@@ -994,7 +994,7 @@ void rtw_regd_exc_list_free(struct rf_ctl_t *rfctl)
 {
 	struct regd_exc_ent *ent;
 	_irqL irqL;
-	_list *cur, *head;
+	struct list_head *cur, *head;
 
 	_enter_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
 
@@ -1079,7 +1079,7 @@ void dump_txpwr_lmt(void *sel, _adapter *adapter)
 
 				for (ntx_idx = RF_1TX; ntx_idx < MAX_TX_COUNT; ntx_idx++) {
 					struct txpwr_lmt_ent *ent;
-					_list *cur, *head;
+					struct list_head *cur, *head;
 
 					if (ntx_idx >= hal_spec->tx_nss_num)
 						continue;
@@ -1291,7 +1291,7 @@ void rtw_txpwr_lmt_add_with_nlen(struct rf_ctl_t *rfctl, const char *regd_name, 
 {
 	struct txpwr_lmt_ent *ent;
 	_irqL irqL;
-	_list *cur, *head;
+	struct list_head *cur, *head;
 	s8 pre_lmt;
 
 	if (!regd_name || !nlen) {
@@ -1365,7 +1365,7 @@ inline void rtw_txpwr_lmt_add(struct rf_ctl_t *rfctl, const char *regd_name
 struct txpwr_lmt_ent *_rtw_txpwr_lmt_get_by_name(struct rf_ctl_t *rfctl, const char *regd_name)
 {
 	struct txpwr_lmt_ent *ent;
-	_list *cur, *head;
+	struct list_head *cur, *head;
 	u8 found = 0;
 
 	head = &rfctl->txpwr_lmt_list;
@@ -1402,7 +1402,7 @@ void rtw_txpwr_lmt_list_free(struct rf_ctl_t *rfctl)
 {
 	struct txpwr_lmt_ent *ent;
 	_irqL irqL;
-	_list *cur, *head;
+	struct list_head *cur, *head;
 
 	_enter_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
 

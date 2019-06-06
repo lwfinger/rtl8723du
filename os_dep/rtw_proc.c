@@ -504,7 +504,7 @@ static int proc_get_tx_info_msg(struct seq_file *m, void *v)
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
 	struct sta_priv *pstapriv = &padapter->stapriv;
 	int i;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	u8 current_rate_id = 0, current_sgi = 0;
 
 	char *BW, *status;

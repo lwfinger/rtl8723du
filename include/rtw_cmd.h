@@ -26,7 +26,7 @@ struct cmd_obj {
 	struct submit_ctx *sctx;
 	u8 no_io;
 	/* _sema 	cmd_sem; */
-	_list	list;
+	struct list_head	list;
 };
 
 /* cmd flags */
@@ -62,7 +62,7 @@ struct evt_obj {
 	u8	res;
 	u8	*parmbuf;
 	u32	evtsz;
-	_list	list;
+	struct list_head	list;
 };
 #endif
 

@@ -10,7 +10,7 @@
 #define NR_MP_XMITFRAME		8
 
 struct mp_xmit_frame {
-	_list	list;
+	struct list_head	list;
 
 	struct pkt_attrib attrib;
 

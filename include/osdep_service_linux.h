@@ -140,9 +140,7 @@ typedef	struct sk_buff	_pkt;
 typedef unsigned char	_buffer;
 
 typedef struct	__queue	_queue;
-typedef struct	list_head	_list;
 typedef	int	_OS_STATUS;
-/* typedef u32	_irqL; */
 typedef unsigned long _irqL;
 typedef	struct	net_device *_nic_hdl;
 
@@ -188,12 +186,12 @@ static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
 }
 #endif
 
-__inline static _list *get_next(_list	*list)
+__inline static struct list_head *get_next(struct list_head *list)
 {
 	return list->next;
 }
 
-__inline static _list	*get_list_head(_queue	*queue)
+__inline static struct list_head	*get_list_head(_queue	*queue)
 {
 	return &(queue->queue);
 }
@@ -255,7 +253,7 @@ __inline static void _exit_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 #endif
 }
 
-__inline static void rtw_list_delete(_list *plist)
+__inline static void rtw_list_delete(struct list_head *plist)
 {
 	list_del_init(plist);
 }

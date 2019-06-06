@@ -1546,7 +1546,7 @@ static int rtw_wx_set_wap(struct net_device *dev,
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
 	struct sockaddr *temp = (struct sockaddr *)awrq;
 	struct	mlme_priv	*pmlmepriv = &(padapter->mlmepriv);
-	_list	*phead;
+	struct list_head	*phead;
 	u8 *dst_bssid, *src_bssid;
 	_queue	*queue	= &(pmlmepriv->scanned_queue);
 	struct	wlan_network	*pnetwork = NULL;
@@ -1877,7 +1877,7 @@ static int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
 			   union iwreq_data *wrqu, char *extra)
 {
 	_irqL	irqL;
-	_list					*plist, *phead;
+	struct list_head					*plist, *phead;
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
 	struct	mlme_priv	*pmlmepriv = &(padapter->mlmepriv);
 	_queue				*queue	= &(pmlmepriv->scanned_queue);
@@ -1955,7 +1955,7 @@ static int rtw_wx_set_essid(struct net_device *dev,
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	_queue *queue = &pmlmepriv->scanned_queue;
-	_list *phead;
+	struct list_head *phead;
 	s8 status = true;
 	struct wlan_network *pnetwork = NULL;
 	NDIS_802_11_AUTHENTICATION_MODE authmode;
@@ -3149,7 +3149,7 @@ static int rtw_get_ap_info(struct net_device *dev,
 	int bssid_match, ret = 0;
 	u32 cnt = 0, wpa_ielen;
 	_irqL	irqL;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	unsigned char *pbuf;
 	u8 bssid[ETH_ALEN];
 	char data[32];
@@ -3734,7 +3734,7 @@ static int rtw_p2p_get_wps_configmethod(struct net_device *dev,
 	u8 peerMAC[ETH_ALEN] = { 0x00 };
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	_irqL irqL;
-	_list *plist, *phead;
+	struct list_head *plist, *phead;
 	_queue *queue = &(pmlmepriv->scanned_queue);
 	struct wlan_network *pnetwork = NULL;
 	u8 blnMatch = 0;
@@ -3864,7 +3864,7 @@ static int rtw_p2p_get_go_device_address(struct net_device *dev,
 	u8 peerMAC[ETH_ALEN] = { 0x00 };
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	_irqL irqL;
-	_list *plist, *phead;
+	struct list_head *plist, *phead;
 	_queue *queue	= &(pmlmepriv->scanned_queue);
 	struct wlan_network *pnetwork = NULL;
 	u8 blnMatch = 0;
@@ -3950,7 +3950,7 @@ static int rtw_p2p_get_device_type(struct net_device *dev,
 	u8 peerMAC[ETH_ALEN] = { 0x00 };
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	_irqL irqL;
-	_list *plist, *phead;
+	struct list_head *plist, *phead;
 	_queue *queue = &(pmlmepriv->scanned_queue);
 	struct wlan_network *pnetwork = NULL;
 	u8 blnMatch = 0;
@@ -4024,7 +4024,7 @@ static int rtw_p2p_get_device_name(struct net_device *dev,
 	u8 peerMAC[ETH_ALEN] = { 0x00 };
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	_irqL irqL;
-	_list *plist, *phead;
+	struct list_head *plist, *phead;
 	_queue *queue = &(pmlmepriv->scanned_queue);
 	struct wlan_network *pnetwork = NULL;
 	u8 blnMatch = 0;
@@ -4094,7 +4094,7 @@ static int rtw_p2p_get_invitation_procedure(struct net_device *dev,
 	u8 peerMAC[ETH_ALEN] = { 0x00 };
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	_irqL irqL;
-	_list *plist, *phead;
+	struct list_head *plist, *phead;
 	_queue *queue	= &(pmlmepriv->scanned_queue);
 	struct wlan_network *pnetwork = NULL;
 	u8 blnMatch = 0;
@@ -4178,7 +4178,7 @@ static int rtw_p2p_connect(struct net_device *dev,
 	u8					peerMACStr[ETH_ALEN * 2] = { 0x00 };
 	struct mlme_priv		*pmlmepriv = &padapter->mlmepriv;
 	_irqL				irqL;
-	_list					*plist, *phead;
+	struct list_head					*plist, *phead;
 	_queue				*queue	= &(pmlmepriv->scanned_queue);
 	struct	wlan_network	*pnetwork = NULL;
 	uint					uintPeerChannel = 0;
@@ -4316,7 +4316,7 @@ static int rtw_p2p_invite_req(struct net_device *dev,
 	int						jj, kk;
 	u8						peerMACStr[ETH_ALEN * 2] = { 0x00 };
 	struct mlme_priv			*pmlmepriv = &padapter->mlmepriv;
-	_list						*plist, *phead;
+	struct list_head						*plist, *phead;
 	_queue					*queue	= &(pmlmepriv->scanned_queue);
 	struct	wlan_network		*pnetwork = NULL;
 	uint						uintPeerChannel = 0;
@@ -4497,7 +4497,7 @@ static int rtw_p2p_set_persistent(struct net_device *dev,
 	int						jj, kk;
 	u8						peerMACStr[ETH_ALEN * 2] = { 0x00 };
 	struct mlme_priv			*pmlmepriv = &padapter->mlmepriv;
-	_list						*plist, *phead;
+	struct list_head						*plist, *phead;
 	_queue					*queue	= &(pmlmepriv->scanned_queue);
 	struct	wlan_network		*pnetwork = NULL;
 	uint						uintPeerChannel = 0;
@@ -4602,7 +4602,7 @@ static int rtw_p2p_set_pc(struct net_device *dev,
 	int					jj, kk;
 	u8					peerMACStr[ETH_ALEN * 2] = { 0x00 };
 	struct mlme_priv		*pmlmepriv = &padapter->mlmepriv;
-	_list					*plist, *phead;
+	struct list_head					*plist, *phead;
 	_queue				*queue	= &(pmlmepriv->scanned_queue);
 	struct	wlan_network	*pnetwork = NULL;
 	u8					attr_content[50] = { 0x00 }, _status = 0;
@@ -4817,7 +4817,7 @@ static int rtw_p2p_prov_disc(struct net_device *dev,
 	int					jj, kk;
 	u8					peerMACStr[ETH_ALEN * 2] = { 0x00 };
 	struct mlme_priv		*pmlmepriv = &padapter->mlmepriv;
-	_list					*plist, *phead;
+	struct list_head					*plist, *phead;
 	_queue				*queue	= &(pmlmepriv->scanned_queue);
 	struct	wlan_network	*pnetwork = NULL;
 	uint					uintPeerChannel = 0;
@@ -5522,7 +5522,7 @@ static int rtw_dbg_port(struct net_device *dev,
 			break;
 		case 0x09: {
 			int i;
-			_list	*plist, *phead;
+			struct list_head	*plist, *phead;
 
 			RTW_INFO_DUMP("sta_dz_bitmap:", pstapriv->sta_dz_bitmap, pstapriv->aid_bmp_len);
 			RTW_INFO_DUMP("tim_bitmap:", pstapriv->tim_bitmap, pstapriv->aid_bmp_len);

@@ -3656,8 +3656,8 @@ static void session_tracker_chk_for_sta(_adapter *adapter, struct sta_info *sta)
 	struct st_ctl_t *st_ctl = &sta->st_ctl;
 	int i;
 	_irqL irqL;
-	_list *plist, *phead, *pnext;
-	_list dlist;
+	struct list_head *plist, *phead, *pnext;
+	struct list_head dlist;
 	struct session_tracker *st = NULL;
 	u8 op_wfd_mode = MIRACAST_DISABLED;
 
@@ -3733,7 +3733,7 @@ static void session_tracker_chk_for_adapter(_adapter *adapter)
 	struct sta_info *sta;
 	int i;
 	_irqL irqL;
-	_list *plist, *phead;
+	struct list_head *plist, *phead;
 	u8 op_wfd_mode = MIRACAST_DISABLED;
 
 	_enter_critical_bh(&stapriv->sta_hash_lock, &irqL);
@@ -3778,7 +3778,7 @@ static void session_tracker_cmd_hdl(_adapter *adapter, struct st_cmd_parm *parm)
 		__be16 remote_port = cpu_to_be16(parm->remote_port);
 		struct session_tracker *st = NULL;
 		_irqL irqL;
-		_list *plist, *phead;
+		struct list_head *plist, *phead;
 		u8 free_st = 0;
 		u8 alloc_st = 0;
 

@@ -718,9 +718,9 @@ struct rf_ctl_t {
 
 #ifdef CONFIG_TXPWR_LIMIT
 	_mutex txpwr_lmt_mutex;
-	_list reg_exc_list;
+	struct list_head reg_exc_list;
 	u8 regd_exc_num;
-	_list txpwr_lmt_list;
+	struct list_head txpwr_lmt_list;
 	u8 txpwr_regd_num;
 	const char *regd_name;
 
@@ -979,7 +979,7 @@ struct _ADAPTER {
 	int	pid[3];/* process id from UI, 0:wps, 1:hostapd, 2:dhcpcd */
 	int	bDongle;/* build-in module or external dongle */
 
-	_list	list;
+	struct list_head	list;
 
 	struct dvobj_priv *dvobj;
 	struct	mlme_priv mlmepriv;

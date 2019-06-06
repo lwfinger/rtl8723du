@@ -3006,7 +3006,7 @@ u16 rtw_rx_ampdu_apply(_adapter *adapter)
 
 	} else if (MLME_IS_AP(adapter) || MLME_IS_MESH(adapter)) {
 		_irqL irqL;
-		_list *phead, *plist;
+		struct list_head *phead, *plist;
 		u8 peer_num = 0;
 		char peers[NUM_STA];
 		struct sta_priv *pstapriv = &adapter->stapriv;
@@ -8776,7 +8776,7 @@ exit:
 void issue_action_spct_ch_switch(_adapter *padapter, u8 *ra, u8 new_ch, u8 ch_offset)
 {
 	_irqL	irqL;
-	_list		*plist, *phead;
+	struct list_head		*plist, *phead;
 	struct xmit_frame			*pmgntframe;
 	struct pkt_attrib			*pattrib;
 	unsigned char				*pframe;
@@ -9262,7 +9262,7 @@ exit:
 void issue_action_BSSCoexistPacket(_adapter *padapter)
 {
 	_irqL	irqL;
-	_list		*plist, *phead;
+	struct list_head		*plist, *phead;
 	unsigned char category, action;
 	struct xmit_frame			*pmgntframe;
 	struct pkt_attrib			*pattrib;
@@ -11338,7 +11338,7 @@ bypass_active_keep_alive:
 
 	} else if (is_client_associated_to_ibss(padapter)) {
 		_irqL irqL;
-		_list *phead, *plist, dlist;
+		struct list_head *phead, *plist, dlist;
 
 		_rtw_init_listhead(&dlist);
 
@@ -13760,7 +13760,7 @@ u8 chk_bmc_sleepq_hdl(_adapter *padapter, unsigned char *pbuf)
 {
 	_irqL irqL;
 	struct sta_info *psta_bmc;
-	_list	*xmitframe_plist, *xmitframe_phead;
+	struct list_head	*xmitframe_plist, *xmitframe_phead;
 	struct xmit_frame *pxmitframe = NULL;
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
 	struct sta_priv  *pstapriv = &padapter->stapriv;

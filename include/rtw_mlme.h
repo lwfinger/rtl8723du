@@ -684,7 +684,7 @@ struct mlme_priv {
 	bool need_to_roam;
 	u8	*nic_hdl;
 
-	_list		*pscanned;
+	struct list_head		*pscanned;
 	_queue	free_bss_pool;
 	_queue	scanned_queue;
 	u8		*free_bss_buf;

@@ -2161,7 +2161,7 @@ s8 phy_get_txpwr_lmt_abs(
 	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(Adapter);
 	struct txpwr_lmt_ent *ent = NULL;
 	_irqL irqL;
-	_list *cur, *head;
+	struct list_head *cur, *head;
 	s8 ch_idx;
 	u8 is_ww_regd = 0;
 	s8 lmt = MAX_POWER_INDEX;
@@ -2386,7 +2386,7 @@ static void phy_txpwr_lmt_cck_ofdm_mt_chk(_adapter *adapter)
 {
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
 	struct txpwr_lmt_ent *ent;
-	_list *cur, *head;
+	struct list_head *cur, *head;
 	u8 channel, tlrs, ntx_idx;
 
 	rfctl->txpwr_lmt_2g_cck_ofdm_state = 0;

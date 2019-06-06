@@ -26,7 +26,7 @@ inline void rtw_st_ctl_init(struct st_ctl_t *st_ctl)
 inline void rtw_st_ctl_clear_tracker_q(struct st_ctl_t *st_ctl)
 {
 	_irqL irqL;
-	_list *plist, *phead;
+	struct list_head *plist, *phead;
 	struct session_tracker *st;
 
 	_enter_critical_bh(&st_ctl->tracker_q.lock, &irqL);
@@ -157,7 +157,7 @@ void dump_st_ctl(void *sel, struct st_ctl_t *st_ctl)
 {
 	int i;
 	_irqL irqL;
-	_list *plist, *phead;
+	struct list_head *plist, *phead;
 	struct session_tracker *st;
 
 	if (!DBG_SESSION_TRACKER)
@@ -362,7 +362,7 @@ void rtw_mfree_all_stainfo(struct sta_priv *pstapriv);
 void rtw_mfree_all_stainfo(struct sta_priv *pstapriv)
 {
 	_irqL	 irqL;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	struct sta_info *psta = NULL;
 
 
@@ -401,7 +401,7 @@ void rtw_mfree_sta_priv_lock(struct	sta_priv *pstapriv)
 u32	_rtw_free_sta_priv(struct	sta_priv *pstapriv)
 {
 	_irqL	irqL;
-	_list	*phead, *plist;
+	struct list_head	*phead, *plist;
 	struct sta_info *psta = NULL;
 	struct recv_reorder_ctrl *preorder_ctrl;
 	int	index;
@@ -469,7 +469,7 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 {
 	_irqL irqL, irqL2;
 	int	index;
-	_list	*phash_list;
+	struct list_head	*phash_list;
 	struct sta_info	*psta;
 	_queue *pfree_sta_queue;
 	struct recv_reorder_ctrl *preorder_ctrl;
@@ -676,7 +676,7 @@ u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta)
 	/* for A-MPDU Rx reordering buffer control, cancel reordering_ctrl_timer */
 	for (i = 0; i < 16 ; i++) {
 		_irqL irqL;
-		_list	*phead, *plist;
+		struct list_head	*phead, *plist;
 		union recv_frame *prframe;
 		_queue *ppending_recvframe_queue;
 		_queue *pfree_recv_queue = &padapter->recvpriv.free_recv_queue;
@@ -771,7 +771,7 @@ exit:
 void rtw_free_all_stainfo(_adapter *padapter)
 {
 	_irqL	 irqL;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	int	index;
 	struct sta_info *psta = NULL;
 	struct	sta_priv *pstapriv = &padapter->stapriv;
@@ -825,7 +825,7 @@ struct sta_info *rtw_get_stainfo(struct sta_priv *pstapriv, const u8 *hwaddr)
 
 	_irqL	 irqL;
 
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 
 	struct sta_info *psta = NULL;
 
@@ -970,7 +970,7 @@ u8 rtw_access_ctrl(_adapter *adapter, u8 *mac_addr)
 {
 	u8 res = true;
 	_irqL irqL;
-	_list *list, *head;
+	struct list_head *list, *head;
 	struct rtw_wlan_acl_node *acl_node;
 	u8 match = false;
 	struct sta_priv *stapriv = &adapter->stapriv;

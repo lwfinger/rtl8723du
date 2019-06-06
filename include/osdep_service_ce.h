@@ -12,7 +12,6 @@
 #include <usbdi.h>
 
 typedef HANDLE 	_sema;
-typedef	LIST_ENTRY	_list;
 typedef uint _OS_STATUS;
 
 typedef NDIS_SPIN_LOCK	_lock;
@@ -30,7 +29,7 @@ struct timer_list {
 };
 
 struct	__queue	{
-	LIST_ENTRY	queue;
+	Lstruct list_head	queue;
 	_lock	lock;
 };
 

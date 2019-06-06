@@ -341,7 +341,7 @@ struct	wlan_network *_rtw_alloc_network(struct	mlme_priv *pmlmepriv) /* (_queue 
 	_irqL	irqL;
 	struct	wlan_network	*pnetwork;
 	_queue *free_queue = &pmlmepriv->free_bss_pool;
-	_list *plist = NULL;
+	struct list_head *plist = NULL;
 
 
 	_enter_critical_bh(&free_queue->lock, &irqL);
@@ -448,7 +448,7 @@ struct wlan_network *_rtw_find_network(_queue *scanned_queue, u8 *addr)
 {
 
 	/* _irqL irqL; */
-	_list	*phead, *plist;
+	struct list_head	*phead, *plist;
 	struct	wlan_network *pnetwork = NULL;
 	u8 zero_addr[ETH_ALEN] = {0, 0, 0, 0, 0, 0};
 
@@ -488,7 +488,7 @@ exit:
 void _rtw_free_network_queue(_adapter *padapter, u8 isfreeall)
 {
 	_irqL irqL;
-	_list *phead, *plist;
+	struct list_head *phead, *plist;
 	struct wlan_network *pnetwork;
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	_queue *scanned_queue = &pmlmepriv->scanned_queue;
@@ -713,7 +713,7 @@ int is_same_network(WLAN_BSSID_EX *src, WLAN_BSSID_EX *dst, u8 feature)
 
 struct wlan_network *_rtw_find_same_network(_queue *scanned_queue, struct wlan_network *network)
 {
-	_list *phead, *plist;
+	struct list_head *phead, *plist;
 	struct wlan_network *found = NULL;
 
 	phead = get_list_head(scanned_queue);
@@ -752,7 +752,7 @@ exit:
 
 struct	wlan_network	*rtw_get_oldest_wlan_network(_queue *scanned_queue)
 {
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 
 
 	struct	wlan_network	*pwlan = NULL;
@@ -862,7 +862,7 @@ Caller must hold pmlmepriv->lock first.
 bool rtw_update_scanned_network(_adapter *adapter, WLAN_BSSID_EX *target)
 {
 	_irqL irqL;
-	_list	*plist, *phead;
+	struct list_head	*plist, *phead;
 	u32	bssid_ex_sz;
 	struct mlme_priv	*pmlmepriv = &(adapter->mlmepriv);
 	struct mlme_ext_priv	*pmlmeext = &(adapter->mlmeextpriv);
@@ -1304,7 +1304,7 @@ static void free_scanqueue(struct	mlme_priv *pmlmepriv)
 	_irqL irqL, irqL0;
 	_queue *free_queue = &pmlmepriv->free_bss_pool;
 	_queue *scan_queue = &pmlmepriv->scanned_queue;
-	_list	*plist, *phead, *ptemp;
+	struct list_head	*plist, *phead, *ptemp;
 
 
 	_enter_critical_bh(&scan_queue->lock, &irqL0);
@@ -3063,7 +3063,7 @@ int rtw_select_roaming_candidate(struct mlme_priv *mlme)
 {
 	_irqL	irqL;
 	int ret = _FAIL;
-	_list	*phead;
+	struct list_head	*phead;
 	_adapter *adapter;
 	_queue	*queue	= &(mlme->scanned_queue);
 	struct	wlan_network	*pnetwork = NULL;
@@ -3191,7 +3191,7 @@ int rtw_select_and_join_from_scanned_queue(struct mlme_priv *pmlmepriv)
 {
 	_irqL	irqL;
 	int ret;
-	_list	*phead;
+	struct list_head	*phead;
 	_adapter *adapter;
 	_queue	*queue	= &(pmlmepriv->scanned_queue);
 	struct	wlan_network	*pnetwork = NULL;

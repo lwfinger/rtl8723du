@@ -26,7 +26,7 @@ static int is_any_client_associated(_adapter *padapter)
 static u32 go_add_group_info_attr(struct wifidirect_info *pwdinfo, u8 *pbuf)
 {
 	_irqL irqL;
-	_list	*phead, *plist;
+	struct list_head	*phead, *plist;
 	u32 len = 0;
 	u16 attr_len = 0;
 	u8 tmplen, *pdata_attr, *pstart, *pcur;
@@ -2384,7 +2384,7 @@ u32 process_p2p_devdisc_req(struct wifidirect_info *pwdinfo, u8 *pframe, uint le
 				attr_contentlen = 0;
 				if (rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_DEVICE_ID, dev_addr, &attr_contentlen)) {
 					_irqL irqL;
-					_list	*phead, *plist;
+					struct list_head	*phead, *plist;
 
 					_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
 					phead = &pstapriv->asoc_list;

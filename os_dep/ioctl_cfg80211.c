@@ -2085,7 +2085,7 @@ exit:
 static void _rtw_cfg80211_surveydone_event_callback(_adapter *padapter, struct cfg80211_scan_request *scan_req)
 {
 	_irqL	irqL;
-	_list					*plist, *phead;
+	struct list_head					*plist, *phead;
 	struct	mlme_priv	*pmlmepriv = &(padapter->mlmepriv);
 	_queue				*queue	= &(pmlmepriv->scanned_queue);
 	struct	wlan_network	*pnetwork = NULL;
@@ -4096,7 +4096,7 @@ static int	cfg80211_rtw_del_station(struct wiphy *wiphy, struct net_device *ndev
 {
 	int ret = 0;
 	_irqL irqL;
-	_list	*phead, *plist;
+	struct list_head	*phead, *plist;
 	u8 updated = false;
 	const u8 *target_mac;
 	struct sta_info *psta = NULL;
@@ -4199,7 +4199,7 @@ static struct sta_info *rtw_sta_info_get_by_idx(const int idx, struct sta_priv *
 
 {
 
-	_list	*phead, *plist;
+	struct list_head	*phead, *plist;
 	struct sta_info *psta = NULL;
 	int i = 0;
 
