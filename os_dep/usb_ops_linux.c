@@ -156,7 +156,7 @@ static u32 usb_bulkout_zero(struct intf_hdl *pintfhdl, u32 addr)
 	u32 ret;
 	unsigned char *pbuf;
 	struct zero_bulkout_context *pcontext;
-	PURB	purb = NULL;
+	struct urb *	purb = NULL;
 	_adapter *padapter = (_adapter *)pintfhdl->padapter;
 	struct dvobj_priv *pdvobj = adapter_to_dvobj(padapter);
 	struct pwrctrl_priv *pwrctl = dvobj_to_pwrctl(pdvobj);
@@ -372,7 +372,7 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 	unsigned int pipe;
 	int status;
 	u32 ret = _FAIL, bwritezero = false;
-	PURB	purb = NULL;
+	struct urb *	purb = NULL;
 	_adapter *padapter = (_adapter *)pintfhdl->padapter;
 	struct dvobj_priv	*pdvobj = adapter_to_dvobj(padapter);
 	struct pwrctrl_priv *pwrctl = dvobj_to_pwrctl(pdvobj);
@@ -617,7 +617,7 @@ u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
 	int err;
 	unsigned int pipe;
 	u32 ret = _FAIL;
-	PURB purb = NULL;
+	struct urb * purb = NULL;
 	struct recv_buf	*precvbuf = (struct recv_buf *)rmem;
 	_adapter		*adapter = pintfhdl->padapter;
 	struct dvobj_priv	*pdvobj = adapter_to_dvobj(adapter);

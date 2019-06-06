@@ -93,7 +93,6 @@
 #include <linux/usb.h>
 #include <linux/usb/ch9.h>
 
-typedef struct urb   *PURB;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 22))
 	#ifdef CONFIG_USB_SUSPEND
 		#define CONFIG_AUTOSUSPEND	1
