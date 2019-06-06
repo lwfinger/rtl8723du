@@ -174,7 +174,7 @@ typedef enum _bt_op_code {
 static u8 GLBtcBtMpOperSeq;
 static _mutex GLBtcBtMpOperLock;
 static _timer GLBtcBtMpOperTimer;
-static _sema GLBtcBtMpRptSema;
+static struct semaphore GLBtcBtMpRptSema;
 static u8 GLBtcBtMpRptSeq;
 static u8 GLBtcBtMpRptStatus;
 static u8 GLBtcBtMpRptRsp[C2H_MAX_SIZE];

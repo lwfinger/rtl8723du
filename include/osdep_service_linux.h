@@ -120,8 +120,6 @@
 
 #endif
 
-typedef struct	semaphore _sema;
-
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
 	typedef struct mutex		_mutex;
 #else

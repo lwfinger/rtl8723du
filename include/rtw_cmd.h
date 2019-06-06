@@ -25,7 +25,7 @@ struct cmd_obj {
 	u32	rspsz;
 	struct submit_ctx *sctx;
 	u8 no_io;
-	/* _sema 	cmd_sem; */
+	/* struct semaphore 	cmd_sem; */
 	struct list_head	list;
 };
 
@@ -36,9 +36,8 @@ enum {
 };
 
 struct cmd_priv {
-	_sema	cmd_queue_sema;
-	/* _sema	cmd_done_sema; */
-	_sema	start_cmdthread_sema;
+	struct semaphore	cmd_queue_sema;
+	struct semaphore	start_cmdthread_sema;
 
 	_queue	cmd_queue;
 	u8	cmd_seq;
@@ -68,7 +67,7 @@ struct evt_obj {
 
 struct	evt_priv {
 #ifdef CONFIG_EVENT_THREAD_MODE
-	_sema	evt_notify;
+	struct semaphore	evt_notify;
 
 	_queue	evt_queue;
 #endif

@@ -239,7 +239,7 @@ struct recv_priv {
 	uint  rx_middlepacket_crcerr;
 
 	/* u8 *pallocated_urb_buf; */
-	_sema allrxreturnevt;
+	struct semaphore allrxreturnevt;
 	uint	ff_hwaddr;
 	ATOMIC_T	rx_pending_cnt;
 

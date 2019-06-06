@@ -90,28 +90,24 @@ struct reportpwrstate_parm {
 	unsigned short rsvd;
 };
 
-
-typedef _sema _pwrlock;
-
-
-__inline static void _init_pwrlock(_pwrlock *plock)
+__inline static void _init_pwrlock(struct semaphore *plock)
 {
 	_rtw_init_sema(plock, 1);
 }
 
-__inline static void _free_pwrlock(_pwrlock *plock)
+__inline static void _free_pwrlock(struct semaphore *plock)
 {
 	_rtw_free_sema(plock);
 }
 
 
-__inline static void _enter_pwrlock(_pwrlock *plock)
+__inline static void _enter_pwrlock(struct semaphore *plock)
 {
 	_rtw_down_sema(plock);
 }
 
 
-__inline static void _exit_pwrlock(_pwrlock *plock)
+__inline static void _exit_pwrlock(struct semaphore *plock)
 {
 	_rtw_up_sema(plock);
 }
@@ -196,8 +192,8 @@ struct aoac_report {
 };
 
 struct pwrctrl_priv {
-	_pwrlock	lock;
-	_pwrlock	check_32k_lock;
+	struct semaphore	lock;
+	struct semaphore	check_32k_lock;
 	volatile u8 rpwm; /* requested power state for fw */
 	volatile u8 cpwm; /* fw current power state. updated when 1. read from HCPWM 2. driver lowers power level */
 	volatile u8 tog; /* toggling */

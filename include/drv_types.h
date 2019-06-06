@@ -849,7 +849,7 @@ struct dvobj_priv {
 
 	int	RegUsbSS;
 
-	_sema	usb_suspend_sema;
+	struct semaphore	usb_suspend_sema;
 
 	_mutex  usb_vendor_req_mutex;
 	u8 *usb_alloc_vendor_req_buf;
@@ -949,7 +949,7 @@ enum _NAPI_STATE {
 
 #ifdef CONFIG_MAC_LOOPBACK_DRIVER
 typedef struct loopbackdata {
-	_sema	sema;
+	struct semaphore	sema;
 	_thread_hdl_ lbkthread;
 	u8 bstop;
 	u32 cnt;
