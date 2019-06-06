@@ -304,20 +304,20 @@ u32 _rtw_down_sema(struct semaphore *sema)
 		return _SUCCESS;
 }
 
-inline void thread_exit(_completion *comp)
+inline void thread_exit(struct completion *comp)
 {
 	complete_and_exit(comp, 0);
 }
 
-inline void _rtw_init_completion(_completion *comp)
+inline void _rtw_init_completion(struct completion *comp)
 {
 	init_completion(comp);
 }
-inline void _rtw_wait_for_comp_timeout(_completion *comp)
+inline void _rtw_wait_for_comp_timeout(struct completion *comp)
 {
 	wait_for_completion_timeout(comp, msecs_to_jiffies(3000));
 }
-inline void _rtw_wait_for_comp(_completion *comp)
+inline void _rtw_wait_for_comp(struct completion *comp)
 {
 	wait_for_completion(comp);
 }

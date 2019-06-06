@@ -125,7 +125,6 @@
 #else
 	typedef struct semaphore	_mutex;
 #endif
-typedef struct completion _completion;
 
 struct	__queue	{
 	struct	list_head	queue;
