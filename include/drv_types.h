@@ -579,7 +579,7 @@ struct sec_cam_bmp {
 };
 
 struct cam_ctl_t {
-	_lock lock;
+	spinlock_t lock;
 
 	u8 sec_cap;
 	u32 flags;
@@ -617,7 +617,7 @@ struct macid_bmp {
 };
 
 struct macid_ctl_t {
-	_lock lock;
+	spinlock_t lock;
 	u8 num;
 	struct macid_bmp used;
 	struct macid_bmp bmc;
@@ -736,7 +736,7 @@ struct rf_ctl_t {
 #define TOTAL_MBID_CAM_NUM	8
 #define INVALID_CAM_ID			0xFF
 struct mbid_cam_ctl_t {
-	_lock lock;
+	spinlock_t lock;
 	u8 bitmap;
 	ATOMIC_T mbid_entry_num;
 };
@@ -809,7 +809,7 @@ struct dvobj_priv {
 	ATOMIC_T disable_func;
 
 	u8 xmit_block;
-	_lock xmit_block_lock;
+	spinlock_t xmit_block_lock;
 
 	struct pwrctrl_priv pwrctl_priv;
 
@@ -991,7 +991,7 @@ struct _ADAPTER {
 	struct	recv_priv	recvpriv;
 	struct	sta_priv	stapriv;
 	struct	security_priv	securitypriv;
-	_lock   security_key_mutex; /* add for CONFIG_IEEE80211W, none 11w also can use */
+	spinlock_t   security_key_mutex; /* add for CONFIG_IEEE80211W, none 11w also can use */
 	struct	registry_priv	registrypriv;
 	struct	led_priv	ledpriv;
 
@@ -1100,7 +1100,7 @@ struct _ADAPTER {
 	u8 iface_id;
 
 #ifdef CONFIG_BR_EXT
-	_lock					br_ext_lock;
+	spinlock_t					br_ext_lock;
 	/* unsigned int			macclone_completed; */
 	struct nat25_network_db_entry	*nethash[NAT25_HASH_SIZE];
 	int				pppoe_connection_in_progress;

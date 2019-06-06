@@ -105,10 +105,10 @@ struct rtw_wdev_priv {
 	#endif
 
 	struct cfg80211_scan_request *scan_request;
-	_lock scan_req_lock;
+	spinlock_t scan_req_lock;
 
 	struct cfg80211_connect_params *connect_req;
-	_lock connect_req_lock;
+	spinlock_t connect_req_lock;
 
 	struct net_device *pmon_ndev;/* for monitor interface */
 	char ifname_mon[IFNAMSIZ + 1]; /* interface name for monitor interface */

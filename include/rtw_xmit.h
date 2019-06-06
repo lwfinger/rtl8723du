@@ -171,7 +171,7 @@ union txdesc {
 #endif
 
 struct	hw_xmit	{
-	/* _lock xmit_lock; */
+	/* spinlock_t xmit_lock; */
 	/* _list	pending; */
 	_queue *sta_queue;
 	/* struct hw_txqueue *phwtxqueue; */
@@ -364,7 +364,7 @@ struct tx_servq {
 };
 
 struct sta_xmit_priv {
-	_lock	lock;
+	spinlock_t	lock;
 	sint	option;
 	sint	apsd_setting;	/* When bit mask is on, the associated edca queue supports APSD. */
 
@@ -413,7 +413,7 @@ u8 rtw_get_hwseq_no(_adapter *padapter);
 
 struct	xmit_priv	{
 
-	_lock	lock;
+	spinlock_t	lock;
 
 	_sema	xmit_sema;
 
@@ -513,7 +513,7 @@ struct	xmit_priv	{
 	u32 amsdu_debug_coalesce_two;
 
 #endif
-	_lock lock_sctx;
+	spinlock_t lock_sctx;
 
 };
 

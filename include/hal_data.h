@@ -432,7 +432,7 @@ typedef struct hal_com_data {
 	u8 sw_antdiv_bl_state;
 
 	/******** PHY DM & DM Section **********/
-	_lock		IQKSpinLock;
+	spinlock_t		IQKSpinLock;
 	u8			INIDATA_RATE[MACID_NUM_SW_LIMIT];
 
 	struct PHY_DM_STRUCT	 odmpriv;

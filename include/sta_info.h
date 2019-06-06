@@ -38,7 +38,7 @@ struct pre_link_sta_node_t {
 };
 
 struct pre_link_sta_ctl_t {
-	_lock lock;
+	spinlock_t lock;
 	u8 num;
 	struct pre_link_sta_node_t node[RTW_PRE_LINK_STA_NUM];
 };
@@ -187,7 +187,7 @@ void dump_st_ctl(void *sel, struct st_ctl_t *st_ctl);
 
 struct sta_info {
 
-	_lock	lock;
+	spinlock_t	lock;
 	struct list_head	list; /* free_sta_queue */
 	struct list_head	hash_list; /* sta_hash */
 	/* _list asoc_list; */ /* 20061114 */
@@ -434,7 +434,7 @@ struct	sta_priv {
 	u8 *pstainfo_buf;
 	_queue	free_sta_queue;
 
-	_lock sta_hash_lock;
+	spinlock_t sta_hash_lock;
 	struct list_head   sta_hash[NUM_STA];
 	int asoc_sta_count;
 	_queue sleep_q;
@@ -446,8 +446,8 @@ struct	sta_priv {
 
 	struct list_head asoc_list;
 	struct list_head auth_list;
-	_lock asoc_list_lock;
-	_lock auth_list_lock;
+	spinlock_t asoc_list_lock;
+	spinlock_t auth_list_lock;
 	u8 asoc_list_cnt;
 	u8 auth_list_cnt;
 

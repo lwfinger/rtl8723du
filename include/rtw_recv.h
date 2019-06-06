@@ -207,7 +207,7 @@ using enter_critical section to protect
 */
 
 struct recv_priv {
-	_lock	lock;
+	spinlock_t	lock;
 	_queue	free_recv_queue;
 	_queue	recv_pending_queue;
 	_queue	uc_swdec_pending_queue;
@@ -307,7 +307,7 @@ struct recv_priv {
 		   (recvpriv)->signal_stat_sampling_interval)
 
 struct sta_recv_priv {
-	_lock	lock;
+	spinlock_t	lock;
 	sint	option;
 	_queue defrag_q;	 /* keeping the fragment frame until defrag */
 	struct	stainfo_rxcache rxcache;
@@ -316,7 +316,7 @@ struct sta_recv_priv {
 struct recv_buf {
 	struct list_head list;
 
-	_lock recvbuf_lock;
+	spinlock_t recvbuf_lock;
 
 	u32	ref_cnt;
 
