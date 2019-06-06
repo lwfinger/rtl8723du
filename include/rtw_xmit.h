@@ -346,7 +346,7 @@ struct xmit_buf {
 struct xmit_frame {
 	struct list_head	list;
 	struct pkt_attrib attrib;
-	_pkt *pkt;
+	struct sk_buff *pkt;
 	struct xmit_buf *pxmitbuf;
 	int	frame_tag;
 	_adapter *padapter;
@@ -552,9 +552,9 @@ extern struct xmit_frame *rtw_dequeue_xframe(struct xmit_priv *pxmitpriv, struct
 extern int rtw_xmit_classifier(_adapter *padapter, struct xmit_frame *pxmitframe);
 extern u32 rtw_calculate_wlan_pkt_size_by_attribue(struct pkt_attrib *pattrib);
 #define rtw_wlan_pkt_size(f) rtw_calculate_wlan_pkt_size_by_attribue(&f->attrib)
-extern int rtw_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxmitframe);
+extern int rtw_xmitframe_coalesce(_adapter *padapter, struct sk_buff *pkt, struct xmit_frame *pxmitframe);
 #if defined(CONFIG_IEEE80211W) || defined(CONFIG_RTW_MESH)
-extern int rtw_mgmt_xmitframe_coalesce(_adapter *padapter, _pkt *pkt, struct xmit_frame *pxmitframe);
+extern int rtw_mgmt_xmitframe_coalesce(_adapter *padapter, struct sk_buff *pkt, struct xmit_frame *pxmitframe);
 #endif
 int _rtw_init_hw_txqueue(struct hw_txqueue *phw_txqueue, u8 ac_tag);
 void _rtw_init_sta_xmit_priv(struct sta_xmit_priv *psta_xmitpriv);
@@ -573,7 +573,7 @@ void rtw_free_hwxmits(_adapter *padapter);
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 24))
 int rtw_monitor_xmit_entry(struct sk_buff *skb, struct net_device *ndev);
 #endif
-int rtw_xmit(_adapter *padapter, _pkt **pkt);
+int rtw_xmit(_adapter *padapter, struct sk_buff **pkt);
 bool xmitframe_hiq_filter(struct xmit_frame *xmitframe);
 sint xmitframe_enqueue_for_sleeping_sta(_adapter *padapter, struct xmit_frame *pxmitframe);
 void stop_sta_xmit(_adapter *padapter, struct sta_info *psta);

@@ -17,14 +17,14 @@ int recvbuf2recvframe(PADAPTER padapter, void *ptr)
 	PHAL_DATA_TYPE pHalData;
 	struct recv_priv *precvpriv;
 	_queue *pfree_recv_queue;
-	_pkt *pskb;
+	struct sk_buff *pskb;
 
 
 	pHalData = GET_HAL_DATA(padapter);
 	precvpriv = &padapter->recvpriv;
 	pfree_recv_queue = &precvpriv->free_recv_queue;
 
-	pskb = (_pkt *)ptr;
+	pskb = (struct sk_buff *)ptr;
 	transfer_len = (int)pskb->len;
 	pbuf = pskb->data;
 

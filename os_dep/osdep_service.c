@@ -197,17 +197,17 @@ void rtw_mfree2d(void *pbuf, int h, int w, int size)
 	rtw_mfree((u8 *)pbuf, h * sizeof(void *) + w * h * size);
 }
 
-inline void rtw_os_pkt_free(_pkt *pkt)
+inline void rtw_os_pkt_free(struct sk_buff *pkt)
 {
 	rtw_skb_free(pkt);
 }
 
-inline void *rtw_os_pkt_data(_pkt *pkt)
+inline void *rtw_os_pkt_data(struct sk_buff *pkt)
 {
 	return pkt->data;
 }
 
-inline u32 rtw_os_pkt_len(_pkt *pkt)
+inline u32 rtw_os_pkt_len(struct sk_buff *pkt)
 {
 	return pkt->len;
 }

@@ -1154,7 +1154,7 @@ _adapter *rtw_get_iface_by_hwport(_adapter *padapter, u8 hw_port)
 #ifdef DBG_SKB_PROCESS
 static void rtw_dbg_skb_process(_adapter *padapter, union recv_frame *precvframe, union recv_frame *pcloneframe)
 {
-	_pkt *pkt_copy, *pkt_org;
+	struct sk_buff *pkt_copy, *pkt_org;
 
 	pkt_org = precvframe->u.hdr.pkt;
 	pkt_copy = pcloneframe->u.hdr.pkt;

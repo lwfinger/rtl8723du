@@ -337,7 +337,7 @@ struct recv_buf {
 	u8  irp_pending;
 	int  transfer_len;
 
-	_pkt *pskb;
+	struct sk_buff *pskb;
 };
 
 
@@ -358,7 +358,7 @@ struct recv_buf {
 */
 struct recv_frame_hdr {
 	struct list_head	list;
-	_pkt *pkt;
+	struct sk_buff *pkt;
 
 	_adapter  *adapter;
 
@@ -575,7 +575,7 @@ static inline union recv_frame *rxmem_to_recvframe(u8 *rxmem)
 
 }
 
-static inline union recv_frame *pkt_to_recvframe(_pkt *pkt)
+static inline union recv_frame *pkt_to_recvframe(struct sk_buff *pkt)
 {
 
 	u8 *buf_star;
@@ -585,7 +585,7 @@ static inline union recv_frame *pkt_to_recvframe(_pkt *pkt)
 	return precv_frame;
 }
 
-static inline u8 *pkt_to_recvmem(_pkt *pkt)
+static inline u8 *pkt_to_recvmem(struct sk_buff *pkt)
 {
 	/* return the rx_head */
 
@@ -595,7 +595,7 @@ static inline u8 *pkt_to_recvmem(_pkt *pkt)
 
 }
 
-static inline u8 *pkt_to_recvdata(_pkt *pkt)
+static inline u8 *pkt_to_recvdata(struct sk_buff *pkt)
 {
 	/* return the rx_data */
 

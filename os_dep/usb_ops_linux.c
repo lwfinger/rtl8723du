@@ -512,7 +512,7 @@ static void usb_init_recvbuf(_adapter *padapter, struct recv_buf *precvbuf)
 
 void usb_recv_tasklet(void *priv)
 {
-	_pkt			*pskb;
+	struct sk_buff			*pskb;
 	_adapter		*padapter = (_adapter *)priv;
 	struct recv_priv	*precvpriv = &padapter->recvpriv;
 	struct recv_buf	*precvbuf = NULL;
