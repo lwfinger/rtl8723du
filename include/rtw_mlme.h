@@ -297,7 +297,7 @@ struct scan_limit_info {
 
 #ifdef CONFIG_IOCTL_CFG80211
 struct cfg80211_wifidirect_info {
-	_timer					remain_on_ch_timer;
+	struct timer_list					remain_on_ch_timer;
 	u8						restore_channel;
 	struct ieee80211_channel	remain_on_ch_channel;
 	enum nl80211_channel_type	remain_on_ch_type;
@@ -311,16 +311,16 @@ struct cfg80211_wifidirect_info {
 
 struct wifidirect_info {
 	_adapter				*padapter;
-	_timer					find_phase_timer;
-	_timer					restore_p2p_state_timer;
+	struct timer_list					find_phase_timer;
+	struct timer_list					restore_p2p_state_timer;
 
 	/*	Used to do the scanning. After confirming the peer is availalble, the driver transmits the P2P frame to peer. */
-	_timer					pre_tx_scan_timer;
-	_timer					reset_ch_sitesurvey;
-	_timer					reset_ch_sitesurvey2;	/*	Just for resetting the scan limit function by using p2p nego */
+	struct timer_list					pre_tx_scan_timer;
+	struct timer_list					reset_ch_sitesurvey;
+	struct timer_list					reset_ch_sitesurvey2;	/*	Just for resetting the scan limit function by using p2p nego */
 #ifdef CONFIG_CONCURRENT_MODE
 	/*	Used to switch the channel between legacy AP and listen state. */
-	_timer					ap_p2p_switch_timer;
+	struct timer_list					ap_p2p_switch_timer;
 #endif
 	struct tx_provdisc_req_info	tx_prov_disc_info;
 	struct rx_provdisc_req_info rx_prov_disc_info;
@@ -664,7 +664,7 @@ struct roam_nb_info {
 	u8 roam_target_addr[ETH_ALEN];
 	u32	last_nb_rpt_entries;
 	bool	nb_rpt_is_same;
-	_timer roam_scan_timer;
+	struct timer_list roam_scan_timer;
 };
 #endif	/* defined(CONFIG_RTW_WNM) */
 
@@ -713,13 +713,13 @@ struct mlme_priv {
 
 	u32	auto_scan_int_ms;
 
-	_timer assoc_timer;
+	struct timer_list assoc_timer;
 
 	uint assoc_by_bssid;
 	uint assoc_by_rssi;
-	_timer scan_to_timer; /* driver itself handles scan_timeout status. */
+	struct timer_list scan_to_timer; /* driver itself handles scan_timeout status. */
 	systime scan_start_time; /* used to evaluate the time spent in scanning */
-	_timer set_scan_deny_timer;
+	struct timer_list set_scan_deny_timer;
 	ATOMIC_T set_scan_deny; /* 0: allowed, 1: deny */
 	struct qos_priv qospriv;
 	/* Number of non-HT AP/stations */
@@ -863,7 +863,7 @@ struct mlme_priv {
 #ifdef CONFIG_INTEL_WIDI
 	int	widi_state;
 	int	listen_state;
-	_timer	listen_timer;
+	struct timer_list	listen_timer;
 	ATOMIC_T	rx_probe_rsp; /* 1:receive probe respone from RDS source. */
 	u8	*l2sdTaBuffer;
 	u8	channel_idx;

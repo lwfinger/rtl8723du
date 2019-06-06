@@ -173,7 +173,7 @@ typedef enum _bt_op_code {
 #define C2H_MAX_SIZE		16
 static u8 GLBtcBtMpOperSeq;
 static _mutex GLBtcBtMpOperLock;
-static _timer GLBtcBtMpOperTimer;
+static struct timer_list GLBtcBtMpOperTimer;
 static struct semaphore GLBtcBtMpRptSema;
 static u8 GLBtcBtMpRptSeq;
 static u8 GLBtcBtMpRptStatus;

@@ -218,7 +218,7 @@ struct sta_info {
 	u8 replay_ctr[RTW_REPLAY_CTR_LEN];
 #endif /* CONFIG_GTK_OL */
 #ifdef CONFIG_IEEE80211W
-	_timer dot11w_expire_timer;
+	struct timer_list dot11w_expire_timer;
 #endif /* CONFIG_IEEE80211W */
 
 	u8	bssrateset[16];
@@ -233,7 +233,7 @@ struct sta_info {
 	struct stainfo_stats sta_stats;
 
 	/* for A-MPDU TX, ADDBA timeout check	 */
-	_timer addba_retry_timer;
+	struct timer_list addba_retry_timer;
 	/* for A-MPDU Rx reordering buffer control */
 	struct recv_reorder_ctrl recvreorder_ctrl[TID_NUM];
 	ATOMIC_T continual_no_rx_packet[TID_NUM];

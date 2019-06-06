@@ -532,12 +532,12 @@ struct mlme_ext_priv {
 	struct ss_res		sitesurvey_res;
 	struct mlme_ext_info	mlmext_info;/* for sta/adhoc mode, including current scanning/connecting/connected related info.
                                                       * for ap mode, network includes ap's cap_info */
-	_timer		survey_timer;
-	_timer		link_timer;
+	struct timer_list		survey_timer;
+	struct timer_list		link_timer;
 
 #ifdef CONFIG_RTW_80211R
-	_timer		ft_link_timer;
-	_timer		ft_roam_timer;
+	struct timer_list		ft_link_timer;
+	struct timer_list		ft_roam_timer;
 #endif
 
 	systime last_scan_time;

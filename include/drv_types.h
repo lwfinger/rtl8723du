@@ -821,7 +821,7 @@ struct dvobj_priv {
 	struct wiphy *wiphy;
 	#endif
 
-	_timer dynamic_chk_timer; /* dynamic/periodic check timer */
+	struct timer_list dynamic_chk_timer; /* dynamic/periodic check timer */
 	
 #ifdef CONFIG_RTW_NAPI_DYNAMIC
 	u8 en_napi_dynamic;
@@ -972,7 +972,7 @@ struct tsf_info {
 #define ADAPTER_TX_BW_5G(adapter) BW_MODE_5G((adapter)->driver_tx_bw_mode)
 
 struct _ADAPTER {
-	_timer	pwr_state_check_timer;
+	struct timer_list	pwr_state_check_timer;
 	int	pwr_state_check_interval;
 	u8 pwr_state_check_cnts;
 	int	DriverState;/* for disable driver using module, use dongle to replace module. */

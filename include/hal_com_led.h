@@ -195,7 +195,7 @@ typedef struct _LED_USB {
 	u8					BlinkCounter; /* Added for turn off overlap led after blinking a while, by page, 20120821 */
 	LED_STATE			BlinkingLedState; /* Next state for blinking, either LED_ON or LED_OFF are. */
 
-	_timer				BlinkTimer; /* Timer object for led blinking. */
+	struct timer_list		BlinkTimer; /* Timer object for led blinking. */
 
 	_workitem			BlinkWorkItem; /* Workitem used by BlinkTimer to manipulate H/W to blink LED.' */
 } LED_USB, *PLED_USB;
