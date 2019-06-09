@@ -42,13 +42,13 @@ struct _DFS_STATISTICS {
 	u8			st_l2h_max;
 	u8			st_l2h_min;
 	u8			mask_hist_checked;
-	boolean		pulse_flag_hist[5];
-	boolean		radar_det_mask_hist[5];
-	boolean		idle_mode;
-	boolean		force_TP_mode;
-	boolean		dbg_mode;
-	boolean		det_print;
-	boolean		det_print2;
+	bool		pulse_flag_hist[5];
+	bool		radar_det_mask_hist[5];
+	bool		idle_mode;
+	bool		force_TP_mode;
+	bool		dbg_mode;
+	bool		det_print;
+	bool		det_print2;
 };
 
 
@@ -73,22 +73,22 @@ enum phydm_dfs_region_domain {
 void phydm_radar_detect_reset(void *p_dm_void);
 void phydm_radar_detect_disable(void *p_dm_void);
 void phydm_radar_detect_enable(void *p_dm_void);
-boolean phydm_radar_detect(void *p_dm_void);
+bool phydm_radar_detect(void *p_dm_void);
 void phydm_dfs_parameter_init(void *p_dm_void);
 void phydm_dfs_debug(void *p_dm_void, u32 *const argv, u32 *_used, char *output, u32 *_out_len);
 #endif /* defined(CONFIG_PHYDM_DFS_MASTER) */
 
-boolean 
+bool 
 phydm_dfs_is_meteorology_channel(
 	void		*p_dm_void
 );
 
-boolean
+bool
 phydm_is_dfs_band(
 	void		*p_dm_void
 );
 
-boolean
+bool
 phydm_dfs_master_enabled(
 	void		*p_dm_void
 );

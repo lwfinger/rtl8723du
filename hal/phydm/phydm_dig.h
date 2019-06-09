@@ -79,8 +79,8 @@ enum lna_sat_timer_state {
 
 struct phydm_dig_struct {
 
-	boolean	is_ignore_dig; /*for old pause function*/
-	boolean	is_dbg_fa_th;
+	bool	is_ignore_dig; /*for old pause function*/
+	bool	is_dbg_fa_th;
 	u8		dig_mode_decision;
 	u8		cur_ig_value;
 	u8		rvrt_val;
@@ -90,7 +90,7 @@ struct phydm_dig_struct {
 	u8		dm_dig_max;			/*Absolutly upper bound*/
 	u8		dm_dig_min;			/*Absolutly lower bound*/
 	u8		dig_max_of_min;		/*Absolutly max of min*/
-	boolean	is_media_connect;
+	bool	is_media_connect;
 	u32		ant_div_rssi_max;
 	u8		*is_p2p_in_process;
 	u8		pause_lv_bitmap; /*bit-map of pause level*/
@@ -145,10 +145,10 @@ struct phydm_fa_struct {
 	u32		cnt_vht_crc32_ok;
 	u32		cnt_crc32_error_all;
 	u32		cnt_crc32_ok_all;
-	boolean	cck_block_enable;
-	boolean	ofdm_block_enable;
+	bool	cck_block_enable;
+	bool	ofdm_block_enable;
 	u32		dbg_port0;
-	boolean	edcca_flag;
+	bool	edcca_flag;
 };
 
 #ifdef PHYDM_TDMA_DIG_SUPPORT
@@ -188,8 +188,8 @@ struct phydm_lna_sat_info_struct {
 	u32			sat_cnt_acc_patha;
 	u32			sat_cnt_acc_pathb;
 	u32			check_time;
-	boolean		pre_sat_status;
-	boolean		cur_sat_status;
+	bool		pre_sat_status;
+	bool		cur_sat_status;
 	struct timer_list	phydm_lna_sat_chk_timer;
 	u32			cur_timer_check_cnt;
 	u32			pre_timer_check_cnt;
@@ -276,7 +276,7 @@ phydm_false_alarm_counter_reset(
 void
 phydm_false_alarm_counter_acc(
 	void		*p_dm_void,
-	boolean		rssi_dump_en
+	bool		rssi_dump_en
 	);
 
 void

@@ -189,17 +189,17 @@ struct phydm_phyinfo_struct {
 	u8		band_width:2;
 	u8		rxsc:4;						/* sub-channel---*/
 	u8		channel;						/* channel number---*/
-	u8		is_mu_packet:1;				/* is MU packet or not---boolean*/
-	u8		is_beamformed:1;				/* BF packet---boolean*/
+	u8		is_mu_packet:1;				/* is MU packet or not---bool*/
+	u8		is_beamformed:1;				/* BF packet---bool*/
 };
 
 struct phydm_perpkt_info_struct {
 	u8		data_rate;
 	u8		station_id;
-	u8		is_packet_match_bssid:1;	/*boolean*/
-	u8		is_packet_to_self:1;		/*boolean*/
-	u8		is_packet_beacon:1;		/*boolean*/
-	u8		is_to_self:1;				/*boolean*/
+	u8		is_packet_match_bssid:1;	/*bool*/
+	u8		is_packet_to_self:1;		/*bool*/
+	u8		is_packet_beacon:1;		/*bool*/
+	u8		is_to_self:1;				/*bool*/
 	u8		ppdu_cnt;
 };
 

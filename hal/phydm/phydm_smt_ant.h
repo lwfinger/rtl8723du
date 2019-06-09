@@ -26,7 +26,7 @@ struct smt_ant_cumitek {
 #if (defined(CONFIG_HL_SMART_ANTENNA))
 struct smt_ant_honbo {
 	u32	latch_time;
-	boolean	pkt_skip_statistic_en;
+	bool	pkt_skip_statistic_en;
 	u32	fix_beam_pattern_en;
 	u32	fix_training_num_en;
 	u32	fix_beam_pattern_codeword;
@@ -56,7 +56,7 @@ struct smt_ant_honbo {
 	
 	
 	u32	pre_codeword;
-	boolean	force_update_beam_en;
+	bool	force_update_beam_en;
 	u32	beacon_counter;
 	u32	pre_beacon_counter;
 	u8	pkt_counter;		/*packet number that each beam-set should be colected in training state*/

@@ -340,7 +340,7 @@ exit:
 
 u8 rtw_get_ch_group(u8 ch, u8 *group, u8 *cck_group)
 {
-	BAND_TYPE band = BAND_MAX;
+	enum BAND_TYPE band = BAND_MAX;
 	s8 gp = -1, cck_gp = -1;
 
 	if (ch <= 14) {
@@ -891,7 +891,7 @@ exit:
 
 inline void dump_regd_exc_list(void *sel, struct rf_ctl_t *rfctl)
 {
-	_irqL irqL;
+	unsigned long irqL;
 
 	_enter_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
 	_dump_regd_exc_list(sel, rfctl);
@@ -901,7 +901,7 @@ inline void dump_regd_exc_list(void *sel, struct rf_ctl_t *rfctl)
 void rtw_regd_exc_add_with_nlen(struct rf_ctl_t *rfctl, const char *country, u8 domain, const char *regd_name, u32 nlen)
 {
 	struct regd_exc_ent *ent;
-	_irqL irqL;
+	unsigned long irqL;
 
 	if (!regd_name || !nlen) {
 		rtw_warn_on(1);
@@ -981,7 +981,7 @@ exit:
 inline struct regd_exc_ent *rtw_regd_exc_search(struct rf_ctl_t *rfctl, const char *country, u8 domain)
 {
 	struct regd_exc_ent *ent;
-	_irqL irqL;
+	unsigned long irqL;
 
 	_enter_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
 	ent = _rtw_regd_exc_search(rfctl, country, domain);
@@ -993,7 +993,7 @@ inline struct regd_exc_ent *rtw_regd_exc_search(struct rf_ctl_t *rfctl, const ch
 void rtw_regd_exc_list_free(struct rf_ctl_t *rfctl)
 {
 	struct regd_exc_ent *ent;
-	_irqL irqL;
+	unsigned long irqL;
 	struct list_head *cur, *head;
 
 	_enter_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
@@ -1012,12 +1012,12 @@ void rtw_regd_exc_list_free(struct rf_ctl_t *rfctl)
 	_exit_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
 }
 
-void dump_txpwr_lmt(void *sel, _adapter *adapter)
+void dump_txpwr_lmt(void *sel, struct adapter *adapter)
 {
 #define TMP_STR_LEN 16
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
-	_irqL irqL;
+	unsigned long irqL;
 	char fmt[16];
 	char tmp_str[TMP_STR_LEN];
 	s8 *lmt_idx = NULL;
@@ -1290,7 +1290,7 @@ void rtw_txpwr_lmt_add_with_nlen(struct rf_ctl_t *rfctl, const char *regd_name, 
 	, u8 band, u8 bw, u8 tlrs, u8 ntx_idx, u8 ch_idx, s8 lmt)
 {
 	struct txpwr_lmt_ent *ent;
-	_irqL irqL;
+	unsigned long irqL;
 	struct list_head *cur, *head;
 	s8 pre_lmt;
 
@@ -1389,7 +1389,7 @@ struct txpwr_lmt_ent *_rtw_txpwr_lmt_get_by_name(struct rf_ctl_t *rfctl, const c
 inline struct txpwr_lmt_ent *rtw_txpwr_lmt_get_by_name(struct rf_ctl_t *rfctl, const char *regd_name)
 {
 	struct txpwr_lmt_ent *ent;
-	_irqL irqL;
+	unsigned long irqL;
 
 	_enter_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
 	ent = _rtw_txpwr_lmt_get_by_name(rfctl, regd_name);
@@ -1401,7 +1401,7 @@ inline struct txpwr_lmt_ent *rtw_txpwr_lmt_get_by_name(struct rf_ctl_t *rfctl, c
 void rtw_txpwr_lmt_list_free(struct rf_ctl_t *rfctl)
 {
 	struct txpwr_lmt_ent *ent;
-	_irqL irqL;
+	unsigned long irqL;
 	struct list_head *cur, *head;
 
 	_enter_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
@@ -1432,12 +1432,12 @@ int rtw_ch_to_bb_gain_sel(int ch)
 	return sel;
 }
 
-static s8 rtw_rf_get_kfree_tx_gain_offset(_adapter *padapter, u8 path, u8 ch)
+static s8 rtw_rf_get_kfree_tx_gain_offset(struct adapter *adapt, u8 path, u8 ch)
 {
 	s8 kfree_offset = 0;
 
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(padapter);
-	struct kfree_data_t *kfree_data = GET_KFREE_DATA(padapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapt);
+	struct kfree_data_t *kfree_data = GET_KFREE_DATA(adapt);
 	s8 bb_gain_sel = rtw_ch_to_bb_gain_sel(ch);
 
 	if (bb_gain_sel < BB_GAIN_2G || bb_gain_sel >= BB_GAIN_NUM) {
@@ -1447,7 +1447,7 @@ static s8 rtw_rf_get_kfree_tx_gain_offset(_adapter *padapter, u8 path, u8 ch)
 
 	if (kfree_data->flag & KFREE_FLAG_ON) {
 		kfree_offset = kfree_data->bb_gain[bb_gain_sel][path];
-		if (IS_HARDWARE_TYPE_8723D(padapter))
+		if (IS_HARDWARE_TYPE_8723D(adapt))
 			RTW_INFO("%s path:%s, ch:%u, bb_gain_sel:%d, kfree_offset:%d\n"
 				, __func__, (path == 0)?"S1":"S0", 
 				ch, bb_gain_sel, kfree_offset);
@@ -1459,7 +1459,7 @@ exit:
 	return kfree_offset;
 }
 
-void rtw_rf_set_tx_gain_offset(_adapter *adapter, u8 path, s8 offset)
+void rtw_rf_set_tx_gain_offset(struct adapter *adapter, u8 path, s8 offset)
 {
 	u8 write_value;
 	u8 target_path = 0;
@@ -1502,9 +1502,9 @@ void rtw_rf_set_tx_gain_offset(_adapter *adapter, u8 path, s8 offset)
 	RTW_INFO(" after :0x%x\n", val32);
 }
 
-void rtw_rf_apply_tx_gain_offset(_adapter *adapter, u8 ch)
+void rtw_rf_apply_tx_gain_offset(struct adapter *adapter, u8 ch)
 {
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	s8 kfree_offset = 0;
 	s8 tx_pwr_track_offset = 0; /* TODO: 8814A should consider tx pwr track when setting tx gain offset */
 	s8 total_offset;

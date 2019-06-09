@@ -265,7 +265,7 @@ phydm_cmd_parser(
 void
 phydm_fw_trace_en_h2c(
 	void		*p_dm_void,
-	boolean	enable,
+	bool	enable,
 	u32		fw_debug_component,
 	u32		monitor_mode,
 	u32		macid

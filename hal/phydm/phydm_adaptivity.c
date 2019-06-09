@@ -231,7 +231,7 @@ phydm_check_environment(
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct phydm_adaptivity_struct	*adaptivity = (struct phydm_adaptivity_struct *)phydm_get_structure(p_dm, PHYDM_ADAPTIVITY);
-	boolean	is_clean_environment = false;
+	bool	is_clean_environment = false;
 
 	is_clean_environment = phydm_cal_nhm_cnt(p_dm);
 
@@ -261,7 +261,7 @@ phydm_search_pwdb_lower_bound(
 	u32			value32 = 0, reg_value32 = 0;
 	u8			cnt, try_count = 0;
 	u8			tx_edcca1 = 0;
-	boolean			is_adjust = true;
+	bool			is_adjust = true;
 	s8			th_l2h_dmc, th_h2l_dmc, igi_target = 0x32;
 	s8			diff;
 	u8			IGI = adaptivity->igi_base + 30 + (u8)p_dm->th_l2h_ini - (u8)p_dm->th_edcca_hl_diff;
@@ -334,7 +334,7 @@ phydm_search_pwdb_lower_bound(
 	phydm_set_edcca_threshold(p_dm, 0x7f, 0x7f);				/*resume to no link state*/
 }
 
-static boolean
+static bool
 phydm_re_search_condition(
 	void				*p_dm_void
 )
@@ -369,7 +369,7 @@ phydm_adaptivity_info_init(
 
 	switch (cmn_info)	{
 	case PHYDM_ADAPINFO_CARRIER_SENSE_ENABLE:
-		p_dm->carrier_sense_enable = (boolean)value;
+		p_dm->carrier_sense_enable = (bool)value;
 		break;
 
 	case PHYDM_ADAPINFO_DCBACKOFF:
@@ -377,7 +377,7 @@ phydm_adaptivity_info_init(
 		break;
 
 	case PHYDM_ADAPINFO_DYNAMICLINKADAPTIVITY:
-		adaptivity->dynamic_link_adaptivity = (boolean)value;
+		adaptivity->dynamic_link_adaptivity = (bool)value;
 		break;
 
 	case PHYDM_ADAPINFO_TH_L2H_INI:
@@ -576,7 +576,7 @@ phydm_adaptivity(
 void
 phydm_pause_edcca(
 	void	*p_dm_void,
-	boolean	is_pasue_edcca
+	bool	is_pasue_edcca
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;

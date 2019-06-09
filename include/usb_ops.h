@@ -21,7 +21,7 @@ enum {
 
 #include <usb_ops_linux.h>
 
-void usb_set_intf_ops(_adapter *padapter, struct _io_ops *pops);
+void usb_set_intf_ops(struct adapter *adapt, struct _io_ops *pops);
 
 void rtl8723du_set_hw_type(struct dvobj_priv *pdvobj);
 void rtl8723du_set_intf_ops(struct _io_ops *pops);
@@ -43,13 +43,13 @@ enum RTW_USB_SPEED {
 #define USB_HIGH_SPEED_BULK_SIZE	512		/* usb 2.0 */
 #define USB_FULL_SPEED_BULK_SIZE	64		/* usb 1.1 */
 
-static inline u8 rtw_usb_bulk_size_boundary(_adapter *padapter, int buf_len)
+static inline u8 rtw_usb_bulk_size_boundary(struct adapter *adapt, int buf_len)
 {
 	u8 rst = true;
 
-	if (IS_SUPER_SPEED_USB(padapter))
+	if (IS_SUPER_SPEED_USB(adapt))
 		rst = (0 == (buf_len) % USB_SUPER_SPEED_BULK_SIZE) ? true : false;
-	else if (IS_HIGH_SPEED_USB(padapter))
+	else if (IS_HIGH_SPEED_USB(adapt))
 		rst = (0 == (buf_len) % USB_HIGH_SPEED_BULK_SIZE) ? true : false;
 	else
 		rst = (0 == (buf_len) % USB_FULL_SPEED_BULK_SIZE) ? true : false;

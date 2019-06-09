@@ -51,7 +51,7 @@ struct phydm_pricca_struct {
 #endif /*#ifdef PHYDM_PRIMARY_CCA*/
 
 
-boolean
+bool
 odm_dynamic_primary_cca_dup_rts(
 	void			*p_dm_void
 );

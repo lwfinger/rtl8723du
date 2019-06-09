@@ -29,10 +29,10 @@ static u8 MgntQuery_NssTxRate(u16 Rate)
 	return NssNum;
 }
 
-void hal_mpt_SwitchRfSetting(PADAPTER	pAdapter)
+void hal_mpt_SwitchRfSetting(struct adapter *	pAdapter)
 {
-	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(pAdapter);
-	PMPT_CONTEXT		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct hal_com_data		*pHalData = GET_HAL_DATA(pAdapter);
+	struct mpt_context *		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 	u8				ChannelToSw = pMptCtx->MptChannelToSw;
 	u32				ulRateIdx = pMptCtx->mpt_rate_index;
 	u32				ulbandwidth = pMptCtx->MptBandWidth;
@@ -64,17 +64,17 @@ void hal_mpt_SwitchRfSetting(PADAPTER	pAdapter)
 	}
 }
 
-int hal_mpt_SetPowerTracking(PADAPTER padapter, u8 enable)
+int hal_mpt_SetPowerTracking(struct adapter * adapt, u8 enable)
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
 
 
-	if (!netif_running(padapter->pnetdev)) {
+	if (!netif_running(adapt->pnetdev)) {
 		return _FAIL;
 	}
 
-	if (check_fwstate(&padapter->mlmepriv, WIFI_MP_STATE) == false) {
+	if (check_fwstate(&adapt->mlmepriv, WIFI_MP_STATE) == false) {
 		return _FAIL;
 	}
 	if (enable)
@@ -85,9 +85,9 @@ int hal_mpt_SetPowerTracking(PADAPTER padapter, u8 enable)
 	return _SUCCESS;
 }
 
-void hal_mpt_GetPowerTracking(PADAPTER padapter, u8 *enable)
+void hal_mpt_GetPowerTracking(struct adapter * adapt, u8 *enable)
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
 
 
@@ -95,13 +95,13 @@ void hal_mpt_GetPowerTracking(PADAPTER padapter, u8 *enable)
 }
 
 
-void hal_mpt_CCKTxPowerAdjust(PADAPTER Adapter, bool bInCH14)
+void hal_mpt_CCKTxPowerAdjust(struct adapter * Adapter, bool bInCH14)
 {
 	u32		TempVal = 0, TempVal2 = 0, TempVal3 = 0;
 	u32		CurrCCKSwingVal = 0, CCKSwingIndex = 12;
 	u8		i;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
-	PMPT_CONTEXT		pMptCtx = &(Adapter->mppriv.mpt_ctx);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
+	struct mpt_context *		pMptCtx = &(Adapter->mppriv.mpt_ctx);
 	u8				u1Channel = pHalData->current_channel;
 	u32				ulRateIdx = pMptCtx->mpt_rate_index;
 	u8				DataRate = 0xFF;
@@ -268,10 +268,10 @@ void hal_mpt_CCKTxPowerAdjust(PADAPTER Adapter, bool bInCH14)
 
 }
 
-void hal_mpt_SetChannel(PADAPTER pAdapter)
+void hal_mpt_SetChannel(struct adapter * pAdapter)
 {
 	enum rf_path eRFPath;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
 	struct mp_priv	*pmp = &pAdapter->mppriv;
 	u8		channel = pmp->channel;
@@ -291,10 +291,10 @@ void hal_mpt_SetChannel(PADAPTER pAdapter)
  * Notice
  *	Switch bandwitdth may change center frequency(channel)
  */
-void hal_mpt_SetBandwidth(PADAPTER pAdapter)
+void hal_mpt_SetBandwidth(struct adapter * pAdapter)
 {
 	struct mp_priv *pmp = &pAdapter->mppriv;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 
 	u8		channel = pmp->channel;
 	u8		bandwidth = pmp->bandwidth;
@@ -306,7 +306,8 @@ void hal_mpt_SetBandwidth(PADAPTER pAdapter)
 	hal_mpt_SwitchRfSetting(pAdapter);
 }
 
-static void mpt_SetTxPower_Old(PADAPTER pAdapter, MPT_TXPWR_DEF Rate, u8 *pTxPower)
+static void mpt_SetTxPower_Old(struct adapter *pAdapter,
+			       enum mpt_txpwr_def Rate, u8 *pTxPower)
 {
 	switch (Rate) {
 	case MPT_CCK: {
@@ -366,12 +367,12 @@ static void mpt_SetTxPower_Old(PADAPTER pAdapter, MPT_TXPWR_DEF Rate, u8 *pTxPow
 
 static void
 mpt_SetTxPower(
-	PADAPTER		pAdapter,
-	MPT_TXPWR_DEF	Rate,
+	struct adapter *		pAdapter,
+	enum mpt_txpwr_def	Rate,
 	u8 *	pTxPower
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 
 	u8 path = 0 , i = 0, MaxRate = MGN_6M;
 	u8 StartPath = RF_PATH_A, EndPath = RF_PATH_B;
@@ -459,10 +460,10 @@ mpt_SetTxPower(
 	}
 }
 
-void hal_mpt_SetTxPower(PADAPTER pAdapter)
+void hal_mpt_SetTxPower(struct adapter * pAdapter)
 {
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(pAdapter);
-	PMPT_CONTEXT		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct hal_com_data *pHalData = GET_HAL_DATA(pAdapter);
+	struct mpt_context *		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 	struct PHY_DM_STRUCT		*pDM_Odm = &pHalData->odmpriv;
 
 	if (pHalData->rf_chip < RF_CHIP_MAX) {
@@ -492,10 +493,10 @@ void hal_mpt_SetTxPower(PADAPTER pAdapter)
 	odm_clear_txpowertracking_state(pDM_Odm);
 }
 
-void hal_mpt_SetDataRate(PADAPTER pAdapter)
+void hal_mpt_SetDataRate(struct adapter * pAdapter)
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
-	PMPT_CONTEXT		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
+	struct mpt_context *		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 	u32 DataRate;
 
 	DataRate = mpt_to_mgnt_rate(pMptCtx->mpt_rate_index);
@@ -507,12 +508,12 @@ void hal_mpt_SetDataRate(PADAPTER pAdapter)
 
 #define RF_PATH_AB	22
 
-static void mpt_SetRFPath_8723D(PADAPTER pAdapter)
+static void mpt_SetRFPath_8723D(struct adapter * pAdapter)
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 	u8	p = 0, i = 0;
 	u32	ulAntennaTx, ulAntennaRx, offset = 0, data = 0, val32 = 0;
-	PMPT_CONTEXT	pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct mpt_context *	pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 	struct PHY_DM_STRUCT	*pDM_Odm = &pHalData->odmpriv;
 	struct odm_rf_calibration_structure	*pRFCalibrateInfo = &(pDM_Odm->rf_calibrate_info);
 
@@ -544,13 +545,13 @@ static void mpt_SetRFPath_8723D(PADAPTER pAdapter)
 	}
 }
 
-static void mpt_SetRFPath_819X(PADAPTER	pAdapter)
+static void mpt_SetRFPath_819X(struct adapter *	pAdapter)
 {
-	HAL_DATA_TYPE			*pHalData	= GET_HAL_DATA(pAdapter);
-	PMPT_CONTEXT		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct hal_com_data			*pHalData	= GET_HAL_DATA(pAdapter);
+	struct mpt_context *		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 	u32			ulAntennaTx, ulAntennaRx;
-	R_ANTENNA_SELECT_OFDM	*p_ofdm_tx;	/* OFDM Tx register */
-	R_ANTENNA_SELECT_CCK	*p_cck_txrx;
+	struct antenna_sel_ofdm	*p_ofdm_tx;	/* OFDM Tx register */
+	struct antenna_sel_cck	*p_cck_txrx;
 	u8		r_rx_antenna_ofdm = 0, r_ant_select_cck_val = 0;
 	u8		chgTx = 0, chgRx = 0;
 	u32		r_ant_sel_cck_val = 0, r_ant_select_ofdm_val = 0, r_ofdm_tx_en_val = 0;
@@ -558,8 +559,8 @@ static void mpt_SetRFPath_819X(PADAPTER	pAdapter)
 	ulAntennaTx = pHalData->antenna_tx_path;
 	ulAntennaRx = pHalData->AntennaRxPath;
 
-	p_ofdm_tx = (R_ANTENNA_SELECT_OFDM *)&r_ant_select_ofdm_val;
-	p_cck_txrx = (R_ANTENNA_SELECT_CCK *)&r_ant_select_cck_val;
+	p_ofdm_tx = (struct antenna_sel_ofdm *)&r_ant_select_ofdm_val;
+	p_cck_txrx = (struct antenna_sel_cck *)&r_ant_select_cck_val;
 
 	p_ofdm_tx->r_ant_ht1			= 0x1;
 	p_ofdm_tx->r_ant_ht2			= 0x2;/*Second TX RF path is A*/
@@ -699,7 +700,7 @@ static void mpt_SetRFPath_819X(PADAPTER	pAdapter)
 }	/* MPT_ProSetRFPath */
 
 
-void hal_mpt_SetAntenna(PADAPTER	pAdapter)
+void hal_mpt_SetAntenna(struct adapter *	pAdapter)
 
 {
 	RTW_INFO("Do %s\n", __func__);
@@ -711,9 +712,9 @@ void hal_mpt_SetAntenna(PADAPTER	pAdapter)
 	RTW_INFO("mpt_SetRFPath_819X Do %s\n", __func__);
 }
 
-int hal_mpt_SetThermalMeter(PADAPTER pAdapter, u8 target_ther)
+int hal_mpt_SetThermalMeter(struct adapter * pAdapter, u8 target_ther)
 {
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data *pHalData = GET_HAL_DATA(pAdapter);
 
 	if (!netif_running(pAdapter->pnetdev)) {
 		return _FAIL;
@@ -737,14 +738,14 @@ int hal_mpt_SetThermalMeter(PADAPTER pAdapter, u8 target_ther)
 }
 
 
-void hal_mpt_TriggerRFThermalMeter(PADAPTER pAdapter)
+void hal_mpt_TriggerRFThermalMeter(struct adapter * pAdapter)
 {
 	phy_set_rf_reg(pAdapter, RF_PATH_A, 0x42, BIT17 | BIT16, 0x03);
 
 }
 
 
-u8 hal_mpt_ReadRFThermalMeter(PADAPTER pAdapter)
+u8 hal_mpt_ReadRFThermalMeter(struct adapter * pAdapter)
 
 {
 	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(pAdapter);
@@ -768,7 +769,7 @@ u8 hal_mpt_ReadRFThermalMeter(PADAPTER pAdapter)
 }
 
 
-void hal_mpt_GetThermalMeter(PADAPTER pAdapter, u8 *value)
+void hal_mpt_GetThermalMeter(struct adapter * pAdapter, u8 *value)
 {
 	hal_mpt_TriggerRFThermalMeter(pAdapter);
 	rtw_msleep_os(1000);
@@ -776,9 +777,9 @@ void hal_mpt_GetThermalMeter(PADAPTER pAdapter, u8 *value)
 }
 
 
-void hal_mpt_SetSingleCarrierTx(PADAPTER pAdapter, u8 bStart)
+void hal_mpt_SetSingleCarrierTx(struct adapter * pAdapter, u8 bStart)
 {
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data *pHalData = GET_HAL_DATA(pAdapter);
 
 	pAdapter->mppriv.mpt_ctx.bSingleCarrier = bStart;
 
@@ -810,10 +811,10 @@ void hal_mpt_SetSingleCarrierTx(PADAPTER pAdapter, u8 bStart)
 }
 
 
-void hal_mpt_SetSingleToneTx(PADAPTER pAdapter, u8 bStart)
+void hal_mpt_SetSingleToneTx(struct adapter * pAdapter, u8 bStart)
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
-	PMPT_CONTEXT		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
+	struct mpt_context *		pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 	u32			ulAntennaTx = pHalData->antenna_tx_path;
 	static u32		regRF = 0, regBB0 = 0, regBB1 = 0, regBB2 = 0, regBB3 = 0;
 	u8 rfPath;
@@ -932,7 +933,7 @@ void hal_mpt_SetSingleToneTx(PADAPTER pAdapter, u8 bStart)
 	}
 }
 
-void hal_mpt_SetCarrierSuppressionTx(PADAPTER pAdapter, u8 bStart)
+void hal_mpt_SetCarrierSuppressionTx(struct adapter * pAdapter, u8 bStart)
 {
 	u8 Rate;
 
@@ -976,10 +977,10 @@ void hal_mpt_SetCarrierSuppressionTx(PADAPTER pAdapter, u8 bStart)
 	RTW_INFO("\n MPT_ProSetCarrierSupp() is finished.\n");
 }
 
-u32 hal_mpt_query_phytxok(PADAPTER	pAdapter)
+u32 hal_mpt_query_phytxok(struct adapter *	pAdapter)
 {
-	PMPT_CONTEXT pMptCtx = &(pAdapter->mppriv.mpt_ctx);
-	RT_PMAC_TX_INFO PMacTxInfo = pMptCtx->PMacTxInfo;
+	struct mpt_context * pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct rt_pmac_tx_info PMacTxInfo = pMptCtx->PMacTxInfo;
 	u16 count = 0;
 
 	if (IS_MPT_CCK_RATE(PMacTxInfo.TX_RATE))
@@ -998,11 +999,11 @@ u32 hal_mpt_query_phytxok(PADAPTER	pAdapter)
 }
 
 static	void mpt_StopCckContTx(
-	PADAPTER	pAdapter
+	struct adapter *	pAdapter
 )
 {
-	HAL_DATA_TYPE	*pHalData	= GET_HAL_DATA(pAdapter);
-	PMPT_CONTEXT	pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct hal_com_data	*pHalData	= GET_HAL_DATA(pAdapter);
+	struct mpt_context *	pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 	u8			u1bReg;
 
 	pMptCtx->bCckContTx = false;
@@ -1029,11 +1030,11 @@ static	void mpt_StopCckContTx(
 
 
 static	void mpt_StopOfdmContTx(
-	PADAPTER	pAdapter
+	struct adapter *	pAdapter
 )
 {
-	HAL_DATA_TYPE	*pHalData	= GET_HAL_DATA(pAdapter);
-	PMPT_CONTEXT	pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct hal_com_data	*pHalData	= GET_HAL_DATA(pAdapter);
+	struct mpt_context *	pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 	u8			u1bReg;
 	u32			data;
 
@@ -1057,11 +1058,11 @@ static	void mpt_StopOfdmContTx(
 
 
 static	void mpt_StartCckContTx(
-	PADAPTER		pAdapter
+	struct adapter *		pAdapter
 )
 {
-	HAL_DATA_TYPE	*pHalData	= GET_HAL_DATA(pAdapter);
-	PMPT_CONTEXT	pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct hal_com_data	*pHalData	= GET_HAL_DATA(pAdapter);
+	struct mpt_context *	pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 	u32			cckrate;
 
 	/* 1. if CCK block on */
@@ -1094,11 +1095,11 @@ static	void mpt_StartCckContTx(
 
 
 static	void mpt_StartOfdmContTx(
-	PADAPTER		pAdapter
+	struct adapter *		pAdapter
 )
 {
-	HAL_DATA_TYPE	*pHalData	= GET_HAL_DATA(pAdapter);
-	PMPT_CONTEXT	pMptCtx = &(pAdapter->mppriv.mpt_ctx);
+	struct hal_com_data	*pHalData	= GET_HAL_DATA(pAdapter);
+	struct mpt_context *	pMptCtx = &(pAdapter->mppriv.mpt_ctx);
 
 	/* 1. if OFDM block on?*/
 	if (!phy_query_bb_reg(pAdapter, rFPGA0_RFMOD, bOFDMEn))
@@ -1124,7 +1125,7 @@ static	void mpt_StartOfdmContTx(
 }	/* mpt_StartOfdmContTx */
 
 
-void hal_mpt_SetContinuousTx(PADAPTER pAdapter, u8 bStart)
+void hal_mpt_SetContinuousTx(struct adapter * pAdapter, u8 bStart)
 {
 	u8 Rate;
 

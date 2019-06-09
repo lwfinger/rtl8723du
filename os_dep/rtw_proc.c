@@ -268,7 +268,7 @@ void rtw_drv_proc_deinit(void)
 static void *proc_start_seq_file_test(struct seq_file *m, loff_t *pos)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	RTW_PRINT(FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(adapter));
 	if (*pos >= RTW_SEQ_FILE_TEST_SHOW_LIMIT) {
@@ -282,7 +282,7 @@ static void *proc_start_seq_file_test(struct seq_file *m, loff_t *pos)
 void proc_stop_seq_file_test(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	RTW_PRINT(FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(adapter));
 }
@@ -290,7 +290,7 @@ void proc_stop_seq_file_test(struct seq_file *m, void *v)
 void *proc_next_seq_file_test(struct seq_file *m, void *v, loff_t *pos)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	(*pos)++;
 	if (*pos >= RTW_SEQ_FILE_TEST_SHOW_LIMIT) {
@@ -305,7 +305,7 @@ void *proc_next_seq_file_test(struct seq_file *m, void *v, loff_t *pos)
 static int proc_get_seq_file_test(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	u32 pos = *((loff_t *)(v));
 	RTW_PRINT(FUNC_ADPT_FMT" pos:%d\n", FUNC_ADPT_ARG(adapter), pos);
@@ -324,7 +324,7 @@ struct seq_operations seq_file_test = {
 static int proc_get_fw_info(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	rtw_dump_fw_info(m, adapter);
 	return 0;
@@ -332,7 +332,7 @@ static int proc_get_fw_info(struct seq_file *m, void *v)
 static int proc_get_mac_reg_dump(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	mac_reg_dump(m, adapter);
 
@@ -342,7 +342,7 @@ static int proc_get_mac_reg_dump(struct seq_file *m, void *v)
 static int proc_get_bb_reg_dump(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	bb_reg_dump(m, adapter);
 
@@ -352,7 +352,7 @@ static int proc_get_bb_reg_dump(struct seq_file *m, void *v)
 static int proc_get_bb_reg_dump_ex(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	bb_reg_dump_ex(m, adapter);
 
@@ -362,7 +362,7 @@ static int proc_get_bb_reg_dump_ex(struct seq_file *m, void *v)
 static int proc_get_rf_reg_dump(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	rf_reg_dump(m, adapter);
 
@@ -372,7 +372,7 @@ static int proc_get_rf_reg_dump(struct seq_file *m, void *v)
 static int proc_get_aid_status(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_aid_status(m, adapter);
 
@@ -382,7 +382,7 @@ static int proc_get_aid_status(struct seq_file *m, void *v)
 static ssize_t proc_set_aid_status(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct sta_priv *stapriv = &adapter->stapriv;
 
 	char tmp[32];
@@ -415,7 +415,7 @@ static ssize_t proc_set_aid_status(struct file *file, const char __user *buffer,
 static int proc_get_dump_tx_rate_bmp(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_tx_rate_bmp(m, adapter_to_dvobj(adapter));
 
@@ -425,7 +425,7 @@ static int proc_get_dump_tx_rate_bmp(struct seq_file *m, void *v)
 static int proc_get_dump_adapters_status(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_adapters_status(m, adapter_to_dvobj(adapter));
 
@@ -435,7 +435,7 @@ static int proc_get_dump_adapters_status(struct seq_file *m, void *v)
 static int proc_get_customer_str(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	u8 cstr[RTW_CUSTOMER_STR_LEN];
 
 	rtw_ps_deny(adapter, PS_DENY_IOCTL);
@@ -456,12 +456,12 @@ static ssize_t proc_set_rx_info_msg(struct file *file, const char __user *buffer
 {
 
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct recv_priv *precvpriv = &(padapter->recvpriv);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
+	struct recv_priv *precvpriv = &(adapt->recvpriv);
 	char tmp[32] = {0};
 	int phy_info_flag = 0;
 
-	if (!padapter)
+	if (!adapt)
 		return -EFAULT;
 
 	if (count < 1) {
@@ -486,23 +486,23 @@ static ssize_t proc_set_rx_info_msg(struct file *file, const char __user *buffer
 static int proc_get_rx_info_msg(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 
-	rtw_hal_set_odm_var(padapter, HAL_ODM_RX_Dframe_INFO, m, false);
+	rtw_hal_set_odm_var(adapt, HAL_ODM_RX_Dframe_INFO, m, false);
 	return 0;
 }
 static int proc_get_tx_info_msg(struct seq_file *m, void *v)
 {
-	_irqL irqL;
+	unsigned long irqL;
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct macid_ctl_t *macid_ctl = dvobj_to_macidctl(dvobj);
 	struct sta_info *psta;
 	u8 bc_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 	u8 null_addr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct sta_priv *pstapriv = &padapter->stapriv;
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
+	struct sta_priv *pstapriv = &adapt->stapriv;
 	int i;
 	struct list_head	*plist, *phead;
 	u8 current_rate_id = 0, current_sgi = 0;
@@ -511,11 +511,11 @@ static int proc_get_tx_info_msg(struct seq_file *m, void *v)
 
 	_enter_critical_bh(&pstapriv->sta_hash_lock, &irqL);
 
-	if (MLME_IS_STA(padapter))
+	if (MLME_IS_STA(adapt))
 		status = "station mode";
-	else if (MLME_IS_AP(padapter))
+	else if (MLME_IS_AP(adapt))
 		status = "AP mode";
-	else if (MLME_IS_MESH(padapter))
+	else if (MLME_IS_MESH(adapt))
 		status = "mesh mode";
 	else
 		status = " ";
@@ -532,7 +532,7 @@ static int proc_get_tx_info_msg(struct seq_file *m, void *v)
 
 			if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)  !=  true)
 				&& (_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6) != true)
-				&& (_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(padapter), 6) != true)) {
+				&& (_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapt), 6) != true)) {
 
 				switch (psta->cmn.bw_mode) {
 
@@ -578,9 +578,9 @@ static int proc_get_tx_info_msg(struct seq_file *m, void *v)
 static int proc_get_linked_info_dump(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	if (padapter)
-		RTW_PRINT_SEL(m, "linked_info_dump :%s\n", (padapter->bLinkInfoDump) ? "enable" : "disable");
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
+	if (adapt)
+		RTW_PRINT_SEL(m, "linked_info_dump :%s\n", (adapt->bLinkInfoDump) ? "enable" : "disable");
 
 	return 0;
 }
@@ -589,7 +589,7 @@ static int proc_get_linked_info_dump(struct seq_file *m, void *v)
 static ssize_t proc_set_linked_info_dump(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 
 	char tmp[32] = {0};
 	int mode = 0, pre_mode = 0;
@@ -603,7 +603,7 @@ static ssize_t proc_set_linked_info_dump(struct file *file, const char __user *b
 		return -EFAULT;
 	}
 
-	pre_mode = padapter->bLinkInfoDump;
+	pre_mode = adapt->bLinkInfoDump;
 	RTW_INFO("pre_mode=%d\n", pre_mode);
 
 	if (buffer && !copy_from_user(tmp, buffer, count)) {
@@ -617,11 +617,11 @@ static ssize_t proc_set_linked_info_dump(struct file *file, const char __user *b
 		}
 
 		if (mode == 1 || (mode == 0 && pre_mode == 1)) /* not consider pwr_saving 0: */
-			padapter->bLinkInfoDump = mode;
+			adapt->bLinkInfoDump = mode;
 
 		else if ((mode == 2) || (mode == 0 && pre_mode == 2)) { /* consider power_saving */
-			/* RTW_INFO("linked_info_dump =%s\n", (padapter->bLinkInfoDump)?"enable":"disable") */
-			linked_info_dump(padapter, mode);
+			/* RTW_INFO("linked_info_dump =%s\n", (adapt->bLinkInfoDump)?"enable":"disable") */
+			linked_info_dump(adapt, mode);
 		}
 	}
 	return count;
@@ -631,10 +631,10 @@ static ssize_t proc_set_linked_info_dump(struct file *file, const char __user *b
 static int proc_get_sta_tp_dump(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 
-	if (padapter)
-		RTW_PRINT_SEL(m, "sta_tp_dump :%s\n", (padapter->bsta_tp_dump) ? "enable" : "disable");
+	if (adapt)
+		RTW_PRINT_SEL(m, "sta_tp_dump :%s\n", (adapt->bsta_tp_dump) ? "enable" : "disable");
 
 	return 0;
 }
@@ -642,7 +642,7 @@ static int proc_get_sta_tp_dump(struct seq_file *m, void *v)
 static ssize_t proc_set_sta_tp_dump(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 
 	char tmp[32] = {0};
 	int mode = 0;
@@ -664,8 +664,8 @@ static ssize_t proc_set_sta_tp_dump(struct file *file, const char __user *buffer
 			RTW_INFO("argument number is wrong\n");
 			return -EFAULT;
 		}
-		if (padapter)
-			padapter->bsta_tp_dump = mode;
+		if (adapt)
+			adapt->bsta_tp_dump = mode;
 	}
 	return count;
 }
@@ -673,10 +673,10 @@ static ssize_t proc_set_sta_tp_dump(struct file *file, const char __user *buffer
 static int proc_get_sta_tp_info(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 
-	if (padapter)
-		rtw_sta_traffic_info(m, padapter);
+	if (adapt)
+		rtw_sta_traffic_info(m, adapt);
 
 	return 0;
 }
@@ -684,8 +684,8 @@ static int proc_get_sta_tp_info(struct seq_file *m, void *v)
 static int proc_get_turboedca_ctrl(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(padapter);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapt);
 
 	if (hal_data)
 		RTW_PRINT_SEL(m, "Turbo-EDCA :%s\n", (hal_data->dis_turboedca) ? "Disable" : "Enable");
@@ -696,8 +696,8 @@ static int proc_get_turboedca_ctrl(struct seq_file *m, void *v)
 static ssize_t proc_set_turboedca_ctrl(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(padapter);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapt);
 
 	char tmp[32] = {0};
 	int mode = 0, num = 0;
@@ -724,7 +724,7 @@ static ssize_t proc_set_turboedca_ctrl(struct file *file, const char __user *buf
 static int proc_get_mac_qinfo(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	rtw_hal_get_hwreg(adapter, HW_VAR_DUMP_MAC_QUEUE_INFO, (u8 *)m);
 
@@ -734,8 +734,8 @@ static int proc_get_mac_qinfo(struct seq_file *m, void *v)
 int proc_get_wifi_spec(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct registry_priv	*pregpriv = &padapter->registrypriv;
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
+	struct registry_priv	*pregpriv = &adapt->registrypriv;
 
 	RTW_PRINT_SEL(m, "wifi_spec=%d\n", pregpriv->wifi_spec);
 	return 0;
@@ -744,7 +744,7 @@ int proc_get_wifi_spec(struct seq_file *m, void *v)
 static int proc_get_chan_plan(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_cur_chset(m, adapter);
 
@@ -754,11 +754,11 @@ static int proc_get_chan_plan(struct seq_file *m, void *v)
 static ssize_t proc_set_chan_plan(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	char tmp[32];
 	u8 chan_plan = RTW_CHPLAN_UNSPECIFIED;
 
-	if (!padapter)
+	if (!adapt)
 		return -EFAULT;
 
 	if (count < 1) {
@@ -777,7 +777,7 @@ static ssize_t proc_set_chan_plan(struct file *file, const char __user *buffer, 
 			return count;
 	}
 
-	rtw_set_channel_plan(padapter, chan_plan);
+	rtw_set_channel_plan(adapt, chan_plan);
 
 	return count;
 }
@@ -785,7 +785,7 @@ static ssize_t proc_set_chan_plan(struct file *file, const char __user *buffer, 
 static int proc_get_country_code(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
 
 	if (rfctl->country_ent)
@@ -799,7 +799,7 @@ static int proc_get_country_code(struct seq_file *m, void *v)
 static ssize_t proc_set_country_code(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	char tmp[32];
 	char alpha2[2];
 	int num;
@@ -819,7 +819,7 @@ static ssize_t proc_set_country_code(struct file *file, const char __user *buffe
 	if (num !=	2)
 		return count;
 
-	rtw_set_country(padapter, alpha2);
+	rtw_set_country(adapt, alpha2);
 
 exit:
 	return count;
@@ -829,7 +829,7 @@ exit:
 static int proc_get_macaddr_acl(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_macaddr_acl(m, adapter);
 	return 0;
@@ -838,7 +838,7 @@ static int proc_get_macaddr_acl(struct seq_file *m, void *v)
 static ssize_t proc_set_macaddr_acl(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct mlme_priv *mlme = &adapter->mlmepriv;
 	struct mlme_ext_priv *mlmeext = &adapter->mlmeextpriv;
 	char tmp[17 * NUM_ACL + 32] = {0};
@@ -895,7 +895,7 @@ exit:
 static int proc_get_pre_link_sta(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_pre_link_sta_ctl(m, &adapter->stapriv);
 	return 0;
@@ -904,7 +904,7 @@ static int proc_get_pre_link_sta(struct seq_file *m, void *v)
 ssize_t proc_set_pre_link_sta(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct mlme_priv *mlme = &adapter->mlmepriv;
 	struct mlme_ext_priv *mlmeext = &adapter->mlmeextpriv;
 	char tmp[17 * RTW_PRE_LINK_STA_NUM + 32] = {0};
@@ -982,7 +982,7 @@ exit:
 static int proc_get_rx_ampdu_size_limit(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_regsty_rx_ampdu_size_limit(m, adapter);
 
@@ -992,7 +992,7 @@ static int proc_get_rx_ampdu_size_limit(struct seq_file *m, void *v)
 static ssize_t proc_set_rx_ampdu_size_limit(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct registry_priv *regsty = adapter_to_regsty(adapter);
 	char tmp[32];
 	u8 nss;
@@ -1029,8 +1029,8 @@ exit:
 static int proc_get_udpport(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct recv_priv *precvpriv = &(padapter->recvpriv);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
+	struct recv_priv *precvpriv = &(adapt->recvpriv);
 
 	RTW_PRINT_SEL(m, "%d\n", precvpriv->sink_udpport);
 	return 0;
@@ -1038,13 +1038,13 @@ static int proc_get_udpport(struct seq_file *m, void *v)
 static ssize_t proc_set_udpport(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct recv_priv *precvpriv = &(padapter->recvpriv);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
+	struct recv_priv *precvpriv = &(adapt->recvpriv);
 	int sink_udpport = 0;
 	char tmp[32];
 
 
-	if (!padapter)
+	if (!adapt)
 		return -EFAULT;
 
 	if (count < 1) {
@@ -1076,7 +1076,7 @@ static ssize_t proc_set_udpport(struct file *file, const char __user *buffer, si
 static int proc_get_mi_ap_bc_info(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct macid_ctl_t *macid_ctl = dvobj_to_macidctl(dvobj);
 	u8 i;
@@ -1089,7 +1089,7 @@ static int proc_get_mi_ap_bc_info(struct seq_file *m, void *v)
 static int proc_get_macid_info(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct macid_ctl_t *macid_ctl = dvobj_to_macidctl(dvobj);
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
@@ -1148,7 +1148,7 @@ static int proc_get_macid_info(struct seq_file *m, void *v)
 static int proc_get_sec_cam(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct cam_ctl_t *cam_ctl = &dvobj->cam_ctl;
 
@@ -1172,7 +1172,7 @@ static int proc_get_sec_cam(struct seq_file *m, void *v)
 static ssize_t proc_set_sec_cam(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct cam_ctl_t *cam_ctl = &dvobj->cam_ctl;
 	char tmp[32] = {0};
@@ -1223,7 +1223,7 @@ static ssize_t proc_set_sec_cam(struct file *file, const char __user *buffer, si
 static int proc_get_sec_cam_cache(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_sec_cam_cache(m, adapter);
 	return 0;
@@ -1232,7 +1232,7 @@ static int proc_get_sec_cam_cache(struct seq_file *m, void *v)
 static ssize_t proc_set_change_bss_chbw(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct mlme_priv *mlme = &(adapter->mlmepriv);
 	struct mlme_ext_priv *mlmeext = &(adapter->mlmeextpriv);
 	char tmp[32];
@@ -1266,7 +1266,7 @@ exit:
 static int proc_get_tx_bw_mode(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	RTW_PRINT_SEL(m, "0x%02x\n", adapter->driver_tx_bw_mode);
 	RTW_PRINT_SEL(m, "2.4G:%s\n", ch_width_str(ADAPTER_TX_BW_2G(adapter)));
@@ -1277,7 +1277,7 @@ static int proc_get_tx_bw_mode(struct seq_file *m, void *v)
 static ssize_t proc_set_tx_bw_mode(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct macid_ctl_t *macid_ctl = &adapter->dvobj->macid_ctl;
 	struct mlme_priv *mlme = &(adapter->mlmepriv);
 	struct mlme_ext_priv *mlmeext = &(adapter->mlmeextpriv);
@@ -1326,7 +1326,7 @@ exit:
 static int proc_get_hal_txpwr_info(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 
 	if (hal_is_band_support(adapter, BAND_ON_2_4G))
@@ -1338,7 +1338,7 @@ static int proc_get_hal_txpwr_info(struct seq_file *m, void *v)
 static int proc_get_target_tx_power(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_target_tx_power(m, adapter);
 
@@ -1348,7 +1348,7 @@ static int proc_get_target_tx_power(struct seq_file *m, void *v)
 static int proc_get_tx_power_by_rate(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_tx_power_by_rate(m, adapter);
 
@@ -1359,7 +1359,7 @@ static int proc_get_tx_power_by_rate(struct seq_file *m, void *v)
 static int proc_get_tx_power_limit(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_txpwr_lmt(m, adapter);
 
@@ -1370,7 +1370,7 @@ static int proc_get_tx_power_limit(struct seq_file *m, void *v)
 static int proc_get_tx_power_ext_info(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_tx_power_ext_info(m, adapter);
 
@@ -1380,7 +1380,7 @@ static int proc_get_tx_power_ext_info(struct seq_file *m, void *v)
 static ssize_t proc_set_tx_power_ext_info(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	char tmp[32] = {0};
 	char cmd[16] = {0};
@@ -1420,7 +1420,7 @@ clear_ps_deny:
 static void *proc_start_tx_power_idx(struct seq_file *m, loff_t *pos)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	u8 path = ((*pos) & 0xFF00) >> 8;
 	u8 rs = *pos & 0xFF;
 
@@ -1432,13 +1432,13 @@ static void *proc_start_tx_power_idx(struct seq_file *m, loff_t *pos)
 static void proc_stop_tx_power_idx(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 }
 
 static void *proc_next_tx_power_idx(struct seq_file *m, void *v, loff_t *pos)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	u8 path = ((*pos) & 0xFF00) >> 8;
 	u8 rs = *pos & 0xFF;
 
@@ -1459,7 +1459,7 @@ static void *proc_next_tx_power_idx(struct seq_file *m, void *v, loff_t *pos)
 static int proc_get_tx_power_idx(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	u32 pos = *((loff_t *)(v));
 	u8 path = (pos & 0xFF00) >> 8;
 	u8 rs = pos & 0xFF;
@@ -1481,7 +1481,7 @@ static struct seq_operations seq_ops_tx_power_idx = {
 static int proc_get_kfree_flag(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct kfree_data_t *kfree_data = GET_KFREE_DATA(adapter);
 
 	RTW_PRINT_SEL(m, "0x%02x\n", kfree_data->flag);
@@ -1492,7 +1492,7 @@ static int proc_get_kfree_flag(struct seq_file *m, void *v)
 static ssize_t proc_set_kfree_flag(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct kfree_data_t *kfree_data = GET_KFREE_DATA(adapter);
 	char tmp[32] = {0};
 	u8 flag;
@@ -1518,8 +1518,8 @@ static ssize_t proc_set_kfree_flag(struct file *file, const char __user *buffer,
 static int proc_get_kfree_bb_gain(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	struct kfree_data_t *kfree_data = GET_KFREE_DATA(adapter);
 	u8 i, j;
 
@@ -1548,8 +1548,8 @@ static int proc_get_kfree_bb_gain(struct seq_file *m, void *v)
 static ssize_t proc_set_kfree_bb_gain(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	struct kfree_data_t *kfree_data = GET_KFREE_DATA(adapter);
 	char tmp[BB_GAIN_NUM * RF_PATH_MAX] = {0};
 	u8 path, chidx;
@@ -1600,7 +1600,7 @@ static ssize_t proc_set_kfree_bb_gain(struct file *file, const char __user *buff
 static int proc_get_kfree_thermal(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct kfree_data_t *kfree_data = GET_KFREE_DATA(adapter);
 
 	_RTW_PRINT_SEL(m, "%d\n", kfree_data->thermal);
@@ -1611,7 +1611,7 @@ static int proc_get_kfree_thermal(struct seq_file *m, void *v)
 static ssize_t proc_set_kfree_thermal(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct kfree_data_t *kfree_data = GET_KFREE_DATA(adapter);
 	char tmp[32] = {0};
 	s8 thermal;
@@ -1637,12 +1637,12 @@ static ssize_t proc_set_kfree_thermal(struct file *file, const char __user *buff
 static ssize_t proc_set_tx_gain_offset(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *adapter;
+	struct adapter *adapter;
 	char tmp[32] = {0};
 	u8 rf_path;
 	s8 offset;
 
-	adapter = (_adapter *)rtw_netdev_priv(dev);
+	adapter = (struct adapter *)rtw_netdev_priv(dev);
 	if (!adapter)
 		return -EFAULT;
 
@@ -1668,7 +1668,7 @@ static ssize_t proc_set_tx_gain_offset(struct file *file, const char __user *buf
 static ssize_t proc_set_btinfo_evt(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	char tmp[32];
 	u8 btinfo[8];
 
@@ -1694,7 +1694,7 @@ static ssize_t proc_set_btinfo_evt(struct file *file, const char __user *buffer,
 
 		btinfo[1] = num - 2;
 
-		rtw_btinfo_cmd(padapter, btinfo, btinfo[1] + 2);
+		rtw_btinfo_cmd(adapt, btinfo, btinfo[1] + 2);
 	}
 
 	return count;
@@ -1795,7 +1795,7 @@ static int btreg_parse_str(char const *input, u8 *type, u16 *addr, u16 *val)
 static int proc_get_btreg_read(struct seq_file *m, void *v)
 {
 	struct net_device *dev;
-	PADAPTER padapter;
+	struct adapter * adapt;
 	u16 ret;
 	u32 data;
 
@@ -1804,9 +1804,9 @@ static int proc_get_btreg_read(struct seq_file *m, void *v)
 		return btreg_read_error;
 
 	dev = m->private;
-	padapter = (PADAPTER)rtw_netdev_priv(dev);
+	adapt = (struct adapter *)rtw_netdev_priv(dev);
 
-	ret = rtw_btcoex_btreg_read(padapter, btreg_read_type, btreg_read_addr, &data);
+	ret = rtw_btcoex_btreg_read(adapt, btreg_read_type, btreg_read_addr, &data);
 	if (CHECK_STATUS_CODE_FROM_BT_MP_OPER_RET(ret, BT_STATUS_BT_OP_SUCCESS))
 		RTW_PRINT_SEL(m, "BTREG read: (%s)0x%04X = 0x%08x\n", btreg_type[btreg_read_type], btreg_read_addr, data);
 	else
@@ -1818,24 +1818,24 @@ static int proc_get_btreg_read(struct seq_file *m, void *v)
 static ssize_t proc_set_btreg_read(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	PADAPTER padapter;
+	struct adapter * adapt;
 	u8 tmp[80] = {0};
 	u32 num;
 	int err;
 
 
-	padapter = (PADAPTER)rtw_netdev_priv(dev);
+	adapt = (struct adapter *)rtw_netdev_priv(dev);
 
 	if (NULL == buffer) {
 		RTW_INFO(FUNC_ADPT_FMT ": input buffer is NULL!\n",
-			 FUNC_ADPT_ARG(padapter));
+			 FUNC_ADPT_ARG(adapt));
 		err = -EFAULT;
 		goto exit;
 	}
 
 	if (count < 1) {
 		RTW_INFO(FUNC_ADPT_FMT ": input length is 0!\n",
-			 FUNC_ADPT_ARG(padapter));
+			 FUNC_ADPT_ARG(adapt));
 		err = -EFAULT;
 		goto exit;
 	}
@@ -1846,7 +1846,7 @@ static ssize_t proc_set_btreg_read(struct file *file, const char __user *buffer,
 
 	if (copy_from_user(tmp, buffer, num)) {
 		RTW_INFO(FUNC_ADPT_FMT ": copy buffer from user space FAIL!\n",
-			 FUNC_ADPT_ARG(padapter));
+			 FUNC_ADPT_ARG(adapt));
 		err = -EFAULT;
 		goto exit;
 	}
@@ -1858,7 +1858,7 @@ static ssize_t proc_set_btreg_read(struct file *file, const char __user *buffer,
 		goto exit;
 
 	RTW_INFO(FUNC_ADPT_FMT ": addr=(%s)0x%X\n",
-		FUNC_ADPT_ARG(padapter), btreg_type[btreg_read_type], btreg_read_addr);
+		FUNC_ADPT_ARG(adapt), btreg_type[btreg_read_type], btreg_read_addr);
 
 exit:
 	btreg_read_error = err;
@@ -1869,7 +1869,7 @@ exit:
 static int proc_get_btreg_write(struct seq_file *m, void *v)
 {
 	struct net_device *dev;
-	PADAPTER padapter;
+	struct adapter * adapt;
 	u16 ret;
 	u32 data;
 
@@ -1882,9 +1882,9 @@ static int proc_get_btreg_write(struct seq_file *m, void *v)
 	}
 
 	dev = m->private;
-	padapter = (PADAPTER)rtw_netdev_priv(dev);
+	adapt = (struct adapter *)rtw_netdev_priv(dev);
 
-	ret = rtw_btcoex_btreg_read(padapter, btreg_write_type, btreg_write_addr, &data);
+	ret = rtw_btcoex_btreg_read(adapt, btreg_write_type, btreg_write_addr, &data);
 	if (CHECK_STATUS_CODE_FROM_BT_MP_OPER_RET(ret, BT_STATUS_BT_OP_SUCCESS))
 		RTW_PRINT_SEL(m, "BTREG read: (%s)0x%04X = 0x%08x\n", btreg_type[btreg_write_type], btreg_write_addr, data);
 	else
@@ -1896,7 +1896,7 @@ static int proc_get_btreg_write(struct seq_file *m, void *v)
 static ssize_t proc_set_btreg_write(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	PADAPTER padapter;
+	struct adapter * adapt;
 	u8 tmp[80] = {0};
 	u32 num;
 	u16 val;
@@ -1904,18 +1904,18 @@ static ssize_t proc_set_btreg_write(struct file *file, const char __user *buffer
 	int err;
 
 
-	padapter = (PADAPTER)rtw_netdev_priv(dev);
+	adapt = (struct adapter *)rtw_netdev_priv(dev);
 
 	if (NULL == buffer) {
 		RTW_INFO(FUNC_ADPT_FMT ": input buffer is NULL!\n",
-			 FUNC_ADPT_ARG(padapter));
+			 FUNC_ADPT_ARG(adapt));
 		err = -EFAULT;
 		goto exit;
 	}
 
 	if (count < 1) {
 		RTW_INFO(FUNC_ADPT_FMT ": input length is 0!\n",
-			 FUNC_ADPT_ARG(padapter));
+			 FUNC_ADPT_ARG(adapt));
 		err = -EFAULT;
 		goto exit;
 	}
@@ -1926,7 +1926,7 @@ static ssize_t proc_set_btreg_write(struct file *file, const char __user *buffer
 
 	if (copy_from_user(tmp, buffer, num)) {
 		RTW_INFO(FUNC_ADPT_FMT ": copy buffer from user space FAIL!\n",
-			 FUNC_ADPT_ARG(padapter));
+			 FUNC_ADPT_ARG(adapt));
 		err = -EFAULT;
 		goto exit;
 	}
@@ -1936,9 +1936,9 @@ static ssize_t proc_set_btreg_write(struct file *file, const char __user *buffer
 		goto exit;
 
 	RTW_INFO(FUNC_ADPT_FMT ": Set (%s)0x%X = 0x%x\n",
-		FUNC_ADPT_ARG(padapter), btreg_type[btreg_write_type], btreg_write_addr, val);
+		FUNC_ADPT_ARG(adapt), btreg_type[btreg_write_type], btreg_write_addr, val);
 
-	ret = rtw_btcoex_btreg_write(padapter, btreg_write_type, btreg_write_addr, val);
+	ret = rtw_btcoex_btreg_write(adapt, btreg_write_type, btreg_write_addr, val);
 	if (!CHECK_STATUS_CODE_FROM_BT_MP_OPER_RET(ret, BT_STATUS_BT_OP_SUCCESS))
 		err = ret;
 
@@ -1952,7 +1952,7 @@ exit:
 int proc_get_mbid_cam_cache(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	rtw_mbid_cam_cache_dump(m, __func__, adapter);
 	rtw_mbid_cam_dump(m, __func__, adapter);
@@ -1963,7 +1963,7 @@ int proc_get_mbid_cam_cache(struct seq_file *m, void *v)
 static int proc_get_mac_addr(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	rtw_hal_dump_macaddr(m, adapter);
 	return 0;
@@ -1972,7 +1972,7 @@ static int proc_get_mac_addr(struct seq_file *m, void *v)
 static int proc_get_skip_band(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	int bandskip;
 
 	bandskip = RTW_GET_SCAN_BAND_SKIP(adapter);
@@ -1983,7 +1983,7 @@ static int proc_get_skip_band(struct seq_file *m, void *v)
 static ssize_t proc_set_skip_band(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	char tmp[6];
 	u8 skip_band;
 
@@ -2002,13 +2002,13 @@ static ssize_t proc_set_skip_band(struct file *file, const char __user *buffer, 
 			return -EINVAL;
 
 		if (1 == skip_band)
-			RTW_SET_SCAN_BAND_SKIP(padapter, BAND_24G);
+			RTW_SET_SCAN_BAND_SKIP(adapt, BAND_24G);
 		else if (2 == skip_band)
-			RTW_SET_SCAN_BAND_SKIP(padapter, BAND_5G);
+			RTW_SET_SCAN_BAND_SKIP(adapt, BAND_5G);
 		else if (3 == skip_band)
-			RTW_CLR_SCAN_BAND_SKIP(padapter, BAND_24G);
+			RTW_CLR_SCAN_BAND_SKIP(adapt, BAND_24G);
 		else if (4 == skip_band)
-			RTW_CLR_SCAN_BAND_SKIP(padapter, BAND_5G);
+			RTW_CLR_SCAN_BAND_SKIP(adapt, BAND_5G);
 	}
 	return count;
 
@@ -2017,7 +2017,7 @@ static ssize_t proc_set_skip_band(struct file *file, const char __user *buffer, 
 static int proc_get_hal_spec(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_hal_spec(m, adapter);
 	return 0;
@@ -2026,7 +2026,7 @@ static int proc_get_hal_spec(struct seq_file *m, void *v)
 static int proc_get_phy_cap(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	rtw_dump_phy_cap(m, adapter);
 	rtw_dump_drv_phy_cap(m, adapter);
@@ -2039,7 +2039,7 @@ static int proc_get_phy_cap(struct seq_file *m, void *v)
 static int proc_get_trx_share_mode(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	dump_trx_share_mode(m, adapter);
 	return 0;
@@ -2049,7 +2049,7 @@ static int proc_get_trx_share_mode(struct seq_file *m, void *v)
 static int proc_dump_rsvd_page(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	rtw_dump_rsvd_page(m, adapter, adapter->rsvd_page_offset, adapter->rsvd_page_num);
 	return 0;
@@ -2057,7 +2057,7 @@ static int proc_dump_rsvd_page(struct seq_file *m, void *v)
 static ssize_t proc_set_rsvd_page_info(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	char tmp[32];
 	u8 page_offset, page_num;
 
@@ -2074,8 +2074,8 @@ static ssize_t proc_set_rsvd_page_info(struct file *file, const char __user *buf
 
 		if (num < 2)
 			return -EINVAL;
-		padapter->rsvd_page_offset = page_offset;
-		padapter->rsvd_page_num = page_num;
+		adapt->rsvd_page_offset = page_offset;
+		adapt->rsvd_page_num = page_num;
 	}
 	return count;
 }
@@ -2084,13 +2084,13 @@ static ssize_t proc_set_rsvd_page_info(struct file *file, const char __user *buf
 int proc_dump_pattern_cam(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
+	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
 	int i;
 	struct  rtl_wow_pattern context;
 
 	for (i = 0 ; i < pwrpriv->wowlan_pattern_idx; i++) {
-		rtw_wow_pattern_read_cam_ent(padapter, i, &context);
+		rtw_wow_pattern_read_cam_ent(adapt, i, &context);
 		rtw_dump_wow_pattern(m, &context, i);
 	}
 
@@ -2101,7 +2101,7 @@ int proc_dump_pattern_cam(struct seq_file *m, void *v)
 static int proc_get_napi_info(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct registry_priv *pregistrypriv = &adapter->registrypriv;
 	u8 napi = 0, gro = 0;
 	u32 weight = 0;
@@ -2145,7 +2145,7 @@ static int proc_get_napi_info(struct seq_file *m, void *v)
 static ssize_t proc_set_napi_th(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	struct _ADAPTER *adapter = (struct _ADAPTER *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct registry_priv *registry = &adapter->registrypriv;
 	char tmp[32] = {0};
 	int thrshld = 0;
@@ -2181,7 +2181,7 @@ static ssize_t proc_set_napi_th(struct file *file, const char __user *buffer, si
 static ssize_t proc_set_dynamic_agg_enable(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	char tmp[32];
 	int enable = 0, i = 0;
 
@@ -2192,8 +2192,8 @@ static ssize_t proc_set_dynamic_agg_enable(struct file *file, const char __user 
 
 	if (buffer && !copy_from_user(tmp, buffer, count)) {
 
-		struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
-		PADAPTER iface = NULL;
+		struct dvobj_priv *dvobj = adapter_to_dvobj(adapt);
+		struct adapter * iface = NULL;
 		int num = sscanf(tmp, "%d", &enable);
 
 		if (num !=  1) {
@@ -2204,7 +2204,7 @@ static ssize_t proc_set_dynamic_agg_enable(struct file *file, const char __user 
 		RTW_INFO("dynamic_agg_enable:%d\n", enable);
 
 		for (i = 0; i < dvobj->iface_nums; i++) {
-			iface = dvobj->padapters[i];
+			iface = dvobj->adapters[i];
 			if (iface)
 				iface->registrypriv.dynamic_agg_enable = enable;
 		}
@@ -2218,7 +2218,7 @@ static ssize_t proc_set_dynamic_agg_enable(struct file *file, const char __user 
 static int proc_get_dynamic_agg_enable(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct registry_priv *pregistrypriv = &adapter->registrypriv;
 
 	RTW_PRINT_SEL(m, "dynamic_agg_enable:%d\n", pregistrypriv->dynamic_agg_enable);
@@ -2463,9 +2463,9 @@ static const struct file_operations rtw_adapter_proc_sseq_fops = {
 int proc_get_odm_adaptivity(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 
-	rtw_odm_adaptivity_parm_msg(m, padapter);
+	rtw_odm_adaptivity_parm_msg(m, adapt);
 
 	return 0;
 }
@@ -2473,7 +2473,7 @@ int proc_get_odm_adaptivity(struct seq_file *m, void *v)
 ssize_t proc_set_odm_adaptivity(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	char tmp[32];
 	u32 th_l2h_ini;
 	u32 th_l2h_ini_mode2;
@@ -2496,7 +2496,7 @@ ssize_t proc_set_odm_adaptivity(struct file *file, const char __user *buffer, si
 		if (num != 5)
 			return count;
 
-		rtw_odm_adaptivity_parm_set(padapter, (s8)th_l2h_ini, th_edcca_hl_diff, (s8)th_l2h_ini_mode2, th_edcca_hl_diff_mode2, edcca_enable);
+		rtw_odm_adaptivity_parm_set(adapt, (s8)th_l2h_ini, th_edcca_hl_diff, (s8)th_l2h_ini_mode2, th_edcca_hl_diff_mode2, edcca_enable);
 	}
 
 	return count;
@@ -2508,13 +2508,13 @@ static char *phydm_msg = NULL;
 static int proc_get_phydm_cmd(struct seq_file *m, void *v)
 {
 	struct net_device *netdev;
-	PADAPTER padapter;
+	struct adapter * adapt;
 	struct PHY_DM_STRUCT *phydm;
 
 
 	netdev = m->private;
-	padapter = (PADAPTER)rtw_netdev_priv(netdev);
-	phydm = adapter_to_phydm(padapter);
+	adapt = (struct adapter *)rtw_netdev_priv(netdev);
+	phydm = adapter_to_phydm(adapt);
 
 	if (NULL == phydm_msg) {
 		phydm_msg = rtw_zmalloc(PHYDM_MSG_LEN);
@@ -2535,14 +2535,14 @@ static int proc_get_phydm_cmd(struct seq_file *m, void *v)
 static ssize_t proc_set_phydm_cmd(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
 {
 	struct net_device *netdev;
-	PADAPTER padapter;
+	struct adapter * adapt;
 	struct PHY_DM_STRUCT *phydm;
 	char tmp[64] = {0};
 
 
 	netdev = (struct net_device *)data;
-	padapter = (PADAPTER)rtw_netdev_priv(netdev);
-	phydm = adapter_to_phydm(padapter);
+	adapt = (struct adapter *)rtw_netdev_priv(netdev);
+	phydm = adapter_to_phydm(adapt);
 
 	if (count < 1)
 		return -EFAULT;
@@ -2636,7 +2636,7 @@ static struct proc_dir_entry *rtw_odm_proc_init(struct net_device *dev)
 {
 	struct proc_dir_entry *dir_odm = NULL;
 	struct proc_dir_entry *entry = NULL;
-	_adapter	*adapter = rtw_netdev_priv(dev);
+	struct adapter	*adapter = rtw_netdev_priv(dev);
 	ssize_t i;
 
 	if (!adapter->dir_dev) {
@@ -2675,7 +2675,7 @@ exit:
 	return dir_odm;
 }
 
-static void rtw_odm_proc_deinit(_adapter	*adapter)
+static void rtw_odm_proc_deinit(struct adapter	*adapter)
 {
 	struct proc_dir_entry *dir_odm = NULL;
 	int i;
@@ -2705,7 +2705,7 @@ struct proc_dir_entry *rtw_adapter_proc_init(struct net_device *dev)
 	struct proc_dir_entry *drv_proc = get_rtw_drv_proc();
 	struct proc_dir_entry *dir_dev = NULL;
 	struct proc_dir_entry *entry = NULL;
-	_adapter *adapter = rtw_netdev_priv(dev);
+	struct adapter *adapter = rtw_netdev_priv(dev);
 	u8 rf_type;
 	ssize_t i;
 
@@ -2751,7 +2751,7 @@ void rtw_adapter_proc_deinit(struct net_device *dev)
 {
 	struct proc_dir_entry *drv_proc = get_rtw_drv_proc();
 	struct proc_dir_entry *dir_dev = NULL;
-	_adapter *adapter = rtw_netdev_priv(dev);
+	struct adapter *adapter = rtw_netdev_priv(dev);
 	int i;
 
 	dir_dev = adapter->dir_dev;
@@ -2775,7 +2775,7 @@ void rtw_adapter_proc_replace(struct net_device *dev)
 {
 	struct proc_dir_entry *drv_proc = get_rtw_drv_proc();
 	struct proc_dir_entry *dir_dev = NULL;
-	_adapter *adapter = rtw_netdev_priv(dev);
+	struct adapter *adapter = rtw_netdev_priv(dev);
 	int i;
 
 	dir_dev = adapter->dir_dev;

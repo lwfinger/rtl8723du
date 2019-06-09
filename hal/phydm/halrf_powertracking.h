@@ -6,7 +6,7 @@
 
 #define HALRF_POWRTRACKING_ALL_VER	"1.0"
 
-boolean
+bool
 odm_check_power_status(
 	void		*p_dm_void
 );

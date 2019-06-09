@@ -1153,8 +1153,8 @@ void phydm_basic_profile(
 	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d\n", "PHY Para Release Ver", release_ver));
 
 	{
-		struct _ADAPTER		*adapter = p_dm->adapter;
-		HAL_DATA_TYPE		*p_hal_data = GET_HAL_DATA(adapter);
+		struct adapter		*adapter = p_dm->adapter;
+		struct hal_com_data		*p_hal_data = GET_HAL_DATA(adapter);
 		PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d (Subversion: %d)\n", "FW Ver", p_hal_data->firmware_version, p_hal_data->firmware_sub_version));
 	}
 	/* 1 PHY DM version List */
@@ -1179,7 +1179,7 @@ void phydm_basic_profile(
 void
 phydm_fw_trace_en_h2c(
 	void		*p_dm_void,
-	boolean		enable,
+	bool		enable,
 	u32		fw_debug_component,
 	u32		monitor_mode,
 	u32		macid
@@ -1519,7 +1519,7 @@ phydm_dump_all_reg(
 static void
 phydm_enable_big_jump(
 	struct PHY_DM_STRUCT	*p_dm,
-	boolean		state
+	bool		state
 )
 {
 }
@@ -1540,7 +1540,7 @@ phydm_api_adjust(
 	u32		used = *_used;
 	u32		out_len = *_out_len;
 	u8		i;
-	boolean	is_enable_dbg_mode;
+	bool	is_enable_dbg_mode;
 	u8 central_ch, primary_ch_idx;
 	enum channel_width	bandwidth;
 	
@@ -1885,7 +1885,7 @@ phydm_cmd_parser(
 
 	case PHYDM_SET_TXAGC:
 	{
-		boolean		is_enable_dbg_mode;
+		bool		is_enable_dbg_mode;
 
 		for (i = 0; i < 5; i++) {
 			if (input[i + 1]) {
@@ -1900,7 +1900,7 @@ phydm_cmd_parser(
 
 		} else {
 
-			is_enable_dbg_mode = (boolean)var1[0];
+			is_enable_dbg_mode = (bool)var1[0];
 			if (is_enable_dbg_mode) {
 				p_dm->is_disable_phy_api = false;
 				phydm_set_txagc(p_dm, (u32 *)var1, &used, output, &out_len);

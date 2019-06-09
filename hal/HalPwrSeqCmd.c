@@ -28,13 +28,13 @@ Major Change History:
  *	2011.07.07, added by Roger.
  *   */
 u8 HalPwrSeqCmdParsing(
-	PADAPTER		padapter,
+	struct adapter *		adapt,
 	u8				CutVersion,
 	u8				FabVersion,
 	u8				InterfaceType,
-	WLAN_PWR_CFG	PwrSeqCmd[])
+	struct wlan_pwr_cfg	PwrSeqCmd[])
 {
-	WLAN_PWR_CFG	PwrCfgCmd = {0};
+	struct wlan_pwr_cfg	PwrCfgCmd = {0};
 	u8				bPollingBit = false;
 	u8				bHWICSupport = false;
 	u32				AryIdx = 0;
@@ -59,19 +59,19 @@ u8 HalPwrSeqCmdParsing(
 				offset = GET_PWR_CFG_OFFSET(PwrCfgCmd);
 
 				/* Read the value from system register */
-				value = rtw_read8(padapter, offset);
+				value = rtw_read8(adapt, offset);
 
 				value = value & (~(GET_PWR_CFG_MASK(PwrCfgCmd)));
 				value = value | (GET_PWR_CFG_VALUE(PwrCfgCmd) & GET_PWR_CFG_MASK(PwrCfgCmd));
 
 				/* Write the value back to sytem register */
-				rtw_write8(padapter, offset, value);
+				rtw_write8(adapt, offset, value);
 				break;
 			case PWR_CMD_POLLING:
 				bPollingBit = false;
 				offset = GET_PWR_CFG_OFFSET(PwrCfgCmd);
 
-				rtw_hal_get_hwreg(padapter, HW_VAR_PWR_CMD, &bHWICSupport);
+				rtw_hal_get_hwreg(adapt, HW_VAR_PWR_CMD, &bHWICSupport);
 				if (bHWICSupport && offset == 0x06) {
 					flag = 0;
 					maxPollingCnt = 100000;
@@ -79,7 +79,7 @@ u8 HalPwrSeqCmdParsing(
 					maxPollingCnt = 5000;
 
 				do {
-					value = rtw_read8(padapter, offset);
+					value = rtw_read8(adapt, offset);
 
 					value = value & GET_PWR_CFG_MASK(PwrCfgCmd);
 					if (value == (GET_PWR_CFG_VALUE(PwrCfgCmd) & GET_PWR_CFG_MASK(PwrCfgCmd)))
@@ -94,14 +94,14 @@ u8 HalPwrSeqCmdParsing(
 						if (bHWICSupport && offset == 0x06  && flag == 0) {
 
 							RTW_ERR("[WARNING] PCIE polling(0x%X) timeout(%d), Toggle 0x04[3] and try again.\n", offset, maxPollingCnt);
-							if (IS_HARDWARE_TYPE_8723DE(padapter))
-								PlatformEFIOWrite1Byte(padapter, 0x40, (PlatformEFIORead1Byte(padapter, 0x40)) & (~BIT3));
+							if (IS_HARDWARE_TYPE_8723DE(adapt))
+								PlatformEFIOWrite1Byte(adapt, 0x40, (PlatformEFIORead1Byte(adapt, 0x40)) & (~BIT3));
 
-							PlatformEFIOWrite1Byte(padapter, 0x04, PlatformEFIORead1Byte(padapter, 0x04) | BIT3);
-							PlatformEFIOWrite1Byte(padapter, 0x04, PlatformEFIORead1Byte(padapter, 0x04) & ~BIT3);
+							PlatformEFIOWrite1Byte(adapt, 0x04, PlatformEFIORead1Byte(adapt, 0x04) | BIT3);
+							PlatformEFIOWrite1Byte(adapt, 0x04, PlatformEFIORead1Byte(adapt, 0x04) & ~BIT3);
 
-							if (IS_HARDWARE_TYPE_8723DE(padapter))
-								PlatformEFIOWrite1Byte(padapter, 0x40, PlatformEFIORead1Byte(padapter, 0x40)|BIT3);
+							if (IS_HARDWARE_TYPE_8723DE(adapt))
+								PlatformEFIOWrite1Byte(adapt, 0x40, PlatformEFIORead1Byte(adapt, 0x40)|BIT3);
 
 							/* Retry Polling Process one more time */
 							pollingCount = 0;

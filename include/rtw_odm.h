@@ -9,7 +9,7 @@
 /*
 * This file provides utilities/wrappers for rtw driver to use ODM
 */
-typedef enum _HAL_PHYDM_OPS {
+enum hal_phydm_ops {
 	HAL_PHYDM_DIS_ALL_FUNC,
 	HAL_PHYDM_FUNC_SET,
 	HAL_PHYDM_FUNC_CLR,
@@ -17,11 +17,10 @@ typedef enum _HAL_PHYDM_OPS {
 	HAL_PHYDM_ABILITY_RESTORE,
 	HAL_PHYDM_ABILITY_SET,
 	HAL_PHYDM_ABILITY_GET,
-} HAL_PHYDM_OPS;
-
+};
 
 #define DYNAMIC_FUNC_DISABLE		(0x0)
-	u32 rtw_phydm_ability_ops(_adapter *adapter, HAL_PHYDM_OPS ops, u32 ability);
+	u32 rtw_phydm_ability_ops(struct adapter *adapter, enum hal_phydm_ops ops, u32 ability);
 
 #define rtw_phydm_func_disable_all(adapter)	\
 		rtw_phydm_ability_ops(adapter, HAL_PHYDM_DIS_ALL_FUNC, 0)
@@ -43,25 +42,25 @@ typedef enum _HAL_PHYDM_OPS {
 		rtw_phydm_ability_ops(adapter, HAL_PHYDM_ABILITY_RESTORE, 0)
 
 
-static inline u32 rtw_phydm_ability_get(_adapter *adapter)
+static inline u32 rtw_phydm_ability_get(struct adapter *adapter)
 {
 	return rtw_phydm_ability_ops(adapter, HAL_PHYDM_ABILITY_GET, 0);
 }
 
 
-void rtw_odm_init_ic_type(_adapter *adapter);
+void rtw_odm_init_ic_type(struct adapter *adapter);
 
-void rtw_odm_adaptivity_config_msg(void *sel, _adapter *adapter);
+void rtw_odm_adaptivity_config_msg(void *sel, struct adapter *adapter);
 
-bool rtw_odm_adaptivity_needed(_adapter *adapter);
-void rtw_odm_adaptivity_parm_msg(void *sel, _adapter *adapter);
-void rtw_odm_adaptivity_parm_set(_adapter *adapter, s8 th_l2h_ini, s8 th_edcca_hl_diff, s8 th_l2h_ini_mode2, s8 th_edcca_hl_diff_mode2, u8 edcca_enable);
-void rtw_odm_get_perpkt_rssi(void *sel, _adapter *adapter);
-void rtw_odm_acquirespinlock(_adapter *adapter,	enum rt_spinlock_type type);
-void rtw_odm_releasespinlock(_adapter *adapter,	enum rt_spinlock_type type);
+bool rtw_odm_adaptivity_needed(struct adapter *adapter);
+void rtw_odm_adaptivity_parm_msg(void *sel, struct adapter *adapter);
+void rtw_odm_adaptivity_parm_set(struct adapter *adapter, s8 th_l2h_ini, s8 th_edcca_hl_diff, s8 th_l2h_ini_mode2, s8 th_edcca_hl_diff_mode2, u8 edcca_enable);
+void rtw_odm_get_perpkt_rssi(void *sel, struct adapter *adapter);
+void rtw_odm_acquirespinlock(struct adapter *adapter,	enum rt_spinlock_type type);
+void rtw_odm_releasespinlock(struct adapter *adapter,	enum rt_spinlock_type type);
 
-u8 rtw_odm_get_dfs_domain(_adapter *adapter);
-u8 rtw_odm_dfs_domain_unknown(_adapter *adapter);
+u8 rtw_odm_get_dfs_domain(struct adapter *adapter);
+u8 rtw_odm_dfs_domain_unknown(struct adapter *adapter);
 void rtw_odm_parse_rx_phy_status_chinfo(union recv_frame *rframe, u8 *phys);
 
 #endif /* __RTW_ODM_H__ */

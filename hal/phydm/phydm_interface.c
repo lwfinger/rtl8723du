@@ -12,14 +12,14 @@
 
 u8 odm_read_1byte(struct PHY_DM_STRUCT *p_dm, u32 reg_addr)
 {
-	struct _ADAPTER		*adapter = p_dm->adapter;
+	struct adapter		*adapter = p_dm->adapter;
 
 	return rtw_read8(adapter, reg_addr);
 }
 
 u16 odm_read_2byte(struct PHY_DM_STRUCT *p_dm, u32 reg_addr)
 {
-	struct _ADAPTER		*adapter = p_dm->adapter;
+	struct adapter		*adapter = p_dm->adapter;
 	return rtw_read16(adapter, reg_addr);
 }
 
@@ -30,7 +30,7 @@ odm_read_4byte(
 	u32			reg_addr
 )
 {
-	struct _ADAPTER		*adapter = p_dm->adapter;
+	struct adapter		*adapter = p_dm->adapter;
 	return rtw_read32(adapter, reg_addr);
 }
 
@@ -41,7 +41,7 @@ odm_write_1byte(
 	u8			data
 )
 {
-	struct _ADAPTER		*adapter = p_dm->adapter;
+	struct adapter		*adapter = p_dm->adapter;
 	rtw_write8(adapter, reg_addr, data);
 }
 
@@ -53,7 +53,7 @@ odm_write_2byte(
 	u16			data
 )
 {
-	struct _ADAPTER		*adapter = p_dm->adapter;
+	struct adapter		*adapter = p_dm->adapter;
 	rtw_write16(adapter, reg_addr, data);
 }
 
@@ -64,7 +64,7 @@ odm_write_4byte(
 	u32			data
 )
 {
-	struct _ADAPTER		*adapter = p_dm->adapter;
+	struct adapter		*adapter = p_dm->adapter;
 	rtw_write32(adapter, reg_addr, data);
 }
 
@@ -221,7 +221,7 @@ odm_acquire_spin_lock(
 	enum rt_spinlock_type	type
 )
 {
-	struct _ADAPTER *adapter = p_dm->adapter;
+	struct adapter *adapter = p_dm->adapter;
 
 	rtw_odm_acquirespinlock(adapter, type);
 }
@@ -231,7 +231,7 @@ odm_release_spin_lock(
 	enum rt_spinlock_type	type
 )
 {
-	struct _ADAPTER *adapter = p_dm->adapter;
+	struct adapter *adapter = p_dm->adapter;
 
 	rtw_odm_releasespinlock(adapter, type);
 }
@@ -285,7 +285,7 @@ odm_initialize_timer(
 	const char			*sz_id
 )
 {
-	struct _ADAPTER *adapter = p_dm->adapter;
+	struct adapter *adapter = p_dm->adapter;
 
 	_init_timer(p_timer, adapter->pnetdev, call_back_func, p_dm);
 }
@@ -364,7 +364,7 @@ odm_fill_h2c_cmd(
 	u8			*p_cmd_buffer
 )
 {
-	struct _ADAPTER	*adapter = p_dm->adapter;
+	struct adapter	*adapter = p_dm->adapter;
 	u8		h2c_id = phydm_trans_h2c_id(p_dm, phydm_h2c_id);
 
 	PHYDM_DBG(p_dm, DBG_RA, ("[H2C]  h2c_id=((0x%x))\n", h2c_id));
@@ -441,7 +441,7 @@ odm_get_progressing_time(
 	u64			start_time
 )
 {
-	return rtw_get_passing_time_ms((systime)start_time);
+	return rtw_get_passing_time_ms((unsigned long)start_time);
 }
 
 void
@@ -451,7 +451,7 @@ phydm_set_hw_reg_handler_interface (
 	u8				*val
 	)
 {
-	struct _ADAPTER *adapter = p_dm->adapter;
+	struct adapter *adapter = p_dm->adapter;
 
 	adapter->hal_func.set_hw_reg_handler(adapter, RegName, val);
 }
@@ -459,11 +459,11 @@ phydm_set_hw_reg_handler_interface (
 void
 phydm_get_hal_def_var_handler_interface (
 	struct PHY_DM_STRUCT		*p_dm,
-	enum _HAL_DEF_VARIABLE		e_variable,
+	enum hal_def_variable		e_variable,
 	void						*p_value
 	)
 {
-	struct _ADAPTER *adapter = p_dm->adapter;
+	struct adapter *adapter = p_dm->adapter;
 
 	adapter->hal_func.get_hal_def_var_handler(adapter, e_variable, p_value);
 }
@@ -497,7 +497,7 @@ odm_efuse_one_byte_read(
 	struct PHY_DM_STRUCT	*p_dm,
 	u16			addr,
 	u8			*data,
-	boolean		b_pseu_do_test
+	bool		b_pseu_do_test
 	)
 {
 	return efuse_onebyte_read(p_dm->adapter, addr, data, b_pseu_do_test);
@@ -576,14 +576,14 @@ phydm_enable_rx_related_interrupt_handler(
 {
 }
 
-boolean
+bool
 phydm_get_txbf_en(
 	struct PHY_DM_STRUCT		*p_dm,
 	u16							mac_id,
 	u8							i
 )
 {
-	boolean txbf_en = false;
+	bool txbf_en = false;
 
 	return txbf_en;
 }
@@ -594,7 +594,7 @@ phydm_iqk_wait(
 	u32		timeout
 )
 {
-	struct _ADAPTER		*p_adapter = p_dm->adapter;
+	struct adapter *adapter = p_dm->adapter;
 
-	rtl8812_iqk_wait(p_adapter, timeout);
+	rtl8812_iqk_wait(adapter, timeout);
 }

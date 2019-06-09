@@ -1009,7 +1009,7 @@ EXhalbtcoutsrc_ConnectNotify(
 void
 EXhalbtcoutsrc_MediaStatusNotify(
 	PBTC_COEXIST		pBtCoexist,
-	RT_MEDIA_STATUS	mediaStatus
+	enum rt_media_status	mediaStatus
 	);
 void
 EXhalbtcoutsrc_SpecificPacketNotify(

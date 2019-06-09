@@ -151,7 +151,7 @@ odm_auto_channel_select(
 	}
 }
 
-boolean
+bool
 phydm_acs_check(
 	void	*p_dm_void
 )

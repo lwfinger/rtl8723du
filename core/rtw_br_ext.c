@@ -115,7 +115,7 @@ static int skb_pull_and_merge(struct sk_buff *skb, unsigned char *src, int len)
 	return 0;
 }
 
-static __inline__ unsigned long __nat25_timeout(_adapter *priv)
+static __inline__ unsigned long __nat25_timeout(struct adapter *priv)
 {
 	unsigned long timeout;
 
@@ -125,7 +125,7 @@ static __inline__ unsigned long __nat25_timeout(_adapter *priv)
 }
 
 
-static __inline__ int  __nat25_has_expired(_adapter *priv,
+static __inline__ int  __nat25_has_expired(struct adapter *priv,
 		struct nat25_network_db_entry *fdb)
 {
 	if (time_before_eq(fdb->ageing_timer, __nat25_timeout(priv)))
@@ -349,11 +349,11 @@ static __inline__ int __nat25_network_hash(unsigned char *networkAddr)
 }
 
 
-static __inline__ void __network_hash_link(_adapter *priv,
+static __inline__ void __network_hash_link(struct adapter *priv,
 		struct nat25_network_db_entry *ent, int hash)
 {
 	/* Caller must _enter_critical_bh already! */
-	/* _irqL irqL; */
+	/* unsigned long irqL; */
 	/* _enter_critical_bh(&priv->br_ext_lock, &irqL); */
 
 	ent->next_hash = priv->nethash[hash];
@@ -369,7 +369,7 @@ static __inline__ void __network_hash_link(_adapter *priv,
 static __inline__ void __network_hash_unlink(struct nat25_network_db_entry *ent)
 {
 	/* Caller must _enter_critical_bh already! */
-	/* _irqL irqL; */
+	/* unsigned long irqL; */
 	/* _enter_critical_bh(&priv->br_ext_lock, &irqL); */
 
 	*(ent->pprev_hash) = ent->next_hash;
@@ -382,11 +382,11 @@ static __inline__ void __network_hash_unlink(struct nat25_network_db_entry *ent)
 }
 
 
-static int __nat25_db_network_lookup_and_replace(_adapter *priv,
+static int __nat25_db_network_lookup_and_replace(struct adapter *priv,
 		struct sk_buff *skb, unsigned char *networkAddr)
 {
 	struct nat25_network_db_entry *db;
-	_irqL irqL;
+	unsigned long irqL;
 	_enter_critical_bh(&priv->br_ext_lock, &irqL);
 
 	db = priv->nethash[__nat25_network_hash(networkAddr)];
@@ -456,12 +456,12 @@ static int __nat25_db_network_lookup_and_replace(_adapter *priv,
 }
 
 
-static void __nat25_db_network_insert(_adapter *priv,
+static void __nat25_db_network_insert(struct adapter *priv,
 		      unsigned char *macAddr, unsigned char *networkAddr)
 {
 	struct nat25_network_db_entry *db;
 	int hash;
-	_irqL irqL;
+	unsigned long irqL;
 	_enter_critical_bh(&priv->br_ext_lock, &irqL);
 
 	hash = __nat25_network_hash(networkAddr);
@@ -494,9 +494,9 @@ static void __nat25_db_network_insert(_adapter *priv,
 }
 
 
-static void __nat25_db_print(_adapter *priv)
+static void __nat25_db_print(struct adapter *priv)
 {
-	_irqL irqL;
+	unsigned long irqL;
 	_enter_critical_bh(&priv->br_ext_lock, &irqL);
 
 #ifdef BR_EXT_DEBUG
@@ -581,10 +581,10 @@ static void __nat25_db_print(_adapter *priv)
  *	NAT2.5 interface
  */
 
-void nat25_db_cleanup(_adapter *priv)
+void nat25_db_cleanup(struct adapter *priv)
 {
 	int i;
-	_irqL irqL;
+	unsigned long irqL;
 	_enter_critical_bh(&priv->br_ext_lock, &irqL);
 
 	for (i = 0; i < NAT25_HASH_SIZE; i++) {
@@ -610,10 +610,10 @@ void nat25_db_cleanup(_adapter *priv)
 }
 
 
-void nat25_db_expire(_adapter *priv)
+void nat25_db_expire(struct adapter *priv)
 {
 	int i;
-	_irqL irqL;
+	unsigned long irqL;
 	_enter_critical_bh(&priv->br_ext_lock, &irqL);
 
 	/* if(!priv->ethBrExtInfo.nat25_disable) */
@@ -699,7 +699,7 @@ void nat25_db_expire(_adapter *priv)
 
 
 #ifdef SUPPORT_TX_MCAST2UNI
-static int checkIPMcAndReplace(_adapter *priv, struct sk_buff *skb, unsigned int *dst_ip)
+static int checkIPMcAndReplace(struct adapter *priv, struct sk_buff *skb, unsigned int *dst_ip)
 {
 	struct stat_info	*pstat;
 	struct list_head	*phead, *plist;
@@ -726,7 +726,7 @@ static int checkIPMcAndReplace(_adapter *priv, struct sk_buff *skb, unsigned int
 }
 #endif
 
-int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
+int nat25_db_handle(struct adapter *priv, struct sk_buff *skb, int method)
 {
 	__be16 protocol;
 	unsigned char networkAddr[MAX_NETWORK_ADDR_LEN];
@@ -1355,7 +1355,7 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 }
 
 
-int nat25_handle_frame(_adapter *priv, struct sk_buff *skb)
+int nat25_handle_frame(struct adapter *priv, struct sk_buff *skb)
 {
 #ifdef BR_EXT_DEBUG
 	if ((!priv->ethBrExtInfo.nat25_disable) && (!(skb->data[0] & 1))) {
@@ -1388,7 +1388,7 @@ int nat25_handle_frame(_adapter *priv, struct sk_buff *skb)
 		}
 
 		if (!priv->ethBrExtInfo.nat25_disable) {
-			_irqL irqL;
+			unsigned long irqL;
 			_enter_critical_bh(&priv->br_ext_lock, &irqL);
 			/*
 			 *	This function look up the destination network address from
@@ -1457,7 +1457,7 @@ struct dhcpMessage {
 	u_int8_t options[308]; /* 312 - cookie */
 };
 
-void dhcp_flag_bcast(_adapter *priv, struct sk_buff *skb)
+void dhcp_flag_bcast(struct adapter *priv, struct sk_buff *skb)
 {
 	if (skb == NULL)
 		return;
@@ -1497,13 +1497,13 @@ void dhcp_flag_bcast(_adapter *priv, struct sk_buff *skb)
 	}
 }
 
-void *scdb_findEntry(_adapter *priv, unsigned char *macAddr,
+void *scdb_findEntry(struct adapter *priv, unsigned char *macAddr,
 		     unsigned char *ipAddr)
 {
 	unsigned char networkAddr[MAX_NETWORK_ADDR_LEN];
 	struct nat25_network_db_entry *db;
 	int hash;
-	/* _irqL irqL; */
+	/* unsigned long irqL; */
 	/* _enter_critical_bh(&priv->br_ext_lock, &irqL); */
 
 	__nat25_generate_ipv4_network_addr(networkAddr, (unsigned int *)ipAddr);

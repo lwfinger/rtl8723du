@@ -534,8 +534,8 @@ odm_txpowertracking_thermal_meter_init(
 	u8 default_cck_swing_index = get_cck_swing_index(p_dm);
 	u8			p = 0;
 	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
-	struct _ADAPTER		*adapter = p_dm->adapter;
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
+	struct adapter		*adapter = p_dm->adapter;
+	struct hal_com_data	*p_hal_data = GET_HAL_DATA(adapter);
 
 	p_rf_calibrate_info->is_txpowertracking = true;
 	p_rf_calibrate_info->tx_powercount = 0;
@@ -629,7 +629,7 @@ odm_txpowertracking_check_ce(
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _hal_rf_				*p_rf = &(p_dm->rf_table);
-	struct _ADAPTER	*adapter = p_dm->adapter;
+	struct adapter	*adapter = p_dm->adapter;
 
 
 	if (!(p_rf->rf_supportability & HAL_RF_TX_PWR_TRACK))

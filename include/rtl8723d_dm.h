@@ -19,10 +19,10 @@
  * function prototype
  * ************************************************************ */
 
-void rtl8723d_init_dm_priv(PADAPTER padapter);
-void rtl8723d_deinit_dm_priv(PADAPTER padapter);
+void rtl8723d_init_dm_priv(struct adapter * adapt);
+void rtl8723d_deinit_dm_priv(struct adapter * adapt);
 
-void rtl8723d_InitHalDm(PADAPTER padapter);
-void rtl8723d_HalDmWatchDog(PADAPTER padapter);
+void rtl8723d_InitHalDm(struct adapter * adapt);
+void rtl8723d_HalDmWatchDog(struct adapter * adapt);
 
 #endif

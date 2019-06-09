@@ -4,11 +4,11 @@
 #ifndef __RTW_MI_H_
 #define __RTW_MI_H_
 
-void rtw_mi_update_union_chan_inf(_adapter *adapter, u8 ch, u8 offset , u8 bw);
-u8 rtw_mi_stayin_union_ch_chk(_adapter *adapter);
-u8 rtw_mi_stayin_union_band_chk(_adapter *adapter);
-int rtw_mi_get_ch_setting_union(_adapter *adapter, u8 *ch, u8 *bw, u8 *offset);
-int rtw_mi_get_ch_setting_union_no_self(_adapter *adapter, u8 *ch, u8 *bw, u8 *offset);
+void rtw_mi_update_union_chan_inf(struct adapter *adapter, u8 ch, u8 offset , u8 bw);
+u8 rtw_mi_stayin_union_ch_chk(struct adapter *adapter);
+u8 rtw_mi_stayin_union_band_chk(struct adapter *adapter);
+int rtw_mi_get_ch_setting_union(struct adapter *adapter, u8 *ch, u8 *bw, u8 *offset);
+int rtw_mi_get_ch_setting_union_no_self(struct adapter *adapter, u8 *ch, u8 *bw, u8 *offset);
 
 struct mi_state {
 	u8 sta_num;			/* WIFI_STATION_STATE */
@@ -86,72 +86,72 @@ struct mi_state {
 #define rtw_mi_get_mesh_num(adapter)		DEV_MESH_NUM(adapter_to_dvobj(adapter))
 
 /* For now, not return union_ch/bw/offset */
-void rtw_mi_status(_adapter *adapter, struct mi_state *mstate);
-void rtw_mi_status_no_self(_adapter *adapter, struct mi_state *mstate);
-void rtw_mi_status_no_others(_adapter *adapter, struct mi_state *mstate);
+void rtw_mi_status(struct adapter *adapter, struct mi_state *mstate);
+void rtw_mi_status_no_self(struct adapter *adapter, struct mi_state *mstate);
+void rtw_mi_status_no_others(struct adapter *adapter, struct mi_state *mstate);
 
 /* For now, not handle union_ch/bw/offset */
 void rtw_mi_status_merge(struct mi_state *d, struct mi_state *a);
 
-void rtw_mi_update_iface_status(struct mlme_priv *pmlmepriv, sint state);
+void rtw_mi_update_iface_status(struct mlme_priv *pmlmepriv, int state);
 
-u8 rtw_mi_netif_stop_queue(_adapter *padapter);
-u8 rtw_mi_buddy_netif_stop_queue(_adapter *padapter);
+u8 rtw_mi_netif_stop_queue(struct adapter *adapt);
+u8 rtw_mi_buddy_netif_stop_queue(struct adapter *adapt);
 
-u8 rtw_mi_netif_wake_queue(_adapter *padapter);
-u8 rtw_mi_buddy_netif_wake_queue(_adapter *padapter);
+u8 rtw_mi_netif_wake_queue(struct adapter *adapt);
+u8 rtw_mi_buddy_netif_wake_queue(struct adapter *adapt);
 
-u8 rtw_mi_netif_carrier_on(_adapter *padapter);
-u8 rtw_mi_buddy_netif_carrier_on(_adapter *padapter);
-u8 rtw_mi_netif_carrier_off(_adapter *padapter);
-u8 rtw_mi_buddy_netif_carrier_off(_adapter *padapter);
+u8 rtw_mi_netif_carrier_on(struct adapter *adapt);
+u8 rtw_mi_buddy_netif_carrier_on(struct adapter *adapt);
+u8 rtw_mi_netif_carrier_off(struct adapter *adapt);
+u8 rtw_mi_buddy_netif_carrier_off(struct adapter *adapt);
 
-u8 rtw_mi_netif_caroff_qstop(_adapter *padapter);
-u8 rtw_mi_buddy_netif_caroff_qstop(_adapter *padapter);
-u8 rtw_mi_netif_caron_qstart(_adapter *padapter);
-u8 rtw_mi_buddy_netif_caron_qstart(_adapter *padapter);
+u8 rtw_mi_netif_caroff_qstop(struct adapter *adapt);
+u8 rtw_mi_buddy_netif_caroff_qstop(struct adapter *adapt);
+u8 rtw_mi_netif_caron_qstart(struct adapter *adapt);
+u8 rtw_mi_buddy_netif_caron_qstart(struct adapter *adapt);
 
-void rtw_mi_scan_abort(_adapter *adapter, bool bwait);
-void rtw_mi_buddy_scan_abort(_adapter *adapter, bool bwait);
-u32 rtw_mi_start_drv_threads(_adapter *adapter);
-u32 rtw_mi_buddy_start_drv_threads(_adapter *adapter);
-void rtw_mi_stop_drv_threads(_adapter *adapter);
-void rtw_mi_buddy_stop_drv_threads(_adapter *adapter);
-void rtw_mi_cancel_all_timer(_adapter *adapter);
-void rtw_mi_buddy_cancel_all_timer(_adapter *adapter);
-void rtw_mi_reset_drv_sw(_adapter *adapter);
-void rtw_mi_buddy_reset_drv_sw(_adapter *adapter);
+void rtw_mi_scan_abort(struct adapter *adapter, bool bwait);
+void rtw_mi_buddy_scan_abort(struct adapter *adapter, bool bwait);
+u32 rtw_mi_start_drv_threads(struct adapter *adapter);
+u32 rtw_mi_buddy_start_drv_threads(struct adapter *adapter);
+void rtw_mi_stop_drv_threads(struct adapter *adapter);
+void rtw_mi_buddy_stop_drv_threads(struct adapter *adapter);
+void rtw_mi_cancel_all_timer(struct adapter *adapter);
+void rtw_mi_buddy_cancel_all_timer(struct adapter *adapter);
+void rtw_mi_reset_drv_sw(struct adapter *adapter);
+void rtw_mi_buddy_reset_drv_sw(struct adapter *adapter);
 
-extern void rtw_intf_start(_adapter *adapter);
-extern void rtw_intf_stop(_adapter *adapter);
-void rtw_mi_intf_start(_adapter *adapter);
-void rtw_mi_buddy_intf_start(_adapter *adapter);
-void rtw_mi_intf_stop(_adapter *adapter);
-void rtw_mi_buddy_intf_stop(_adapter *adapter);
+extern void rtw_intf_start(struct adapter *adapter);
+extern void rtw_intf_stop(struct adapter *adapter);
+void rtw_mi_intf_start(struct adapter *adapter);
+void rtw_mi_buddy_intf_start(struct adapter *adapter);
+void rtw_mi_intf_stop(struct adapter *adapter);
+void rtw_mi_buddy_intf_stop(struct adapter *adapter);
 
-void rtw_mi_suspend_free_assoc_resource(_adapter *adapter);
-void rtw_mi_buddy_suspend_free_assoc_resource(_adapter *adapter);
+void rtw_mi_suspend_free_assoc_resource(struct adapter *adapter);
+void rtw_mi_buddy_suspend_free_assoc_resource(struct adapter *adapter);
 
-void rtw_mi_set_scan_deny(_adapter *adapter, u32 ms);
-void rtw_mi_buddy_set_scan_deny(_adapter *adapter, u32 ms);
+void rtw_mi_set_scan_deny(struct adapter *adapter, u32 ms);
+void rtw_mi_buddy_set_scan_deny(struct adapter *adapter, u32 ms);
 
-u8 rtw_mi_is_scan_deny(_adapter *adapter);
-u8 rtw_mi_buddy_is_scan_deny(_adapter *adapter);
+u8 rtw_mi_is_scan_deny(struct adapter *adapter);
+u8 rtw_mi_buddy_is_scan_deny(struct adapter *adapter);
 
-void rtw_mi_beacon_update(_adapter *padapter);
-void rtw_mi_buddy_beacon_update(_adapter *padapter);
+void rtw_mi_beacon_update(struct adapter *adapt);
+void rtw_mi_buddy_beacon_update(struct adapter *adapt);
 
-void rtw_mi_hal_dump_macaddr(_adapter *padapter);
-void rtw_mi_buddy_hal_dump_macaddr(_adapter *padapter);
+void rtw_mi_hal_dump_macaddr(struct adapter *adapt);
+void rtw_mi_buddy_hal_dump_macaddr(struct adapter *adapt);
 
-u8 rtw_mi_busy_traffic_check(_adapter *padapter, bool check_sc_interval);
-u8 rtw_mi_buddy_busy_traffic_check(_adapter *padapter, bool check_sc_interval);
+u8 rtw_mi_busy_traffic_check(struct adapter *adapt, bool check_sc_interval);
+u8 rtw_mi_buddy_busy_traffic_check(struct adapter *adapt, bool check_sc_interval);
 
-u8 rtw_mi_check_mlmeinfo_state(_adapter *padapter, u32 state);
-u8 rtw_mi_buddy_check_mlmeinfo_state(_adapter *padapter, u32 state);
+u8 rtw_mi_check_mlmeinfo_state(struct adapter *adapt, u32 state);
+u8 rtw_mi_buddy_check_mlmeinfo_state(struct adapter *adapt, u32 state);
 
-u8 rtw_mi_check_fwstate(_adapter *padapter, sint state);
-u8 rtw_mi_buddy_check_fwstate(_adapter *padapter, sint state);
+u8 rtw_mi_check_fwstate(struct adapter *adapt, int state);
+u8 rtw_mi_buddy_check_fwstate(struct adapter *adapt, int state);
 enum {
 	MI_LINKED,
 	MI_ASSOC,
@@ -166,55 +166,55 @@ enum {
 	MI_STA_LINKED,
 	MI_STA_LINKING,
 };
-u8 rtw_mi_check_status(_adapter *adapter, u8 type);
+u8 rtw_mi_check_status(struct adapter *adapter, u8 type);
 
-void dump_dvobj_mi_status(void *sel, const char *fun_name, _adapter *adapter);
+void dump_dvobj_mi_status(void *sel, const char *fun_name, struct adapter *adapter);
 void dump_mi_status(void *sel, struct dvobj_priv *dvobj);
 
-u8 rtw_mi_traffic_statistics(_adapter *padapter);
-u8 rtw_mi_check_miracast_enabled(_adapter *padapter);
+u8 rtw_mi_traffic_statistics(struct adapter *adapt);
+u8 rtw_mi_check_miracast_enabled(struct adapter *adapt);
 
-void rtw_mi_adapter_reset(_adapter *padapter);
-void rtw_mi_buddy_adapter_reset(_adapter *padapter);
+void rtw_mi_adapter_reset(struct adapter *adapt);
+void rtw_mi_buddy_adapter_reset(struct adapter *adapt);
 
-u8 rtw_mi_dynamic_check_timer_handlder(_adapter *padapter);
-u8 rtw_mi_buddy_dynamic_check_timer_handlder(_adapter *padapter);
+u8 rtw_mi_dynamic_check_timer_handlder(struct adapter *adapt);
+u8 rtw_mi_buddy_dynamic_check_timer_handlder(struct adapter *adapt);
 
-u8 rtw_mi_dev_unload(_adapter *padapter);
-u8 rtw_mi_buddy_dev_unload(_adapter *padapter);
+u8 rtw_mi_dev_unload(struct adapter *adapt);
+u8 rtw_mi_buddy_dev_unload(struct adapter *adapt);
 
-extern void rtw_iface_dynamic_chk_wk_hdl(_adapter *padapter);
-u8 rtw_mi_dynamic_chk_wk_hdl(_adapter *padapter);
-u8 rtw_mi_buddy_dynamic_chk_wk_hdl(_adapter *padapter);
+extern void rtw_iface_dynamic_chk_wk_hdl(struct adapter *adapt);
+u8 rtw_mi_dynamic_chk_wk_hdl(struct adapter *adapt);
+u8 rtw_mi_buddy_dynamic_chk_wk_hdl(struct adapter *adapt);
 
-u8 rtw_mi_os_xmit_schedule(_adapter *padapter);
-u8 rtw_mi_buddy_os_xmit_schedule(_adapter *padapter);
+u8 rtw_mi_os_xmit_schedule(struct adapter *adapt);
+u8 rtw_mi_buddy_os_xmit_schedule(struct adapter *adapt);
 
-u8 rtw_mi_report_survey_event(_adapter *padapter, union recv_frame *precv_frame);
-u8 rtw_mi_buddy_report_survey_event(_adapter *padapter, union recv_frame *precv_frame);
+u8 rtw_mi_report_survey_event(struct adapter *adapt, union recv_frame *precv_frame);
+u8 rtw_mi_buddy_report_survey_event(struct adapter *adapt, union recv_frame *precv_frame);
 
-extern void sreset_start_adapter(_adapter *padapter);
-extern void sreset_stop_adapter(_adapter *padapter);
-u8 rtw_mi_sreset_adapter_hdl(_adapter *padapter, u8 bstart);
-u8 rtw_mi_buddy_sreset_adapter_hdl(_adapter *padapter, u8 bstart);
+extern void sreset_start_adapter(struct adapter *adapt);
+extern void sreset_stop_adapter(struct adapter *adapt);
+u8 rtw_mi_sreset_adapter_hdl(struct adapter *adapt, u8 bstart);
+u8 rtw_mi_buddy_sreset_adapter_hdl(struct adapter *adapt, u8 bstart);
 
-u8 rtw_mi_tx_beacon_hdl(_adapter *padapter);
-u8 rtw_mi_buddy_tx_beacon_hdl(_adapter *padapter);
+u8 rtw_mi_tx_beacon_hdl(struct adapter *adapt);
+u8 rtw_mi_buddy_tx_beacon_hdl(struct adapter *adapt);
 
-u8 rtw_mi_set_tx_beacon_cmd(_adapter *padapter);
-u8 rtw_mi_buddy_set_tx_beacon_cmd(_adapter *padapter);
+u8 rtw_mi_set_tx_beacon_cmd(struct adapter *adapt);
+u8 rtw_mi_buddy_set_tx_beacon_cmd(struct adapter *adapt);
 
-u8 rtw_mi_p2p_chk_state(_adapter *padapter, enum P2P_STATE p2p_state);
-u8 rtw_mi_buddy_p2p_chk_state(_adapter *padapter, enum P2P_STATE p2p_state);
-u8 rtw_mi_stay_in_p2p_mode(_adapter *padapter);
-u8 rtw_mi_buddy_stay_in_p2p_mode(_adapter *padapter);
+u8 rtw_mi_p2p_chk_state(struct adapter *adapt, enum P2P_STATE p2p_state);
+u8 rtw_mi_buddy_p2p_chk_state(struct adapter *adapt, enum P2P_STATE p2p_state);
+u8 rtw_mi_stay_in_p2p_mode(struct adapter *adapt);
+u8 rtw_mi_buddy_stay_in_p2p_mode(struct adapter *adapt);
 
-_adapter *rtw_get_iface_by_id(_adapter *padapter, u8 iface_id);
-_adapter *rtw_get_iface_by_macddr(_adapter *padapter, u8 *mac_addr);
-_adapter *rtw_get_iface_by_hwport(_adapter *padapter, u8 hw_port);
+struct adapter *rtw_get_iface_by_id(struct adapter *adapt, u8 iface_id);
+struct adapter *rtw_get_iface_by_macddr(struct adapter *adapt, u8 *mac_addr);
+struct adapter *rtw_get_iface_by_hwport(struct adapter *adapt, u8 hw_port);
 
-void rtw_mi_buddy_clone_bcmc_packet(_adapter *padapter, union recv_frame *precvframe, u8 *pphy_status);
+void rtw_mi_buddy_clone_bcmc_packet(struct adapter *adapt, union recv_frame *precvframe, u8 *pphy_status);
 
-void rtw_mi_update_ap_bmc_camid(_adapter *padapter, u8 camid_a, u8 camid_b);
+void rtw_mi_update_ap_bmc_camid(struct adapter *adapt, u8 camid_a, u8 camid_b);
 
 #endif /*__RTW_MI_H_*/

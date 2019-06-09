@@ -57,9 +57,9 @@ static u8 delta_swing_table_idx_2ga_n_8188e[] = {0, 0, 0, 2, 2, 3, 3, 4, 4, 4, 4
 #define dm_check_txpowertracking	odm_txpowertracking_check
 
 struct _IQK_MATRIX_REGS_SETTING {
-	boolean	is_iqk_done;
+	bool	is_iqk_done;
 	s32		value[3][iqk_matrix_reg_num];
-	boolean	is_bw_iqk_result_saved[3];
+	bool	is_bw_iqk_result_saved[3];
 };
 
 struct odm_rf_calibration_structure {
@@ -72,8 +72,8 @@ struct odm_rf_calibration_structure {
 	s32	regebc;
 
 	u8	tx_powercount;
-	boolean is_txpowertracking_init;
-	boolean is_txpowertracking;
+	bool is_txpowertracking_init;
+	bool is_txpowertracking;
 	u8  	txpowertrack_control; /* for mp mode, turn off txpwrtracking as default */
 	u8	tm_trigger;
 	u8  	internal_pa_5g[2];	/* pathA / pathB */
@@ -90,9 +90,9 @@ struct odm_rf_calibration_structure {
 	u8	thermal_value_crystal;
 	u8	thermal_value_dpk_store;
 	u8	thermal_value_dpk_track;
-	boolean	txpowertracking_in_progress;
+	bool	txpowertracking_in_progress;
 
-	boolean	is_reloadtxpowerindex;
+	bool	is_reloadtxpowerindex;
 	u8	is_rf_pi_enable;
 	u32 	txpowertracking_callback_cnt; /* cosa add for debug */
 
@@ -104,7 +104,7 @@ struct odm_rf_calibration_structure {
 	s8	power_index_offset[MAX_RF_PATH];
 	s8	delta_power_index[MAX_RF_PATH];
 	s8	delta_power_index_last[MAX_RF_PATH];
-	boolean is_tx_power_changed;
+	bool is_tx_power_changed;
 	s8	xtal_offset;
 	s8	xtal_offset_last;
 
@@ -157,25 +157,25 @@ struct odm_rf_calibration_structure {
 	u8			bb_swing_idx_ofdm[MAX_RF_PATH];
 	u8			bb_swing_idx_ofdm_current;
 	u8			bb_swing_idx_ofdm_base[MAX_RF_PATH];
-	boolean		default_bb_swing_index_flag;
-	boolean			bb_swing_flag_ofdm;
+	bool		default_bb_swing_index_flag;
+	bool			bb_swing_flag_ofdm;
 	u8			bb_swing_idx_cck;
 	u8			bb_swing_idx_cck_current;
 	u8			bb_swing_idx_cck_base;
 	u8			default_ofdm_index;
 	u8			default_cck_index;
-	boolean			bb_swing_flag_cck;
+	bool			bb_swing_flag_cck;
 
 	s8			absolute_ofdm_swing_idx[MAX_RF_PATH];
 	s8			remnant_ofdm_swing_idx[MAX_RF_PATH];
 	s8			absolute_cck_swing_idx[MAX_RF_PATH];
 	s8			remnant_cck_swing_idx;
 	s8			modify_tx_agc_value;       /*Remnat compensate value at tx_agc */
-	boolean			modify_tx_agc_flag_path_a;
-	boolean			modify_tx_agc_flag_path_b;
-	boolean			modify_tx_agc_flag_path_c;
-	boolean			modify_tx_agc_flag_path_d;
-	boolean			modify_tx_agc_flag_path_a_cck;
+	bool			modify_tx_agc_flag_path_a;
+	bool			modify_tx_agc_flag_path_b;
+	bool			modify_tx_agc_flag_path_c;
+	bool			modify_tx_agc_flag_path_d;
+	bool			modify_tx_agc_flag_path_a_cck;
 
 	s8			kfree_offset[MAX_RF_PATH];
 
@@ -191,12 +191,12 @@ struct odm_rf_calibration_structure {
 	u32	reg860;
 	u32	reg864;
 
-	boolean	is_iqk_initialized;
-	boolean is_lck_in_progress;
-	boolean	is_antenna_detected;
-	boolean	is_need_iqk;
-	boolean	is_iqk_in_progress;
-	boolean is_iqk_pa_off;
+	bool	is_iqk_initialized;
+	bool is_lck_in_progress;
+	bool	is_antenna_detected;
+	bool	is_need_iqk;
+	bool	is_iqk_in_progress;
+	bool is_iqk_pa_off;
 	u8	delta_iqk;
 	u32	ADDA_backup[IQK_ADDA_REG_NUM];
 	u32	IQK_MAC_backup[IQK_MAC_REG_NUM];
@@ -215,7 +215,7 @@ struct odm_rf_calibration_structure {
 	u8	iqk_step;
 	u8	kcount;
 	u8	retry_count[4][2]; /* [4]: path ABCD, [2] TXK, RXK */
-	boolean	is_mp_mode;
+	bool	is_mp_mode;
 
 
 
@@ -233,7 +233,7 @@ struct odm_rf_calibration_structure {
 	u8	is_apk_thermal_meter_ignore;
 
 	/* DPK */
-	boolean is_dpk_fail;
+	bool is_dpk_fail;
 	u8	is_dp_done;
 	u8	is_dp_path_aok;
 	u8	is_dp_path_bok;

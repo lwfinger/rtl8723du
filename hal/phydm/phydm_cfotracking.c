@@ -37,8 +37,8 @@ odm_get_default_crytaltal_cap(
 {
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8						crystal_cap = 0x20;
-	struct _ADAPTER					*adapter = p_dm->adapter;
-	HAL_DATA_TYPE				*p_hal_data = GET_HAL_DATA(adapter);
+	struct adapter					*adapter = p_dm->adapter;
+	struct hal_com_data				*p_hal_data = GET_HAL_DATA(adapter);
 
 	crystal_cap = p_hal_data->crystal_cap;
 	crystal_cap = crystal_cap & 0x3f;
@@ -49,7 +49,7 @@ odm_get_default_crytaltal_cap(
 static void
 odm_set_atc_status(
 	void					*p_dm_void,
-	boolean					atc_status
+	bool					atc_status
 )
 {
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
@@ -62,15 +62,15 @@ odm_set_atc_status(
 	p_cfo_track->is_atc_status = atc_status;
 }
 
-static boolean
+static bool
 odm_get_atc_status(
 	void					*p_dm_void
 )
 {
-	boolean						atc_status;
+	bool						atc_status;
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
-	atc_status = (boolean)odm_get_bb_reg(p_dm, ODM_REG(BB_ATC, p_dm), ODM_BIT(BB_ATC, p_dm));
+	atc_status = (bool)odm_get_bb_reg(p_dm, ODM_REG(BB_ATC, p_dm), ODM_BIT(BB_ATC, p_dm));
 	return atc_status;
 }
 

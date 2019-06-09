@@ -119,13 +119,13 @@ __inline static void _exit_pwrlock(struct semaphore *plock)
 #define EXE_PWR_LPS		0x04
 
 /* RF state. */
-typedef enum _rt_rf_power_state {
+enum rt_rf_power_state {
 	rf_on,		/* RF is on after RFSleep or RFOff */
 	rf_sleep,	/* 802.11 Power Save mode */
 	rf_off,		/* HW/SW Radio OFF or Inactive Power Save */
 	/* =====Add the new RF state above this line===== */
 	rf_max
-} rt_rf_power_state;
+};
 
 /* RF Off Level for IPS or HW/SW radio off */
 #define	RT_RF_OFF_LEVL_ASPM			BIT(0)	/* PCI ASPM */
@@ -164,7 +164,7 @@ enum { /* for ips_mode */
 };
 
 /* Design for pwrctrl_priv.ips_deny, 32 bits for 32 reasons at most */
-typedef enum _PS_DENY_REASON {
+enum ps_deny_reason {
 	PS_DENY_DRV_INITIAL = 0,
 	PS_DENY_SCAN,
 	PS_DENY_JOIN,
@@ -176,7 +176,7 @@ typedef enum _PS_DENY_REASON {
 	PS_DENY_BEAMFORMING,		/* Beamforming */
 	PS_DENY_DRV_REMOVE = 30,
 	PS_DENY_OTHERS = 31
-} PS_DENY_REASON;
+};
 
 struct aoac_report {
 	u8 iv[8];
@@ -231,11 +231,11 @@ struct pwrctrl_priv {
 	u8	ips_org_mode;
 	u8	ips_mode_req; /* used to accept the mode setting request, will update to ipsmode later */
 	uint bips_processing;
-	systime ips_deny_time; /* will deny IPS when system time is smaller than this */
+	unsigned long ips_deny_time; /* will deny IPS when system time is smaller than this */
 	u8 pre_ips_type;/* 0: default flow, 1: carddisbale flow */
 
 	/* ps_deny: if 0, power save is free to go; otherwise deny all kinds of power save. */
-	/* Use PS_DENY_REASON to decide reason. */
+	/* Use enum ps_deny_reason to decide reason. */
 	/* Don't access this variable directly without control function, */
 	/* and this variable should be protected by lock. */
 	u32 ps_deny;
@@ -248,7 +248,7 @@ struct pwrctrl_priv {
 	u8	power_mgnt;
 	u8	org_power_mgnt;
 	u8	bFwCurrentInPSMode;
-	systime	DelayLPSLastTimeStamp;
+	unsigned long	DelayLPSLastTimeStamp;
 	int		pnp_current_pwr_state;
 	u8		pnp_bstop_trx;
 
@@ -268,9 +268,9 @@ struct pwrctrl_priv {
 	u8		wowlan_pno_enable;
 	u8		wowlan_in_resume;
 
-	rt_rf_power_state	rf_pwrstate;/* cur power state, only for IPS */
-	/* rt_rf_power_state	current_rfpwrstate; */
-	rt_rf_power_state	change_rfpwrstate;
+	enum rt_rf_power_state	rf_pwrstate;/* cur power state, only for IPS */
+	/* enum rt_rf_power_state	current_rfpwrstate; */
+	enum rt_rf_power_state	change_rfpwrstate;
 
 	u8		bHWPowerdown; /* power down mode selection. 0:radio off, 1:power down */
 	u8		bHWPwrPindetect; /* come from registrypriv.hwpwrp_detect. enable power down function. 0:disable, 1:enable */
@@ -283,8 +283,8 @@ struct pwrctrl_priv {
 	u8 current_lps_hw_port_id;
 
 #ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS
-	systime radio_on_start_time;
-	systime pwr_saving_start_time;
+	unsigned long radio_on_start_time;
+	unsigned long pwr_saving_start_time;
 	u32 pwr_saving_time;
 	u32 on_time;
 	u32 tx_time;
@@ -310,36 +310,36 @@ struct pwrctrl_priv {
 #define rtw_set_pwr_state_check_timer(__padapt) \
 	_rtw_set_pwr_state_check_timer((__padapt), (__padapt)->pwr_state_check_interval)
 
-extern void rtw_init_pwrctrl_priv(_adapter *adapter);
-extern void rtw_free_pwrctrl_priv(_adapter *adapter);
+extern void rtw_init_pwrctrl_priv(struct adapter *adapter);
+extern void rtw_free_pwrctrl_priv(struct adapter *adapter);
 
-extern void LeaveAllPowerSaveMode(PADAPTER Adapter);
-extern void LeaveAllPowerSaveModeDirect(PADAPTER Adapter);
-void _ips_enter(_adapter *padapter);
-void ips_enter(_adapter *padapter);
-int _ips_leave(_adapter *padapter);
-int ips_leave(_adapter *padapter);
+extern void LeaveAllPowerSaveMode(struct adapter * Adapter);
+extern void LeaveAllPowerSaveModeDirect(struct adapter * Adapter);
+void _ips_enter(struct adapter *adapt);
+void ips_enter(struct adapter *adapt);
+int _ips_leave(struct adapter *adapt);
+int ips_leave(struct adapter *adapt);
 
-void rtw_ps_processor(_adapter *padapter);
+void rtw_ps_processor(struct adapter *adapt);
 
 #ifdef CONFIG_AUTOSUSPEND
-int autoresume_enter(_adapter *padapter);
+int autoresume_enter(struct adapter *adapt);
 #endif
 #ifdef SUPPORT_HW_RFOFF_DETECTED
-rt_rf_power_state RfOnOffDetect(IN	PADAPTER pAdapter);
+enum rt_rf_power_state RfOnOffDetect(IN	struct adapter * pAdapter);
 #endif
 
 
-int rtw_fw_ps_state(PADAPTER padapter);
+int rtw_fw_ps_state(struct adapter * adapt);
 
-int LPS_RF_ON_check(PADAPTER padapter, u32 delay_ms);
-void LPS_Enter(PADAPTER padapter, const char *msg);
-void LPS_Leave(PADAPTER padapter, const char *msg);
-void traffic_check_for_leave_lps(PADAPTER padapter, u8 tx, u32 tx_packets);
-void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode, const char *msg);
-void rtw_set_fw_in_ips_mode(PADAPTER padapter, u8 enable);
-void rtw_set_rpwm(_adapter *padapter, u8 val8);
-void rtw_wow_lps_level_decide(_adapter *adapter, u8 wow_en);
+int LPS_RF_ON_check(struct adapter * adapt, u32 delay_ms);
+void LPS_Enter(struct adapter * adapt, const char *msg);
+void LPS_Leave(struct adapter * adapt, const char *msg);
+void traffic_check_for_leave_lps(struct adapter * adapt, u8 tx, u32 tx_packets);
+void rtw_set_ps_mode(struct adapter * adapt, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode, const char *msg);
+void rtw_set_fw_in_ips_mode(struct adapter * adapt, u8 enable);
+void rtw_set_rpwm(struct adapter *adapt, u8 val8);
+void rtw_wow_lps_level_decide(struct adapter *adapter, u8 wow_en);
 
 #define rtw_is_earlysuspend_registered(pwrpriv) false
 #define rtw_is_do_late_resume(pwrpriv) false
@@ -347,17 +347,17 @@ void rtw_wow_lps_level_decide(_adapter *adapter, u8 wow_en);
 #define rtw_register_early_suspend(pwrpriv) do {} while (0)
 #define rtw_unregister_early_suspend(pwrpriv) do {} while (0)
 
-u8 rtw_interface_ps_func(_adapter *padapter, HAL_INTF_PS_FUNC efunc_id, u8 *val);
-void rtw_set_ips_deny(_adapter *padapter, u32 ms);
-int _rtw_pwr_wakeup(_adapter *padapter, u32 ips_deffer_ms, const char *caller);
+u8 rtw_interface_ps_func(struct adapter *adapt, enum hal_intf_ps_func efunc_id, u8 *val);
+void rtw_set_ips_deny(struct adapter *adapt, u32 ms);
+int _rtw_pwr_wakeup(struct adapter *adapt, u32 ips_deffer_ms, const char *caller);
 #define rtw_pwr_wakeup(adapter) _rtw_pwr_wakeup(adapter, RTW_PWR_STATE_CHK_INTERVAL, __FUNCTION__)
 #define rtw_pwr_wakeup_ex(adapter, ips_deffer_ms) _rtw_pwr_wakeup(adapter, ips_deffer_ms, __FUNCTION__)
-int rtw_pm_set_ips(_adapter *padapter, u8 mode);
-int rtw_pm_set_lps(_adapter *padapter, u8 mode);
-int rtw_pm_set_lps_level(_adapter *padapter, u8 level);
+int rtw_pm_set_ips(struct adapter *adapt, u8 mode);
+int rtw_pm_set_lps(struct adapter *adapt, u8 mode);
+int rtw_pm_set_lps_level(struct adapter *adapt, u8 level);
 
-void rtw_ps_deny(PADAPTER padapter, PS_DENY_REASON reason);
-void rtw_ps_deny_cancel(PADAPTER padapter, PS_DENY_REASON reason);
-u32 rtw_ps_deny_get(PADAPTER padapter);
+void rtw_ps_deny(struct adapter * adapt, enum ps_deny_reason reason);
+void rtw_ps_deny_cancel(struct adapter * adapt, enum ps_deny_reason reason);
+u32 rtw_ps_deny_get(struct adapter * adapt);
 
 #endif /* __RTL871X_PWRCTRL_H_ */

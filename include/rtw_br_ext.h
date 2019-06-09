@@ -12,7 +12,7 @@
 #define DEBUG_INFO		/* RTW_INFO */
 #define DEBUG_ERR		RTW_INFO
 /* #define GET_MY_HWADDR		((GET_MIB(priv))->dot11OperationEntry.hwaddr) */
-#define GET_MY_HWADDR(padapter)		(adapter_mac_addr(padapter))
+#define GET_MY_HWADDR(adapt)		(adapter_mac_addr(adapt))
 
 #define NAT25_HASH_BITS		4
 #define NAT25_HASH_SIZE		(1 << NAT25_HASH_BITS)
@@ -51,6 +51,6 @@ struct br_ext_info {
 	unsigned int	nat25sc_disable;
 };
 
-void nat25_db_cleanup(_adapter *priv);
+void nat25_db_cleanup(struct adapter *priv);
 
 #endif /* _RTW_BR_EXT_H_ */

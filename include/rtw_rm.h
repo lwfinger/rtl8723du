@@ -5,7 +5,7 @@
 #ifndef __RTW_RM_H_
 #define __RTW_RM_H_
 
-u8 rm_post_event_hdl(_adapter *padapter, u8 *pbuf);
+u8 rm_post_event_hdl(struct adapter *adapt, u8 *pbuf);
 
 #define RM_TIMER_NUM 		32
 #define RM_ALL_MEAS		BIT(1)

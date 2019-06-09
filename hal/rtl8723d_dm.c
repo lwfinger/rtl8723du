@@ -22,32 +22,32 @@
 
 static void
 dm_CheckProtection(
-	PADAPTER	Adapter
+	struct adapter *	Adapter
 )
 {
 }
 
 #ifdef CONFIG_SUPPORT_HW_WPS_PBC
-static void dm_CheckPbcGPIO(_adapter *padapter)
+static void dm_CheckPbcGPIO(struct adapter *adapt)
 {
 	u8	tmp1byte;
 	u8	bPbcPressed = false;
 
-	if (!padapter->registrypriv.hw_wps_pbc)
+	if (!adapt->registrypriv.hw_wps_pbc)
 		return;
 
-	tmp1byte = rtw_read8(padapter, GPIO_IO_SEL);
+	tmp1byte = rtw_read8(adapt, GPIO_IO_SEL);
 	tmp1byte |= (HAL_8192C_HW_GPIO_WPS_BIT);
-	rtw_write8(padapter, GPIO_IO_SEL, tmp1byte);	/* enable GPIO[2] as output mode */
+	rtw_write8(adapt, GPIO_IO_SEL, tmp1byte);	/* enable GPIO[2] as output mode */
 
 	tmp1byte &= ~(HAL_8192C_HW_GPIO_WPS_BIT);
-	rtw_write8(padapter,  GPIO_IN, tmp1byte);		/* reset the floating voltage level */
+	rtw_write8(adapt,  GPIO_IN, tmp1byte);		/* reset the floating voltage level */
 
-	tmp1byte = rtw_read8(padapter, GPIO_IO_SEL);
+	tmp1byte = rtw_read8(adapt, GPIO_IO_SEL);
 	tmp1byte &= ~(HAL_8192C_HW_GPIO_WPS_BIT);
-	rtw_write8(padapter, GPIO_IO_SEL, tmp1byte);	/* enable GPIO[2] as input mode */
+	rtw_write8(adapt, GPIO_IO_SEL, tmp1byte);	/* enable GPIO[2] as input mode */
 
-	tmp1byte = rtw_read8(padapter, GPIO_IN);
+	tmp1byte = rtw_read8(adapt, GPIO_IN);
 
 	if (tmp1byte == 0xff)
 		return;
@@ -58,7 +58,7 @@ static void dm_CheckPbcGPIO(_adapter *padapter)
 		/* Here we only set bPbcPressed to true */
 		/* After trigger PBC, the variable will be set to false */
 		RTW_INFO("CheckPbcGPIO - PBC is pressed\n");
-		rtw_request_wps_pbc_event(padapter);
+		rtw_request_wps_pbc_event(adapt);
 	}
 }
 #endif /* #ifdef CONFIG_SUPPORT_HW_WPS_PBC */
@@ -68,10 +68,10 @@ static void dm_CheckPbcGPIO(_adapter *padapter)
  *   */
 static void
 dm_InitGPIOSetting(
-	PADAPTER	Adapter
+	struct adapter *	Adapter
 )
 {
-	PHAL_DATA_TYPE		pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *		pHalData = GET_HAL_DATA(Adapter);
 
 	u8	tmp1byte;
 
@@ -83,9 +83,9 @@ dm_InitGPIOSetting(
 /* ************************************************************
  * functions
  * ************************************************************ */
-static void Init_ODM_ComInfo_8723d(PADAPTER	Adapter)
+static void Init_ODM_ComInfo_8723d(struct adapter *	Adapter)
 {
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
 	u8	cut_ver, fab_ver;
 
@@ -103,10 +103,10 @@ static void Init_ODM_ComInfo_8723d(PADAPTER	Adapter)
 
 void
 rtl8723d_InitHalDm(
-	PADAPTER	Adapter
+	struct adapter *	Adapter
 )
 {
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
 
 	dm_InitGPIOSetting(Adapter);
@@ -116,12 +116,12 @@ rtl8723d_InitHalDm(
 
 void
 rtl8723d_HalDmWatchDog(
-	PADAPTER	Adapter
+	struct adapter *	Adapter
 )
 {
 	bool		bFwCurrentInPSMode = false;
 	u8 bFwPSAwake = true;
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
 
 #ifdef CONFIG_MP_INCLUDED
 	/* #if MP_DRIVER */
@@ -165,9 +165,9 @@ skip_dm:
 	return;
 }
 
-void rtl8723d_init_dm_priv(PADAPTER Adapter)
+void rtl8723d_init_dm_priv(struct adapter * Adapter)
 {
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT		*podmpriv = &pHalData->odmpriv;
 
 	Init_ODM_ComInfo_8723d(Adapter);
@@ -175,9 +175,9 @@ void rtl8723d_init_dm_priv(PADAPTER Adapter)
 
 }
 
-void rtl8723d_deinit_dm_priv(PADAPTER Adapter)
+void rtl8723d_deinit_dm_priv(struct adapter * Adapter)
 {
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT		*podmpriv = &pHalData->odmpriv;
 
 	odm_cancel_all_timers(podmpriv);

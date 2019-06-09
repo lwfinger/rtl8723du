@@ -228,7 +228,7 @@ odm_inband_noise_monitor_ac_series(
 {
 	s32          rxi_buf_anta, rxq_buf_anta; /*rxi_buf_antb, rxq_buf_antb;*/
 	s32	        value32, pwdb_A = 0, sval, noise, sum = 0;
-	boolean	        pd_flag;
+	bool	        pd_flag;
 	u8		valid_cnt = 0;
 	u64	start = 0, func_start = 0, func_end = 0;
 
@@ -263,7 +263,7 @@ odm_inband_noise_monitor_ac_series(
 		rxi_buf_anta = (value32 & 0xFFC00) >> 10; /*rxi_buf_anta=RegFA0[19:10]*/
 		rxq_buf_anta = value32 & 0x3FF; /*rxq_buf_anta=RegFA0[19:10]*/
 
-		pd_flag = (boolean)((value32 & BIT(31)) >> 31);
+		pd_flag = (bool)((value32 & BIT(31)) >> 31);
 
 		/*Not in packet detection period or Tx state */
 		if ((!pd_flag) || (rxi_buf_anta != 0x200)) {

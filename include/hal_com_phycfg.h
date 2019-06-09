@@ -9,19 +9,19 @@
 #define		PathC			0x2
 #define		PathD			0x3
 
-typedef enum _RF_TX_NUM {
+enum rf_tx_num {
 	RF_1TX = 0,
 	RF_2TX,
 	RF_3TX,
 	RF_4TX,
 	RF_MAX_TX_NUM,
 	RF_TX_NUM_NONIMPLEMENT,
-} RF_TX_NUM;
+};
 
 #define MAX_POWER_INDEX		0x3F
 
 /*------------------------------Define structure----------------------------*/
-typedef struct _BB_REGISTER_DEFINITION {
+struct bb_register_definition {
 	u32 rfintfs;			/* set software control: */
 	/*		0x870~0x877[8 bytes] */
 
@@ -42,21 +42,21 @@ typedef struct _BB_REGISTER_DEFINITION {
 
 	u32 rfLSSIReadBackPi;	/* LSSI RF readback data PI mode 0x8b8-8bc for Path A and B */
 
-} BB_REGISTER_DEFINITION_T, *PBB_REGISTER_DEFINITION_T;
+};
 
 
 /* ---------------------------------------------------------------------- */
 u8
 PHY_GetTxPowerByRateBase(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	u8				Band,
 	u8				RfPath,
-	RATE_SECTION	RateSection
+	enum rate_section RateSection
 );
 
 void
 PHY_GetRateValuesOfTxPowerByRate(
-	PADAPTER pAdapter,
+	struct adapter * pAdapter,
 	u32 RegAddr,
 	u32 BitMask,
 	u32 Value,
@@ -72,7 +72,7 @@ PHY_GetRateIndexOfTxPowerByRate(
 
 void
 phy_set_tx_power_index_by_rate_section(
-	PADAPTER		pAdapter,
+	struct adapter *		pAdapter,
 	enum rf_path		RFPath,
 	u8				Channel,
 	u8				RateSection
@@ -80,7 +80,7 @@ phy_set_tx_power_index_by_rate_section(
 
 s8
 _PHY_GetTxPowerByRate(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	u8			Band,
 	enum rf_path	RFPath,
 	u8			RateIndex
@@ -88,7 +88,7 @@ _PHY_GetTxPowerByRate(
 
 s8
 PHY_GetTxPowerByRate(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	u8			Band,
 	enum rf_path	RFPath,
 	u8			RateIndex
@@ -96,7 +96,7 @@ PHY_GetTxPowerByRate(
 
 void
 PHY_SetTxPowerByRate(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	u8			Band,
 	enum rf_path	RFPath,
 	u8			Rate,
@@ -105,14 +105,14 @@ PHY_SetTxPowerByRate(
 
 void
 phy_set_tx_power_level_by_path(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	u8			channel,
 	u8			path
 );
 
 void
 PHY_SetTxPowerIndexByRateArray(
-	PADAPTER		pAdapter,
+	struct adapter *		pAdapter,
 	enum rf_path		RFPath,
 	enum channel_width BandWidth,
 	u8				Channel,
@@ -122,12 +122,12 @@ PHY_SetTxPowerIndexByRateArray(
 
 void
 PHY_InitTxPowerByRate(
-	PADAPTER	pAdapter
+	struct adapter *	pAdapter
 );
 
 void
 phy_store_tx_power_by_rate(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	u32			Band,
 	u32			RfPath,
 	u32			TxNum,
@@ -138,12 +138,12 @@ phy_store_tx_power_by_rate(
 
 void
 PHY_TxPowerByRateConfiguration(
-	 PADAPTER			pAdapter
+	 struct adapter *			pAdapter
 );
 
 u8
 PHY_GetTxPowerIndexBase(
-	PADAPTER		pAdapter,
+	struct adapter *		pAdapter,
 	enum rf_path		RFPath,
 	u8				Rate,
 	u8 ntx_idx,
@@ -153,19 +153,19 @@ PHY_GetTxPowerIndexBase(
 );
 
 #ifdef CONFIG_TXPWR_LIMIT
-s8 phy_get_txpwr_lmt_abs(_adapter *adapter
+s8 phy_get_txpwr_lmt_abs(struct adapter *adapter
 	, const char *regd_name
 	, BAND_TYPE band, enum channel_width bw
 	, u8 tlrs, u8 ntx_idx, u8 cch, u8 lock
 );
 
-s8 phy_get_txpwr_lmt(_adapter *adapter
+s8 phy_get_txpwr_lmt(struct adapter *adapter
 	, const char *regd_name
 	, BAND_TYPE band, enum channel_width bw
 	, u8 rfpath, u8 rs, u8 ntx_idx, u8 cch, u8 lock
 );
 
-s8 PHY_GetTxPowerLimit(_adapter *adapter
+s8 PHY_GetTxPowerLimit(struct adapter *adapter
 	, const char *regd_name
 	, BAND_TYPE band, enum channel_width bw
 	, u8 rfpath, u8 rate, u8 ntx_idx, u8 cch
@@ -178,7 +178,7 @@ s8 PHY_GetTxPowerLimit(_adapter *adapter
 
 s8
 PHY_GetTxPowerTrackingOffset(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	enum rf_path	RFPath,
 	u8			Rate
 );
@@ -194,7 +194,7 @@ struct txpwr_idx_comp {
 
 u8
 phy_get_tx_power_index(
-	PADAPTER			pAdapter,
+	struct adapter *			pAdapter,
 	enum rf_path			RFPath,
 	u8					Rate,
 	enum channel_width	BandWidth,
@@ -203,43 +203,43 @@ phy_get_tx_power_index(
 
 void
 PHY_SetTxPowerIndex(
-	PADAPTER		pAdapter,
+	struct adapter *		pAdapter,
 	u32				PowerIndex,
 	enum rf_path		RFPath,
 	u8				Rate
 );
 
-void dump_tx_power_idx_title(void *sel, _adapter *adapter);
-void dump_tx_power_idx_by_path_rs(void *sel, _adapter *adapter, u8 rfpath, u8 rs);
-void dump_tx_power_idx(void *sel, _adapter *adapter);
+void dump_tx_power_idx_title(void *sel, struct adapter *adapter);
+void dump_tx_power_idx_by_path_rs(void *sel, struct adapter *adapter, u8 rfpath, u8 rs);
+void dump_tx_power_idx(void *sel, struct adapter *adapter);
 
-bool phy_is_tx_power_limit_needed(_adapter *adapter);
-bool phy_is_tx_power_by_rate_needed(_adapter *adapter);
-int phy_load_tx_power_by_rate(_adapter *adapter, u8 chk_file);
+bool phy_is_tx_power_limit_needed(struct adapter *adapter);
+bool phy_is_tx_power_by_rate_needed(struct adapter *adapter);
+int phy_load_tx_power_by_rate(struct adapter *adapter, u8 chk_file);
 #ifdef CONFIG_TXPWR_LIMIT
-int phy_load_tx_power_limit(_adapter *adapter, u8 chk_file);
+int phy_load_tx_power_limit(struct adapter *adapter, u8 chk_file);
 #endif
-void phy_load_tx_power_ext_info(_adapter *adapter, u8 chk_file);
-void phy_reload_tx_power_ext_info(_adapter *adapter);
-void phy_reload_default_tx_power_ext_info(_adapter *adapter);
+void phy_load_tx_power_ext_info(struct adapter *adapter, u8 chk_file);
+void phy_reload_tx_power_ext_info(struct adapter *adapter);
+void phy_reload_default_tx_power_ext_info(struct adapter *adapter);
 
-const struct map_t *hal_pg_txpwr_def_info(_adapter *adapter);
+const struct map_t *hal_pg_txpwr_def_info(struct adapter *adapter);
 
-void dump_hal_txpwr_info_2g(void *sel, _adapter *adapter, u8 rfpath_num, u8 max_tx_cnt);
-void dump_hal_txpwr_info_5g(void *sel, _adapter *adapter, u8 rfpath_num, u8 max_tx_cnt);
+void dump_hal_txpwr_info_2g(void *sel, struct adapter *adapter, u8 rfpath_num, u8 max_tx_cnt);
+void dump_hal_txpwr_info_5g(void *sel, struct adapter *adapter, u8 rfpath_num, u8 max_tx_cnt);
 
 void hal_load_txpwr_info(
-	_adapter *adapter,
-	TxPowerInfo24G *pwr_info_2g,
-	TxPowerInfo5G *pwr_info_5g,
+	struct adapter *adapter,
+	struct TxPowerInfo24G *pwr_info_2g,
+	struct TxPowerInfo5G *pwr_info_5g,
 	u8 *pg_data
 );
 
-void dump_tx_power_ext_info(void *sel, _adapter *adapter);
-void dump_target_tx_power(void *sel, _adapter *adapter);
-void dump_tx_power_by_rate(void *sel, _adapter *adapter);
+void dump_tx_power_ext_info(void *sel, struct adapter *adapter);
+void dump_target_tx_power(void *sel, struct adapter *adapter);
+void dump_tx_power_by_rate(void *sel, struct adapter *adapter);
 
-int rtw_get_phy_file_path(_adapter *adapter, const char *file_name);
+int rtw_get_phy_file_path(struct adapter *adapter, const char *file_name);
 
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
 #define MAC_FILE_FW_NIC			"FW_NIC.bin"
@@ -270,17 +270,17 @@ int rtw_get_phy_file_path(_adapter *adapter, const char *file_name);
 #define LOAD_RF_TXPWR_TRACK_PARA_FILE	BIT5
 #define LOAD_RF_TXPWR_LMT_PARA_FILE		BIT6
 
-int phy_ConfigMACWithParaFile(PADAPTER	Adapter, char	*pFileName);
-int phy_ConfigBBWithParaFile(PADAPTER	Adapter, char	*pFileName, u32	ConfigType);
-int phy_ConfigBBWithPgParaFile(PADAPTER	Adapter, const char *pFileName);
-int phy_ConfigBBWithMpParaFile(PADAPTER	Adapter, char	*pFileName);
-int PHY_ConfigRFWithParaFile(PADAPTER	Adapter, char	*pFileName, enum rf_path	eRFPath);
-int PHY_ConfigRFWithTxPwrTrackParaFile(PADAPTER	Adapter, char	*pFileName);
+int phy_ConfigMACWithParaFile(struct adapter *	Adapter, char	*pFileName);
+int phy_ConfigBBWithParaFile(struct adapter *	Adapter, char	*pFileName, u32	ConfigType);
+int phy_ConfigBBWithPgParaFile(struct adapter *	Adapter, const char *pFileName);
+int phy_ConfigBBWithMpParaFile(struct adapter *	Adapter, char	*pFileName);
+int PHY_ConfigRFWithParaFile(struct adapter *	Adapter, char	*pFileName, enum rf_path	eRFPath);
+int PHY_ConfigRFWithTxPwrTrackParaFile(struct adapter *	Adapter, char	*pFileName);
 #ifdef CONFIG_TXPWR_LIMIT
-int PHY_ConfigRFWithPowerLimitTableParaFile(PADAPTER	Adapter, const char *pFileName);
+int PHY_ConfigRFWithPowerLimitTableParaFile(struct adapter *	Adapter, const char *pFileName);
 #endif
-void phy_free_filebuf_mask(_adapter *padapter, u8 mask);
-void phy_free_filebuf(_adapter *padapter);
+void phy_free_filebuf_mask(struct adapter *adapt, u8 mask);
+void phy_free_filebuf(struct adapter *adapt);
 #endif /* CONFIG_LOAD_PHY_PARA_FROM_FILE */
 
 #endif /* __HAL_COMMON_H__ */

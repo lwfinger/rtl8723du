@@ -7,11 +7,11 @@
 
 struct pkt_file {
 	struct sk_buff *pkt;
-	SIZE_T pkt_len;	 /* the remainder length of the open_file */
-	_buffer *cur_buffer;
+	__kernel_size_t pkt_len;	 /* the remainder length of the open_file */
+	unsigned char *cur_buffer;
 	u8 *buf_start;
 	u8 *cur_addr;
-	SIZE_T buf_len;
+	__kernel_size_t buf_len;
 };
 
 #define NR_XMITFRAME	256
@@ -22,26 +22,26 @@ struct sta_xmit_priv;
 struct xmit_frame;
 struct xmit_buf;
 
-extern int _rtw_xmit_entry(struct sk_buff *pkt, _nic_hdl pnetdev);
-extern int rtw_xmit_entry(struct sk_buff *pkt, _nic_hdl pnetdev);
+extern int _rtw_xmit_entry(struct sk_buff *pkt, struct  net_device * pnetdev);
+extern int rtw_xmit_entry(struct sk_buff *pkt, struct  net_device * pnetdev);
 
-void rtw_os_xmit_schedule(_adapter *padapter);
+void rtw_os_xmit_schedule(struct adapter *adapt);
 
-int rtw_os_xmit_resource_alloc(_adapter *padapter, struct xmit_buf *pxmitbuf, u32 alloc_sz, u8 flag);
-void rtw_os_xmit_resource_free(_adapter *padapter, struct xmit_buf *pxmitbuf, u32 free_sz, u8 flag);
+int rtw_os_xmit_resource_alloc(struct adapter *adapt, struct xmit_buf *pxmitbuf, u32 alloc_sz, u8 flag);
+void rtw_os_xmit_resource_free(struct adapter *adapt, struct xmit_buf *pxmitbuf, u32 free_sz, u8 flag);
 
 extern void rtw_set_tx_chksum_offload(struct sk_buff *pkt, struct pkt_attrib *pattrib);
 
 extern uint rtw_remainder_len(struct pkt_file *pfile);
 extern void _rtw_open_pktfile(struct sk_buff *pkt, struct pkt_file *pfile);
 extern uint _rtw_pktfile_read(struct pkt_file *pfile, u8 *rmem, uint rlen);
-extern sint rtw_endofpktfile(struct pkt_file *pfile);
+extern int rtw_endofpktfile(struct pkt_file *pfile);
 
-extern void rtw_os_pkt_complete(_adapter *padapter, struct sk_buff *pkt);
-extern void rtw_os_xmit_complete(_adapter *padapter, struct xmit_frame *pxframe);
+extern void rtw_os_pkt_complete(struct adapter *adapt, struct sk_buff *pkt);
+extern void rtw_os_xmit_complete(struct adapter *adapt, struct xmit_frame *pxframe);
 
-void rtw_os_wake_queue_at_free_stainfo(_adapter *padapter, int *qcnt_freed);
+void rtw_os_wake_queue_at_free_stainfo(struct adapter *adapt, int *qcnt_freed);
 
-void dump_os_queue(void *sel, _adapter *padapter);
+void dump_os_queue(void *sel, struct adapter *adapt);
 
 #endif /* __XMIT_OSDEP_H_ */

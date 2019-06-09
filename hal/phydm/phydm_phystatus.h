@@ -421,7 +421,7 @@ phydm_rx_phy_status_new_type(
 	struct phydm_phyinfo_struct			*p_phy_info
 );
 
-boolean
+bool
 phydm_query_is_mu_api(
 	struct PHY_DM_STRUCT			*p_phydm,
 	u8								ppdu_idx,

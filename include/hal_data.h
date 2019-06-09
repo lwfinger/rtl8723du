@@ -10,55 +10,54 @@
 /*
  * <Roger_Notes> For RTL8723 WiFi/BT/GPS multi-function configuration. 2010.10.06.
  *   */
-typedef enum _RT_MULTI_FUNC {
+enum RT_MULTI_FUNC {
 	RT_MULTI_FUNC_NONE	= 0x00,
 	RT_MULTI_FUNC_WIFI	= 0x01,
 	RT_MULTI_FUNC_BT		= 0x02,
 	RT_MULTI_FUNC_GPS	= 0x04,
-} RT_MULTI_FUNC, *PRT_MULTI_FUNC;
+};
 /*
  * <Roger_Notes> For RTL8723 WiFi PDn/GPIO polarity control configuration. 2010.10.08.
  *   */
-typedef enum _RT_POLARITY_CTL {
+enum RT_POLARITY_CTL {
 	RT_POLARITY_LOW_ACT	= 0,
 	RT_POLARITY_HIGH_ACT	= 1,
-} RT_POLARITY_CTL, *PRT_POLARITY_CTL;
+};
 
 /* For RTL8723 regulator mode. by tynli. 2011.01.14. */
-typedef enum _RT_REGULATOR_MODE {
+enum RT_REGULATOR_MODE {
 	RT_SWITCHING_REGULATOR	= 0,
 	RT_LDO_REGULATOR			= 1,
-} RT_REGULATOR_MODE, *PRT_REGULATOR_MODE;
+};
 
 /*
  * Interface type.
  *   */
-typedef	enum _INTERFACE_SELECT_PCIE {
+enum INTERFACE_SELECT_PCIE {
 	INTF_SEL0_SOLO_MINICARD			= 0,		/* WiFi solo-mCard */
 	INTF_SEL1_BT_COMBO_MINICARD		= 1,		/* WiFi+BT combo-mCard */
 	INTF_SEL2_PCIe						= 2,		/* PCIe Card */
-} INTERFACE_SELECT_PCIE, *PINTERFACE_SELECT_PCIE;
+};
 
-
-typedef	enum _INTERFACE_SELECT_USB {
+enum INTERFACE_SELECT_USB {
 	INTF_SEL0_USB 				= 0,		/* USB */
 	INTF_SEL1_USB_High_Power  	= 1,		/* USB with high power PA */
 	INTF_SEL2_MINICARD		  	= 2,		/* Minicard */
 	INTF_SEL3_USB_Solo 		= 3,		/* USB solo-Slim module */
 	INTF_SEL4_USB_Combo		= 4,		/* USB Combo-Slim module */
 	INTF_SEL5_USB_Combo_MF	= 5,		/* USB WiFi+BT Multi-Function Combo, i.e., Proprietary layout(AS-VAU) which is the same as SDIO card */
-} INTERFACE_SELECT_USB, *PINTERFACE_SELECT_USB;
+};
 
-typedef enum _RT_AMPDU_BRUST_MODE {
-	RT_AMPDU_BRUST_NONE		= 0,
-	RT_AMPDU_BRUST_92D		= 1,
-	RT_AMPDU_BRUST_88E		= 2,
-	RT_AMPDU_BRUST_8812_4	= 3,
-	RT_AMPDU_BRUST_8812_8	= 4,
-	RT_AMPDU_BRUST_8812_12	= 5,
-	RT_AMPDU_BRUST_8812_15	= 6,
-	RT_AMPDU_BRUST_8723B		= 7,
-} RT_AMPDU_BRUST, *PRT_AMPDU_BRUST_MODE;
+enum RT_AMPDU_BURST {
+	RT_AMPDU_BURST_NONE	= 0,
+	RT_AMPDU_BURST_92D	= 1,
+	RT_AMPDU_BURST_88E	= 2,
+	RT_AMPDU_BURST_8812_4	= 3,
+	RT_AMPDU_BURST_8812_8	= 4,
+	RT_AMPDU_BURST_8812_12	= 5,
+	RT_AMPDU_BURST_8812_15	= 6,
+	RT_AMPDU_BURST_8723B	= 7,
+};
 
 /* Tx Power Limit Table Size */
 #define MAX_REGULATION_NUM						4
@@ -86,12 +85,12 @@ typedef enum _RT_AMPDU_BRUST_MODE {
 /* ###### duplicate code,will move to ODM ######### */
 
 #ifdef RTW_RX_AGGREGATION
-typedef enum _RX_AGG_MODE {
+enum RX_AGG_MODE {
 	RX_AGG_DISABLE,
 	RX_AGG_DMA,
 	RX_AGG_USB,
 	RX_AGG_MIX
-} RX_AGG_MODE;
+};
 
 /* #define MAX_RX_DMA_BUFFER_SIZE	10240 */		/* 10K for 8192C RX DMA buffer */
 
@@ -118,11 +117,10 @@ typedef enum _RX_AGG_MODE {
 #define RF_GAIN_OFFSET_MASK		0xfffff
 
 /* For store initial value of BB register */
-typedef struct _BB_INIT_REGISTER {
+struct bb_init_register {
 	u16	offset;
 	u32	value;
-
-} BB_INIT_REGISTER, *PBB_INIT_REGISTER;
+};
 
 #define PAGE_SIZE_128	128
 #define PAGE_SIZE_256	256
@@ -202,7 +200,7 @@ struct hal_iqk_reg_backup {
 };
 
 
-typedef struct hal_p2p_ps_para {
+struct hal_p2p_ps_para {
 	/*DW0*/
 	u8  offload_en:1;
 	u8  role:1;
@@ -233,7 +231,7 @@ typedef struct hal_p2p_ps_para {
 
 	/*DW5*/
 	u32 noa_count_para;
-} HAL_P2P_PS_PARA, *PHAL_P2P_PS_PARA;
+};
 
 #define TXPWR_LMT_RS_CCK	0
 #define TXPWR_LMT_RS_OFDM	1
@@ -260,11 +258,11 @@ struct txpwr_lmt_ent {
 };
 #endif /* CONFIG_TXPWR_LIMIT */
 
-typedef struct hal_com_data {
-	HAL_VERSION			version_id;
-	RT_MULTI_FUNC		MultiFunc; /* For multi-function consideration. */
-	RT_POLARITY_CTL		PolarityCtl; /* For Wifi PDn Polarity control. */
-	RT_REGULATOR_MODE	RegulatorMode; /* switching regulator or LDO */
+struct hal_com_data {
+	struct hal_version			version_id;
+	enum RT_MULTI_FUNC		MultiFunc; /* For multi-function consideration. */
+	enum RT_POLARITY_CTL		PolarityCtl; /* For Wifi PDn Polarity control. */
+	enum RT_REGULATOR_MODE	RegulatorMode; /* switching regulator or LDO */
 	u8	hw_init_completed;
 	/****** FW related ******/
 	u32 firmware_size;
@@ -279,10 +277,10 @@ typedef struct hal_com_data {
 	u8	LastHMEBoxNum;	/* H2C - for host message to fw */
 
 	/****** current WIFI_PHY values ******/
-	WIRELESS_MODE	CurrentWirelessMode;
+	enum wireless_mode CurrentWirelessMode;
 	enum channel_width current_channel_bw;
-	BAND_TYPE		current_band_type;	/* 0:2.4G, 1:5G */
-	BAND_TYPE		BandSet;
+	enum BAND_TYPE		current_band_type;	/* 0:2.4G, 1:5G */
+	enum BAND_TYPE		BandSet;
 	u8				current_channel;
 	u8				cch_20;
 	u8				cch_40;
@@ -361,7 +359,7 @@ typedef struct hal_com_data {
 	u8      need_restore;
 	u8	EfuseUsedPercentage;
 	u16	EfuseUsedBytes;
-	EFUSE_HAL	EfuseHal;
+	struct efuse_hal	EfuseHal;
 
 	/*---------------------------------------------------------------------------------*/
 	/* 2.4G TX power info for target TX power*/
@@ -412,7 +410,7 @@ typedef struct hal_com_data {
 	u32	ac_param_be; /* Original parameter for BE, use for EDCA turbo.	*/
 	u8	is_turbo_edca;
 	u8	prv_traffic_idx;
-	BB_REGISTER_DEFINITION_T	PHYRegDef[MAX_RF_PATH];	/* Radio A/B/C/D */
+	struct bb_register_definition	PHYRegDef[MAX_RF_PATH];	/* Radio A/B/C/D */
 
 	u32	RfRegChnlVal[MAX_RF_PATH];
 
@@ -458,7 +456,7 @@ typedef struct hal_com_data {
 	struct submit_ctx	iqk_sctx;
 	u8 ch_switch_offload;
 	struct submit_ctx chsw_sctx;
-	RT_AMPDU_BRUST		AMPDUBurstMode; /* 92C maybe not use, but for compile successfully */
+	enum RT_AMPDU_BURST AMPDUBurstMode; /* 92C maybe not use, but for compile successfully */
 	u8	OutEpQueueSel;
 	u8	OutEpNumber;
 
@@ -482,7 +480,7 @@ typedef struct hal_com_data {
 	u32			IntrMask[3];
 
 	/* For bluetooth co-existance */
-	BT_COEXIST		bt_coexist;
+	struct bt_coexist		bt_coexist;
 
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
 	char	para_file_buf[MAX_PARA_FILE_BUF_LEN];
@@ -513,7 +511,7 @@ typedef struct hal_com_data {
 	u8	RfKFreeEnable;
 	u8	RfKFree_ch_group;
 	bool				bCCKinCH14;
-	BB_INIT_REGISTER	RegForRecover[5];
+	struct bb_init_register	RegForRecover[5];
 
 	u32 RxGainOffset[4]; /*{2G, 5G_Low, 5G_Middle, G_High}*/
 	u8 BackUp_IG_REG_4_Chnl_Section[4]; /*{A,B,C,D}*/
@@ -524,20 +522,21 @@ typedef struct hal_com_data {
 	u8 phydm_op_mode;
 
 	u8 in_cta_test;
-} HAL_DATA_COMMON, *PHAL_DATA_COMMON;
+};
 
 extern unsigned char RTW_WPA_OUI[];
 extern unsigned char WPA_TKIP_CIPHER[4];
 extern unsigned char RSN_TKIP_CIPHER[4];
 
-typedef struct hal_com_data HAL_DATA_TYPE, *PHAL_DATA_TYPE;
-#define GET_HAL_DATA(__pAdapter)			((HAL_DATA_TYPE *)((__pAdapter)->HalData))
+struct hal_com_data;
+
+#define GET_HAL_DATA(__pAdapter)			((struct hal_com_data *)((__pAdapter)->HalData))
 #define GET_HAL_SPEC(__pAdapter)			(&(GET_HAL_DATA((__pAdapter))->hal_spec))
 
-#define GET_HAL_RFPATH_NUM(__pAdapter)		(((HAL_DATA_TYPE *)((__pAdapter)->HalData))->NumTotalRFPath)
+#define GET_HAL_RFPATH_NUM(__pAdapter)		(((struct hal_com_data *)((__pAdapter)->HalData))->NumTotalRFPath)
 #define RT_GetInterfaceSelection(_Adapter)		(GET_HAL_DATA(_Adapter)->InterfaceSel)
 #define GET_RF_TYPE(__pAdapter)				(GET_HAL_DATA(__pAdapter)->rf_type)
-#define GET_KFREE_DATA(_adapter) (&(GET_HAL_DATA((_adapter))->kfree_data))
+#define GET_KFREE_DATA(__ADAPTER) (&(GET_HAL_DATA((__ADAPTER))->kfree_data))
 
 #define	SUPPORT_HW_RADIO_DETECT(Adapter)	(RT_GetInterfaceSelection(Adapter) == INTF_SEL2_MINICARD || \
 		RT_GetInterfaceSelection(Adapter) == INTF_SEL3_USB_Solo || \
@@ -548,7 +547,7 @@ typedef struct hal_com_data HAL_DATA_TYPE, *PHAL_DATA_TYPE;
 #define rtw_get_hw_init_completed(adapter)		(GET_HAL_DATA(adapter)->hw_init_completed)
 #define rtw_is_hw_init_completed(adapter)		(GET_HAL_DATA(adapter)->hw_init_completed == true)
 
-int recvbuf2recvframe(PADAPTER padapter, void *ptr);
+int recvbuf2recvframe(struct adapter * adapt, void *ptr);
 extern int new_bcn_max;
 
 /* alias for phydm coding style */

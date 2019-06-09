@@ -5,7 +5,7 @@
 
 #include <drv_types.h>
 
-int rtw_os_recvframe_duplicate_skb(_adapter *padapter, union recv_frame *pcloneframe, struct sk_buff *pskb)
+int rtw_os_recvframe_duplicate_skb(struct adapter *adapt, union recv_frame *pcloneframe, struct sk_buff *pskb)
 {
 	int res = _SUCCESS;
 	struct sk_buff	*pkt_copy = NULL;
@@ -21,7 +21,7 @@ int rtw_os_recvframe_duplicate_skb(_adapter *padapter, union recv_frame *pclonef
 		RTW_INFO("%s [WARN] rtw_skb_copy fail , drop frag frame\n", __func__);
 		return _FAIL;
 	}
-	pkt_copy->dev = padapter->pnetdev;
+	pkt_copy->dev = adapt->pnetdev;
 
 	pcloneframe->u.hdr.pkt = pkt_copy;
 	pcloneframe->u.hdr.rx_head = pkt_copy->head;
@@ -33,7 +33,7 @@ int rtw_os_recvframe_duplicate_skb(_adapter *padapter, union recv_frame *pclonef
 	return res;
 }
 
-int rtw_os_alloc_recvframe(_adapter *padapter, union recv_frame *precvframe, u8 *pdata, struct sk_buff *pskb)
+int rtw_os_alloc_recvframe(struct adapter *adapt, union recv_frame *precvframe, u8 *pdata, struct sk_buff *pskb)
 {
 	int res = _SUCCESS;
 	u8	shift_sz = 0;
@@ -70,7 +70,7 @@ int rtw_os_alloc_recvframe(_adapter *padapter, union recv_frame *precvframe, u8 
 	pkt_copy = rtw_skb_alloc(alloc_sz);
 
 	if (pkt_copy) {
-		pkt_copy->dev = padapter->pnetdev;
+		pkt_copy->dev = adapt->pnetdev;
 		pkt_copy->len = skb_len;
 		precvframe->u.hdr.pkt = pkt_copy;
 		precvframe->u.hdr.rx_head = pkt_copy->head;
@@ -94,7 +94,7 @@ int rtw_os_alloc_recvframe(_adapter *padapter, union recv_frame *precvframe, u8 
 
 		precvframe->u.hdr.pkt = rtw_skb_clone(pskb);
 		if (precvframe->u.hdr.pkt) {
-			precvframe->u.hdr.pkt->dev = padapter->pnetdev;
+			precvframe->u.hdr.pkt->dev = adapt->pnetdev;
 			precvframe->u.hdr.rx_head = precvframe->u.hdr.rx_data = precvframe->u.hdr.rx_tail = pdata;
 			precvframe->u.hdr.rx_end =  pdata + alloc_sz;
 		} else {
@@ -119,7 +119,7 @@ void rtw_os_free_recvframe(union recv_frame *precvframe)
 }
 
 /* init os related resource in struct recv_priv */
-int rtw_os_recv_resource_init(struct recv_priv *precvpriv, _adapter *padapter)
+int rtw_os_recv_resource_init(struct recv_priv *precvpriv, struct adapter *adapt)
 {
 	int	res = _SUCCESS;
 
@@ -132,7 +132,7 @@ int rtw_os_recv_resource_init(struct recv_priv *precvpriv, _adapter *padapter)
 }
 
 /* alloc os related resource in union recv_frame */
-int rtw_os_recv_resource_alloc(_adapter *padapter, union recv_frame *precvframe)
+int rtw_os_recv_resource_alloc(struct adapter *adapt, union recv_frame *precvframe)
 {
 	int	res = _SUCCESS;
 
@@ -144,7 +144,7 @@ int rtw_os_recv_resource_alloc(_adapter *padapter, union recv_frame *precvframe)
 /* free os related resource in union recv_frame */
 void rtw_os_recv_resource_free(struct recv_priv *precvpriv)
 {
-	sint i;
+	int i;
 	union recv_frame *precvframe;
 	precvframe = (union recv_frame *) precvpriv->precv_frame_buf;
 
@@ -162,11 +162,11 @@ void rtw_os_recv_resource_free(struct recv_priv *precvpriv)
 }
 
 /* alloc os related resource in struct recv_buf */
-int rtw_os_recvbuf_resource_alloc(_adapter *padapter, struct recv_buf *precvbuf)
+int rtw_os_recvbuf_resource_alloc(struct adapter *adapt, struct recv_buf *precvbuf)
 {
 	int res = _SUCCESS;
 
-	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(padapter);
+	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(adapt);
 	struct usb_device	*pusbd = pdvobjpriv->pusbdev;
 
 	precvbuf->irp_pending = false;
@@ -187,7 +187,7 @@ int rtw_os_recvbuf_resource_alloc(_adapter *padapter, struct recv_buf *precvbuf)
 }
 
 /* free os related resource in struct recv_buf */
-int rtw_os_recvbuf_resource_free(_adapter *padapter, struct recv_buf *precvbuf)
+int rtw_os_recvbuf_resource_free(struct adapter *adapt, struct recv_buf *precvbuf)
 {
 	int ret = _SUCCESS;
 
@@ -249,12 +249,12 @@ struct sk_buff *rtw_os_alloc_msdu_pkt(union recv_frame *prframe, u16 nSubframe_L
 }
 
 #ifdef CONFIG_RTW_NAPI
-static int napi_recv(_adapter *padapter, int budget)
+static int napi_recv(struct adapter *adapt, int budget)
 {
 	struct sk_buff *pskb;
-	struct recv_priv *precvpriv = &padapter->recvpriv;
+	struct recv_priv *precvpriv = &adapt->recvpriv;
 	int work_done = 0;
-	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+	struct registry_priv *pregistrypriv = &adapt->registrypriv;
 	u8 rx_ok;
 
 
@@ -268,21 +268,21 @@ static int napi_recv(_adapter *padapter, int budget)
 
 #ifdef CONFIG_RTW_GRO
 		if (pregistrypriv->en_gro) {
-			if (rtw_napi_gro_receive(&padapter->napi, pskb) != GRO_DROP)
+			if (rtw_napi_gro_receive(&adapt->napi, pskb) != GRO_DROP)
 				rx_ok = true;
 			goto next;
 		}
 #endif /* CONFIG_RTW_GRO */
 
-		if (rtw_netif_receive_skb(padapter->pnetdev, pskb) == NET_RX_SUCCESS)
+		if (rtw_netif_receive_skb(adapt->pnetdev, pskb) == NET_RX_SUCCESS)
 			rx_ok = true;
 
 next:
 		if (rx_ok == true) {
 			work_done++;
-			DBG_COUNTER(padapter->rx_logs.os_netif_ok);
+			DBG_COUNTER(adapt->rx_logs.os_netif_ok);
 		} else {
-			DBG_COUNTER(padapter->rx_logs.os_netif_err);
+			DBG_COUNTER(adapt->rx_logs.os_netif_err);
 		}
 	}
 
@@ -291,12 +291,12 @@ next:
 
 int rtw_recv_napi_poll(struct napi_struct *napi, int budget)
 {
-	_adapter *padapter = container_of(napi, _adapter, napi);
+	struct adapter *adapt = container_of(napi, struct adapter, napi);
 	int work_done = 0;
-	struct recv_priv *precvpriv = &padapter->recvpriv;
+	struct recv_priv *precvpriv = &adapt->recvpriv;
 
 
-	work_done = napi_recv(padapter, budget);
+	work_done = napi_recv(adapt, budget);
 	if (work_done < budget) {
 		napi_complete(napi);
 		if (!skb_queue_empty(&precvpriv->rx_napi_skb_queue))
@@ -307,11 +307,11 @@ int rtw_recv_napi_poll(struct napi_struct *napi, int budget)
 }
 #endif /* CONFIG_RTW_NAPI */
 
-void rtw_os_recv_indicate_pkt(_adapter *padapter, struct sk_buff *pkt, union recv_frame *rframe)
+void rtw_os_recv_indicate_pkt(struct adapter *adapt, struct sk_buff *pkt, union recv_frame *rframe)
 {
-	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
-	struct recv_priv *precvpriv = &(padapter->recvpriv);
-	struct registry_priv	*pregistrypriv = &padapter->registrypriv;
+	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
+	struct recv_priv *precvpriv = &(adapt->recvpriv);
+	struct registry_priv	*pregistrypriv = &adapt->registrypriv;
 #ifdef CONFIG_BR_EXT
 	void *br_port = NULL;
 #endif
@@ -321,27 +321,27 @@ void rtw_os_recv_indicate_pkt(_adapter *padapter, struct sk_buff *pkt, union rec
 	if (pkt) {
 		struct ethhdr *ehdr = (struct ethhdr *)pkt->data;
 
-		DBG_COUNTER(padapter->rx_logs.os_indicate);
+		DBG_COUNTER(adapt->rx_logs.os_indicate);
 
-		if (MLME_IS_AP(padapter)) {
+		if (MLME_IS_AP(adapt)) {
 			struct sk_buff *pskb2 = NULL;
 			struct sta_info *psta = NULL;
-			struct sta_priv *pstapriv = &padapter->stapriv;
+			struct sta_priv *pstapriv = &adapt->stapriv;
 			int bmcast = IS_MCAST(ehdr->h_dest);
 
 			/* RTW_INFO("bmcast=%d\n", bmcast); */
 
-			if (_rtw_memcmp(ehdr->h_dest, adapter_mac_addr(padapter), ETH_ALEN) == false) {
+			if (_rtw_memcmp(ehdr->h_dest, adapter_mac_addr(adapt), ETH_ALEN) == false) {
 				/* RTW_INFO("not ap psta=%p, addr=%pM\n", psta, ehdr->h_dest); */
 
 				if (bmcast) {
-					psta = rtw_get_bcmc_stainfo(padapter);
+					psta = rtw_get_bcmc_stainfo(adapt);
 					pskb2 = rtw_skb_clone(pkt);
 				} else
 					psta = rtw_get_stainfo(pstapriv, ehdr->h_dest);
 
 				if (psta) {
-					struct net_device *pnetdev = (struct net_device *)padapter->pnetdev;
+					struct net_device *pnetdev = (struct net_device *)adapt->pnetdev;
 
 					/* RTW_INFO("directly forwarding to the rtw_xmit_entry\n"); */
 
@@ -355,15 +355,15 @@ void rtw_os_recv_indicate_pkt(_adapter *padapter, struct sk_buff *pkt, union rec
 
 					if (bmcast && (pskb2)) {
 						pkt = pskb2;
-						DBG_COUNTER(padapter->rx_logs.os_indicate_ap_mcast);
+						DBG_COUNTER(adapt->rx_logs.os_indicate_ap_mcast);
 					} else {
-						DBG_COUNTER(padapter->rx_logs.os_indicate_ap_forward);
+						DBG_COUNTER(adapt->rx_logs.os_indicate_ap_forward);
 						return;
 					}
 				}
 			} else { /* to APself */
 				/* RTW_INFO("to APSelf\n"); */
-				DBG_COUNTER(padapter->rx_logs.os_indicate_ap_self);
+				DBG_COUNTER(adapt->rx_logs.os_indicate_ap_self);
 			}
 		}
 
@@ -371,15 +371,15 @@ void rtw_os_recv_indicate_pkt(_adapter *padapter, struct sk_buff *pkt, union rec
 		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_ADHOC_STATE) == true) {
 			/* Insert NAT2.5 RX here! */
 			#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
-			br_port = padapter->pnetdev->br_port;
+			br_port = adapt->pnetdev->br_port;
 			#else
 			rcu_read_lock();
-			br_port = rcu_dereference(padapter->pnetdev->rx_handler_data);
+			br_port = rcu_dereference(adapt->pnetdev->rx_handler_data);
 			rcu_read_unlock();
 			#endif
 
 			if (br_port) {
-				if (nat25_handle_frame(padapter, pkt) == -1) {
+				if (nat25_handle_frame(adapt, pkt) == -1) {
 					/* priv->ext_stats.rx_data_drops++; */
 					/* DEBUG_ERR("RX DROP: nat25_handle_frame fail!\n"); */
 					/* return FAIL; */
@@ -391,42 +391,42 @@ void rtw_os_recv_indicate_pkt(_adapter *padapter, struct sk_buff *pkt, union rec
 #endif /* CONFIG_BR_EXT */
 
 		/* After eth_type_trans process , pkt->data pointer will move from ethrnet header to ip header */
-		pkt->protocol = eth_type_trans(pkt, padapter->pnetdev);
-		pkt->dev = padapter->pnetdev;
+		pkt->protocol = eth_type_trans(pkt, adapt->pnetdev);
+		pkt->dev = adapt->pnetdev;
 		pkt->ip_summed = CHECKSUM_NONE; /* CONFIG_TCP_CSUM_OFFLOAD_RX */
 
 #ifdef CONFIG_RTW_NAPI
 		if (pregistrypriv->en_napi
 			#ifdef CONFIG_RTW_NAPI_DYNAMIC
-			&& adapter_to_dvobj(padapter)->en_napi_dynamic
+			&& adapter_to_dvobj(adapt)->en_napi_dynamic
 			#endif
 		) {
 			skb_queue_tail(&precvpriv->rx_napi_skb_queue, pkt);
 			#ifndef CONFIG_RTW_NAPI_V2
-			napi_schedule(&padapter->napi);
+			napi_schedule(&adapt->napi);
 			#endif
 			return;
 		}
 #endif /* CONFIG_RTW_NAPI */
 
-		ret = rtw_netif_rx(padapter->pnetdev, pkt);
+		ret = rtw_netif_rx(adapt->pnetdev, pkt);
 		if (ret == NET_RX_SUCCESS)
-			DBG_COUNTER(padapter->rx_logs.os_netif_ok);
+			DBG_COUNTER(adapt->rx_logs.os_netif_ok);
 		else
-			DBG_COUNTER(padapter->rx_logs.os_netif_err);
+			DBG_COUNTER(adapt->rx_logs.os_netif_err);
 	}
 }
 
-void rtw_handle_tkip_mic_err(_adapter *padapter, struct sta_info *sta, u8 bgroup)
+void rtw_handle_tkip_mic_err(struct adapter *adapt, struct sta_info *sta, u8 bgroup)
 {
 #ifdef CONFIG_IOCTL_CFG80211
 	enum nl80211_key_type key_type = 0;
 #endif
 	union iwreq_data wrqu;
 	struct iw_michaelmicfailure    ev;
-	struct mlme_priv              *pmlmepriv  = &padapter->mlmepriv;
-	struct security_priv	*psecuritypriv = &padapter->securitypriv;
-	systime cur_time = 0;
+	struct mlme_priv              *pmlmepriv  = &adapt->mlmepriv;
+	struct security_priv	*psecuritypriv = &adapt->securitypriv;
+	unsigned long cur_time = 0;
 
 	if (psecuritypriv->last_mic_err_time == 0)
 		psecuritypriv->last_mic_err_time = rtw_get_current_time();
@@ -447,7 +447,7 @@ void rtw_handle_tkip_mic_err(_adapter *padapter, struct sta_info *sta, u8 bgroup
 	else
 		key_type |= NL80211_KEYTYPE_PAIRWISE;
 
-	cfg80211_michael_mic_failure(padapter->pnetdev, sta->cmn.mac_addr, key_type, -1, NULL, GFP_ATOMIC);
+	cfg80211_michael_mic_failure(adapt->pnetdev, sta->cmn.mac_addr, key_type, -1, NULL, GFP_ATOMIC);
 #endif
 
 	_rtw_memset(&ev, 0x00, sizeof(ev));
@@ -463,24 +463,24 @@ void rtw_handle_tkip_mic_err(_adapter *padapter, struct sta_info *sta, u8 bgroup
 	wrqu.data.length = sizeof(ev);
 
 #ifndef CONFIG_IOCTL_CFG80211
-	wireless_send_event(padapter->pnetdev, IWEVMICHAELMICFAILURE, &wrqu, (char *) &ev);
+	wireless_send_event(adapt->pnetdev, IWEVMICHAELMICFAILURE, &wrqu, (char *) &ev);
 #endif
 }
 
-int rtw_recv_monitor(_adapter *padapter, union recv_frame *precv_frame)
+int rtw_recv_monitor(struct adapter *adapt, union recv_frame *precv_frame)
 {
 	int ret = _FAIL;
 	struct recv_priv *precvpriv;
-	_queue	*pfree_recv_queue;
+	struct __queue	*pfree_recv_queue;
 	struct sk_buff *skb;
-	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
+	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 	struct rx_pkt_attrib *pattrib;
 
 	if (NULL == precv_frame)
 		goto _recv_drop;
 
 	pattrib = &precv_frame->u.hdr.attrib;
-	precvpriv = &(padapter->recvpriv);
+	precvpriv = &(adapt->recvpriv);
 	pfree_recv_queue = &(precvpriv->free_recv_queue);
 
 	skb = precv_frame->u.hdr.pkt;
@@ -496,7 +496,7 @@ int rtw_recv_monitor(_adapter *padapter, union recv_frame *precv_frame)
 	skb->pkt_type = PACKET_OTHERHOST;
 	skb->protocol = htons(0x0019); /* ETH_P_80211_RAW */
 
-	rtw_netif_rx(padapter->pnetdev, skb);
+	rtw_netif_rx(adapt->pnetdev, skb);
 
 	/* pointers to NULL before rtw_free_recvframe() */
 	precv_frame->u.hdr.pkt = NULL;
@@ -513,14 +513,14 @@ _recv_drop:
 
 }
 
-int rtw_recv_indicatepkt(_adapter *padapter, union recv_frame *precv_frame)
+int rtw_recv_indicatepkt(struct adapter *adapt, union recv_frame *precv_frame)
 {
 	struct recv_priv *precvpriv;
-	_queue	*pfree_recv_queue;
+	struct __queue	*pfree_recv_queue;
 	struct sk_buff *skb;
-	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
+	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 
-	precvpriv = &(padapter->recvpriv);
+	precvpriv = &(adapt->recvpriv);
 	pfree_recv_queue = &(precvpriv->free_recv_queue);
 
 	skb = precv_frame->u.hdr.pkt;
@@ -531,7 +531,7 @@ int rtw_recv_indicatepkt(_adapter *padapter, union recv_frame *precv_frame)
 	skb_set_tail_pointer(skb, precv_frame->u.hdr.len);
 	skb->len = precv_frame->u.hdr.len;
 
-	rtw_os_recv_indicate_pkt(padapter, skb, precv_frame);
+	rtw_os_recv_indicate_pkt(adapt, skb, precv_frame);
 
 _recv_indicatepkt_end:
 	precv_frame->u.hdr.pkt = NULL;
@@ -540,13 +540,13 @@ _recv_indicatepkt_end:
 
 _recv_indicatepkt_drop:
 	rtw_free_recvframe(precv_frame, pfree_recv_queue);
-	DBG_COUNTER(padapter->rx_logs.os_indicate_err);
+	DBG_COUNTER(adapt->rx_logs.os_indicate_err);
 	return _FAIL;
 }
 
-void rtw_os_read_port(_adapter *padapter, struct recv_buf *precvbuf)
+void rtw_os_read_port(struct adapter *adapt, struct recv_buf *precvbuf)
 {
-	struct recv_priv *precvpriv = &padapter->recvpriv;
+	struct recv_priv *precvpriv = &adapt->recvpriv;
 
 	precvbuf->ref_cnt--;
 
@@ -556,6 +556,6 @@ void rtw_os_read_port(_adapter *padapter, struct recv_buf *precvbuf)
 	precvbuf->pskb = NULL;
 
 	if (precvbuf->irp_pending == false)
-		rtw_read_port(padapter, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
+		rtw_read_port(adapt, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
 }
 

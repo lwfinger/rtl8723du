@@ -5,7 +5,7 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-static boolean
+static bool
 check_positive(
 	struct PHY_DM_STRUCT *p_dm,
 	const u32	condition1,
@@ -93,7 +93,7 @@ check_positive(
 	} else
 		return false;
 }
-static boolean
+static bool
 check_negative(
 	struct PHY_DM_STRUCT *p_dm,
 	const u32	condition1,
@@ -504,7 +504,7 @@ odm_read_and_config_mp_8723d_agc_tab(
 {
 	u32	i = 0;
 	u8	c_cond;
-	boolean	is_matched = true, is_skipped = false;
+	bool	is_matched = true, is_skipped = false;
 	u32	array_len = sizeof(array_mp_8723d_agc_tab)/sizeof(u32);
 	u32	*array = array_mp_8723d_agc_tab;
 
@@ -795,7 +795,7 @@ odm_read_and_config_mp_8723d_phy_reg(
 {
 	u32	i = 0;
 	u8	c_cond;
-	boolean	is_matched = true, is_skipped = false;
+	bool	is_matched = true, is_skipped = false;
 	u32	array_len = sizeof(array_mp_8723d_phy_reg)/sizeof(u32);
 	u32	*array = array_mp_8723d_phy_reg;
 

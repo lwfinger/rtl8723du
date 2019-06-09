@@ -85,7 +85,7 @@
  * LED object.
  * ******************************************************************************** */
 
-typedef enum _LED_CTL_MODE {
+enum led_ctl_mode {
 	LED_CTL_POWER_ON = 1,
 	LED_CTL_LINK = 2,
 	LED_CTL_NO_LINK = 3,
@@ -100,9 +100,9 @@ typedef enum _LED_CTL_MODE {
 	LED_CTL_STOP_WPS_FAIL = 12, /* added for ALPHA	 */
 	LED_CTL_STOP_WPS_FAIL_OVERLAP = 13, /* added for BELKIN */
 	LED_CTL_CONNECTION_NO_TRANSFER = 14,
-} LED_CTL_MODE;
+};
 
-typedef	enum _LED_STATE {
+enum led_state {
 	LED_UNKNOWN = 0,
 	RTW_LED_ON = 1,
 	RTW_LED_OFF = 2,
@@ -130,29 +130,27 @@ typedef	enum _LED_STATE {
 	LED_BLINK_Azurewave_MAXMbps = 24,
 	LED_BLINK_LINK_IDEL = 25,
 	LED_BLINK_WPS_LINKED = 26,
-} LED_STATE;
+};
 
-typedef enum _LED_PIN {
+enum led_pin {
 	LED_PIN_GPIO0,
 	LED_PIN_LED0,
 	LED_PIN_LED1,
 	LED_PIN_LED2
-} LED_PIN;
-
+};
 
 /* ********************************************************************************
  * USB  LED Definition.
  * ******************************************************************************** */
 
-#define IS_LED_WPS_BLINKING(_LED_USB)	(((PLED_USB)_LED_USB)->CurrLedState == LED_BLINK_WPS \
-		|| ((PLED_USB)_LED_USB)->CurrLedState == LED_BLINK_WPS_STOP \
-		|| ((PLED_USB)_LED_USB)->bLedWPSBlinkInProgress)
+#define IS_LED_WPS_BLINKING(_led_usb)	(((struct led_usb *)_led_usb)->CurrLedState == LED_BLINK_WPS \
+		|| ((struct led_usb *)_led_usb)->CurrLedState == LED_BLINK_WPS_STOP \
+		|| ((struct led_usb *)_led_usb)->bLedWPSBlinkInProgress)
 
-#define IS_LED_BLINKING(_LED_USB)	(((PLED_USB)_LED_USB)->bLedWPSBlinkInProgress \
-		|| ((PLED_USB)_LED_USB)->bLedScanBlinkInProgress)
+#define IS_LED_BLINKING(_led_usb)	(((struct led_usb *)_led_usb)->bLedWPSBlinkInProgress \
+		|| ((struct led_usb *)_led_usb)->bLedScanBlinkInProgress)
 
-
-typedef	enum _LED_STRATEGY_USB {
+enum led_strategy {
 	/* start from 2 */
 	SW_LED_MODE0 = 2, /* SW control 1 LED via GPIO0. It is default option. */
 	SW_LED_MODE1, /* 2 LEDs, through LED0 and LED1. For ALPHA. */
@@ -170,15 +168,15 @@ typedef	enum _LED_STRATEGY_USB {
 	SW_LED_MODE13, /* for Netgear A6100, 8811Au */
 	SW_LED_MODE14, /* for Buffalo, DNI, 8811Au */
 	SW_LED_MODE15, /* for DLINK,  8811Au/8812AU	 */
-} LED_STRATEGY_USB, *PLED_STRATEGY_USB;
+};
 
 
-typedef struct _LED_USB {
-	PADAPTER			padapter;
+struct led_usb {
+	struct adapter *adapt;
 
-	LED_PIN			LedPin;	/* Identify how to implement this SW led. */
+	enum led_pin LedPin;	/* Identify how to implement this SW led. */
 
-	LED_STATE			CurrLedState; /* Current LED state. */
+	enum led_state			CurrLedState; /* Current LED state. */
 	bool				bLedOn; /* true if LED is ON, false if LED is OFF. */
 
 	bool				bSWLedCtrl;
@@ -193,31 +191,28 @@ typedef struct _LED_USB {
 
 	u32					BlinkTimes; /* Number of times to toggle led state for blinking. */
 	u8					BlinkCounter; /* Added for turn off overlap led after blinking a while, by page, 20120821 */
-	LED_STATE			BlinkingLedState; /* Next state for blinking, either LED_ON or LED_OFF are. */
+	enum led_state			BlinkingLedState; /* Next state for blinking, either LED_ON or LED_OFF are. */
 
 	struct timer_list		BlinkTimer; /* Timer object for led blinking. */
 
 	_workitem			BlinkWorkItem; /* Workitem used by BlinkTimer to manipulate H/W to blink LED.' */
-} LED_USB, *PLED_USB;
-
-typedef struct _LED_USB	LED_DATA, *PLED_DATA;
-typedef enum _LED_STRATEGY_USB	LED_STRATEGY, *PLED_STRATEGY;
+};
 
 void LedControlUSB(
-	PADAPTER		Adapter,
-	LED_CTL_MODE		LedAction
+	struct adapter *		Adapter,
+	enum led_ctl_mode		LedAction
 );
 
 struct led_priv {
-	LED_STRATEGY		LedStrategy;
+	enum led_strategy LedStrategy;
 	/* add for led controll */
-	LED_DATA			SwLed0;
-	LED_DATA			SwLed1;
-	LED_DATA			SwLed2;
+	struct led_usb			SwLed0;
+	struct led_usb			SwLed1;
+	struct led_usb			SwLed2;
 	u8					bRegUseLed;
-	void (*LedControlHandler)(_adapter *padapter, LED_CTL_MODE LedAction);
-	void (*SwLedOn)(_adapter *padapter, PLED_DATA pLed);
-	void (*SwLedOff)(_adapter *padapter, PLED_DATA pLed);
+	void (*LedControlHandler)(struct adapter *adapt, enum led_ctl_mode LedAction);
+	void (*SwLedOn)(struct adapter *adapt, struct led_usb * pLed);
+	void (*SwLedOff)(struct adapter *adapt, struct led_usb * pLed);
 	/* add for led controll */
 };
 
@@ -240,22 +235,22 @@ void BlinkTimerCallback(void *data);
 #endif
 void BlinkWorkItemCallback(_workitem *work);
 
-void ResetLedStatus(PLED_DATA pLed);
+void ResetLedStatus(struct led_usb * pLed);
 
 void
 InitLed(
-	_adapter			*padapter,
-	PLED_DATA		pLed,
-	LED_PIN		LedPin
+	struct adapter			*adapt,
+	struct led_usb *		pLed,
+	enum led_pin LedPin
 );
 
 void
 DeInitLed(
-	PLED_DATA		pLed
+	struct led_usb *		pLed
 );
 
 /* hal... */
-extern void BlinkHandler(PLED_DATA	pLed);
+extern void BlinkHandler(struct led_usb *	pLed);
 
 #define rtw_led_control(adapter, LedAction) \
 	do { \

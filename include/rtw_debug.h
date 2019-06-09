@@ -210,12 +210,12 @@ void dump_drv_version(void *sel);
 void dump_log_level(void *sel);
 void dump_drv_cfg(struct seq_file *sel);
 
-void mac_reg_dump(void *sel, _adapter *adapter);
-void bb_reg_dump(void *sel, _adapter *adapter);
-void bb_reg_dump_ex(void *sel, _adapter *adapter);
-void rf_reg_dump(void *sel, _adapter *adapter);
+void mac_reg_dump(void *sel, struct adapter *adapter);
+void bb_reg_dump(void *sel, struct adapter *adapter);
+void bb_reg_dump_ex(void *sel, struct adapter *adapter);
+void rf_reg_dump(void *sel, struct adapter *adapter);
 
-void rtw_sink_rtp_seq_dbg(_adapter *adapter, u8 *ehdr_pos);
+void rtw_sink_rtp_seq_dbg(struct adapter *adapter, u8 *ehdr_pos);
 
 struct sta_info;
 void sta_rx_reorder_ctl_dump(void *sel, struct sta_info *sta);
@@ -227,8 +227,8 @@ void dump_adapters_status(void *sel, struct dvobj_priv *dvobj);
 struct sec_cam_ent;
 void dump_sec_cam_ent(void *sel, struct sec_cam_ent *ent, int id);
 void dump_sec_cam_ent_title(void *sel, u8 has_id);
-void dump_sec_cam(void *sel, _adapter *adapter);
-void dump_sec_cam_cache(void *sel, _adapter *adapter);
+void dump_sec_cam(void *sel, struct adapter *adapter);
+void dump_sec_cam_cache(void *sel, struct adapter *adapter);
 
 #ifdef CONFIG_PROC_DEBUG
 ssize_t proc_set_write_reg(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
@@ -314,13 +314,13 @@ ssize_t proc_set_ampdu_enable(struct file *file, const char __user *buffer, size
 
 int proc_get_mac_rptbuf(struct seq_file *m, void *v);
 
-void dump_regsty_rx_ampdu_size_limit(void *sel, _adapter *adapter);
+void dump_regsty_rx_ampdu_size_limit(void *sel, struct adapter *adapter);
 int proc_get_rx_ampdu(struct seq_file *m, void *v);
 ssize_t proc_set_rx_ampdu(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 
-void rtw_dump_dft_phy_cap(void *sel, _adapter *adapter);
-void rtw_get_dft_phy_cap(void *sel, _adapter *adapter);
-void rtw_dump_drv_phy_cap(void *sel, _adapter *adapter);
+void rtw_dump_dft_phy_cap(void *sel, struct adapter *adapter);
+void rtw_get_dft_phy_cap(void *sel, struct adapter *adapter);
+void rtw_dump_drv_phy_cap(void *sel, struct adapter *adapter);
 
 int proc_get_rx_stbc(struct seq_file *m, void *v);
 ssize_t proc_set_rx_stbc(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);

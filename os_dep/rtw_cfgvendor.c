@@ -112,7 +112,7 @@ static int rtw_cfgvendor_send_cmd_reply(struct wiphy *wiphy,
 #include <hal_data.h>
 static int rtw_dev_get_feature_set(struct net_device *dev)
 {
-	_adapter *adapter = (_adapter *)rtw_netdev_priv(dev);
+	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 
 	int feature_set = 0;
 
@@ -241,7 +241,7 @@ exit:
 
 #if defined(GSCAN_SUPPORT) && 0
 int rtw_cfgvendor_send_hotlist_event(struct wiphy *wiphy,
-	struct net_device *dev, void  *data, int len, rtw_vendor_event_t event)
+	struct net_device *dev, void  *data, int len, enum rtw_vendor_event event)
 {
 	u16 kflags;
 	const void *ptr;
@@ -992,26 +992,26 @@ enum {
 	LSTATS_SUBCMD_SET_INFO,
 	LSTATS_SUBCMD_CLEAR_INFO,
 };
-static void LinkLayerStats(_adapter *padapter)
+static void LinkLayerStats(struct adapter *adapt)
 {
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
-	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(padapter);
+	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
+	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(adapt);
 	u32 ps_time, trx_total_time;
 	u64 tx_bytes, rx_bytes, trx_total_bytes = 0;
 	u64 tmp = 0;
 	
-	RTW_DBG("%s adapter type : %u\n", __func__, padapter->adapter_type);
+	RTW_DBG("%s adapter type : %u\n", __func__, adapt->adapter_type);
 
 	tx_bytes = 0;
 	rx_bytes = 0;
 	ps_time = 0;
 	trx_total_time = 0;
 
-	if ( padapter->netif_up == true ) {
+	if ( adapt->netif_up == true ) {
 
 		pwrpriv->on_time = rtw_get_passing_time_ms(pwrpriv->radio_on_start_time);
 
-		if (rtw_mi_check_fwstate(padapter, _FW_LINKED)) {
+		if (rtw_mi_check_fwstate(adapt, _FW_LINKED)) {
 			if ( pwrpriv->bpower_saving == true ) {
 				pwrpriv->pwr_saving_time += rtw_get_passing_time_ms(pwrpriv->pwr_saving_start_time);
 				pwrpriv->pwr_saving_start_time = rtw_get_current_time();
@@ -1062,7 +1062,7 @@ static void LinkLayerStats(_adapter *padapter)
 
 #ifdef CONFIG_RTW_WIFI_HAL_DEBUG
 		RTW_INFO("- tx_bytes : %llu rx_bytes : %llu total bytes : %llu\n", tx_bytes, rx_bytes, trx_total_bytes);
-		RTW_INFO("- netif_up=%s, on_time : %u ms\n", padapter->netif_up ? "1":"0", pwrpriv->on_time);
+		RTW_INFO("- netif_up=%s, on_time : %u ms\n", adapt->netif_up ? "1":"0", pwrpriv->on_time);
 		RTW_INFO("- pwr_saving_time : %u (%u) ms\n", pwrpriv->pwr_saving_time, ps_time);
 		RTW_INFO("- trx_total_time : %u ms\n", trx_total_time);		
 		RTW_INFO("- tx_time : %u ms\n", pwrpriv->tx_time);
@@ -1076,8 +1076,8 @@ static int rtw_cfgvendor_lstats_get_info(struct wiphy *wiphy,
 	struct wireless_dev *wdev, const void  *data, int len)
 {
 	int err = 0;
-	_adapter *padapter = GET_PRIMARY_ADAPTER(wiphy_to_adapter(wiphy));
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
+	struct adapter *adapt = GET_PRIMARY_ADAPTER(wiphy_to_adapter(wiphy));
+	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
 	wifi_radio_stat *radio;
 	char *output;
 
@@ -1092,7 +1092,7 @@ static int rtw_cfgvendor_lstats_get_info(struct wiphy *wiphy,
 	radio->radio = 1;
 
 	/* to get on_time, tx_time, rx_time */
-	LinkLayerStats(padapter); 
+	LinkLayerStats(adapt); 
 	
 	radio->on_time = pwrpriv->on_time;
 	radio->tx_time = pwrpriv->tx_time;

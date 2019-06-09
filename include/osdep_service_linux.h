@@ -126,24 +126,10 @@
 	typedef struct semaphore	_mutex;
 #endif
 
-struct	__queue	{
+struct __queue	{
 	struct	list_head	queue;
 	spinlock_t	lock;
 };
-
-typedef unsigned char	_buffer;
-
-typedef struct	__queue	_queue;
-typedef	int	_OS_STATUS;
-typedef unsigned long _irqL;
-typedef	struct	net_device *_nic_hdl;
-
-typedef void		*_thread_hdl_;
-typedef int		thread_return;
-typedef void	*thread_context;
-
-typedef void timer_hdl_return;
-typedef void *timer_hdl_context;
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 41))
 	typedef struct work_struct _workitem;
@@ -154,8 +140,6 @@ typedef void *timer_hdl_context;
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24))
 	#define DMA_BIT_MASK(n) (((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
 #endif
-
-typedef unsigned long systime;
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 22))
 /* Porting from linux kernel, for compatible with old kernel. */
@@ -185,47 +169,47 @@ __inline static struct list_head *get_next(struct list_head *list)
 	return list->next;
 }
 
-__inline static struct list_head	*get_list_head(_queue	*queue)
+__inline static struct list_head	*get_list_head(struct __queue	*queue)
 {
 	return &(queue->queue);
 }
 
 
 #define LIST_CONTAINOR(ptr, type, member) \
-	((type *)((char *)(ptr)-(SIZE_T)(&((type *)0)->member)))
+	((type *)((char *)(ptr)-(__kernel_size_t)(&((type *)0)->member)))
 
 
-__inline static void _enter_critical(spinlock_t *plock, _irqL *pirqL)
+__inline static void _enter_critical(spinlock_t *plock, unsigned long *pirqL)
 {
 	spin_lock_irqsave(plock, *pirqL);
 }
 
-__inline static void _exit_critical(spinlock_t *plock, _irqL *pirqL)
+__inline static void _exit_critical(spinlock_t *plock, unsigned long *pirqL)
 {
 	spin_unlock_irqrestore(plock, *pirqL);
 }
 
-__inline static void _enter_critical_ex(spinlock_t *plock, _irqL *pirqL)
+__inline static void _enter_critical_ex(spinlock_t *plock, unsigned long *pirqL)
 {
 	spin_lock_irqsave(plock, *pirqL);
 }
 
-__inline static void _exit_critical_ex(spinlock_t *plock, _irqL *pirqL)
+__inline static void _exit_critical_ex(spinlock_t *plock, unsigned long *pirqL)
 {
 	spin_unlock_irqrestore(plock, *pirqL);
 }
 
-__inline static void _enter_critical_bh(spinlock_t *plock, _irqL *pirqL)
+__inline static void _enter_critical_bh(spinlock_t *plock, unsigned long *pirqL)
 {
 	spin_lock_bh(plock);
 }
 
-__inline static void _exit_critical_bh(spinlock_t *plock, _irqL *pirqL)
+__inline static void _exit_critical_bh(spinlock_t *plock, unsigned long *pirqL)
 {
 	spin_unlock_bh(plock);
 }
 
-__inline static int _enter_critical_mutex(_mutex *pmutex, _irqL *pirqL)
+__inline static int _enter_critical_mutex(_mutex *pmutex, unsigned long *pirqL)
 {
 	int ret = 0;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
@@ -238,7 +222,7 @@ __inline static int _enter_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 }
 
 
-__inline static void _exit_critical_mutex(_mutex *pmutex, _irqL *pirqL)
+__inline static void _exit_critical_mutex(_mutex *pmutex, unsigned long *pirqL)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
 	mutex_unlock(pmutex);
@@ -253,7 +237,7 @@ __inline static void rtw_list_delete(struct list_head *plist)
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-__inline static void _init_timer(struct timer_list *ptimer, _nic_hdl nic_hdl, void *pfunc, void *cntx)
+__inline static void _init_timer(struct timer_list *ptimer, struct  net_device * nic_hdl, void *pfunc, void *cntx)
 {
 	/* setup_timer(ptimer, pfunc,(u32)cntx);	 */
 	ptimer->function = pfunc;

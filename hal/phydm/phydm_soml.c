@@ -100,7 +100,7 @@ phydm_adaptive_soml_workitem_callback(
 )
 {
 	void *adapter = (void *)context;
-	HAL_DATA_TYPE	*hal_data = GET_HAL_DATA(((PADAPTER)adapter));
+	struct hal_com_data	*hal_data = GET_HAL_DATA(((struct adapter *)adapter));
 	struct PHY_DM_STRUCT		*dm = &hal_data->odmpriv;
 
 	/*dbg_print("phydm_adaptive_soml-phydm_adaptive_soml_workitem_callback\n");*/

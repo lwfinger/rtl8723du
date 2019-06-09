@@ -43,25 +43,6 @@ u8 rtw_get_op_chs_by_cch_bw(u8 cch, u8 bw, u8 **op_chs, u8 *op_ch_num);
 
 u8 rtw_get_ch_group(u8 ch, u8 *group, u8 *cck_group);
 
-typedef enum _CAPABILITY {
-	cESS			= 0x0001,
-	cIBSS			= 0x0002,
-	cPollable		= 0x0004,
-	cPollReq			= 0x0008,
-	cPrivacy		= 0x0010,
-	cShortPreamble	= 0x0020,
-	cPBCC			= 0x0040,
-	cChannelAgility	= 0x0080,
-	cSpectrumMgnt	= 0x0100,
-	cQos			= 0x0200,	/* For HCCA, use with CF-Pollable and CF-PollReq */
-	cShortSlotTime	= 0x0400,
-	cAPSD			= 0x0800,
-	cRM				= 0x1000,	/* RRM (Radio Request Measurement) */
-	cDSSS_OFDM	= 0x2000,
-	cDelayedBA		= 0x4000,
-	cImmediateBA	= 0x8000,
-} CAPABILITY, *PCAPABILITY;
-
 enum	_REG_PREAMBLE_MODE {
 	PREAMBLE_LONG	= 1,
 	PREAMBLE_AUTO	= 2,
@@ -75,12 +56,12 @@ enum	_REG_PREAMBLE_MODE {
 #define HAL_PRIME_CHNL_OFFSET_LOWER	1
 #define HAL_PRIME_CHNL_OFFSET_UPPER	2
 
-typedef enum _BAND_TYPE {
+enum BAND_TYPE {
 	BAND_ON_2_4G = 0,
 	BAND_ON_5G = 1,
 	BAND_ON_BOTH = 2,
 	BAND_MAX = 3,
-} BAND_TYPE, *PBAND_TYPE;
+};
 
 extern const char *const _band_str[];
 #define band_str(band) (((band) >= BAND_MAX) ? _band_str[BAND_MAX] : _band_str[(band)])
@@ -95,18 +76,37 @@ extern const char *const _ch_width_str[];
 extern const u8 _ch_width_to_bw_cap[];
 #define ch_width_to_bw_cap(bw) (((bw) < CHANNEL_WIDTH_MAX) ? _ch_width_to_bw_cap[(bw)] : 0)
 
+enum CAPABILITY {
+	cESS		= 0x0001,
+	cIBSS		= 0x0002,
+	cPollable	= 0x0004,
+	cPollReq	= 0x0008,
+	cPrivacy	= 0x0010,
+	cShortPreamble	= 0x0020,
+	cPBCC		= 0x0040,
+	cChannelAgility = 0x0080,
+	cSpectrumMgnt	= 0x0100,
+	cQos		= 0x0200, /* For HCCA, use with CF-Pollable and CF-PollReq */
+	cShortSlotTime  = 0x0400,
+	cAPSD		= 0x0800,
+	cRM		= 0x1000, /* RRM (Radio Request Measurement) */
+	cDSSS_OFDM	= 0x2000,
+	cDelayedBA	= 0x4000,
+	cImmediateBA	= 0x8000,
+};
+
 /*
  * Represent Extention Channel Offset in HT Capabilities
  * This is available only in 40Mhz mode.
  *   */
-typedef enum _EXTCHNL_OFFSET {
+enum EXTCHNL_OFFSET {
 	EXTCHNL_OFFSET_NO_EXT = 0,
 	EXTCHNL_OFFSET_UPPER = 1,
 	EXTCHNL_OFFSET_NO_DEF = 2,
 	EXTCHNL_OFFSET_LOWER = 3,
-} EXTCHNL_OFFSET, *PEXTCHNL_OFFSET;
+};
 
-typedef enum _VHT_DATA_SC {
+enum VHT_DATA_SC {
 	VHT_DATA_SC_DONOT_CARE = 0,
 	VHT_DATA_SC_20_UPPER_OF_80MHZ = 1,
 	VHT_DATA_SC_20_LOWER_OF_80MHZ = 2,
@@ -118,13 +118,13 @@ typedef enum _VHT_DATA_SC {
 	VHT_DATA_SC_20_RECV4 = 8,
 	VHT_DATA_SC_40_UPPER_OF_80MHZ = 9,
 	VHT_DATA_SC_40_LOWER_OF_80MHZ = 10,
-} VHT_DATA_SC, *PVHT_DATA_SC_E;
+};
 
-typedef enum _PROTECTION_MODE {
+enum PROTECTION_MODE {
 	PROTECTION_MODE_AUTO = 0,
 	PROTECTION_MODE_FORCE_ENABLE = 1,
 	PROTECTION_MODE_FORCE_DISABLE = 2,
-} PROTECTION_MODE, *PPROTECTION_MODE;
+};
 
 #define RF_TYPE_VALID(rf_type) (rf_type < RF_TYPE_MAX)
 
@@ -165,7 +165,7 @@ const struct country_chplan *rtw_get_chplan_from_country(const char *country_cod
 
 struct rf_ctl_t;
 
-typedef enum _REGULATION_TXPWR_LMT {
+enum REGULATION_TXPWR_LMT {
 	TXPWR_LMT_NONE = 0, /* no limit */
 	TXPWR_LMT_FCC = 1,
 	TXPWR_LMT_MKK = 2,
@@ -175,7 +175,7 @@ typedef enum _REGULATION_TXPWR_LMT {
 	TXPWR_LMT_ACMA = 6,
 	TXPWR_LMT_CHILE = 7,
 	TXPWR_LMT_WW = 8, /* smallest of all available limit, keep last */
-} REGULATION_TXPWR_LMT;
+};
 
 extern const char *const _regd_str[];
 #define regd_str(regd) (((regd) > TXPWR_LMT_WW) ? _regd_str[TXPWR_LMT_WW] : _regd_str[(regd)])
@@ -195,7 +195,7 @@ struct regd_exc_ent *_rtw_regd_exc_search(struct rf_ctl_t *rfctl, const char *co
 struct regd_exc_ent *rtw_regd_exc_search(struct rf_ctl_t *rfctl, const char *country, u8 domain);
 void rtw_regd_exc_list_free(struct rf_ctl_t *rfctl);
 
-void dump_txpwr_lmt(void *sel, _adapter *adapter);
+void dump_txpwr_lmt(void *sel, struct adapter *adapter);
 void rtw_txpwr_lmt_add_with_nlen(struct rf_ctl_t *rfctl, const char *regd_name, u32 nlen
 	, u8 band, u8 bw, u8 tlrs, u8 ntx_idx, u8 ch_idx, s8 lmt);
 void rtw_txpwr_lmt_add(struct rf_ctl_t *rfctl, const char *regd_name
@@ -210,8 +210,8 @@ void rtw_txpwr_lmt_list_free(struct rf_ctl_t *rfctl);
 #define BB_GAIN_NUM 1
 
 int rtw_ch_to_bb_gain_sel(int ch);
-void rtw_rf_set_tx_gain_offset(_adapter *adapter, u8 path, s8 offset);
-void rtw_rf_apply_tx_gain_offset(_adapter *adapter, u8 ch);
+void rtw_rf_set_tx_gain_offset(struct adapter *adapter, u8 path, s8 offset);
+void rtw_rf_apply_tx_gain_offset(struct adapter *adapter, u8 ch);
 
 u8 rtw_is_dfs_range(u32 hi, u32 lo);
 u8 rtw_is_dfs_ch(u8 ch);

@@ -64,7 +64,7 @@ phy_CalculateBitShift(
 * OverView:	Read "sepcific bits" from BB register
 *
 * Input:
-*			PADAPTER		Adapter,
+*			struct adapter *		Adapter,
 *			u32			RegAddr,
 *			u32			BitMask
 *
@@ -74,7 +74,7 @@ phy_CalculateBitShift(
 */
 u32
 PHY_QueryBBReg_8723D(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	u32		RegAddr,
 	u32		BitMask
 )
@@ -102,7 +102,7 @@ PHY_QueryBBReg_8723D(
 * OverView:	Write "Specific bits" to BB register (page 8~)
 *
 * Input:
-*			PADAPTER		Adapter,
+*			struct adapter *		Adapter,
 *			u32			RegAddr,
 *			u32			BitMask
 *
@@ -116,13 +116,13 @@ PHY_QueryBBReg_8723D(
 
 void
 PHY_SetBBReg_8723D(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	u32		RegAddr,
 	u32		BitMask,
 	u32		Data
 )
 {
-	HAL_DATA_TYPE	*pHalData		= GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData		= GET_HAL_DATA(Adapter);
 	/* u16			BBWaitCounter	= 0; */
 	u32			OriginalValue, BitShift;
 
@@ -164,7 +164,7 @@ PHY_SetBBReg_8723D(
  *---------------------------------------------------------------------------*/
 static	u32
 phy_FwRFSerialRead(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	enum rf_path			eRFPath,
 	u32				Offset)
 {
@@ -193,7 +193,7 @@ phy_FwRFSerialRead(
  *---------------------------------------------------------------------------*/
 static	void
 phy_FwRFSerialWrite(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	enum rf_path			eRFPath,
 	u32				Offset,
 	u32				Data)
@@ -203,14 +203,14 @@ phy_FwRFSerialWrite(
 
 static	u32
 phy_RFSerialRead_8723D(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	enum rf_path			eRFPath,
 	u32				Offset
 )
 {
 	u32						retValue = 0;
-	HAL_DATA_TYPE				*pHalData = GET_HAL_DATA(Adapter);
-	BB_REGISTER_DEFINITION_T	*pPhyReg = &pHalData->PHYRegDef[eRFPath];
+	struct hal_com_data				*pHalData = GET_HAL_DATA(Adapter);
+	struct bb_register_definition	*pPhyReg = &pHalData->PHYRegDef[eRFPath];
 	u32						NewOffset;
 	u32						tmplong, tmplong2;
 	u8					RfPiEnable = 0;
@@ -272,7 +272,7 @@ phy_RFSerialRead_8723D(
 * OverView:	Write data to RF register (page 8~)
 *
 * Input:
-*			PADAPTER		Adapter,
+*			struct adapter *		Adapter,
 			enum rf_path		eRFPath,
 *			u32			Offset,
 *			u32			Data
@@ -311,15 +311,15 @@ phy_RFSerialRead_8723D(
 */
 static	void
 phy_RFSerialWrite_8723D(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	enum rf_path			eRFPath,
 	u32				Offset,
 	u32				Data
 )
 {
 	u32						DataAndAddr = 0;
-	HAL_DATA_TYPE				*pHalData = GET_HAL_DATA(Adapter);
-	BB_REGISTER_DEFINITION_T	*pPhyReg = &pHalData->PHYRegDef[eRFPath];
+	struct hal_com_data				*pHalData = GET_HAL_DATA(Adapter);
+	struct bb_register_definition	*pPhyReg = &pHalData->PHYRegDef[eRFPath];
 	u32						NewOffset;
 
 	Offset &= 0xff;
@@ -355,7 +355,7 @@ phy_RFSerialWrite_8723D(
 * OverView:	Query "Specific bits" to RF register (page 8~)
 *
 * Input:
-*			PADAPTER		Adapter,
+*			struct adapter *		Adapter,
 			enum rf_path			eRFPath,
 *			u32			RegAddr,
 *			u32			BitMask
@@ -367,7 +367,7 @@ phy_RFSerialWrite_8723D(
 */
 u32
 PHY_QueryRFReg_8723D(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	enum rf_path			eRFPath,
 	u32				RegAddr,
 	u32				BitMask
@@ -393,7 +393,7 @@ PHY_QueryRFReg_8723D(
 * OverView:	Write "Specific bits" to RF register (page 8~)
 *
 * Input:
-*			PADAPTER		Adapter,
+*			struct adapter *		Adapter,
 *			RF_PATH			eRFPath,
 *			u32			RegAddr,
 *			u32			BitMask
@@ -407,7 +407,7 @@ PHY_QueryRFReg_8723D(
 */
 void
 PHY_SetRFReg_8723D(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	enum rf_path			eRFPath,
 	u32				RegAddr,
 	u32				BitMask,
@@ -452,10 +452,10 @@ PHY_SetRFReg_8723D(
  *  08/12/2008	MHC		Create Version 0.
  *
  *---------------------------------------------------------------------------*/
-int PHY_MACConfig8723D(PADAPTER Adapter)
+int PHY_MACConfig8723D(struct adapter * Adapter)
 {
 	int		rtStatus = _SUCCESS;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 
 	/* */
 	/* Config MAC */
@@ -480,7 +480,7 @@ int PHY_MACConfig8723D(PADAPTER Adapter)
 * OverView:	Initialize Register definition offset for Radio Path A/B/C/D
 *
 * Input:
-*			PADAPTER		Adapter,
+*			struct adapter *		Adapter,
 *
 * Output:	None
 * Return:		None
@@ -488,10 +488,10 @@ int PHY_MACConfig8723D(PADAPTER Adapter)
 */
 static	void
 phy_InitBBRFRegisterDefinition(
-	PADAPTER		Adapter
+	struct adapter *		Adapter
 )
 {
-	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data		*pHalData = GET_HAL_DATA(Adapter);
 
 	/* RF Interface Sowrtware Control */
 	pHalData->PHYRegDef[RF_PATH_A].rfintfs = rFPGA0_XAB_RFInterfaceSW; /* 16 LSBs if read 32-bit from 0x870 */
@@ -521,10 +521,10 @@ phy_InitBBRFRegisterDefinition(
 
 static	int
 phy_BB8723d_Config_ParaFile(
-	PADAPTER	Adapter
+	struct adapter *	Adapter
 )
 {
-	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data		*pHalData = GET_HAL_DATA(Adapter);
 	int			rtStatus = _SUCCESS;
 
 	/* */
@@ -579,11 +579,11 @@ phy_BB8190_Config_ParaFile_Fail:
 
 int
 PHY_BBConfig8723D(
-	PADAPTER Adapter
+	struct adapter * Adapter
 )
 {
 	int	rtStatus = _SUCCESS;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	u32	RegVal;
 	u8	TmpU1B = 0;
 	u8	value8;
@@ -616,10 +616,10 @@ PHY_BBConfig8723D(
 
 int
 PHY_RFConfig8723D(
-	PADAPTER	Adapter
+	struct adapter *	Adapter
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	int		rtStatus = _SUCCESS;
 
 	/* */
@@ -637,7 +637,7 @@ PHY_RFConfig8723D(
  *
  * Overview:    This function read RF parameters from general file format, and do RF 3-wire
  *
- * Input:	PADAPTER			Adapter
+ * Input:	struct adapter *			Adapter
  *			u8 *pFileName
  *			enum rf_path				eRFPath
  *
@@ -649,7 +649,7 @@ PHY_RFConfig8723D(
  *---------------------------------------------------------------------------*/
 int
 PHY_ConfigRFWithParaFile_8723D(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	u8					*pFileName,
 	enum rf_path				eRFPath
 )
@@ -666,7 +666,7 @@ PHY_ConfigRFWithParaFile_8723D(
 
 void
 PHY_SetTxPowerIndex_8723D(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	u32					PowerIndex,
 	enum rf_path			RFPath,
 	u8					Rate
@@ -748,7 +748,7 @@ PHY_SetTxPowerIndex_8723D(
 
 u8
 PHY_GetTxPowerIndex_8723D(
-	PADAPTER			pAdapter,
+	struct adapter *			pAdapter,
 	enum rf_path			RFPath,
 	u8					Rate,
 	u8					BandWidth,
@@ -756,7 +756,7 @@ PHY_GetTxPowerIndex_8723D(
 	struct txpwr_idx_comp *tic
 )
 {
-	PHAL_DATA_TYPE pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data * pHalData = GET_HAL_DATA(pAdapter);
 	s16 power_idx;
 	u8 base_idx = 0;
 	s8 by_rate_diff = 0, limit = 0, tpt_offset = 0, extra_bias = 0;
@@ -791,11 +791,11 @@ PHY_GetTxPowerIndex_8723D(
 
 void
 PHY_SetTxPowerLevel8723D(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	u8				Channel
 )
 {
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
 	u8				cur_antenna;
 	enum rf_path		RFPath = RF_PATH_A;
 
@@ -805,7 +805,7 @@ PHY_SetTxPowerLevel8723D(
 
 void
 PHY_GetTxPowerLevel8723D(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	int				*powerlevel
 )
 {
@@ -814,7 +814,7 @@ PHY_GetTxPowerLevel8723D(
 /* <20160217, Jessica> A workaround to eliminate the 2472MHz & 2484MHz spur of 8723D. */
 static void
 phy_SpurCalibration_8723D(
-	PADAPTER					pAdapter,
+	struct adapter *					pAdapter,
 	u8						ToChannel,
 	u8						threshold
 )
@@ -826,7 +826,7 @@ phy_SpurCalibration_8723D(
 
 	/* add for notch */
 	u32				wlan_channel, CurrentChannel;
-	HAL_DATA_TYPE		*pHalData	= GET_HAL_DATA(pAdapter);
+	struct hal_com_data		*pHalData	= GET_HAL_DATA(pAdapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
 
 	/* check threshold */
@@ -902,7 +902,7 @@ phy_SpurCalibration_8723D(
 
 static void
 phy_SetRegBW_8723D(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	enum channel_width	CurrentBW
 )
 {
@@ -933,11 +933,11 @@ phy_SetRegBW_8723D(
 
 static u8
 phy_GetSecondaryChnl_8723D(
-	PADAPTER	Adapter
+	struct adapter *	Adapter
 )
 {
 	u8	SCSettingOf40 = 0, SCSettingOf20 = 0;
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
 
 	if (pHalData->current_channel_bw == CHANNEL_WIDTH_80) {
 		if (pHalData->nCur80MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_LOWER)
@@ -969,18 +969,18 @@ phy_GetSecondaryChnl_8723D(
 
 static void
 phy_PostSetBwMode8723D(
-	PADAPTER padapter
+	struct adapter * adapt
 )
 {
 	u8 SubChnlNum = 0;
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
+	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
 
 	/* 2 Set Reg668 Reg440 BW */
-	phy_SetRegBW_8723D(padapter, pHalData->current_channel_bw);
+	phy_SetRegBW_8723D(adapt, pHalData->current_channel_bw);
 
 	/* 3 Set Reg483 */
-	SubChnlNum = phy_GetSecondaryChnl_8723D(padapter);
-	rtw_write8(padapter, REG_DATA_SC_8723D, SubChnlNum);
+	SubChnlNum = phy_GetSecondaryChnl_8723D(adapt);
+	rtw_write8(adapt, REG_DATA_SC_8723D, SubChnlNum);
 
 	switch (pHalData->current_channel_bw) {
 	/* 20 MHz channel*/
@@ -991,10 +991,10 @@ phy_PostSetBwMode8723D(
 		0x954[19]=1'b1
 		0x954[27:24]= 10
 		*/
-		phy_set_bb_reg(padapter, rFPGA0_RFMOD, bRFMOD, 0x0);
-		phy_set_bb_reg(padapter, rFPGA1_RFMOD, bRFMOD, 0x0);
-		phy_set_bb_reg(padapter, rBBrx_DFIR, BIT(19), 1);
-		phy_set_bb_reg(padapter, rBBrx_DFIR,
+		phy_set_bb_reg(adapt, rFPGA0_RFMOD, bRFMOD, 0x0);
+		phy_set_bb_reg(adapt, rFPGA1_RFMOD, bRFMOD, 0x0);
+		phy_set_bb_reg(adapt, rBBrx_DFIR, BIT(19), 1);
+		phy_set_bb_reg(adapt, rBBrx_DFIR,
 			     (BIT(27) | BIT(26) | BIT(25) | BIT(24)), 0xa);
 		break;
 	/* 40 MHz channel*/
@@ -1006,10 +1006,10 @@ phy_PostSetBwMode8723D(
 		0x954[23:20]=2'b11(For ACPR)
 		0xa00[4]=1/0
 		*/
-		phy_set_bb_reg(padapter, rFPGA0_RFMOD, bRFMOD, 0x1);
-		phy_set_bb_reg(padapter, rFPGA1_RFMOD, bRFMOD, 0x1);
-		phy_set_bb_reg(padapter, rBBrx_DFIR, BIT(19), 0);
-		phy_set_bb_reg(padapter, rCCK0_System, bCCKSideBand,
+		phy_set_bb_reg(adapt, rFPGA0_RFMOD, bRFMOD, 0x1);
+		phy_set_bb_reg(adapt, rFPGA1_RFMOD, bRFMOD, 0x1);
+		phy_set_bb_reg(adapt, rBBrx_DFIR, BIT(19), 0);
+		phy_set_bb_reg(adapt, rCCK0_System, bCCKSideBand,
 			     (pHalData->nCur40MhzPrimeSC >> 1));
 
 		break;
@@ -1018,15 +1018,15 @@ phy_PostSetBwMode8723D(
 	}
 
 	/*3<3>Set RF related register */
-	PHY_RF6052SetBandwidth8723D(padapter, pHalData->current_channel_bw);
+	PHY_RF6052SetBandwidth8723D(adapt, pHalData->current_channel_bw);
 }
 
 static void
 phy_SwChnl8723D(
-	PADAPTER					pAdapter
+	struct adapter *					pAdapter
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 	u8		channelToSW = pHalData->current_channel;
 	u8		i = 0;
 
@@ -1068,10 +1068,10 @@ phy_SwChnl8723D(
 
 static void
 phy_SwChnlAndSetBwMode8723D(
-	PADAPTER		Adapter
+	struct adapter *		Adapter
 )
 {
-	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data		*pHalData = GET_HAL_DATA(Adapter);
 
 	if (Adapter->bNotifyChannelChange) {
 		RTW_INFO("[%s] bSwChnl=%d, ch=%d, bSetChnlBW=%d, bw=%d\n",
@@ -1100,18 +1100,18 @@ phy_SwChnlAndSetBwMode8723D(
 
 static void
 PHY_HandleSwChnlAndSetBW8723D(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	bool				bSwitchChannel,
 	bool				bSetBandWidth,
 	u8					ChannelNum,
 	enum channel_width	ChnlWidth,
-	EXTCHNL_OFFSET	ExtChnlOffsetOf40MHz,
-	EXTCHNL_OFFSET	ExtChnlOffsetOf80MHz,
+	enum EXTCHNL_OFFSET	ExtChnlOffsetOf40MHz,
+enum EXTCHNL_OFFSET	ExtChnlOffsetOf80MHz,
 	u8					CenterFrequencyIndex1
 )
 {
 	/* static bool		bInitialzed = false; */
-	PHAL_DATA_TYPE		pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *		pHalData = GET_HAL_DATA(Adapter);
 	u8					tmpChannel = pHalData->current_channel;
 	enum channel_width	tmpBW = pHalData->current_channel_bw;
 	u8					tmpnCur40MhzPrimeSC = pHalData->nCur40MhzPrimeSC;
@@ -1182,7 +1182,7 @@ PHY_HandleSwChnlAndSetBW8723D(
 
 void
 PHY_SetSwChnlBWMode8723D(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	u8					channel,
 	enum channel_width	Bandwidth,
 	u8					Offset40,
@@ -1197,7 +1197,7 @@ PHY_SetSwChnlBWMode8723D(
 }
 
 static void
-_PHY_DumpRFReg_8723D(PADAPTER	pAdapter)
+_PHY_DumpRFReg_8723D(struct adapter *	pAdapter)
 {
 	u32 rfRegValue, rfRegOffset;
 

@@ -10,7 +10,7 @@ static enum odm_board_type_e boardType(u8 InterfaceSel)
 {
 	enum odm_board_type_e        board	= ODM_BOARD_DEFAULT;
 
-	INTERFACE_SELECT_USB    usb	= (INTERFACE_SELECT_USB)InterfaceSel;
+	enum INTERFACE_SELECT_USB    usb	= (enum INTERFACE_SELECT_USB)InterfaceSel;
 	switch (usb) {
 	case INTF_SEL1_USB_High_Power:
 		board |= ODM_BOARD_EXT_LNA;
@@ -34,9 +34,9 @@ static enum odm_board_type_e boardType(u8 InterfaceSel)
 	return board;
 }
 
-void rtw_hal_update_iqk_fw_offload_cap(_adapter *adapter)
+void rtw_hal_update_iqk_fw_offload_cap(struct adapter *adapter)
 {
-	PHAL_DATA_TYPE hal = GET_HAL_DATA(adapter);
+	struct hal_com_data * hal = GET_HAL_DATA(adapter);
 	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(adapter);
 
 	if (hal->RegIQKFWOffload) {
@@ -48,21 +48,21 @@ void rtw_hal_update_iqk_fw_offload_cap(_adapter *adapter)
 	RTW_INFO("IQK FW offload:%s\n", hal->RegIQKFWOffload ? "enable" : "disable");
 }
 
-static void rtw_phydm_iqk_trigger_dbg(_adapter *adapter, bool recovery, bool clear, bool segment)
+static void rtw_phydm_iqk_trigger_dbg(struct adapter *adapter, bool recovery, bool clear, bool segment)
 {
 	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(adapter);
 
 	halrf_iqk_trigger(p_dm_odm, recovery);
 }
 
-static void rtw_phydm_lck_trigger(_adapter *adapter)
+static void rtw_phydm_lck_trigger(struct adapter *adapter)
 {
 	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(adapter);
 
 	halrf_lck_trigger(p_dm_odm);
 }
 #ifdef CONFIG_DBG_RF_CAL
-void rtw_hal_iqk_test(_adapter *adapter, bool recovery, bool clear, bool segment)
+void rtw_hal_iqk_test(struct adapter *adapter, bool recovery, bool clear, bool segment)
 {
 	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(adapter);
 
@@ -80,7 +80,7 @@ void rtw_hal_iqk_test(_adapter *adapter, bool recovery, bool clear, bool segment
 	rtw_ps_deny_cancel(adapter, PS_DENY_IOCTL);
 }
 
-void rtw_hal_lck_test(_adapter *adapter)
+void rtw_hal_lck_test(struct adapter *adapter)
 {
 	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(adapter);
 
@@ -100,7 +100,7 @@ void rtw_hal_lck_test(_adapter *adapter)
 #endif
 
 #ifdef CONFIG_FW_OFFLOAD_PARAM_INIT
-void rtw_hal_update_param_init_fw_offload_cap(_adapter *adapter)
+void rtw_hal_update_param_init_fw_offload_cap(struct adapter *adapter)
 {
 	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(adapter);
 
@@ -116,7 +116,7 @@ void rtw_hal_update_param_init_fw_offload_cap(_adapter *adapter)
 static void record_ra_info(void *p_dm_void, u8 macid, struct cmn_sta_info *p_sta, u64 ra_mask)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	_adapter *adapter = p_dm->adapter;
+	struct adapter *adapter = p_dm->adapter;
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct macid_ctl_t *macid_ctl = dvobj_to_macidctl(dvobj);
 
@@ -135,10 +135,10 @@ static void rtw_phydm_ops_func_init(struct PHY_DM_STRUCT *p_phydm)
 	p_ra_t->record_ra_info = record_ra_info;
 }
 
-void Init_ODM_ComInfo(_adapter *adapter)
+void Init_ODM_ComInfo(struct adapter *adapter)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(adapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
 	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(adapter);
 	int i;
@@ -303,9 +303,9 @@ static u32 edca_setting_dl_g_mode[HT_IOT_PEER_MAX] =
 /*RALINK, ATHEROS, CISCO, MERU, MARVELL, 92U_AP, SELF_AP */
 { 0x4322, 0xa44f, 0x5e4322, 0xa42b, 0x5e4322, 0x4322,	 0xa42b, 0x5ea42b, 0xa44f, 0x5e4322, 0x5ea42b};
 
-void rtw_hal_turbo_edca(_adapter *adapter)
+void rtw_hal_turbo_edca(struct adapter *adapter)
 {
-	HAL_DATA_TYPE		*hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data		*hal_data = GET_HAL_DATA(adapter);
 	struct dvobj_priv		*dvobj = adapter_to_dvobj(adapter);
 	struct recv_priv		*precvpriv = &(adapter->recvpriv);
 	struct registry_priv		*pregpriv = &adapter->registrypriv;
@@ -448,7 +448,7 @@ void rtw_hal_turbo_edca(_adapter *adapter)
 
 }
 
-s8 rtw_phydm_get_min_rssi(_adapter *adapter)
+s8 rtw_phydm_get_min_rssi(struct adapter *adapter)
 {
 	struct PHY_DM_STRUCT *phydm = adapter_to_phydm(adapter);
 	s8 rssi_min = 0;
@@ -457,7 +457,7 @@ s8 rtw_phydm_get_min_rssi(_adapter *adapter)
 	return rssi_min;
 }
 
-u8 rtw_phydm_get_cur_igi(_adapter *adapter)
+u8 rtw_phydm_get_cur_igi(struct adapter *adapter)
 {
 	struct PHY_DM_STRUCT *phydm = adapter_to_phydm(adapter);
 	u8 cur_igi = 0;
@@ -466,7 +466,7 @@ u8 rtw_phydm_get_cur_igi(_adapter *adapter)
 	return cur_igi;
 }
 
-u32 rtw_phydm_get_phy_cnt(_adapter *adapter, enum phy_cnt cnt)
+u32 rtw_phydm_get_phy_cnt(struct adapter *adapter, enum phy_cnt cnt)
 {
 	struct PHY_DM_STRUCT *phydm = adapter_to_phydm(adapter);
 
@@ -502,7 +502,7 @@ u32 rtw_phydm_get_phy_cnt(_adapter *adapter, enum phy_cnt cnt)
 		return 0;
 }
 
-u8 rtw_phydm_is_iqk_in_progress(_adapter *adapter)
+u8 rtw_phydm_is_iqk_in_progress(struct adapter *adapter)
 {
 	u8 rts = false;
 	struct PHY_DM_STRUCT *podmpriv = adapter_to_phydm(adapter);
@@ -518,13 +518,13 @@ u8 rtw_phydm_is_iqk_in_progress(_adapter *adapter)
 }
 
 void SetHalODMVar(
-	PADAPTER				Adapter,
-	HAL_ODM_VARIABLE		eVariable,
+	struct adapter *				Adapter,
+	enum hal_odm_variable		eVariable,
 	void *					pValue1,
 	bool					bSet)
 {
 	struct PHY_DM_STRUCT *podmpriv = adapter_to_phydm(Adapter);
-	/* _irqL irqL; */
+	/* unsigned long irqL; */
 	switch (eVariable) {
 	case HAL_ODM_STA_INFO: {
 		struct sta_info *psta = (struct sta_info *)pValue1;
@@ -607,8 +607,8 @@ void SetHalODMVar(
 }
 
 void GetHalODMVar(
-	PADAPTER				Adapter,
-	HAL_ODM_VARIABLE		eVariable,
+	struct adapter *				Adapter,
+	enum hal_odm_variable		eVariable,
 	void *					pValue1,
 	void *					pValue2)
 {
@@ -646,7 +646,7 @@ rtw_phydm_cfg_phy_para(
 	return HAL_STATUS_SUCCESS;
 }
 
-void dump_sta_traffic(void *sel, _adapter *adapter, struct sta_info *psta)
+void dump_sta_traffic(void *sel, struct adapter *adapter, struct sta_info *psta)
 {
 	struct ra_sta_info *ra_info;
 	u8 curr_sgi = false;
@@ -706,9 +706,9 @@ void dump_sta_info(void *sel, struct sta_info *psta)
 	RTW_PRINT_SEL(sel, "ra_mask : 0x%016llx\n\n", ra_info->ramask);
 }
 
-void rtw_phydm_ra_registed(_adapter *adapter, struct sta_info *psta)
+void rtw_phydm_ra_registed(struct adapter *adapter, struct sta_info *psta)
 {
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 
 	if (!psta) {
 		RTW_ERR(FUNC_ADPT_FMT" sta is NULL\n", FUNC_ADPT_ARG(adapter));
@@ -724,7 +724,7 @@ void rtw_phydm_ra_registed(_adapter *adapter, struct sta_info *psta)
 /*#define DBG_PHYDM_STATE_CHK*/
 
 
-static u8 _rtw_phydm_rfk_condition_check(_adapter *adapter)
+static u8 _rtw_phydm_rfk_condition_check(struct adapter *adapter)
 {
 	u8 rst = false;
 
@@ -735,17 +735,17 @@ static u8 _rtw_phydm_rfk_condition_check(_adapter *adapter)
 }
 
 /*check the tx low rate while unlinked to any AP;for pwr tracking */
-static u8 _rtw_phydm_pwr_tracking_rate_check(_adapter *adapter)
+static u8 _rtw_phydm_pwr_tracking_rate_check(struct adapter *adapter)
 {
 	int i;
-	_adapter *iface;
+	struct adapter *iface;
 	u8		if_tx_rate = 0xFF;
 	u8		tx_rate = 0xFF;
 	struct mlme_ext_priv	*pmlmeext = NULL;
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 
 	for (i = 0; i < dvobj->iface_nums; i++) {
-		iface = dvobj->padapters[i];
+		iface = dvobj->adapters[i];
 		pmlmeext = &(iface->mlmeextpriv);
 		if ((iface) && rtw_is_adapter_up(iface)) {
 			if (!rtw_p2p_chk_role(&(iface)->wdinfo, P2P_ROLE_DISABLE))
@@ -762,7 +762,7 @@ static u8 _rtw_phydm_pwr_tracking_rate_check(_adapter *adapter)
 	return tx_rate;
 }
 
-void rtw_phydm_watchdog(_adapter *adapter)
+void rtw_phydm_watchdog(struct adapter *adapter)
 {
 	u8	bLinked = false;
 	u8	bsta_state = false;
@@ -770,7 +770,7 @@ void rtw_phydm_watchdog(_adapter *adapter)
 	u8	rfk_forbidden = true;
 	u8	segment_iqk = true;
 	u8	tx_unlinked_low_rate = 0xFF;
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(adapter);
 	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(adapter);
 
 	if (!rtw_is_hw_init_completed(adapter)) {

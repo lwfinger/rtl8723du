@@ -73,7 +73,7 @@ extern unsigned char P2P_OUI[];
 extern unsigned char WMM_INFO_OUI[];
 extern unsigned char WMM_PARA_OUI[];
 
-typedef enum _RT_CHANNEL_DOMAIN {
+enum rt_channel_domain {
 	/* ===== 0x00 ~ 0x1F, legacy channel plan ===== */
 	RTW_CHPLAN_FCC = 0x00,
 	RTW_CHPLAN_IC = 0x01,
@@ -172,16 +172,16 @@ typedef enum _RT_CHANNEL_DOMAIN {
 	RTW_CHPLAN_MAX,
 	RTW_CHPLAN_REALTEK_DEFINE = 0x7F,
 	RTW_CHPLAN_UNSPECIFIED = 0xFF,
-} RT_CHANNEL_DOMAIN, *PRT_CHANNEL_DOMAIN;
+};
 
 bool rtw_chplan_is_empty(u8 id);
 #define rtw_is_channel_plan_valid(chplan) (((chplan) < RTW_CHPLAN_MAX || (chplan) == RTW_CHPLAN_REALTEK_DEFINE) && !rtw_chplan_is_empty(chplan))
 #define rtw_is_legacy_channel_plan(chplan) ((chplan) < 0x20)
 
-typedef struct _RT_CHANNEL_PLAN {
+struct rt_channel_plan {
 	unsigned char	Channel[MAX_CHANNEL_NUM];
 	unsigned char	Len;
-} RT_CHANNEL_PLAN, *PRT_CHANNEL_PLAN;
+};
 
 struct ch_list_t {
 	u8 *len_ch;
@@ -193,10 +193,10 @@ struct ch_list_t {
 #define CH_LIST_LEN(_ch_list) (_ch_list.len_ch[0])
 #define CH_LIST_CH(_ch_list, _i) (_ch_list.len_ch[_i + 1])
 
-typedef struct _RT_CHANNEL_PLAN_MAP {
+struct rt_channel_plan_map {
 	u8 Index2G;
 	u8 regd; /* value of REGULATION_TXPWR_LMT */
-} RT_CHANNEL_PLAN_MAP, *PRT_CHANNEL_PLAN_MAP;
+};
 
 #define CHPLAN_ENT(i2g, i5g, regd) {i2g, regd}
 
@@ -212,7 +212,7 @@ enum Associated_AP {
 	maxAP,
 };
 
-typedef enum _HT_IOT_PEER {
+enum ht_iot_peer {
 	HT_IOT_PEER_UNKNOWN			= 0,
 	HT_IOT_PEER_REALTEK			= 1,
 	HT_IOT_PEER_REALTEK_92SE		= 2,
@@ -232,18 +232,18 @@ typedef enum _HT_IOT_PEER {
 	HT_IOT_PEER_REALTEK_JAGUAR_BCUTAP = 16,
 	HT_IOT_PEER_REALTEK_JAGUAR_CCUTAP = 17,
 	HT_IOT_PEER_MAX				= 18
-} HT_IOT_PEER_E, *PHTIOT_PEER_E;
+};
 
 struct mlme_handler {
 	unsigned int   num;
 	char *str;
-	unsigned int (*func)(_adapter *padapter, union recv_frame *precv_frame);
+	unsigned int (*func)(struct adapter *adapt, union recv_frame *precv_frame);
 };
 
 struct action_handler {
 	unsigned int   num;
 	char *str;
-	unsigned int (*func)(_adapter *padapter, union recv_frame *precv_frame);
+	unsigned int (*func)(struct adapter *adapt, union recv_frame *precv_frame);
 };
 
 enum SCAN_STATE {
@@ -301,12 +301,12 @@ struct ss_res {
 	u8 backop_flags; /* per backop runtime decision */
 	u8 scan_cnt;
 	u8 scan_cnt_max;
-	systime backop_time; /* the start time of backop */
+	unsigned long backop_time; /* the start time of backop */
 	u16 backop_ms;
 #endif
 	u8 ssid_num;
 	u8 ch_num;
-	NDIS_802_11_SSID ssid[RTW_SSID_SCAN_AMOUNT];
+	struct ndis_802_11_ssid ssid[RTW_SSID_SCAN_AMOUNT];
 	struct rtw_ieee80211_channel ch[RTW_CHANNEL_SCAN_AMOUNT];
 
 	u32 token; 	/* 0: use to identify caller */
@@ -412,20 +412,20 @@ struct mlme_ext_info {
 	struct WMM_para_element	WMM_param;
 	struct HT_caps_element	HT_caps;
 	struct HT_info_element		HT_info;
-	WLAN_BSSID_EX			network;/* join network or bss_network, if in ap mode, it is the same to cur_network.network */
+	struct wlan_bssid_ex			network;/* join network or bss_network, if in ap mode, it is the same to cur_network.network */
 };
 
 /* The channel information about this channel including joining, scanning, and power constraints. */
-typedef struct _RT_CHANNEL_INFO {
+struct rt_channel_info {
 	u8				ChannelNum;		/* The channel number. */
-	RT_SCAN_TYPE	ScanType;		/* Scan type such as passive or active scan. */
+	enum rt_scan_type	ScanType;		/* Scan type such as passive or active scan. */
 	/* u16				ScanPeriod;		 */ /* Listen time in millisecond in this channel. */
 	/* int				MaxTxPwrDbm;	 */ /* Max allowed tx power. */
 	/* u32				ExInfo;			 */ /* Extended Information for this channel. */
 #ifdef CONFIG_DFS
 	u8 hidden_bss_cnt; /* per scan count */
 #endif
-} RT_CHANNEL_INFO, *PRT_CHANNEL_INFO;
+};
 
 #define DFS_MASTER_TIMER_MS 100
 #define CAC_TIME_MS (60*1000)
@@ -435,8 +435,8 @@ typedef struct _RT_CHANNEL_INFO {
 #ifdef CONFIG_TXPWR_LIMIT
 void rtw_txpwr_init_regd(struct rf_ctl_t *rfctl);
 #endif
-void rtw_rfctl_init(_adapter *adapter);
-void rtw_rfctl_deinit(_adapter *adapter);
+void rtw_rfctl_init(struct adapter *adapter);
+void rtw_rfctl_deinit(struct adapter *adapter);
 
 #define CH_IS_NON_OCP(rt_ch_info) 0
 #define rtw_chset_is_ch_non_ocp(ch_set, ch, bw, offset) false
@@ -452,30 +452,30 @@ enum {
 	RTW_CHF_NON_OCP = BIT6,
 };
 
-bool rtw_choose_shortest_waiting_ch(_adapter *adapter, u8 req_bw, u8 *dec_ch, u8 *dec_bw, u8 *dec_offset, u8 d_flags);
+bool rtw_choose_shortest_waiting_ch(struct adapter *adapter, u8 req_bw, u8 *dec_ch, u8 *dec_bw, u8 *dec_offset, u8 d_flags);
 
 void dump_country_chplan(void *sel, const struct country_chplan *ent);
 void dump_country_chplan_map(void *sel);
 void dump_chplan_id_list(void *sel);
 void dump_chplan_test(void *sel);
-void dump_chset(void *sel, RT_CHANNEL_INFO *ch_set);
-void dump_cur_chset(void *sel, _adapter *adapter);
+void dump_chset(void *sel, struct rt_channel_info *ch_set);
+void dump_cur_chset(void *sel, struct adapter *adapter);
 
-int rtw_chset_search_ch(RT_CHANNEL_INFO *ch_set, const u32 ch);
-u8 rtw_chset_is_chbw_valid(RT_CHANNEL_INFO *ch_set, u8 ch, u8 bw, u8 offset);
+int rtw_chset_search_ch(struct rt_channel_info *ch_set, const u32 ch);
+u8 rtw_chset_is_chbw_valid(struct rt_channel_info *ch_set, u8 ch, u8 bw, u8 offset);
 
-bool rtw_mlme_band_check(_adapter *adapter, const u32 ch);
+bool rtw_mlme_band_check(struct adapter *adapter, const u32 ch);
 
 
 enum {
 	BAND_24G = BIT0,
 	BAND_5G = BIT1,
 };
-void RTW_SET_SCAN_BAND_SKIP(_adapter *padapter, int skip_band);
-void RTW_CLR_SCAN_BAND_SKIP(_adapter *padapter, int skip_band);
-int RTW_GET_SCAN_BAND_SKIP(_adapter *padapter);
+void RTW_SET_SCAN_BAND_SKIP(struct adapter *adapt, int skip_band);
+void RTW_CLR_SCAN_BAND_SKIP(struct adapter *adapt, int skip_band);
+int RTW_GET_SCAN_BAND_SKIP(struct adapter *adapt);
 
-bool rtw_mlme_ignore_chan(_adapter *adapter, const u32 ch);
+bool rtw_mlme_ignore_chan(struct adapter *adapter, const u32 ch);
 
 /* P2P_MAX_REG_CLASSES - Maximum number of regulatory classes */
 #define P2P_MAX_REG_CLASSES 10
@@ -511,7 +511,7 @@ struct p2p_oper_class_map {
 };
 
 struct mlme_ext_priv {
-	_adapter	*padapter;
+	struct adapter	*adapt;
 	u8	mlmeext_init;
 	ATOMIC_T		event_seq;
 	u16	mgnt_seq;
@@ -540,7 +540,7 @@ struct mlme_ext_priv {
 	struct timer_list		ft_roam_timer;
 #endif
 
-	systime last_scan_time;
+	unsigned long last_scan_time;
 	u8	scan_abort;
 	u8 join_abort;
 	u8	tx_rate; /* TXRATE when USERATE is set. */
@@ -572,7 +572,7 @@ struct mlme_ext_priv {
 	u8 en_hw_update_tsf;
 };
 
-static inline u8 check_mlmeinfo_state(struct mlme_ext_priv *plmeext, sint state)
+static inline u8 check_mlmeinfo_state(struct mlme_ext_priv *plmeext, int state)
 {
 	if ((plmeext->mlmext_info.state & 0x03) == state)
 		return true;
@@ -580,7 +580,7 @@ static inline u8 check_mlmeinfo_state(struct mlme_ext_priv *plmeext, sint state)
 	return false;
 }
 
-void sitesurvey_set_offch_state(_adapter *adapter, u8 scan_state);
+void sitesurvey_set_offch_state(struct adapter *adapter, u8 scan_state);
 
 #define mlmeext_msr(mlmeext) ((mlmeext)->mlmext_info.state & 0x03)
 #define mlmeext_scan_state(mlmeext) ((mlmeext)->sitesurvey_res.state)
@@ -590,9 +590,9 @@ void sitesurvey_set_offch_state(_adapter *adapter, u8 scan_state);
 	do { \
 		((mlmeext)->sitesurvey_res.state = (_state)); \
 		((mlmeext)->sitesurvey_res.next_state = (_state)); \
-		rtw_mi_update_iface_status(&((container_of(mlmeext, _adapter, mlmeextpriv)->mlmepriv)), 0); \
+		rtw_mi_update_iface_status(&((container_of(mlmeext, struct adapter, mlmeextpriv)->mlmepriv)), 0); \
 		/* RTW_INFO("set_scan_state:%s\n", scan_state_str(_state)); */ \
-		sitesurvey_set_offch_state(container_of(mlmeext, _adapter, mlmeextpriv), _state); \
+		sitesurvey_set_offch_state(container_of(mlmeext, struct adapter, mlmeextpriv), _state); \
 	} while (0)
 
 #define mlmeext_scan_next_state(mlmeext) ((mlmeext)->sitesurvey_res.next_state)
@@ -637,139 +637,139 @@ void sitesurvey_set_offch_state(_adapter *adapter, u8 scan_state);
 #define mlmeext_chk_scan_backop_flags_ap(mlmeext, flags) (0)
 #define mlmeext_assign_scan_backop_flags_ap(mlmeext, flags) do {} while (0)
 #endif
-u32 rtw_scan_timeout_decision(_adapter *padapter);
+u32 rtw_scan_timeout_decision(struct adapter *adapt);
 
-void init_mlme_default_rate_set(_adapter *padapter);
-int init_mlme_ext_priv(_adapter *padapter);
-int init_hw_mlme_ext(_adapter *padapter);
+void init_mlme_default_rate_set(struct adapter *adapt);
+int init_mlme_ext_priv(struct adapter *adapt);
+int init_hw_mlme_ext(struct adapter *adapt);
 void free_mlme_ext_priv(struct mlme_ext_priv *pmlmeext);
 extern struct xmit_frame *alloc_mgtxmitframe(struct xmit_priv *pxmitpriv);
 struct xmit_frame *alloc_mgtxmitframe_once(struct xmit_priv *pxmitpriv);
 
-/* void fill_fwpriv(_adapter * padapter, struct fw_priv *pfwpriv); */
-u8 judge_network_type(_adapter *padapter, unsigned char *rate, int ratelen);
-void get_rate_set(_adapter *padapter, unsigned char *pbssrate, int *bssrate_len);
+/* void fill_fwpriv(struct adapter * adapt, struct fw_priv *pfwpriv); */
+u8 judge_network_type(struct adapter *adapt, unsigned char *rate, int ratelen);
+void get_rate_set(struct adapter *adapt, unsigned char *pbssrate, int *bssrate_len);
 void set_mcs_rate_by_mask(u8 *mcs_set, u32 mask);
-void UpdateBrateTbl(_adapter *padapter, u8 *mBratesOS);
+void UpdateBrateTbl(struct adapter *adapt, u8 *mBratesOS);
 void UpdateBrateTblForSoftAP(u8 *bssrateset, u32 bssratelen);
-void change_band_update_ie(_adapter *padapter, WLAN_BSSID_EX *pnetwork, u8 ch);
+void change_band_update_ie(struct adapter *adapt, struct wlan_bssid_ex *pnetwork, u8 ch);
 
-void Set_MSR(_adapter *padapter, u8 type);
+void Set_MSR(struct adapter *adapt, u8 type);
 
-u8 rtw_get_oper_ch(_adapter *adapter);
-void rtw_set_oper_ch(_adapter *adapter, u8 ch);
-u8 rtw_get_oper_bw(_adapter *adapter);
-void rtw_set_oper_bw(_adapter *adapter, u8 bw);
-u8 rtw_get_oper_choffset(_adapter *adapter);
-void rtw_set_oper_choffset(_adapter *adapter, u8 offset);
+u8 rtw_get_oper_ch(struct adapter *adapter);
+void rtw_set_oper_ch(struct adapter *adapter, u8 ch);
+u8 rtw_get_oper_bw(struct adapter *adapter);
+void rtw_set_oper_bw(struct adapter *adapter, u8 bw);
+u8 rtw_get_oper_choffset(struct adapter *adapter);
+void rtw_set_oper_choffset(struct adapter *adapter, u8 offset);
 u8	rtw_get_center_ch(u8 channel, u8 chnl_bw, u8 chnl_offset);
-systime rtw_get_on_oper_ch_time(_adapter *adapter);
-systime rtw_get_on_cur_ch_time(_adapter *adapter);
+unsigned long rtw_get_on_oper_ch_time(struct adapter *adapter);
+unsigned long rtw_get_on_cur_ch_time(struct adapter *adapter);
 
 u8 rtw_get_offset_by_chbw(u8 ch, u8 bw, u8 *r_offset);
 u8 rtw_get_offset_by_ch(u8 channel);
 
-void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char channel_offset, unsigned short bwmode);
+void set_channel_bwmode(struct adapter *adapt, unsigned char channel, unsigned char channel_offset, unsigned short bwmode);
 
 unsigned int decide_wait_for_beacon_timeout(unsigned int bcn_interval);
 
-void _clear_cam_entry(_adapter *padapter, u8 entry);
-void write_cam_from_cache(_adapter *adapter, u8 id);
-void rtw_sec_cam_swap(_adapter *adapter, u8 cam_id_a, u8 cam_id_b);
-void rtw_clean_dk_section(_adapter *adapter);
-void rtw_clean_hw_dk_cam(_adapter *adapter);
+void _clear_cam_entry(struct adapter *adapt, u8 entry);
+void write_cam_from_cache(struct adapter *adapter, u8 id);
+void rtw_sec_cam_swap(struct adapter *adapter, u8 cam_id_a, u8 cam_id_b);
+void rtw_clean_dk_section(struct adapter *adapter);
+void rtw_clean_hw_dk_cam(struct adapter *adapter);
 
 /* modify both HW and cache */
-void write_cam(_adapter *padapter, u8 id, u16 ctrl, u8 *mac, u8 *key);
-void clear_cam_entry(_adapter *padapter, u8 id);
+void write_cam(struct adapter *adapt, u8 id, u16 ctrl, u8 *mac, u8 *key);
+void clear_cam_entry(struct adapter *adapt, u8 id);
 
 /* modify cache only */
-void write_cam_cache(_adapter *adapter, u8 id, u16 ctrl, u8 *mac, u8 *key);
-void clear_cam_cache(_adapter *adapter, u8 id);
+void write_cam_cache(struct adapter *adapter, u8 id, u16 ctrl, u8 *mac, u8 *key);
+void clear_cam_cache(struct adapter *adapter, u8 id);
 
-void invalidate_cam_all(_adapter *padapter);
-void CAM_empty_entry(PADAPTER Adapter, u8 ucIndex);
+void invalidate_cam_all(struct adapter *adapt);
+void CAM_empty_entry(struct adapter * Adapter, u8 ucIndex);
 
-void flush_all_cam_entry(_adapter *padapter);
+void flush_all_cam_entry(struct adapter *adapt);
 
-bool IsLegal5GChannel(PADAPTER Adapter, u8 channel);
+bool IsLegal5GChannel(struct adapter * Adapter, u8 channel);
 
-void site_survey(_adapter *padapter, u8 survey_channel, RT_SCAN_TYPE ScanType);
-u8 collect_bss_info(_adapter *padapter, union recv_frame *precv_frame, WLAN_BSSID_EX *bssid);
-void update_network(WLAN_BSSID_EX *dst, WLAN_BSSID_EX *src, _adapter *padapter, bool update_ie);
+void site_survey(struct adapter *adapt, u8 survey_channel, enum rt_scan_type ScanType);
+u8 collect_bss_info(struct adapter *adapt, union recv_frame *precv_frame, struct wlan_bssid_ex *bssid);
+void update_network(struct wlan_bssid_ex *dst, struct wlan_bssid_ex *src, struct adapter *adapt, bool update_ie);
 
-u8 *get_my_bssid(WLAN_BSSID_EX *pnetwork);
-u16 get_beacon_interval(WLAN_BSSID_EX *bss);
+u8 *get_my_bssid(struct wlan_bssid_ex *pnetwork);
+u16 get_beacon_interval(struct wlan_bssid_ex *bss);
 
-int is_client_associated_to_ap(_adapter *padapter);
-int is_client_associated_to_ibss(_adapter *padapter);
-int is_IBSS_empty(_adapter *padapter);
+int is_client_associated_to_ap(struct adapter *adapt);
+int is_client_associated_to_ibss(struct adapter *adapt);
+int is_IBSS_empty(struct adapter *adapt);
 
 unsigned char check_assoc_AP(u8 *pframe, uint len);
 
-int WMM_param_handler(_adapter *padapter, PNDIS_802_11_VARIABLE_IEs	pIE);
-void rtw_process_wfd_ie(_adapter *adapter, u8 *ie, u8 ie_len, const char *tag);
-void rtw_process_wfd_ies(_adapter *adapter, u8 *ies, u8 ies_len, const char *tag);
-void WMMOnAssocRsp(_adapter *padapter);
+int WMM_param_handler(struct adapter *adapt, struct ndis_802_11_variable_ies *	pIE);
+void rtw_process_wfd_ie(struct adapter *adapter, u8 *ie, u8 ie_len, const char *tag);
+void rtw_process_wfd_ies(struct adapter *adapter, u8 *ies, u8 ies_len, const char *tag);
+void WMMOnAssocRsp(struct adapter *adapt);
 
-void HT_caps_handler(_adapter *padapter, PNDIS_802_11_VARIABLE_IEs pIE);
-void HT_info_handler(_adapter *padapter, PNDIS_802_11_VARIABLE_IEs pIE);
-void HTOnAssocRsp(_adapter *padapter);
+void HT_caps_handler(struct adapter *adapt, struct ndis_802_11_variable_ies * pIE);
+void HT_info_handler(struct adapter *adapt, struct ndis_802_11_variable_ies * pIE);
+void HTOnAssocRsp(struct adapter *adapt);
 
-void ERP_IE_handler(_adapter *padapter, PNDIS_802_11_VARIABLE_IEs pIE);
-void VCS_update(_adapter *padapter, struct sta_info *psta);
+void ERP_IE_handler(struct adapter *adapt, struct ndis_802_11_variable_ies * pIE);
+void VCS_update(struct adapter *adapt, struct sta_info *psta);
 void	update_ldpc_stbc_cap(struct sta_info *psta);
 
-int rtw_get_bcn_keys(ADAPTER *Adapter, u8 *pframe, u32 packet_len,
+int rtw_get_bcn_keys(struct adapter *Adapter, u8 *pframe, u32 packet_len,
 		struct beacon_keys *recv_beacon);
 int validate_beacon_len(u8 *pframe, uint len);
 void rtw_dump_bcn_keys(struct beacon_keys *recv_beacon);
-int rtw_check_bcn_info(ADAPTER *Adapter, u8 *pframe, u32 packet_len);
-void update_beacon_info(_adapter *padapter, u8 *pframe, uint len, struct sta_info *psta);
+int rtw_check_bcn_info(struct adapter *adapt, u8 *pframe, u32 packet_len);
+void update_beacon_info(struct adapter *adapt, u8 *pframe, uint len, struct sta_info *psta);
 #ifdef CONFIG_DFS
-void process_csa_ie(_adapter *padapter, u8 *pframe, uint len);
+void process_csa_ie(struct adapter *adapt, u8 *pframe, uint len);
 #endif /* CONFIG_DFS */
-void update_capinfo(PADAPTER Adapter, u16 updateCap);
-void update_wireless_mode(_adapter *padapter);
-void update_tx_basic_rate(_adapter *padapter, u8 modulation);
+void update_capinfo(struct adapter * Adapter, u16 updateCap);
+void update_wireless_mode(struct adapter *adapt);
+void update_tx_basic_rate(struct adapter *adapt, u8 modulation);
 void update_sta_basic_rate(struct sta_info *psta, u8 wireless_mode);
 int rtw_ies_get_supported_rate(u8 *ies, uint ies_len, u8 *rate_set, u8 *rate_num);
 
 /* for sta/adhoc mode */
-void update_sta_info(_adapter *padapter, struct sta_info *psta);
+void update_sta_info(struct adapter *adapt, struct sta_info *psta);
 unsigned int update_basic_rate(unsigned char *ptn, unsigned int ptn_sz);
 unsigned int update_supported_rate(unsigned char *ptn, unsigned int ptn_sz);
-void Update_RA_Entry(_adapter *padapter, struct sta_info *psta);
-void set_sta_rate(_adapter *padapter, struct sta_info *psta);
+void Update_RA_Entry(struct adapter *adapt, struct sta_info *psta);
+void set_sta_rate(struct adapter *adapt, struct sta_info *psta);
 
-unsigned int receive_disconnect(_adapter *padapter, unsigned char *MacAddr, unsigned short reason, u8 locally_generated);
+unsigned int receive_disconnect(struct adapter *adapt, unsigned char *MacAddr, unsigned short reason, u8 locally_generated);
 
 unsigned char get_highest_rate_idx(u64 mask);
 unsigned char get_lowest_rate_idx_ex(u64 mask, int start_bit);
 #define get_lowest_rate_idx(mask) get_lowest_rate_idx_ex(mask, 0)
 
-int support_short_GI(_adapter *padapter, struct HT_caps_element *pHT_caps, u8 bwmode);
-unsigned int is_ap_in_tkip(_adapter *padapter);
-unsigned int is_ap_in_wep(_adapter *padapter);
-unsigned int should_forbid_n_rate(_adapter *padapter);
+int support_short_GI(struct adapter *adapt, struct HT_caps_element *pHT_caps, u8 bwmode);
+unsigned int is_ap_in_tkip(struct adapter *adapt);
+unsigned int is_ap_in_wep(struct adapter *adapt);
+unsigned int should_forbid_n_rate(struct adapter *adapt);
 
-bool _rtw_camctl_chk_cap(_adapter *adapter, u8 cap);
-void _rtw_camctl_set_flags(_adapter *adapter, u32 flags);
-void rtw_camctl_set_flags(_adapter *adapter, u32 flags);
-void _rtw_camctl_clr_flags(_adapter *adapter, u32 flags);
-void rtw_camctl_clr_flags(_adapter *adapter, u32 flags);
-bool _rtw_camctl_chk_flags(_adapter *adapter, u32 flags);
+bool _rtw_camctl_chk_cap(struct adapter *adapter, u8 cap);
+void _rtw_camctl_set_flags(struct adapter *adapter, u32 flags);
+void rtw_camctl_set_flags(struct adapter *adapter, u32 flags);
+void _rtw_camctl_clr_flags(struct adapter *adapter, u32 flags);
+void rtw_camctl_clr_flags(struct adapter *adapter, u32 flags);
+bool _rtw_camctl_chk_flags(struct adapter *adapter, u32 flags);
 
 struct sec_cam_bmp;
 void dump_sec_cam_map(void *sel, struct sec_cam_bmp *map, u8 max_num);
 void rtw_sec_cam_map_clr_all(struct sec_cam_bmp *map);
 
-bool _rtw_camid_is_gk(_adapter *adapter, u8 cam_id);
-bool rtw_camid_is_gk(_adapter *adapter, u8 cam_id);
-s16 rtw_camid_search(_adapter *adapter, u8 *addr, s16 kid, s8 gk);
-s16 rtw_camid_alloc(_adapter *adapter, struct sta_info *sta, u8 kid, bool *used);
-void rtw_camid_free(_adapter *adapter, u8 cam_id);
-u8 rtw_get_sec_camid(_adapter *adapter, u8 max_bk_key_num, u8 *sec_key_id);
+bool _rtw_camid_is_gk(struct adapter *adapter, u8 cam_id);
+bool rtw_camid_is_gk(struct adapter *adapter, u8 cam_id);
+s16 rtw_camid_search(struct adapter *adapter, u8 *addr, s16 kid, s8 gk);
+s16 rtw_camid_alloc(struct adapter *adapter, struct sta_info *sta, u8 kid, bool *used);
+void rtw_camid_free(struct adapter *adapter, u8 cam_id);
+u8 rtw_get_sec_camid(struct adapter *adapter, u8 max_bk_key_num, u8 *sec_key_id);
 
 struct macid_bmp;
 struct macid_ctl_t;
@@ -779,11 +779,11 @@ bool rtw_macid_is_used(struct macid_ctl_t *macid_ctl, u8 id);
 bool rtw_macid_is_bmc(struct macid_ctl_t *macid_ctl, u8 id);
 u8 rtw_macid_get_iface_bmp(struct macid_ctl_t *macid_ctl, u8 id);
 bool rtw_macid_is_iface_shared(struct macid_ctl_t *macid_ctl, u8 id);
-bool rtw_macid_is_iface_specific(struct macid_ctl_t *macid_ctl, u8 id, _adapter *adapter);
+bool rtw_macid_is_iface_specific(struct macid_ctl_t *macid_ctl, u8 id, struct adapter *adapter);
 s8 rtw_macid_get_ch_g(struct macid_ctl_t *macid_ctl, u8 id);
-void rtw_alloc_macid(_adapter *padapter, struct sta_info *psta);
-void rtw_release_macid(_adapter *padapter, struct sta_info *psta);
-u8 rtw_search_max_mac_id(_adapter *padapter);
+void rtw_alloc_macid(struct adapter *adapt, struct sta_info *psta);
+void rtw_release_macid(struct adapter *adapt, struct sta_info *psta);
+u8 rtw_search_max_mac_id(struct adapter *adapt);
 void rtw_macid_ctl_set_h2c_msr(struct macid_ctl_t *macid_ctl, u8 id, u8 h2c_msr);
 void rtw_macid_ctl_set_bw(struct macid_ctl_t *macid_ctl, u8 id, u8 bw);
 void rtw_macid_ctl_set_vht_en(struct macid_ctl_t *macid_ctl, u8 id, u8 en);
@@ -792,8 +792,8 @@ void rtw_macid_ctl_set_rate_bmp1(struct macid_ctl_t *macid_ctl, u8 id, u32 bmp);
 void rtw_macid_ctl_init_sleep_reg(struct macid_ctl_t *macid_ctl, u16 m0, u16 m1, u16 m2, u16 m3);
 void rtw_macid_ctl_init(struct macid_ctl_t *macid_ctl);
 void rtw_macid_ctl_deinit(struct macid_ctl_t *macid_ctl);
-u8 rtw_iface_bcmc_id_get(_adapter *padapter);
-void rtw_iface_bcmc_id_set(_adapter *padapter, u8 mac_id);
+u8 rtw_iface_bcmc_id_get(struct adapter *adapt);
+void rtw_iface_bcmc_id_set(struct adapter *adapt, u8 mac_id);
 
 bool rtw_bmp_is_set(const u8 *bmp, u8 bmp_len, u8 id);
 void rtw_bmp_set(u8 *bmp, u8 bmp_len, u8 id);
@@ -801,98 +801,98 @@ void rtw_bmp_clear(u8 *bmp, u8 bmp_len, u8 id);
 bool rtw_bmp_not_empty(const u8 *bmp, u8 bmp_len);
 bool rtw_bmp_not_empty_exclude_bit0(const u8 *bmp, u8 bmp_len);
 
-bool rtw_tim_map_is_set(_adapter *padapter, const u8 *map, u8 id);
-void rtw_tim_map_set(_adapter *padapter, u8 *map, u8 id);
-void rtw_tim_map_clear(_adapter *padapter, u8 *map, u8 id);
-bool rtw_tim_map_anyone_be_set(_adapter *padapter, const u8 *map);
-bool rtw_tim_map_anyone_be_set_exclude_aid0(_adapter *padapter, const u8 *map);
+bool rtw_tim_map_is_set(struct adapter *adapt, const u8 *map, u8 id);
+void rtw_tim_map_set(struct adapter *adapt, u8 *map, u8 id);
+void rtw_tim_map_clear(struct adapter *adapt, u8 *map, u8 id);
+bool rtw_tim_map_anyone_be_set(struct adapter *adapt, const u8 *map);
+bool rtw_tim_map_anyone_be_set_exclude_aid0(struct adapter *adapt, const u8 *map);
 
-u32 report_join_res(_adapter *padapter, int res);
-void report_survey_event(_adapter *padapter, union recv_frame *precv_frame);
-void report_surveydone_event(_adapter *padapter);
-u32 report_del_sta_event(_adapter *padapter, unsigned char *MacAddr, unsigned short reason, bool enqueue, u8 locally_generated);
-void report_add_sta_event(_adapter *padapter, unsigned char *MacAddr);
-bool rtw_port_switch_chk(_adapter *adapter);
-void report_wmm_edca_update(_adapter *padapter);
+u32 report_join_res(struct adapter *adapt, int res);
+void report_survey_event(struct adapter *adapt, union recv_frame *precv_frame);
+void report_surveydone_event(struct adapter *adapt);
+u32 report_del_sta_event(struct adapter *adapt, unsigned char *MacAddr, unsigned short reason, bool enqueue, u8 locally_generated);
+void report_add_sta_event(struct adapter *adapt, unsigned char *MacAddr);
+bool rtw_port_switch_chk(struct adapter *adapter);
+void report_wmm_edca_update(struct adapter *adapt);
 
-void beacon_timing_control(_adapter *padapter);
-u8 chk_bmc_sleepq_cmd(_adapter *padapter);
-extern u8 set_tx_beacon_cmd(_adapter *padapter);
-unsigned int setup_beacon_frame(_adapter *padapter, unsigned char *beacon_frame);
-void update_mgnt_tx_rate(_adapter *padapter, u8 rate);
-void update_monitor_frame_attrib(_adapter *padapter, struct pkt_attrib *pattrib);
-void update_mgntframe_attrib(_adapter *padapter, struct pkt_attrib *pattrib);
-void update_mgntframe_attrib_addr(_adapter *padapter, struct xmit_frame *pmgntframe);
-void dump_mgntframe(_adapter *padapter, struct xmit_frame *pmgntframe);
-int dump_mgntframe_and_wait(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms);
-int dump_mgntframe_and_wait_ack(_adapter *padapter, struct xmit_frame *pmgntframe);
-int dump_mgntframe_and_wait_ack_timeout(_adapter *padapter, struct xmit_frame *pmgntframe, int timeout_ms);
+void beacon_timing_control(struct adapter *adapt);
+u8 chk_bmc_sleepq_cmd(struct adapter *adapt);
+extern u8 set_tx_beacon_cmd(struct adapter *adapt);
+unsigned int setup_beacon_frame(struct adapter *adapt, unsigned char *beacon_frame);
+void update_mgnt_tx_rate(struct adapter *adapt, u8 rate);
+void update_monitor_frame_attrib(struct adapter *adapt, struct pkt_attrib *pattrib);
+void update_mgntframe_attrib(struct adapter *adapt, struct pkt_attrib *pattrib);
+void update_mgntframe_attrib_addr(struct adapter *adapt, struct xmit_frame *pmgntframe);
+void dump_mgntframe(struct adapter *adapt, struct xmit_frame *pmgntframe);
+int dump_mgntframe_and_wait(struct adapter *adapt, struct xmit_frame *pmgntframe, int timeout_ms);
+int dump_mgntframe_and_wait_ack(struct adapter *adapt, struct xmit_frame *pmgntframe);
+int dump_mgntframe_and_wait_ack_timeout(struct adapter *adapt, struct xmit_frame *pmgntframe, int timeout_ms);
 
 int get_reg_classes_full_count(struct p2p_channels *channel_list);
-void issue_probersp_p2p(_adapter *padapter, unsigned char *da);
-void issue_p2p_provision_request(_adapter *padapter, u8 *pssid, u8 ussidlen, u8 *pdev_raddr);
-void issue_p2p_GO_request(_adapter *padapter, u8 *raddr);
-void issue_probereq_p2p(_adapter *padapter, u8 *da);
-int issue_probereq_p2p_ex(_adapter *adapter, u8 *da, int try_cnt, int wait_ms);
-void issue_p2p_invitation_response(_adapter *padapter, u8 *raddr, u8 dialogToken, u8 success);
-void issue_p2p_invitation_request(_adapter *padapter, u8 *raddr);
-void issue_beacon(_adapter *padapter, int timeout_ms);
-void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probereq);
-void _issue_assocreq(_adapter *padapter, u8 is_assoc);
-void issue_assocreq(_adapter *padapter);
-void issue_reassocreq(_adapter *padapter);
-void issue_asocrsp(_adapter *padapter, unsigned short status, struct sta_info *pstat, int pkt_type);
-void issue_auth(_adapter *padapter, struct sta_info *psta, unsigned short status);
-void issue_probereq(_adapter *padapter, NDIS_802_11_SSID *pssid, u8 *da);
-int issue_probereq_ex(_adapter *padapter, NDIS_802_11_SSID *pssid, u8 *da, u8 ch, bool append_wps, int try_cnt, int wait_ms);
-int issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int power_mode, int try_cnt, int wait_ms);
-int issue_qos_nulldata(_adapter *padapter, unsigned char *da, u16 tid, int try_cnt, int wait_ms);
-int issue_deauth(_adapter *padapter, unsigned char *da, unsigned short reason);
-int issue_deauth_ex(_adapter *padapter, u8 *da, unsigned short reason, int try_cnt, int wait_ms);
-void issue_action_spct_ch_switch(_adapter *padapter, u8 *ra, u8 new_ch, u8 ch_offset);
-void issue_addba_req(_adapter *adapter, unsigned char *ra, u8 tid);
-void issue_addba_rsp(_adapter *adapter, unsigned char *ra, u8 tid, u16 status, u8 size);
-u8 issue_addba_rsp_wait_ack(_adapter *adapter, unsigned char *ra, u8 tid, u16 status, u8 size, int try_cnt, int wait_ms);
-void issue_del_ba(_adapter *adapter, unsigned char *ra, u8 tid, u16 reason, u8 initiator);
-int issue_del_ba_ex(_adapter *adapter, unsigned char *ra, u8 tid, u16 reason, u8 initiator, int try_cnt, int wait_ms);
-void issue_action_BSSCoexistPacket(_adapter *padapter);
+void issue_probersp_p2p(struct adapter *adapt, unsigned char *da);
+void issue_p2p_provision_request(struct adapter *adapt, u8 *pssid, u8 ussidlen, u8 *pdev_raddr);
+void issue_p2p_GO_request(struct adapter *adapt, u8 *raddr);
+void issue_probereq_p2p(struct adapter *adapt, u8 *da);
+int issue_probereq_p2p_ex(struct adapter *adapter, u8 *da, int try_cnt, int wait_ms);
+void issue_p2p_invitation_response(struct adapter *adapt, u8 *raddr, u8 dialogToken, u8 success);
+void issue_p2p_invitation_request(struct adapter *adapt, u8 *raddr);
+void issue_beacon(struct adapter *adapt, int timeout_ms);
+void issue_probersp(struct adapter *adapt, unsigned char *da, u8 is_valid_p2p_probereq);
+void _issue_assocreq(struct adapter *adapt, u8 is_assoc);
+void issue_assocreq(struct adapter *adapt);
+void issue_reassocreq(struct adapter *adapt);
+void issue_asocrsp(struct adapter *adapt, unsigned short status, struct sta_info *pstat, int pkt_type);
+void issue_auth(struct adapter *adapt, struct sta_info *psta, unsigned short status);
+void issue_probereq(struct adapter *adapt, struct ndis_802_11_ssid *pssid, u8 *da);
+int issue_probereq_ex(struct adapter *adapt, struct ndis_802_11_ssid *pssid, u8 *da, u8 ch, bool append_wps, int try_cnt, int wait_ms);
+int issue_nulldata(struct adapter *adapt, unsigned char *da, unsigned int power_mode, int try_cnt, int wait_ms);
+int issue_qos_nulldata(struct adapter *adapt, unsigned char *da, u16 tid, int try_cnt, int wait_ms);
+int issue_deauth(struct adapter *adapt, unsigned char *da, unsigned short reason);
+int issue_deauth_ex(struct adapter *adapt, u8 *da, unsigned short reason, int try_cnt, int wait_ms);
+void issue_action_spct_ch_switch(struct adapter *adapt, u8 *ra, u8 new_ch, u8 ch_offset);
+void issue_addba_req(struct adapter *adapter, unsigned char *ra, u8 tid);
+void issue_addba_rsp(struct adapter *adapter, unsigned char *ra, u8 tid, u16 status, u8 size);
+u8 issue_addba_rsp_wait_ack(struct adapter *adapter, unsigned char *ra, u8 tid, u16 status, u8 size, int try_cnt, int wait_ms);
+void issue_del_ba(struct adapter *adapter, unsigned char *ra, u8 tid, u16 reason, u8 initiator);
+int issue_del_ba_ex(struct adapter *adapter, unsigned char *ra, u8 tid, u16 reason, u8 initiator, int try_cnt, int wait_ms);
+void issue_action_BSSCoexistPacket(struct adapter *adapt);
 
 #ifdef CONFIG_IEEE80211W
-void issue_action_SA_Query(_adapter *padapter, unsigned char *raddr, unsigned char action, unsigned short tid, u8 key_type);
-int issue_deauth_11w(_adapter *padapter, unsigned char *da, unsigned short reason, u8 key_type);
+void issue_action_SA_Query(struct adapter *adapt, unsigned char *raddr, unsigned char action, unsigned short tid, u8 key_type);
+int issue_deauth_11w(struct adapter *adapt, unsigned char *da, unsigned short reason, u8 key_type);
 #endif /* CONFIG_IEEE80211W */
-int issue_action_SM_PS(_adapter *padapter ,  unsigned char *raddr , u8 NewMimoPsMode);
-int issue_action_SM_PS_wait_ack(_adapter *padapter, unsigned char *raddr, u8 NewMimoPsMode, int try_cnt, int wait_ms);
+int issue_action_SM_PS(struct adapter *adapt ,  unsigned char *raddr , u8 NewMimoPsMode);
+int issue_action_SM_PS_wait_ack(struct adapter *adapt, unsigned char *raddr, u8 NewMimoPsMode, int try_cnt, int wait_ms);
 
-unsigned int send_delba_sta_tid(_adapter *adapter, u8 initiator, struct sta_info *sta, u8 tid, u8 force);
-unsigned int send_delba_sta_tid_wait_ack(_adapter *adapter, u8 initiator, struct sta_info *sta, u8 tid, u8 force);
+unsigned int send_delba_sta_tid(struct adapter *adapter, u8 initiator, struct sta_info *sta, u8 tid, u8 force);
+unsigned int send_delba_sta_tid_wait_ack(struct adapter *adapter, u8 initiator, struct sta_info *sta, u8 tid, u8 force);
 
-unsigned int send_delba(_adapter *padapter, u8 initiator, u8 *addr);
-unsigned int send_beacon(_adapter *padapter);
+unsigned int send_delba(struct adapter *adapt, u8 initiator, u8 *addr);
+unsigned int send_beacon(struct adapter *adapt);
 
-void start_clnt_assoc(_adapter *padapter);
-void start_clnt_auth(_adapter *padapter);
-void start_clnt_join(_adapter *padapter);
-void start_create_ibss(_adapter *padapter);
+void start_clnt_assoc(struct adapter *adapt);
+void start_clnt_auth(struct adapter *adapt);
+void start_clnt_join(struct adapter *adapt);
+void start_create_ibss(struct adapter *adapt);
 
-unsigned int OnAssocReq(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAssocRsp(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnProbeReq(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnProbeRsp(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int DoReserved(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnBeacon(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAtim(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnDisassoc(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAuth(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAuthClient(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnDeAuth(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAction(_adapter *padapter, union recv_frame *precv_frame);
+unsigned int OnAssocReq(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAssocRsp(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnProbeReq(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnProbeRsp(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int DoReserved(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnBeacon(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAtim(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnDisassoc(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAuth(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAuthClient(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnDeAuth(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAction(struct adapter *adapt, union recv_frame *precv_frame);
 
-unsigned int on_action_spct(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAction_qos(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAction_dls(_adapter *padapter, union recv_frame *precv_frame);
+unsigned int on_action_spct(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAction_qos(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAction_dls(struct adapter *adapt, union recv_frame *precv_frame);
 #ifdef CONFIG_RTW_WNM
-unsigned int on_action_wnm(_adapter *adapter, union recv_frame *rframe);
+unsigned int on_action_wnm(struct adapter *adapter, union recv_frame *rframe);
 #endif
 
 #define RX_AMPDU_ACCEPT_INVALID 0xFF
@@ -903,62 +903,62 @@ enum rx_ampdu_reason {
 	RX_AMPDU_BTCOEX = 2, /* not used, because BTCOEX has its own variable management */
 	RX_AMPDU_DRV_SCAN = 3,
 };
-u8 rtw_rx_ampdu_size(_adapter *adapter);
-bool rtw_rx_ampdu_is_accept(_adapter *adapter);
-bool rtw_rx_ampdu_set_size(_adapter *adapter, u8 size, u8 reason);
-bool rtw_rx_ampdu_set_accept(_adapter *adapter, u8 accept, u8 reason);
-u8 rx_ampdu_apply_sta_tid(_adapter *adapter, struct sta_info *sta, u8 tid, u8 accept, u8 size);
-u8 rx_ampdu_size_sta_limit(_adapter *adapter, struct sta_info *sta);
-u8 rx_ampdu_apply_sta(_adapter *adapter, struct sta_info *sta, u8 accept, u8 size);
-u16 rtw_rx_ampdu_apply(_adapter *adapter);
+u8 rtw_rx_ampdu_size(struct adapter *adapter);
+bool rtw_rx_ampdu_is_accept(struct adapter *adapter);
+bool rtw_rx_ampdu_set_size(struct adapter *adapter, u8 size, u8 reason);
+bool rtw_rx_ampdu_set_accept(struct adapter *adapter, u8 accept, u8 reason);
+u8 rx_ampdu_apply_sta_tid(struct adapter *adapter, struct sta_info *sta, u8 tid, u8 accept, u8 size);
+u8 rx_ampdu_size_sta_limit(struct adapter *adapter, struct sta_info *sta);
+u8 rx_ampdu_apply_sta(struct adapter *adapter, struct sta_info *sta, u8 accept, u8 size);
+u16 rtw_rx_ampdu_apply(struct adapter *adapter);
 
-unsigned int OnAction_back(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int on_action_public(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAction_ft(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAction_ht(_adapter *padapter, union recv_frame *precv_frame);
+unsigned int OnAction_back(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int on_action_public(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAction_ft(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAction_ht(struct adapter *adapt, union recv_frame *precv_frame);
 #ifdef CONFIG_IEEE80211W
-unsigned int OnAction_sa_query(_adapter *padapter, union recv_frame *precv_frame);
+unsigned int OnAction_sa_query(struct adapter *adapt, union recv_frame *precv_frame);
 #endif /* CONFIG_IEEE80211W */
-unsigned int on_action_rm(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAction_wmm(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAction_vht(_adapter *padapter, union recv_frame *precv_frame);
-unsigned int OnAction_p2p(_adapter *padapter, union recv_frame *precv_frame);
+unsigned int on_action_rm(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAction_wmm(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAction_vht(struct adapter *adapt, union recv_frame *precv_frame);
+unsigned int OnAction_p2p(struct adapter *adapt, union recv_frame *precv_frame);
 
 #ifdef CONFIG_RTW_80211R
-void rtw_ft_update_bcn(_adapter *padapter, union recv_frame *precv_frame);
-void rtw_ft_start_clnt_join(_adapter *padapter);
-u8 rtw_ft_update_rsnie(_adapter *padapter, u8 bwrite, 
+void rtw_ft_update_bcn(struct adapter *adapt, union recv_frame *precv_frame);
+void rtw_ft_start_clnt_join(struct adapter *adapt);
+u8 rtw_ft_update_rsnie(struct adapter *adapt, u8 bwrite, 
 	struct pkt_attrib *pattrib, u8 **pframe);
-void rtw_ft_build_auth_req_ies(_adapter *padapter, 
+void rtw_ft_build_auth_req_ies(struct adapter *adapt, 
 	struct pkt_attrib *pattrib, u8 **pframe);
-void rtw_ft_build_assoc_req_ies(_adapter *padapter, 
+void rtw_ft_build_assoc_req_ies(struct adapter *adapt, 
 	u8 is_reassoc, struct pkt_attrib *pattrib, u8 **pframe);
-u8 rtw_ft_update_auth_rsp_ies(_adapter *padapter, u8 *pframe, u32 len);
-void rtw_ft_start_roam(_adapter *padapter, u8 *pTargetAddr);
-void rtw_ft_issue_action_req(_adapter *padapter, u8 *pTargetAddr);
-void rtw_ft_report_evt(_adapter *padapter);
-void rtw_ft_report_reassoc_evt(_adapter *padapter, u8 *pMacAddr);
+u8 rtw_ft_update_auth_rsp_ies(struct adapter *adapt, u8 *pframe, u32 len);
+void rtw_ft_start_roam(struct adapter *adapt, u8 *pTargetAddr);
+void rtw_ft_issue_action_req(struct adapter *adapt, u8 *pTargetAddr);
+void rtw_ft_report_evt(struct adapter *adapt);
+void rtw_ft_report_reassoc_evt(struct adapter *adapt, u8 *pMacAddr);
 void rtw_ft_link_timer_hdl(void *ctx);
 void rtw_ft_roam_timer_hdl(void *ctx);
-void rtw_ft_roam_status_reset(_adapter *padapter);
+void rtw_ft_roam_status_reset(struct adapter *adapt);
 #endif
 #ifdef CONFIG_RTW_WNM
 void rtw_wnm_roam_scan_hdl(void *ctx);
-void rtw_wnm_process_btm_req(_adapter *padapter,  u8* pframe, u32 frame_len);
+void rtw_wnm_process_btm_req(struct adapter *adapt,  u8* pframe, u32 frame_len);
 void rtw_wnm_reset_btm_candidate(struct roam_nb_info *pnb);
-void rtw_wnm_reset_btm_state(_adapter *padapter);
-void rtw_wnm_issue_action(_adapter *padapter, u8 action, u8 reason);
+void rtw_wnm_reset_btm_state(struct adapter *adapt);
+void rtw_wnm_issue_action(struct adapter *adapt, u8 action, u8 reason);
 #endif
 #if defined(CONFIG_RTW_WNM)
-u32 rtw_wnm_btm_candidates_survey(_adapter *padapter, u8* pframe, u32 elem_len, u8 is_preference);
+u32 rtw_wnm_btm_candidates_survey(struct adapter *adapt, u8* pframe, u32 elem_len, u8 is_preference);
 #endif
-void mlmeext_joinbss_event_callback(_adapter *padapter, int join_res);
-void mlmeext_sta_del_event_callback(_adapter *padapter);
-void mlmeext_sta_add_event_callback(_adapter *padapter, struct sta_info *psta);
+void mlmeext_joinbss_event_callback(struct adapter *adapt, int join_res);
+void mlmeext_sta_del_event_callback(struct adapter *adapt);
+void mlmeext_sta_add_event_callback(struct adapter *adapt, struct sta_info *psta);
 
-void linked_status_chk(_adapter *padapter, u8 from_timer);
+void linked_status_chk(struct adapter *adapt, u8 from_timer);
 
-void _linked_info_dump(_adapter *padapter);
+void _linked_info_dump(struct adapter *adapt);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 void survey_timer_hdl(struct timer_list *t);
@@ -991,17 +991,17 @@ void sa_query_timer_hdl(void *ctx);
 extern int cckrates_included(unsigned char *rate, int ratelen);
 extern int cckratesonly_included(unsigned char *rate, int ratelen);
 
-extern void process_addba_req(_adapter *padapter, u8 *paddba_req, u8 *addr);
+extern void process_addba_req(struct adapter *adapt, u8 *paddba_req, u8 *addr);
 
 extern void update_TSF(struct mlme_ext_priv *pmlmeext, u8 *pframe, uint len);
-extern void correct_TSF(_adapter *padapter, struct mlme_ext_priv *pmlmeext);
+extern void correct_TSF(struct adapter *adapt, struct mlme_ext_priv *pmlmeext);
 extern void adaptive_early_32k(struct mlme_ext_priv *pmlmeext, u8 *pframe, uint len);
-extern u8 traffic_status_watchdog(_adapter *padapter, u8 from_timer);
+extern u8 traffic_status_watchdog(struct adapter *adapt, u8 from_timer);
 
-void rtw_process_bar_frame(_adapter *padapter, union recv_frame *precv_frame);
-void rtw_join_done_chk_ch(_adapter *padapter, int join_res);
+void rtw_process_bar_frame(struct adapter *adapt, union recv_frame *precv_frame);
+void rtw_join_done_chk_ch(struct adapter *adapt, int join_res);
 
-int rtw_chk_start_clnt_join(_adapter *padapter, u8 *ch, u8 *bw, u8 *offset);
+int rtw_chk_start_clnt_join(struct adapter *adapt, u8 *ch, u8 *bw, u8 *offset);
 
 #ifdef CONFIG_PLATFORM_ARM_SUN8I
 	#define BUSY_TRAFFIC_SCAN_DENY_PERIOD	8000
@@ -1011,47 +1011,47 @@ int rtw_chk_start_clnt_join(_adapter *padapter, u8 *ch, u8 *bw, u8 *offset);
 
 struct cmd_hdl {
 	uint	parmsize;
-	u8(*h2cfuns)(struct _ADAPTER *padapter, u8 *pbuf);
+	u8(*h2cfuns)(struct adapter *adapt, u8 *pbuf);
 };
 
-void rtw_leave_opch(_adapter *adapter);
-void rtw_back_opch(_adapter *adapter);
+void rtw_leave_opch(struct adapter *adapter);
+void rtw_back_opch(struct adapter *adapter);
 
-u8 read_macreg_hdl(_adapter *padapter, u8 *pbuf);
-u8 write_macreg_hdl(_adapter *padapter, u8 *pbuf);
-u8 read_bbreg_hdl(_adapter *padapter, u8 *pbuf);
-u8 write_bbreg_hdl(_adapter *padapter, u8 *pbuf);
-u8 read_rfreg_hdl(_adapter *padapter, u8 *pbuf);
-u8 write_rfreg_hdl(_adapter *padapter, u8 *pbuf);
+u8 read_macreg_hdl(struct adapter *adapt, u8 *pbuf);
+u8 write_macreg_hdl(struct adapter *adapt, u8 *pbuf);
+u8 read_bbreg_hdl(struct adapter *adapt, u8 *pbuf);
+u8 write_bbreg_hdl(struct adapter *adapt, u8 *pbuf);
+u8 read_rfreg_hdl(struct adapter *adapt, u8 *pbuf);
+u8 write_rfreg_hdl(struct adapter *adapt, u8 *pbuf);
 
 
-u8 NULL_hdl(_adapter *padapter, u8 *pbuf);
-u8 join_cmd_hdl(_adapter *padapter, u8 *pbuf);
-u8 disconnect_hdl(_adapter *padapter, u8 *pbuf);
-u8 createbss_hdl(_adapter *padapter, u8 *pbuf);
-u8 setopmode_hdl(_adapter *padapter, u8 *pbuf);
-u8 sitesurvey_cmd_hdl(_adapter *padapter, u8 *pbuf);
-u8 setauth_hdl(_adapter *padapter, u8 *pbuf);
-u8 setkey_hdl(_adapter *padapter, u8 *pbuf);
-u8 set_stakey_hdl(_adapter *padapter, u8 *pbuf);
-u8 set_assocsta_hdl(_adapter *padapter, u8 *pbuf);
-u8 del_assocsta_hdl(_adapter *padapter, u8 *pbuf);
-u8 add_ba_hdl(_adapter *padapter, unsigned char *pbuf);
-u8 add_ba_rsp_hdl(_adapter *padapter, unsigned char *pbuf);
+u8 NULL_hdl(struct adapter *adapt, u8 *pbuf);
+u8 join_cmd_hdl(struct adapter *adapt, u8 *pbuf);
+u8 disconnect_hdl(struct adapter *adapt, u8 *pbuf);
+u8 createbss_hdl(struct adapter *adapt, u8 *pbuf);
+u8 setopmode_hdl(struct adapter *adapt, u8 *pbuf);
+u8 sitesurvey_cmd_hdl(struct adapter *adapt, u8 *pbuf);
+u8 setauth_hdl(struct adapter *adapt, u8 *pbuf);
+u8 setkey_hdl(struct adapter *adapt, u8 *pbuf);
+u8 set_stakey_hdl(struct adapter *adapt, u8 *pbuf);
+u8 set_assocsta_hdl(struct adapter *adapt, u8 *pbuf);
+u8 del_assocsta_hdl(struct adapter *adapt, u8 *pbuf);
+u8 add_ba_hdl(struct adapter *adapt, unsigned char *pbuf);
+u8 add_ba_rsp_hdl(struct adapter *adapt, unsigned char *pbuf);
 
-void rtw_ap_wep_pk_setting(_adapter *adapter, struct sta_info *psta);
+void rtw_ap_wep_pk_setting(struct adapter *adapter, struct sta_info *psta);
 
-u8 mlme_evt_hdl(_adapter *padapter, unsigned char *pbuf);
-u8 h2c_msg_hdl(_adapter *padapter, unsigned char *pbuf);
-u8 chk_bmc_sleepq_hdl(_adapter *padapter, unsigned char *pbuf);
-u8 tx_beacon_hdl(_adapter *padapter, unsigned char *pbuf);
-u8 rtw_set_chbw_hdl(_adapter *padapter, u8 *pbuf);
-u8 set_chplan_hdl(_adapter *padapter, unsigned char *pbuf);
-u8 led_blink_hdl(_adapter *padapter, unsigned char *pbuf);
-u8 set_csa_hdl(_adapter *padapter, unsigned char *pbuf);	/* Kurt: Handling DFS channel switch announcement ie. */
-u8 tdls_hdl(_adapter *padapter, unsigned char *pbuf);
-u8 run_in_thread_hdl(_adapter *padapter, u8 *pbuf);
-u8 rtw_getmacreg_hdl(_adapter *padapter, u8 *pbuf);
+u8 mlme_evt_hdl(struct adapter *adapt, unsigned char *pbuf);
+u8 h2c_msg_hdl(struct adapter *adapt, unsigned char *pbuf);
+u8 chk_bmc_sleepq_hdl(struct adapter *adapt, unsigned char *pbuf);
+u8 tx_beacon_hdl(struct adapter *adapt, unsigned char *pbuf);
+u8 rtw_set_chbw_hdl(struct adapter *adapt, u8 *pbuf);
+u8 set_chplan_hdl(struct adapter *adapt, unsigned char *pbuf);
+u8 led_blink_hdl(struct adapter *adapt, unsigned char *pbuf);
+u8 set_csa_hdl(struct adapter *adapt, unsigned char *pbuf);	/* Kurt: Handling DFS channel switch announcement ie. */
+u8 tdls_hdl(struct adapter *adapt, unsigned char *pbuf);
+u8 run_in_thread_hdl(struct adapter *adapt, u8 *pbuf);
+u8 rtw_getmacreg_hdl(struct adapter *adapt, u8 *pbuf);
 
 #define GEN_DRV_CMD_HANDLER(size, cmd)	{size, &cmd ## _hdl},
 #define GEN_MLME_EXT_HANDLER(size, cmd)	{size, cmd},
@@ -1152,8 +1152,8 @@ struct C2HEvent_Header {
 
 };
 
-void rtw_dummy_event_callback(_adapter *adapter , u8 *pbuf);
-void rtw_fwdbg_event_callback(_adapter *adapter , u8 *pbuf);
+void rtw_dummy_event_callback(struct adapter *adapter , u8 *pbuf);
+void rtw_fwdbg_event_callback(struct adapter *adapter , u8 *pbuf);
 
 enum rtw_c2h_event {
 	GEN_EVT_CODE(_Read_MACREG) = 0, /*0*/

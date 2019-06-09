@@ -98,7 +98,7 @@ struct rtw_wdev_nego_info {
 struct rtw_wdev_priv {
 	struct wireless_dev *rtw_wdev;
 
-	_adapter *padapter;
+	struct adapter *adapt;
 
 	#if !RTW_CFG80211_ALWAYS_INFORM_STA_DISCONNECT_EVENT
 	u8 not_indic_disco;
@@ -114,7 +114,7 @@ struct rtw_wdev_priv {
 	char ifname_mon[IFNAMSIZ + 1]; /* interface name for monitor interface */
 
 	u8 p2p_enabled;
-	systime probe_resp_ie_update_time;
+	unsigned long probe_resp_ie_update_time;
 
 	u8 provdisc_req_issued;
 
@@ -140,7 +140,7 @@ struct rtw_wdev_priv {
 
 };
 
-bool rtw_cfg80211_is_connect_requested(_adapter *adapter);
+bool rtw_cfg80211_is_connect_requested(struct adapter *adapter);
 
 #if RTW_CFG80211_ALWAYS_INFORM_STA_DISCONNECT_EVENT
 #define rtw_wdev_not_indic_disco(rtw_wdev_data) 0
@@ -166,7 +166,7 @@ struct rtw_wiphy_data {
 	struct dvobj_priv *dvobj;
 
 #ifndef RTW_SINGLE_WIPHY
-	_adapter *adapter;
+	struct adapter *adapter;
 #endif
 };
 
@@ -188,66 +188,66 @@ struct rtw_wiphy_data {
 #define SET_CFG80211_REPORT_MGMT(w, t, v) (w->report_mgmt |= (v ? BIT(t >> 4) : 0))
 #define GET_CFG80211_REPORT_MGMT(w, t) ((w->report_mgmt & BIT(t >> 4)) > 0)
 
-struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev);
+struct wiphy *rtw_wiphy_alloc(struct adapter *adapt, struct device *dev);
 void rtw_wiphy_free(struct wiphy *wiphy);
 int rtw_wiphy_register(struct wiphy *wiphy);
 void rtw_wiphy_unregister(struct wiphy *wiphy);
 
-int rtw_wdev_alloc(_adapter *padapter, struct wiphy *wiphy);
+int rtw_wdev_alloc(struct adapter *adapt, struct wiphy *wiphy);
 void rtw_wdev_free(struct wireless_dev *wdev);
 void rtw_wdev_unregister(struct wireless_dev *wdev);
 
-int rtw_cfg80211_ndev_res_alloc(_adapter *adapter);
-void rtw_cfg80211_ndev_res_free(_adapter *adapter);
-int rtw_cfg80211_ndev_res_register(_adapter *adapter);
-void rtw_cfg80211_ndev_res_unregister(_adapter *adapter);
+int rtw_cfg80211_ndev_res_alloc(struct adapter *adapter);
+void rtw_cfg80211_ndev_res_free(struct adapter *adapter);
+int rtw_cfg80211_ndev_res_register(struct adapter *adapter);
+void rtw_cfg80211_ndev_res_unregister(struct adapter *adapter);
 
 int rtw_cfg80211_dev_res_alloc(struct dvobj_priv *dvobj);
 void rtw_cfg80211_dev_res_free(struct dvobj_priv *dvobj);
 int rtw_cfg80211_dev_res_register(struct dvobj_priv *dvobj);
 void rtw_cfg80211_dev_res_unregister(struct dvobj_priv *dvobj);
 
-void rtw_cfg80211_init_wdev_data(_adapter *padapter);
-void rtw_cfg80211_init_wiphy(_adapter *padapter);
+void rtw_cfg80211_init_wdev_data(struct adapter *adapt);
+void rtw_cfg80211_init_wiphy(struct adapter *adapt);
 
-void rtw_cfg80211_unlink_bss(_adapter *padapter, struct wlan_network *pnetwork);
-void rtw_cfg80211_surveydone_event_callback(_adapter *padapter);
-struct cfg80211_bss *rtw_cfg80211_inform_bss(_adapter *padapter, struct wlan_network *pnetwork);
-int rtw_cfg80211_check_bss(_adapter *padapter);
-void rtw_cfg80211_ibss_indicate_connect(_adapter *padapter);
-void rtw_cfg80211_indicate_connect(_adapter *padapter);
-void rtw_cfg80211_indicate_disconnect(_adapter *padapter, u16 reason, u8 locally_generated);
-void rtw_cfg80211_indicate_scan_done(_adapter *adapter, bool aborted);
-u32 rtw_cfg80211_wait_scan_req_empty(_adapter *adapter, u32 timeout_ms);
+void rtw_cfg80211_unlink_bss(struct adapter *adapt, struct wlan_network *pnetwork);
+void rtw_cfg80211_surveydone_event_callback(struct adapter *adapt);
+struct cfg80211_bss *rtw_cfg80211_inform_bss(struct adapter *adapt, struct wlan_network *pnetwork);
+int rtw_cfg80211_check_bss(struct adapter *adapt);
+void rtw_cfg80211_ibss_indicate_connect(struct adapter *adapt);
+void rtw_cfg80211_indicate_connect(struct adapter *adapt);
+void rtw_cfg80211_indicate_disconnect(struct adapter *adapt, u16 reason, u8 locally_generated);
+void rtw_cfg80211_indicate_scan_done(struct adapter *adapter, bool aborted);
+u32 rtw_cfg80211_wait_scan_req_empty(struct adapter *adapter, u32 timeout_ms);
 
 #ifdef CONFIG_CONCURRENT_MODE
-u8 rtw_cfg80211_scan_via_buddy(_adapter *padapter, struct cfg80211_scan_request *request);
-void rtw_cfg80211_indicate_scan_done_for_buddy(_adapter *padapter, bool bscan_aborted);
+u8 rtw_cfg80211_scan_via_buddy(struct adapter *adapt, struct cfg80211_scan_request *request);
+void rtw_cfg80211_indicate_scan_done_for_buddy(struct adapter *adapt, bool bscan_aborted);
 #endif
 
-void rtw_cfg80211_indicate_sta_assoc(_adapter *padapter, u8 *pmgmt_frame, uint frame_len);
-void rtw_cfg80211_indicate_sta_disassoc(_adapter *padapter, unsigned char *da, unsigned short reason);
+void rtw_cfg80211_indicate_sta_assoc(struct adapter *adapt, u8 *pmgmt_frame, uint frame_len);
+void rtw_cfg80211_indicate_sta_disassoc(struct adapter *adapt, unsigned char *da, unsigned short reason);
 
-void rtw_cfg80211_set_is_roch(_adapter *adapter, bool val);
-bool rtw_cfg80211_get_is_roch(_adapter *adapter);
+void rtw_cfg80211_set_is_roch(struct adapter *adapter, bool val);
+bool rtw_cfg80211_get_is_roch(struct adapter *adapter);
 
-int rtw_cfg80211_iface_has_p2p_group_cap(_adapter *adapter);
-int rtw_cfg80211_is_p2p_scan(_adapter *adapter);
+int rtw_cfg80211_iface_has_p2p_group_cap(struct adapter *adapter);
+int rtw_cfg80211_is_p2p_scan(struct adapter *adapter);
 
-void rtw_cfg80211_set_is_mgmt_tx(_adapter *adapter, u8 val);
-u8 rtw_cfg80211_get_is_mgmt_tx(_adapter *adapter);
-u8 rtw_mgnt_tx_handler(_adapter *adapter, u8 *buf);
+void rtw_cfg80211_set_is_mgmt_tx(struct adapter *adapter, u8 val);
+u8 rtw_cfg80211_get_is_mgmt_tx(struct adapter *adapter);
+u8 rtw_mgnt_tx_handler(struct adapter *adapter, u8 *buf);
 
-void rtw_cfg80211_issue_p2p_provision_request(_adapter *padapter, const u8 *buf, size_t len);
+void rtw_cfg80211_issue_p2p_provision_request(struct adapter *adapt, const u8 *buf, size_t len);
 
-void rtw_cfg80211_rx_p2p_action_public(_adapter *padapter, union recv_frame *rframe);
-void rtw_cfg80211_rx_action_p2p(_adapter *padapter, union recv_frame *rframe);
-void rtw_cfg80211_rx_action(_adapter *adapter, union recv_frame *rframe, const char *msg);
-void rtw_cfg80211_rx_probe_request(_adapter *padapter, union recv_frame *rframe);
+void rtw_cfg80211_rx_p2p_action_public(struct adapter *adapt, union recv_frame *rframe);
+void rtw_cfg80211_rx_action_p2p(struct adapter *adapt, union recv_frame *rframe);
+void rtw_cfg80211_rx_action(struct adapter *adapter, union recv_frame *rframe, const char *msg);
+void rtw_cfg80211_rx_probe_request(struct adapter *adapt, union recv_frame *rframe);
 
 int rtw_cfg80211_set_mgnt_wpsp2pie(struct net_device *net, char *buf, int len, int type);
 
-bool rtw_cfg80211_pwr_mgmt(_adapter *adapter);
+bool rtw_cfg80211_pwr_mgmt(struct adapter *adapter);
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0))  && !defined(COMPAT_KERNEL_RELEASE)
 #define rtw_cfg80211_rx_mgmt(wdev, freq, sig_dbm, buf, len, gfp) cfg80211_rx_mgmt(wdev_to_ndev(wdev), freq, buf, len, gfp)
@@ -301,7 +301,7 @@ bool rtw_cfg80211_pwr_mgmt(_adapter *adapter);
 #endif
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 5, 0))
-u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 ht);
+u8 rtw_cfg80211_ch_switch_notify(struct adapter *adapter, u8 ch, u8 bw, u8 offset, u8 ht);
 #endif
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 26)) && (LINUX_VERSION_CODE < KERNEL_VERSION(4, 7, 0))

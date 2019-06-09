@@ -304,7 +304,7 @@ phydm_update_beam_pattern_type2(
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct smt_ant_honbo			*pdm_sat_table = &(p_dm->dm_sat_table);
 	u8			i;
-	boolean			beam_ctrl_signal;
+	bool			beam_ctrl_signal;
 	u32			one = 0x1;
 	u32			reg44_tmp_p, reg44_tmp_n, reg44_ori;
 	u8			devide_num = 4;
@@ -318,7 +318,7 @@ phydm_update_beam_pattern_type2(
 	/*devide_num = (pdm_sat_table->rfu_protocol_type == 2) ? 8 : 4;*/
 
 	for (i = 0; i <= (codeword_length - 1); i++) {
-		beam_ctrl_signal = (boolean)((codeword & BIT(i)) >> i);
+		beam_ctrl_signal = (bool)((codeword & BIT(i)) >> i);
 		
 		if (p_dm->debug_components & DBG_ANT_DIV) {
 
@@ -421,7 +421,7 @@ phydm_hl_smart_ant_debug_type2(
 			/*devide_num = (pdm_sat_table->rfu_protocol_type == 2) ? 8 : 4;*/
 			
 			for (i = 0; i <= (codeword_length - 1); i++) {
-				beam_ctrl_signal = (boolean)((pdm_sat_table->update_beam_codeword & BIT(i)) >> i);
+				beam_ctrl_signal = (bool)((pdm_sat_table->update_beam_codeword & BIT(i)) >> i);
 
 				if (i == (codeword_length - 1)) {
 					PHYDM_SNPRINTF((output + used, out_len - used, "%d]\n", beam_ctrl_signal));
@@ -1081,7 +1081,7 @@ phydm_update_beam_pattern(
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct smt_ant_honbo			*pdm_sat_table = &(p_dm->dm_sat_table);
 	u8			i;
-	boolean			beam_ctrl_signal;
+	bool			beam_ctrl_signal;
 	u32			one = 0x1;
 	u32			reg44_tmp_p, reg44_tmp_n, reg44_ori;
 	u8			devide_num = 4;
@@ -1095,7 +1095,7 @@ phydm_update_beam_pattern(
 	devide_num = (pdm_sat_table->rfu_protocol_type == 2) ? 6 : 4;
 
 	for (i = 0; i <= (codeword_length - 1); i++) {
-		beam_ctrl_signal = (boolean)((codeword & BIT(i)) >> i);
+		beam_ctrl_signal = (bool)((codeword & BIT(i)) >> i);
 
 		if (p_dm->debug_components & DBG_ANT_DIV) {
 
@@ -1184,7 +1184,7 @@ phydm_hl_smart_ant_debug(
 			devide_num = (pdm_sat_table->rfu_protocol_type == 2) ? 6 : 4;
 			
 			for (i = 0; i <= (codeword_length - 1); i++) {
-				beam_ctrl_signal = (boolean)((pdm_sat_table->update_beam_codeword & BIT(i)) >> i);
+				beam_ctrl_signal = (bool)((pdm_sat_table->update_beam_codeword & BIT(i)) >> i);
 
 				if (i == (codeword_length - 1)) {
 					PHYDM_SNPRINTF((output + used, out_len - used, "%d]\n", beam_ctrl_signal));

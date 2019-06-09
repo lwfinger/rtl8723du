@@ -28,13 +28,13 @@
  */
 static void
 SwLedOn_8723DU(
-	PADAPTER padapter,
-	PLED_USB pLed
+	struct adapter * adapt,
+	struct led_usb * pLed
 )
 {
 	u8 LedCfg;
 
-	if (RTW_CANNOT_RUN(padapter))
+	if (RTW_CANNOT_RUN(adapt))
 		return;
 
 	pLed->bLedOn = true;
@@ -48,13 +48,13 @@ SwLedOn_8723DU(
  */
 static void
 SwLedOff_8723DU(
-	PADAPTER padapter,
-	PLED_USB pLed
+	struct adapter * adapt,
+	struct led_usb * pLed
 )
 {
 	u8 LedCfg;
 
-	if (RTW_CANNOT_RUN(padapter))
+	if (RTW_CANNOT_RUN(adapt))
 		goto exit;
 
 exit:
@@ -80,19 +80,19 @@ exit:
  */
 void
 rtl8723du_InitSwLeds(
-	PADAPTER padapter
+	struct adapter * adapt
 )
 {
-	struct led_priv *pledpriv = &(padapter->ledpriv);
+	struct led_priv *pledpriv = &(adapt->ledpriv);
 
 	pledpriv->LedControlHandler = LedControlUSB;
 
 	pledpriv->SwLedOn = SwLedOn_8723DU;
 	pledpriv->SwLedOff = SwLedOff_8723DU;
 
-	InitLed(padapter, &(pledpriv->SwLed0), LED_PIN_LED0);
+	InitLed(adapt, &(pledpriv->SwLed0), LED_PIN_LED0);
 
-	InitLed(padapter, &(pledpriv->SwLed1), LED_PIN_LED1);
+	InitLed(adapt, &(pledpriv->SwLed1), LED_PIN_LED1);
 }
 
 
@@ -102,10 +102,10 @@ rtl8723du_InitSwLeds(
  */
 void
 rtl8723du_DeInitSwLeds(
-	PADAPTER padapter
+	struct adapter * adapt
 )
 {
-	struct led_priv *ledpriv = &(padapter->ledpriv);
+	struct led_priv *ledpriv = &(adapt->ledpriv);
 
 	DeInitLed(&(ledpriv->SwLed0));
 	DeInitLed(&(ledpriv->SwLed1));

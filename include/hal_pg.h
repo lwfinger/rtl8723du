@@ -715,7 +715,7 @@
 /* It must always set to 4, otherwise read efuse table sequence will be wrong. */
 #define	MAX_TX_COUNT				4
 
-typedef struct _TxPowerInfo24G {
+struct TxPowerInfo24G {
 	u8 IndexCCK_Base[MAX_RF_PATH][MAX_CHNL_GROUP_24G];
 	u8 IndexBW40_Base[MAX_RF_PATH][MAX_CHNL_GROUP_24G];
 	/* If only one tx, only BW20 and OFDM are used. */
@@ -723,9 +723,9 @@ typedef struct _TxPowerInfo24G {
 	s8 OFDM_Diff[MAX_RF_PATH][MAX_TX_COUNT];
 	s8 BW20_Diff[MAX_RF_PATH][MAX_TX_COUNT];
 	s8 BW40_Diff[MAX_RF_PATH][MAX_TX_COUNT];
-} TxPowerInfo24G, *PTxPowerInfo24G;
+};
 
-typedef struct _TxPowerInfo5G {
+struct TxPowerInfo5G {
 	u8 IndexBW40_Base[MAX_RF_PATH][MAX_CHNL_GROUP_5G];
 	/* If only one tx, only BW20, OFDM, BW80 and BW160 are used. */
 	s8 OFDM_Diff[MAX_RF_PATH][MAX_TX_COUNT];
@@ -733,15 +733,15 @@ typedef struct _TxPowerInfo5G {
 	s8 BW40_Diff[MAX_RF_PATH][MAX_TX_COUNT];
 	s8 BW80_Diff[MAX_RF_PATH][MAX_TX_COUNT];
 	s8 BW160_Diff[MAX_RF_PATH][MAX_TX_COUNT];
-} TxPowerInfo5G, *PTxPowerInfo5G;
+};
 
 
-typedef	enum _BT_Ant_NUM {
+enum BT_Ant_NUM {
 	Ant_x2	= 0,
 	Ant_x1	= 1
-} BT_Ant_NUM, *PBT_Ant_NUM;
+};
 
-typedef	enum _BT_CoType {
+enum BT_CoType {
 	BT_2WIRE		= 0,
 	BT_ISSC_3WIRE	= 1,
 	BT_ACCEL		= 2,
@@ -758,12 +758,12 @@ typedef	enum _BT_CoType {
 	BT_RTL8822B		= 13,
 	BT_RTL8723D		= 14,
 	BT_RTL8821C		= 15
-} BT_CoType, *PBT_CoType;
+};
 
-typedef	enum _BT_RadioShared {
+enum BT_RadioShared {
 	BT_Radio_Shared	= 0,
 	BT_Radio_Individual	= 1,
-} BT_RadioShared, *PBT_RadioShared;
+};
 
 
 #endif

@@ -79,7 +79,7 @@ phydm_set_cckpd_val(
 	}
 }
 
-static boolean
+static bool
 phydm_stop_cck_pd_th(
 	void		*p_dm_void
 )

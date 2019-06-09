@@ -570,7 +570,7 @@ static inline int IsFrameTypeData(unsigned char *pframe)
 
 #define	_RESERVED47_				47
 
-typedef	enum _ELEMENT_ID {
+enum element_id {
 	EID_SsId					= 0, /* service set identifier (0:32) */
 	EID_SupRates				= 1, /* supported rates (1:8) */
 	EID_FHParms				= 2, /* FH parameter set (5) */
@@ -645,7 +645,7 @@ typedef	enum _ELEMENT_ID {
 	EID_VHTOperation 			= 192, /* Based on 802.11ac D2.0 */
 	EID_AID						= 197, /* Based on 802.11ac D4.0 */
 	EID_OpModeNotification		= 199, /* Based on 802.11ac D3.0 */
-} ELEMENT_ID, *PELEMENT_ID;
+};
 
 /* ---------------------------------------------------------------------------
 					Below is the fixed elements...
@@ -799,22 +799,21 @@ struct ADDBA_request {
 	__le16	BA_starting_seqctrl;
 }  __attribute__((packed));
 
-typedef enum _HT_CAP_AMPDU_FACTOR {
+enum ht_cap_ampdu_factor {
 	MAX_AMPDU_FACTOR_8K		= 0,
 	MAX_AMPDU_FACTOR_16K	= 1,
 	MAX_AMPDU_FACTOR_32K	= 2,
 	MAX_AMPDU_FACTOR_64K	= 3,
-} HT_CAP_AMPDU_FACTOR;
+};
 
-typedef enum _VHT_CAP_AMPDU_FACTOR {
+enum vht_cap_ampdu_factor {
 	MAX_AMPDU_FACTOR_128K = 4,
 	MAX_AMPDU_FACTOR_256K = 5,
 	MAX_AMPDU_FACTOR_512K = 6,
 	MAX_AMPDU_FACTOR_1M = 7,
-} VHT_CAP_AMPDU_FACTOR;
+};
 
-
-typedef enum _HT_CAP_AMPDU_DENSITY {
+enum ht_cap_ampdu_density {
 	AMPDU_DENSITY_VALUE_0 = 0 , /* For no restriction */
 	AMPDU_DENSITY_VALUE_1 = 1 , /* For 1/4 us */
 	AMPDU_DENSITY_VALUE_2 = 2 , /* For 1/2 us */
@@ -823,7 +822,7 @@ typedef enum _HT_CAP_AMPDU_DENSITY {
 	AMPDU_DENSITY_VALUE_5 = 5 , /* For 4 us */
 	AMPDU_DENSITY_VALUE_6 = 6 , /* For 8 us */
 	AMPDU_DENSITY_VALUE_7 = 7 , /* For 16 us */
-} HT_CAP_AMPDU_DENSITY;
+};
 
 /* 802.11n HT capabilities masks */
 #define IEEE80211_HT_CAP_LDPC_CODING		0x0001

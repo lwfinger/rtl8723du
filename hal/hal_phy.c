@@ -9,7 +9,7 @@
  *	Constant.
  * ********************************************************************************
  * 2008/11/20 MH For Debug only, RF */
-static RF_SHADOW_T RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG];
+static struct shadow_compare_map RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG];
 
 /**
 * Function:	PHY_CalculateBitShift
@@ -68,7 +68,7 @@ PHY_CalculateBitShift(
  *---------------------------------------------------------------------------*/
 u32
 PHY_RFShadowRead(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	enum rf_path		eRFPath,
 	u32				Offset)
 {
@@ -79,7 +79,7 @@ PHY_RFShadowRead(
 
 void
 PHY_RFShadowWrite(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	enum rf_path		eRFPath,
 	u32				Offset,
 	u32				Data)
@@ -92,7 +92,7 @@ PHY_RFShadowWrite(
 
 bool
 PHY_RFShadowCompare(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	enum rf_path		eRFPath,
 	u32				Offset)
 {
@@ -113,7 +113,7 @@ PHY_RFShadowCompare(
 
 void
 PHY_RFShadowRecorver(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	enum rf_path		eRFPath,
 	u32				Offset)
 {
@@ -131,7 +131,7 @@ PHY_RFShadowRecorver(
 
 void
 PHY_RFShadowCompareAll(
-	PADAPTER			Adapter)
+	struct adapter *			Adapter)
 {
 	enum rf_path	eRFPath = RF_PATH_A;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
@@ -146,7 +146,7 @@ PHY_RFShadowCompareAll(
 
 void
 PHY_RFShadowRecorverAll(
-	PADAPTER			Adapter)
+	struct adapter *			Adapter)
 {
 	enum rf_path		eRFPath = RF_PATH_A;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
@@ -161,7 +161,7 @@ PHY_RFShadowRecorverAll(
 
 void
 PHY_RFShadowCompareFlagSet(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	enum rf_path		eRFPath,
 	u32				Offset,
 	u8				Type)
@@ -174,7 +174,7 @@ PHY_RFShadowCompareFlagSet(
 
 void
 PHY_RFShadowRecorverFlagSet(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	enum rf_path		eRFPath,
 	u32				Offset,
 	u8				Type)
@@ -187,7 +187,7 @@ PHY_RFShadowRecorverFlagSet(
 
 void
 PHY_RFShadowCompareFlagSetAll(
-	PADAPTER			Adapter)
+	struct adapter *			Adapter)
 {
 	enum rf_path	eRFPath = RF_PATH_A;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
@@ -207,7 +207,7 @@ PHY_RFShadowCompareFlagSetAll(
 
 void
 PHY_RFShadowRecorverFlagSetAll(
-	PADAPTER			Adapter)
+	struct adapter *			Adapter)
 {
 	enum rf_path		eRFPath = RF_PATH_A;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
@@ -226,7 +226,7 @@ PHY_RFShadowRecorverFlagSetAll(
 
 void
 PHY_RFShadowRefresh(
-	PADAPTER			Adapter)
+	struct adapter *			Adapter)
 {
 	enum rf_path		eRFPath = RF_PATH_A;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);

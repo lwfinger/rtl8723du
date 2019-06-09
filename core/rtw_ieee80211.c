@@ -174,7 +174,7 @@ u8 *rtw_set_fixed_ie(unsigned char *pbuf, unsigned int len, unsigned char *sourc
 u8 *rtw_set_ie
 (
 	u8 *pbuf,
-	sint index,
+	int index,
 	uint len,
 	const u8 *source,
 	uint *frlen /* frame length */
@@ -249,9 +249,9 @@ inline u8 *rtw_set_ie_mesh_ch_switch_parm(u8 *buf, u32 *buf_len, u8 ttl,
 /*----------------------------------------------------------------------------
 index: the information element id index, limit is the limit for search
 -----------------------------------------------------------------------------*/
-u8 *rtw_get_ie(const u8 *pbuf, sint index, sint *len, sint limit)
+u8 *rtw_get_ie(const u8 *pbuf, int index, int *len, int limit)
 {
-	sint tmp, i;
+	int tmp, i;
 	const u8 *p;
 	if (limit < 1) {
 		return NULL;
@@ -414,7 +414,7 @@ int rtw_generate_ie(struct registry_priv *pregistrypriv)
 {
 	u8	wireless_mode;
 	int	sz = 0, rateLen;
-	WLAN_BSSID_EX	*pdev_network = &pregistrypriv->dev_network;
+	struct wlan_bssid_ex	*pdev_network = &pregistrypriv->dev_network;
 	u8	*ie = pdev_network->IEs;
 
 
@@ -1160,7 +1160,7 @@ static int rtw_ieee802_11_parse_vendor_specific(u8 *pos, uint elen,
  * @show_errors: Whether to show parsing errors in debug log
  * Returns: Parsing result
  */
-ParseRes rtw_ieee802_11_parse_elems(u8 *start, uint len,
+enum ParseRes rtw_ieee802_11_parse_elems(u8 *start, uint len,
 				    struct rtw_ieee802_11_elems *elems,
 				    int show_errors)
 {
@@ -1464,7 +1464,7 @@ static void dump_ht_cap_ie(void *sel, const u8 *ie, u32 ie_len)
 	u16 len;
 
 	const u8 *ht_cap_ie;
-	sint ht_cap_ielen;
+	int ht_cap_ielen;
 
 	ht_cap_ie = rtw_get_ie(ie, WLAN_EID_HT_CAP, &ht_cap_ielen, ie_len);
 	if (!ie || ht_cap_ie != ie)
@@ -1501,7 +1501,7 @@ static void dump_ht_op_ie(void *sel, const u8 *ie, u32 ie_len)
 	u16 len;
 
 	const u8 *ht_op_ie;
-	sint ht_op_ielen;
+	int ht_op_ielen;
 
 	ht_op_ie = rtw_get_ie(ie, WLAN_EID_HT_OPERATION, &ht_op_ielen, ie_len);
 	if (!ie || ht_op_ie != ie)
@@ -1611,10 +1611,10 @@ void rtw_ies_get_chbw(u8 *ies, int ies_len, u8 *ch, u8 *bw, u8 *offset)
 	}
 }
 
-void rtw_bss_get_chbw(WLAN_BSSID_EX *bss, u8 *ch, u8 *bw, u8 *offset)
+void rtw_bss_get_chbw(struct wlan_bssid_ex *bss, u8 *ch, u8 *bw, u8 *offset)
 {
-	rtw_ies_get_chbw(bss->IEs + sizeof(NDIS_802_11_FIXED_IEs)
-		, bss->IELength - sizeof(NDIS_802_11_FIXED_IEs)
+	rtw_ies_get_chbw(bss->IEs + sizeof(struct ndis_802_11_fixed_ies)
+		, bss->IELength - sizeof(struct ndis_802_11_fixed_ies)
 		, ch, bw, offset);
 
 	if (*ch == 0)
@@ -1724,13 +1724,13 @@ void rtw_sync_chbw(u8 *req_ch, u8 *req_bw, u8 *req_offset
  */
 u32 rtw_get_p2p_merged_ies_len(u8 *in_ie, u32 in_len)
 {
-	PNDIS_802_11_VARIABLE_IEs	pIE;
+	struct ndis_802_11_variable_ies *	pIE;
 	u8 OUI[4] = { 0x50, 0x6f, 0x9a, 0x09 };
 	int i = 0;
 	int j = 0, len = 0;
 
 	while (i < in_len) {
-		pIE = (PNDIS_802_11_VARIABLE_IEs)(in_ie + i);
+		pIE = (struct ndis_802_11_variable_ies *)(in_ie + i);
 
 		if (pIE->ElementID == _VENDOR_SPECIFIC_IE_ && _rtw_memcmp(pIE->data, OUI, 4)) {
 			len += pIE->Length - 4; /* 4 is P2P OUI length, don't count it in this loop */
@@ -1751,7 +1751,7 @@ u32 rtw_get_p2p_merged_ies_len(u8 *in_ie, u32 in_len)
  */
 int rtw_p2p_merge_ies(u8 *in_ie, u32 in_len, u8 *merge_ie)
 {
-	PNDIS_802_11_VARIABLE_IEs	pIE;
+	struct ndis_802_11_variable_ies *	pIE;
 	u8 len = 0;
 	u8 OUI[4] = { 0x50, 0x6f, 0x9a, 0x09 };
 	u8 ELOUI[6] = { 0xDD, 0x00, 0x50, 0x6f, 0x9a, 0x09 };	/* EID;Len;OUI, Len would copy at the end of function */
@@ -1763,7 +1763,7 @@ int rtw_p2p_merge_ies(u8 *in_ie, u32 in_len, u8 *merge_ie)
 		merge_ie += 6;
 
 		while (i < in_len) {
-			pIE = (PNDIS_802_11_VARIABLE_IEs)(in_ie + i);
+			pIE = (struct ndis_802_11_variable_ies *)(in_ie + i);
 
 			/* Take out the rest of P2P OUIs */
 			if (pIE->ElementID == _VENDOR_SPECIFIC_IE_ && _rtw_memcmp(pIE->data, OUI, 4)) {
@@ -2048,12 +2048,12 @@ uint rtw_del_p2p_attr(u8 *ie, uint ielen_ori, u8 attr_id)
 	return ielen;
 }
 
-inline u8 *rtw_bss_ex_get_p2p_ie(WLAN_BSSID_EX *bss_ex, u8 *p2p_ie, uint *p2p_ielen)
+inline u8 *rtw_bss_ex_get_p2p_ie(struct wlan_bssid_ex *bss_ex, u8 *p2p_ie, uint *p2p_ielen)
 {
 	return rtw_get_p2p_ie(BSS_EX_TLV_IES(bss_ex), BSS_EX_TLV_IES_LEN(bss_ex), p2p_ie, p2p_ielen);
 }
 
-void rtw_bss_ex_del_p2p_ie(WLAN_BSSID_EX *bss_ex)
+void rtw_bss_ex_del_p2p_ie(struct wlan_bssid_ex *bss_ex)
 {
 #define DBG_BSS_EX_DEL_P2P_IE 0
 
@@ -2065,7 +2065,7 @@ void rtw_bss_ex_del_p2p_ie(WLAN_BSSID_EX *bss_ex)
 	bss_ex->IELength -= ies_len_ori - ies_len;
 }
 
-void rtw_bss_ex_del_p2p_attr(WLAN_BSSID_EX *bss_ex, u8 attr_id)
+void rtw_bss_ex_del_p2p_attr(struct wlan_bssid_ex *bss_ex, u8 attr_id)
 {
 #define DBG_BSS_EX_DEL_P2P_ATTR 0
 
@@ -2372,12 +2372,12 @@ uint rtw_del_wfd_attr(u8 *ie, uint ielen_ori, u8 attr_id)
 	return ielen;
 }
 
-inline u8 *rtw_bss_ex_get_wfd_ie(WLAN_BSSID_EX *bss_ex, u8 *wfd_ie, uint *wfd_ielen)
+inline u8 *rtw_bss_ex_get_wfd_ie(struct wlan_bssid_ex *bss_ex, u8 *wfd_ie, uint *wfd_ielen)
 {
 	return rtw_get_wfd_ie(BSS_EX_TLV_IES(bss_ex), BSS_EX_TLV_IES_LEN(bss_ex), wfd_ie, wfd_ielen);
 }
 
-void rtw_bss_ex_del_wfd_ie(WLAN_BSSID_EX *bss_ex)
+void rtw_bss_ex_del_wfd_ie(struct wlan_bssid_ex *bss_ex)
 {
 #define DBG_BSS_EX_DEL_WFD_IE 0
 	u8 *ies = BSS_EX_TLV_IES(bss_ex);
@@ -2388,7 +2388,7 @@ void rtw_bss_ex_del_wfd_ie(WLAN_BSSID_EX *bss_ex)
 	bss_ex->IELength -= ies_len_ori - ies_len;
 }
 
-void rtw_bss_ex_del_wfd_attr(WLAN_BSSID_EX *bss_ex, u8 attr_id)
+void rtw_bss_ex_del_wfd_attr(struct wlan_bssid_ex *bss_ex, u8 attr_id)
 {
 #define DBG_BSS_EX_DEL_WFD_ATTR 0
 

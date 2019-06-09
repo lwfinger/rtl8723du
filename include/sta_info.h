@@ -70,7 +70,7 @@ struct wlan_acl_pool {
 	int mode;
 	int num;
 	struct rtw_wlan_acl_node aclnode[NUM_ACL];
-	_queue	acl_node_q;
+	struct __queue	acl_node_q;
 };
 
 struct	stainfo_stats	{
@@ -143,7 +143,7 @@ struct session_tracker {
 	__be16 local_port;
 	__be16 remote_port;
 	u32 remote_naddr;
-	systime set_time;
+	unsigned long set_time;
 	u8 status;
 };
 
@@ -161,7 +161,7 @@ struct st_cmd_parm {
 	u32 remote_naddr; /* TODO: IPV6 */
 };
 
-typedef bool (*st_match_rule)(_adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port);
+typedef bool (*st_match_rule)(struct adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port);
 
 struct st_register {
 	u8 s_proto;
@@ -173,7 +173,7 @@ struct st_register {
 
 struct st_ctl_t {
 	struct st_register reg[SESSION_TRACKER_REG_ID_NUM];
-	_queue tracker_q;
+	struct __queue tracker_q;
 };
 
 void rtw_st_ctl_init(struct st_ctl_t *st_ctl);
@@ -181,7 +181,7 @@ void rtw_st_ctl_deinit(struct st_ctl_t *st_ctl);
 void rtw_st_ctl_register(struct st_ctl_t *st_ctl, u8 st_reg_id, struct st_register *reg);
 void rtw_st_ctl_unregister(struct st_ctl_t *st_ctl, u8 st_reg_id);
 bool rtw_st_ctl_chk_reg_s_proto(struct st_ctl_t *st_ctl, u8 s_proto);
-bool rtw_st_ctl_chk_reg_rule(struct st_ctl_t *st_ctl, _adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port);
+bool rtw_st_ctl_chk_reg_rule(struct st_ctl_t *st_ctl, struct adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port);
 void rtw_st_ctl_rx(struct sta_info *sta, u8 *ehdr_pos);
 void dump_st_ctl(void *sel, struct st_ctl_t *st_ctl);
 
@@ -193,13 +193,13 @@ struct sta_info {
 	/* _list asoc_list; */ /* 20061114 */
 	/* _list sleep_list; */ /* sleep_q */
 	/* _list wakeup_list; */ /* wakeup_q */
-	_adapter *padapter;
+	struct adapter *adapt;
 	struct cmn_sta_info cmn;
 
 	struct sta_xmit_priv sta_xmitpriv;
 	struct sta_recv_priv sta_recvpriv;
 
-	_queue sleep_q;
+	struct __queue sleep_q;
 	unsigned int sleepq_len;
 
 	uint state;
@@ -311,7 +311,7 @@ struct sta_info {
 	u32 assoc_req_len;
 #endif
 
-	u8		IOTPeer;			/* Enum value.	HT_IOT_PEER_E */
+	u8		IOTPeer;			/* Enum value.	enum ht_iot_peer */
 
 	/* To store the sequence number of received management frame */
 	u16 RxMgmtFrameSeqNum;
@@ -432,15 +432,15 @@ struct sta_info {
 struct	sta_priv {
 	u8 *pallocated_stainfo_buf;
 	u8 *pstainfo_buf;
-	_queue	free_sta_queue;
+	struct __queue	free_sta_queue;
 
 	spinlock_t sta_hash_lock;
 	struct list_head   sta_hash[NUM_STA];
 	int asoc_sta_count;
-	_queue sleep_q;
-	_queue wakeup_q;
+	struct __queue sleep_q;
+	struct __queue wakeup_q;
 
-	_adapter *padapter;
+	struct adapter *adapt;
 
 	u32 adhoc_expire_to;
 
@@ -511,18 +511,18 @@ int rtw_stainfo_offset(struct sta_priv *stapriv, struct sta_info *sta);
 struct sta_info *rtw_get_stainfo_by_offset(struct sta_priv *stapriv, int offset);
 
 extern struct sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr);
-extern u32	rtw_free_stainfo(_adapter *padapter , struct sta_info *psta);
-extern void rtw_free_all_stainfo(_adapter *padapter);
+extern u32	rtw_free_stainfo(struct adapter *adapt , struct sta_info *psta);
+extern void rtw_free_all_stainfo(struct adapter *adapt);
 extern struct sta_info *rtw_get_stainfo(struct sta_priv *pstapriv, const u8 *hwaddr);
-extern u32 rtw_init_bcmc_stainfo(_adapter *padapter);
-extern struct sta_info *rtw_get_bcmc_stainfo(_adapter *padapter);
+extern u32 rtw_init_bcmc_stainfo(struct adapter *adapt);
+extern struct sta_info *rtw_get_bcmc_stainfo(struct adapter *adapt);
 
-u16 rtw_aid_alloc(_adapter *adapter, struct sta_info *sta);
-void dump_aid_status(void *sel, _adapter *adapter);
+u16 rtw_aid_alloc(struct adapter *adapter, struct sta_info *sta);
+void dump_aid_status(void *sel, struct adapter *adapter);
 
 #if CONFIG_RTW_MACADDR_ACL
-extern u8 rtw_access_ctrl(_adapter *adapter, u8 *mac_addr);
-void dump_macaddr_acl(void *sel, _adapter *adapter);
+extern u8 rtw_access_ctrl(struct adapter *adapter, u8 *mac_addr);
+void dump_macaddr_acl(void *sel, struct adapter *adapter);
 #endif
 
 bool rtw_is_pre_link_sta(struct sta_priv *stapriv, u8 *addr);

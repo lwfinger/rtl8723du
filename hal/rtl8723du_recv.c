@@ -5,12 +5,12 @@
 
 #include <rtl8723d_hal.h>
 
-int rtl8723du_init_recv_priv(PADAPTER padapter)
+int rtl8723du_init_recv_priv(struct adapter * adapt)
 {
-	return usb_init_recv_priv(padapter, USB_INTR_CONTENT_LENGTH);
+	return usb_init_recv_priv(adapt, USB_INTR_CONTENT_LENGTH);
 }
 
-void rtl8723du_free_recv_priv(PADAPTER padapter)
+void rtl8723du_free_recv_priv(struct adapter * adapt)
 {
-	usb_free_recv_priv(padapter, USB_INTR_CONTENT_LENGTH);
+	usb_free_recv_priv(adapt, USB_INTR_CONTENT_LENGTH);
 }

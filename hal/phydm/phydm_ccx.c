@@ -116,7 +116,7 @@ phydm_get_fahm_result(
 	u16		fahm_denumerator;	/*packet count*/
 	u32		reg_rpt, reg_rpt_2;
 	u32		reg_val_tmp;
-	boolean	is_ready = false;
+	bool	is_ready = false;
 	u8		i;
 
 	PHYDM_DBG(p_dm, DBG_ENV_MNTR, ("[%s]===>\n", __FUNCTION__));
@@ -371,7 +371,7 @@ phydm_clm_h2c(
 
 }
 
-boolean
+bool
 phydm_cal_nhm_cnt(
 	void		*p_dm_void
 )
@@ -381,7 +381,7 @@ phydm_cal_nhm_cnt(
 	u8						noisy_nhm_th_index, low_pwr_cnt = 0, high_pwr_cnt = 0;
 	u8						noisy_nhm_th = 0x52;
 	u8						i;
-	boolean					noisy = false, clean = true;
+	bool					noisy = false, clean = true;
 
 	PHYDM_DBG(p_dm, DBG_ENV_MNTR, ("[%s]===>\n", __FUNCTION__));
 
@@ -685,14 +685,14 @@ phydm_get_nhm_result(
 			ccx_info->nhm_result[2], ccx_info->nhm_result[1], ccx_info->nhm_result[0]));
 }
 
-static boolean
+static bool
 phydm_check_nhm_rdy(
 	void		*p_dm_void
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8			i;
-	boolean			is_ready = false;
+	bool			is_ready = false;
 
 	if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {
 
@@ -801,13 +801,13 @@ phydm_clm_trigger(
 	}
 }
 
-static boolean
+static bool
 phydm_check_clm_rdy(
 	void			*p_dm_void
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	boolean			is_ready = false;
+	bool			is_ready = false;
 	u8				i;
 
 	if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {

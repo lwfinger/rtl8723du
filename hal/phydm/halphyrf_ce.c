@@ -44,7 +44,7 @@ odm_clear_txpowertracking_state(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(p_dm->adapter);
+	struct hal_com_data *	p_hal_data = GET_HAL_DATA(p_dm->adapter);
 	u8			p = 0;
 	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
 
@@ -80,11 +80,11 @@ odm_clear_txpowertracking_state(
 
 void
 odm_txpowertracking_callback_thermal_meter(
-	struct _ADAPTER	*adapter
+	struct adapter	*adapter
 )
 {
 
-	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data	*p_hal_data = GET_HAL_DATA(adapter);
 	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->odmpriv;
 
 	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
@@ -641,7 +641,7 @@ odm_iq_calibrate(
 	struct PHY_DM_STRUCT	*p_dm
 )
 {
-	struct _ADAPTER	*adapter = p_dm->adapter;
+	struct adapter	*adapter = p_dm->adapter;
 	struct _IQK_INFORMATION	*p_iqk_info = &p_dm->IQK_info;
 
 	if (IS_HARDWARE_TYPE_8812AU(adapter))

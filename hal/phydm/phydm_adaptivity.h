@@ -50,19 +50,19 @@ struct phydm_adaptivity_struct {
 	u8			igi_target;
 	s8			h2l_lb;
 	s8			l2h_lb;
-	boolean		is_check;
-	boolean		dynamic_link_adaptivity;
+	bool		is_check;
+	bool		dynamic_link_adaptivity;
 	u8			ap_num_th;
 	u8			adajust_igi_level;
 	s8			backup_l2h;
 	s8			backup_h2l;
-	boolean			is_stop_edcca;
+	bool			is_stop_edcca;
 	u32			adaptivity_dbg_port; /*N:0x208, AC:0x209*/
 	u8			debug_mode;
 	s8			th_l2h_ini_debug;
 	u16			igi_up_bound_lmt_cnt;	/*When igi_up_bound_lmt_cnt !=0, limit IGI upper bound to "adapt_igi_up"*/
 	u16			igi_up_bound_lmt_val;	/*max value of igi_up_bound_lmt_cnt*/
-	boolean		igi_lmt_en;
+	bool		igi_lmt_en;
 	u8			adapt_igi_up;
 	s8			rvrt_val[2];
 	s8			th_l2h;
@@ -72,7 +72,7 @@ struct phydm_adaptivity_struct {
 void
 phydm_pause_edcca(
 	void	*p_dm_void,
-	boolean	is_pasue_edcca
+	bool	is_pasue_edcca
 );
 
 void

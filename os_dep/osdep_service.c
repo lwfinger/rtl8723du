@@ -130,14 +130,14 @@ inline struct sk_buff *_rtw_pskb_copy(struct sk_buff *skb)
 #endif
 }
 
-inline int _rtw_netif_rx(_nic_hdl ndev, struct sk_buff *skb)
+inline int _rtw_netif_rx(struct  net_device * ndev, struct sk_buff *skb)
 {
 	skb->dev = ndev;
 	return netif_rx(skb);
 }
 
 #ifdef CONFIG_RTW_NAPI
-inline int _rtw_netif_receive_skb(_nic_hdl ndev, struct sk_buff *skb)
+inline int _rtw_netif_receive_skb(struct  net_device * ndev, struct sk_buff *skb)
 {
 	skb->dev = ndev;
 	return netif_receive_skb(skb);
@@ -267,9 +267,9 @@ void rtw_list_insert_tail(struct list_head *plist, struct list_head *phead)
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-void rtw_init_timer(_timer *ptimer, void *padapter, void *pfunc, void *ctx)
+void rtw_init_timer(_timer *ptimer, void *adapt, void *pfunc, void *ctx)
 {
-	_adapter *adapter = (_adapter *)padapter;
+	struct adapter *adapter = (struct adapter *)adapt;
 
 	_init_timer(ptimer, adapter->pnetdev, pfunc, ctx);
 }
@@ -369,18 +369,18 @@ void	_rtw_spinunlock_ex(spinlock_t *plock)
 	spin_unlock(plock);
 }
 
-void _rtw_init_queue(_queue *pqueue)
+void _rtw_init_queue(struct __queue *pqueue)
 {
 	_rtw_init_listhead(&(pqueue->queue));
 	_rtw_spinlock_init(&(pqueue->lock));
 }
 
-void _rtw_deinit_queue(_queue *pqueue)
+void _rtw_deinit_queue(struct __queue *pqueue)
 {
 	_rtw_spinlock_free(&(pqueue->lock));
 }
 
-u32	  _rtw_queue_empty(_queue	*pqueue)
+u32	  _rtw_queue_empty(struct __queue	*pqueue)
 {
 	return rtw_is_list_empty(&(pqueue->queue));
 }
@@ -395,28 +395,28 @@ u32 rtw_end_of_queue_search(struct list_head *head, struct list_head *plist)
 }
 
 
-systime _rtw_get_current_time(void)
+unsigned long _rtw_get_current_time(void)
 {
 	return jiffies;
 }
 
-inline u32 _rtw_systime_to_ms(systime stime)
+inline u32 _rtw_systime_to_ms(unsigned long stime)
 {
 	return jiffies_to_msecs(stime);
 }
 
-inline systime _rtw_ms_to_systime(u32 ms)
+inline unsigned long _rtw_ms_to_systime(u32 ms)
 {
 	return msecs_to_jiffies(ms);
 }
 
 /* the input parameter start use the same unit as returned by rtw_get_current_time */
-inline int _rtw_get_passing_time_ms(systime start)
+inline int _rtw_get_passing_time_ms(unsigned long start)
 {
 	return _rtw_systime_to_ms(_rtw_get_current_time() - start);
 }
 
-inline int _rtw_get_time_interval_ms(systime start, systime end)
+inline int _rtw_get_time_interval_ms(unsigned long start, unsigned long end)
 {
 	return _rtw_systime_to_ms(end - start);
 }
@@ -944,7 +944,7 @@ RETURN:
 	return;
 }
 
-int rtw_change_ifname(_adapter *padapter, const char *ifname)
+int rtw_change_ifname(struct adapter *adapt, const char *ifname)
 {
 	struct dvobj_priv *dvobj;
 	struct net_device *pnetdev;
@@ -953,12 +953,12 @@ int rtw_change_ifname(_adapter *padapter, const char *ifname)
 	int ret;
 	u8 rtnl_lock_needed;
 
-	if (!padapter)
+	if (!adapt)
 		goto error;
 
-	dvobj = adapter_to_dvobj(padapter);
-	cur_pnetdev = padapter->pnetdev;
-	rereg_priv = &padapter->rereg_nd_name_priv;
+	dvobj = adapter_to_dvobj(adapt);
+	cur_pnetdev = adapt->pnetdev;
+	rereg_priv = &adapt->rereg_nd_name_priv;
 
 	/* free the old_pnetdev */
 	if (rereg_priv->old_pnetdev) {
@@ -975,17 +975,17 @@ int rtw_change_ifname(_adapter *padapter, const char *ifname)
 
 	rereg_priv->old_pnetdev = cur_pnetdev;
 
-	pnetdev = rtw_init_netdev(padapter);
+	pnetdev = rtw_init_netdev(adapt);
 	if (!pnetdev)  {
 		ret = -1;
 		goto error;
 	}
 
-	SET_NETDEV_DEV(pnetdev, dvobj_to_dev(adapter_to_dvobj(padapter)));
+	SET_NETDEV_DEV(pnetdev, dvobj_to_dev(adapter_to_dvobj(adapt)));
 
 	rtw_init_netdev_name(pnetdev, ifname);
 
-	_rtw_memcpy(pnetdev->dev_addr, adapter_mac_addr(padapter), ETH_ALEN);
+	_rtw_memcpy(pnetdev->dev_addr, adapter_mac_addr(adapt), ETH_ALEN);
 
 	if (rtnl_lock_needed)
 		ret = register_netdev(pnetdev);

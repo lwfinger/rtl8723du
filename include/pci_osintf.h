@@ -24,16 +24,16 @@
 //#define PCI_BC_ASPM_LTR	BIT4
 //#define PCI_BC_ASPM_OBFF	BIT5
 
-void	rtw_pci_disable_aspm(_adapter *padapter);
-void	rtw_pci_enable_aspm(_adapter *padapter);
-void	PlatformClearPciPMEStatus(PADAPTER Adapter);
-void	rtw_pci_aspm_config(_adapter *padapter);
-void	rtw_pci_aspm_config_l1off_general(_adapter *padapter, u8 eanble);
+void	rtw_pci_disable_aspm(struct adapter *adapt);
+void	rtw_pci_enable_aspm(struct adapter *adapt);
+void	PlatformClearPciPMEStatus(struct adapter * Adapter);
+void	rtw_pci_aspm_config(struct adapter *adapt);
+void	rtw_pci_aspm_config_l1off_general(struct adapter *adapt, u8 eanble);
 #ifdef CONFIG_PCI_DYNAMIC_ASPM
-void	rtw_pci_aspm_config_dynamic_l1_ilde_time(_adapter *padapter);
+void	rtw_pci_aspm_config_dynamic_l1_ilde_time(struct adapter *adapt);
 #endif
 #ifdef CONFIG_64BIT_DMA
-	u8	PlatformEnableDMA64(PADAPTER Adapter);
+	u8	PlatformEnableDMA64(struct adapter * Adapter);
 #endif
 
 #endif

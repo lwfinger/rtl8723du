@@ -16,7 +16,7 @@
 #define ACS_NHM_SETTING                         2
 
 struct _ACS_ {
-	boolean		is_force_acs_result;
+	bool		is_force_acs_result;
 	u8		clean_channel_2g;
 	u8		clean_channel_5g;
 	u16		channel_info_2g[2][ODM_MAX_CHANNEL_2G];		/* Channel_Info[1]: channel score, Channel_Info[2]:Channel_Scan_Times */
@@ -45,7 +45,7 @@ odm_get_auto_channel_select_result(
 	u8			band
 );
 
-boolean
+bool
 phydm_acs_check(
 	void	*p_dm_void
 );

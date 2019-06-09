@@ -42,7 +42,7 @@ static const char *const _pg_txpwr_src_str[] = {
 #endif
 
 #if DBG_PG_TXPWR_READ
-static void dump_pg_txpwr_info_2g(void *sel, TxPowerInfo24G *txpwr_info, u8 rfpath_num, u8 max_tx_cnt)
+static void dump_pg_txpwr_info_2g(void *sel, struct TxPowerInfo24G *txpwr_info, u8 rfpath_num, u8 max_tx_cnt)
 {
 	int path, group, tx_idx;
 
@@ -126,7 +126,7 @@ static void dump_pg_txpwr_info_2g(void *sel, TxPowerInfo24G *txpwr_info, u8 rfpa
 	RTW_PRINT_SEL(sel, "\n");
 }
 
-static void dump_pg_txpwr_info_5g(void *sel, TxPowerInfo5G *txpwr_info, u8 rfpath_num, u8 max_tx_cnt)
+static void dump_pg_txpwr_info_5g(void *sel, struct TxPowerInfo5G *txpwr_info, u8 rfpath_num, u8 max_tx_cnt)
 {
 	int path, group, tx_idx;
 
@@ -235,7 +235,7 @@ static const struct map_t rtl8723d_pg_txpwr_def_info =
 			0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x21, 0x21, 0x21, 0x21, 0x21, 0x02)
 	);
 
-const struct map_t *hal_pg_txpwr_def_info(_adapter *adapter)
+const struct map_t *hal_pg_txpwr_def_info(struct adapter *adapter)
 {
 	u8 interface_type = 0;
 	const struct map_t *map = NULL;
@@ -257,7 +257,7 @@ const struct map_t *hal_pg_txpwr_def_info(_adapter *adapter)
 	return map;
 }
 
-static u8 hal_chk_pg_txpwr_info_2g(_adapter *adapter, TxPowerInfo24G *pwr_info)
+static u8 hal_chk_pg_txpwr_info_2g(struct adapter *adapter, struct TxPowerInfo24G *pwr_info)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	u8 path, group, tx_idx;
@@ -287,12 +287,12 @@ static u8 hal_chk_pg_txpwr_info_2g(_adapter *adapter, TxPowerInfo24G *pwr_info)
 	return _SUCCESS;
 }
 
-static u8 hal_chk_pg_txpwr_info_5g(_adapter *adapter, TxPowerInfo5G *pwr_info)
+static u8 hal_chk_pg_txpwr_info_5g(struct adapter *adapter, struct TxPowerInfo5G *pwr_info)
 {
 	return _SUCCESS;
 }
 
-static inline void hal_init_pg_txpwr_info_2g(_adapter *adapter, TxPowerInfo24G *pwr_info)
+static inline void hal_init_pg_txpwr_info_2g(struct adapter *adapter, struct TxPowerInfo24G *pwr_info)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	u8 path, group, tx_idx;
@@ -300,7 +300,7 @@ static inline void hal_init_pg_txpwr_info_2g(_adapter *adapter, TxPowerInfo24G *
 	if (!pwr_info)
 		return;
 
-	_rtw_memset(pwr_info, 0, sizeof(TxPowerInfo24G));
+	_rtw_memset(pwr_info, 0, sizeof(struct TxPowerInfo24G));
 
 	/* init with invalid value */
 	for (path = 0; path < MAX_RF_PATH; path++) {
@@ -329,7 +329,7 @@ static inline void hal_init_pg_txpwr_info_2g(_adapter *adapter, TxPowerInfo24G *
 	}
 }
 
-static inline void hal_init_pg_txpwr_info_5g(_adapter *adapter, TxPowerInfo5G *pwr_info)
+static inline void hal_init_pg_txpwr_info_5g(struct adapter *adapter, struct TxPowerInfo5G *pwr_info)
 {
 }
 
@@ -340,8 +340,8 @@ static inline void hal_init_pg_txpwr_info_5g(_adapter *adapter, TxPowerInfo5G *p
 #endif
 
 static u16 hal_load_pg_txpwr_info_path_2g(
-	_adapter *adapter,
-	TxPowerInfo24G	*pwr_info,
+	struct adapter *adapter,
+	struct TxPowerInfo24G	*pwr_info,
 	u32 path,
 	u8 txpwr_src,
 	const struct map_t *txpwr_map,
@@ -470,8 +470,8 @@ exit:
 }
 
 static u16 hal_load_pg_txpwr_info_path_5g(
-	_adapter *adapter,
-	TxPowerInfo5G	*pwr_info,
+	struct adapter *adapter,
+	struct TxPowerInfo5G	*pwr_info,
 	u32 path,
 	u8 txpwr_src,
 	const struct map_t *txpwr_map,
@@ -491,9 +491,9 @@ static u16 hal_load_pg_txpwr_info_path_5g(
 }
 
 static void hal_load_pg_txpwr_info(
-	_adapter *adapter,
-	TxPowerInfo24G *pwr_info_2g,
-	TxPowerInfo5G *pwr_info_5g,
+	struct adapter *adapter,
+	struct TxPowerInfo24G *pwr_info_2g,
+	struct TxPowerInfo5G *pwr_info_5g,
 	u8 *pg_data,
 	bool AutoLoadFail
 )
@@ -560,13 +560,13 @@ exit:
 }
 
 void hal_load_txpwr_info(
-	_adapter *adapter,
-	TxPowerInfo24G *pwr_info_2g,
-	TxPowerInfo5G *pwr_info_5g,
+	struct adapter *adapter,
+	struct TxPowerInfo24G *pwr_info_2g,
+	struct TxPowerInfo5G *pwr_info_5g,
 	u8 *pg_data
 )
 {
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	u8 max_tx_cnt = hal_spec->max_tx_cnt;
 	u8 rfpath, ch_idx, group, tx_idx;
@@ -606,9 +606,9 @@ bypass_2g:
 	}
 }
 
-void dump_hal_txpwr_info_2g(void *sel, _adapter *adapter, u8 rfpath_num, u8 max_tx_cnt)
+void dump_hal_txpwr_info_2g(void *sel, struct adapter *adapter, u8 rfpath_num, u8 max_tx_cnt)
 {
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	int path, ch_idx, tx_idx;
 
 	RTW_PRINT_SEL(sel, "2.4G\n");
@@ -691,7 +691,7 @@ void dump_hal_txpwr_info_2g(void *sel, _adapter *adapter, u8 rfpath_num, u8 max_
 	RTW_PRINT_SEL(sel, "\n");
 }
 
-void dump_hal_txpwr_info_5g(void *sel, _adapter *adapter, u8 rfpath_num, u8 max_tx_cnt)
+void dump_hal_txpwr_info_5g(void *sel, struct adapter *adapter, u8 rfpath_num, u8 max_tx_cnt)
 {
 }
 
@@ -701,10 +701,10 @@ void dump_hal_txpwr_info_5g(void *sel, _adapter *adapter, u8 rfpath_num, u8 max_
 * Return dBm or -1 for undefined
 */
 static s8 rtw_regsty_get_target_tx_power(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	u8				Band,
 	u8				RfPath,
-	RATE_SECTION	RateSection
+	enum rate_section RateSection
 )
 {
 	struct registry_priv *regsty = adapter_to_regsty(Adapter);
@@ -732,10 +732,10 @@ static s8 rtw_regsty_get_target_tx_power(
 	return value;
 }
 
-static bool rtw_regsty_chk_target_tx_power_valid(_adapter *adapter)
+static bool rtw_regsty_chk_target_tx_power_valid(struct adapter *adapter)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	int path, tx_num, band, rs;
 	s8 target;
 
@@ -777,13 +777,13 @@ static bool rtw_regsty_chk_target_tx_power_valid(_adapter *adapter)
 */
 u8
 PHY_GetTxPowerByRateBase(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	u8				Band,
 	u8				RfPath,
-	RATE_SECTION	RateSection
+	enum rate_section RateSection
 )
 {
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *pHalData = GET_HAL_DATA(Adapter);
 	u8 value = 0;
 
 	if (RfPath > RF_PATH_D) {
@@ -814,14 +814,14 @@ PHY_GetTxPowerByRateBase(
 
 static void
 phy_SetTxPowerByRateBase(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	u8				Band,
 	u8				RfPath,
-	RATE_SECTION	RateSection,
+	enum rate_section RateSection,
 	u8				Value
 )
 {
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *pHalData = GET_HAL_DATA(Adapter);
 
 	if (RfPath > RF_PATH_D) {
 		RTW_PRINT("%s invalid RfPath:%d\n", __func__, RfPath);
@@ -847,10 +847,10 @@ phy_SetTxPowerByRateBase(
 		pHalData->TxPwrByRateBase5G[RfPath][RateSection - 1] = Value;
 }
 
-static inline bool phy_is_txpwr_by_rate_undefined_of_band_path(_adapter *adapter, u8 band, u8 path)
+static inline bool phy_is_txpwr_by_rate_undefined_of_band_path(struct adapter *adapter, u8 band, u8 path)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	u8 rate_idx = 0;
 
 	for (rate_idx = 0; rate_idx < TX_PWR_BY_RATE_NUM_RATE; rate_idx++) {
@@ -862,20 +862,20 @@ exit:
 	return rate_idx >= TX_PWR_BY_RATE_NUM_RATE ? true : false;
 }
 
-static inline void phy_txpwr_by_rate_duplicate_band_path(_adapter *adapter, u8 band, u8 s_path, u8 t_path)
+static inline void phy_txpwr_by_rate_duplicate_band_path(struct adapter *adapter, u8 band, u8 s_path, u8 t_path)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	u8 rate_idx = 0;
 
 	for (rate_idx = 0; rate_idx < TX_PWR_BY_RATE_NUM_RATE; rate_idx++)
 		hal_data->TxPwrByRateOffset[band][t_path][rate_idx] = hal_data->TxPwrByRateOffset[band][s_path][rate_idx];
 }
 
-static void phy_txpwr_by_rate_chk_for_path_dup(_adapter *adapter)
+static void phy_txpwr_by_rate_chk_for_path_dup(struct adapter *adapter)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	u8 band, path;
 	s8 src_path;
 
@@ -931,7 +931,7 @@ static void phy_txpwr_by_rate_chk_for_path_dup(_adapter *adapter)
 
 static void
 phy_StoreTxPowerByRateBase(
-	PADAPTER	pAdapter
+	struct adapter *	pAdapter
 )
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(pAdapter);
@@ -983,7 +983,7 @@ phy_StoreTxPowerByRateBase(
 
 void
 PHY_GetRateValuesOfTxPowerByRate(
-	PADAPTER pAdapter,
+	struct adapter * pAdapter,
 	u32 RegAddr,
 	u32 BitMask,
 	u32 Value,
@@ -992,7 +992,7 @@ PHY_GetRateValuesOfTxPowerByRate(
 	u8 *RateNum
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &pHalData->odmpriv;
 	u8				index = 0, i = 0;
 
@@ -1373,7 +1373,7 @@ PHY_GetRateValuesOfTxPowerByRate(
 
 static void
 PHY_StoreTxPowerByRateNew(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	u32			Band,
 	u32			RfPath,
 	u32			RegAddr,
@@ -1381,7 +1381,7 @@ PHY_StoreTxPowerByRateNew(
 	u32			Data
 )
 {
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data *pHalData = GET_HAL_DATA(pAdapter);
 	u8	i = 0, rates[4] = {0}, rateNum = 0;
 	s8	PwrByRateVal[4] = {0};
 
@@ -1406,10 +1406,10 @@ PHY_StoreTxPowerByRateNew(
 
 void
 PHY_InitTxPowerByRate(
-	PADAPTER	pAdapter
+	struct adapter *	pAdapter
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 	u8	band = 0, rfPath = 0, rate = 0, i = 0, j = 0;
 
 	for (band = BAND_ON_2_4G; band <= BAND_ON_5G; ++band)
@@ -1420,7 +1420,7 @@ PHY_InitTxPowerByRate(
 
 void
 phy_store_tx_power_by_rate(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	u32			Band,
 	u32			RfPath,
 	u32			TxNum,
@@ -1429,7 +1429,7 @@ phy_store_tx_power_by_rate(
 	u32			Data
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &pHalData->odmpriv;
 
 	if (pDM_Odm->phy_reg_pg_version > 0)
@@ -1441,10 +1441,10 @@ phy_store_tx_power_by_rate(
 
 static void
 phy_ConvertTxPowerByRateInDbmToRelativeValues(
-	PADAPTER	pAdapter
+	struct adapter *	pAdapter
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 	u8			base = 0, i = 0, value = 0,
 				band = 0, path = 0, index = 0,
 				startIndex = 0, endIndex = 0;
@@ -1533,10 +1533,10 @@ phy_ConvertTxPowerByRateInDbmToRelativeValues(
   */
 void
 PHY_TxPowerByRateConfiguration(
-	PADAPTER			pAdapter
+	struct adapter *			pAdapter
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 
 	phy_txpwr_by_rate_chk_for_path_dup(pAdapter);
 	phy_StoreTxPowerByRateBase(pAdapter);
@@ -1545,13 +1545,13 @@ PHY_TxPowerByRateConfiguration(
 
 void
 phy_set_tx_power_index_by_rate_section(
-	PADAPTER		pAdapter,
+	struct adapter *		pAdapter,
 	enum rf_path		RFPath,
 	u8				Channel,
 	u8				RateSection
 )
 {
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(pAdapter);
 
 	if (RateSection >= RATE_SECTION_NUM) {
 		RTW_INFO("Invalid RateSection %d in %s", RateSection, __func__);
@@ -1597,7 +1597,7 @@ phy_GetChnlIndex(
 
 u8
 PHY_GetTxPowerIndexBase(
-	PADAPTER		pAdapter,
+	struct adapter *		pAdapter,
 	enum rf_path		RFPath,
 	u8				Rate,
 	u8 ntx_idx,
@@ -1606,7 +1606,7 @@ PHY_GetTxPowerIndexBase(
 	bool *bIn24G
 )
 {
-	PHAL_DATA_TYPE		pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data *		pHalData = GET_HAL_DATA(pAdapter);
 	struct PHY_DM_STRUCT			*pDM_Odm = &pHalData->odmpriv;
 	u8					i = 0;	/* default set to 1S */
 	u8					txPower = 0;
@@ -1693,12 +1693,12 @@ exit:
 
 s8
 PHY_GetTxPowerTrackingOffset(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	enum rf_path	RFPath,
 	u8			Rate
 )
 {
-	PHAL_DATA_TYPE		pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data *		pHalData = GET_HAL_DATA(pAdapter);
 	struct PHY_DM_STRUCT			*pDM_Odm = &pHalData->odmpriv;
 	s8	offset = 0;
 
@@ -1987,13 +1987,13 @@ PHY_GetRateIndexOfTxPowerByRate(
 
 s8
 _PHY_GetTxPowerByRate(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	u8			Band,
 	enum rf_path	RFPath,
 	u8			Rate
 )
 {
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data *pHalData = GET_HAL_DATA(pAdapter);
 	s8 value = 0;
 	u8 rateIndex = PHY_GetRateIndexOfTxPowerByRate(Rate);
 
@@ -2019,7 +2019,7 @@ exit:
 
 s8
 PHY_GetTxPowerByRate(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	u8			Band,
 	enum rf_path	RFPath,
 	u8			Rate
@@ -2033,14 +2033,14 @@ PHY_GetTxPowerByRate(
 
 void
 PHY_SetTxPowerByRate(
-	PADAPTER	pAdapter,
+	struct adapter *	pAdapter,
 	u8			Band,
 	enum rf_path	RFPath,
 	u8			Rate,
 	s8			Value
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 	u8	rateIndex = PHY_GetRateIndexOfTxPowerByRate(Rate);
 
 	if (Band != BAND_ON_2_4G && Band != BAND_ON_5G) {
@@ -2061,12 +2061,12 @@ PHY_SetTxPowerByRate(
 
 void
 phy_set_tx_power_level_by_path(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	u8			channel,
 	u8			path
 )
 {
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
 	bool bIsIn24G = (pHalData->current_band_type == BAND_ON_2_4G);
 
 	/* if ( pMgntInfo->RegNByteAccess == 0 ) */
@@ -2090,7 +2090,7 @@ phy_set_tx_power_level_by_path(
 
 void
 PHY_SetTxPowerIndexByRateArray(
-	PADAPTER			pAdapter,
+	struct adapter *			pAdapter,
 	enum rf_path			RFPath,
 	enum channel_width	BandWidth,
 	u8					Channel,
@@ -2146,7 +2146,7 @@ phy_GetChannelIndexOfTxPowerLimit(
 * MAX_POWER_INDEX is returned when NO limit
 */
 s8 phy_get_txpwr_lmt_abs(
-	PADAPTER			Adapter,
+	struct adapter *			Adapter,
 	const char			*regd_name,
 	BAND_TYPE			Band,
 	enum channel_width		bw,
@@ -2158,9 +2158,9 @@ s8 phy_get_txpwr_lmt_abs(
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(Adapter);
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(Adapter);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(Adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(Adapter);
 	struct txpwr_lmt_ent *ent = NULL;
-	_irqL irqL;
+	unsigned long irqL;
 	struct list_head *cur, *head;
 	s8 ch_idx;
 	u8 is_ww_regd = 0;
@@ -2234,7 +2234,7 @@ exit:
 * return txpwr limit diff value
 * MAX_POWER_INDEX is returned when NO limit
 */
-inline s8 phy_get_txpwr_lmt(_adapter *adapter
+inline s8 phy_get_txpwr_lmt(struct adapter *adapter
 	, const char *regd_name
 	, BAND_TYPE band, enum channel_width bw
 	, u8 rfpath, u8 rs, u8 ntx_idx, u8 cch, u8 lock
@@ -2273,14 +2273,14 @@ exit:
 * return txpwr limit diff value
 */
 s8
-PHY_GetTxPowerLimit(_adapter *adapter
+PHY_GetTxPowerLimit(struct adapter *adapter
 	, const char *regd_name
 	, BAND_TYPE band, enum channel_width bw
 	, u8 rfpath, u8 rate, u8 ntx_idx, u8 cch)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	bool no_sc = false;
 	s8 tlrs = -1, rs = -1;
 	s8 lmt = MAX_POWER_INDEX;
@@ -2289,7 +2289,7 @@ PHY_GetTxPowerLimit(_adapter *adapter
 	u8 bw_bmp = 0;
 	s8 min_lmt = MAX_POWER_INDEX;
 	u8 final_bw = bw, final_cch = cch;
-	_irqL irqL;
+	unsigned long irqL;
 
 #ifdef CONFIG_MP_INCLUDED
 	/* MP mode channel don't use secondary channel */
@@ -2382,7 +2382,7 @@ exit:
 	return min_lmt;
 }
 
-static void phy_txpwr_lmt_cck_ofdm_mt_chk(_adapter *adapter)
+static void phy_txpwr_lmt_cck_ofdm_mt_chk(struct adapter *adapter)
 {
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
 	struct txpwr_lmt_ent *ent;
@@ -2425,10 +2425,10 @@ static void phy_txpwr_lmt_cck_ofdm_mt_chk(_adapter *adapter)
 	}
 }
 
-static void phy_txpwr_lmt_post_hdl(_adapter *adapter)
+static void phy_txpwr_lmt_post_hdl(struct adapter *adapter)
 {
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-	_irqL irqL;
+	unsigned long irqL;
 
 	_enter_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
 
@@ -2483,8 +2483,8 @@ phy_set_tx_power_limit(
 )
 {
 #ifdef CONFIG_TXPWR_LIMIT
-	PADAPTER Adapter = pDM_Odm->adapter;
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(Adapter);
+	struct adapter * Adapter = pDM_Odm->adapter;
+	struct hal_com_data *pHalData = GET_HAL_DATA(Adapter);
 	u8 band = 0, bandwidth = 0, tlrs = 0, channel;
 	u8 ntx_idx;
 	s8 powerLimit = 0, prevPowerLimit, channelIndex;
@@ -2565,7 +2565,7 @@ phy_set_tx_power_limit(
 
 u8
 phy_get_tx_power_index(
-	PADAPTER			pAdapter,
+	struct adapter *			pAdapter,
 	enum rf_path			RFPath,
 	u8					Rate,
 	enum channel_width	BandWidth,
@@ -2577,7 +2577,7 @@ phy_get_tx_power_index(
 
 void
 PHY_SetTxPowerIndex(
-	PADAPTER		pAdapter,
+	struct adapter *		pAdapter,
 	u32				PowerIndex,
 	enum rf_path		RFPath,
 	u8				Rate
@@ -2591,9 +2591,9 @@ PHY_SetTxPowerIndex(
 		rtw_hal_set_tx_power_index(pAdapter, PowerIndex, RFPath, Rate);
 }
 
-void dump_tx_power_idx_title(void *sel, _adapter *adapter)
+void dump_tx_power_idx_title(void *sel, struct adapter *adapter)
 {
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	u8 bw = hal_data->current_channel_bw;
 
 	RTW_PRINT_SEL(sel, "%s", ch_width_str(bw));
@@ -2607,9 +2607,9 @@ void dump_tx_power_idx_title(void *sel, _adapter *adapter)
 		, "path", "rate", "", "pwr", "base", "", "(byr", "lmt)", "tpt", "ebias");
 }
 
-void dump_tx_power_idx_by_path_rs(void *sel, _adapter *adapter, u8 rfpath, u8 rs)
+void dump_tx_power_idx_by_path_rs(void *sel, struct adapter *adapter, u8 rfpath, u8 rs)
 {
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	u8 power_idx;
 	struct txpwr_idx_comp tic;
@@ -2643,7 +2643,7 @@ void dump_tx_power_idx_by_path_rs(void *sel, _adapter *adapter, u8 rfpath, u8 rs
 	}
 }
 
-void dump_tx_power_idx(void *sel, _adapter *adapter)
+void dump_tx_power_idx(void *sel, struct adapter *adapter)
 {
 	u8 rfpath, rs;
 
@@ -2653,9 +2653,9 @@ void dump_tx_power_idx(void *sel, _adapter *adapter)
 			dump_tx_power_idx_by_path_rs(sel, adapter, rfpath, rs);
 }
 
-bool phy_is_tx_power_limit_needed(_adapter *adapter)
+bool phy_is_tx_power_limit_needed(struct adapter *adapter)
 {
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	struct registry_priv *regsty = dvobj_to_regsty(adapter_to_dvobj(adapter));
 
 #ifdef CONFIG_TXPWR_LIMIT
@@ -2667,9 +2667,9 @@ bool phy_is_tx_power_limit_needed(_adapter *adapter)
 	return false;
 }
 
-bool phy_is_tx_power_by_rate_needed(_adapter *adapter)
+bool phy_is_tx_power_by_rate_needed(struct adapter *adapter)
 {
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	struct registry_priv *regsty = dvobj_to_regsty(adapter_to_dvobj(adapter));
 
 	if (regsty->RegEnableTxPowerByRate == 1
@@ -2678,9 +2678,9 @@ bool phy_is_tx_power_by_rate_needed(_adapter *adapter)
 	return false;
 }
 
-int phy_load_tx_power_by_rate(_adapter *adapter, u8 chk_file)
+int phy_load_tx_power_by_rate(struct adapter *adapter, u8 chk_file)
 {
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	struct registry_priv *regsty = dvobj_to_regsty(adapter_to_dvobj(adapter));
 	int ret = _FAIL;
 
@@ -2726,9 +2726,9 @@ exit:
 }
 
 #ifdef CONFIG_TXPWR_LIMIT
-int phy_load_tx_power_limit(_adapter *adapter, u8 chk_file)
+int phy_load_tx_power_limit(struct adapter *adapter, u8 chk_file)
 {
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	struct registry_priv *regsty = dvobj_to_regsty(adapter_to_dvobj(adapter));
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
 	int ret = _FAIL;
@@ -2773,7 +2773,7 @@ exit:
 }
 #endif /* CONFIG_TXPWR_LIMIT */
 
-void phy_load_tx_power_ext_info(_adapter *adapter, u8 chk_file)
+void phy_load_tx_power_ext_info(struct adapter *adapter, u8 chk_file)
 {
 	struct registry_priv *regsty = adapter_to_regsty(adapter);
 
@@ -2792,20 +2792,20 @@ void phy_load_tx_power_ext_info(_adapter *adapter, u8 chk_file)
 #endif
 }
 
-inline void phy_reload_tx_power_ext_info(_adapter *adapter)
+inline void phy_reload_tx_power_ext_info(struct adapter *adapter)
 {
 	phy_load_tx_power_ext_info(adapter, 1);
 }
 
-inline void phy_reload_default_tx_power_ext_info(_adapter *adapter)
+inline void phy_reload_default_tx_power_ext_info(struct adapter *adapter)
 {
 	phy_load_tx_power_ext_info(adapter, 0);
 }
 
-void dump_tx_power_ext_info(void *sel, _adapter *adapter)
+void dump_tx_power_ext_info(void *sel, struct adapter *adapter)
 {
 	struct registry_priv *regsty = adapter_to_regsty(adapter);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 
 	if (regsty->target_tx_pwr_valid == true)
 		RTW_PRINT_SEL(sel, "target_tx_power: from registry\n");
@@ -2827,10 +2827,10 @@ void dump_tx_power_ext_info(void *sel, _adapter *adapter)
 	);
 }
 
-void dump_target_tx_power(void *sel, _adapter *adapter)
+void dump_target_tx_power(void *sel, struct adapter *adapter)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	struct registry_priv *regsty = adapter_to_regsty(adapter);
 	int path, tx_num, band, rs;
 	u8 target;
@@ -2871,10 +2871,10 @@ exit:
 	return;
 }
 
-void dump_tx_power_by_rate(void *sel, _adapter *adapter)
+void dump_tx_power_by_rate(void *sel, struct adapter *adapter)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
-	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
+	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	int path, tx_num, band, n, rs;
 	u8 rate_num, max_rate_num, base;
 	s8 by_rate_offset;
@@ -2937,7 +2937,7 @@ void dump_tx_power_by_rate(void *sel, _adapter *adapter)
  * phy file path is stored in global char array rtw_phy_para_file_path
  * need to care about racing
  */
-int rtw_get_phy_file_path(_adapter *adapter, const char *file_name)
+int rtw_get_phy_file_path(struct adapter *adapter, const char *file_name)
 {
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
@@ -2959,11 +2959,11 @@ int rtw_get_phy_file_path(_adapter *adapter, const char *file_name)
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
 int
 phy_ConfigMACWithParaFile(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	char		*pFileName
 )
 {
-	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
 	int	rlen = 0, rtStatus = _FAIL;
 	char	*szLine, *ptmp;
 	u32	u4bRegOffset, u4bRegValue, u4bMove;
@@ -3021,12 +3021,12 @@ phy_ConfigMACWithParaFile(
 
 int
 phy_ConfigBBWithParaFile(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	char		*pFileName,
 	u32			ConfigType
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	int	rlen = 0, rtStatus = _FAIL;
 	char	*szLine, *ptmp;
 	u32	u4bRegOffset, u4bRegValue, u4bMove;
@@ -3128,7 +3128,7 @@ phy_ConfigBBWithParaFile(
 
 static void
 phy_DecryptBBPgParaFile(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	char			*buffer
 )
 {
@@ -3166,12 +3166,12 @@ phy_DecryptBBPgParaFile(
 
 static int
 phy_ParseBBPgParaFile(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	char			*buffer
 )
 {
 	int	rtStatus = _SUCCESS;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	char	*szLine, *ptmp;
 	u32	u4bRegOffset, u4bRegMask, u4bRegValue;
 	u32	u4bMove;
@@ -3423,10 +3423,10 @@ phy_ParseBBPgParaFile(
 
 int
 phy_ConfigBBWithPgParaFile(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	const char	*pFileName)
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	int	rlen = 0, rtStatus = _FAIL;
 
 	if (!(Adapter->registrypriv.load_phy_file & LOAD_BB_PG_PARA_FILE))
@@ -3469,11 +3469,11 @@ phy_ConfigBBWithPgParaFile(
 
 int
 phy_ConfigBBWithMpParaFile(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	char		*pFileName
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	int	rlen = 0, rtStatus = _FAIL;
 	char	*szLine, *ptmp;
 	u32	u4bRegOffset, u4bRegValue, u4bMove;
@@ -3551,12 +3551,12 @@ phy_ConfigBBWithMpParaFile(
 
 int
 PHY_ConfigRFWithParaFile(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	char		*pFileName,
 	enum rf_path		eRFPath
 )
 {
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	int	rlen = 0, rtStatus = _FAIL;
 	char	*szLine, *ptmp;
 	u32	u4bRegOffset, u4bRegValue, u4bMove;
@@ -3671,7 +3671,7 @@ PHY_ConfigRFWithParaFile(
 
 static void
 initDeltaSwingIndexTables(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	char		*Band,
 	char		*Path,
 	char		*Sign,
@@ -3696,7 +3696,7 @@ initDeltaSwingIndexTables(
 		_array[_iteratedIdx++] = (u8)idx;\
 	} } while (0)\
 
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &pHalData->odmpriv;
 	struct odm_rf_calibration_structure	*pRFCalibrateInfo = &(pDM_Odm->rf_calibrate_info);
 	u32	j = 0;
@@ -3761,11 +3761,11 @@ initDeltaSwingIndexTables(
 
 int
 PHY_ConfigRFWithTxPwrTrackParaFile(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	char			*pFileName
 )
 {
-	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data		*pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT			*pDM_Odm = &pHalData->odmpriv;
 	struct odm_rf_calibration_structure		*pRFCalibrateInfo = &(pDM_Odm->rf_calibrate_info);
 	int	rlen = 0, rtStatus = _FAIL;
@@ -3851,7 +3851,7 @@ PHY_ConfigRFWithTxPwrTrackParaFile(
 * or
 * @@CountryCode=GB, Regulation=C7
 */
-static u8 parse_reg_exc_config(_adapter *adapter, char *szLine)
+static u8 parse_reg_exc_config(struct adapter *adapter, char *szLine)
 {
 #define VER_PREFIX "Ver="
 #define DOMAIN_PREFIX "DomainCode=0x"
@@ -3950,7 +3950,7 @@ static u8 parse_reg_exc_config(_adapter *adapter, char *szLine)
 
 static int
 phy_ParsePowerLimitTableFile(
-	PADAPTER		Adapter,
+	struct adapter *		Adapter,
 	char			*buffer
 )
 {
@@ -3961,7 +3961,7 @@ phy_ParsePowerLimitTableFile(
 #define LD_STAGE_CH_ROW			4
 
 	int	rtStatus = _FAIL;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT	*pDM_Odm = &(pHalData->odmpriv);
 	u8	loadingStage = LD_STAGE_EXC_MAPPING;
 	u32	i = 0, forCnt = 0;
@@ -4283,11 +4283,11 @@ exit:
 
 int
 PHY_ConfigRFWithPowerLimitTableParaFile(
-	PADAPTER	Adapter,
+	struct adapter *	Adapter,
 	const char	*pFileName
 )
 {
-	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data		*pHalData = GET_HAL_DATA(Adapter);
 	int	rlen = 0, rtStatus = _FAIL;
 
 	if (!(Adapter->registrypriv.load_phy_file & LOAD_RF_TXPWR_LMT_PARA_FILE))
@@ -4326,9 +4326,9 @@ PHY_ConfigRFWithPowerLimitTableParaFile(
 }
 #endif /* CONFIG_TXPWR_LIMIT */
 
-void phy_free_filebuf_mask(_adapter *padapter, u8 mask)
+void phy_free_filebuf_mask(struct adapter *adapt, u8 mask)
 {
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
+	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
 
 	if (pHalData->mac_reg && (mask & LOAD_MAC_PARA_FILE)) {
 		rtw_vmfree(pHalData->mac_reg, pHalData->mac_reg_len);
@@ -4372,9 +4372,9 @@ void phy_free_filebuf_mask(_adapter *padapter, u8 mask)
 	}
 }
 
-inline void phy_free_filebuf(_adapter *padapter)
+inline void phy_free_filebuf(struct adapter *adapt)
 {
-	phy_free_filebuf_mask(padapter, 0xFF);
+	phy_free_filebuf_mask(adapt, 0xFF);
 }
 
 #endif

@@ -12,7 +12,7 @@
 
 #if defined(CONFIG_PHYDM_DFS_MASTER)
 
-boolean phydm_dfs_is_meteorology_channel(void *p_dm_void){
+bool phydm_dfs_is_meteorology_channel(void *p_dm_void){
 
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	
@@ -308,7 +308,7 @@ void phydm_dfs_dynamic_setting(
 }
 
 
-boolean
+bool
 phydm_radar_detect_dm_check(
 	void *p_dm_void
 ){
@@ -320,7 +320,7 @@ phydm_radar_detect_dm_check(
 	u16 vht_crc_ok_cnt_inc = 0, ht_crc_ok_cnt_cur = 0, ht_crc_ok_cnt_inc = 0, leg_crc_ok_cnt_cur = 0, leg_crc_ok_cnt_inc = 0;
 	u16 total_crc_ok_cnt_inc = 0, short_pulse_cnt_cur = 0, short_pulse_cnt_inc = 0, long_pulse_cnt_cur = 0, long_pulse_cnt_inc = 0, total_pulse_count_inc = 0;
 	u32 regf98_value = 0, reg918_value = 0, reg91c_value = 0, reg920_value = 0, reg924_value = 0;
-	boolean tri_short_pulse = 0, tri_long_pulse = 0, radar_type = 0, fault_flag_det = 0, fault_flag_psd = 0, fa_flag = 0, radar_detected = 0;
+	bool tri_short_pulse = 0, tri_long_pulse = 0, radar_type = 0, fault_flag_det = 0, fault_flag_psd = 0, fa_flag = 0, radar_detected = 0;
 	u8 st_l2h_new = 0, fa_mask_th = 0, sum = 0;
 	u8 c_channel = *(p_dm->p_channel);
 		
@@ -544,12 +544,12 @@ phydm_radar_detect_dm_check(
 
 }
 
-boolean phydm_radar_detect(void *p_dm_void)
+bool phydm_radar_detect(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _DFS_STATISTICS	*p_dfs = (struct _DFS_STATISTICS *)phydm_get_structure(p_dm, PHYDM_DFS);
-	boolean enable_DFS = false;
-	boolean radar_detected = false;
+	bool enable_DFS = false;
+	bool radar_detected = false;
 
 	p_dfs->igi_cur = (u8)odm_get_bb_reg(p_dm, 0xc50, 0x0000007f);
 
@@ -598,10 +598,10 @@ phydm_dfs_debug(
 	u32 used = *_used;
 	u32 out_len = *_out_len;
 
-	p_dfs->dbg_mode = (boolean)argv[0];
-	p_dfs->force_TP_mode = (boolean)argv[1];
-	p_dfs->det_print = (boolean)argv[2];
-	p_dfs->det_print2 = (boolean)argv[3];
+	p_dfs->dbg_mode = (bool)argv[0];
+	p_dfs->force_TP_mode = (bool)argv[1];
+	p_dfs->det_print = (bool)argv[2];
+	p_dfs->det_print2 = (bool)argv[3];
 
 	PHYDM_SNPRINTF((output + used, out_len - used, "dbg_mode: %d, force_TP_mode: %d, det_print: %d, det_print2: %d\n", p_dfs->dbg_mode, p_dfs->force_TP_mode, p_dfs->det_print, p_dfs->det_print2));
 	
@@ -638,7 +638,7 @@ phydm_dfs_debug(
 
 #endif /* defined(CONFIG_PHYDM_DFS_MASTER) */
 
-boolean
+bool
 phydm_is_dfs_band(
 	void		*p_dm_void
 )
@@ -652,7 +652,7 @@ phydm_is_dfs_band(
 		return false;
 }
 
-boolean
+bool
 phydm_dfs_master_enabled(
 	void		*p_dm_void
 )

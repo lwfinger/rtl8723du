@@ -16,8 +16,8 @@ struct sreset_priv {
 	_mutex	silentreset_mutex;
 	u8	silent_reset_inprogress;
 	u8	Wifi_Error_Status;
-	systime last_tx_time;
-	systime last_tx_complete_time;
+	unsigned long last_tx_time;
+	unsigned long last_tx_complete_time;
 
 	int dbg_trigger_point;
 	u64 self_dect_tx_cnt;
@@ -46,12 +46,12 @@ struct sreset_priv {
 #define	WIFI_RX_HANG				BIT5
 #define	WIFI_IF_NOT_EXIST			BIT6
 
-void sreset_init_value(_adapter *padapter);
-void sreset_reset_value(_adapter *padapter);
-u8 sreset_get_wifi_status(_adapter *padapter);
-void sreset_set_wifi_error_status(_adapter *padapter, u32 status);
-void sreset_set_trigger_point(_adapter *padapter, int tgp);
-bool sreset_inprogress(_adapter *padapter);
-void sreset_reset(_adapter *padapter);
+void sreset_init_value(struct adapter *adapt);
+void sreset_reset_value(struct adapter *adapt);
+u8 sreset_get_wifi_status(struct adapter *adapt);
+void sreset_set_wifi_error_status(struct adapter *adapt, u32 status);
+void sreset_set_trigger_point(struct adapter *adapt, int tgp);
+bool sreset_inprogress(struct adapter *adapt);
+void sreset_reset(struct adapter *adapt);
 
 #endif

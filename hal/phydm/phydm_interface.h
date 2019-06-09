@@ -357,7 +357,7 @@ phydm_set_hw_reg_handler_interface (
 void
 phydm_get_hal_def_var_handler_interface (
 	struct PHY_DM_STRUCT		*p_dm,
-	enum _HAL_DEF_VARIABLE		e_variable,
+	enum hal_def_variable		e_variable,
 	void						*p_value
 	);
 
@@ -383,7 +383,7 @@ odm_efuse_one_byte_read(
 	struct PHY_DM_STRUCT	*p_dm,
 	u16			addr,
 	u8			*data,
-	boolean		b_pseu_do_test
+	bool		b_pseu_do_test
 );
 
 void
@@ -427,7 +427,7 @@ phydm_enable_rx_related_interrupt_handler(
 	struct PHY_DM_STRUCT		*p_dm
 );
 
-boolean
+bool
 phydm_get_txbf_en(
 	struct PHY_DM_STRUCT		*p_dm,
 	u16		mac_id,

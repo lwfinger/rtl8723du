@@ -119,7 +119,7 @@ phydm_c2h_clm_report_handler(
 );
 /*NHM*/
 
-boolean
+bool
 phydm_cal_nhm_cnt(
 	void		*p_dm_void
 );

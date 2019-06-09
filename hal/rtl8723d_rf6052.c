@@ -35,8 +35,8 @@
 
 /*------------------------Define local variable------------------------------*/
 /* 2008/11/20 MH For Debug only, RF
- * static	RF_SHADOW_T	RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG] = {0}; */
-static	RF_SHADOW_T	RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG];
+ * static	struct shadow_compare_map	RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG] = {0}; */
+static	struct shadow_compare_map	RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG];
 /*------------------------Define local variable------------------------------*/
 
 /*-----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ static	RF_SHADOW_T	RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG];
  *
  * Overview:    This function is called by SetBWModeCallback8190Pci() only
  *
- * Input:       PADAPTER				Adapter
+ * Input:       struct adapter *				Adapter
  *			WIRELESS_BANDWIDTH_E	Bandwidth
  *
  * Output:      NONE
@@ -55,10 +55,10 @@ static	RF_SHADOW_T	RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG];
  *---------------------------------------------------------------------------*/
 void
 PHY_RF6052SetBandwidth8723D(
-	PADAPTER padapter,
+	struct adapter * adapt,
 	enum channel_width Bandwidth)	/* 20M or 40M */
 {
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
+	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
 
 	switch (Bandwidth) {
 	case CHANNEL_WIDTH_20:
@@ -67,7 +67,7 @@ PHY_RF6052SetBandwidth8723D(
 		RF_A_reg 0x18[9:0]
 		*/
 		pHalData->RfRegChnlVal[0] = ((pHalData->RfRegChnlVal[0] & 0xfffff3ff) | BIT(10) | BIT(11));
-		phy_set_rf_reg(padapter, RF_PATH_A, 0x18, bRFRegOffsetMask, pHalData->RfRegChnlVal[0]); /* RF TRX_BW */
+		phy_set_rf_reg(adapt, RF_PATH_A, 0x18, bRFRegOffsetMask, pHalData->RfRegChnlVal[0]); /* RF TRX_BW */
 		break;
 	case CHANNEL_WIDTH_40:
 		/*
@@ -75,7 +75,7 @@ PHY_RF6052SetBandwidth8723D(
 		RF_A_reg 0x18[9:0]
 		*/
 		pHalData->RfRegChnlVal[0] = ((pHalData->RfRegChnlVal[0] & 0xfffff3ff) | BIT(10));
-		phy_set_rf_reg(padapter, RF_PATH_A, 0x18, bRFRegOffsetMask, pHalData->RfRegChnlVal[0]); /* RF TRX_BW */
+		phy_set_rf_reg(adapt, RF_PATH_A, 0x18, bRFRegOffsetMask, pHalData->RfRegChnlVal[0]); /* RF TRX_BW */
 		break;
 	default:
 		break;
@@ -84,7 +84,7 @@ PHY_RF6052SetBandwidth8723D(
 
 static void
 phy_RF6052_Config_HardCode(
-	PADAPTER		Adapter
+	struct adapter *		Adapter
 )
 {
 
@@ -97,15 +97,15 @@ phy_RF6052_Config_HardCode(
 
 static int
 phy_RF6052_Config_ParaFile(
-	PADAPTER		Adapter
+	struct adapter *		Adapter
 )
 {
 	u32					u4RegValue = 0;
 	enum rf_path			eRFPath;
-	BB_REGISTER_DEFINITION_T	*pPhyReg;
+	struct bb_register_definition	*pPhyReg;
 
 	int					rtStatus = _SUCCESS;
-	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data		*pHalData = GET_HAL_DATA(Adapter);
 
 	/* 3//----------------------------------------------------------------- */
 	/* 3// <2> Initialize RF */
@@ -221,9 +221,9 @@ phy_RF6052_Config_ParaFile_Fail:
 
 int
 PHY_RF6052_Config8723D(
-	PADAPTER		Adapter)
+	struct adapter *		Adapter)
 {
-	HAL_DATA_TYPE				*pHalData = GET_HAL_DATA(Adapter);
+	struct hal_com_data				*pHalData = GET_HAL_DATA(Adapter);
 	int					rtStatus = _SUCCESS;
 
 	/* */

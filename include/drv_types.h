@@ -31,10 +31,9 @@ enum _NIC_VERSION {
 	RTL8712_NIC,
 	RTL8713_NIC,
 	RTL8716_NIC
-
 };
 
-typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
+struct adapter;
 
 #include <rtw_debug.h>
 #include <rtw_sta_info.h>
@@ -121,7 +120,7 @@ struct registry_priv {
 	u8	rfintfs;
 	u8	lbkmode;
 	u8	hci;
-	NDIS_802_11_SSID	ssid;
+	struct ndis_802_11_ssid	ssid;
 	u8	network_mode;	/* infra, ad-hoc, auto */
 	u8	channel;/* ad-hoc support requirement */
 	u8	wireless_mode;/* A, B, G, auto */
@@ -164,7 +163,7 @@ struct registry_priv {
 	u8	uapsd_ac_enable;
 #endif /* CONFIG_WMMPS_STA */
 
-	WLAN_BSSID_EX    dev_network;
+	struct wlan_bssid_ex    dev_network;
 
 	u8 tx_bw_mode;
 	u8 bmc_tx_rate;
@@ -333,8 +332,8 @@ struct registry_priv {
 #define GetRegGLNAType(_Adapter)	(_Adapter->registrypriv.GLNA_Type)
 #define GetRegPowerTrackingType(_Adapter)	(_Adapter->registrypriv.PowerTracking_Type)
 
-#define BSSID_OFT(field) ((u32)FIELD_OFFSET(WLAN_BSSID_EX, field))
-#define BSSID_SZ(field)   sizeof(((PWLAN_BSSID_EX) 0)->field)
+#define BSSID_OFT(field) ((u32)FIELD_OFFSET(struct wlan_bssid_ex, field))
+#define BSSID_SZ(field)   sizeof(((struct wlan_bssid_ex *) 0)->field)
 
 #define BW_MODE_2G(bw_mode) ((bw_mode) & 0x0F)
 #define BW_MODE_5G(bw_mode) ((bw_mode) >> 4)
@@ -346,27 +345,20 @@ struct registry_priv {
 #define REGSTY_IS_11AC_ENABLE(regsty) ((regsty)->vht_enable != 0)
 #define REGSTY_IS_11AC_AUTO(regsty) ((regsty)->vht_enable == 2)
 
-typedef struct rtw_if_operations {
-	int __must_check (*read)(struct dvobj_priv *d, unsigned int addr, void *buf,
-				size_t len, bool fixed);
-	int __must_check (*write)(struct dvobj_priv *d, unsigned int addr, void *buf,
-				 size_t len, bool fixed);
-} RTW_IF_OPS, *PRTW_IF_OPS;
-
 #ifdef CONFIG_CONCURRENT_MODE
 	#define is_primary_adapter(adapter) (adapter->adapter_type == PRIMARY_ADAPTER)
-	#define is_vir_adapter(adapter) (adapter->adapter_type == VIRTUAL_ADAPTER)
+	#define is_vir_adapter(_adapter) (_adapter->adapter_type == VIRTUAL_ADAPTER)
 	#define get_hw_port(adapter) (adapter->hw_port)
 #else
 	#define is_primary_adapter(adapter) (1)
-	#define is_vir_adapter(adapter) (0)
+	#define is_virstruct adapter(adapter) (0)
 	#define get_hw_port(adapter) (HW_PORT0)
 #endif
-#define GET_PRIMARY_ADAPTER(padapter) (((_adapter *)padapter)->dvobj->padapters[IFACE_ID0])
-#define GET_IFACE_NUMS(padapter) (((_adapter *)padapter)->dvobj->iface_nums)
-#define GET_ADAPTER(padapter, iface_id) (((_adapter *)padapter)->dvobj->padapters[iface_id])
+#define GET_PRIMARY_ADAPTER(adapt) (((struct adapter *)adapt)->dvobj->adapters[IFACE_ID0])
+#define GET_IFACE_NUMS(adapt) (((struct adapter *)adapt)->dvobj->iface_nums)
+#define GET_ADAPTER(adapt, iface_id) (((struct adapter *)adapt)->dvobj->adapters[iface_id])
 
-#define GetDefaultAdapter(padapter)	padapter
+#define GetDefaultAdapter(adapt)	adapt
 
 enum _IFACE_ID {
 	IFACE_ID0, /*PRIMARY_ADAPTER*/
@@ -522,7 +514,7 @@ struct debug_priv {
 	u32 dbg_carddisable_cnt;
 	u32 dbg_carddisable_error_cnt;
 	u32 dbg_ps_insuspend_cnt;
-	u32	dbg_dev_unload_inIPS_cnt;
+	u32 dbg_dev_unload_inIPS_cnt;
 	u32 dbg_wow_leave_ps_fail_cnt;
 	u32 dbg_scan_pwr_state_cnt;
 	u32 dbg_downloadfw_pwr_state_cnt;
@@ -701,7 +693,7 @@ struct rf_ctl_t {
 	const struct country_chplan *country_ent;
 	u8 ChannelPlan;
 	u8 max_chan_nums;
-	RT_CHANNEL_INFO channel_set[MAX_CHANNEL_NUM];
+	struct rt_channel_info channel_set[MAX_CHANNEL_NUM];
 	struct p2p_channels channel_list;
 
 	_mutex offch_mutex;
@@ -773,15 +765,15 @@ struct dvobj_priv {
 	unsigned char	oper_channel; /* saved channel info when call set_channel_bw */
 	unsigned char	oper_bwmode;
 	unsigned char	oper_ch_offset;/* PRIME_CHNL_OFFSET */
-	systime on_oper_ch_time;
+	unsigned long on_oper_ch_time;
 
-	_adapter *padapters[CONFIG_IFACE_NUMBER];/*IFACE_ID_MAX*/
+	struct adapter *adapters[CONFIG_IFACE_NUMBER];/*IFACE_ID_MAX*/
 	u8 iface_nums; /* total number of ifaces used runtime */
 	struct mi_state iface_state;
 
 	u8 nr_ap_if; /* total interface s number of ap/go mode. */
 	u16 inter_bcn_space; /* unit:ms */
-	_queue	ap_if_q;
+	struct __queue	ap_if_q;
 	struct macid_ctl_t macid_ctl;
 
 	struct cam_ctl_t cam_ctl;
@@ -815,7 +807,7 @@ struct dvobj_priv {
 
 	struct rtw_traffic_statistics	traffic_stat;
 
-	_thread_hdl_ rtnl_lock_holder;
+	void * rtnl_lock_holder;
 
 	#if defined(CONFIG_IOCTL_CFG80211) && defined(RTW_SINGLE_WIPHY)
 	struct wiphy *wiphy;
@@ -881,7 +873,7 @@ struct dvobj_priv {
 #define pwrctl_to_dvobj(pwrctl) container_of(pwrctl, struct dvobj_priv, pwrctl_priv)
 #define dvobj_to_macidctl(dvobj) (&(dvobj->macid_ctl))
 #define dvobj_to_sec_camctl(dvobj) (&(dvobj->cam_ctl))
-#define dvobj_to_regsty(dvobj) (&(dvobj->padapters[IFACE_ID0]->registrypriv))
+#define dvobj_to_regsty(dvobj) (&(dvobj->adapters[IFACE_ID0]->registrypriv))
 #if defined(CONFIG_IOCTL_CFG80211) && defined(RTW_SINGLE_WIPHY)
 #define dvobj_to_wiphy(dvobj) ((dvobj)->wiphy)
 #endif
@@ -914,10 +906,10 @@ static struct device *dvobj_to_dev(struct dvobj_priv *dvobj)
 	return &dvobj->pusbintf->dev;
 }
 
-_adapter *dvobj_get_port0_adapter(struct dvobj_priv *dvobj);
-_adapter *dvobj_get_unregisterd_adapter(struct dvobj_priv *dvobj);
-_adapter *dvobj_get_adapter_by_addr(struct dvobj_priv *dvobj, u8 *addr);
-#define dvobj_get_primary_adapter(dvobj)	((dvobj)->padapters[IFACE_ID0])
+struct adapter *dvobj_get_port0_adapter(struct dvobj_priv *dvobj);
+struct adapter *dvobj_get_unregisterd_adapter(struct dvobj_priv *dvobj);
+struct adapter *dvobj_get_adapter_by_addr(struct dvobj_priv *dvobj, u8 *addr);
+#define dvobj_get_primary_adapter(dvobj)	((dvobj)->adapters[IFACE_ID0])
 
 enum _hw_port {
 	HW_PORT0,
@@ -934,11 +926,11 @@ enum _ADAPTER_TYPE {
 	MAX_ADAPTER = 0xFF,
 };
 
-typedef enum _DRIVER_STATE {
+enum DRIVER_STATE {
 	DRIVER_NORMAL = 0,
 	DRIVER_DISAPPEAR = 1,
 	DRIVER_REPLACE_DONGLE = 2,
-} DRIVER_STATE;
+};
 
 #ifdef CONFIG_RTW_NAPI
 enum _NAPI_STATE {
@@ -948,9 +940,9 @@ enum _NAPI_STATE {
 #endif
 
 #ifdef CONFIG_MAC_LOOPBACK_DRIVER
-typedef struct loopbackdata {
+struct loopbackdata {
 	struct semaphore	sema;
-	_thread_hdl_ lbkthread;
+	void * lbkthread;
 	u8 bstop;
 	u32 cnt;
 	u16 size;
@@ -960,7 +952,7 @@ typedef struct loopbackdata {
 	u8 rxbuf[0x8000];
 	u8 msg[100];
 
-} LOOPBACKDATA, *PLOOPBACKDATA;
+} struct loopbackdata, *struct loopbackdata *;
 #endif
 
 struct tsf_info {
@@ -971,7 +963,7 @@ struct tsf_info {
 #define ADAPTER_TX_BW_2G(adapter) BW_MODE_2G((adapter)->driver_tx_bw_mode)
 #define ADAPTER_TX_BW_5G(adapter) BW_MODE_5G((adapter)->driver_tx_bw_mode)
 
-struct _ADAPTER {
+struct adapter {
 	struct timer_list	pwr_state_check_timer;
 	int	pwr_state_check_interval;
 	u8 pwr_state_check_cnts;
@@ -1017,9 +1009,9 @@ struct _ADAPTER {
 
 	struct wifi_display_info wfd_info;
 
-	ERROR_CODE		LastError; /* <20130613, Kordan> Only the functions associated with MP records the error code by now. */
+	enum error_code LastError;
 
-	void *			HalData;
+	void * HalData;
 	u32 hal_data_sz;
 	struct hal_ops	hal_func;
 
@@ -1030,21 +1022,21 @@ struct _ADAPTER {
 	u8	bDriverIsGoingToUnload;
 	u8	init_adpt_in_progress;
 	u8	bHaltInProgress;
-	_thread_hdl_ cmdThread;
+	void * cmdThread;
 #ifdef CONFIG_EVENT_THREAD_MODE
-	_thread_hdl_ evtThread;
+	void * evtThread;
 #endif
 	u8 registered;
 
-	void (*intf_start)(_adapter *adapter);
-	void (*intf_stop)(_adapter *adapter);
+	void (*intf_start)(struct adapter *adapter);
+	void (*intf_stop)(struct adapter *adapter);
 
-	_nic_hdl pnetdev;
+	struct  net_device * pnetdev;
 	char old_ifname[IFNAMSIZ];
 
 	/* used by rtw_rereg_nd_name related function */
 	struct rereg_nd_name_data {
-		_nic_hdl old_pnetdev;
+		struct  net_device * old_pnetdev;
 		char old_ifname[IFNAMSIZ];
 		u8 old_ips_mode;
 		u8 old_bRegUseLed;
@@ -1115,7 +1107,7 @@ struct _ADAPTER {
 #endif /* CONFIG_BR_EXT */
 
 #ifdef CONFIG_MAC_LOOPBACK_DRIVER
-	PLOOPBACKDATA ploopback;
+	struct loopbackdata * ploopback;
 #endif
 	u8 bmc_tx_rate;
 	/* for debug purpose */
@@ -1163,33 +1155,33 @@ struct _ADAPTER {
 #define adapter_mac_addr(adapter) (adapter->mac_addr)
 #define adapter_to_chset(adapter) (adapter_to_rfctl((adapter))->channel_set)
 
-#define mlme_to_adapter(mlme) container_of((mlme), struct _ADAPTER, mlmepriv)
-#define tdls_info_to_adapter(tdls) container_of((tdls), struct _ADAPTER, tdlsinfo)
+#define mlme_to_adapter(mlme) container_of((mlme), struct adapter, mlmepriv)
+#define tdls_info_to_adapter(tdls) container_of((tdls), struct adapter, tdlsinfo)
 
-#define rtw_get_chip_type(adapter) (((PADAPTER)adapter)->dvobj->chip_type)
-#define rtw_get_hw_type(adapter) (((PADAPTER)adapter)->dvobj->HardwareType)
-#define rtw_get_intf_type(adapter) (((PADAPTER)adapter)->dvobj->interface_type)
+#define rtw_get_chip_type(_adapter) (_adapter->dvobj->chip_type)
+#define rtw_get_hw_type(_adapter) (_adapter->dvobj->HardwareType)
+#define rtw_get_intf_type(_adapter) (_adapter->dvobj->interface_type)
 
-#define rtw_get_mi_nums(adapter) (((PADAPTER)adapter)->dvobj->iface_nums)
+#define rtw_get_mi_nums(adapter) (_adapter->dvobj->iface_nums)
 
-static inline void rtw_set_surprise_removed(_adapter *padapter)
+static inline void rtw_set_surprise_removed(struct adapter *adapt)
 {
-	dev_set_surprise_removed(adapter_to_dvobj(padapter));
+	dev_set_surprise_removed(adapter_to_dvobj(adapt));
 }
-static inline void rtw_clr_surprise_removed(_adapter *padapter)
+static inline void rtw_clr_surprise_removed(struct adapter *adapt)
 {
-	dev_clr_surprise_removed(adapter_to_dvobj(padapter));
+	dev_clr_surprise_removed(adapter_to_dvobj(adapt));
 }
-static inline void rtw_set_drv_stopped(_adapter *padapter)
+static inline void rtw_set_drv_stopped(struct adapter *adapt)
 {
-	dev_set_drv_stopped(adapter_to_dvobj(padapter));
+	dev_set_drv_stopped(adapter_to_dvobj(adapt));
 }
-static inline void rtw_clr_drv_stopped(_adapter *padapter)
+static inline void rtw_clr_drv_stopped(struct adapter *adapt)
 {
-	dev_clr_drv_stopped(adapter_to_dvobj(padapter));
+	dev_clr_drv_stopped(adapter_to_dvobj(adapt));
 }
-#define rtw_is_surprise_removed(padapter)	(dev_is_surprise_removed(adapter_to_dvobj(padapter)))
-#define rtw_is_drv_stopped(padapter)		(dev_is_drv_stopped(adapter_to_dvobj(padapter)))
+#define rtw_is_surprise_removed(adapt)	(dev_is_surprise_removed(adapter_to_dvobj(adapt)))
+#define rtw_is_drv_stopped(adapt)		(dev_is_drv_stopped(adapter_to_dvobj(adapt)))
 
 /*
  * Function disabled.
@@ -1198,50 +1190,50 @@ static inline void rtw_clr_drv_stopped(_adapter *padapter)
 #define DF_RX_BIT		BIT1			/*read_port_cancel*/
 #define DF_IO_BIT		BIT2
 
-/* #define RTW_DISABLE_FUNC(padapter, func) (ATOMIC_ADD(&adapter_to_dvobj(padapter)->disable_func, (func))) */
-/* #define RTW_ENABLE_FUNC(padapter, func) (ATOMIC_SUB(&adapter_to_dvobj(padapter)->disable_func, (func))) */
-__inline static void RTW_DISABLE_FUNC(_adapter *padapter, int func_bit)
+/* #define RTW_DISABLE_FUNC(adapt, func) (ATOMIC_ADD(&adapter_to_dvobj(adapt)->disable_func, (func))) */
+/* #define RTW_ENABLE_FUNC(adapt, func) (ATOMIC_SUB(&adapter_to_dvobj(adapt)->disable_func, (func))) */
+__inline static void RTW_DISABLE_FUNC(struct adapter *adapt, int func_bit)
 {
-	int	df = ATOMIC_READ(&adapter_to_dvobj(padapter)->disable_func);
+	int	df = ATOMIC_READ(&adapter_to_dvobj(adapt)->disable_func);
 	df |= func_bit;
-	ATOMIC_SET(&adapter_to_dvobj(padapter)->disable_func, df);
+	ATOMIC_SET(&adapter_to_dvobj(adapt)->disable_func, df);
 }
 
-__inline static void RTW_ENABLE_FUNC(_adapter *padapter, int func_bit)
+__inline static void RTW_ENABLE_FUNC(struct adapter *adapt, int func_bit)
 {
-	int	df = ATOMIC_READ(&adapter_to_dvobj(padapter)->disable_func);
+	int	df = ATOMIC_READ(&adapter_to_dvobj(adapt)->disable_func);
 	df &= ~(func_bit);
-	ATOMIC_SET(&adapter_to_dvobj(padapter)->disable_func, df);
+	ATOMIC_SET(&adapter_to_dvobj(adapt)->disable_func, df);
 }
 
-#define RTW_CANNOT_RUN(padapter) \
-	(rtw_is_surprise_removed(padapter) || \
-	 rtw_is_drv_stopped(padapter))
+#define RTW_CANNOT_RUN(adapt) \
+	(rtw_is_surprise_removed(adapt) || \
+	 rtw_is_drv_stopped(adapt))
 
-#define RTW_IS_FUNC_DISABLED(padapter, func_bit) (ATOMIC_READ(&adapter_to_dvobj(padapter)->disable_func) & (func_bit))
+#define RTW_IS_FUNC_DISABLED(adapt, func_bit) (ATOMIC_READ(&adapter_to_dvobj(adapt)->disable_func) & (func_bit))
 
-#define RTW_CANNOT_IO(padapter) \
-	(rtw_is_surprise_removed(padapter) || \
-	 RTW_IS_FUNC_DISABLED((padapter), DF_IO_BIT))
+#define RTW_CANNOT_IO(adapt) \
+	(rtw_is_surprise_removed(adapt) || \
+	 RTW_IS_FUNC_DISABLED((adapt), DF_IO_BIT))
 
-#define RTW_CANNOT_RX(padapter) \
-	(RTW_CANNOT_RUN(padapter) || \
-	 RTW_IS_FUNC_DISABLED((padapter), DF_RX_BIT))
+#define RTW_CANNOT_RX(adapt) \
+	(RTW_CANNOT_RUN(adapt) || \
+	 RTW_IS_FUNC_DISABLED((adapt), DF_RX_BIT))
 
-#define RTW_CANNOT_TX(padapter) \
-	(RTW_CANNOT_RUN(padapter) || \
-	 RTW_IS_FUNC_DISABLED((padapter), DF_TX_BIT))
+#define RTW_CANNOT_TX(adapt) \
+	(RTW_CANNOT_RUN(adapt) || \
+	 RTW_IS_FUNC_DISABLED((adapt), DF_TX_BIT))
 
-int rtw_suspend_free_assoc_resource(_adapter *padapter);
-int rtw_change_ifname(_adapter *padapter, const char *ifname);
-void nat25_db_expire(_adapter *priv);
-void *scdb_findEntry(_adapter *priv, unsigned char *macAddr, unsigned char *ipAddr);
-void dhcp_flag_bcast(_adapter *priv, struct sk_buff *skb);
-void rtw_indicate_wx_assoc_event(_adapter *padapter);
-void rtw_indicate_wx_disassoc_event(_adapter *padapter);
-void indicate_wx_scan_complete_event(_adapter *padapter);
-int nat25_handle_frame(_adapter *priv, struct sk_buff *skb);
-int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method);
+int rtw_suspend_free_assoc_resource(struct adapter *adapt);
+int rtw_change_ifname(struct adapter *adapt, const char *ifname);
+void nat25_db_expire(struct adapter *priv);
+void *scdb_findEntry(struct adapter *priv, unsigned char *macAddr, unsigned char *ipAddr);
+void dhcp_flag_bcast(struct adapter *priv, struct sk_buff *skb);
+void rtw_indicate_wx_assoc_event(struct adapter *adapt);
+void rtw_indicate_wx_disassoc_event(struct adapter *adapt);
+void indicate_wx_scan_complete_event(struct adapter *adapt);
+int nat25_handle_frame(struct adapter *priv, struct sk_buff *skb);
+int nat25_db_handle(struct adapter *priv, struct sk_buff *skb, int method);
 
 /* HCI Related header file */
 #include <usb_ops.h>

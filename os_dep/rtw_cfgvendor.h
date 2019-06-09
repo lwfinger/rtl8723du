@@ -36,7 +36,7 @@
 #define VENDOR_REPLY_OVERHEAD       (VENDOR_ID_OVERHEAD + \
 				     VENDOR_SUBCMD_OVERHEAD + \
 				     VENDOR_DATA_OVERHEAD)
-typedef enum {
+enum android_vendor_sub_command {
     /* don't use 0 as a valid subcommand */
     VENDOR_NL80211_SUBCMD_UNSPECIFIED,
 
@@ -77,7 +77,7 @@ typedef enum {
 
     /* This is reserved for future usage */
 
-} ANDROID_VENDOR_SUB_COMMAND;
+};
 
 enum rtw_vendor_subcmd {
     GSCAN_SUBCMD_GET_CAPABILITIES = ANDROID_NL80211_SUBCMD_GSCAN_RANGE_START,
@@ -213,7 +213,7 @@ enum rtt_attributes {
 	RTT_ATTRIBUTE_TARGET_NUM_RETRY
 };
 
-typedef enum rtw_vendor_event {
+enum rtw_vendor_event {
     RTK_RESERVED1,
     RTK_RESERVED2,
     GSCAN_EVENT_SIGNIFICANT_CHANGE_RESULTS ,
@@ -228,14 +228,14 @@ typedef enum rtw_vendor_event {
     GOOGLE_DEBUG_MEM_DUMP_EVENT,
     GSCAN_EVENT_ANQPO_HOTSPOT_MATCH,
     GOOGLE_RSSI_MONITOR_EVENT
-} rtw_vendor_event_t;
+};
 
 enum andr_wifi_feature_set_attr {
 	ANDR_WIFI_ATTRIBUTE_NUM_FEATURE_SET,
 	ANDR_WIFI_ATTRIBUTE_FEATURE_SET
 };
 
-typedef enum rtw_vendor_gscan_attribute {
+enum rtw_vendor_gscan_attribute {
 	ATTR_START_GSCAN,
 	ATTR_STOP_GSCAN,
 	ATTR_SET_SCAN_BATCH_CFG_ID, /* set batch scan params */
@@ -245,7 +245,7 @@ typedef enum rtw_vendor_gscan_attribute {
 	ATTR_GET_GSCAN_CAPABILITIES_ID,
 	/* Add more sub commands here */
 	ATTR_GSCAN_MAX
-} rtw_vendor_gscan_attribute_t;
+};
 
 typedef enum gscan_batch_attribute {
 	ATTR_GSCAN_BATCH_BESTN,
@@ -552,7 +552,7 @@ extern int rtw_cfgvendor_send_async_event(struct wiphy *wiphy,
 	struct net_device *dev, int event_id, const void  *data, int len);
 #if defined(GSCAN_SUPPORT) && 0
 extern int rtw_cfgvendor_send_hotlist_event(struct wiphy *wiphy,
-	struct net_device *dev, void  *data, int len, rtw_vendor_event_t event);
+	struct net_device *dev, void  *data, int len, enum rtw_vendor_event event);
 #endif
 #endif /* (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT) */
 

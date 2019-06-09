@@ -62,7 +62,7 @@ odm_dynamic_tx_power(
 )
 {
 	/* For AP/ADSL use struct rtl8192cd_priv* */
-	/* For CE/NIC use struct _ADAPTER* */
+	/* For CE/NIC use struct adapter* */
 	/*  */
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 

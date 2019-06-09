@@ -43,9 +43,9 @@
 	#define SET_RX_BUFFER_PHYSICAL_HIGH_8723D(__pRxStatusDesc, __Value)
 #endif
 
-int rtl8723du_init_recv_priv(_adapter *padapter);
-void rtl8723du_free_recv_priv(_adapter *padapter);
-void rtl8723du_init_recvbuf(_adapter *padapter, struct recv_buf *precvbuf);
+int rtl8723du_init_recv_priv(struct adapter *adapt);
+void rtl8723du_free_recv_priv(struct adapter *adapt);
+void rtl8723du_init_recvbuf(struct adapter *adapt, struct recv_buf *precvbuf);
 
 void rtl8723d_query_rx_desc_status(union recv_frame *precvframe, u8 *pdesc);
 

@@ -10,14 +10,14 @@
 void Linkup_workitem_callback(struct work_struct *work)
 {
 	struct mlme_priv *pmlmepriv = container_of(work, struct mlme_priv, Linkup_workitem);
-	_adapter *padapter = container_of(pmlmepriv, _adapter, mlmepriv);
+	struct adapter *adapt = container_of(pmlmepriv, struct adapter, mlmepriv);
 
 
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 12))
-	kobject_uevent(&padapter->pnetdev->dev.kobj, KOBJ_LINKUP);
+	kobject_uevent(&adapt->pnetdev->dev.kobj, KOBJ_LINKUP);
 #else
-	kobject_hotplug(&padapter->pnetdev->class_dev.kobj, KOBJ_LINKUP);
+	kobject_hotplug(&adapt->pnetdev->class_dev.kobj, KOBJ_LINKUP);
 #endif
 
 }
@@ -25,20 +25,20 @@ void Linkup_workitem_callback(struct work_struct *work)
 void Linkdown_workitem_callback(struct work_struct *work)
 {
 	struct mlme_priv *pmlmepriv = container_of(work, struct mlme_priv, Linkdown_workitem);
-	_adapter *padapter = container_of(pmlmepriv, _adapter, mlmepriv);
+	struct adapter *adapt = container_of(pmlmepriv, struct adapter, mlmepriv);
 
 
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 12))
-	kobject_uevent(&padapter->pnetdev->dev.kobj, KOBJ_LINKDOWN);
+	kobject_uevent(&adapt->pnetdev->dev.kobj, KOBJ_LINKDOWN);
 #else
-	kobject_hotplug(&padapter->pnetdev->class_dev.kobj, KOBJ_LINKDOWN);
+	kobject_hotplug(&adapt->pnetdev->class_dev.kobj, KOBJ_LINKDOWN);
 #endif
 
 }
 #endif
 
-void rtw_os_indicate_connect(_adapter *adapter)
+void rtw_os_indicate_connect(struct adapter *adapter)
 {
 	struct mlme_priv *pmlmepriv = &(adapter->mlmepriv);
 
@@ -63,22 +63,22 @@ void rtw_os_indicate_connect(_adapter *adapter)
 
 }
 
-void rtw_os_indicate_scan_done(_adapter *padapter, bool aborted)
+void rtw_os_indicate_scan_done(struct adapter *adapt, bool aborted)
 {
 #ifdef CONFIG_IOCTL_CFG80211
-	rtw_cfg80211_indicate_scan_done(padapter, aborted);
+	rtw_cfg80211_indicate_scan_done(adapt, aborted);
 #endif
-	indicate_wx_scan_complete_event(padapter);
+	indicate_wx_scan_complete_event(adapt);
 }
 
-static RT_PMKID_LIST   backupPMKIDList[NUM_PMKID_CACHE];
-void rtw_reset_securitypriv(_adapter *adapter)
+static struct rt_pkmid_list   backupPMKIDList[NUM_PMKID_CACHE];
+void rtw_reset_securitypriv(struct adapter *adapter)
 {
 	u8	backupPMKIDIndex = 0;
 	u8	backupTKIPCountermeasure = 0x00;
 	u32	backupTKIPcountermeasure_time = 0;
 	/* add for CONFIG_IEEE80211W, none 11w also can use */
-	_irqL irqL;
+	unsigned long irqL;
 	struct mlme_ext_priv	*pmlmeext = &adapter->mlmeextpriv;
 
 	_enter_critical_bh(&adapter->security_key_mutex, &irqL);
@@ -90,9 +90,9 @@ void rtw_reset_securitypriv(_adapter *adapter)
 		/* Backup the btkip_countermeasure information. */
 		/* When the countermeasure is trigger, the driver have to disconnect with AP for 60 seconds. */
 
-		_rtw_memset(&backupPMKIDList[0], 0x00, sizeof(RT_PMKID_LIST) * NUM_PMKID_CACHE);
+		_rtw_memset(&backupPMKIDList[0], 0x00, sizeof(struct rt_pkmid_list) * NUM_PMKID_CACHE);
 
-		_rtw_memcpy(&backupPMKIDList[0], &adapter->securitypriv.PMKIDList[0], sizeof(RT_PMKID_LIST) * NUM_PMKID_CACHE);
+		_rtw_memcpy(&backupPMKIDList[0], &adapter->securitypriv.PMKIDList[0], sizeof(struct rt_pkmid_list) * NUM_PMKID_CACHE);
 		backupPMKIDIndex = adapter->securitypriv.PMKIDIndex;
 		backupTKIPCountermeasure = adapter->securitypriv.btkip_countermeasure;
 		backupTKIPcountermeasure_time = adapter->securitypriv.btkip_countermeasure_time;
@@ -100,7 +100,7 @@ void rtw_reset_securitypriv(_adapter *adapter)
 
 		/* Added by Albert 2009/02/18 */
 		/* Restore the PMK information to securitypriv structure for the following connection. */
-		_rtw_memcpy(&adapter->securitypriv.PMKIDList[0], &backupPMKIDList[0], sizeof(RT_PMKID_LIST) * NUM_PMKID_CACHE);
+		_rtw_memcpy(&adapter->securitypriv.PMKIDList[0], &backupPMKIDList[0], sizeof(struct rt_pkmid_list) * NUM_PMKID_CACHE);
 		adapter->securitypriv.PMKIDIndex = backupPMKIDIndex;
 		adapter->securitypriv.btkip_countermeasure = backupTKIPCountermeasure;
 		adapter->securitypriv.btkip_countermeasure_time = backupTKIPcountermeasure_time;
@@ -130,9 +130,9 @@ void rtw_reset_securitypriv(_adapter *adapter)
 	RTW_INFO(FUNC_ADPT_FMT" - End to Disconnect\n", FUNC_ADPT_ARG(adapter));
 }
 
-void rtw_os_indicate_disconnect(_adapter *adapter,  u16 reason, u8 locally_generated)
+void rtw_os_indicate_disconnect(struct adapter *adapter,  u16 reason, u8 locally_generated)
 {
-	/* RT_PMKID_LIST   backupPMKIDList[NUM_PMKID_CACHE]; */
+	/* struct rt_pkmid_list   backupPMKIDList[NUM_PMKID_CACHE]; */
 
 
 	rtw_netif_carrier_off(adapter->pnetdev); /* Do it first for tx broadcast pkt after disconnection issue! */
@@ -152,7 +152,7 @@ void rtw_os_indicate_disconnect(_adapter *adapter,  u16 reason, u8 locally_gener
 
 }
 
-void rtw_report_sec_ie(_adapter *adapter, u8 authmode, u8 *sec_ie)
+void rtw_report_sec_ie(struct adapter *adapter, u8 authmode, u8 *sec_ie)
 {
 	uint	len;
 	u8	*buff, *p, i;
@@ -197,10 +197,10 @@ void rtw_report_sec_ie(_adapter *adapter, u8 authmode, u8 *sec_ie)
 
 }
 
-void rtw_indicate_sta_assoc_event(_adapter *padapter, struct sta_info *psta)
+void rtw_indicate_sta_assoc_event(struct adapter *adapt, struct sta_info *psta)
 {
 	union iwreq_data wrqu;
-	struct sta_priv *pstapriv = &padapter->stapriv;
+	struct sta_priv *pstapriv = &adapt->stapriv;
 
 	if (!psta)
 		return;
@@ -219,15 +219,15 @@ void rtw_indicate_sta_assoc_event(_adapter *padapter, struct sta_info *psta)
 	RTW_INFO("+rtw_indicate_sta_assoc_event\n");
 
 #ifndef CONFIG_IOCTL_CFG80211
-	wireless_send_event(padapter->pnetdev, IWEVREGISTERED, &wrqu, NULL);
+	wireless_send_event(adapt->pnetdev, IWEVREGISTERED, &wrqu, NULL);
 #endif
 
 }
 
-void rtw_indicate_sta_disassoc_event(_adapter *padapter, struct sta_info *psta)
+void rtw_indicate_sta_disassoc_event(struct adapter *adapt, struct sta_info *psta)
 {
 	union iwreq_data wrqu;
-	struct sta_priv *pstapriv = &padapter->stapriv;
+	struct sta_priv *pstapriv = &adapt->stapriv;
 
 	if (!psta)
 		return;
@@ -246,7 +246,7 @@ void rtw_indicate_sta_disassoc_event(_adapter *padapter, struct sta_info *psta)
 	RTW_INFO("+rtw_indicate_sta_disassoc_event\n");
 
 #ifndef CONFIG_IOCTL_CFG80211
-	wireless_send_event(padapter->pnetdev, IWEVEXPIRED, &wrqu, NULL);
+	wireless_send_event(adapt->pnetdev, IWEVEXPIRED, &wrqu, NULL);
 #endif
 
 }

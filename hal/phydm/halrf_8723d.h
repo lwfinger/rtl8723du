@@ -66,7 +66,7 @@ odm_txxtaltrack_set_xtal_8723d(
 void
 phy_iq_calibrate_8723d(
 	void		*p_dm_void,
-	boolean	is_recovery);
+	bool	is_recovery);
 
 
 /*
@@ -79,8 +79,8 @@ phy_lc_calibrate_8723d(
 
 
 void phy_set_rf_path_switch_8723d(
-	struct _ADAPTER	*p_adapter,
-	boolean		is_main
+	struct adapter	*adapt,
+	bool		is_main
 );
 
 void
@@ -95,8 +95,8 @@ void
 _phy_path_adda_on_8723d(
 	struct PHY_DM_STRUCT		*p_dm,
 	u32		*adda_reg,
-	boolean		is_path_a_on,
-	boolean		is2T
+	bool		is_path_a_on,
+	bool		is2T
 );
 
 void

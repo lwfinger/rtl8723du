@@ -75,28 +75,28 @@ enum h2c_cmd_8723D {
 /* ---------------------------------------------------------------------------------------------------------
  * ----------------------------------    H2C CMD CONTENT    --------------------------------------------------
  * ---------------------------------------------------------------------------------------------------------
- * _RSVDPAGE_LOC_CMD_0x00 */
-static inline void SET_8723D_H2CCMD_RSVDPAGE_LOC_PROBE_RSP(u8 *__pH2CCmd, u8 __Value)
+ * _RSVD_PAGE_CMD_0x00 */
+static inline void SET_8723D_H2CCMD_RSVD_PAGE_PROBE_RSP(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 0));
 }
 
-static inline void SET_8723D_H2CCMD_RSVDPAGE_LOC_PSPOLL(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_8723D_H2CCMD_RSVD_PAGE_PSPOLL(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
 }
 
-static inline void SET_8723D_H2CCMD_RSVDPAGE_LOC_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_8723D_H2CCMD_RSVD_PAGE_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(7, 0));
 }
 
-static inline void SET_8723D_H2CCMD_RSVDPAGE_LOC_QOS_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_8723D_H2CCMD_RSVD_PAGE_QOS_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
 }
 
-static inline void SET_8723D_H2CCMD_RSVDPAGE_LOC_BT_QOS_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_8723D_H2CCMD_RSVD_PAGE_BT_QOS_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 4, __Value, GENMASK(7, 0));
 }
@@ -334,15 +334,15 @@ static inline void SET_8723D_H2CCMD_BT_FW_PATCH_ADDR3(u8 *__pH2CCmd, u8 __Value)
  * --------------------------------------------------------------------------------------------------------- */
 
 /* host message to firmware cmd */
-void rtl8723d_set_FwPwrMode_cmd(PADAPTER padapter, u8 Mode);
-void rtl8723d_set_FwJoinBssRpt_cmd(PADAPTER padapter, u8 mstatus);
-/* int rtl8723d_set_lowpwr_lps_cmd(PADAPTER padapter, u8 enable); */
-void rtl8723d_set_FwPsTuneParam_cmd(PADAPTER padapter);
-void rtl8723d_download_rsvd_page(PADAPTER padapter, u8 mstatus);
-void rtl8723d_download_BTCoex_AP_mode_rsvd_page(PADAPTER padapter);
-void rtl8723d_set_p2p_ps_offload_cmd(PADAPTER padapter, u8 p2p_ps_state);
+void rtl8723d_set_FwPwrMode_cmd(struct adapter * adapt, u8 Mode);
+void rtl8723d_set_FwJoinBssRpt_cmd(struct adapter * adapt, u8 mstatus);
+/* int rtl8723d_set_lowpwr_lps_cmd(struct adapter * adapt, u8 enable); */
+void rtl8723d_set_FwPsTuneParam_cmd(struct adapter * adapt);
+void rtl8723d_download_rsvd_page(struct adapter * adapt, u8 mstatus);
+void rtl8723d_download_BTCoex_AP_mode_rsvd_page(struct adapter * adapt);
+void rtl8723d_set_p2p_ps_offload_cmd(struct adapter * adapt, u8 p2p_ps_state);
 
-int FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer);
-u8 GetTxBufferRsvdPageNum8723D(_adapter *padapter, bool wowlan);
+int FillH2CCmd8723D(struct adapter * adapt, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer);
+u8 GetTxBufferRsvdPageNum8723D(struct adapter *adapt, bool wowlan);
 
 #endif

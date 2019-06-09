@@ -106,7 +106,7 @@ phydm_primary_cca_11n(
 
 #endif
 
-boolean
+bool
 odm_dynamic_primary_cca_dup_rts(
 	void			*p_dm_void
 )

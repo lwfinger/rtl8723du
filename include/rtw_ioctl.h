@@ -144,10 +144,10 @@ static uint oid_null_function(struct oid_par_priv *poid_par_priv)
 extern struct iw_handler_def  rtw_handlers_def;
 #endif
 
-extern void rtw_request_wps_pbc_event(_adapter *padapter);
+extern void rtw_request_wps_pbc_event(struct adapter *adapt);
 
 extern	uint drv_query_info(
-	_nic_hdl		MiniportAdapterContext,
+	struct  net_device *		MiniportAdapterContext,
 	uint		Oid,
 	void			*InformationBuffer,
 	u32			InformationBufferLength,
@@ -156,7 +156,7 @@ extern	uint drv_query_info(
 );
 
 extern	uint	drv_set_info(
-	_nic_hdl		MiniportAdapterContext,
+	struct  net_device *		MiniportAdapterContext,
 	uint		Oid,
 	void			*InformationBuffer,
 	u32			InformationBufferLength,

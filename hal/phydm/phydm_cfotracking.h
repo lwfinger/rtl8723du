@@ -11,9 +11,9 @@
 #define		CFO_TH_ATC					80			/* kHz */
 
 struct phydm_cfo_track_struct {
-	boolean			is_atc_status;
-	boolean			large_cfo_hit;
-	boolean			is_adjust;
+	bool			is_atc_status;
+	bool			large_cfo_hit;
+	bool			is_adjust;
 	u8			crystal_cap;
 	u8			def_x_cap;
 	s32			CFO_tail[4];
@@ -22,8 +22,8 @@ struct phydm_cfo_track_struct {
 	u32			packet_count;
 	u32			packet_count_pre;
 
-	boolean			is_force_xtal_cap;
-	boolean			is_reset;
+	bool			is_force_xtal_cap;
+	bool			is_reset;
 };
 
 void

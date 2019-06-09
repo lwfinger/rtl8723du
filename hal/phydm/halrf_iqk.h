@@ -20,8 +20,8 @@
 /*---------------------------End Define Parameters-------------------------------*/
 
 struct _IQK_INFORMATION {
-	boolean		LOK_fail[NUM];
-	boolean		IQK_fail[2][NUM];
+	bool		LOK_fail[NUM];
+	bool		IQK_fail[2][NUM];
 	u32		iqc_matrix[2][NUM];
 	u8      iqk_times;
 	u32		rf_reg18;
@@ -30,7 +30,7 @@ struct _IQK_INFORMATION {
 	u8		tmp1bcc;
 	u8		kcount;
 	u8		rfk_ing; /*bit0:IQKing, bit1:LCKing, bit2:DPKing*/
-	boolean rfk_forbidden;	
+	bool rfk_forbidden;	
 };
 
 #endif

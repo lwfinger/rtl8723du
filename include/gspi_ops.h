@@ -130,15 +130,15 @@ struct spi_more_data {
 	unsigned long len;
 };
 
-extern void spi_set_chip_endian(PADAPTER padapter);
+extern void spi_set_chip_endian(struct adapter * adapt);
 extern unsigned int spi_write8_endian(ADAPTER *Adapter, unsigned int addr, unsigned int buf, u32 big);
-extern void spi_set_intf_ops(_adapter *padapter, struct _io_ops *pops);
-extern void spi_set_chip_endian(PADAPTER padapter);
-extern void InitInterrupt8723ASdio(PADAPTER padapter);
-extern void InitSysInterrupt8723ASdio(PADAPTER padapter);
-extern void EnableInterrupt8723ASdio(PADAPTER padapter);
-extern void DisableInterrupt8723ASdio(PADAPTER padapter);
-extern void spi_int_hdl(PADAPTER padapter);
-extern u8 HalQueryTxBufferStatus8723ASdio(PADAPTER padapter);
+extern void spi_set_intf_ops(struct adapter *adapt, struct _io_ops *pops);
+extern void spi_set_chip_endian(struct adapter * adapt);
+extern void InitInterrupt8723ASdio(struct adapter * adapt);
+extern void InitSysInterrupt8723ASdio(struct adapter * adapt);
+extern void EnableInterrupt8723ASdio(struct adapter * adapt);
+extern void DisableInterrupt8723ASdio(struct adapter * adapt);
+extern void spi_int_hdl(struct adapter * adapt);
+extern u8 HalQueryTxBufferStatus8723ASdio(struct adapter * adapt);
 
 #endif /* __GSPI_OPS_H__ */

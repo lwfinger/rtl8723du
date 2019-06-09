@@ -95,7 +95,7 @@ phydm_init_cck_setting(
 	struct PHY_DM_STRUCT		*p_dm
 )
 {
-	p_dm->is_cck_high_power = (boolean) odm_get_bb_reg(p_dm, ODM_REG(CCK_RPT_FORMAT, p_dm), ODM_BIT(CCK_RPT_FORMAT, p_dm));
+	p_dm->is_cck_high_power = (bool) odm_get_bb_reg(p_dm, ODM_REG(CCK_RPT_FORMAT, p_dm), ODM_BIT(CCK_RPT_FORMAT, p_dm));
 
 	phydm_config_cck_rx_antenna_init(p_dm);
 	phydm_config_cck_rx_path(p_dm, BB_PATH_A);
@@ -1069,13 +1069,13 @@ odm_cmn_info_init(
 		p_dm->iot_table.win_patch_id = (u8)value;
 		break;
 	case	ODM_CMNINFO_BINHCT_TEST:
-		p_dm->is_in_hct_test = (boolean)value;
+		p_dm->is_in_hct_test = (bool)value;
 		break;
 	case	ODM_CMNINFO_BWIFI_TEST:
 		p_dm->wifi_test = (u8)value;
 		break;
 	case	ODM_CMNINFO_SMART_CONCURRENT:
-		p_dm->is_dual_mac_smart_concurrent = (boolean)value;
+		p_dm->is_dual_mac_smart_concurrent = (bool)value;
 		break;
 	case	ODM_CMNINFO_DOMAIN_CODE_2G:
 		p_dm->odm_regulation_2_4g = (u8)value;
@@ -1084,7 +1084,7 @@ odm_cmn_info_init(
 		p_dm->odm_regulation_5g = (u8)value;
 		break;
 	case	ODM_CMNINFO_IQKPAOFF:
-		p_dm->rf_calibrate_info.is_iqk_pa_off = (boolean)value;
+		p_dm->rf_calibrate_info.is_iqk_pa_off = (bool)value;
 		break;
 	case	ODM_CMNINFO_REGRFKFREEENABLE:
 		p_dm->rf_calibrate_info.reg_rf_kfree_enable = (u8)value;
@@ -1120,7 +1120,7 @@ odm_cmn_info_init(
 		break;
 
 	case	ODM_CMNINFO_HP_HWID:
-		p_dm->hp_hw_id = (boolean)value;
+		p_dm->hp_hw_id = (bool)value;
 		break;
 	/* To remove the compiler warning, must add an empty default statement to handle the other values. */
 	default:
@@ -1175,11 +1175,11 @@ odm_cmn_info_hook(
 		break;
 
 	case	ODM_CMNINFO_SCAN:
-		p_dm->p_is_scan_in_process = (boolean *)p_value;
+		p_dm->p_is_scan_in_process = (bool *)p_value;
 		break;
 
 	case	ODM_CMNINFO_POWER_SAVING:
-		p_dm->p_is_power_saving = (boolean *)p_value;
+		p_dm->p_is_power_saving = (bool *)p_value;
 		break;
 
 	case	ODM_CMNINFO_ONE_PATH_CCA:
@@ -1187,15 +1187,15 @@ odm_cmn_info_hook(
 		break;
 
 	case	ODM_CMNINFO_DRV_STOP:
-		p_dm->p_is_driver_stopped = (boolean *)p_value;
+		p_dm->p_is_driver_stopped = (bool *)p_value;
 		break;
 
 	case	ODM_CMNINFO_PNP_IN:
-		p_dm->p_is_driver_is_going_to_pnp_set_power_sleep = (boolean *)p_value;
+		p_dm->p_is_driver_is_going_to_pnp_set_power_sleep = (bool *)p_value;
 		break;
 
 	case	ODM_CMNINFO_INIT_ON:
-		p_dm->pinit_adpt_in_progress = (boolean *)p_value;
+		p_dm->pinit_adpt_in_progress = (bool *)p_value;
 		break;
 
 	case	ODM_CMNINFO_ANT_TEST:
@@ -1203,7 +1203,7 @@ odm_cmn_info_hook(
 		break;
 
 	case	ODM_CMNINFO_NET_CLOSED:
-		p_dm->p_is_net_closed = (boolean *)p_value;
+		p_dm->p_is_net_closed = (bool *)p_value;
 		break;
 
 	case	ODM_CMNINFO_FORCED_RATE:
@@ -1221,7 +1221,7 @@ odm_cmn_info_hook(
 		break;
 
 	case	ODM_CMNINFO_IS1ANTENNA:
-		p_dm->p_is_1_antenna = (boolean *)p_value;
+		p_dm->p_is_1_antenna = (bool *)p_value;
 		break;
 
 	case	ODM_CMNINFO_RFDEFAULTPATH:
@@ -1229,14 +1229,14 @@ odm_cmn_info_hook(
 		break;
 
 	case	ODM_CMNINFO_FCS_MODE:
-		p_dm->p_is_fcs_mode_enable = (boolean *)p_value;
+		p_dm->p_is_fcs_mode_enable = (bool *)p_value;
 		break;
 	/*add by YuChen for beamforming PhyDM*/
 	case	ODM_CMNINFO_HUBUSBMODE:
 		p_dm->hub_usb_mode = (u8 *)p_value;
 		break;
 	case	ODM_CMNINFO_FWDWRSVDPAGEINPROGRESS:
-		p_dm->p_is_fw_dw_rsvd_page_in_progress = (boolean *)p_value;
+		p_dm->p_is_fw_dw_rsvd_page_in_progress = (bool *)p_value;
 		break;
 	case	ODM_CMNINFO_TX_TP:
 		p_dm->p_current_tx_tp = (u32 *)p_value;
@@ -1271,7 +1271,7 @@ odm_cmn_info_hook(
 		p_dm->p_bb_op_mode = (u8 *)p_value;
 		break;
 	case ODM_CMNINFO_BF_ANTDIV_DECISION:
-		p_dm->dm_fat_table.is_no_csi_feedback = (boolean *)p_value;
+		p_dm->dm_fat_table.is_no_csi_feedback = (bool *)p_value;
 		break;
 
 	default:
@@ -1296,7 +1296,7 @@ odm_cmn_info_update(
 	/*  */
 	switch	(cmn_info) {
 	case ODM_CMNINFO_LINK_IN_PROGRESS:
-		p_dm->is_link_in_process = (boolean)value;
+		p_dm->is_link_in_process = (bool)value;
 		break;
 
 	case	ODM_CMNINFO_ABILITY:
@@ -1308,23 +1308,23 @@ odm_cmn_info_update(
 		break;
 
 	case	ODM_CMNINFO_WIFI_DIRECT:
-		p_dm->is_wifi_direct = (boolean)value;
+		p_dm->is_wifi_direct = (bool)value;
 		break;
 
 	case	ODM_CMNINFO_WIFI_DISPLAY:
-		p_dm->is_wifi_display = (boolean)value;
+		p_dm->is_wifi_display = (bool)value;
 		break;
 
 	case	ODM_CMNINFO_LINK:
-		p_dm->is_linked = (boolean)value;
+		p_dm->is_linked = (bool)value;
 		break;
 
 	case	ODM_CMNINFO_CMW500LINK:
-		p_dm->iot_table.is_linked_cmw500 = (boolean)value;
+		p_dm->iot_table.is_linked_cmw500 = (bool)value;
 		break;
 
 	case	ODM_CMNINFO_STATION_STATE:
-		p_dm->bsta_state = (boolean)value;
+		p_dm->bsta_state = (bool)value;
 		break;
 
 	case	ODM_CMNINFO_RSSI_MIN:
@@ -1344,11 +1344,11 @@ odm_cmn_info_update(
 		break;
 	/* The following is for BT HS mode and BT coexist mechanism. */
 	case ODM_CMNINFO_BT_ENABLED:
-		p_dm->bt_info_table.is_bt_enabled = (boolean)value;
+		p_dm->bt_info_table.is_bt_enabled = (bool)value;
 		break;
 
 	case ODM_CMNINFO_BT_HS_CONNECT_PROCESS:
-		p_dm->bt_info_table.is_bt_connect_process = (boolean)value;
+		p_dm->bt_info_table.is_bt_connect_process = (bool)value;
 		break;
 
 	case ODM_CMNINFO_BT_HS_RSSI:
@@ -1356,18 +1356,18 @@ odm_cmn_info_update(
 		break;
 
 	case	ODM_CMNINFO_BT_OPERATION:
-		p_dm->bt_info_table.is_bt_hs_operation = (boolean)value;
+		p_dm->bt_info_table.is_bt_hs_operation = (bool)value;
 		break;
 
 	case	ODM_CMNINFO_BT_LIMITED_DIG:
-		p_dm->bt_info_table.is_bt_limited_dig = (boolean)value;
+		p_dm->bt_info_table.is_bt_limited_dig = (bool)value;
 		break;
 	case	ODM_CMNINFO_AP_TOTAL_NUM:
 		p_dm->ap_total_num = (u8)value;
 		break;
 
 	case ODM_CMNINFO_POWER_TRAINING:
-		p_dm->is_disable_power_training = (boolean)value;
+		p_dm->is_disable_power_training = (bool)value;
 		break;
 
 #ifdef CONFIG_PHYDM_DFS_MASTER
@@ -1376,7 +1376,7 @@ odm_cmn_info_update(
 		break;
 #endif
 	case	ODM_CMNINFO_BT_CONTINUOUS_TURN:
-		p_dm->is_bt_continuous_turn = (boolean)value;
+		p_dm->is_bt_continuous_turn = (bool)value;
 		break;
 	default:
 		/* do nothing */

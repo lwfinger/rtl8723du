@@ -126,7 +126,7 @@ extern u8 RSN_CIPHER_SUITE_CCMP[];
 extern u8 RSN_CIPHER_SUITE_WEP104[];
 
 
-typedef enum _RATEID_IDX_ {
+enum rateid_idx {
 	RATEID_IDX_BGN_40M_2SS = 0,
 	RATEID_IDX_BGN_40M_1SS = 1,
 	RATEID_IDX_BGN_20M_2SS_BN = 2,
@@ -142,9 +142,9 @@ typedef enum _RATEID_IDX_ {
 	RATEID_IDX_MIX2 = 12,
 	RATEID_IDX_VHT_3SS = 13,
 	RATEID_IDX_BGN_3SS = 14,
-} RATEID_IDX, *PRATEID_IDX;
+};
 
-typedef enum _RATR_TABLE_MODE {
+enum ratr_table_mode {
 	RATR_INX_WIRELESS_NGB = 0,	/* BGN 40 Mhz 2SS 1SS */
 	RATR_INX_WIRELESS_NG = 1,		/* GN or N */
 	RATR_INX_WIRELESS_NB = 2,		/* BGN 20 Mhz 2SS 1SS  or BN */
@@ -154,8 +154,7 @@ typedef enum _RATR_TABLE_MODE {
 	RATR_INX_WIRELESS_B = 6,
 	RATR_INX_WIRELESS_MC = 7,
 	RATR_INX_WIRELESS_AC_N = 8,
-} RATR_TABLE_MODE, *PRATR_TABLE_MODE;
-
+};
 
 enum NETWORK_TYPE {
 	WIRELESS_INVALID = 0,
@@ -212,7 +211,7 @@ enum NETWORK_TYPE {
 
 
 
-typedef struct ieee_param {
+struct ieee_param {
 	u32 cmd;
 	u8 sta_addr[ETH_ALEN];
 	union {
@@ -250,13 +249,13 @@ typedef struct ieee_param {
 			u8	buf[0];
 		} bcn_ie;
 	} u;
-} ieee_param;
+};
 
-typedef struct ieee_param_ex {
+struct ieee_param_ex {
 	u32 cmd;
 	u8 sta_addr[ETH_ALEN];
 	u8 data[0];
-} ieee_param_ex;
+};
 
 struct sta_data {
 	u16 aid;
@@ -851,7 +850,7 @@ enum MGN_RATE {
 	(_rate == MGN_VHT4SS_MCS8) ? "VHT4SMCS8" : \
 	(_rate == MGN_VHT4SS_MCS9) ? "VHT4SMCS9" : "UNKNOWN"
 
-typedef enum _RATE_SECTION {
+enum rate_section {
 	CCK = 0,
 	OFDM = 1,
 	HT_MCS0_MCS7 = 2,
@@ -871,7 +870,7 @@ typedef enum _RATE_SECTION {
 	VHT_3SS = VHT_3SSMCS0_3SSMCS9,
 	VHT_4SS = VHT_4SSMCS0_4SSMCS9,
 	RATE_SECTION_NUM,
-} RATE_SECTION;
+};
 
 const char *rate_section_str(u8 section);
 
@@ -1249,12 +1248,10 @@ extern __inline int is_zero_mac_addr(const u8 *addr)
 #define CFG_IEEE80211_RESERVE_FCS (1<<0)
 #define CFG_IEEE80211_COMPUTE_FCS (1<<1)
 
-typedef struct tx_pending_t {
+struct tx_pending_t {
 	int frag;
 	struct ieee80211_txb *txb;
-} tx_pending_t;
-
-
+};
 
 #define TID_NUM	16
 
@@ -1543,14 +1540,18 @@ struct rtw_ieee802_11_elems {
 	u8 rm_en_cap_len;
 };
 
-typedef enum { ParseOK = 0, ParseUnknown = 1, ParseFailed = -1 } ParseRes;
+enum ParseRes {
+	ParseOK = 0,
+	ParseUnknown = 1,
+	ParseFailed = -1
+};
 
-ParseRes rtw_ieee802_11_parse_elems(u8 *start, uint len,
-				struct rtw_ieee802_11_elems *elems,
-				int show_errors);
+enum ParseRes rtw_ieee802_11_parse_elems(u8 *start, uint len,
+					 struct rtw_ieee802_11_elems *elems,
+					 int show_errors);
 
 u8 *rtw_set_fixed_ie(unsigned char *pbuf, unsigned int len, unsigned char *source, unsigned int *frlen);
-u8 *rtw_set_ie(u8 *pbuf, sint index, uint len, const u8 *source, uint *frlen);
+u8 *rtw_set_ie(u8 *pbuf, int index, uint len, const u8 *source, uint *frlen);
 
 enum secondary_ch_offset {
 	SCN = 0, /* no secondary channel */
@@ -1563,7 +1564,7 @@ u8 *rtw_set_ie_ch_switch(u8 *buf, u32 *buf_len, u8 ch_switch_mode, u8 new_ch, u8
 u8 *rtw_set_ie_secondary_ch_offset(u8 *buf, u32 *buf_len, u8 secondary_ch_offset);
 u8 *rtw_set_ie_mesh_ch_switch_parm(u8 *buf, u32 *buf_len, u8 ttl, u8 flags, u16 reason, u16 precedence);
 
-u8 *rtw_get_ie(const u8 *pbuf, sint index, sint *len, sint limit);
+u8 *rtw_get_ie(const u8 *pbuf, int index, int *len, int limit);
 u8 *rtw_get_ie_ex(const u8 *in_ie, uint in_len, u8 eid, const u8 *oui, u8 oui_len, u8 *ie, uint *ielen);
 int rtw_ies_remove_ie(u8 *ies, uint *ies_len, uint offset, u8 eid, u8 *oui, u8 oui_len);
 
@@ -1628,7 +1629,7 @@ void dump_wps_ie(void *sel, const u8 *ie, u32 ie_len);
 
 void rtw_ies_get_chbw(u8 *ies, int ies_len, u8 *ch, u8 *bw, u8 *offset);
 
-void rtw_bss_get_chbw(WLAN_BSSID_EX *bss, u8 *ch, u8 *bw, u8 *offset);
+void rtw_bss_get_chbw(struct wlan_bssid_ex *bss, u8 *ch, u8 *bw, u8 *offset);
 
 bool rtw_is_chbw_grouped(u8 ch_a, u8 bw_a, u8 offset_a
 	, u8 ch_b, u8 bw_b, u8 offset_b);
@@ -1644,9 +1645,9 @@ u8 *rtw_get_p2p_attr_content(u8 *p2p_ie, uint p2p_ielen, u8 target_attr_id, u8 *
 u32 rtw_set_p2p_attr_content(u8 *pbuf, u8 attr_id, u16 attr_len, u8 *pdata_attr);
 uint rtw_del_p2p_ie(u8 *ies, uint ies_len_ori, const char *msg);
 uint rtw_del_p2p_attr(u8 *ie, uint ielen_ori, u8 attr_id);
-u8 *rtw_bss_ex_get_p2p_ie(WLAN_BSSID_EX *bss_ex, u8 *p2p_ie, uint *p2p_ielen);
-void rtw_bss_ex_del_p2p_ie(WLAN_BSSID_EX *bss_ex);
-void rtw_bss_ex_del_p2p_attr(WLAN_BSSID_EX *bss_ex, u8 attr_id);
+u8 *rtw_bss_ex_get_p2p_ie(struct wlan_bssid_ex *bss_ex, u8 *p2p_ie, uint *p2p_ielen);
+void rtw_bss_ex_del_p2p_ie(struct wlan_bssid_ex *bss_ex);
+void rtw_bss_ex_del_p2p_attr(struct wlan_bssid_ex *bss_ex, u8 attr_id);
 
 void dump_wfd_ie(void *sel, const u8 *ie, u32 ie_len);
 u8 *rtw_get_wfd_ie(const u8 *in_ie, int in_len, u8 *wfd_ie, uint *wfd_ielen);
@@ -1654,9 +1655,9 @@ u8 *rtw_get_wfd_attr(u8 *wfd_ie, uint wfd_ielen, u8 target_attr_id, u8 *buf_attr
 u8 *rtw_get_wfd_attr_content(u8 *wfd_ie, uint wfd_ielen, u8 target_attr_id, u8 *buf_content, uint *len_content);
 uint rtw_del_wfd_ie(u8 *ies, uint ies_len_ori, const char *msg);
 uint rtw_del_wfd_attr(u8 *ie, uint ielen_ori, u8 attr_id);
-u8 *rtw_bss_ex_get_wfd_ie(WLAN_BSSID_EX *bss_ex, u8 *wfd_ie, uint *wfd_ielen);
-void rtw_bss_ex_del_wfd_ie(WLAN_BSSID_EX *bss_ex);
-void rtw_bss_ex_del_wfd_attr(WLAN_BSSID_EX *bss_ex, u8 attr_id);
+u8 *rtw_bss_ex_get_wfd_ie(struct wlan_bssid_ex *bss_ex, u8 *wfd_ie, uint *wfd_ielen);
+void rtw_bss_ex_del_wfd_ie(struct wlan_bssid_ex *bss_ex);
+void rtw_bss_ex_del_wfd_attr(struct wlan_bssid_ex *bss_ex, u8 attr_id);
 
 uint	rtw_get_rateset_len(u8	*rateset);
 

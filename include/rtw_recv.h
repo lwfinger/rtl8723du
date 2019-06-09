@@ -54,14 +54,14 @@ static u8 rtw_bridge_tunnel_header[] = { 0xaa, 0xaa, 0x03, 0x00, 0x00, 0xf8 };
 
 /* for Rx reordering buffer control */
 struct recv_reorder_ctrl {
-	_adapter	*padapter;
+	struct adapter	*adapt;
 	u8 tid;
 	u8 enable;
 	u16 indicate_seq;/* =wstart_b, init_value=0xffff */
 	u16 wend_b;
 	u8 wsize_b;
 	u8 ampdu_size;
-	_queue pending_recvframe_queue;
+	struct __queue pending_recvframe_queue;
 	struct timer_list reordering_ctrl_timer;
 	u8 bReorderWaiting;
 };
@@ -208,16 +208,16 @@ using enter_critical section to protect
 
 struct recv_priv {
 	spinlock_t	lock;
-	_queue	free_recv_queue;
-	_queue	recv_pending_queue;
-	_queue	uc_swdec_pending_queue;
+	struct __queue	free_recv_queue;
+	struct __queue	recv_pending_queue;
+	struct __queue	uc_swdec_pending_queue;
 
 	u8 *pallocated_frame_buf;
 	u8 *precv_frame_buf;
 
 	uint free_recvframe_cnt;
 
-	_adapter	*adapter;
+	struct adapter	*adapter;
 
 	u32 is_any_non_be_pkts;
 
@@ -257,10 +257,10 @@ struct recv_priv {
 
 	u8 *pallocated_recv_buf;
 	u8 *precv_buf;    /* 4 alignment */
-	_queue	free_recv_buf_queue;
+	struct __queue	free_recv_buf_queue;
 	u32	free_recv_buf_queue_cnt;
 
-	_queue	recv_buf_pending_queue;
+	struct __queue	recv_buf_pending_queue;
 
 	/* For display the phy informatiom */
 	u8 is_signal_dbg;	/* for debug */
@@ -308,8 +308,8 @@ struct recv_priv {
 
 struct sta_recv_priv {
 	spinlock_t	lock;
-	sint	option;
-	_queue defrag_q;	 /* keeping the fragment frame until defrag */
+	int	option;
+	struct __queue defrag_q;	 /* keeping the fragment frame until defrag */
 	struct	stainfo_rxcache rxcache;
 };
 
@@ -320,7 +320,7 @@ struct recv_buf {
 
 	u32	ref_cnt;
 
-	PADAPTER adapter;
+	struct adapter * adapter;
 
 	u8	*pbuf;
 	u8	*pallocated_buf;
@@ -360,7 +360,7 @@ struct recv_frame_hdr {
 	struct list_head	list;
 	struct sk_buff *pkt;
 
-	_adapter  *adapter;
+	struct adapter  *adapter;
 
 	u8 fragcnt;
 
@@ -398,29 +398,29 @@ union recv_frame {
 
 bool rtw_rframe_del_wfd_ie(union recv_frame *rframe, u8 ies_offset);
 
-typedef enum _RX_PACKET_TYPE {
+enum RX_PACKET_TYPE {
 	NORMAL_RX,/* Normal rx packet */
 	TX_REPORT1,/* CCX */
 	TX_REPORT2,/* TX RPT */
 	HIS_REPORT,/* USB HISR RPT */
 	C2H_PACKET
-} RX_PACKET_TYPE, *PRX_PACKET_TYPE;
+};
 
-extern union recv_frame *_rtw_alloc_recvframe(_queue *pfree_recv_queue);   /* get a free recv_frame from pfree_recv_queue */
-extern union recv_frame *rtw_alloc_recvframe(_queue *pfree_recv_queue);   /* get a free recv_frame from pfree_recv_queue */
-extern void rtw_init_recvframe(union recv_frame *precvframe , struct recv_priv *precvpriv);
-extern int	 rtw_free_recvframe(union recv_frame *precvframe, _queue *pfree_recv_queue);
+union recv_frame *_rtw_alloc_recvframe(struct __queue *pfree_recv_queue);   /* get a free recv_frame from pfree_recv_queue */
+union recv_frame *rtw_alloc_recvframe(struct __queue *pfree_recv_queue);   /* get a free recv_frame from pfree_recv_queue */
+void rtw_init_recvframe(union recv_frame *precvframe , struct recv_priv *precvpriv);
+int rtw_free_recvframe(union recv_frame *precvframe, struct __queue *pfree_recv_queue);
 
 #define rtw_dequeue_recvframe(queue) rtw_alloc_recvframe(queue)
-extern int _rtw_enqueue_recvframe(union recv_frame *precvframe, _queue *queue);
-extern int rtw_enqueue_recvframe(union recv_frame *precvframe, _queue *queue);
+int _rtw_enqueue_recvframe(union recv_frame *precvframe, struct __queue *queue);
+int rtw_enqueue_recvframe(union recv_frame *precvframe, struct __queue *queue);
 
-extern void rtw_free_recvframe_queue(_queue *pframequeue,  _queue *pfree_recv_queue);
-u32 rtw_free_uc_swdec_pending_queue(_adapter *adapter);
+void rtw_free_recvframe_queue(struct __queue *pframequeue,  struct __queue *pfree_recv_queue);
+u32 rtw_free_uc_swdec_pending_queue(struct adapter *adapter);
 
-sint rtw_enqueue_recvbuf_to_head(struct recv_buf *precvbuf, _queue *queue);
-sint rtw_enqueue_recvbuf(struct recv_buf *precvbuf, _queue *queue);
-struct recv_buf *rtw_dequeue_recvbuf(_queue *queue);
+int rtw_enqueue_recvbuf_to_head(struct recv_buf *precvbuf, struct __queue *queue);
+int rtw_enqueue_recvbuf(struct recv_buf *precvbuf, struct __queue *queue);
+struct recv_buf *rtw_dequeue_recvbuf(struct __queue *queue);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 void rtw_reordering_ctrl_timeout_handler(struct timer_list *t);
@@ -459,7 +459,7 @@ static inline u8 *get_recvframe_data(union recv_frame *precvframe)
 
 }
 
-static inline u8 *recvframe_push(union recv_frame *precvframe, sint sz)
+static inline u8 *recvframe_push(union recv_frame *precvframe, int sz)
 {
 	/* append data before rx_data */
 
@@ -485,7 +485,7 @@ static inline u8 *recvframe_push(union recv_frame *precvframe, sint sz)
 
 }
 
-static inline u8 *recvframe_pull(union recv_frame *precvframe, sint sz)
+static inline u8 *recvframe_pull(union recv_frame *precvframe, int sz)
 {
 	/* rx_data += sz; move rx_data sz bytes  hereafter */
 
@@ -534,7 +534,7 @@ static inline u8 *recvframe_put(union recv_frame *precvframe, __le16 le_sz)
 	return precvframe->u.hdr.rx_tail;
 }
 
-static inline u8 *recvframe_pull_tail(union recv_frame *precvframe, sint sz)
+static inline u8 *recvframe_pull_tail(union recv_frame *precvframe, int sz)
 {
 	/* rmv data from rx_tail (by yitsen) */
 
@@ -556,9 +556,9 @@ static inline u8 *recvframe_pull_tail(union recv_frame *precvframe, sint sz)
 	return precvframe->u.hdr.rx_tail;
 }
 
-static inline _buffer *get_rxbuf_desc(union recv_frame *precvframe)
+static inline unsigned char *get_rxbuf_desc(union recv_frame *precvframe)
 {
-	_buffer *buf_desc;
+	unsigned char *buf_desc;
 
 	if (!precvframe)
 		return NULL;
@@ -606,7 +606,7 @@ static inline u8 *pkt_to_recvdata(struct sk_buff *pkt)
 }
 
 
-static inline sint get_recvframe_len(union recv_frame *precvframe)
+static inline int get_recvframe_len(union recv_frame *precvframe)
 {
 	return precvframe->u.hdr.len;
 }
@@ -624,11 +624,11 @@ static inline int translate_percentage_to_dbm(u32 SignalStrengthIndex)
 
 struct sta_info;
 
-extern void _rtw_init_sta_recv_priv(struct sta_recv_priv *psta_recvpriv);
+void _rtw_init_sta_recv_priv(struct sta_recv_priv *psta_recvpriv);
 
-extern void  mgt_dispatcher(_adapter *padapter, union recv_frame *precv_frame);
+void  mgt_dispatcher(struct adapter *adapt, union recv_frame *precv_frame);
 
-u8 adapter_allow_bmc_data_rx(_adapter *adapter);
+u8 adapter_allow_bmc_data_rx(struct adapter *adapter);
 int pre_recv_entry(union recv_frame *precvframe, u8 *pphy_status);
 
 #endif

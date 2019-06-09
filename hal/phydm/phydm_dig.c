@@ -8,7 +8,7 @@
 #include "phydm_precomp.h"
 
 
-static boolean
+static bool
 phydm_dig_go_up_check(
 	void		*p_dm_void
 )
@@ -23,7 +23,7 @@ phydm_dig_go_up_check(
 	u8		total_nhm_cnt = ccx_info->nhm_result_total;
 	u32		dig_cover_cnt = 0;
 	u32		over_dig_cover_cnt = 0;
-	boolean		ret = true;
+	bool		ret = true;
 
 	if (*p_dm->p_bb_op_mode == PHYDM_PERFORMANCE_MODE)
 		return ret;
@@ -80,8 +80,8 @@ phydm_dig_go_up_check(
 static void
 odm_fa_threshold_check(
 	void			*p_dm_void,
-	boolean			is_dfs_band,
-	boolean			is_performance
+	bool			is_dfs_band,
+	bool			is_performance
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
@@ -344,7 +344,7 @@ odm_pause_dig(
 
 }
 
-static boolean
+static bool
 odm_dig_abort(
 	void			*p_dm_void
 )
@@ -412,8 +412,8 @@ phydm_dig_init(
 static void
 phydm_dig_abs_boundary_decision(
 	struct PHY_DM_STRUCT		*p_dm,
-	boolean	is_performance,
-	boolean	is_dfs_band
+	bool	is_performance,
+	bool	is_dfs_band
 )
 {
 	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
@@ -471,7 +471,7 @@ phydm_dig_abs_boundary_decision(
 static void
 phydm_dig_dym_boundary_decision(
 	struct PHY_DM_STRUCT		*p_dm,
-	boolean	is_performance
+	bool	is_performance
 )
 {
 	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
@@ -525,12 +525,12 @@ static void
 phydm_dig_abnormal_case(
 	struct PHY_DM_STRUCT		*p_dm,
 	u8	current_igi,
-	boolean	is_performance,
-	boolean	is_dfs_band
+	bool	is_performance,
+	bool	is_dfs_band
 )
 {
 	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
-	boolean	first_connect = false, first_dis_connect = false;
+	bool	first_connect = false, first_dis_connect = false;
 
 	first_connect = (p_dm->is_linked) && (p_dig_t->is_media_connect == false);
 	first_dis_connect = (!p_dm->is_linked) && (p_dig_t->is_media_connect == true);
@@ -563,7 +563,7 @@ phydm_dig_current_igi_by_fa_th(
 	u8			*step_size
 )
 {
-	boolean	dig_go_up_check = true;
+	bool	dig_go_up_check = true;
 	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
 	
 	dig_go_up_check = phydm_dig_go_up_check(p_dm);
@@ -582,15 +582,15 @@ phydm_dig_current_igi_by_fa_th(
 static u8
 phydm_dig_igi_start_value(
 	struct PHY_DM_STRUCT		*p_dm,
-	boolean	is_performance,
+	bool	is_performance,
 	u8		current_igi,
 	u32		false_alm_cnt,
-	boolean	is_dfs_band
+	bool	is_dfs_band
 )
 {
 	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
 	u8		step_size[3] = {0};
-	boolean	first_connect = false, first_dis_connect = false;
+	bool	first_connect = false, first_dis_connect = false;
 
 	first_connect = (p_dm->is_linked) && (p_dig_t->is_media_connect == false);
 	first_dis_connect = (!p_dm->is_linked) && (p_dig_t->is_media_connect == true);
@@ -682,10 +682,10 @@ phydm_dig(
 #ifdef PHYDM_TDMA_DIG_SUPPORT
 	struct phydm_fa_acc_struct *p_falm_cnt_acc = &p_dm->false_alm_cnt_acc;
 #endif
-	boolean		first_connect, first_dis_connect;
+	bool		first_connect, first_dis_connect;
 	u8			current_igi = p_dig_t->cur_ig_value;
 	u32			false_alm_cnt= p_falm_cnt->cnt_all;
-	boolean		is_dfs_band = false, is_performance = true;
+	bool		is_dfs_band = false, is_performance = true;
 
 #ifdef PHYDM_TDMA_DIG_SUPPORT
 	if (p_dm->original_dig_restore == 0) {
@@ -1078,13 +1078,13 @@ odm_false_alarm_counter_statistics(
 
 		if (phydm_set_bb_dbg_port(p_dm, BB_DBGPORT_PRIORITY_1, adaptivity->adaptivity_dbg_port)) {
 			if (p_dm->support_ic_type & (ODM_RTL8723B | ODM_RTL8188E))
-				false_alm_cnt->edcca_flag = (boolean)((phydm_get_bb_dbg_port_value(p_dm) & BIT(30)) >> 30);
+				false_alm_cnt->edcca_flag = (bool)((phydm_get_bb_dbg_port_value(p_dm) & BIT(30)) >> 30);
 			else
-				false_alm_cnt->edcca_flag = (boolean)((phydm_get_bb_dbg_port_value(p_dm) & BIT(29)) >> 29);
+				false_alm_cnt->edcca_flag = (bool)((phydm_get_bb_dbg_port_value(p_dm) & BIT(29)) >> 29);
 			phydm_release_bb_dbg_port(p_dm);
 		}
 	} else {
-		false_alm_cnt->edcca_flag = (boolean)(odm_get_bb_reg(p_dm, 0x9a0, BIT(29)));
+		false_alm_cnt->edcca_flag = (bool)(odm_get_bb_reg(p_dm, 0x9a0, BIT(29)));
 	}
 
 
@@ -1265,7 +1265,7 @@ phydm_tdma_false_alarm_counter_check(
 	struct phydm_fa_struct	*p_falm_cnt;
 	struct phydm_fa_acc_struct	*p_falm_cnt_acc;
 	struct phydm_dig_struct	*p_dig_t;
-	boolean	rssi_dump_en = 0;
+	bool	rssi_dump_en = 0;
 	u32 timestamp;
 	u8 tdma_dig_state_number;
 
@@ -1327,7 +1327,7 @@ phydm_tdma_false_alarm_counter_check(
 void
 phydm_false_alarm_counter_acc(
 	void		*p_dm_void,
-	boolean		rssi_dump_en
+	bool		rssi_dump_en
 	)
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;

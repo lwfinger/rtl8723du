@@ -20,7 +20,7 @@ phydm_set_kfree_to_rf_8814a(
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
-	boolean is_odd;
+	bool is_odd;
 
 	if ((data % 2) != 0) {	/*odd->positive*/
 		data = data - 1;
@@ -172,7 +172,7 @@ static void
 phydm_set_kfree_to_rf_8821c(
 	void		*p_dm_void,
 	u8		e_rf_path,
-	boolean		wlg_btg,
+	bool		wlg_btg,
 	u8		data
 )
 {

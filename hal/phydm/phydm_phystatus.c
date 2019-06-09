@@ -400,7 +400,7 @@ phydm_rx_phy_status92c_series_parsing(
 	s8				rx_pwr[4], rx_pwr_all = 0;
 	u8				EVM, PWDB_ALL = 0, PWDB_ALL_BT;
 	u8				RSSI, total_rssi = 0;
-	boolean				is_cck_rate = false;
+	bool				is_cck_rate = false;
 	u8				rf_rx_num = 0;
 	u8				LNA_idx = 0;
 	u8				VGA_idx = 0;
@@ -1228,7 +1228,7 @@ phydm_process_rssi_for_dm(
 /* For 8822B only!! need to move to FW finally */
 /*==============================================*/
 
-boolean
+bool
 phydm_query_is_mu_api(
 	struct PHY_DM_STRUCT					*p_phydm,
 	u8							ppdu_idx,
@@ -1237,7 +1237,7 @@ phydm_query_is_mu_api(
 )
 {
 	u8	data_rate = 0, gid = 0;
-	boolean is_mu = false;
+	bool is_mu = false;
 
 	data_rate = p_phydm->phy_dbg_info.num_of_ppdu[ppdu_idx];
 	gid = p_phydm->phy_dbg_info.gid_num[ppdu_idx];
@@ -1332,8 +1332,8 @@ static void
 phydm_set_common_phy_info(
 	s8							rx_power,
 	u8							channel,
-	boolean							is_beamformed,
-	boolean							is_mu_packet,
+	bool							is_beamformed,
+	bool							is_mu_packet,
 	u8							bandwidth,
 	u8							signal_quality,
 	u8							rxsc,
@@ -1434,7 +1434,7 @@ phydm_get_rx_phy_status_type1(
 	struct _phy_status_rpt_jaguar2_type1	*p_phy_sta_rpt = (struct _phy_status_rpt_jaguar2_type1 *)p_phy_status;
 	s8							rx_pwr_db = -120;
 	u8							i, rxsc, bw = CHANNEL_WIDTH_20, rx_count = 0;
-	boolean						is_mu;
+	bool						is_mu;
 	u8							num_ss;
 
 	/* Update OFDM packet counter */
@@ -1508,7 +1508,7 @@ phydm_get_rx_phy_status_type1(
 	}
 
 	/* Update packet information */
-	phydm_set_common_phy_info(rx_pwr_db, p_phy_sta_rpt->channel, (boolean)p_phy_sta_rpt->beamformed,
+	phydm_set_common_phy_info(rx_pwr_db, p_phy_sta_rpt->channel, (bool)p_phy_sta_rpt->beamformed,
 		is_mu, bw, p_phy_info->rx_mimo_signal_quality[0], rxsc, p_phy_info);
 
 	num_ss = phydm_rate_to_num_ss(p_dm, p_pktinfo->data_rate);
@@ -1590,7 +1590,7 @@ phydm_get_rx_phy_status_type2(
 	}
 
 	/* Update packet information */
-	phydm_set_common_phy_info(rx_pwr_db, p_phy_sta_rpt->channel, (boolean)p_phy_sta_rpt->beamformed,
+	phydm_set_common_phy_info(rx_pwr_db, p_phy_sta_rpt->channel, (bool)p_phy_sta_rpt->beamformed,
 				  false, bw, 0, rxsc, p_phy_info);
 }
 

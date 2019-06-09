@@ -60,7 +60,7 @@ odm_clear_txpowertracking_state(
 
 void
 odm_txpowertracking_callback_thermal_meter(
-	struct _ADAPTER	*adapter
+	struct adapter	*adapter
 );
 
 #define ODM_TARGET_CHNL_NUM_2G_5G	59

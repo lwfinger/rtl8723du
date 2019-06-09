@@ -79,12 +79,12 @@
 #define	PWR_CUT_ALL_MSK			0xFF
 
 
-typedef enum _PWRSEQ_CMD_DELAY_UNIT_ {
+enum PWRSEQ_DELAY_UNIT {
 	PWRSEQ_DELAY_US,
 	PWRSEQ_DELAY_MS,
-} PWRSEQ_DELAY_UNIT;
+};
 
-typedef struct _WL_PWR_CFG_ {
+struct wlan_pwr_cfg {
 	u16 offset;
 	u8 cut_msk;
 	u8 fab_msk:4;
@@ -93,7 +93,7 @@ typedef struct _WL_PWR_CFG_ {
 	u8 cmd:4;
 	u8 msk;
 	u8 value;
-} WLAN_PWR_CFG, *PWLAN_PWR_CFG;
+};
 
 
 #define GET_PWR_CFG_OFFSET(__PWR_CMD)		((__PWR_CMD).offset)
@@ -110,10 +110,10 @@ typedef struct _WL_PWR_CFG_ {
  *	Prototype of protected function.
  * ******************************************************************************** */
 u8 HalPwrSeqCmdParsing(
-	PADAPTER		padapter,
+	struct adapter *		adapt,
 	u8				CutVersion,
 	u8				FabVersion,
 	u8				InterfaceType,
-	WLAN_PWR_CFG	PwrCfgCmd[]);
+	struct wlan_pwr_cfg	PwrCfgCmd[]);
 
 #endif

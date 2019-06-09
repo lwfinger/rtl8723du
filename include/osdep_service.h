@@ -103,11 +103,11 @@ enum mstat_f {
 #define mstat_tf_idx(flags) ((flags) & 0xff)
 #define mstat_ff_idx(flags) (((flags) & 0xff00) >> 8)
 
-typedef enum mstat_status {
+enum mstat_status {
 	MSTAT_ALLOC_SUCCESS = 0,
 	MSTAT_ALLOC_FAIL,
 	MSTAT_FREE
-} MSTAT_STATUS;
+};
 
 #define rtw_mstat_update(flag, status, sz) do {} while (0)
 #define rtw_mstat_dump(sel) do {} while (0)
@@ -122,9 +122,9 @@ struct sk_buff *_rtw_skb_alloc(u32 sz);
 void _rtw_skb_free(struct sk_buff *skb);
 struct sk_buff *_rtw_skb_copy(const struct sk_buff *skb);
 struct sk_buff *_rtw_skb_clone(struct sk_buff *skb);
-int _rtw_netif_rx(_nic_hdl ndev, struct sk_buff *skb);
+int _rtw_netif_rx(struct  net_device * ndev, struct sk_buff *skb);
 #ifdef CONFIG_RTW_NAPI
-int _rtw_netif_receive_skb(_nic_hdl ndev, struct sk_buff *skb);
+int _rtw_netif_receive_skb(struct  net_device * ndev, struct sk_buff *skb);
 #ifdef CONFIG_RTW_GRO
 gro_result_t _rtw_napi_gro_receive(struct napi_struct *napi, struct sk_buff *skb);
 #endif
@@ -208,21 +208,21 @@ extern void	_rtw_spinunlock(spinlock_t	*plock);
 extern void	_rtw_spinlock_ex(spinlock_t	*plock);
 extern void	_rtw_spinunlock_ex(spinlock_t	*plock);
 
-extern void	_rtw_init_queue(_queue *pqueue);
-extern void _rtw_deinit_queue(_queue *pqueue);
-extern u32	_rtw_queue_empty(_queue	*pqueue);
+extern void	_rtw_init_queue(struct __queue *pqueue);
+extern void _rtw_deinit_queue(struct __queue *pqueue);
+extern u32	_rtw_queue_empty(struct __queue	*pqueue);
 extern u32	rtw_end_of_queue_search(struct list_head *queue, struct list_head *pelement);
 
-extern systime _rtw_get_current_time(void);
-extern u32	_rtw_systime_to_ms(systime stime);
-extern systime _rtw_ms_to_systime(u32 ms);
-extern int	_rtw_get_passing_time_ms(systime start);
-extern int	_rtw_get_time_interval_ms(systime start, systime end);
+extern unsigned long _rtw_get_current_time(void);
+extern u32	_rtw_systime_to_ms(unsigned long stime);
+extern unsigned long _rtw_ms_to_systime(u32 ms);
+extern int	_rtw_get_passing_time_ms(unsigned long start);
+extern int	_rtw_get_time_interval_ms(unsigned long start, unsigned long end);
 
 #ifdef DBG_SYSTIME
-#define rtw_get_current_time() ({systime __stime = _rtw_get_current_time(); __stime;})
+#define rtw_get_current_time() ({unsigned long __stime = _rtw_get_current_time(); __stime;})
 #define rtw_systime_to_ms(stime) ({u32 __ms = _rtw_systime_to_ms(stime); typecheck(systime, stime); __ms;})
-#define rtw_ms_to_systime(ms) ({systime __stime = _rtw_ms_to_systime(ms); __stime;})
+#define rtw_ms_to_systime(ms) ({unsigned long __stime = _rtw_ms_to_systime(ms); __stime;})
 #define rtw_get_passing_time_ms(start) ({u32 __ms = _rtw_get_passing_time_ms(start); typecheck(systime, start); __ms;})
 #define rtw_get_time_interval_ms(start, end) ({u32 __ms = _rtw_get_time_interval_ms(start, end); typecheck(systime, start); typecheck(systime, end); __ms;})
 #else
@@ -247,7 +247,7 @@ extern void rtw_yield_os(void);
 
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-extern void rtw_init_timer(struct timer_list *ptimer, void *padapter, void *pfunc, void *ctx);
+extern void rtw_init_timer(struct timer_list *ptimer, void *adapt, void *pfunc, void *ctx);
 #endif
 
 __inline static unsigned char _cancel_timer_ex(struct timer_list *ptimer)
@@ -268,7 +268,7 @@ void _rtw_init_completion(struct completion *comp);
 void _rtw_wait_for_comp_timeout(struct completion *comp);
 void _rtw_wait_for_comp(struct completion *comp);
 
-static inline bool rtw_thread_stop(_thread_hdl_ th)
+static inline bool rtw_thread_stop(void * th)
 {
 	return kthread_stop(th);
 }
@@ -288,7 +288,7 @@ __inline static void flush_signals_thread(void)
 		flush_signals(current);
 }
 
-__inline static _OS_STATUS res_to_status(sint res)
+__inline static int res_to_status(int res)
 {
 	return res;
 }

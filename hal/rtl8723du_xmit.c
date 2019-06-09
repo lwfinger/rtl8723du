@@ -5,12 +5,12 @@
 
 #include <rtl8723d_hal.h>
 
-void _dbg_dump_tx_info(PADAPTER padapter, int frame_tag, struct tx_desc *ptxdesc)
+void _dbg_dump_tx_info(struct adapter * adapt, int frame_tag, struct tx_desc *ptxdesc)
 {
 	u8 bDumpTxPkt;
 	u8 bDumpTxDesc = false;
 
-	rtw_hal_get_def_var(padapter, HAL_DEF_DBG_DUMP_TXPKT, &(bDumpTxPkt));
+	rtw_hal_get_def_var(adapt, HAL_DEF_DBG_DUMP_TXPKT, &(bDumpTxPkt));
 
 	if (bDumpTxPkt == 1) { /* dump txdesc for data frame */
 		RTW_INFO("dump tx_desc for data frame\n");
@@ -49,24 +49,24 @@ void _dbg_dump_tx_info(PADAPTER padapter, int frame_tag, struct tx_desc *ptxdesc
 	}
 }
 
-int rtl8723du_init_xmit_priv(PADAPTER padapter)
+int rtl8723du_init_xmit_priv(struct adapter * adapt)
 {
-	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
+	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
 
 	tasklet_init(&pxmitpriv->xmit_tasklet,
 		     (void (*)(unsigned long))rtl8723du_xmit_tasklet,
-		     (unsigned long)padapter);
+		     (unsigned long)adapt);
 	return _SUCCESS;
 }
 
-void rtl8723du_free_xmit_priv(PADAPTER padapter)
+void rtl8723du_free_xmit_priv(struct adapter * adapt)
 {
 }
 
-static int urb_zero_packet_chk(PADAPTER padapter, int sz)
+static int urb_zero_packet_chk(struct adapter * adapt, int sz)
 {
 	u8 blnSetTxDescOffset;
-	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);
+	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
 
 	blnSetTxDescOffset = (((sz + TXDESC_SIZE) % pHalData->UsbBulkOutSize) == 0) ? 1 : 0;
 
@@ -77,12 +77,12 @@ static int update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, int sz, u8 bag
 {
 	int pull = 0;
 
-	PADAPTER padapter = pxmitframe->padapter;
+	struct adapter * adapt = pxmitframe->adapt;
 	struct tx_desc *ptxdesc = (struct tx_desc *)pmem;
 
 	if ((PACKET_OFFSET_SZ != 0)
 	    && (false == bagg_pkt)
-	    && (urb_zero_packet_chk(padapter, sz) == 0)) {
+	    && (urb_zero_packet_chk(adapt, sz) == 0)) {
 		ptxdesc = (struct tx_desc *)(pmem + PACKET_OFFSET_SZ);
 		pull = 1;
 		pxmitframe->pkt_offset--;
@@ -91,11 +91,11 @@ static int update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, int sz, u8 bag
 	_rtw_memset(ptxdesc, 0, sizeof(struct tx_desc));
 
 	rtl8723d_update_txdesc(pxmitframe, (u8 *)ptxdesc);
-	_dbg_dump_tx_info(padapter, pxmitframe->frame_tag, ptxdesc);
+	_dbg_dump_tx_info(adapt, pxmitframe->frame_tag, ptxdesc);
 	return pull;
 }
 
-static int rtw_dump_xframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
+static int rtw_dump_xframe(struct adapter * adapt, struct xmit_frame *pxmitframe)
 {
 	int ret = _SUCCESS;
 	int inner_ret = _SUCCESS;
@@ -104,14 +104,14 @@ static int rtw_dump_xframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 	u32 ff_hwaddr;
 	struct xmit_buf *pxmitbuf = pxmitframe->pxmitbuf;
 	struct pkt_attrib *pattrib = &pxmitframe->attrib;
-	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
-	struct security_priv *psecuritypriv = &padapter->securitypriv;
+	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
+	struct security_priv *psecuritypriv = &adapt->securitypriv;
 
 	if ((pxmitframe->frame_tag == DATA_FRAMETAG) &&
 	    (pxmitframe->attrib.ether_type != 0x0806) &&
 	    (pxmitframe->attrib.ether_type != 0x888e) &&
 	    (pxmitframe->attrib.dhcp_pkt != 1))
-		rtw_issue_addbareq_cmd(padapter, pxmitframe);
+		rtw_issue_addbareq_cmd(adapt, pxmitframe);
 
 	mem_addr = pxmitframe->buf_addr;
 
@@ -141,8 +141,8 @@ static int rtw_dump_xframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 			w_sz = sz + TXDESC_SIZE + PACKET_OFFSET_SZ;
 
 		ff_hwaddr = rtw_get_ff_hwaddr(pxmitframe);
-		inner_ret = rtw_write_port(padapter, ff_hwaddr, w_sz, (unsigned char *)pxmitbuf);
-		rtw_count_tx_stats(padapter, pxmitframe, sz);
+		inner_ret = rtw_write_port(adapt, ff_hwaddr, w_sz, (unsigned char *)pxmitbuf);
+		rtw_count_tx_stats(adapt, pxmitframe, sz);
 
 		mem_addr += w_sz;
 
@@ -157,11 +157,11 @@ static int rtw_dump_xframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 	return ret;
 }
 
-int rtl8723du_xmitframe_complete(PADAPTER padapter, struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf)
+int rtl8723du_xmitframe_complete(struct adapter * adapt, struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf)
 {
 
 	struct hw_xmit *phwxmits;
-	sint hwentry;
+	int hwentry;
 	struct xmit_frame *pxmitframe = NULL;
 	int res = _SUCCESS, xcnt = 0;
 
@@ -188,16 +188,16 @@ int rtl8723du_xmitframe_complete(PADAPTER padapter, struct xmit_priv *pxmitpriv,
 
 			if ((pxmitframe->frame_tag & 0x0f) == DATA_FRAMETAG) {
 				if (pxmitframe->attrib.priority <= 15) /* TID0~15 */
-					res = rtw_xmitframe_coalesce(padapter, pxmitframe->pkt, pxmitframe);
+					res = rtw_xmitframe_coalesce(adapt, pxmitframe->pkt, pxmitframe);
 
-				rtw_os_xmit_complete(padapter, pxmitframe); /* always return ndis_packet after rtw_xmitframe_coalesce */
+				rtw_os_xmit_complete(adapt, pxmitframe); /* always return ndis_packet after rtw_xmitframe_coalesce */
 			}
 
 
 
 
 			if (res == _SUCCESS)
-				rtw_dump_xframe(padapter, pxmitframe);
+				rtw_dump_xframe(adapt, pxmitframe);
 			else {
 				rtw_free_xmitbuf(pxmitpriv, pxmitbuf);
 				rtw_free_xmitframe(pxmitpriv, pxmitframe);
@@ -218,14 +218,14 @@ int rtl8723du_xmitframe_complete(PADAPTER padapter, struct xmit_priv *pxmitpriv,
 
 }
 
-static int xmitframe_direct(PADAPTER padapter, struct xmit_frame *pxmitframe)
+static int xmitframe_direct(struct adapter * adapt, struct xmit_frame *pxmitframe)
 {
 	int res = _SUCCESS;
 
 
-	res = rtw_xmitframe_coalesce(padapter, pxmitframe->pkt, pxmitframe);
+	res = rtw_xmitframe_coalesce(adapt, pxmitframe->pkt, pxmitframe);
 	if (res == _SUCCESS)
-		rtw_dump_xframe(padapter, pxmitframe);
+		rtw_dump_xframe(adapt, pxmitframe);
 
 	return res;
 }
@@ -235,24 +235,24 @@ static int xmitframe_direct(PADAPTER padapter, struct xmit_frame *pxmitframe)
  *	true	dump packet directly
  *	false	enqueue packet
  */
-static int pre_xmitframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
+static int pre_xmitframe(struct adapter * adapt, struct xmit_frame *pxmitframe)
 {
-	_irqL irqL;
+	unsigned long irqL;
 	int res;
 	struct xmit_buf *pxmitbuf = NULL;
-	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
+	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
 	struct pkt_attrib *pattrib = &pxmitframe->attrib;
-	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
+	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 
 	_enter_critical_bh(&pxmitpriv->lock, &irqL);
 
-	if (rtw_txframes_sta_ac_pending(padapter, pattrib) > 0)
+	if (rtw_txframes_sta_ac_pending(adapt, pattrib) > 0)
 		goto enqueue;
 
-	if (rtw_xmit_ac_blocked(padapter) == true)
+	if (rtw_xmit_ac_blocked(adapt) == true)
 		goto enqueue;
 
-	if (DEV_STA_LG_NUM(padapter->dvobj))
+	if (DEV_STA_LG_NUM(adapt->dvobj))
 		goto enqueue;
 
 	pxmitbuf = rtw_alloc_xmitbuf(pxmitpriv);
@@ -265,7 +265,7 @@ static int pre_xmitframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 	pxmitframe->buf_addr = pxmitbuf->pbuf;
 	pxmitbuf->priv_data = pxmitframe;
 
-	if (xmitframe_direct(padapter, pxmitframe) != _SUCCESS) {
+	if (xmitframe_direct(adapt, pxmitframe) != _SUCCESS) {
 		rtw_free_xmitbuf(pxmitpriv, pxmitbuf);
 		rtw_free_xmitframe(pxmitpriv, pxmitframe);
 	}
@@ -273,7 +273,7 @@ static int pre_xmitframe(PADAPTER padapter, struct xmit_frame *pxmitframe)
 	return true;
 
 enqueue:
-	res = rtw_xmitframe_enqueue(padapter, pxmitframe);
+	res = rtw_xmitframe_enqueue(adapt, pxmitframe);
 	_exit_critical_bh(&pxmitpriv->lock, &irqL);
 
 	if (res != _SUCCESS) {
@@ -286,9 +286,9 @@ enqueue:
 	return false;
 }
 
-int rtl8723du_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe)
+int rtl8723du_mgnt_xmit(struct adapter * adapt, struct xmit_frame *pmgntframe)
 {
-	return rtw_dump_xframe(padapter, pmgntframe);
+	return rtw_dump_xframe(adapt, pmgntframe);
 }
 
 /*
@@ -296,17 +296,17 @@ int rtl8723du_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe)
  *	true	dump packet directly ok
  *	false	temporary can't transmit packets to hardware
  */
-int rtl8723du_hal_xmit(PADAPTER padapter, struct xmit_frame *pxmitframe)
+int rtl8723du_hal_xmit(struct adapter * adapt, struct xmit_frame *pxmitframe)
 {
-	return pre_xmitframe(padapter, pxmitframe);
+	return pre_xmitframe(adapt, pxmitframe);
 }
 
-int rtl8723du_hal_xmitframe_enqueue(PADAPTER padapter, struct xmit_frame *pxmitframe)
+int rtl8723du_hal_xmitframe_enqueue(struct adapter * adapt, struct xmit_frame *pxmitframe)
 {
-	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
+	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
 	int err;
 
-	err = rtw_xmitframe_enqueue(padapter, pxmitframe);
+	err = rtw_xmitframe_enqueue(adapt, pxmitframe);
 	if (err != _SUCCESS) {
 		rtw_free_xmitframe(pxmitpriv, pxmitframe);
 

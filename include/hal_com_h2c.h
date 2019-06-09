@@ -120,7 +120,7 @@ enum h2c_cmd {
 #define H2C_FORCE_BT_TXPWR_LEN		3
 #define H2C_BCN_RSVDPAGE_LEN		5
 #define H2C_PROBERSP_RSVDPAGE_LEN	5
-#define H2C_P2PRSVDPAGE_LOC_LEN	5
+#define H2C_P2PRSVDPAGE_LOC_LEN		5
 #define H2C_P2P_OFFLOAD_LEN	3
 
 #if defined(CONFIG_FW_MULTI_PORT_SUPPORT)
@@ -133,28 +133,28 @@ enum h2c_cmd {
 #define cpIpAddr(des, src)					((des)[0] = (src)[0], (des)[1] = (src)[1], (des)[2] = (src)[2], (des)[3] = (src)[3])
 
 
-/* _RSVDPAGE_LOC_CMD_0x00 */
-static inline void SET_H2CCMD_RSVDPAGE_LOC_PROBE_RSP(u8 *__pH2CCmd, u8 __Value)
+/* _RSVD_PAGE_CMD_0x00 */
+static inline void SET_H2CCMD_RSVD_PAGE_PROBE_RSP(u8 *__pH2CCmd, u8 __Value)
 {
 	*(__pH2CCmd) = __Value;
 }
 
-static inline void SET_H2CCMD_RSVDPAGE_LOC_PSPOLL(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_RSVD_PAGE_PSPOLL(u8 *__pH2CCmd, u8 __Value)
 {
 	*(__pH2CCmd + 1) = __Value;
 }
 
-static inline void SET_H2CCMD_RSVDPAGE_LOC_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_RSVD_PAGE_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
 {
 	*(__pH2CCmd + 2) = __Value;
 }
 
-static inline void SET_H2CCMD_RSVDPAGE_LOC_QOS_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_RSVD_PAGE_QOS_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
 {
 	*(__pH2CCmd + 3) = __Value;
 }
 
-static inline void SET_H2CCMD_RSVDPAGE_LOC_BT_QOS_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_RSVD_PAGE_BT_QOS_NULL_DATA(u8 *__pH2CCmd, u8 __Value)
 {
 	*(__pH2CCmd + 4) = __Value;
 }
@@ -239,9 +239,9 @@ extern const char *const _h2c_msr_role_str[];
 	h2c_msr_role_str(GET_H2CCMD_MSRRPT_PARM_ROLE((h2c_msr))), \
 	GET_H2CCMD_MSRRPT_PARM_MIRACAST((h2c_msr)) ? (GET_H2CCMD_MSRRPT_PARM_MIRACAST_SINK((h2c_msr)) ? " MSINK" : " MSRC") : ""
 
-int rtw_hal_set_FwMediaStatusRpt_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, bool macid_ind, u8 macid_end);
-int rtw_hal_set_FwMediaStatusRpt_single_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid);
-int rtw_hal_set_FwMediaStatusRpt_range_cmd(_adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, u8 macid_end);
+int rtw_hal_set_FwMediaStatusRpt_cmd(struct adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, bool macid_ind, u8 macid_end);
+int rtw_hal_set_FwMediaStatusRpt_single_cmd(struct adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid);
+int rtw_hal_set_FwMediaStatusRpt_range_cmd(struct adapter *adapter, bool opmode, bool miracast, bool miracast_sink, u8 role, u8 macid, u8 macid_end);
 
 /* _KEEP_ALIVE_CMD_0x03 */
 static inline void SET_H2CCMD_KEEPALIVE_PARM_ENABLE(u8 *__pH2CCmd, u8 __Value)
@@ -308,8 +308,8 @@ static inline void SET_H2CCMD_CUSTOMER_STR_REQ_EN(u8 *__pH2CCmd, u8 __Value)
 	u8p_replace_bits(__pH2CCmd, __Value, BIT(0));
 }
 
-int rtw_hal_h2c_customer_str_req(_adapter *adapter);
-int rtw_hal_customer_str_read(_adapter *adapter, u8 *cs);
+int rtw_hal_h2c_customer_str_req(struct adapter *adapter);
+int rtw_hal_customer_str_read(struct adapter *adapter, u8 *cs);
 
 /* H2C_CUSTOMER_STR_W1 0xC6 */
 #define H2C_CUSTOMER_STR_W1_LEN 7
@@ -337,8 +337,8 @@ static inline void SET_H2CCMD_CUSTOMER_STR_W3_EN(u8 *__pH2CCmd, u8 __Value)
 }
 
 #define H2CCMD_CUSTOMER_STR_W3_BYTE12(__pH2CCmd)			(((u8 *)(__pH2CCmd)) + 1)
-int rtw_hal_h2c_customer_str_write(_adapter *adapter, const u8 *cs);
-int rtw_hal_customer_str_write(_adapter *adapter, const u8 *cs);
+int rtw_hal_h2c_customer_str_write(struct adapter *adapter, const u8 *cs);
+int rtw_hal_customer_str_write(struct adapter *adapter, const u8 *cs);
 
 /* _AP_Offload 0x08 */
 static inline void SET_H2CCMD_AP_WOWLAN_EN(u8 *__pH2CCmd, u8 __Value)
@@ -347,13 +347,13 @@ static inline void SET_H2CCMD_AP_WOWLAN_EN(u8 *__pH2CCmd, u8 __Value)
 }
 
 /* _BCN_RsvdPage	0x09 */
-static inline void SET_H2CCMD_AP_WOWLAN_RSVDPAGE_LOC_BCN(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_AP_WOWLAN_RSVD_PAGE_BCN(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd, __Value, GENMASK(7, 0));
 }
 
 /* _Probersp_RsvdPage 0x0a */
-static inline void SET_H2CCMD_AP_WOWLAN_RSVDPAGE_LOC_ProbeRsp(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_AP_WOWLAN_RSVD_PAGE_ProbeRsp(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd, __Value, GENMASK(7, 0));
 }
@@ -645,38 +645,38 @@ static inline void SET_H2CCMD_AOAC_GLOBAL_INFO_GROUP_ENC_ALG(u8 *__pH2CCmd, u8 _
 	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
 }
 
-/* AOAC_RSVDPAGE_LOC_0x83 */
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_REMOTE_WAKE_CTRL_INFO(u8 *__pH2CCmd, u8 __Value)
+/* AOAC_RSVD_PAGE_0x83 */
+static inline void SET_H2CCMD_AOAC_RSVD_PAGE_REMOTE_WAKE_CTRL_INFO(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 0, __Value, GENMASK(7, 0));
 }
 
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_ARP_RSP(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_AOAC_RSVD_PAGE_ARP_RSP(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
 }
 
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_NEIGHBOR_ADV(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_AOAC_RSVD_PAGE_NEIGHBOR_ADV(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 2, __Value, GENMASK(7, 0));
 }
 
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_GTK_RSP(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_AOAC_RSVD_PAGE_GTK_RSP(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 3, __Value, GENMASK(7, 0));
 }
 
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_GTK_INFO(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_AOAC_RSVD_PAGE_GTK_INFO(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 4, __Value, GENMASK(7, 0));
 }
 
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_GTK_EXT_MEM(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_AOAC_RSVD_PAGE_GTK_EXT_MEM(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 5, __Value, GENMASK(7, 0));
 }
 
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_NDP_INFO(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_AOAC_RSVD_PAGE_NDP_INFO(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 6, __Value, GENMASK(7, 0));
 }
@@ -684,7 +684,7 @@ static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_NDP_INFO(u8 *__pH2CCmd, u8 __Val
 /* AOAC_RSVDPAGE_2_0x84 */
 
 /* AOAC_RSVDPAGE_3_0x88 */
-static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_AOAC_REPORT(u8 *__pH2CCmd, u8 __Value)
+static inline void SET_H2CCMD_AOAC_RSVD_PAGE_AOAC_REPORT(u8 *__pH2CCmd, u8 __Value)
 {
 	u8p_replace_bits(__pH2CCmd + 1, __Value, GENMASK(7, 0));
 }
@@ -692,17 +692,17 @@ static inline void SET_H2CCMD_AOAC_RSVDPAGE_LOC_AOAC_REPORT(u8 *__pH2CCmd, u8 __
 /* ---------------------------------------------------------------------------------------------------------
  * -------------------------------------------    Structure    --------------------------------------------------
  * --------------------------------------------------------------------------------------------------------- */
-typedef struct _RSVDPAGE_LOC {
+struct rsvd_page {
 	u8 LocProbeRsp;
 	u8 LocPsPoll;
 	u8 LocNullData;
 	u8 LocQosNull;
 	u8 LocBTQosNull;
 	u8 LocApOffloadBCN;
-} RSVDPAGE_LOC, *PRSVDPAGE_LOC;
+};
 
-void dump_TX_FIFO(PADAPTER padapter, u8 page_num, u16 page_size);
-u8 rtw_hal_set_fw_media_status_cmd(_adapter *adapter, u8 mstatus, u8 macid);
+void dump_TX_FIFO(struct adapter * adapt, u8 page_num, u16 page_size);
+u8 rtw_hal_set_fw_media_status_cmd(struct adapter *adapter, u8 mstatus, u8 macid);
 
 #endif
 

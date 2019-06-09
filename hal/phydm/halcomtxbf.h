@@ -47,13 +47,13 @@ struct _HAL_TXBF_INFO {
 
 #define hal_com_txbf_beamform_init(p_dm_void)					NULL
 #define hal_com_txbf_config_gtab(p_dm_void)				NULL
-#define hal_com_txbf_enter_work_item_callback(_adapter)		NULL
-#define hal_com_txbf_leave_work_item_callback(_adapter)		NULL
-#define hal_com_txbf_fw_ndpa_work_item_callback(_adapter)		NULL
-#define hal_com_txbf_clk_work_item_callback(_adapter)			NULL
-#define hal_com_txbf_rate_work_item_callback(_adapter)		NULL
-#define hal_com_txbf_fw_ndpa_timer_callback(_adapter)		NULL
-#define hal_com_txbf_status_work_item_callback(_adapter)		NULL
+#define hal_com_txbf_enter_work_item_callback(adapter)		NULL
+#define hal_com_txbf_leave_work_item_callback(adapter)		NULL
+#define hal_com_txbf_fw_ndpa_work_item_callback(adapter)		NULL
+#define hal_com_txbf_clk_work_item_callback(adapter)			NULL
+#define hal_com_txbf_rate_work_item_callback(adapter)		NULL
+#define hal_com_txbf_fw_ndpa_timer_callback(adapter)		NULL
+#define hal_com_txbf_status_work_item_callback(adapter)		NULL
 #define hal_com_txbf_get(_adapter, _get_type, _pout_buf)
 
 #endif	/*  #ifndef __HAL_COM_TXBF_H__ */

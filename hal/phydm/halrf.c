@@ -106,13 +106,13 @@ void halrf_cmn_info_hook(void *p_dm_void, enum halrf_cmninfo_hook_e cmn_info,
 	
 	switch	(cmn_info) {
 	case	HALRF_CMNINFO_CON_TX:
-		p_rf->p_is_con_tx = (boolean *)p_value;
+		p_rf->p_is_con_tx = (bool *)p_value;
 		break;
 	case	HALRF_CMNINFO_SINGLE_TONE:
-		p_rf->p_is_single_tone = (boolean *)p_value;		
+		p_rf->p_is_single_tone = (bool *)p_value;		
 		break;
 	case	HALRF_CMNINFO_CARRIER_SUPPRESSION:
-		p_rf->p_is_carrier_suppresion = (boolean *)p_value;		
+		p_rf->p_is_carrier_suppresion = (bool *)p_value;		
 		break;
 	case	HALRF_CMNINFO_MP_RATE_INDEX:
 		p_rf->p_mp_rate_index = (u8 *)p_value;
@@ -139,7 +139,7 @@ void halrf_cmn_info_set(void *p_dm_void, u32 cmn_info, u64 value)
 			p_rf->dpk_en = (u8)value;
 			break;
 		case HALRF_CMNINFO_RFK_FORBIDDEN :
-			p_dm->IQK_info.rfk_forbidden = (boolean)value;
+			p_dm->IQK_info.rfk_forbidden = (bool)value;
 			break;
 		case HALRF_CMNINFO_RATE_INDEX:
 			p_rf->p_rate_index = (u32)value;
@@ -218,7 +218,7 @@ void halrf_watchdog(void *p_dm_void)
 	phydm_rf_watchdog(p_dm);
 }
 
-void halrf_iqk_trigger(void *p_dm_void, boolean is_recovery)
+void halrf_iqk_trigger(void *p_dm_void, bool is_recovery)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _IQK_INFORMATION		*p_iqk_info = &p_dm->IQK_info;

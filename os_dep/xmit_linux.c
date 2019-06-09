@@ -41,7 +41,7 @@ uint _rtw_pktfile_read(struct pkt_file *pfile, u8 *rmem, uint rlen)
 	return len;
 }
 
-sint rtw_endofpktfile(struct pkt_file *pfile)
+int rtw_endofpktfile(struct pkt_file *pfile)
 {
 
 	if (pfile->pkt_len == 0) {
@@ -83,7 +83,7 @@ void rtw_set_tx_chksum_offload(struct sk_buff *pkt, struct pkt_attrib *pattrib)
 
 }
 
-int rtw_os_xmit_resource_alloc(_adapter *padapter, struct xmit_buf *pxmitbuf, u32 alloc_sz, u8 flag)
+int rtw_os_xmit_resource_alloc(struct adapter *adapt, struct xmit_buf *pxmitbuf, u32 alloc_sz, u8 flag)
 {
 	if (alloc_sz > 0) {
 		pxmitbuf->pallocated_buf = rtw_zmalloc(alloc_sz);
@@ -107,7 +107,7 @@ int rtw_os_xmit_resource_alloc(_adapter *padapter, struct xmit_buf *pxmitbuf, u3
 	return _SUCCESS;
 }
 
-void rtw_os_xmit_resource_free(_adapter *padapter, struct xmit_buf *pxmitbuf, u32 free_sz, u8 flag)
+void rtw_os_xmit_resource_free(struct adapter *adapt, struct xmit_buf *pxmitbuf, u32 free_sz, u8 flag)
 {
 	if (flag) {
 		int i;
@@ -126,9 +126,9 @@ void rtw_os_xmit_resource_free(_adapter *padapter, struct xmit_buf *pxmitbuf, u3
 	}
 }
 
-void dump_os_queue(void *sel, _adapter *padapter)
+void dump_os_queue(void *sel, struct adapter *adapt)
 {
-	struct net_device *ndev = padapter->pnetdev;
+	struct net_device *ndev = adapt->pnetdev;
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
 	int i;
@@ -145,12 +145,12 @@ void dump_os_queue(void *sel, _adapter *padapter)
 
 #define WMM_XMIT_THRESHOLD	(NR_XMITFRAME*2/5)
 
-static inline bool rtw_os_need_wake_queue(_adapter *padapter, u16 qidx)
+static inline bool rtw_os_need_wake_queue(struct adapter *adapt, u16 qidx)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
-	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
+	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
 
-	if (padapter->registrypriv.wifi_spec) {
+	if (adapt->registrypriv.wifi_spec) {
 		if (pxmitpriv->hwxmits[qidx].accnt < WMM_XMIT_THRESHOLD)
 			return true;
 	} else {
@@ -162,11 +162,11 @@ static inline bool rtw_os_need_wake_queue(_adapter *padapter, u16 qidx)
 #endif
 }
 
-static inline bool rtw_os_need_stop_queue(_adapter *padapter, u16 qidx)
+static inline bool rtw_os_need_stop_queue(struct adapter *adapt, u16 qidx)
 {
-	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
+	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
-	if (padapter->registrypriv.wifi_spec) {
+	if (adapt->registrypriv.wifi_spec) {
 		/* No free space for Tx, tx_worker is too slow */
 		if (pxmitpriv->hwxmits[qidx].accnt > WMM_XMIT_THRESHOLD)
 			return true;
@@ -181,80 +181,80 @@ static inline bool rtw_os_need_stop_queue(_adapter *padapter, u16 qidx)
 	return false;
 }
 
-void rtw_os_pkt_complete(_adapter *padapter, struct sk_buff *pkt)
+void rtw_os_pkt_complete(struct adapter *adapt, struct sk_buff *pkt)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
 	u16	qidx;
 
 	qidx = skb_get_queue_mapping(pkt);
-	if (rtw_os_need_wake_queue(padapter, qidx)) {
+	if (rtw_os_need_wake_queue(adapt, qidx)) {
 		if (DBG_DUMP_OS_QUEUE_CTL)
-			RTW_INFO(FUNC_ADPT_FMT": netif_wake_subqueue[%d]\n", FUNC_ADPT_ARG(padapter), qidx);
-		netif_wake_subqueue(padapter->pnetdev, qidx);
+			RTW_INFO(FUNC_ADPT_FMT": netif_wake_subqueue[%d]\n", FUNC_ADPT_ARG(adapt), qidx);
+		netif_wake_subqueue(adapt->pnetdev, qidx);
 	}
 #else
-	if (rtw_os_need_wake_queue(padapter, 0)) {
+	if (rtw_os_need_wake_queue(adapt, 0)) {
 		if (DBG_DUMP_OS_QUEUE_CTL)
-			RTW_INFO(FUNC_ADPT_FMT": netif_wake_queue\n", FUNC_ADPT_ARG(padapter));
-		netif_wake_queue(padapter->pnetdev);
+			RTW_INFO(FUNC_ADPT_FMT": netif_wake_queue\n", FUNC_ADPT_ARG(adapt));
+		netif_wake_queue(adapt->pnetdev);
 	}
 #endif
 
 	rtw_skb_free(pkt);
 }
 
-void rtw_os_xmit_complete(_adapter *padapter, struct xmit_frame *pxframe)
+void rtw_os_xmit_complete(struct adapter *adapt, struct xmit_frame *pxframe)
 {
 	if (pxframe->pkt)
-		rtw_os_pkt_complete(padapter, pxframe->pkt);
+		rtw_os_pkt_complete(adapt, pxframe->pkt);
 
 	pxframe->pkt = NULL;
 }
 
-void rtw_os_xmit_schedule(_adapter *padapter)
+void rtw_os_xmit_schedule(struct adapter *adapt)
 {
-	_irqL  irqL;
+	unsigned long  irqL;
 	struct xmit_priv *pxmitpriv;
 
-	if (!padapter)
+	if (!adapt)
 		return;
 
-	pxmitpriv = &padapter->xmitpriv;
+	pxmitpriv = &adapt->xmitpriv;
 
 	_enter_critical_bh(&pxmitpriv->lock, &irqL);
 
-	if (rtw_txframes_pending(padapter))
+	if (rtw_txframes_pending(adapt))
 		tasklet_hi_schedule(&pxmitpriv->xmit_tasklet);
 
 	_exit_critical_bh(&pxmitpriv->lock, &irqL);
 }
 
-static bool rtw_check_xmit_resource(_adapter *padapter, struct sk_buff *pkt)
+static bool rtw_check_xmit_resource(struct adapter *adapt, struct sk_buff *pkt)
 {
 	bool busy = false;
-	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
+	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
 	u16	qidx;
 
 	qidx = skb_get_queue_mapping(pkt);
-	if (rtw_os_need_stop_queue(padapter, qidx)) {
+	if (rtw_os_need_stop_queue(adapt, qidx)) {
 		if (DBG_DUMP_OS_QUEUE_CTL)
-			RTW_INFO(FUNC_ADPT_FMT": netif_stop_subqueue[%d]\n", FUNC_ADPT_ARG(padapter), qidx);
-		netif_stop_subqueue(padapter->pnetdev, qidx);
+			RTW_INFO(FUNC_ADPT_FMT": netif_stop_subqueue[%d]\n", FUNC_ADPT_ARG(adapt), qidx);
+		netif_stop_subqueue(adapt->pnetdev, qidx);
 		busy = true;
 	}
 #else
-	if (rtw_os_need_stop_queue(padapter, 0)) {
+	if (rtw_os_need_stop_queue(adapt, 0)) {
 		if (DBG_DUMP_OS_QUEUE_CTL)
-			RTW_INFO(FUNC_ADPT_FMT": netif_stop_queue\n", FUNC_ADPT_ARG(padapter));
-		rtw_netif_stop_queue(padapter->pnetdev);
+			RTW_INFO(FUNC_ADPT_FMT": netif_stop_queue\n", FUNC_ADPT_ARG(adapt));
+		rtw_netif_stop_queue(adapt->pnetdev);
 		busy = true;
 	}
 #endif
 	return busy;
 }
 
-void rtw_os_wake_queue_at_free_stainfo(_adapter *padapter, int *qcnt_freed)
+void rtw_os_wake_queue_at_free_stainfo(struct adapter *adapt, int *qcnt_freed)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
 	int i;
@@ -263,28 +263,28 @@ void rtw_os_wake_queue_at_free_stainfo(_adapter *padapter, int *qcnt_freed)
 		if (qcnt_freed[i] == 0)
 			continue;
 
-		if (rtw_os_need_wake_queue(padapter, i)) {
+		if (rtw_os_need_wake_queue(adapt, i)) {
 			if (DBG_DUMP_OS_QUEUE_CTL)
-				RTW_INFO(FUNC_ADPT_FMT": netif_wake_subqueue[%d]\n", FUNC_ADPT_ARG(padapter), i);
-			netif_wake_subqueue(padapter->pnetdev, i);
+				RTW_INFO(FUNC_ADPT_FMT": netif_wake_subqueue[%d]\n", FUNC_ADPT_ARG(adapt), i);
+			netif_wake_subqueue(adapt->pnetdev, i);
 		}
 	}
 #else
 	if (qcnt_freed[0] || qcnt_freed[1] || qcnt_freed[2] || qcnt_freed[3]) {
-		if (rtw_os_need_wake_queue(padapter, 0)) {
+		if (rtw_os_need_wake_queue(adapt, 0)) {
 			if (DBG_DUMP_OS_QUEUE_CTL)
-				RTW_INFO(FUNC_ADPT_FMT": netif_wake_queue\n", FUNC_ADPT_ARG(padapter));
-			netif_wake_queue(padapter->pnetdev);
+				RTW_INFO(FUNC_ADPT_FMT": netif_wake_queue\n", FUNC_ADPT_ARG(adapt));
+			netif_wake_queue(adapt->pnetdev);
 		}
 	}
 #endif
 }
 
-static int rtw_mlcst2unicst(_adapter *padapter, struct sk_buff *skb)
+static int rtw_mlcst2unicst(struct adapter *adapt, struct sk_buff *skb)
 {
-	struct	sta_priv *pstapriv = &padapter->stapriv;
-	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
-	_irqL	irqL;
+	struct	sta_priv *pstapriv = &adapt->stapriv;
+	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
+	unsigned long	irqL;
 	struct list_head	*phead, *plist;
 	struct sk_buff *newskb;
 	struct sta_info *psta = NULL;
@@ -296,7 +296,7 @@ static int rtw_mlcst2unicst(_adapter *padapter, struct sk_buff *skb)
 	int i;
 	int	res;
 
-	DBG_COUNTER(padapter->tx_logs.os_tx_m2u);
+	DBG_COUNTER(adapt->tx_logs.os_tx_m2u);
 
 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
 	phead = &pstapriv->asoc_list;
@@ -317,7 +317,7 @@ static int rtw_mlcst2unicst(_adapter *padapter, struct sk_buff *skb)
 	for (i = 0; i < chk_alive_num; i++) {
 		psta = rtw_get_stainfo_by_offset(pstapriv, chk_alive_list[i]);
 		if (!(psta->state & _FW_LINKED)) {
-			DBG_COUNTER(padapter->tx_logs.os_tx_m2u_ignore_fw_linked);
+			DBG_COUNTER(adapt->tx_logs.os_tx_m2u_ignore_fw_linked);
 			continue;
 		}
 
@@ -326,25 +326,25 @@ static int rtw_mlcst2unicst(_adapter *padapter, struct sk_buff *skb)
 			|| _rtw_memcmp(psta->cmn.mac_addr, null_addr, 6) == true
 			|| _rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6) == true
 		) {
-			DBG_COUNTER(padapter->tx_logs.os_tx_m2u_ignore_self);
+			DBG_COUNTER(adapt->tx_logs.os_tx_m2u_ignore_self);
 			continue;
 		}
 
-		DBG_COUNTER(padapter->tx_logs.os_tx_m2u_entry);
+		DBG_COUNTER(adapt->tx_logs.os_tx_m2u_entry);
 
 		newskb = rtw_skb_copy(skb);
 
 		if (newskb) {
 			_rtw_memcpy(newskb->data, psta->cmn.mac_addr, 6);
-			res = rtw_xmit(padapter, &newskb);
+			res = rtw_xmit(adapt, &newskb);
 			if (res < 0) {
-				DBG_COUNTER(padapter->tx_logs.os_tx_m2u_entry_err_xmit);
+				DBG_COUNTER(adapt->tx_logs.os_tx_m2u_entry_err_xmit);
 				RTW_INFO("%s()-%d: rtw_xmit() return error! res=%d\n", __FUNCTION__, __LINE__, res);
 				pxmitpriv->tx_drop++;
 				rtw_skb_free(newskb);
 			}
 		} else {
-			DBG_COUNTER(padapter->tx_logs.os_tx_m2u_entry_err_skb);
+			DBG_COUNTER(adapt->tx_logs.os_tx_m2u_entry_err_skb);
 			RTW_INFO("%s-%d: rtw_skb_copy() failed!\n", __FUNCTION__, __LINE__);
 			pxmitpriv->tx_drop++;
 			/* rtw_skb_free(skb); */
@@ -356,52 +356,52 @@ static int rtw_mlcst2unicst(_adapter *padapter, struct sk_buff *skb)
 	return true;
 }
 
-int _rtw_xmit_entry(struct sk_buff *pkt, _nic_hdl pnetdev)
+int _rtw_xmit_entry(struct sk_buff *pkt, struct  net_device * pnetdev)
 {
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(pnetdev);
-	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
-	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(pnetdev);
+	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
+	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
 	int res = 0;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
 	u16 queue;
 #endif
 
 
-	if (padapter->registrypriv.mp_mode) {
+	if (adapt->registrypriv.mp_mode) {
 		RTW_INFO("MP_TX_DROP_OS_FRAME\n");
 		goto drop_packet;
 	}
-	DBG_COUNTER(padapter->tx_logs.os_tx);
+	DBG_COUNTER(adapt->tx_logs.os_tx);
 
-	if (rtw_if_up(padapter) == false) {
-		DBG_COUNTER(padapter->tx_logs.os_tx_err_up);
+	if (rtw_if_up(adapt) == false) {
+		DBG_COUNTER(adapt->tx_logs.os_tx_err_up);
 		goto drop_packet;
 	}
 
-	rtw_check_xmit_resource(padapter, pkt);
+	rtw_check_xmit_resource(adapt, pkt);
 
 	if (!rtw_mc2u_disable
-		&& (MLME_IS_AP(padapter) || MLME_IS_MESH(padapter))
+		&& (MLME_IS_AP(adapt) || MLME_IS_MESH(adapt))
 		&& (IP_MCAST_MAC(pkt->data)
 			|| ICMPV6_MCAST_MAC(pkt->data)
 			#ifdef CONFIG_TX_BCAST2UNI
 			|| is_broadcast_mac_addr(pkt->data)
 			#endif
 			)
-		&& (padapter->registrypriv.wifi_spec == 0)
+		&& (adapt->registrypriv.wifi_spec == 0)
 	) {
 		if (pxmitpriv->free_xmitframe_cnt > (NR_XMITFRAME / 4)) {
-			res = rtw_mlcst2unicst(padapter, pkt);
+			res = rtw_mlcst2unicst(adapt, pkt);
 			if (res == true)
 				goto exit;
 		} else {
 			/* RTW_INFO("Stop M2U(%d, %d)! ", pxmitpriv->free_xmitframe_cnt, pxmitpriv->free_xmitbuf_cnt); */
 			/* RTW_INFO("!m2u ); */
-			DBG_COUNTER(padapter->tx_logs.os_tx_m2u_stop);
+			DBG_COUNTER(adapt->tx_logs.os_tx_m2u_stop);
 		}
 	}
 
-	res = rtw_xmit(padapter, &pkt);
+	res = rtw_xmit(adapt, &pkt);
 	if (res < 0)
 		goto drop_packet;
 
@@ -409,7 +409,7 @@ int _rtw_xmit_entry(struct sk_buff *pkt, _nic_hdl pnetdev)
 
 drop_packet:
 	pxmitpriv->tx_drop++;
-	rtw_os_pkt_complete(padapter, pkt);
+	rtw_os_pkt_complete(adapt, pkt);
 
 exit:
 
@@ -417,10 +417,10 @@ exit:
 	return 0;
 }
 
-int rtw_xmit_entry(struct sk_buff *pkt, _nic_hdl pnetdev)
+int rtw_xmit_entry(struct sk_buff *pkt, struct  net_device * pnetdev)
 {
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(pnetdev);
-	struct	mlme_priv	*pmlmepriv = &(padapter->mlmepriv);
+	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(pnetdev);
+	struct	mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
 	int ret = 0;
 
 	if (pkt) {

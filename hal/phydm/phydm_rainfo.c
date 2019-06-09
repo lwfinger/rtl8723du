@@ -1373,7 +1373,7 @@ u8
 odm_find_rts_rate(
 	void			*p_dm_void,
 	u8			tx_rate,
-	boolean		is_erp_protect
+	bool		is_erp_protect
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;

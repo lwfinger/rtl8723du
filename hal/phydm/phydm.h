@@ -146,8 +146,8 @@ struct _odm_phy_dbg_info_ {
 	u32		num_qry_mu_pkt;
 	u32		num_qry_bf_pkt;
 	u32		num_qry_mu_vht_pkt[40];
-	boolean	is_ldpc_pkt;
-	boolean	is_stbc_pkt;
+	bool	is_ldpc_pkt;
+	bool	is_stbc_pkt;
 	u8		num_of_ppdu[4];
 	u8		gid_num[4];
 	u8		num_qry_beacon_pkt;
@@ -463,15 +463,15 @@ struct pkt_process_info {
 };
 
 struct	phydm_bt_info {
-	boolean		is_bt_enabled;			/*BT is enabled*/
-	boolean		is_bt_connect_process;	/*BT HS is under connection progress.*/
+	bool		is_bt_enabled;			/*BT is enabled*/
+	bool		is_bt_connect_process;	/*BT HS is under connection progress.*/
 	u8			bt_hs_rssi;				/*BT HS mode wifi rssi value.*/
-	boolean		is_bt_hs_operation;		/*BT HS mode is under progress*/
-	boolean		is_bt_limited_dig;		/*BT is busy.*/
+	bool		is_bt_hs_operation;		/*BT HS mode is under progress*/
+	bool		is_bt_limited_dig;		/*BT is busy.*/
 };
 
 struct	phydm_iot_center {
-	boolean		is_linked_cmw500;
+	bool		is_linked_cmw500;
 	u8			win_patch_id;		/*Customer ID*/
 	u32			phydm_patch_id;
 
@@ -480,10 +480,10 @@ struct	phydm_iot_center {
 	struct PHY_DM_STRUCT
 {
 	/*Add for different team use temporarily*/
-	struct _ADAPTER		*adapter;		/*For CE/NIC team*/
+	struct adapter		*adapter;		/*For CE/NIC team*/
 	struct rtl8192cd_priv	*priv;			/*For AP team*/
 	/*WHen you use adapter or priv pointer, you must make sure the pointer is ready.*/
-	boolean		odm_ready;
+	bool		odm_ready;
 	enum phy_reg_pg_type	phy_reg_pg_value_type;
 	u8			phy_reg_pg_version;
 	u64			support_ability;	/*PHYDM function Supportability*/
@@ -494,10 +494,10 @@ struct	phydm_iot_center {
 	u32			num_qry_phy_status_all;		/*CCK + OFDM*/
 	u32			last_num_qry_phy_status_all;
 	u32			rx_pwdb_ave;
-	boolean		is_init_hw_info_by_rfe;
+	bool		is_init_hw_info_by_rfe;
 
 	/*------ ODM HANDLE, DRIVER NEEDS NOT TO HOOK------*/
-	boolean		is_cck_high_power;
+	bool		is_cck_high_power;
 	u8			rf_path_rx_enable;
 	/*------ ODM HANDLE, DRIVER NEEDS NOT TO HOOK------*/
 
@@ -508,7 +508,7 @@ struct	phydm_iot_center {
 
 	u8			support_platform;/*PHYDM Platform info WIN/AP/CE = 1/2/3 */
 	u8			normal_rx_path;	
-	boolean			brxagcswitch; /* for rx AGC table switch in Microsoft case */
+	bool			brxagcswitch; /* for rx AGC table switch in Microsoft case */
 	u8			support_interface;/*PHYDM PCIE/USB/SDIO = 1/2/3*/
 	u32			support_ic_type;	/*PHYDM supported IC*/
 	u8			cut_version;		/*cut version TestChip/A-cut/B-cut... = 0/1/2/3/...*/
@@ -529,13 +529,13 @@ struct	phydm_iot_center {
 	u8 			efuse0x3d8;
 	u8			ext_trsw;		/*with external TRSW  NO/Yes = 0/1*/
 	u8			ext_lna_gain;	/*gain of external lna*/
-	boolean		is_in_hct_test;
+	bool		is_in_hct_test;
 	u8			wifi_test;
-	boolean		is_dual_mac_smart_concurrent;
+	bool		is_dual_mac_smart_concurrent;
 	u32			bk_support_ability; /*SD4 only*/
 	u8			with_extenal_ant_switch;
 	/*cck agc relative*/
-	boolean		cck_new_agc;
+	bool		cck_new_agc;
 	s8			cck_lna_gain_table[8];
 	/*-------------------------------------*/
 	u8			phydm_period;
@@ -548,9 +548,9 @@ struct	phydm_iot_center {
 	u32			u32_dummy;
 	u8			rfe_hwsetting_band;
 	u8			p_advance_ota;
-	boolean		hp_hw_id;
-	boolean		BOOLEAN_temp;
-	boolean		is_dfs_band;
+	bool		hp_hw_id;
+	bool		BOOLEAN_temp;
+	bool		is_dfs_band;
 	u8			is_receiver_blocking_en;
 	u16			fw_offload_ability;
 /*-----------HOOK BEFORE REG INIT-----------*/
@@ -565,14 +565,14 @@ struct	phydm_iot_center {
 	u8			*p_security;					/*security mode Open/WEP/AES/TKIP = 0/1/2/3*/
 	u8			*p_band_width;				/*BW info 20M/40M/80M = 0/1/2*/
 	u8			*p_channel;					/*central channel number*/
-	boolean		*p_is_scan_in_process;		/*Common info for status*/
-	boolean		*p_is_power_saving;
+	bool		*p_is_scan_in_process;		/*Common info for status*/
+	bool		*p_is_power_saving;
 	u8			*p_one_path_cca;			/*CCA path 2-path/path-A/path-B = 0/1/2; using enum odm_cca_path_e.*/
 	u8			*p_antenna_test;
-	boolean		*p_is_net_closed;
-	boolean		*p_is_fcs_mode_enable;
+	bool		*p_is_net_closed;
+	bool		*p_is_fcs_mode_enable;
 	/*--------- For 8723B IQK-------------------------------------*/
-	boolean		*p_is_1_antenna;
+	bool		*p_is_1_antenna;
 	u8			*p_rf_default_path;	/* 0:S1, 1:S0 */
 	/*-----------------------------------------------------------*/
 
@@ -580,7 +580,7 @@ struct	phydm_iot_center {
 	u8			*p_enable_antdiv;
 	u8			*p_enable_adaptivity;
 	u8			*hub_usb_mode;		/*1: USB 2.0, 2: USB 3.0*/
-	boolean		*p_is_fw_dw_rsvd_page_in_progress;
+	bool		*p_is_fw_dw_rsvd_page_in_progress;
 	u32			*p_current_tx_tp;
 	u32			*p_current_rx_tp;
 	u8			*p_sounding_seq;
@@ -593,17 +593,17 @@ struct	phydm_iot_center {
 /*===========================================================*/	
 
 	u8			disable_phydm_watchdog;
-	boolean		is_link_in_process;
-	boolean		is_wifi_direct;
-	boolean		is_wifi_display;
-	boolean		is_linked;
-	boolean		bsta_state;
+	bool		is_link_in_process;
+	bool		is_wifi_direct;
+	bool		is_wifi_display;
+	bool		is_linked;
+	bool		bsta_state;
 	u8			rssi_min;
 	u8			pre_rssi_min;
 	u8			rssi_max;
 	u8			rssi_min_by_path;
-	boolean		is_mp_chip;
-	boolean		is_one_entry_only;
+	bool		is_mp_chip;
+	bool		is_one_entry_only;
 	u32			one_entry_macid;
 	u32			one_entry_tp;
 	u32			pre_one_entry_tp;
@@ -611,7 +611,7 @@ struct	phydm_iot_center {
 	u8			number_linked_client;
 	u8			pre_number_active_client;
 	u8			number_active_client;
-	boolean		is_disable_phy_api;
+	bool		is_disable_phy_api;
 	u8			RSSI_A;
 	u8			RSSI_B;
 	u8			RSSI_C;
@@ -632,9 +632,9 @@ struct	phydm_iot_center {
 	u8			linked_interval;
 	u8			pre_channel;
 	u32			txagc_offset_value_a;
-	boolean		is_txagc_offset_positive_a;
+	bool		is_txagc_offset_positive_a;
 	u32			txagc_offset_value_b;
-	boolean		is_txagc_offset_positive_b;
+	bool		is_txagc_offset_positive_b;
 	/*[traffic]*/
 	u8			traffic_load;
 	u8			pre_traffic_load;
@@ -648,11 +648,11 @@ struct	phydm_iot_center {
 	u64			last_rx_ok_cnt;
 	u16			consecutive_idlel_time;	/*unit: second*/
 	/*---------------------------*/
-	boolean		is_bb_swing_offset_positive_a;
-	boolean		is_bb_swing_offset_positive_b;
+	bool		is_bb_swing_offset_positive_a;
+	bool		is_bb_swing_offset_positive_b;
 
 	/*[DIG]*/
-	boolean		MPDIG_2G;				/*off MPDIG*/
+	bool		MPDIG_2G;				/*off MPDIG*/
 	u8			times_2g;	/*for MP DIG*/
 
 	/*[TDMA-DIG]*/
@@ -660,7 +660,7 @@ struct	phydm_iot_center {
 	u8			tdma_dig_state_number;
 	u8			tdma_dig_low_upper_bond;
 	u8			fix_expire_to_zero;
-	boolean		original_dig_restore;
+	bool		original_dig_restore;
 	/*---------------------------*/
 
 	/*[AntDiv]*/
@@ -687,8 +687,8 @@ struct	phydm_iot_center {
 	/*---------------------------*/
 	
 	u8			ndpa_period;
-	boolean		h2c_rarpt_connect;
-	boolean		cck_agc_report_type;
+	bool		h2c_rarpt_connect;
+	bool		cck_agc_report_type;
 	u8			print_agc;
 	u8			la_mode;
 	/*---8821C Antenna and RF Set BTG/WLG/WLA Select---------------*/
@@ -705,12 +705,12 @@ struct	phydm_iot_center {
 	s8			th_edcca_hl_diff;
 	s8			th_l2h_ini_mode2;
 	s8			th_edcca_hl_diff_mode2;
-	boolean		carrier_sense_enable;
-	boolean		adaptivity_flag;	/*Limit IGI upper bound for Adaptivity*/
+	bool		carrier_sense_enable;
+	bool		adaptivity_flag;	/*Limit IGI upper bound for Adaptivity*/
 	u8			dc_backoff;
-	boolean		adaptivity_enable;
+	bool		adaptivity_enable;
 	u8			ap_total_num;
-	boolean		edcca_enable;
+	bool		edcca_enable;
 	u8			odm_regulation_2_4g;
 	u8			odm_regulation_5g;
 	/*-----------------------------------------------------------*/
@@ -720,23 +720,23 @@ struct	phydm_iot_center {
 	u8			c2h_cmd_start;
 	u8			fw_debug_trace[60];
 	u8			pre_c2h_seq;
-	boolean		fw_buff_is_enpty;
+	bool		fw_buff_is_enpty;
 	u32			data_frame_num;
 
 	/*--- for noise detection ---------------------------------------*/
-	boolean		is_noisy_state;
-	boolean		noisy_decision; /*b_noisy*/
-	boolean		pre_b_noisy;
+	bool		is_noisy_state;
+	bool		noisy_decision; /*b_noisy*/
+	bool		pre_b_noisy;
 	u32			noisy_decision_smooth;
 	u8			lna_sat_chk_cnt;
 	u8			lna_sat_chk_duty_cycle;
 	u32			lna_sat_chk_period_ms;
-	boolean		is_disable_lna_sat_chk;
-	boolean		is_disable_gain_table_switch;
+	bool		is_disable_lna_sat_chk;
+	bool		is_disable_gain_table_switch;
 	/*-----------------------------------------------------------*/
 	
-	boolean		is_disable_dym_ecs;
-	boolean		is_disable_dym_ant_weighting;
+	bool		is_disable_dym_ecs;
+	bool		is_disable_dym_ant_weighting;
 	struct sta_info	*p_odm_sta_info[ODM_ASSOCIATE_ENTRY_NUM];/*_ODM_STA_INFO, 2012/01/12 MH For MP, we need to reduce one array pointer for default port.??*/
 	struct cmn_sta_info	*p_phydm_sta_info[ODM_ASSOCIATE_ENTRY_NUM];
 	u8			phydm_macid_table[ODM_ASSOCIATE_ENTRY_NUM];
@@ -748,26 +748,26 @@ struct	phydm_iot_center {
 	struct _odm_ra_info_   ra_info[ODM_ASSOCIATE_ENTRY_NUM];
 	/*Use mac_id as array index. STA mac_id=0, VWiFi Client mac_id={1, ODM_ASSOCIATE_ENTRY_NUM-1} //YJ,add,120119*/
 #endif
-	boolean		ra_support88e;	/*2012/02/14 MH Add to share 88E ra with other SW team.We need to colelct all support abilit to a proper area.*/
-	boolean		*p_is_driver_stopped;
-	boolean		*p_is_driver_is_going_to_pnp_set_power_sleep;
-	boolean		*pinit_adpt_in_progress;
-	boolean		is_user_assign_level;
+	bool		ra_support88e;	/*2012/02/14 MH Add to share 88E ra with other SW team.We need to colelct all support abilit to a proper area.*/
+	bool		*p_is_driver_stopped;
+	bool		*p_is_driver_is_going_to_pnp_set_power_sleep;
+	bool		*pinit_adpt_in_progress;
+	bool		is_user_assign_level;
 	u8			RSSI_BT;			/*come from BT*/
 
 	/*---PSD Relative ---------------------------------------------*/
-	boolean		is_psd_in_process;
-	boolean		is_psd_active;
+	bool		is_psd_in_process;
+	bool		is_psd_active;
 	/*-----------------------------------------------------------*/
 	
-	boolean		bsomlenabled;		/* for dynamic SoML control */
-	boolean		bhtstfdisabled;		/* for dynamic HTSTF gain control	*/
-	boolean		disrxhpsoml;			/* for dynamic RxHP control with SoML on/off */
+	bool		bsomlenabled;		/* for dynamic SoML control */
+	bool		bhtstfdisabled;		/* for dynamic HTSTF gain control	*/
+	bool		disrxhpsoml;			/* for dynamic RxHP control with SoML on/off */
 	u32			n_iqk_cnt;
 	u32			n_iqk_ok_cnt;
 	u32			n_iqk_fail_cnt;
-	boolean		is_disable_power_training;
-	boolean		is_bt_continuous_turn;
+	bool		is_disable_power_training;
+	bool		is_bt_continuous_turn;
 	u8			dynamic_tx_high_power_lvl;
 	u8			last_dtp_lvl;
 	u32			tx_agc_ofdm_18_6;
@@ -1074,10 +1074,6 @@ phydm_get_structure(
 	/* The following is for compile only*/
 	/*===========================================================*/
 
-	#define	IS_HARDWARE_TYPE_8723A(_adapter)	false
-	#define	IS_HARDWARE_TYPE_8723AE(_adapter)		false
-	#define	IS_HARDWARE_TYPE_8192C(_adapter)			false
-	#define	IS_HARDWARE_TYPE_8192D(_adapter)		false
 	#define	RF_T_METER_92D	0x42
 
 

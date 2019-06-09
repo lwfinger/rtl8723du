@@ -41,14 +41,14 @@ const char *security_type_str(u8 value);
 
 #define INVALID_SEC_MAC_CAM_ID	0xFF
 
-typedef enum {
+enum encryp_protocol {
 	ENCRYP_PROTOCOL_OPENSYS,   /* open system */
 	ENCRYP_PROTOCOL_WEP,       /* WEP */
 	ENCRYP_PROTOCOL_WPA,       /* WPA */
 	ENCRYP_PROTOCOL_WPA2,      /* WPA2 */
 	ENCRYP_PROTOCOL_WAPI,      /* WAPI: Not support in this version */
 	ENCRYP_PROTOCOL_MAX
-} ENCRYP_PROTOCOL_E;
+};
 
 
 #ifndef Ndis802_11AuthModeWPA2
@@ -99,15 +99,14 @@ union Keytype {
 };
 
 
-typedef struct _RT_PMKID_LIST {
+struct rt_pkmid_list {
 	u8						bUsed;
 	u8						Bssid[6];
 	u8						PMKID[16];
 	u8						SsidBuf[33];
 	u8						*ssid_octet;
 	u16						ssid_length;
-} RT_PMKID_LIST, *PRT_PMKID_LIST;
-
+};
 
 struct security_priv {
 	u32	  dot11AuthAlgrthm;		/* 802.11 auth, could be open, shared, 8021x and authswitch */
@@ -172,10 +171,10 @@ struct security_priv {
 
 
 	/* keeps the auth_type & enc_status from upper layer ioctl(wpa_supplicant or wzc) */
-	u32 ndisauthtype;	/* NDIS_802_11_AUTHENTICATION_MODE */
-	u32 ndisencryptstatus;	/* NDIS_802_11_ENCRYPTION_STATUS */
+	u32 ndisauthtype;	/* enum ndis_802_11_authentication_mode */
+	u32 ndisencryptstatus;	/* enum ndis_802_11_wep_status */
 
-	NDIS_802_11_WEP ndiswep;
+	struct ndis_802_11_wep ndiswep;
 
 	u8 assoc_info[600];
 	u8 szofcapability[256]; /* for wpa2 usage */
@@ -185,17 +184,17 @@ struct security_priv {
 
 
 	/* for tkip countermeasure */
-	systime last_mic_err_time;
+	unsigned long last_mic_err_time;
 	u8	btkip_countermeasure;
 	u8	btkip_wait_report;
-	systime btkip_countermeasure_time;
+	unsigned long btkip_countermeasure_time;
 
 	/* --------------------------------------------------------------------------- */
 	/* For WPA2 Pre-Authentication. */
 	/* --------------------------------------------------------------------------- */
 	/* u8				RegEnablePreAuth;				 */ /* Default value: Pre-Authentication enabled or not, from registry "EnablePreAuth". Added by Annie, 2005-11-01. */
 	/* u8				EnablePreAuthentication;			 */ /* Current Value: Pre-Authentication enabled or not. */
-	RT_PMKID_LIST		PMKIDList[NUM_PMKID_CACHE];	/* Renamed from PreAuthKey[NUM_PRE_AUTH_KEY]. Annie, 2006-10-13. */
+	struct rt_pkmid_list		PMKIDList[NUM_PMKID_CACHE];	/* Renamed from PreAuthKey[NUM_PRE_AUTH_KEY]. Annie, 2006-10-13. */
 	u8				PMKIDIndex;
 	/* u32				PMKIDCount;						 */ /* Added by Annie, 2006-10-13. */
 	/* u8				szCapability[256];				 */ /* For WPA2-PSK using zero-config, by Annie, 2005-09-20. */
@@ -443,18 +442,18 @@ void rtw_seccalctkipmic(
 	u8 *Miccode,
 	u8   priority);
 
-u32 rtw_aes_encrypt(_adapter *padapter, u8 *pxmitframe);
-u32 rtw_tkip_encrypt(_adapter *padapter, u8 *pxmitframe);
-void rtw_wep_encrypt(_adapter *padapter, u8  *pxmitframe);
+u32 rtw_aes_encrypt(struct adapter *adapt, u8 *pxmitframe);
+u32 rtw_tkip_encrypt(struct adapter *adapt, u8 *pxmitframe);
+void rtw_wep_encrypt(struct adapter *adapt, u8  *pxmitframe);
 
-u32 rtw_aes_decrypt(_adapter *padapter, u8  *precvframe);
-u32 rtw_tkip_decrypt(_adapter *padapter, u8  *precvframe);
-void rtw_wep_decrypt(_adapter *padapter, u8  *precvframe);
+u32 rtw_aes_decrypt(struct adapter *adapt, u8  *precvframe);
+u32 rtw_tkip_decrypt(struct adapter *adapt, u8  *precvframe);
+void rtw_wep_decrypt(struct adapter *adapt, u8  *precvframe);
 #ifdef CONFIG_IEEE80211W
-u32	rtw_BIP_verify(_adapter *padapter, u8 *whdr_pos, sint flen
+u32	rtw_BIP_verify(struct adapter *adapt, u8 *whdr_pos, int flen
 	, const u8 *key, u16 id, u64* ipn);
 #endif
-void rtw_sec_restore_wep_key(_adapter *adapter);
-u8 rtw_handle_tkip_countermeasure(_adapter *adapter, const char *caller);
+void rtw_sec_restore_wep_key(struct adapter *adapter);
+u8 rtw_handle_tkip_countermeasure(struct adapter *adapter, const char *caller);
 
 #endif /* __RTL871X_SECURITY_H_ */

@@ -13,7 +13,7 @@ Used to report a bss has been scanned
 
 */
 struct survey_event	{
-	WLAN_BSSID_EX bss;
+	struct wlan_bssid_ex bss;
 };
 
 /*
@@ -86,7 +86,7 @@ struct c2hlbk_event {
 
 struct fwevent {
 	u32	parmsize;
-	void (*event_callback)(_adapter *dev, u8 *pbuf);
+	void (*event_callback)(struct adapter *dev, u8 *pbuf);
 };
 
 
@@ -112,7 +112,7 @@ struct c2hevent_queue {
 struct network_queue {
 	volatile int	head;
 	volatile int	tail;
-	WLAN_BSSID_EX networks[NETWORK_QUEUE_SZ];
+	struct wlan_bssid_ex networks[NETWORK_QUEUE_SZ];
 };
 
 

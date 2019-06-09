@@ -8,7 +8,7 @@
 #include "phydm_precomp.h"
 
 
-boolean
+bool
 odm_check_power_status(
 	void		*p_dm_void
 )

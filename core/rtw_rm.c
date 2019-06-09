@@ -6,7 +6,7 @@
 
 #define pstr(s) s+strlen(s)
 
-u8 rm_post_event_hdl(_adapter *padapter, u8 *pbuf)
+u8 rm_post_event_hdl(struct adapter *adapt, u8 *pbuf)
 {
 	return H2C_SUCCESS;
 }

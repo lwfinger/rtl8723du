@@ -24,7 +24,7 @@
 #ifdef CONFIG_ADAPTIVE_SOML
 
 struct adaptive_soml {
-	boolean		is_soml_method_enable;
+	bool		is_soml_method_enable;
 	u8			soml_on_off;
 	u8			soml_state_cnt;
 	u8			soml_delay_time;

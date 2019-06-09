@@ -112,10 +112,10 @@ static void _rtw_reg_apply_radar_flags(struct wiphy *wiphy)
 
 static void _rtw_reg_apply_flags(struct wiphy *wiphy)
 {
-	_adapter *padapter = wiphy_to_adapter(wiphy);
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(padapter);
+	struct adapter *adapt = wiphy_to_adapter(wiphy);
+	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapt);
 	u8 channel_plan = rfctl->ChannelPlan;
-	RT_CHANNEL_INFO *channel_set = rfctl->channel_set;
+	struct rt_channel_info *channel_set = rfctl->channel_set;
 	u8 max_chan_nums = rfctl->max_chan_nums;
 
 	struct ieee80211_supported_band *sband;
@@ -233,7 +233,7 @@ static void rtw_reg_notifier(struct wiphy *wiphy, struct regulatory_request *req
 #endif
 }
 
-void rtw_reg_notify_by_driver(_adapter *adapter)
+void rtw_reg_notify_by_driver(struct adapter *adapter)
 {
 	if ((adapter->rtw_wdev) && (adapter->rtw_wdev->wiphy)) {
 		struct regulatory_request request;
@@ -278,9 +278,9 @@ static struct country_code_to_enum_rd *_rtw_regd_find_country(u16 countrycode)
 	return NULL;
 }
 
-int rtw_regd_init(_adapter *padapter)
+int rtw_regd_init(struct adapter *adapt)
 {
-	struct wiphy *wiphy = padapter->rtw_wdev->wiphy;
+	struct wiphy *wiphy = adapt->rtw_wdev->wiphy;
 
 	_rtw_regd_init_wiphy(NULL, wiphy);
 

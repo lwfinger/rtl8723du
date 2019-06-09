@@ -136,7 +136,7 @@ struct _sw_antenna_switch_ {
 	u8		train_time_flag; /*base on RSSI difference between two antennas*/
 	struct timer_list	phydm_sw_antenna_switch_timer;
 	u32		pkt_cnt_sw_ant_div_by_ctrl_frame;
-	boolean		is_sw_ant_div_by_ctrl_frame;
+	bool		is_sw_ant_div_by_ctrl_frame;
 
 	/* AntDect (Before link Antenna Switch check) need to be moved*/
 	u16		single_ant_counter;
@@ -145,10 +145,10 @@ struct _sw_antenna_switch_ {
 	u16		retry_counter;
 	u8		swas_no_link_state;
 	u32		swas_no_link_bk_reg948;
-	boolean		ANTA_ON;	/*To indicate ant A is or not*/
-	boolean		ANTB_ON;	/*To indicate ant B is on or not*/
-	boolean		pre_aux_fail_detec;
-	boolean		rssi_ant_dect_result;
+	bool		ANTA_ON;	/*To indicate ant A is or not*/
+	bool		ANTB_ON;	/*To indicate ant B is on or not*/
+	bool		pre_aux_fail_detec;
+	bool		rssi_ant_dect_result;
 	u8		ant_5g;
 	u8		ant_2g;
 };
@@ -179,7 +179,7 @@ struct phydm_fat_struct {
 	u8	rx_idle_ant;
 	u8	rvrt_val;
 	u8	ant_div_on_off;
-	boolean	is_become_linked;
+	bool	is_become_linked;
 	u32	min_max_rssi;
 	u8	idx_ant_div_counter_2g;
 	u8	idx_ant_div_counter_5g;
@@ -198,7 +198,7 @@ struct phydm_fat_struct {
 	u32	main_ant_evm_2ss_cnt[ODM_ASSOCIATE_ENTRY_NUM];
 	u32	aux_ant_evm_2ss_cnt[ODM_ASSOCIATE_ENTRY_NUM];
 
-	boolean	EVM_method_enable;
+	bool	EVM_method_enable;
 	u8	target_ant_evm;
 	u8	target_ant_crc32;
 	u8	target_ant_tp;
@@ -231,10 +231,10 @@ struct phydm_fat_struct {
 	u32	main_ant_ctrl_frame_cnt;
 	u32	aux_ant_ctrl_frame_cnt;
 	u8	b_fix_tx_ant;
-	boolean	fix_ant_bfee;
-	boolean	enable_ctrl_frame_antdiv;
-	boolean	use_ctrl_frame_antdiv;
-	boolean	*is_no_csi_feedback;
+	bool	fix_ant_bfee;
+	bool	enable_ctrl_frame_antdiv;
+	bool	use_ctrl_frame_antdiv;
+	bool	*is_no_csi_feedback;
 	u8	hw_antsw_occur;
 	u8	*p_force_tx_ant_by_desc;
 	u8	force_tx_ant_by_desc; /*A temp value, will hook to driver team's outer parameter later*/

@@ -123,12 +123,12 @@ struct _hal_rf_ {
 
 	u8		eeprom_thermal;
 	u8		dpk_en;			/*Enable Function DPK OFF/ON = 0/1*/
-	boolean	dpk_done;
+	bool	dpk_done;
 	u32		fw_ver;
 
-	boolean	*p_is_con_tx;
-	boolean	*p_is_single_tone;
-	boolean	*p_is_carrier_suppresion;
+	bool	*p_is_con_tx;
+	bool	*p_is_single_tone;
+	bool	*p_is_carrier_suppresion;
 
 	u8		*p_mp_rate_index;
 	u32		p_rate_index;
@@ -199,14 +199,14 @@ halrf_init(
 void
 halrf_iqk_trigger(
 	void			*p_dm_void,
-	boolean		is_recovery
+	bool		is_recovery
 );
 
 void
 halrf_segment_iqk_trigger(
 	void			*p_dm_void,
-	boolean		clear,
-	boolean		segment_iqk
+	bool		clear,
+	bool		segment_iqk
 );
 
 void
@@ -228,7 +228,7 @@ phydm_get_iqk_cfir(
 	void		*p_dm_void,
 	u8 idx,
 	u8 path,
-	boolean debug
+	bool debug
 );
 
 void 

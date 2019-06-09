@@ -6,15 +6,15 @@
 #include <drv_types.h>
 #include <hal_data.h>
 
-int	usb_init_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
+int	usb_init_recv_priv(struct adapter *adapt, u16 ini_in_buf_sz)
 {
-	struct recv_priv	*precvpriv = &padapter->recvpriv;
+	struct recv_priv	*precvpriv = &adapt->recvpriv;
 	int	i, res = _SUCCESS;
 	struct recv_buf *precvbuf;
 
 	tasklet_init(&precvpriv->recv_tasklet,
 		     (void(*)(unsigned long))usb_recv_tasklet,
-		     (unsigned long)padapter);
+		     (unsigned long)adapt);
 
 	/* init recv_buf */
 	_rtw_init_queue(&precvpriv->free_recv_buf_queue);
@@ -41,12 +41,12 @@ int	usb_init_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
 
 		precvbuf->alloc_sz = MAX_RECVBUF_SZ;
 
-		res = rtw_os_recvbuf_resource_alloc(padapter, precvbuf);
+		res = rtw_os_recvbuf_resource_alloc(adapt, precvbuf);
 		if (res == _FAIL)
 			break;
 
 		precvbuf->ref_cnt = 0;
-		precvbuf->adapter = padapter;
+		precvbuf->adapter = adapt;
 
 		/* rtw_list_insert_tail(&precvbuf->list, &(precvpriv->free_recv_buf_queue.queue)); */
 
@@ -73,7 +73,7 @@ int	usb_init_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
 		for (i = 0; i < NR_PREALLOC_RECV_SKB; i++) {
 			pskb = rtw_skb_alloc(MAX_RECVBUF_SZ + RECVBUFF_ALIGN_SZ);
 			if (pskb) {
-				pskb->dev = padapter->pnetdev;
+				pskb->dev = adapt->pnetdev;
 
 				tmpaddr = (SIZE_PTR)pskb->data;
 				alignment = tmpaddr & (RECVBUFF_ALIGN_SZ - 1);
@@ -88,16 +88,16 @@ exit:
 	return res;
 }
 
-void usb_free_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
+void usb_free_recv_priv(struct adapter *adapt, u16 ini_in_buf_sz)
 {
 	int i;
 	struct recv_buf *precvbuf;
-	struct recv_priv	*precvpriv = &padapter->recvpriv;
+	struct recv_priv	*precvpriv = &adapt->recvpriv;
 
 	precvbuf = (struct recv_buf *)precvpriv->precv_buf;
 
 	for (i = 0; i < NR_RECVBUFF ; i++) {
-		rtw_os_recvbuf_resource_free(padapter, precvbuf);
+		rtw_os_recvbuf_resource_free(adapt, precvbuf);
 		precvbuf++;
 	}
 
@@ -116,7 +116,7 @@ void usb_free_recv_priv(_adapter *padapter, u16 ini_in_buf_sz)
 }
 
 #ifdef CONFIG_FW_C2H_REG
-void usb_c2h_hisr_hdl(_adapter *adapter, u8 *buf)
+void usb_c2h_hisr_hdl(struct adapter *adapter, u8 *buf)
 {
 	u8 *c2h_evt = buf;
 	u8 id, seq, plen;
@@ -318,7 +318,7 @@ int usb_writeN(struct intf_hdl *pintfhdl, u32 addr, u32 length, u8 *pdata)
 	return ret;
 }
 
-void usb_set_intf_ops(_adapter *padapter, struct _io_ops *pops)
+void usb_set_intf_ops(struct adapter *adapt, struct _io_ops *pops)
 {
 	_rtw_memset((u8 *)pops, 0, sizeof(struct _io_ops));
 

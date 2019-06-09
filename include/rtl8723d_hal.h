@@ -69,7 +69,7 @@ struct rt_8723d_firmware_hdr {
 
 /* for 8723D
  * TX 32K, RX 16K, Page size 128B for TX, 8B for RX */
-#define PAGE_SIZE_TX_8723D			128
+#define PAGE___kernel_size_tX_8723D			128
 #define PAGE_SIZE_RX_8723D			8
 
 #define TX_DMA_SIZE_8723D			0x8000	/* 32K(TX) */
@@ -176,87 +176,87 @@ typedef enum tag_Package_Definition {
 #endif /* CONFIG_FILE_FWIMG */
 
 /* rtl8723d_hal_init.c */
-int rtl8723d_FirmwareDownload(PADAPTER padapter, bool  bUsedWoWLANFw);
-void rtl8723d_FirmwareSelfReset(PADAPTER padapter);
-void rtl8723d_InitializeFirmwareVars(PADAPTER padapter);
+int rtl8723d_FirmwareDownload(struct adapter * adapt, bool  bUsedWoWLANFw);
+void rtl8723d_FirmwareSelfReset(struct adapter * adapt);
+void rtl8723d_InitializeFirmwareVars(struct adapter * adapt);
 
-void rtl8723d_InitAntenna_Selection(PADAPTER padapter);
-void rtl8723d_DeinitAntenna_Selection(PADAPTER padapter);
-void rtl8723d_CheckAntenna_Selection(PADAPTER padapter);
-void rtl8723d_init_default_value(PADAPTER padapter);
+void rtl8723d_InitAntenna_Selection(struct adapter * adapt);
+void rtl8723d_DeinitAntenna_Selection(struct adapter * adapt);
+void rtl8723d_CheckAntenna_Selection(struct adapter * adapt);
+void rtl8723d_init_default_value(struct adapter * adapt);
 
-int rtl8723d_InitLLTTable(PADAPTER padapter);
+int rtl8723d_InitLLTTable(struct adapter * adapt);
 
-int CardDisableHWSM(PADAPTER padapter, u8 resetMCU);
-int CardDisableWithoutHWSM(PADAPTER padapter);
+int CardDisableHWSM(struct adapter * adapt, u8 resetMCU);
+int CardDisableWithoutHWSM(struct adapter * adapt);
 
 /* EFuse */
-u8 GetEEPROMSize8723D(PADAPTER padapter);
-void Hal_InitPGData(PADAPTER padapter, u8 *PROMContent);
-void Hal_EfuseParseIDCode(PADAPTER padapter, u8 *hwinfo);
-void Hal_EfuseParseTxPowerInfo_8723D(PADAPTER padapter,
+u8 GetEEPROMSize8723D(struct adapter * adapt);
+void Hal_InitPGData(struct adapter * adapt, u8 *PROMContent);
+void Hal_EfuseParseIDCode(struct adapter * adapt, u8 *hwinfo);
+void Hal_EfuseParseTxPowerInfo_8723D(struct adapter * adapt,
 				     u8 *PROMContent, bool AutoLoadFail);
-void Hal_EfuseParseBTCoexistInfo_8723D(PADAPTER padapter,
+void Hal_EfuseParseBTCoexistInfo_8723D(struct adapter * adapt,
 				       u8 *hwinfo, bool AutoLoadFail);
-void Hal_EfuseParseEEPROMVer_8723D(PADAPTER padapter,
+void Hal_EfuseParseEEPROMVer_8723D(struct adapter * adapt,
 				   u8 *hwinfo, bool AutoLoadFail);
-void Hal_EfuseParsePackageType_8723D(PADAPTER pAdapter,
+void Hal_EfuseParsePackageType_8723D(struct adapter * pAdapter,
 				     u8 *hwinfo, bool AutoLoadFail);
-void Hal_EfuseParseChnlPlan_8723D(PADAPTER padapter,
+void Hal_EfuseParseChnlPlan_8723D(struct adapter * adapt,
 				  u8 *hwinfo, bool AutoLoadFail);
-void Hal_EfuseParseCustomerID_8723D(PADAPTER padapter,
+void Hal_EfuseParseCustomerID_8723D(struct adapter * adapt,
 				    u8 *hwinfo, bool AutoLoadFail);
-void Hal_EfuseParseAntennaDiversity_8723D(PADAPTER padapter,
+void Hal_EfuseParseAntennaDiversity_8723D(struct adapter * adapt,
 		u8 *hwinfo, bool AutoLoadFail);
-void Hal_EfuseParseXtal_8723D(PADAPTER pAdapter,
+void Hal_EfuseParseXtal_8723D(struct adapter * pAdapter,
 			      u8 *hwinfo, bool AutoLoadFail);
-void Hal_EfuseParseThermalMeter_8723D(PADAPTER padapter,
+void Hal_EfuseParseThermalMeter_8723D(struct adapter * adapt,
 				      u8 *hwinfo, bool AutoLoadFail);
-void Hal_EfuseParseVoltage_8723D(PADAPTER pAdapter,
+void Hal_EfuseParseVoltage_8723D(struct adapter * pAdapter,
 				 u8 *hwinfo, bool	AutoLoadFail);
-void Hal_EfuseParseBoardType_8723D(PADAPTER Adapter,
+void Hal_EfuseParseBoardType_8723D(struct adapter * Adapter,
 				   u8	*PROMContent, bool AutoloadFail);
 
 void rtl8723d_set_hal_ops(struct hal_ops *pHalFunc);
-void init_hal_spec_8723d(_adapter *adapter);
-u8 SetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val);
-void GetHwReg8723D(PADAPTER padapter, u8 variable, u8 *val);
-u8 SetHalDefVar8723D(PADAPTER padapter, HAL_DEF_VARIABLE variable, void *pval);
-u8 GetHalDefVar8723D(PADAPTER padapter, HAL_DEF_VARIABLE variable, void *pval);
+void init_hal_spec_8723d(struct adapter *adapter);
+u8 SetHwReg8723D(struct adapter * adapt, u8 variable, u8 *val);
+void GetHwReg8723D(struct adapter * adapt, u8 variable, u8 *val);
+u8 SetHalDefVar8723D(struct adapter * adapt, enum hal_def_variable variable, void *pval);
+u8 GetHalDefVar8723D(struct adapter * adapt, enum hal_def_variable variable, void *pval);
 
 /* register */
-void rtl8723d_InitBeaconParameters(PADAPTER padapter);
-void rtl8723d_InitBeaconMaxError(PADAPTER padapter, u8 InfraMode);
-void _InitMacAPLLSetting_8723D(PADAPTER Adapter);
-void _8051Reset8723(PADAPTER padapter);
+void rtl8723d_InitBeaconParameters(struct adapter * adapt);
+void rtl8723d_InitBeaconMaxError(struct adapter * adapt, u8 InfraMode);
+void _InitMacAPLLSetting_8723D(struct adapter * Adapter);
+void _8051Reset8723(struct adapter * adapt);
 
-void rtl8723d_start_thread(_adapter *padapter);
-void rtl8723d_stop_thread(_adapter *padapter);
+void rtl8723d_start_thread(struct adapter *adapt);
+void rtl8723d_stop_thread(struct adapter *adapt);
 
 #if defined(CONFIG_CHECK_BT_HANG)
-	void rtl8723ds_init_checkbthang_workqueue(_adapter *adapter);
-	void rtl8723ds_free_checkbthang_workqueue(_adapter *adapter);
-	void rtl8723ds_cancle_checkbthang_workqueue(_adapter *adapter);
-	void rtl8723ds_hal_check_bt_hang(_adapter *adapter);
+	void rtl8723ds_init_checkbthang_workqueue(struct adapter *adapter);
+	void rtl8723ds_free_checkbthang_workqueue(struct adapter *adapter);
+	void rtl8723ds_cancle_checkbthang_workqueue(struct adapter *adapter);
+	void rtl8723ds_hal_check_bt_hang(struct adapter *adapter);
 #endif
 
 #ifdef CONFIG_MP_INCLUDED
-int FirmwareDownloadBT(PADAPTER Adapter, struct rt_mp_firmware *pFirmware);
+int FirmwareDownloadBT(struct adapter * Adapter, struct rt_mp_firmware *pFirmware);
 #endif
-void CCX_FwC2HTxRpt_8723d(PADAPTER padapter, u8 *pdata, u8 len);
+void CCX_FwC2HTxRpt_8723d(struct adapter * adapt, u8 *pdata, u8 len);
 
 u8 MRateToHwRate8723D(u8 rate);
 u8 HwRateToMRate8723D(u8 rate);
 
-void Hal_ReadRFGainOffset(PADAPTER pAdapter, u8 *hwinfo, bool AutoLoadFail);
+void Hal_ReadRFGainOffset(struct adapter * pAdapter, u8 *hwinfo, bool AutoLoadFail);
 
 #if defined(CONFIG_CHECK_BT_HANG)
 	void check_bt_status_work(void *data);
 #endif
 
 void rtl8723d_cal_txdesc_chksum(struct tx_desc *ptxdesc);
-int PHY_RF6052_Config8723D(PADAPTER pdapter);
+int PHY_RF6052_Config8723D(struct adapter * pdapter);
 
-void PHY_RF6052SetBandwidth8723D(PADAPTER Adapter, enum channel_width Bandwidth);
+void PHY_RF6052SetBandwidth8723D(struct adapter * Adapter, enum channel_width Bandwidth);
 
 #endif
