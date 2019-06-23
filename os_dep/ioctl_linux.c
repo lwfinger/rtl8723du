@@ -5319,23 +5319,12 @@ static int rtw_rereg_nd_name(struct net_device *dev,
 		rereg_priv->old_bRegUseLed = adapt->ledpriv.bRegUseLed;
 		adapt->ledpriv.bRegUseLed = false;
 		rtw_hal_sw_led_deinit(adapt);
-		/* the interface is being "disabled", we can do deeper IPS */
-		/* rereg_priv->old_ips_mode = rtw_get_ips_mode_req(&adapt->pwrctrlpriv); */
-		/* rtw_ips_mode_req(&adapt->pwrctrlpriv, IPS_NORMAL); */
 	}
 exit:
 	return ret;
 
 }
 
-#ifdef DBG_CMD_QUEUE
-u8 dump_cmd_id = 0;
-#endif
-/*
-#ifdef DBG_DUMP_TSF_BY_PORT
-extern void get_tsf_by_port(struct adapter *adapter, u8 *tsftr, u8 hw_port);
-#endif
-*/
 static int rtw_dbg_port(struct net_device *dev,
 			struct iw_request_info *info,
 			union iwreq_data *wrqu, char *extra)
@@ -5493,14 +5482,7 @@ static int rtw_dbg_port(struct net_device *dev,
 			} else
 				RTW_INFO("can't get sta's macaddr, cur_network's macaddr:" MAC_FMT "\n", MAC_ARG(cur_network->network.MacAddress));
 			break;
-		case 0x06: {
-				#ifdef DBG_DUMP_TSF_BY_PORT
-				u64 tsf = 0;
-
-				get_tsf_by_port(adapt, (u8 *)&tsf, extra_arg);
-				RTW_INFO(" PORT-%d TSF :%lld\n", extra_arg, tsf);
-				#endif
-		}
+		case 0x06:
 			break;
 		case 0x07:
 			RTW_INFO("bSurpriseRemoved=%s, bDriverStopped=%s\n"
@@ -5660,16 +5642,6 @@ static int rtw_dbg_port(struct net_device *dev,
 
 		}
 			break;
-
-#ifdef DBG_FIXED_CHAN
-		case 0x17: {
-			struct mlme_ext_priv	*pmlmeext = &(adapt->mlmeextpriv);
-			printk("===>  Fixed channel to %d\n", extra_arg);
-			pmlmeext->fixed_chan = extra_arg;
-
-		}
-			break;
-#endif
 		case 0x19: {
 			struct registry_priv	*pregistrypriv = &adapt->registrypriv;
 			/* extra_arg : */
@@ -5769,13 +5741,6 @@ static int rtw_dbg_port(struct net_device *dev,
 			adapt->bShowGetP2PState = extra_arg;
 			break;
 		}
-#ifdef DBG_CMD_QUEUE
-		case 0x28: {
-			dump_cmd_id = extra_arg;
-			RTW_INFO("dump_cmd_id:%d\n", dump_cmd_id);
-		}
-			break;
-#endif /* DBG_CMD_QUEUE */
 		case 0xaa: {
 			if ((extra_arg & 0x7F) > 0x3F)
 				extra_arg = 0xFF;

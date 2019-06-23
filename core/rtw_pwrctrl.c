@@ -73,9 +73,7 @@ void _ips_enter(struct adapter *adapt)
 		if (pwrpriv->ips_mode == IPS_LEVEL_2)
 			pwrpriv->bkeepfwalive = true;
 
-#ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS		
 		pwrpriv->pwr_saving_start_time = rtw_get_current_time();
-#endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
 
 		rtw_ips_pwr_down(adapt);
 		pwrpriv->rf_pwrstate = rf_off;
@@ -110,9 +108,7 @@ int _ips_leave(struct adapter *adapt)
 		if (result == _SUCCESS)
 			pwrpriv->rf_pwrstate = rf_on;
 		
-#ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS	
 		pwrpriv->pwr_saving_time += rtw_get_passing_time_ms(pwrpriv->pwr_saving_start_time);
-#endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
 
 		RTW_PRINT("nolinked power save leave\n");
 
@@ -138,12 +134,6 @@ int ips_leave(struct adapter *adapt)
 
 	_enter_pwrlock(&pwrpriv->lock);
 	ret = _ips_leave(adapt);
-#ifdef DBG_CHECK_FW_PS_STATE
-	if (rtw_fw_ps_state(adapt) == _FAIL) {
-		RTW_INFO("ips leave doesn't leave 32k\n");
-		pdbgpriv->dbg_leave_ips_fail_cnt++;
-	}
-#endif /* DBG_CHECK_FW_PS_STATE */
 	_exit_pwrlock(&pwrpriv->lock);
 
 	if (_SUCCESS == ret)
@@ -746,18 +736,14 @@ void LPS_Enter(struct adapter * adapt, const char *msg)
 				sprintf(buf, "WIFI-%s", msg);
 				pwrpriv->bpower_saving = true;
 				
-#ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS
 				pwrpriv->pwr_saving_start_time = rtw_get_current_time();
-#endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
 
 				rtw_set_ps_mode(adapt, pwrpriv->power_mgnt, adapt->registrypriv.smart_ps, 0, buf);
 			}
-		} else
+		} else {
 			pwrpriv->LpsIdleCount++;
+		}
 	}
-
-	/*	RTW_INFO("-LeisurePSEnter\n"); */
-
 }
 
 /*
@@ -792,9 +778,7 @@ void LPS_Leave(struct adapter * adapt, const char *msg)
 			sprintf(buf, "WIFI-%s", msg);
 			rtw_set_ps_mode(adapt, PS_MODE_ACTIVE, 0, 0, buf);
 
-#ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS	
 			pwrpriv->pwr_saving_time += rtw_get_passing_time_ms(pwrpriv->pwr_saving_start_time);
-#endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
 
 			if (pwrpriv->pwr_mode == PS_MODE_ACTIVE)
 				LPS_RF_ON_check(adapt, LPS_LEAVE_TIMEOUT_MS);
@@ -802,14 +786,6 @@ void LPS_Leave(struct adapter * adapt, const char *msg)
 	}
 
 	pwrpriv->bpower_saving = false;
-#ifdef DBG_CHECK_FW_PS_STATE
-	if (rtw_fw_ps_state(adapt) == _FAIL) {
-		RTW_INFO("leave lps, fw in 32k\n");
-		pdbgpriv->dbg_leave_lps_fail_cnt++;
-	}
-#endif /* DBG_CHECK_FW_PS_STATE
- * 	RTW_INFO("-LeisurePSLeave\n"); */
-
 }
 
 void rtw_wow_lps_level_decide(struct adapter *adapter, u8 wow_en)

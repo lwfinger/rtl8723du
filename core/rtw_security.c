@@ -28,7 +28,6 @@ const char *security_type_str(u8 value)
 	return NULL;
 }
 
-#ifdef DBG_SW_SEC_CNT
 #define WEP_SW_ENC_CNT_INC(sec, ra) do {\
 	if (is_broadcast_mac_addr(ra)) \
 		sec->wep_sw_enc_cnt_bc++; \
@@ -82,15 +81,6 @@ const char *security_type_str(u8 value)
 	else \
 		sec->aes_sw_dec_cnt_uc++; \
 	} while (0)
-#else
-#define WEP_SW_ENC_CNT_INC(sec, ra)
-#define WEP_SW_DEC_CNT_INC(sec, ra)
-#define TKIP_SW_ENC_CNT_INC(sec, ra)
-#define TKIP_SW_DEC_CNT_INC(sec, ra)
-#define AES_SW_ENC_CNT_INC(sec, ra)
-#define AES_SW_DEC_CNT_INC(sec, ra)
-#endif /* DBG_SW_SEC_CNT */
-
 /* *****WEP related***** */
 
 #define CRC32_POLY 0x04c11db7

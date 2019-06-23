@@ -721,9 +721,6 @@ void rtw_phydm_ra_registed(struct adapter *adapter, struct sta_info *psta)
 		dump_sta_info(RTW_DBGDUMP, psta);
 }
 
-/*#define DBG_PHYDM_STATE_CHK*/
-
-
 static u8 _rtw_phydm_rfk_condition_check(struct adapter *adapter)
 {
 	u8 rst = false;
@@ -796,17 +793,13 @@ void rtw_phydm_watchdog(struct adapter *adapter)
 							(bBtDisabled == true) ? false : true);
 	odm_cmn_info_update(&pHalData->odmpriv, ODM_CMNINFO_POWER_TRAINING,
 							(pHalData->bDisableTXPowerTraining) ? true : false);
-	if (bLinked == true) {
+	if (bLinked) {
 		rfk_forbidden = (_rtw_phydm_rfk_condition_check(adapter) == true) ? false : true;
 		halrf_cmn_info_set(&pHalData->odmpriv, HALRF_CMNINFO_RFK_FORBIDDEN, rfk_forbidden);
 	} else {
 		tx_unlinked_low_rate = _rtw_phydm_pwr_tracking_rate_check(adapter);
 		halrf_cmn_info_set(&pHalData->odmpriv, HALRF_CMNINFO_RATE_INDEX, tx_unlinked_low_rate);
 	}
-#ifdef DBG_PHYDM_STATE_CHK
-	RTW_INFO("%s rfk_forbidden = %s, segment_iqk = %s\n",
-		__func__, (rfk_forbidden) ? "Y" : "N", (segment_iqk) ? "Y" : "N");
-#endif
 	if (pwrctl->bpower_saving)
 		phydm_watchdog_lps(&pHalData->odmpriv);
 	else

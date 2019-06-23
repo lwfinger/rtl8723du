@@ -58,16 +58,6 @@ int FillH2CCmd8723D(struct adapter * adapt, u8 ElementID, u32 CmdLen, u8 *pCmdBu
 
 	adapt = GET_PRIMARY_ADAPTER(adapt);
 	pHalData = GET_HAL_DATA(adapt);
-#ifdef DBG_CHECK_FW_PS_STATE
-#ifdef DBG_CHECK_FW_PS_STATE_H2C
-	if (rtw_fw_ps_state(adapt) == _FAIL) {
-		RTW_INFO("%s: h2c doesn't leave 32k ElementID=%02x\n", __FUNCTION__, ElementID);
-		pdbgpriv->dbg_h2c_leave32k_fail_cnt++;
-	}
-
-	/* RTW_INFO("H2C ElementID=%02x , pHalData->LastHMEBoxNum=%02x\n", ElementID, pHalData->LastHMEBoxNum); */
-#endif /* DBG_CHECK_FW_PS_STATE_H2C */
-#endif /* DBG_CHECK_FW_PS_STATE */
 	_enter_critical_mutex(&(adapter_to_dvobj(adapt)->h2c_fwcmd_mutex), NULL);
 
 	if (!pCmdBuffer)
@@ -86,15 +76,8 @@ int FillH2CCmd8723D(struct adapter * adapt, u8 ElementID, u32 CmdLen, u8 *pCmdBu
 
 		if (!_is_fw_read_cmd_down(adapt, h2c_box_num)) {
 			RTW_INFO(" fw read cmd failed...\n");
-#ifdef DBG_CHECK_FW_PS_STATE
-			RTW_INFO("MAC_1C0=%08x, MAC_1C4=%08x, MAC_1C8=%08x, MAC_1CC=%08x\n", rtw_read32(adapt, 0x1c0), rtw_read32(adapt, 0x1c4)
-				, rtw_read32(adapt, 0x1c8), rtw_read32(adapt, 0x1cc));
-#endif /* DBG_CHECK_FW_PS_STATE */
-			/* RTW_INFO(" 0x1c0: 0x%8x\n", rtw_read32(adapt, 0x1c0)); */
-			/* RTW_INFO(" 0x1c4: 0x%8x\n", rtw_read32(adapt, 0x1c4)); */
 			goto exit;
 		}
-
 		/* Write Ext command (byte 4~7) */
 		msgbox_ex_addr = REG_HMEBOX_EXT0_8723D + (h2c_box_num * RTL8723D_EX_MESSAGE_BOX_SIZE);
 		_rtw_memcpy((u8 *)(&le_tmp), h2c + 4, RTL8723D_EX_MESSAGE_BOX_SIZE);

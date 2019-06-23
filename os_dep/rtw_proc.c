@@ -1209,14 +1209,7 @@ static ssize_t proc_set_sec_cam(struct file *file, const char __user *buffer, si
 			rtw_sec_cam_swap(adapter, id_1, id_2);
 		else if (strcmp("cdk", cmd) == 0)
 			rtw_clean_dk_section(adapter);
-#ifdef DBG_SEC_CAM_MOVE
-		else if (strcmp("sgd", cmd) == 0)
-			rtw_hal_move_sta_gk_to_dk(adapter);
-		else if (strcmp("rsd", cmd) == 0)
-			rtw_hal_read_sta_dk_key(adapter, id_1);
-#endif
 	}
-
 	return count;
 }
 
@@ -1948,7 +1941,7 @@ exit:
 	return count;
 }
 
-#ifdef CONFIG_MBSSID_CAM
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 int proc_get_mbid_cam_cache(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -1958,7 +1951,7 @@ int proc_get_mbid_cam_cache(struct seq_file *m, void *v)
 	rtw_mbid_cam_dump(m, __func__, adapter);
 	return 0;
 }
-#endif /* CONFIG_MBSSID_CAM */
+#endif /* CONFIG_MI_WITH_MBSSID_CAM */
 
 static int proc_get_mac_addr(struct seq_file *m, void *v)
 {
@@ -2371,7 +2364,7 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("11w_tx_auth", proc_get_tx_auth, proc_set_tx_auth),
 #endif /* CONFIG_IEEE80211W */
 
-#ifdef CONFIG_MBSSID_CAM
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 	RTW_PROC_HDL_SSEQ("mbid_cam", proc_get_mbid_cam_cache, NULL),
 #endif
 	RTW_PROC_HDL_SSEQ("mac_addr", proc_get_mac_addr, NULL),

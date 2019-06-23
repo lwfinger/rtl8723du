@@ -1163,15 +1163,9 @@ int	init_mlme_ext_priv(struct adapter *adapt)
 	pmlmeext->last_scan_time = 0;
 	pmlmeext->mlmeext_init = true;
 
-
 	pmlmeext->active_keep_alive_check = true;
 
-#ifdef DBG_FIXED_CHAN
-	pmlmeext->fixed_chan = 0xFF;
-#endif
-
 	return res;
-
 }
 
 void free_mlme_ext_priv(struct mlme_ext_priv *pmlmeext)
@@ -11121,27 +11115,6 @@ static u8 chk_ap_is_alive(struct adapter *adapt, struct sta_info *psta)
 	struct mlme_ext_priv	*pmlmeext = &adapt->mlmeextpriv;
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
-#ifdef DBG_EXPIRATION_CHK
-	RTW_INFO(FUNC_ADPT_FMT" rx:"STA_PKTS_FMT", beacon:%llu, probersp_to_self:%llu"
-		/*", probersp_bm:%llu, probersp_uo:%llu, probereq:%llu, BI:%u"*/
-		 ", retry:%u\n"
-		 , FUNC_ADPT_ARG(adapt)
-		 , STA_RX_PKTS_DIFF_ARG(psta)
-		, psta->sta_stats.rx_beacon_pkts - psta->sta_stats.last_rx_beacon_pkts
-		, psta->sta_stats.rx_probersp_pkts - psta->sta_stats.last_rx_probersp_pkts
-		/*, psta->sta_stats.rx_probersp_bm_pkts - psta->sta_stats.last_rx_probersp_bm_pkts
-		, psta->sta_stats.rx_probersp_uo_pkts - psta->sta_stats.last_rx_probersp_uo_pkts
-		, psta->sta_stats.rx_probereq_pkts - psta->sta_stats.last_rx_probereq_pkts
-		 , pmlmeinfo->bcn_interval*/
-		 , pmlmeext->retry
-		);
-
-	RTW_INFO(FUNC_ADPT_FMT" tx_pkts:%llu, link_count:%u\n", FUNC_ADPT_ARG(adapt)
-		 , sta_tx_pkts(psta)
-		 , pmlmeinfo->link_count
-		);
-#endif
-
 	if ((sta_rx_data_pkts(psta) == sta_last_rx_data_pkts(psta))
 	    && sta_rx_beacon_pkts(psta) == sta_last_rx_beacon_pkts(psta)
 	    && sta_rx_probersp_pkts(psta) == sta_last_rx_probersp_pkts(psta)
@@ -11158,23 +11131,6 @@ static u8 chk_ap_is_alive(struct adapter *adapt, struct sta_info *psta)
 static u8 chk_adhoc_peer_is_alive(struct sta_info *psta)
 {
 	u8 ret = true;
-
-#ifdef DBG_EXPIRATION_CHK
-	RTW_INFO("sta:"MAC_FMT", rssi:%d, rx:"STA_PKTS_FMT", beacon:%llu, probersp_to_self:%llu"
-		/*", probersp_bm:%llu, probersp_uo:%llu, probereq:%llu, BI:%u"*/
-		 ", expire_to:%u\n"
-		 , MAC_ARG(psta->cmn.mac_addr)
-		 , psta->cmn.rssi_stat.rssi
-		 , STA_RX_PKTS_DIFF_ARG(psta)
-		, psta->sta_stats.rx_beacon_pkts - psta->sta_stats.last_rx_beacon_pkts
-		, psta->sta_stats.rx_probersp_pkts - psta->sta_stats.last_rx_probersp_pkts
-		/*, psta->sta_stats.rx_probersp_bm_pkts - psta->sta_stats.last_rx_probersp_bm_pkts
-		, psta->sta_stats.rx_probersp_uo_pkts - psta->sta_stats.last_rx_probersp_uo_pkts
-		, psta->sta_stats.rx_probereq_pkts - psta->sta_stats.last_rx_probereq_pkts
-		 , pmlmeinfo->bcn_interval*/
-		 , psta->expire_to
-		);
-#endif
 
 	if (sta_rx_data_pkts(psta) == sta_last_rx_data_pkts(psta)
 	    && sta_rx_beacon_pkts(psta) == sta_last_rx_beacon_pkts(psta)
@@ -11295,9 +11251,6 @@ bypass_active_keep_alive:
 			} else {
 				if (rx_chk != _SUCCESS) {
 					if (pmlmeext->retry == 0) {
-#ifdef DBG_EXPIRATION_CHK
-						RTW_INFO("issue_probereq to trigger probersp, retry=%d\n", pmlmeext->retry);
-#endif
 						issue_probereq_ex(adapt, &pmlmeinfo->network.Ssid, pmlmeinfo->network.MacAddress, 0, 0, 0, (from_timer ? 0 : 1));
 						issue_probereq_ex(adapt, &pmlmeinfo->network.Ssid, pmlmeinfo->network.MacAddress, 0, 0, 0, (from_timer ? 0 : 1));
 						issue_probereq_ex(adapt, &pmlmeinfo->network.Ssid, pmlmeinfo->network.MacAddress, 0, 0, 0, (from_timer ? 0 : 1));
@@ -11305,9 +11258,6 @@ bypass_active_keep_alive:
 				}
 
 				if (tx_chk != _SUCCESS && pmlmeinfo->link_count++ == link_count_limit) {
-					#ifdef DBG_EXPIRATION_CHK
-					RTW_INFO("%s issue_nulldata(%d)\n", __FUNCTION__, from_timer ? 1 : 0);
-					#endif
 					if (from_timer)
 						tx_chk = issue_nulldata(adapt, NULL, 1, 0, 0);
 					else
@@ -12479,11 +12429,7 @@ u32 rtw_scan_timeout_decision(struct adapter *adapt)
 		scan_ms = ss->duration;
 	else
 		scan_ms = ss->scan_ch_ms;
-
 	ss->scan_timeout_ms = (scan_ms * max_chan_num) + back_op_times + SCANNING_TIMEOUT_EX;
-	#ifdef DBG_SITESURVEY
-	RTW_INFO("%s , scan_timeout_ms = %d (ms)\n", __func__, ss->scan_timeout_ms);
-	#endif /*DBG_SITESURVEY*/
 	return ss->scan_timeout_ms;
 }
 
@@ -12720,13 +12666,6 @@ static u8 sitesurvey_pick_ch_behavior(struct adapter *adapt, u8 *ch, enum rt_sca
 	if (next_state != SCAN_PROCESS)
 		ss->scan_cnt = 0;
 #endif
-
-
-#ifdef DBG_FIXED_CHAN
-	if (pmlmeext->fixed_chan != 0xff && next_state == SCAN_PROCESS)
-		scan_ch = pmlmeext->fixed_chan;
-#endif
-
 	if (ch)
 		*ch = scan_ch;
 	if (type)
@@ -13022,13 +12961,6 @@ u8 sitesurvey_cmd_hdl(struct adapter *adapt, u8 *pbuf)
 	u8 val8;
 	struct wifidirect_info *pwdinfo = &adapt->wdinfo;
 
-#ifdef DBG_CHECK_FW_PS_STATE
-	if (rtw_fw_ps_state(adapt) == _FAIL) {
-		RTW_INFO("scan without leave 32k\n");
-		pdbgpriv->dbg_scan_pwr_state_cnt++;
-	}
-#endif /* DBG_CHECK_FW_PS_STATE */
-
 	/* increase channel idx */
 	if (mlmeext_chk_scan_state(pmlmeext, SCAN_PROCESS))
 		ss->channel_idx++;
@@ -13110,22 +13042,6 @@ operation_by_state:
 		}
 
 		/* still SCAN_PROCESS state */
-		#ifdef DBG_SITESURVEY
-			RTW_INFO(FUNC_ADPT_FMT" %s ch:%u (cnt:%u,idx:%d) at %dms, %c%c%c\n"
-				 , FUNC_ADPT_ARG(adapt)
-				 , mlmeext_scan_state_str(pmlmeext)
-				 , scan_ch
-				, pwdinfo->find_phase_state_exchange_cnt, ss->channel_idx
-				, rtw_get_passing_time_ms(adapt->mlmepriv.scan_start_time)
-				, scan_type ? 'A' : 'P', ss->scan_mode ? 'A' : 'P'
-				 , ss->ssid[0].SsidLength ? 'S' : ' '
-				);
-		#endif /*DBG_SITESURVEY*/
-#ifdef DBG_FIXED_CHAN
-		if (pmlmeext->fixed_chan != 0xff)
-			RTW_INFO(FUNC_ADPT_FMT" fixed_chan:%u\n", pmlmeext->fixed_chan);
-#endif
-
 		site_survey(adapt, scan_ch, scan_type);
 
 #if defined(CONFIG_ATMEL_RC_PATCH)
@@ -13154,15 +13070,6 @@ operation_by_state:
 			if (rtw_mi_get_ch_setting_union(adapt, &back_ch, &back_bw, &back_ch_offset) == 0)
 				rtw_warn_on(1);
 		}
-
-		#ifdef DBG_SITESURVEY
-			RTW_INFO(FUNC_ADPT_FMT" %s ch:%u, bw:%u, offset:%u at %dms\n"
-				 , FUNC_ADPT_ARG(adapt)
-				 , mlmeext_scan_state_str(pmlmeext)
-				 , back_ch, back_bw, back_ch_offset
-				, rtw_get_passing_time_ms(adapt->mlmepriv.scan_start_time)
-				);
-		#endif /*DBG_SITESURVEY*/
 		set_channel_bwmode(adapt, back_ch, back_ch_offset, back_bw);
 
 		sitesurvey_set_msr(adapt, false);

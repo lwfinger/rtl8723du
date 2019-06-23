@@ -565,9 +565,6 @@ struct mlme_ext_priv {
 	u16	 action_public_rxseq;
 
 	u8 active_keep_alive_check;
-#ifdef DBG_FIXED_CHAN
-	u8 fixed_chan;
-#endif
 	/* set hw sync bcn tsf register or not */
 	u8 en_hw_update_tsf;
 };

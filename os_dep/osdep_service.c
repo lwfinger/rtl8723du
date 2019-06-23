@@ -267,7 +267,7 @@ void rtw_list_insert_tail(struct list_head *plist, struct list_head *phead)
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-void rtw_init_timer(_timer *ptimer, void *adapt, void *pfunc, void *ctx)
+void rtw_init_timer(struct timer_list *ptimer, void *adapt, void *pfunc, void *ctx)
 {
 	struct adapter *adapter = (struct adapter *)adapt;
 

@@ -724,7 +724,7 @@ struct rf_ctl_t {
 #define IS_CH_WAITING(rfctl) 0
 #define IS_UNDER_CAC(rfctl) 0
 
-#ifdef CONFIG_MBSSID_CAM
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 #define TOTAL_MBID_CAM_NUM	8
 #define INVALID_CAM_ID			0xFF
 struct mbid_cam_ctl_t {
@@ -737,7 +737,7 @@ struct mbid_cam_cache {
 	/*u8 role;*/ /*WIFI_STATION_STATE or WIFI_AP_STATE*/
 	u8 mac_addr[ETH_ALEN];
 };
-#endif /*CONFIG_MBSSID_CAM*/
+#endif /*CONFIG_MI_WITH_MBSSID_CAM*/
 
 struct dvobj_priv {
 	/*-------- below is common data --------*/
@@ -779,7 +779,7 @@ struct dvobj_priv {
 	struct cam_ctl_t cam_ctl;
 	struct sec_cam_ent cam_cache[SEC_CAM_ENT_NUM_SW_LIMIT];
 
-#ifdef CONFIG_MBSSID_CAM
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 	struct mbid_cam_ctl_t mbid_cam_ctl;
 	struct mbid_cam_cache mbid_cam_cache[TOTAL_MBID_CAM_NUM];
 #endif

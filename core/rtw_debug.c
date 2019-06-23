@@ -650,7 +650,6 @@ int proc_get_sec_info(struct seq_file *m, void *v)
 
 	RTW_PRINT_SEL(m, "hw_decrypted=%d\n", sec->hw_decrypted);
 
-#ifdef DBG_SW_SEC_CNT
 	RTW_PRINT_SEL(m, "wep_sw_enc_cnt=%llu, %llu, %llu\n"
 		, sec->wep_sw_enc_cnt_bc , sec->wep_sw_enc_cnt_mc, sec->wep_sw_enc_cnt_uc);
 	RTW_PRINT_SEL(m, "wep_sw_dec_cnt=%llu, %llu, %llu\n"
@@ -665,8 +664,6 @@ int proc_get_sec_info(struct seq_file *m, void *v)
 		, sec->aes_sw_enc_cnt_bc , sec->aes_sw_enc_cnt_mc, sec->aes_sw_enc_cnt_uc);
 	RTW_PRINT_SEL(m, "aes_sw_dec_cnt=%llu, %llu, %llu\n"
 		, sec->aes_sw_dec_cnt_bc , sec->aes_sw_dec_cnt_mc, sec->aes_sw_dec_cnt_uc);
-#endif /* DBG_SW_SEC_CNT */
-
 	return 0;
 }
 

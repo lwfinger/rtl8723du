@@ -253,20 +253,7 @@ u8 chk_sta_is_alive(struct sta_info *psta);
 u8 chk_sta_is_alive(struct sta_info *psta)
 {
 	u8 ret = false;
-#ifdef DBG_EXPIRATION_CHK
-	RTW_INFO("sta:"MAC_FMT", rssi:%d, rx:"STA_PKTS_FMT", expire_to:%u, %s%ssq_len:%u\n"
-		 , MAC_ARG(psta->cmn.mac_addr)
-		 , psta->cmn.rssi_stat.rssi
-		 /* , STA_RX_PKTS_ARG(psta) */
-		 , STA_RX_PKTS_DIFF_ARG(psta)
-		 , psta->expire_to
-		 , psta->state & WIFI_SLEEP_STATE ? "PS, " : ""
-		 , psta->state & WIFI_STA_ALIVE_CHK_STATE ? "SAC, " : ""
-		 , psta->sleepq_len
-		);
-#endif
 
-	/* if(sta_last_rx_pkts(psta) == sta_rx_pkts(psta)) */
 	if ((psta->sta_stats.last_rx_data_pkts + psta->sta_stats.last_rx_ctrl_pkts) == (psta->sta_stats.rx_data_pkts + psta->sta_stats.rx_ctrl_pkts)) {
 	} else
 		ret = true;
@@ -294,12 +281,6 @@ void	expire_timeout_chk(struct adapter *adapt)
 	plist = get_next(phead);
 
 	/* check auth_queue */
-#ifdef DBG_EXPIRATION_CHK
-	if (rtw_end_of_queue_search(phead, plist) == false) {
-		RTW_INFO(FUNC_NDEV_FMT" auth_list, cnt:%u\n"
-			, FUNC_NDEV_ARG(adapt->pnetdev), pstapriv->auth_list_cnt);
-	}
-#endif
 	while ((rtw_end_of_queue_search(phead, plist)) == false) {
 		psta = LIST_CONTAINOR(plist, struct sta_info, auth_list);
 
@@ -344,12 +325,6 @@ void	expire_timeout_chk(struct adapter *adapt)
 	plist = get_next(phead);
 
 	/* check asoc_queue */
-#ifdef DBG_EXPIRATION_CHK
-	if (rtw_end_of_queue_search(phead, plist) == false) {
-		RTW_INFO(FUNC_NDEV_FMT" asoc_list, cnt:%u\n"
-			, FUNC_NDEV_ARG(adapt->pnetdev), pstapriv->asoc_list_cnt);
-	}
-#endif
 	while ((rtw_end_of_queue_search(phead, plist)) == false) {
 		psta = LIST_CONTAINOR(plist, struct sta_info, asoc_list);
 		plist = get_next(plist);

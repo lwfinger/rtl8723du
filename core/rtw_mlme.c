@@ -1244,10 +1244,6 @@ void rtw_surveydone_event_callback(struct adapter	*adapter, u8 *pbuf)
 
 	rtw_mi_os_xmit_schedule(adapter);
 
-#ifdef CONFIG_DRVEXT_MODULE_WSC
-	drvext_surveydone_callback(&adapter->drvextpriv);
-#endif
-
 #ifdef CONFIG_IOCTL_CFG80211
 	rtw_cfg80211_surveydone_event_callback(adapter);
 #endif /* CONFIG_IOCTL_CFG80211 */
@@ -1510,11 +1506,6 @@ static u32 _rtw_wait_scan_done(struct adapter *adapter, u8 abort, u32 timeout_ms
 		if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY)) {
 			if (!RTW_CANNOT_RUN(adapter))
 				RTW_INFO(FUNC_NDEV_FMT"waiting for scan_abort time out!\n", FUNC_NDEV_ARG(adapter->pnetdev));
-#ifdef CONFIG_PLATFORM_MSTAR
-			/*_clr_fwstate_(pmlmepriv, _FW_UNDER_SURVEY);*/
-			set_survey_timer(pmlmeext, 0);
-			mlme_set_scan_to_timer(pmlmepriv, 50);
-#endif
 			rtw_indicate_scan_done(adapter, true);
 		}
 	}
@@ -2582,16 +2573,7 @@ void rtw_join_timeout_handler (void *FunctionContext)
 #endif /* CONFIG_IOCTL_CFG80211 */
 
 	}
-
 	_exit_critical_bh(&pmlmepriv->lock, &irqL);
-
-
-#ifdef CONFIG_DRVEXT_MODULE_WSC
-	drvext_assoc_fail_indicate(&adapter->drvextpriv);
-#endif
-
-
-
 }
 
 /*
@@ -2849,7 +2831,6 @@ void rtw_sta_traffic_info(void *sel, struct adapter *adapter)
 	}
 }
 
-/*#define DBG_TRAFFIC_STATISTIC*/
 static void collect_traffic_statistics(struct adapter *adapt)
 {
 	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(adapt);
@@ -2876,18 +2857,6 @@ static void collect_traffic_statistics(struct adapter *adapt)
 
 	pdvobjpriv->traffic_stat.cur_tx_tp = (u32)(pdvobjpriv->traffic_stat.cur_tx_bytes * 8 / 2 / 1024 / 1024);
 	pdvobjpriv->traffic_stat.cur_rx_tp = (u32)(pdvobjpriv->traffic_stat.cur_rx_bytes * 8 / 2 / 1024 / 1024);
-
-	#ifdef DBG_TRAFFIC_STATISTIC
-	RTW_INFO("\n========================\n");
-	RTW_INFO("cur_tx_bytes:%lld\n", pdvobjpriv->traffic_stat.cur_tx_bytes);
-	RTW_INFO("cur_rx_bytes:%lld\n", pdvobjpriv->traffic_stat.cur_rx_bytes);
-
-	RTW_INFO("last_tx_bytes:%lld\n", pdvobjpriv->traffic_stat.last_tx_bytes);
-	RTW_INFO("last_rx_bytes:%lld\n", pdvobjpriv->traffic_stat.last_rx_bytes);
-
-	RTW_INFO("cur_tx_tp:%d\n", pdvobjpriv->traffic_stat.cur_tx_tp);
-	RTW_INFO("cur_rx_tp:%d\n", pdvobjpriv->traffic_stat.cur_rx_tp);
-	#endif
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
@@ -3970,12 +3939,7 @@ unsigned int rtw_restructure_ht_ie(struct adapter *adapt, u8 *in_ie, u8 *out_ie,
 		set_mcs_rate_by_mask(ht_capie.supp_mcs_set, MCS_RATE_1R);
 		break;
 	case 2:
-		#ifdef CONFIG_DISABLE_MCS13TO15
-		if (((cbw40_enable == 1) && (operation_bw == CHANNEL_WIDTH_40)) && (pregistrypriv->wifi_spec != 1))
-			set_mcs_rate_by_mask(ht_capie.supp_mcs_set, MCS_RATE_2R_13TO15_OFF);
-		else
-		#endif
-			set_mcs_rate_by_mask(ht_capie.supp_mcs_set, MCS_RATE_2R);
+		set_mcs_rate_by_mask(ht_capie.supp_mcs_set, MCS_RATE_2R);
 		break;
 	case 3:
 		set_mcs_rate_by_mask(ht_capie.supp_mcs_set, MCS_RATE_3R);
@@ -4125,12 +4089,7 @@ void rtw_update_ht_cap(struct adapter *adapt, u8 *pie, uint ie_len, u8 channel)
 			set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_1R);
 			break;
 		case 2:
-			#ifdef CONFIG_DISABLE_MCS13TO15
-			if (pmlmeext->cur_bwmode == CHANNEL_WIDTH_40 && pregistrypriv->wifi_spec != 1)
-				set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_2R_13TO15_OFF);
-			else
-			#endif
-				set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_2R);
+			set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_2R);
 			break;
 		case 3:
 			set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_3R);
@@ -4347,35 +4306,20 @@ int rtw_linked_check(struct adapter *adapt)
 	}
 	return false;
 }
-/*#define DBG_ADAPTER_STATE_CHK*/
+
 u8 rtw_is_adapter_up(struct adapter *adapt)
 {
 	if (!adapt)
 		return false;
 
-	if (RTW_CANNOT_RUN(adapt)) {
-		#ifdef DBG_ADAPTER_STATE_CHK
-		RTW_INFO(FUNC_ADPT_FMT " false -bDriverStopped(%s) bSurpriseRemoved(%s)\n"
-			, FUNC_ADPT_ARG(adapt)
-			, rtw_is_drv_stopped(adapt) ? "True" : "False"
-			, rtw_is_surprise_removed(adapt) ? "True" : "False");
-		#endif
+	if (RTW_CANNOT_RUN(adapt))
 		return false;
-	}
 
-	if (!rtw_is_hw_init_completed(adapt)) {
-		#ifdef DBG_ADAPTER_STATE_CHK
-		RTW_INFO(FUNC_ADPT_FMT " false -(hw_init_completed == false)\n", FUNC_ADPT_ARG(adapt));
-		#endif
+	if (!rtw_is_hw_init_completed(adapt))
 		return false;
-	}
 
-	if (adapt->bup == false) {
-		#ifdef DBG_ADAPTER_STATE_CHK
-		RTW_INFO(FUNC_ADPT_FMT " false -(bup == false)\n", FUNC_ADPT_ARG(adapt));
-		#endif
+	if (adapt->bup == false)
 		return false;
-	}
 
 	return true;
 }

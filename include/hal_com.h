@@ -254,9 +254,7 @@ struct dbg_rx_counter {
 	u32	rx_ht_fa;
 };
 
-#ifdef CONFIG_MBSSID_CAM
-	#define DBG_MBID_CAM_DUMP
-
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 	void rtw_mbid_cam_init(struct dvobj_priv *dvobj);
 	void rtw_mbid_cam_deinit(struct dvobj_priv *dvobj);
 	void rtw_mbid_cam_reset(struct adapter *adapter);
@@ -510,11 +508,6 @@ void StopTxBeacon(struct adapter *adapt);
 #ifdef CONFIG_MI_WITH_MBSSID_CAM /*HW port0 - MBSS*/
 	void hw_var_set_opmode_mbid(struct adapter *Adapter, u8 mode);
 	u8 rtw_mbid_camid_alloc(struct adapter *adapter, u8 *mac_addr);
-#endif
-
-#ifdef DBG_SEC_CAM_MOVE
-	void rtw_hal_move_sta_gk_to_dk(struct adapter *adapter);
-	void rtw_hal_read_sta_dk_key(struct adapter *adapter, u8 key_id);
 #endif
 
 int rtw_hal_get_rsvd_page(struct adapter *adapter, u32 page_offset, u32 page_num, u8 *buffer, u32 buffer_size);

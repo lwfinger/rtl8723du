@@ -3012,19 +3012,6 @@ static int cfg80211_rtw_connect(struct wiphy *wiphy, struct net_device *ndev,
 		RTW_INFO("%s wdev_priv.block is set\n", __FUNCTION__);
 		goto exit;
 	}
-
-#ifdef CONFIG_PLATFORM_MSTAR_SCAN_BEFORE_CONNECT
-	printk("MStar Android!\n");
-	if (pwdev_priv->bandroid_scan == false) {
-		struct wifidirect_info *pwdinfo = &(adapt->wdinfo);
-		if (rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE)) {
-			ret = -EBUSY;
-			printk("Android hasn't attached yet!\n");
-			goto exit;
-		}
-	}
-#endif
-
 	if (!sme->ssid || !sme->ssid_len) {
 		ret = -EINVAL;
 		goto exit;

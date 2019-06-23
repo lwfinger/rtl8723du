@@ -1584,7 +1584,7 @@ struct dvobj_priv *devobj_init(void)
 	rtw_macid_ctl_init(&pdvobj->macid_ctl);
 	_rtw_spinlock_init(&pdvobj->cam_ctl.lock);
 	_rtw_mutex_init(&pdvobj->cam_ctl.sec_cam_access_mutex);
-#ifdef CONFIG_MBSSID_CAM
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 	rtw_mbid_cam_init(pdvobj);
 #endif
 
@@ -1630,7 +1630,7 @@ void devobj_deinit(struct dvobj_priv *pdvobj)
 	_rtw_spinlock_free(&pdvobj->cam_ctl.lock);
 	_rtw_mutex_free(&pdvobj->cam_ctl.sec_cam_access_mutex);
 
-#ifdef CONFIG_MBSSID_CAM
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 	rtw_mbid_cam_deinit(pdvobj);
 #endif
 
@@ -2593,14 +2593,12 @@ netdev_open_normal_process:
 	}
 #endif
 
-#ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS
 	pwrctrlpriv->radio_on_start_time = rtw_get_current_time();
 	pwrctrlpriv->pwr_saving_start_time = rtw_get_current_time();
 	pwrctrlpriv->pwr_saving_time = 0;
 	pwrctrlpriv->on_time = 0;
 	pwrctrlpriv->tx_time = 0;
 	pwrctrlpriv->rx_time = 0;
-#endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
 
 	RTW_INFO("-871x_drv - drv_open, bup=%d\n", adapt->bup);
 

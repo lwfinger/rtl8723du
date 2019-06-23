@@ -8,11 +8,7 @@
 #include <basic_types.h>
 #include <osdep_service.h>
 
-#ifdef CONFIG_PLATFORM_MSTAR_HIGH
-	#define MAX_RTKM_RECVBUF_SZ (31744) /* 31k */
-#else
-	#define MAX_RTKM_RECVBUF_SZ (15360) /* 15k */
-#endif /* CONFIG_PLATFORM_MSTAR_HIGH */
+#define MAX_RTKM_RECVBUF_SZ (15360) /* 15k */
 #define MAX_RTKM_NR_PREALLOC_RECV_SKB 16
 
 u16 rtw_rtkm_get_buff_size(void);

@@ -339,37 +339,10 @@ inline u8 rtw_get_oper_ch(struct adapter *adapter)
 
 inline void rtw_set_oper_ch(struct adapter *adapter, u8 ch)
 {
-#ifdef DBG_CH_SWITCH
-	const int len = 128;
-	char msg[128] = {0};
-	int cnt = 0;
-	int i = 0;
-#endif  /* DBG_CH_SWITCH */
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 
-	if (dvobj->oper_channel != ch) {
+	if (dvobj->oper_channel != ch)
 		dvobj->on_oper_ch_time = rtw_get_current_time();
-
-#ifdef DBG_CH_SWITCH
-		cnt += snprintf(msg + cnt, len - cnt, "switch to ch %3u", ch);
-
-		for (i = 0; i < dvobj->iface_nums; i++) {
-			struct adapter *iface = dvobj->adapters[i];
-			cnt += snprintf(msg + cnt, len - cnt, " ["ADPT_FMT":", ADPT_ARG(iface));
-			if (iface->mlmeextpriv.cur_channel == ch)
-				cnt += snprintf(msg + cnt, len - cnt, "C");
-			else
-				cnt += snprintf(msg + cnt, len - cnt, "_");
-			if (iface->wdinfo.listen_channel == ch && !rtw_p2p_chk_state(&iface->wdinfo, P2P_STATE_NONE))
-				cnt += snprintf(msg + cnt, len - cnt, "L");
-			else
-				cnt += snprintf(msg + cnt, len - cnt, "_");
-			cnt += snprintf(msg + cnt, len - cnt, "]");
-		}
-
-		RTW_INFO(FUNC_ADPT_FMT" %s\n", FUNC_ADPT_ARG(adapter), msg);
-#endif /* DBG_CH_SWITCH */
-	}
 
 	dvobj->oper_channel = ch;
 }
@@ -1714,12 +1687,7 @@ void HT_caps_handler(struct adapter *adapt, struct ndis_802_11_variable_ies * pI
 		set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_1R);
 		break;
 	case 2:
-		#ifdef CONFIG_DISABLE_MCS13TO15
-		if (pmlmeext->cur_bwmode == CHANNEL_WIDTH_40 && pregistrypriv->wifi_spec != 1)
-			set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_2R_13TO15_OFF);
-		else
-		#endif
-			set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_2R);
+		set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_2R);
 		break;
 	case 3:
 		set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_3R);

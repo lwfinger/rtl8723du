@@ -219,19 +219,11 @@ extern unsigned long _rtw_ms_to_systime(u32 ms);
 extern int	_rtw_get_passing_time_ms(unsigned long start);
 extern int	_rtw_get_time_interval_ms(unsigned long start, unsigned long end);
 
-#ifdef DBG_SYSTIME
-#define rtw_get_current_time() ({unsigned long __stime = _rtw_get_current_time(); __stime;})
-#define rtw_systime_to_ms(stime) ({u32 __ms = _rtw_systime_to_ms(stime); typecheck(systime, stime); __ms;})
-#define rtw_ms_to_systime(ms) ({unsigned long __stime = _rtw_ms_to_systime(ms); __stime;})
-#define rtw_get_passing_time_ms(start) ({u32 __ms = _rtw_get_passing_time_ms(start); typecheck(systime, start); __ms;})
-#define rtw_get_time_interval_ms(start, end) ({u32 __ms = _rtw_get_time_interval_ms(start, end); typecheck(systime, start); typecheck(systime, end); __ms;})
-#else
 #define rtw_get_current_time() _rtw_get_current_time()
 #define rtw_systime_to_ms(stime) _rtw_systime_to_ms(stime)
 #define rtw_ms_to_systime(ms) _rtw_ms_to_systime(ms)
 #define rtw_get_passing_time_ms(start) _rtw_get_passing_time_ms(start)
 #define rtw_get_time_interval_ms(start, end) _rtw_get_time_interval_ms(start, end)
-#endif
 
 extern void	rtw_sleep_schedulable(int ms);
 

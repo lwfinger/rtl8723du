@@ -24,68 +24,6 @@ void rtw_dump_fw_info(void *sel, struct adapter *adapter)
 
 /* #define CONFIG_GTK_OL_DBG */
 
-/*#define DBG_SEC_CAM_MOVE*/
-#ifdef DBG_SEC_CAM_MOVE
-void rtw_hal_move_sta_gk_to_dk(struct adapter *adapter)
-{
-	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
-	int cam_id, index = 0;
-	u8 *addr = NULL;
-
-	if (!MLME_IS_STA(adapter))
-		return;
-
-	addr = get_bssid(pmlmepriv);
-
-	if (!addr) {
-		RTW_INFO("%s: get bssid MAC addr fail!!\n", __func__);
-		return;
-	}
-
-	rtw_clean_dk_section(adapter);
-
-	do {
-		cam_id = rtw_camid_search(adapter, addr, index, 1);
-
-		if (cam_id == -1)
-			RTW_INFO("%s: cam_id: %d, key_id:%d\n", __func__, cam_id, index);
-		else
-			rtw_sec_cam_swap(adapter, cam_id, index);
-
-		index++;
-	} while (index < 4);
-
-}
-
-void rtw_hal_read_sta_dk_key(struct adapter *adapter, u8 key_id)
-{
-	struct security_priv *psecuritypriv = &adapter->securitypriv;
-	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
-	struct cam_ctl_t *cam_ctl = &dvobj->cam_ctl;
-	unsigned long irqL;
-	u8 get_key[16];
-
-	_rtw_memset(get_key, 0, sizeof(get_key));
-
-	if (key_id > 4) {
-		RTW_INFO("%s [ERROR] gtk_keyindex:%d invalid\n", __func__, key_id);
-		rtw_warn_on(1);
-		return;
-	}
-	rtw_sec_read_cam_ent(adapter, key_id, NULL, NULL, get_key);
-
-	/*update key into related sw variable*/
-	_enter_critical_bh(&cam_ctl->lock, &irqL);
-	if (_rtw_camid_is_gk(adapter, key_id)) {
-		RTW_INFO("[HW KEY] -Key-id:%d "KEY_FMT"\n", key_id, KEY_ARG(get_key));
-		RTW_INFO("[cam_cache KEY] - Key-id:%d "KEY_FMT"\n", key_id, KEY_ARG(&dvobj->cam_cache[key_id].key));
-	}
-	_exit_critical_bh(&cam_ctl->lock, &irqL);
-
-}
-#endif
-
-
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
 	char	rtw_phy_para_file_path[PATH_LENGTH_MAX];
 #endif
@@ -2052,7 +1990,7 @@ bool rtw_sec_read_cam_is_gk(struct adapter *adapter, u8 id)
 	res = (ctrl & BIT6) ? true : false;
 	return res;
 }
-#ifdef CONFIG_MBSSID_CAM
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 void rtw_mbid_cam_init(struct dvobj_priv *dvobj)
 {
 	struct mbid_cam_ctl_t *mbid_cam_ctl = &dvobj->mbid_cam_ctl;
@@ -2220,7 +2158,7 @@ u8 rtw_mbid_camid_alloc(struct adapter *adapter, u8 *mac_addr)
 	if (cam_id != INVALID_CAM_ID) {
 		ATOMIC_INC(&mbid_cam_ctl->mbid_entry_num);
 		RTW_INFO("%s mac:"MAC_FMT" - cam_id:%d\n", __func__, MAC_ARG(mac_addr), cam_id);
-#ifdef DBG_MBID_CAM_DUMP
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 		rtw_mbid_cam_cache_dump(RTW_DBGDUMP, __func__, adapter);
 #endif
 	} else
@@ -2273,7 +2211,7 @@ u8 rtw_mbid_cam_assign(struct adapter *adapter, u8 *mac_addr, u8 camid)
 	if (ret == true) {
 		ATOMIC_INC(&mbid_cam_ctl->mbid_entry_num);
 		RTW_INFO("%s mac:"MAC_FMT" - cam_id:%d\n", __func__, MAC_ARG(mac_addr), camid);
-#ifdef DBG_MBID_CAM_DUMP
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 		rtw_mbid_cam_cache_dump(RTW_DBGDUMP, __func__, adapter);
 #endif
 	} else
@@ -2427,7 +2365,7 @@ void rtw_mbid_cam_restore(struct adapter *adapter)
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct mbid_cam_ctl_t *mbid_cam_ctl = &dvobj->mbid_cam_ctl;
 
-#ifdef DBG_MBID_CAM_DUMP
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 	rtw_mbid_cam_cache_dump(RTW_DBGDUMP, __func__, adapter);
 #endif
 
@@ -2439,7 +2377,7 @@ void rtw_mbid_cam_restore(struct adapter *adapter)
 	}
 	enable_mbssid_cam(adapter);
 }
-#endif /*CONFIG_MBSSID_CAM*/
+#endif /*CONFIG_MI_WITH_MBSSID_CAM*/
 
 #ifdef CONFIG_MI_WITH_MBSSID_CAM
 void rtw_hal_set_macaddr_mbid(struct adapter *adapter, u8 *mac_addr)
@@ -2716,7 +2654,7 @@ static void rtw_hal_get_msr(struct adapter *adapter, u8 *net_type)
 	}
 }
 
-#if defined(CONFIG_MI_WITH_MBSSID_CAM) && defined(CONFIG_MBSSID_CAM) /*For 2 hw ports - 88E/92E/8812/8821/8723B*/
+#if defined(CONFIG_MI_WITH_MBSSID_CAM) && defined(CONFIG_MI_WITH_MBSSID_CAM) /*For 2 hw ports - 88E/92E/8812/8821/8723B*/
 static u8 rtw_hal_net_type_decision(struct adapter *adapter, u8 net_type)
 {
 	if ((adapter->hw_port == HW_PORT0) && (rtw_get_mbid_cam_entry_num(adapter))) {
@@ -2732,7 +2670,7 @@ static void rtw_hal_set_msr(struct adapter *adapter, u8 net_type)
 
 	switch (adapter->hw_port) {
 	case HW_PORT0:
-		#if defined(CONFIG_MI_WITH_MBSSID_CAM) && defined(CONFIG_MBSSID_CAM)
+		#if defined(CONFIG_MI_WITH_MBSSID_CAM) && defined(CONFIG_MI_WITH_MBSSID_CAM)
 		net_type = rtw_hal_net_type_decision(adapter, net_type);
 		#endif
 		/*REG_CR - BIT[17:16]-Network Type for port 0*/
@@ -3045,7 +2983,6 @@ static void rtw_hal_set_FwAoacRsvdPage_cmd(struct adapter * adapt, struct rsvd_p
 {
 }
 
-/*#define DBG_GET_RSVD_PAGE*/
 int rtw_hal_get_rsvd_page(struct adapter *adapter, u32 page_offset,
 	u32 page_num, u8 *buffer, u32 buffer_size)
 {
@@ -3084,12 +3021,6 @@ int rtw_hal_get_rsvd_page(struct adapter *adapter, u32 page_offset,
 	rtw_write8(adapter, REG_PKT_BUFF_ACCESS_CTRL, 0x0);
 	rst = true;
 
-#ifdef DBG_GET_RSVD_PAGE
-	RTW_INFO("%s [page_offset:%d , page_num:%d][start_addr:0x%04x , size:%d]\n",
-		 __func__, page_offset, page_num, addr, size);
-	RTW_INFO_DUMP("\n", buffer, size);
-	RTW_INFO(" ==================================================\n");
-#endif
 	return rst;
 }
 
@@ -3919,7 +3850,7 @@ u8 SetHwReg(struct adapter *adapter, u8 variable, u8 *val)
 	case HW_VAR_BEACON_INTERVAL:
 		hw_var_set_bcn_interval(adapter, *(u16 *)val);
 		break;
-#ifdef CONFIG_MBSSID_CAM
+#ifdef CONFIG_MI_WITH_MBSSID_CAM
 	case HW_VAR_MBSSID_CAM_WRITE: {
 		u32	cmd = 0;
 		u32	*cam_val = (u32 *)val;

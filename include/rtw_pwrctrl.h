@@ -282,15 +282,12 @@ struct pwrctrl_priv {
 	u8 lps_level; /*LPS_NORMAL,LPA_CG,LPS_PG*/
 	u8 current_lps_hw_port_id;
 
-#ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS
 	unsigned long radio_on_start_time;
 	unsigned long pwr_saving_start_time;
 	u32 pwr_saving_time;
 	u32 on_time;
 	u32 tx_time;
 	u32 rx_time;
-#endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
-
 };
 
 #define rtw_get_ips_mode_req(pwrctl) \

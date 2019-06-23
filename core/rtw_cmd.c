@@ -206,19 +206,13 @@ void _rtw_free_cmd_priv(struct	cmd_priv *pcmdpriv)
 	}
 }
 
-/*
-Calling Context:
-
-rtw_enqueue_cmd can only be called between kernel thread,
-since only spin_lock is used.
-
-ISR/Call-Back functions can't call this sub-function.
-
-*/
-#ifdef DBG_CMD_QUEUE
-extern u8 dump_cmd_id;
-#endif
-
+/* Calling Context:
+ *
+ * rtw_enqueue_cmd can only be called between kernel thread,
+ * since only spin_lock is used.
+ * 
+ * ISR/Call-Back functions can't call this sub-function.
+ */
 int _rtw_enqueue_cmd(struct __queue *queue, struct cmd_obj *obj, bool to_head)
 {
 	unsigned long irqL;
@@ -227,7 +221,6 @@ int _rtw_enqueue_cmd(struct __queue *queue, struct cmd_obj *obj, bool to_head)
 	if (obj == NULL)
 		goto exit;
 
-	/* _enter_critical_bh(&queue->lock, &irqL); */
 	_enter_critical(&queue->lock, &irqL);
 
 	if (to_head)
@@ -235,47 +228,9 @@ int _rtw_enqueue_cmd(struct __queue *queue, struct cmd_obj *obj, bool to_head)
 	else
 		rtw_list_insert_tail(&obj->list, &queue->queue);
 
-#ifdef DBG_CMD_QUEUE
-	if (dump_cmd_id) {
-		printk("%s===> cmdcode:0x%02x\n", __FUNCTION__, obj->cmdcode);
-		if (obj->cmdcode == GEN_CMD_CODE(_Set_MLME_EVT)) {
-			if (obj->parmbuf) {
-				struct C2HEvent_Header *pc2h_evt_hdr = (struct C2HEvent_Header *)(obj->parmbuf);
-				printk("pc2h_evt_hdr->ID:0x%02x(%d)\n", pc2h_evt_hdr->ID, pc2h_evt_hdr->ID);
-			}
-		}
-		if (obj->cmdcode == GEN_CMD_CODE(_Set_Drv_Extra)) {
-			if (obj->parmbuf) {
-				struct drvextra_cmd_parm *pdrvextra_cmd_parm = (struct drvextra_cmd_parm *)(obj->parmbuf);
-				printk("pdrvextra_cmd_parm->ec_id:0x%02x\n", pdrvextra_cmd_parm->ec_id);
-			}
-		}
-	}
-
-	if (queue->queue.prev->next != &queue->queue) {
-		RTW_INFO("[%d] head %p, tail %p, tail->prev->next %p[tail], tail->next %p[head]\n", __LINE__,
-			&queue->queue, queue->queue.prev, queue->queue.prev->prev->next, queue->queue.prev->next);
-
-		RTW_INFO("==========%s============\n", __FUNCTION__);
-		RTW_INFO("head:%p,obj_addr:%p\n", &queue->queue, obj);
-		RTW_INFO("adapt: %p\n", obj->adapt);
-		RTW_INFO("cmdcode: 0x%02x\n", obj->cmdcode);
-		RTW_INFO("res: %d\n", obj->res);
-		RTW_INFO("parmbuf: %p\n", obj->parmbuf);
-		RTW_INFO("cmdsz: %d\n", obj->cmdsz);
-		RTW_INFO("rsp: %p\n", obj->rsp);
-		RTW_INFO("rspsz: %d\n", obj->rspsz);
-		RTW_INFO("sctx: %p\n", obj->sctx);
-		RTW_INFO("list->next: %p\n", obj->list.next);
-		RTW_INFO("list->prev: %p\n", obj->list.prev);
-	}
-#endif /* DBG_CMD_QUEUE */
-
-	/* _exit_critical_bh(&queue->lock, &irqL);	 */
 	_exit_critical(&queue->lock, &irqL);
 
 exit:
-
 
 	return _SUCCESS;
 }
@@ -285,58 +240,17 @@ struct	cmd_obj	*_rtw_dequeue_cmd(struct __queue *queue)
 	unsigned long irqL;
 	struct cmd_obj *obj;
 
-
-	/* _enter_critical_bh(&(queue->lock), &irqL); */
 	_enter_critical(&queue->lock, &irqL);
-
-#ifdef DBG_CMD_QUEUE
-	if (queue->queue.prev->next != &queue->queue) {
-		RTW_INFO("[%d] head %p, tail %p, tail->prev->next %p[tail], tail->next %p[head]\n", __LINE__,
-			&queue->queue, queue->queue.prev, queue->queue.prev->prev->next, queue->queue.prev->next);
-	}
-#endif /* DBG_CMD_QUEUE */
-
 
 	if (rtw_is_list_empty(&(queue->queue)))
 		obj = NULL;
 	else {
 		obj = LIST_CONTAINOR(get_next(&(queue->queue)), struct cmd_obj, list);
 
-#ifdef DBG_CMD_QUEUE
-		if (queue->queue.prev->next != &queue->queue) {
-			RTW_INFO("==========%s============\n", __FUNCTION__);
-			RTW_INFO("head:%p,obj_addr:%p\n", &queue->queue, obj);
-			RTW_INFO("adapt: %p\n", obj->adapt);
-			RTW_INFO("cmdcode: 0x%02x\n", obj->cmdcode);
-			RTW_INFO("res: %d\n", obj->res);
-			RTW_INFO("parmbuf: %p\n", obj->parmbuf);
-			RTW_INFO("cmdsz: %d\n", obj->cmdsz);
-			RTW_INFO("rsp: %p\n", obj->rsp);
-			RTW_INFO("rspsz: %d\n", obj->rspsz);
-			RTW_INFO("sctx: %p\n", obj->sctx);
-			RTW_INFO("list->next: %p\n", obj->list.next);
-			RTW_INFO("list->prev: %p\n", obj->list.prev);
-		}
-
-		if (dump_cmd_id) {
-			RTW_INFO("%s===> cmdcode:0x%02x\n", __FUNCTION__, obj->cmdcode);
-			if (obj->cmdcode == GEN_CMD_CODE(_Set_Drv_Extra)) {
-				if (obj->parmbuf) {
-					struct drvextra_cmd_parm *pdrvextra_cmd_parm = (struct drvextra_cmd_parm *)(obj->parmbuf);
-					printk("pdrvextra_cmd_parm->ec_id:0x%02x\n", pdrvextra_cmd_parm->ec_id);
-				}
-			}
-
-		}
-#endif /* DBG_CMD_QUEUE */
-
 		rtw_list_delete(&obj->list);
 	}
 
-	/* _exit_critical_bh(&(queue->lock), &irqL); */
 	_exit_critical(&queue->lock, &irqL);
-
-
 	return obj;
 }
 
@@ -3150,12 +3064,6 @@ static void rtw_btinfo_hdl(struct adapter *adapter, u8 *buf, u16 buf_len)
 		len = buf_len - 2;
 	} else
 		len = info->len;
-
-	/* #define DBG_PROC_SET_BTINFO_EVT */
-#ifdef DBG_PROC_SET_BTINFO_EVT
-	btinfo_evt_dump((struct seq_file *)RTW_DBGDUMP, info);
-#endif /* DBG_PROC_SET_BTINFO_EVT */
-
 	/* transform BT-FW btinfo to WiFI-FW C2H format and notify */
 	if (cmd_idx == BTINFO_WIFI_FETCH)
 		buf[1] = 0;

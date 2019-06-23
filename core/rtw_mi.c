@@ -814,38 +814,6 @@ u8 rtw_mi_buddy_check_mlmeinfo_state(struct adapter *adapt, u32 state)
 	return _rtw_mi_process(adapt, true, &in_data, _rtw_mi_check_mlmeinfo_state);
 }
 
-/*#define DBG_DUMP_FW_STATE*/
-#ifdef DBG_DUMP_FW_STATE
-static void rtw_dbg_dump_fwstate(struct adapter *adapt, int state)
-{
-	u8 buf[32] = {0};
-
-	if (state & WIFI_FW_NULL_STATE) {
-		_rtw_memset(buf, 0, 32);
-		sprintf(buf, "WIFI_FW_NULL_STATE");
-		RTW_INFO(FUNC_ADPT_FMT"fwstate-%s\n", FUNC_ADPT_ARG(adapt), buf);
-	}
-
-	if (state & _FW_LINKED) {
-		_rtw_memset(buf, 0, 32);
-		sprintf(buf, "_FW_LINKED");
-		RTW_INFO(FUNC_ADPT_FMT"fwstate-%s\n", FUNC_ADPT_ARG(adapt), buf);
-	}
-
-	if (state & _FW_UNDER_LINKING) {
-		_rtw_memset(buf, 0, 32);
-		sprintf(buf, "_FW_UNDER_LINKING");
-		RTW_INFO(FUNC_ADPT_FMT"fwstate-%s\n", FUNC_ADPT_ARG(adapt), buf);
-	}
-
-	if (state & _FW_UNDER_SURVEY) {
-		_rtw_memset(buf, 0, 32);
-		sprintf(buf, "_FW_UNDER_SURVEY");
-		RTW_INFO(FUNC_ADPT_FMT"fwstate-%s\n", FUNC_ADPT_ARG(adapt), buf);
-	}
-}
-#endif
-
 static u8 _rtw_mi_check_fwstate(struct adapter *adapt, void *data)
 {
 	u8 ret = false;
@@ -857,10 +825,6 @@ static u8 _rtw_mi_check_fwstate(struct adapter *adapt, void *data)
 		ret = true;
 	else if (true == check_fwstate(&adapt->mlmepriv, state))
 		ret = true;
-#ifdef DBG_DUMP_FW_STATE
-	if (ret)
-		rtw_dbg_dump_fwstate(adapt, state);
-#endif
 	return ret;
 }
 u8 rtw_mi_check_fwstate(struct adapter *adapt, int state)
@@ -1150,42 +1114,12 @@ struct adapter *rtw_get_iface_by_hwport(struct adapter *adapt, u8 hw_port)
 }
 
 /*#define CONFIG_SKB_ALLOCATED*/
-#define DBG_SKB_PROCESS
-#ifdef DBG_SKB_PROCESS
 static void rtw_dbg_skb_process(struct adapter *adapt, union recv_frame *precvframe, union recv_frame *pcloneframe)
 {
 	struct sk_buff *pkt_copy, *pkt_org;
 
 	pkt_org = precvframe->u.hdr.pkt;
 	pkt_copy = pcloneframe->u.hdr.pkt;
-	/*
-		RTW_INFO("%s ===== ORG SKB =====\n", __func__);
-		RTW_INFO(" SKB head(%p)\n", pkt_org->head);
-		RTW_INFO(" SKB data(%p)\n", pkt_org->data);
-		RTW_INFO(" SKB tail(%p)\n", pkt_org->tail);
-		RTW_INFO(" SKB end(%p)\n", pkt_org->end);
-
-		RTW_INFO(" recv frame head(%p)\n", precvframe->u.hdr.rx_head);
-		RTW_INFO(" recv frame data(%p)\n", precvframe->u.hdr.rx_data);
-		RTW_INFO(" recv frame tail(%p)\n", precvframe->u.hdr.rx_tail);
-		RTW_INFO(" recv frame end(%p)\n", precvframe->u.hdr.rx_end);
-
-		RTW_INFO("%s ===== COPY SKB =====\n", __func__);
-		RTW_INFO(" SKB head(%p)\n", pkt_copy->head);
-		RTW_INFO(" SKB data(%p)\n", pkt_copy->data);
-		RTW_INFO(" SKB tail(%p)\n", pkt_copy->tail);
-		RTW_INFO(" SKB end(%p)\n", pkt_copy->end);
-
-		RTW_INFO(" recv frame head(%p)\n", pcloneframe->u.hdr.rx_head);
-		RTW_INFO(" recv frame data(%p)\n", pcloneframe->u.hdr.rx_data);
-		RTW_INFO(" recv frame tail(%p)\n", pcloneframe->u.hdr.rx_tail);
-		RTW_INFO(" recv frame end(%p)\n", pcloneframe->u.hdr.rx_end);
-	*/
-	/*
-		RTW_INFO("%s => recv_frame adapter(%p,%p)\n", __func__, precvframe->u.hdr.adapter, pcloneframe->u.hdr.adapter);
-		RTW_INFO("%s => recv_frame dev(%p,%p)\n", __func__, pkt_org->dev , pkt_copy->dev);
-		RTW_INFO("%s => recv_frame len(%d,%d)\n", __func__, precvframe->u.hdr.len, pcloneframe->u.hdr.len);
-	*/
 	if (precvframe->u.hdr.len != pcloneframe->u.hdr.len)
 		RTW_INFO("%s [WARN]  recv_frame length(%d:%d) compare failed\n", __func__, precvframe->u.hdr.len, pcloneframe->u.hdr.len);
 
@@ -1196,7 +1130,6 @@ static void rtw_dbg_skb_process(struct adapter *adapt, union recv_frame *precvfr
 		RTW_INFO("%s [WARN]  recv_frame rx_data compare failed\n", __func__);
 
 }
-#endif
 
 static int _rtw_mi_buddy_clone_bcmc_packet(struct adapter *adapter, union recv_frame *precvframe, u8 *pphy_status, union recv_frame *pcloneframe)
 {
@@ -1225,9 +1158,7 @@ static int _rtw_mi_buddy_clone_bcmc_packet(struct adapter *adapter, union recv_f
 			recvframe_put(pcloneframe, pattrib->pkt_len);
 #endif
 
-#ifdef DBG_SKB_PROCESS
 			rtw_dbg_skb_process(adapter, precvframe, pcloneframe);
-#endif
 
 			if (pphy_status)
 				rx_query_phy_status(pcloneframe, pphy_status);

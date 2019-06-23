@@ -122,9 +122,7 @@ static int rtw_dev_get_feature_set(struct net_device *dev)
 	feature_set |= WIFI_FEATURE_SOFT_AP;
 
 	feature_set |= WIFI_FEATURE_ADDITIONAL_STA;
-#ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS
 	feature_set |= WIFI_FEATURE_LINK_LAYER_STATS;
-#endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
 
 	return feature_set;
 }
@@ -986,7 +984,6 @@ exit:
 
 #endif /* RTT_SUPPORT */
 
-#ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS
 enum {
     LSTATS_SUBCMD_GET_INFO = ANDROID_NL80211_SUBCMD_LSTATS_RANGE_START,
 	LSTATS_SUBCMD_SET_INFO,
@@ -1059,16 +1056,6 @@ static void LinkLayerStats(struct adapter *adapt)
 			pwrpriv->tx_time = 0;
 			pwrpriv->rx_time = 0;	
 	}
-
-#ifdef CONFIG_RTW_WIFI_HAL_DEBUG
-		RTW_INFO("- tx_bytes : %llu rx_bytes : %llu total bytes : %llu\n", tx_bytes, rx_bytes, trx_total_bytes);
-		RTW_INFO("- netif_up=%s, on_time : %u ms\n", adapt->netif_up ? "1":"0", pwrpriv->on_time);
-		RTW_INFO("- pwr_saving_time : %u (%u) ms\n", pwrpriv->pwr_saving_time, ps_time);
-		RTW_INFO("- trx_total_time : %u ms\n", trx_total_time);		
-		RTW_INFO("- tx_time : %u ms\n", pwrpriv->tx_time);
-		RTW_INFO("- rx_time : %u ms\n", pwrpriv->rx_time);
-#endif /* CONFIG_RTW_WIFI_HAL_DEBUG */
-
 }
 
 #define DUMMY_TIME_STATICS 99
@@ -1108,17 +1095,6 @@ static int rtw_cfgvendor_lstats_get_info(struct wiphy *wiphy,
 	radio->on_time_gscan = 0;
 	radio->on_time_pno_scan = 0;
 	radio->on_time_hs20 = 0;
-	#ifdef CONFIG_RTW_WIFI_HAL_DEBUG
-	RTW_INFO("==== %s ====\n", __func__);
-	RTW_INFO("radio->radio : %d\n", (radio->radio));
-	RTW_INFO("pwrpriv->on_time : %u ms\n", (pwrpriv->on_time));
-	RTW_INFO("pwrpriv->tx_time :  %u ms\n", (pwrpriv->tx_time));
-	RTW_INFO("pwrpriv->rx_time :  %u ms\n", (pwrpriv->rx_time));
-	RTW_INFO("radio->on_time :  %u ms\n", (radio->on_time));
-	RTW_INFO("radio->tx_time :  %u ms\n", (radio->tx_time));
-	RTW_INFO("radio->rx_time :  %u ms\n", (radio->rx_time));
-	RTW_INFO("radio->tx_time_per_levels value :  %u ms\n", *(radio->tx_time_per_levels));
-	#endif /* CONFIG_RTW_WIFI_HAL_DEBUG */
 	
 	RTW_DBG(FUNC_NDEV_FMT" %s\n", FUNC_NDEV_ARG(wdev_to_ndev(wdev)), (char*)data);
 	err =  rtw_cfgvendor_send_cmd_reply(wiphy, wdev_to_ndev(wdev), 
@@ -1143,7 +1119,6 @@ static int rtw_cfgvendor_lstats_clear_info(struct wiphy *wiphy,
 	RTW_INFO("%s\n", __func__);
 	return err;
 }
-#endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
 
 static const struct wiphy_vendor_command rtw_vendor_cmds[] = {
 #if defined(GSCAN_SUPPORT) && 0
@@ -1246,7 +1221,6 @@ static const struct wiphy_vendor_command rtw_vendor_cmds[] = {
 		.doit = rtw_cfgvendor_rtt_get_capability
 	},
 #endif /* RTT_SUPPORT */
-#ifdef CONFIG_RTW_CFGVEDNOR_LLSTATS
 	{
 		{
 			.vendor_id = OUI_GOOGLE,
@@ -1271,7 +1245,6 @@ static const struct wiphy_vendor_command rtw_vendor_cmds[] = {
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
 		.doit = rtw_cfgvendor_lstats_clear_info
 	},
-#endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
 	{
 		{
 			.vendor_id = OUI_GOOGLE,

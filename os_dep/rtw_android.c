@@ -407,15 +407,8 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		break;
 
 	case ANDROID_WIFI_CMD_SCAN_ACTIVE:
-		/* rtw_set_scan_mode((struct adapter *)rtw_netdev_priv(net), SCAN_ACTIVE); */
-#ifdef CONFIG_PLATFORM_MSTAR
-#ifdef CONFIG_IOCTL_CFG80211
-		adapter_wdev_data((struct adapter *)rtw_netdev_priv(net))->bandroid_scan = true;
-#endif /* CONFIG_IOCTL_CFG80211 */
-#endif /* CONFIG_PLATFORM_MSTAR */
 		break;
 	case ANDROID_WIFI_CMD_SCAN_PASSIVE:
-		/* rtw_set_scan_mode((struct adapter *)rtw_netdev_priv(net), SCAN_PASSIVE); */
 		break;
 	case ANDROID_WIFI_CMD_RSSI:
 		bytes_written = rtw_android_get_rssi(net, command, priv_cmd.total_len);
@@ -433,7 +426,6 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		bytes_written = rtw_android_set_block(net, command, priv_cmd.total_len);
 		break;
 	case ANDROID_WIFI_CMD_RXFILTER_START:
-		/* bytes_written = net_os_set_packet_filter(net, 1); */
 		break;
 	case ANDROID_WIFI_CMD_RXFILTER_STOP:
 		/* bytes_written = net_os_set_packet_filter(net, 0); */
