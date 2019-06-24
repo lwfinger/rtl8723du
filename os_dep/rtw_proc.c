@@ -2027,18 +2027,6 @@ static int proc_get_phy_cap(struct seq_file *m, void *v)
 	return 0;
 }
 
-#ifdef CONFIG_SUPPORT_TRX_SHARED
-#include "../../hal/hal_halmac.h"
-static int proc_get_trx_share_mode(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
-
-	dump_trx_share_mode(m, adapter);
-	return 0;
-}
-#endif
-
 static int proc_dump_rsvd_page(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -2381,9 +2369,6 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("stbc_cap", proc_get_stbc_cap, proc_set_stbc_cap),
 	RTW_PROC_HDL_SSEQ("ldpc_cap", proc_get_ldpc_cap, proc_set_ldpc_cap),
 
-#ifdef CONFIG_SUPPORT_TRX_SHARED
-	RTW_PROC_HDL_SSEQ("trx_share_mode", proc_get_trx_share_mode, NULL),
-#endif
 	RTW_PROC_HDL_SSEQ("napi_info", proc_get_napi_info, NULL),
 #ifdef CONFIG_RTW_NAPI_DYNAMIC
 	RTW_PROC_HDL_SSEQ("napi_th", proc_get_napi_info, proc_set_napi_th),

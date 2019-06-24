@@ -246,39 +246,32 @@ enum rtw_vendor_gscan_attribute {
 	ATTR_GSCAN_MAX
 };
 
-typedef enum gscan_batch_attribute {
+enum gscan_batch_attribute {
 	ATTR_GSCAN_BATCH_BESTN,
 	ATTR_GSCAN_BATCH_MSCAN,
 	ATTR_GSCAN_BATCH_BUFFER_THRESHOLD
-} gscan_batch_attribute_t;
+};
 
-typedef enum gscan_geofence_attribute {
+enum gscan_geofence_attribute {
 	ATTR_GSCAN_NUM_HOTLIST_BSSID,
 	ATTR_GSCAN_HOTLIST_BSSID
-} gscan_geofence_attribute_t;
+};
 
-typedef enum gscan_complete_event {
+enum gscan_complete_event {
 	WIFI_SCAN_BUFFER_FULL,
 	WIFI_SCAN_COMPLETE
-} gscan_complete_event_t;
+};
 /* wifi_hal.h */
 /* WiFi Common definitions */
 typedef unsigned char byte;
-typedef int wifi_request_id;
-typedef int wifi_channel;                       // indicates channel frequency in MHz
-typedef int wifi_rssi;
 typedef byte mac_addr[6];
 typedef byte oui[3];
-typedef int64_t wifi_timestamp;                 // In microseconds (us)
-typedef int64_t wifi_timespan;                  // In picoseconds  (ps)
 
 struct wifi_info;
 struct wifi_interface_info;
-typedef struct wifi_info *wifi_handle;
-typedef struct wifi_interface_info *wifi_interface_handle;
 
 /* channel operating width */
-typedef enum {
+enum int_width {
 	WIFI_CHAN_WIDTH_20    = 0,
 	WIFI_CHAN_WIDTH_40    = 1,
 	WIFI_CHAN_WIDTH_80    = 2,
@@ -287,18 +280,9 @@ typedef enum {
 	WIFI_CHAN_WIDTH_5     = 5,
 	WIFI_CHAN_WIDTH_10    = 6,
 	WIFI_CHAN_WIDTH_INVALID = -1
-} wifi_channel_width;
+};
 
-typedef int wifi_radio;
-
-typedef struct {
-	wifi_channel_width width;
-	int center_frequency0;
-	int center_frequency1;
-	int primary_frequency;
-} wifi_channel_spec;
-
-typedef enum {
+enum wifi_error {
 	WIFI_SUCCESS = 0,
 	WIFI_ERROR_NONE = 0,
 	WIFI_ERROR_UNKNOWN = -1,
@@ -311,27 +295,27 @@ typedef enum {
 	WIFI_ERROR_TOO_MANY_REQUESTS = -8,          // Too many instances of this request
 	WIFI_ERROR_OUT_OF_MEMORY = -9,
 	WIFI_ERROR_BUSY = -10,
-} wifi_error;
+};
 
 #define STATS_MAJOR_VERSION      1
 #define STATS_MINOR_VERSION      0
 #define STATS_MICRO_VERSION      0
 
-typedef enum {
+enum wifi_connection_state {
 	WIFI_DISCONNECTED = 0,
 	WIFI_AUTHENTICATING = 1,
 	WIFI_ASSOCIATING = 2,
 	WIFI_ASSOCIATED = 3,
 	WIFI_EAPOL_STARTED = 4,   // if done by firmware/driver
 	WIFI_EAPOL_COMPLETED = 5, // if done by firmware/driver
-} wifi_connection_state;
+};
 
-typedef enum {
+enum wifi_roam_state {
 	WIFI_ROAMING_IDLE = 0,
 	WIFI_ROAMING_ACTIVE = 1,
-} wifi_roam_state;
+};
 
-typedef enum {
+enum wifi_interface_mode {
 	WIFI_INTERFACE_STA = 0,
 	WIFI_INTERFACE_SOFTAP = 1,
 	WIFI_INTERFACE_IBSS = 2,
@@ -340,7 +324,7 @@ typedef enum {
 	WIFI_INTERFACE_NAN = 5,
 	WIFI_INTERFACE_MESH = 6,
 	WIFI_INTERFACE_UNKNOWN = -1
- } wifi_interface_mode;
+ };
 
 #define WIFI_CAPABILITY_QOS          0x00000001     // set for QOS association
 #define WIFI_CAPABILITY_PROTECTED    0x00000002     // set for protected association (802.11 beacon frame control protected bit set)
@@ -349,28 +333,28 @@ typedef enum {
 #define WIFI_CAPABILITY_SSID_UTF8    0x00000010     // set is 802.11 Extended Capabilities element UTF-8 SSID bit is set
 #define WIFI_CAPABILITY_COUNTRY      0x00000020     // set is 802.11 Country Element is present
 
-typedef struct {
-	wifi_interface_mode mode;     // interface mode
+struct wifi_interface_link_layer_info {
+	enum wifi_interface_mode mode;     // interface mode
 	u8 mac_addr[6];               // interface mac address (self)
-	wifi_connection_state state;  // connection state (valid for STA, CLI only)
-	wifi_roam_state roaming;      // roaming state
+	enum wifi_connection_state state;  // connection state (valid for STA, CLI only)
+	enum wifi_roam_state roaming;      // roaming state
 	u32 capabilities;             // WIFI_CAPABILITY_XXX (self)
 	u8 ssid[33];                  // null terminated SSID
 	u8 bssid[6];                  // bssid
 	u8 ap_country_str[3];         // country string advertised by AP
 	u8 country_str[3];            // country string for this association
-} wifi_interface_link_layer_info;
+};
 
 /* channel information */
-typedef struct {
-	wifi_channel_width width;   // channel width (20, 40, 80, 80+80, 160)
-	wifi_channel center_freq;   // primary 20 MHz channel
-	wifi_channel center_freq0;  // center frequency (MHz) first segment
-	wifi_channel center_freq1;  // center frequency (MHz) second segment
-} wifi_channel_info;
+struct int_info {
+	enum int_width width;   // channel width (20, 40, 80, 80+80, 160)
+	int center_freq;   // primary 20 MHz channel
+	int center_freq0;  // center frequency (MHz) first segment
+	int center_freq1;  // center frequency (MHz) second segment
+};
 
 /* wifi rate */
-typedef struct {
+struct wifi_rate {
 	u32 preamble   :3;   // 0: OFDM, 1:CCK, 2:HT 3:VHT 4..7 reserved
 	u32 nss        :2;   // 0:1x1, 1:2x2, 3:3x3, 4:4x4
 	u32 bw         :3;   // 0:20MHz, 1:40Mhz, 2:80Mhz, 3:160Mhz
@@ -378,21 +362,21 @@ typedef struct {
 	                // HT/VHT it would be mcs index
 	u32 reserved  :16;   // reserved
 	u32 bitrate;         // units of 100 Kbps
-} wifi_rate;
+};
 
 /* channel statistics */
-typedef struct {
-	wifi_channel_info channel;  // channel
+struct int_stat {
+	struct int_info channel;  // channel
 	u32 on_time;                // msecs the radio is awake (32 bits number accruing over time)
 	u32 cca_busy_time;          // msecs the CCA register is busy (32 bits number accruing over time)
-} wifi_channel_stat;
+};
 
 // Max number of tx power levels. The actual number vary per device and is specified by |num_tx_levels|
 #define RADIO_STAT_MAX_TX_LEVELS 256
 
 /* radio statistics */
-typedef struct {
-	wifi_radio radio;                      // wifi radio (if multiple radio supported)
+struct wifi_radio_stat {
+	int radio;                      // wifi radio (if multiple radio supported)
 	u32 on_time;                           // msecs the radio is awake (32 bits number accruing over time)
 	u32 tx_time;                           // msecs the radio is transmitting (32 bits number accruing over time)
 	u32 num_tx_levels;                     // number of radio transmit power levels
@@ -406,8 +390,8 @@ typedef struct {
 	u32 on_time_pno_scan;                  // msecs the radio is awake due to PNO scan (32 bits number accruing over time)
 	u32 on_time_hs20;                      // msecs the radio is awake due to HS2.0 scans and GAS exchange (32 bits number accruing over time)
 	u32 num_channels;                      // number of channels
-	wifi_channel_stat channels[];          // channel statistics
-} wifi_radio_stat;
+	struct int_stat channels[];          // channel statistics
+};
 
 /**
  * Packet statistics reporting by firmware is performed on MPDU basi (i.e. counters increase by 1 for each MPDU)
@@ -431,28 +415,27 @@ typedef struct {
  */
 
 /* per rate statistics */
-typedef struct {
-	wifi_rate rate;     // rate information
+struct wifi_rate_stat {
+	struct wifi_rate rate;     // rate information
 	u32 tx_mpdu;        // number of successfully transmitted data pkts (ACK rcvd)
 	u32 rx_mpdu;        // number of received data pkts
 	u32 mpdu_lost;      // number of data packet losses (no ACK)
 	u32 retries;        // total number of data pkt retries
 	u32 retries_short;  // number of short data pkt retries
 	u32 retries_long;   // number of long data pkt retries
-} wifi_rate_stat;
+};
 
 /* access categories */
-typedef enum {
+enum wifi_traffic_ac {
 	WIFI_AC_VO  = 0,
 	WIFI_AC_VI  = 1,
 	WIFI_AC_BE  = 2,
 	WIFI_AC_BK  = 3,
 	WIFI_AC_MAX = 4,
-} wifi_traffic_ac;
+};
 
 /* wifi peer type */
-typedef enum
-{
+enum wifi_peer_type {
 	WIFI_PEER_STA,
 	WIFI_PEER_AP,
 	WIFI_PEER_P2P_GO,
@@ -460,20 +443,20 @@ typedef enum
 	WIFI_PEER_NAN,
 	WIFI_PEER_TDLS,
 	WIFI_PEER_INVALID,
-} wifi_peer_type;
+};
 
 /* per peer statistics */
-typedef struct {
-	wifi_peer_type type;           // peer type (AP, TDLS, GO etc.)
+struct wifi_peer_info {
+	enum wifi_peer_type type;           // peer type (AP, TDLS, GO etc.)
 	u8 peer_mac_address[6];        // mac address
 	u32 capabilities;              // peer WIFI_CAPABILITY_XXX
 	u32 num_rate;                  // number of rates
-	wifi_rate_stat rate_stats[];   // per rate statistics, number of entries  = num_rate
-} wifi_peer_info;
+	struct wifi_rate_stat rate_stats[];   // per rate statistics, number of entries  = num_rate
+};
 
 /* Per access category statistics */
-typedef struct {
-	wifi_traffic_ac ac;             // access category (VI, VO, BE, BK)
+struct wifi_wmm_ac_stat {
+	enum wifi_traffic_ac ac;             // access category (VI, VO, BE, BK)
 	u32 tx_mpdu;                    // number of successfully transmitted unicast data pkts (ACK rcvd)
 	u32 rx_mpdu;                    // number of received unicast data packets
 	u32 tx_mcast;                   // number of succesfully transmitted multicast data packets
@@ -489,12 +472,12 @@ typedef struct {
 	u32 contention_time_max;        // data pkt max contention time (usecs)
 	u32 contention_time_avg;        // data pkt avg contention time (usecs)
 	u32 contention_num_samples;     // num of data pkts used for contention statistics
-} wifi_wmm_ac_stat;
+};
 
 /* interface statistics */
-typedef struct {
-	wifi_interface_handle iface;		// wifi interface
-	wifi_interface_link_layer_info info;	// current state of the interface
+struct wifi_iface_stat {
+	struct wifi_interface_info * iface;		// wifi interface
+	struct wifi_interface_link_layer_info info;	// current state of the interface
 	u32 beacon_rx;				// access point beacon received count from connected AP
 	u64 average_tsf_offset;			// average beacon offset encountered (beacon_TSF - TBTT)
 						// The average_tsf_offset field is used so as to calculate the
@@ -508,27 +491,26 @@ typedef struct {
 	u32 mgmt_rx;				// access point mgmt frames received count from connected AP (including Beacon)
 	u32 mgmt_action_rx;			// action frames received count
 	u32 mgmt_action_tx;			// action frames transmit count
-	wifi_rssi rssi_mgmt;			// access Point Beacon and Management frames RSSI (averaged)
-	wifi_rssi rssi_data;			// access Point Data Frames RSSI (averaged) from connected AP
-	wifi_rssi rssi_ack;			// access Point ACK RSSI (averaged) from connected AP
-	wifi_wmm_ac_stat ac[WIFI_AC_MAX];	// per ac data packet statistics
+	int rssi_mgmt;			// access Point Beacon and Management frames RSSI (averaged)
+	int rssi_data;			// access Point Data Frames RSSI (averaged) from connected AP
+	int rssi_ack;			// access Point ACK RSSI (averaged) from connected AP
+	struct wifi_wmm_ac_stat ac[WIFI_AC_MAX];	// per ac data packet statistics
 	u32 num_peers;				// number of peers
-	wifi_peer_info peer_info[];		// per peer statistics
-} wifi_iface_stat;
+	struct wifi_peer_info peer_info[];		// per peer statistics
+};
 
 /* configuration params */
-typedef struct {
+struct wifi_link_layer_params {
 	u32 mpdu_size_threshold;		// threshold to classify the pkts as short or long
 						// packet size < mpdu_size_threshold => short
 	u32 aggressive_statistics_gathering;	// set for field debug mode. Driver should collect all statistics regardless of performance impact.
-} wifi_link_layer_params;
+};
 
 /* callback for reporting link layer stats */
-typedef struct {
-	void (*on_link_stats_results) (wifi_request_id id, wifi_iface_stat *iface_stat,
-	int num_radios, wifi_radio_stat *radio_stat);
-} wifi_stats_result_handler;
-
+struct wifi_stats_result_handler {
+	void (*on_link_stats_results) (int id, struct wifi_iface_stat *iface_stat,
+	int num_radios, struct wifi_radio_stat *radio_stat);
+};
 
 /* wifi statistics bitmap  */
 #define WIFI_STATS_RADIO              0x00000001      // all radio statistics

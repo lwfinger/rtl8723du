@@ -1065,15 +1065,15 @@ static int rtw_cfgvendor_lstats_get_info(struct wiphy *wiphy,
 	int err = 0;
 	struct adapter *adapt = GET_PRIMARY_ADAPTER(wiphy_to_adapter(wiphy));
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
-	wifi_radio_stat *radio;
+	struct wifi_radio_stat *radio;
 	char *output;
 
-	output = rtw_malloc(sizeof(wifi_radio_stat) + sizeof(wifi_iface_stat)+1);
+	output = rtw_malloc(sizeof(struct wifi_radio_stat) + sizeof(struct wifi_iface_stat)+1);
 	if (!output) {
 		RTW_DBG("Allocate lstats info buffer fail!\n");
 	}
 
-	radio = (wifi_radio_stat *)output;
+	radio = (struct wifi_radio_stat *)output;
 
 	radio->num_channels = 0;
 	radio->radio = 1;
@@ -1087,7 +1087,7 @@ static int rtw_cfgvendor_lstats_get_info(struct wiphy *wiphy,
 	
 	radio->num_tx_levels = 1;
 	radio->tx_time_per_levels = NULL;
-	radio->tx_time_per_levels = (u32*)(output+sizeof(wifi_radio_stat) + sizeof(wifi_iface_stat));
+	radio->tx_time_per_levels = (u32*)(output+sizeof(struct wifi_radio_stat) + sizeof(struct wifi_iface_stat));
 	*(radio->tx_time_per_levels) = DUMMY_TIME_STATICS;
 
 	radio->on_time_scan = 0;
@@ -1098,11 +1098,11 @@ static int rtw_cfgvendor_lstats_get_info(struct wiphy *wiphy,
 	
 	RTW_DBG(FUNC_NDEV_FMT" %s\n", FUNC_NDEV_ARG(wdev_to_ndev(wdev)), (char*)data);
 	err =  rtw_cfgvendor_send_cmd_reply(wiphy, wdev_to_ndev(wdev), 
-		output, sizeof(wifi_iface_stat) + sizeof(wifi_radio_stat)+1);
+		output, sizeof(struct wifi_iface_stat) + sizeof(struct wifi_radio_stat)+1);
 	if (unlikely(err))
 		RTW_ERR(FUNC_NDEV_FMT"Vendor Command reply failed ret:%d \n"
 			, FUNC_NDEV_ARG(wdev_to_ndev(wdev)), err);
-	rtw_mfree(output, sizeof(wifi_iface_stat) + sizeof(wifi_radio_stat)+1);
+	rtw_mfree(output, sizeof(struct wifi_iface_stat) + sizeof(struct wifi_radio_stat)+1);
 	return err;
 }
 static int rtw_cfgvendor_lstats_set_info(struct wiphy *wiphy,	

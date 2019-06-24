@@ -36,7 +36,7 @@
 #define SET_C2H_SEQ_88XX(_c2h, _val)	SET_BITS_TO_LE_1BYTE(((u8*)(_c2h)) + 1, 0, 8, _val)
 #define SET_C2H_PLEN_88XX(_c2h, _val)	SET_BITS_TO_LE_1BYTE(((u8*)(_c2h)) + 14, 0, 8, _val)
 
-typedef enum _C2H_EVT {
+enum {
 	C2H_DBG = 0x00,
 	C2H_LB = 0x01,
 	C2H_TXBF = 0x02,
@@ -62,11 +62,7 @@ typedef enum _C2H_EVT {
 	C2H_WLAN_INFO = 0x27,
 	C2H_DEFEATURE_RSVD = 0xFD,
 	C2H_EXTEND = 0xff,
-} C2H_EVT;
-
-typedef enum _EXTEND_C2H_EVT {
-	EXTEND_C2H_DBG_PRINT = 0
-} EXTEND_C2H_EVT;
+};
 
 #define C2H_REG_LEN 16
 

@@ -497,16 +497,6 @@ module_param(rtw_decrypt_phy_file, int, 0644);
 MODULE_PARM_DESC(rtw_decrypt_phy_file, "Enable Decrypt PHY File");
 #endif
 
-#ifdef CONFIG_SUPPORT_TRX_SHARED
-#ifdef DFT_TRX_SHARE_MODE
-int rtw_trx_share_mode = DFT_TRX_SHARE_MODE;
-#else
-int rtw_trx_share_mode = 0;
-#endif
-module_param(rtw_trx_share_mode, int, 0644);
-MODULE_PARM_DESC(rtw_trx_share_mode, "TRx FIFO Shared");
-#endif
-
 int _netdev_open(struct net_device *pnetdev);
 int netdev_open(struct net_device *pnetdev);
 static int netdev_close(struct net_device *pnetdev);
@@ -792,10 +782,6 @@ uint loadparam(struct adapter *adapt)
 	registry_par->reg_rxgain_offset_5gl = (u32) rtw_rxgain_offset_5gl;
 	registry_par->reg_rxgain_offset_5gm = (u32) rtw_rxgain_offset_5gm;
 	registry_par->reg_rxgain_offset_5gh = (u32) rtw_rxgain_offset_5gh;
-
-#ifdef CONFIG_SUPPORT_TRX_SHARED
-	registry_par->trx_share_mode = rtw_trx_share_mode;
-#endif
 
 #ifdef CONFIG_RTW_NAPI
 	registry_par->en_napi = (u8)rtw_en_napi;

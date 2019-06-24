@@ -4,14 +4,6 @@
 #ifndef __RTW_IOCTL_SET_H_
 #define __RTW_IOCTL_SET_H_
 
-
-typedef u8 NDIS_802_11_PMKID_VALUE[16];
-
-typedef struct _BSSIDInfo {
-	unsigned char  BSSID[6];
-	NDIS_802_11_PMKID_VALUE  PMKID;
-} BSSIDInfo, *PBSSIDInfo;
-
 u8 rtw_set_802_11_authentication_mode(struct adapter *pdapter, enum ndis_802_11_authentication_mode authmode);
 u8 rtw_set_802_11_bssid(struct adapter *adapt, u8 *bssid);
 u8 rtw_set_802_11_add_wep(struct adapter *adapt, struct ndis_802_11_wep *wep);

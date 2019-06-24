@@ -63,18 +63,18 @@ static const char *android_wifi_cmd_str[ANDROID_WIFI_CMD_MAX] = {
 	"DRIVER_VERSION"
 };
 
-typedef struct android_wifi_priv_cmd {
+struct android_wifi_priv_cmd {
 	char *buf;
 	int used_len;
 	int total_len;
-} android_wifi_priv_cmd;
+};
 
 #ifdef CONFIG_COMPAT
-typedef struct compat_android_wifi_priv_cmd {
+struct compat_android_wifi_priv_cmd {
 	compat_uptr_t buf;
 	int used_len;
 	int total_len;
-} compat_android_wifi_priv_cmd;
+};
 #endif /* CONFIG_COMPAT */
 
 /**
@@ -307,7 +307,7 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 	char *command = NULL;
 	int cmd_num;
 	int bytes_written = 0;
-	android_wifi_priv_cmd priv_cmd;
+	struct android_wifi_priv_cmd priv_cmd;
 	struct adapter	*adapt = (struct adapter *) rtw_netdev_priv(net);
 	struct wifi_display_info		*pwfd_info;
 
@@ -328,9 +328,9 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 	if (in_compat_syscall()) {
 #endif
 		/* User space is 32-bit, use compat ioctl */
-		compat_android_wifi_priv_cmd compat_priv_cmd;
+		struct compat_android_wifi_priv_cmd compat_priv_cmd;
 
-		if (copy_from_user(&compat_priv_cmd, ifr->ifr_data, sizeof(compat_android_wifi_priv_cmd))) {
+		if (copy_from_user(&compat_priv_cmd, ifr->ifr_data, sizeof(struct compat_android_wifi_priv_cmd))) {
 			ret = -EFAULT;
 			goto exit;
 		}
@@ -339,7 +339,7 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		priv_cmd.total_len = compat_priv_cmd.total_len;
 	} else
 #endif /* CONFIG_COMPAT */
-		if (copy_from_user(&priv_cmd, ifr->ifr_data, sizeof(android_wifi_priv_cmd))) {
+		if (copy_from_user(&priv_cmd, ifr->ifr_data, sizeof(struct android_wifi_priv_cmd))) {
 			ret = -EFAULT;
 			goto exit;
 		}
