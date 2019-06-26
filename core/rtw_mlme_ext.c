@@ -1328,13 +1328,6 @@ unsigned int OnProbeReq(struct adapter *adapt, union recv_frame *precv_frame)
 	uint len = precv_frame->u.hdr.len;
 	u8 is_valid_p2p_probereq = false;
 
-#ifdef CONFIG_ATMEL_RC_PATCH
-	u8 *target_ie = NULL, *wps_ie = NULL;
-	u8 *start;
-	uint search_len = 0, wps_ielen = 0, target_ielen = 0;
-	struct sta_info	*psta;
-	struct sta_priv *pstapriv = &adapt->stapriv;
-#endif
 	struct wifidirect_info	*pwdinfo = &(adapt->wdinfo);
 	struct rx_pkt_attrib	*pattrib = &precv_frame->u.hdr.attrib;
 	u8 wifi_test_chk_rate = 1;
@@ -1396,26 +1389,6 @@ _continue:
 	if (check_fwstate(pmlmepriv, _FW_LINKED) == false &&
 	    check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE | WIFI_AP_STATE | WIFI_MESH_STATE) == false)
 		return _SUCCESS;
-
-
-	/* RTW_INFO("+OnProbeReq\n"); */
-
-
-#ifdef CONFIG_ATMEL_RC_PATCH
-	wps_ie = rtw_get_wps_ie(
-			      pframe + WLAN_HDR_A3_LEN + _PROBEREQ_IE_OFFSET_,
-			      len - WLAN_HDR_A3_LEN - _PROBEREQ_IE_OFFSET_,
-			      NULL, &wps_ielen);
-	if (wps_ie)
-		target_ie = rtw_get_wps_attr_content(wps_ie, wps_ielen, WPS_ATTR_MANUFACTURER, NULL, &target_ielen);
-	if ((target_ie && (target_ielen == 4)) && (true == _rtw_memcmp((void *)target_ie, "Ozmo", 4))) {
-		/* psta->flag_atmel_rc = 1; */
-		unsigned char *sa_addr = get_sa(pframe);
-		printk("%s: Find Ozmo RC -- %02x:%02x:%02x:%02x:%02x:%02x  \n\n",
-		       __func__, *sa_addr, *(sa_addr + 1), *(sa_addr + 2), *(sa_addr + 3), *(sa_addr + 4), *(sa_addr + 5));
-		_rtw_memcpy(pstapriv->atmel_rc_pattern, get_sa(pframe), ETH_ALEN);
-	}
-#endif
 
 #ifdef CONFIG_CONCURRENT_MODE
 	if (((pmlmeinfo->state & 0x03) == WIFI_FW_AP_STATE) &&
@@ -13044,14 +13017,7 @@ operation_by_state:
 		/* still SCAN_PROCESS state */
 		site_survey(adapt, scan_ch, scan_type);
 
-#if defined(CONFIG_ATMEL_RC_PATCH)
-		if (check_fwstate(pmlmepriv, _FW_LINKED) == true)
-			scan_ms = 20;
-		else
-			scan_ms = 40;
-#else
 		scan_ms = ss->scan_ch_ms;
-#endif
 
 #if defined(DBG_SCAN_SW_ANTDIV_BL)
 		if (ss->is_sw_antdiv_bl_scan)

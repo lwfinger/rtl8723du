@@ -286,13 +286,6 @@ void	expire_timeout_chk(struct adapter *adapt)
 
 		plist = get_next(plist);
 
-
-#ifdef CONFIG_ATMEL_RC_PATCH
-		if (_rtw_memcmp((void *)(pstapriv->atmel_rc_pattern), (void *)(psta->cmn.mac_addr), ETH_ALEN) == true)
-			continue;
-		if (psta->flag_atmel_rc)
-			continue;
-#endif
 		if (psta->expire_to > 0) {
 			psta->expire_to--;
 			if (psta->expire_to == 0) {
@@ -305,9 +298,7 @@ void	expire_timeout_chk(struct adapter *adapt)
 
 				_exit_critical_bh(&pstapriv->auth_list_lock, &irqL);
 
-				/* _enter_critical_bh(&(pstapriv->sta_hash_lock), &irqL);	 */
 				rtw_free_stainfo(adapt, psta);
-				/* _exit_critical_bh(&(pstapriv->sta_hash_lock), &irqL);	 */
 
 				_enter_critical_bh(&pstapriv->auth_list_lock, &irqL);
 			}
@@ -328,15 +319,6 @@ void	expire_timeout_chk(struct adapter *adapt)
 	while ((rtw_end_of_queue_search(phead, plist)) == false) {
 		psta = LIST_CONTAINOR(plist, struct sta_info, asoc_list);
 		plist = get_next(plist);
-#ifdef CONFIG_ATMEL_RC_PATCH
-		RTW_INFO("%s:%d  psta=%p, %02x,%02x||%02x,%02x  \n\n", __func__,  __LINE__,
-			psta, pstapriv->atmel_rc_pattern[0], pstapriv->atmel_rc_pattern[5], psta->cmn.mac_addr[0], psta->cmn.mac_addr[5]);
-		if (_rtw_memcmp((void *)pstapriv->atmel_rc_pattern, (void *)(psta->cmn.mac_addr), ETH_ALEN) == true)
-			continue;
-		if (psta->flag_atmel_rc)
-			continue;
-		RTW_INFO("%s: debug line:%d\n", __func__, __LINE__);
-#endif
 		if (chk_sta_is_alive(psta) || !psta->expire_to) {
 			psta->expire_to = pstapriv->expire_to;
 			psta->keep_alive_trycnt = 0;
@@ -420,13 +402,6 @@ void	expire_timeout_chk(struct adapter *adapt)
 			int ret = _FAIL;
 
 			psta = rtw_get_stainfo_by_offset(pstapriv, chk_alive_list[i]);
-
-			#ifdef CONFIG_ATMEL_RC_PATCH
-			if (_rtw_memcmp(pstapriv->atmel_rc_pattern, psta->cmn.mac_addr, ETH_ALEN) == true)
-				continue;
-			if (psta->flag_atmel_rc)
-				continue;
-			#endif
 
 			if (!(psta->state & _FW_LINKED))
 				continue;

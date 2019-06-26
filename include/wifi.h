@@ -11,6 +11,7 @@
 #endif
 #define BIT(x)	(1 << (x))
 
+#define CONFIG_BR_EXT_BRNAME	"br0"
 
 #define WLAN_ETHHDR_LEN		14
 #define WLAN_ETHADDR_LEN	6

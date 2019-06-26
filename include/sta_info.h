@@ -273,9 +273,6 @@ struct sta_info {
 	u8 no_ht_set;
 	u8 ht_20mhz_set;
 	u8 ht_40mhz_intolerant;
-#ifdef CONFIG_ATMEL_RC_PATCH
-	u8 flag_atmel_rc;
-#endif
 	u8 qos_info;
 	u8 max_sp_len;
 	u8 uapsd_bk;/* BIT(0): Delivery enabled, BIT(1): Trigger enabled */
@@ -477,13 +474,9 @@ struct	sta_priv {
 	struct pre_link_sta_ctl_t pre_link_sta_ctl;
 	#endif
 
-#ifdef CONFIG_ATMEL_RC_PATCH
-	u8 atmel_rc_pattern[6];
-#endif
 	struct sta_info *c2h_sta;
 	struct submit_ctx *gotc2h;
 };
-
 
 __inline static u32 wifi_mac_hash(const u8 *mac)
 {

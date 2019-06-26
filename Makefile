@@ -29,9 +29,7 @@ CONFIG_TXPWR_LIMIT_EN = n
 CONFIG_RTW_CHPLAN = 0xFF
 CONFIG_RTW_ADAPTIVITY_EN = disable
 CONFIG_RTW_ADAPTIVITY_MODE = normal
-CONFIG_BR_EXT = y
 CONFIG_RTW_NAPI = y
-CONFIG_RTW_GRO = y
 CONFIG_RTW_WIFI_HAL = y
 ########################## Debug ###########################
 CONFIG_RTW_DEBUG = y
@@ -212,18 +210,8 @@ ifneq ($(CONFIG_WAKEUP_GPIO_IDX), default)
 EXTRA_CFLAGS += -DWAKEUP_GPIO_IDX=$(CONFIG_WAKEUP_GPIO_IDX)
 endif
 
-ifeq ($(CONFIG_BR_EXT), y)
-BR_NAME = br0
-EXTRA_CFLAGS += -DCONFIG_BR_EXT
-EXTRA_CFLAGS += '-DCONFIG_BR_EXT_BRNAME="'$(BR_NAME)'"'
-endif
-
 ifeq ($(CONFIG_RTW_NAPI), y)
 EXTRA_CFLAGS += -DCONFIG_RTW_NAPI
-endif
-
-ifeq ($(CONFIG_RTW_GRO), y)
-EXTRA_CFLAGS += -DCONFIG_RTW_GRO
 endif
 
 ifeq ($(CONFIG_RTW_WIFI_HAL), y)
@@ -373,6 +361,7 @@ clean:
 	cd hal ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
 	cd core ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
 	cd os_dep ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
+	cd platform ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
 	rm -fr Module.symvers ; rm -fr Module.markers ; rm -fr modules.order
 	rm -fr *.mod.c *.mod *.o .*.cmd *.ko *~
 	rm -fr .tmp_versions

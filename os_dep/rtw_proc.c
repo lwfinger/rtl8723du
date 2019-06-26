@@ -2096,10 +2096,8 @@ static int proc_get_napi_info(struct seq_file *m, void *v)
 		weight = RTL_NAPI_WEIGHT;
 	}
 
-#ifdef CONFIG_RTW_GRO
 	if (pregistrypriv->en_gro)
 		gro = 1;
-#endif /* CONFIG_RTW_GRO */
 #endif /* CONFIG_RTW_NAPI */
 
 	if (napi) {

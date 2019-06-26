@@ -143,12 +143,10 @@ inline int _rtw_netif_receive_skb(struct  net_device * ndev, struct sk_buff *skb
 	return netif_receive_skb(skb);
 }
 
-#ifdef CONFIG_RTW_GRO
 inline gro_result_t _rtw_napi_gro_receive(struct napi_struct *napi, struct sk_buff *skb)
 {
 	return napi_gro_receive(napi, skb);
 }
-#endif /* CONFIG_RTW_GRO */
 #endif /* CONFIG_RTW_NAPI */
 
 void _rtw_skb_queue_purge(struct sk_buff_head *list)

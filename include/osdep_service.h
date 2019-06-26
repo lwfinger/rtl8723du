@@ -125,9 +125,7 @@ struct sk_buff *_rtw_skb_clone(struct sk_buff *skb);
 int _rtw_netif_rx(struct  net_device * ndev, struct sk_buff *skb);
 #ifdef CONFIG_RTW_NAPI
 int _rtw_netif_receive_skb(struct  net_device * ndev, struct sk_buff *skb);
-#ifdef CONFIG_RTW_GRO
 gro_result_t _rtw_napi_gro_receive(struct napi_struct *napi, struct sk_buff *skb);
-#endif
 #endif /* CONFIG_RTW_NAPI */
 void _rtw_skb_queue_purge(struct sk_buff_head *list);
 
@@ -167,9 +165,7 @@ void _rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr, dma_a
 #define rtw_netif_rx(ndev, skb) _rtw_netif_rx(ndev, skb)
 #ifdef CONFIG_RTW_NAPI
 #define rtw_netif_receive_skb(ndev, skb) _rtw_netif_receive_skb(ndev, skb)
-#ifdef CONFIG_RTW_GRO
 #define rtw_napi_gro_receive(napi, skb) _rtw_napi_gro_receive(napi, skb)
-#endif
 #endif /* CONFIG_RTW_NAPI */
 #define rtw_skb_queue_purge(sk_buff_head) _rtw_skb_queue_purge(sk_buff_head)
 #define rtw_usb_buffer_alloc(dev, size, dma) _rtw_usb_buffer_alloc((dev), (size), (dma))

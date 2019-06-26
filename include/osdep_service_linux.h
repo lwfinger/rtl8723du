@@ -99,13 +99,6 @@
 	#endif
 #endif
 
-#if defined(CONFIG_RTW_GRO) && (!defined(CONFIG_RTW_NAPI))
-
-	#error "Enable NAPI before enable GRO\n"
-
-#endif
-
-
 #if (KERNEL_VERSION(2, 6, 29) > LINUX_VERSION_CODE && defined(CONFIG_RTW_NAPI))
 
 	#undef CONFIG_RTW_NAPI
@@ -113,10 +106,9 @@
 
 #endif
 
-#if (KERNEL_VERSION(2, 6, 33) > LINUX_VERSION_CODE && defined(CONFIG_RTW_GRO))
+#if (KERNEL_VERSION(2, 6, 33) > LINUX_VERSION_CODE)
 
-	#undef CONFIG_RTW_GRO
-	/*#warning "Linux Kernel version too old to support GRO(should newer than 2.6.33)\n"*/
+	#warning "Linux Kernel version too old to support GRO(should newer than 2.6.33)\n"
 
 #endif
 

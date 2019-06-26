@@ -84,9 +84,7 @@ struct adapter;
 	#include <rtw_mp.h>
 #endif /* CONFIG_MP_INCLUDED */
 
-#ifdef CONFIG_BR_EXT
-	#include <rtw_br_ext.h>
-#endif /* CONFIG_BR_EXT */
+#include <rtw_br_ext.h>
 
 #include <ip.h>
 #include <if_ether.h>
@@ -293,9 +291,7 @@ struct registry_priv {
 #ifdef CONFIG_RTW_NAPI_DYNAMIC
 	u32 napi_threshold;	/* unit: Mbps */
 #endif /* CONFIG_RTW_NAPI_DYNAMIC */
-#ifdef CONFIG_RTW_GRO
 	u8 en_gro;
-#endif /* CONFIG_RTW_GRO */
 #endif /* CONFIG_RTW_NAPI */
 
 	u8 check_hw_status;
@@ -1088,7 +1084,6 @@ struct adapter {
 	IFACE_ID1 is equals to VIRTUAL_ADAPTER*/
 	u8 iface_id;
 
-#ifdef CONFIG_BR_EXT
 	spinlock_t					br_ext_lock;
 	/* unsigned int			macclone_completed; */
 	struct nat25_network_db_entry	*nethash[NAT25_HASH_SIZE];
@@ -1101,7 +1096,6 @@ struct adapter {
 	unsigned char			br_ip[4];
 
 	struct br_ext_info		ethBrExtInfo;
-#endif /* CONFIG_BR_EXT */
 
 #ifdef CONFIG_MAC_LOOPBACK_DRIVER
 	struct loopbackdata * ploopback;
@@ -1242,9 +1236,7 @@ extern int rtw_ht_enable;
 extern int rtw_bw_mode;
 extern int rtw_ampdu_enable;/* for enable tx_ampdu */
 extern int rtw_mc2u_disable;
-#ifdef CONFIG_BR_EXT
 void netdev_br_init(struct net_device *netdev);
-#endif
 extern int ui_pid[3];
 
 #endif /* __DRV_TYPES_H__ */

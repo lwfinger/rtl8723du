@@ -510,12 +510,10 @@ module_param(rtw_en_napi, int, 0644);
 int rtw_napi_threshold = 100; /* unit: Mbps */
 module_param(rtw_napi_threshold, int, 0644);
 #endif /* CONFIG_RTW_NAPI_DYNAMIC */
-#ifdef CONFIG_RTW_GRO
 /*following setting should define GRO in Makefile
 enable gro = 1, disable gro = 0*/
 static int rtw_en_gro = 1;
 module_param(rtw_en_gro, int, 0644);
-#endif /* CONFIG_RTW_GRO */
 #endif /* CONFIG_RTW_NAPI */
 
 #ifdef RTW_IQK_FW_OFFLOAD
@@ -788,13 +786,11 @@ uint loadparam(struct adapter *adapt)
 #ifdef CONFIG_RTW_NAPI_DYNAMIC
 	registry_par->napi_threshold = (u32)rtw_napi_threshold;
 #endif /* CONFIG_RTW_NAPI_DYNAMIC */
-#ifdef CONFIG_RTW_GRO
 	registry_par->en_gro = (u8)rtw_en_gro;
 	if (!registry_par->en_napi && registry_par->en_gro) {
 		registry_par->en_gro = 0;
 		RTW_WARN("Disable GRO because NAPI is not enabled\n");
 	}
-#endif /* CONFIG_RTW_GRO */
 #endif /* CONFIG_RTW_NAPI */
 
 	registry_par->iqk_fw_offload = (u8)rtw_iqk_fw_offload;
@@ -1801,9 +1797,7 @@ u8 rtw_init_drv_sw(struct adapter *adapt)
 	}
 #endif /* CONFIG_INTEL_WIDI */
 
-#ifdef CONFIG_BR_EXT
 	_rtw_spinlock_init(&adapt->br_ext_lock);
-#endif /* CONFIG_BR_EXT */
 
 exit:
 
@@ -1866,9 +1860,7 @@ u8 rtw_free_drv_sw(struct adapter *adapt)
 	/* add for CONFIG_IEEE80211W, none 11w also can use */
 	_rtw_spinlock_free(&adapt->security_key_mutex);
 
-#ifdef CONFIG_BR_EXT
 	_rtw_spinlock_free(&adapt->br_ext_lock);
-#endif /* CONFIG_BR_EXT */
 
 #ifdef CONFIG_INTEL_WIDI
 	rtw_free_intel_widi(adapt);
@@ -2452,7 +2444,6 @@ void rtw_os_ndevs_deinit(struct dvobj_priv *dvobj)
 	rtw_os_ndevs_free(dvobj);
 }
 
-#ifdef CONFIG_BR_EXT
 void netdev_br_init(struct net_device *netdev)
 {
 	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(netdev);
@@ -2499,7 +2490,6 @@ void netdev_br_init(struct net_device *netdev)
 	rcu_read_unlock();
 #endif /* (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 35)) */
 }
-#endif /* CONFIG_BR_EXT */
 
 int _netdev_open(struct net_device *pnetdev)
 {
@@ -2562,9 +2552,7 @@ int _netdev_open(struct net_device *pnetdev)
 	/* rtw_netif_carrier_on(pnetdev); */ /* call this func when rtw_joinbss_event_callback return success */
 	rtw_netif_wake_queue(pnetdev);
 
-#ifdef CONFIG_BR_EXT
 	netdev_br_init(pnetdev);
-#endif /* CONFIG_BR_EXT */
 
 netdev_open_normal_process:
 
@@ -2760,14 +2748,7 @@ static int netdev_close(struct net_device *pnetdev)
 		/* Close LED */
 		rtw_led_control(adapt, LED_CTL_POWER_OFF);
 	}
-
-#ifdef CONFIG_BR_EXT
-	/* if (OPMODE & (WIFI_STATION_STATE | WIFI_ADHOC_STATE)) */
-	{
-		/* void nat25_db_cleanup(struct adapter *priv); */
-		nat25_db_cleanup(adapt);
-	}
-#endif /* CONFIG_BR_EXT */
+	nat25_db_cleanup(adapt);
 
 	if (!rtw_p2p_chk_role(&adapt->wdinfo, P2P_ROLE_DISABLE))
 		rtw_p2p_enable(adapt, P2P_ROLE_DISABLE);

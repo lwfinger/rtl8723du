@@ -266,14 +266,11 @@ static int napi_recv(struct adapter *adapt, int budget)
 
 		rx_ok = false;
 
-#ifdef CONFIG_RTW_GRO
 		if (pregistrypriv->en_gro) {
 			if (rtw_napi_gro_receive(&adapt->napi, pskb) != GRO_DROP)
 				rx_ok = true;
 			goto next;
 		}
-#endif /* CONFIG_RTW_GRO */
-
 		if (rtw_netif_receive_skb(adapt->pnetdev, pskb) == NET_RX_SUCCESS)
 			rx_ok = true;
 
@@ -312,9 +309,7 @@ void rtw_os_recv_indicate_pkt(struct adapter *adapt, struct sk_buff *pkt, union 
 	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 	struct recv_priv *precvpriv = &(adapt->recvpriv);
 	struct registry_priv	*pregistrypriv = &adapt->registrypriv;
-#ifdef CONFIG_BR_EXT
 	void *br_port = NULL;
-#endif
 	int ret;
 
 	/* Indicat the packets to upper layer */
@@ -366,8 +361,6 @@ void rtw_os_recv_indicate_pkt(struct adapter *adapt, struct sk_buff *pkt, union 
 				DBG_COUNTER(adapt->rx_logs.os_indicate_ap_self);
 			}
 		}
-
-#ifdef CONFIG_BR_EXT
 		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_ADHOC_STATE) == true) {
 			/* Insert NAT2.5 RX here! */
 			#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
@@ -388,8 +381,6 @@ void rtw_os_recv_indicate_pkt(struct adapter *adapt, struct sk_buff *pkt, union 
 				}
 			}
 		}
-#endif /* CONFIG_BR_EXT */
-
 		/* After eth_type_trans process , pkt->data pointer will move from ethrnet header to ip header */
 		pkt->protocol = eth_type_trans(pkt, adapt->pnetdev);
 		pkt->dev = adapt->pnetdev;

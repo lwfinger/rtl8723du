@@ -2745,9 +2745,6 @@ void rtw_iface_dynamic_check_timer_handlder(struct adapter *adapter)
 		#endif /*CONFIG_BMC_TX_RATE_SELECT*/
 	}
 
-
-#ifdef CONFIG_BR_EXT
-
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 35))
 	rcu_read_lock();
 #endif /* (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 35)) */
@@ -2771,9 +2768,6 @@ void rtw_iface_dynamic_check_timer_handlder(struct adapter *adapter)
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 35))
 	rcu_read_unlock();
 #endif /* (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 35)) */
-
-#endif /* CONFIG_BR_EXT */
-
 }
 
 /*TP_avg(t) = (1/10) * TP_avg(t-1) + (9/10) * TP(t) MBps*/

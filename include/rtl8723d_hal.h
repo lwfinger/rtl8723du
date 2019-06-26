@@ -154,13 +154,13 @@ struct rt_8723d_firmware_hdr {
 #define EFUSE_BT_MAX_SECTION		(EFUSE_BT_MAP_LEN / 8)
 #define EFUSE_PROTECT_BYTES_BANK	16
 
-typedef enum tag_Package_Definition {
+enum {
 	PACKAGE_DEFAULT,
 	PACKAGE_QFN68,
 	PACKAGE_TFBGA90,
 	PACKAGE_TFBGA80,
 	PACKAGE_TFBGA79
-} PACKAGE_TYPE_E;
+};
 
 #define INCLUDE_MULTI_FUNC_BT(_Adapter) \
 	(GET_HAL_DATA(_Adapter)->MultiFunc & RT_MULTI_FUNC_BT)

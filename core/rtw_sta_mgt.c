@@ -276,9 +276,6 @@ u32	_rtw_init_sta_priv(struct	sta_priv *pstapriv)
 	/* pstapriv->expire_to = 900; */ /* 900*2 = 1800 sec = 30 min, expire after no any traffic. */
 	/* pstapriv->expire_to = 30; */ /* 30*2 = 60 sec = 1 min, expire after no any traffic. */
 	pstapriv->expire_to = 3; /* 3*2 = 6 sec */
-#ifdef CONFIG_ATMEL_RC_PATCH
-	_rtw_memset(pstapriv->atmel_rc_pattern, 0, ETH_ALEN);
-#endif
 	pstapriv->max_num_sta = NUM_STA;
 
 #if CONFIG_RTW_MACADDR_ACL
@@ -549,9 +546,6 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 		psta->cmn.rssi_stat.rssi = (-1);
 		psta->cmn.rssi_stat.rssi_cck = (-1);
 		psta->cmn.rssi_stat.rssi_ofdm = (-1);
-#ifdef CONFIG_ATMEL_RC_PATCH
-		psta->flag_atmel_rc = 0;
-#endif
 		/* init for the sequence number of received management frame */
 		psta->RxMgmtFrameSeqNum = 0xffff;
 
@@ -723,9 +717,6 @@ u32	rtw_free_stainfo(struct adapter *adapt , struct sta_info *psta)
 	_exit_critical_bh(&pstapriv->auth_list_lock, &irqL0);
 
 	psta->expire_to = 0;
-#ifdef CONFIG_ATMEL_RC_PATCH
-	psta->flag_atmel_rc = 0;
-#endif
 	psta->sleepq_ac_len = 0;
 	psta->qos_info = 0;
 

@@ -3908,10 +3908,8 @@ void rtw_disassoc_cmd_callback(struct adapter	*adapt,  struct cmd_obj *pcmd)
 		_exit_critical_bh(&pmlmepriv->lock, &irqL);
 		goto exit;
 	}
-#ifdef CONFIG_BR_EXT
 	else /* clear bridge database */
 		nat25_db_cleanup(adapt);
-#endif /* CONFIG_BR_EXT */
 
 	/* free cmd */
 	rtw_free_cmd_obj(pcmd);

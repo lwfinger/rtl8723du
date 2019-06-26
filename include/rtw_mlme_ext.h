@@ -353,13 +353,8 @@ struct ss_res {
  * 4. Back to channel 1 for 300 milliseconds
  * 5. ... and so on, till survey done.
  */
-#if defined(CONFIG_ATMEL_RC_PATCH)
-	#define RTW_SCAN_NUM_OF_CH 2
-	#define RTW_BACK_OP_CH_MS 200
-#else
-	#define RTW_SCAN_NUM_OF_CH 3
-	#define RTW_BACK_OP_CH_MS 400
-#endif
+#define RTW_SCAN_NUM_OF_CH 3
+#define RTW_BACK_OP_CH_MS 400
 
 #define RTW_IP_ADDR_LEN 4
 #define RTW_IPv6_ADDR_LEN 16

@@ -3203,7 +3203,6 @@ void rtw_init_hwxmits(struct hw_xmit *phwxmit, int entry)
 	}
 }
 
-#ifdef CONFIG_BR_EXT
 static int rtw_br_client_tx(struct adapter *adapt, struct sk_buff **pskb)
 {
 	struct sk_buff *skb = *pskb;
@@ -3356,7 +3355,6 @@ static int rtw_br_client_tx(struct adapter *adapt, struct sk_buff **pskb)
 	}
 	return 0;
 }
-#endif /* CONFIG_BR_EXT */
 
 u32 rtw_get_ff_hwaddr(struct xmit_frame *pxmitframe)
 {
@@ -3565,11 +3563,8 @@ int rtw_xmit(struct adapter *adapt, struct sk_buff **ppkt)
 	unsigned long irqL0;
 	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
 	struct xmit_frame *pxmitframe = NULL;
-#ifdef CONFIG_BR_EXT
 	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
 	void *br_port = NULL;
-#endif /* CONFIG_BR_EXT */
-
 	int res;
 
 	DBG_COUNTER(adapt->tx_logs.core_tx);
@@ -3596,8 +3591,6 @@ int rtw_xmit(struct adapter *adapt, struct sk_buff **ppkt)
 		return -1;
 	}
 
-#ifdef CONFIG_BR_EXT
-
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
 	br_port = adapt->pnetdev->br_port;
 #else   /* (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35)) */
@@ -3614,9 +3607,6 @@ int rtw_xmit(struct adapter *adapt, struct sk_buff **ppkt)
 			return -1;
 		}
 	}
-
-#endif /* CONFIG_BR_EXT */
-
 	res = update_attrib(adapt, *ppkt, &pxmitframe->attrib);
 
 	if (res == _FAIL) {
