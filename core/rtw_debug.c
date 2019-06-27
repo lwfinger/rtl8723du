@@ -543,7 +543,7 @@ int proc_get_rx_stat(struct seq_file *m, void *v)
 		phead = &(pstapriv->sta_hash[i]);
 		plist = get_next(phead);
 		while ((rtw_end_of_queue_search(phead, plist)) == false) {
-			psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
+			psta = container_of(plist, struct sta_info, hash_list);
 			plist = get_next(plist);
 			pstats = &psta->sta_stats;
 
@@ -593,7 +593,7 @@ int proc_get_tx_stat(struct seq_file *m, void *v)
 		phead = &(pstapriv->sta_hash[i]);
 		plist = get_next(phead);
 		while ((rtw_end_of_queue_search(phead, plist)) == false) {
-			psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
+			psta = container_of(plist, struct sta_info, hash_list);
 			plist = get_next(plist);
 			if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6) !=  true)
 				&& (_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6) != true)
@@ -1113,7 +1113,7 @@ int proc_get_survey_info(struct seq_file *m, void *v)
 		if (rtw_end_of_queue_search(phead, plist) == true)
 			break;
 
-		pnetwork = LIST_CONTAINOR(plist, struct wlan_network, list);
+		pnetwork = container_of(plist, struct wlan_network, list);
 		if (!pnetwork)
 			break;
 
@@ -2881,7 +2881,7 @@ int proc_get_all_sta_info(struct seq_file *m, void *v)
 		plist = get_next(phead);
 
 		while ((rtw_end_of_queue_search(phead, plist)) == false) {
-			psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
+			psta = container_of(plist, struct sta_info, hash_list);
 
 			plist = get_next(plist);
 
@@ -3287,7 +3287,7 @@ ssize_t proc_set_tx_sa_query(struct file *file, const char __user *buffer, size_
 			plist = get_next(phead);
 
 			while ((rtw_end_of_queue_search(phead, plist)) == false) {
-				psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
+				psta = container_of(plist, struct sta_info, hash_list);
 				plist = get_next(plist);
 				_rtw_memcpy(&mac_addr[psta->cmn.mac_id][0], psta->cmn.mac_addr, ETH_ALEN);
 			}
@@ -3375,7 +3375,7 @@ ssize_t proc_set_tx_deauth(struct file *file, const char __user *buffer, size_t 
 			plist = get_next(phead);
 
 			while ((rtw_end_of_queue_search(phead, plist)) == false) {
-				psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
+				psta = container_of(plist, struct sta_info, hash_list);
 				plist = get_next(plist);
 				_rtw_memcpy(&mac_addr[psta->cmn.mac_id][0], psta->cmn.mac_addr, ETH_ALEN);
 			}

@@ -33,7 +33,7 @@ inline void rtw_st_ctl_clear_tracker_q(struct st_ctl_t *st_ctl)
 	phead = &st_ctl->tracker_q.queue;
 	plist = get_next(phead);
 	while (rtw_end_of_queue_search(phead, plist) == false) {
-		st = LIST_CONTAINOR(plist, struct session_tracker, list);
+		st = container_of(plist, struct session_tracker, list);
 		plist = get_next(plist);
 		rtw_list_delete(&st->list);
 		rtw_mfree((u8 *)st, sizeof(struct session_tracker));
@@ -170,7 +170,7 @@ void dump_st_ctl(void *sel, struct st_ctl_t *st_ctl)
 	phead = &st_ctl->tracker_q.queue;
 	plist = get_next(phead);
 	while (rtw_end_of_queue_search(phead, plist) == false) {
-		st = LIST_CONTAINOR(plist, struct session_tracker, list);
+		st = container_of(plist, struct session_tracker, list);
 		plist = get_next(plist);
 
 		RTW_PRINT_SEL(sel, SESSION_TRACKER_FMT"\n", SESSION_TRACKER_ARG(st));
@@ -369,7 +369,7 @@ void rtw_mfree_all_stainfo(struct sta_priv *pstapriv)
 	plist = get_next(phead);
 
 	while ((rtw_end_of_queue_search(phead, plist)) == false) {
-		psta = LIST_CONTAINOR(plist, struct sta_info , list);
+		psta = container_of(plist, struct sta_info , list);
 		plist = get_next(plist);
 
 		rtw_mfree_stainfo(psta);
@@ -414,7 +414,7 @@ u32	_rtw_free_sta_priv(struct	sta_priv *pstapriv)
 
 			while ((rtw_end_of_queue_search(phead, plist)) == false) {
 				int i;
-				psta = LIST_CONTAINOR(plist, struct sta_info , hash_list);
+				psta = container_of(plist, struct sta_info , hash_list);
 				plist = get_next(plist);
 
 				for (i = 0; i < 16 ; i++) {
@@ -480,7 +480,7 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 	if (_rtw_queue_empty(pfree_sta_queue) == true) {
 		psta = NULL;
 	} else {
-		psta = LIST_CONTAINOR(get_next(&pfree_sta_queue->queue), struct sta_info, list);
+		psta = container_of(get_next(&pfree_sta_queue->queue), struct sta_info, list);
 
 		rtw_list_delete(&(psta->list));
 
@@ -688,7 +688,7 @@ u32	rtw_free_stainfo(struct adapter *adapt , struct sta_info *psta)
 		plist = get_next(phead);
 
 		while (!rtw_is_list_empty(phead)) {
-			prframe = LIST_CONTAINOR(plist, union recv_frame, u);
+			prframe = container_of(plist, union recv_frame, u.list);
 
 			plist = get_next(plist);
 
@@ -782,7 +782,7 @@ void rtw_free_all_stainfo(struct adapter *adapt)
 		plist = get_next(phead);
 
 		while ((rtw_end_of_queue_search(phead, plist)) == false) {
-			psta = LIST_CONTAINOR(plist, struct sta_info , hash_list);
+			psta = container_of(plist, struct sta_info , hash_list);
 
 			plist = get_next(plist);
 
@@ -845,7 +845,7 @@ struct sta_info *rtw_get_stainfo(struct sta_priv *pstapriv, const u8 *hwaddr)
 
 	while ((rtw_end_of_queue_search(phead, plist)) == false) {
 
-		psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
+		psta = container_of(plist, struct sta_info, hash_list);
 
 		if ((_rtw_memcmp(psta->cmn.mac_addr, addr, ETH_ALEN)) == true) {
 			/* if found the matched address */
@@ -972,7 +972,7 @@ u8 rtw_access_ctrl(struct adapter *adapter, u8 *mac_addr)
 	head = get_list_head(acl_node_q);
 	list = get_next(head);
 	while (rtw_end_of_queue_search(head, list) == false) {
-		acl_node = LIST_CONTAINOR(list, struct rtw_wlan_acl_node, list);
+		acl_node = container_of(list, struct rtw_wlan_acl_node, list);
 		list = get_next(list);
 
 		if (_rtw_memcmp(acl_node->addr, mac_addr, ETH_ALEN)) {

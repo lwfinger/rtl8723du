@@ -324,7 +324,7 @@ struct	wlan_network *_rtw_alloc_network(struct	mlme_priv *pmlmepriv) /* (struct 
 	}
 	plist = get_next(&(free_queue->queue));
 
-	pnetwork = LIST_CONTAINOR(plist , struct wlan_network, list);
+	pnetwork = container_of(plist , struct wlan_network, list);
 
 	rtw_list_delete(&pnetwork->list);
 
@@ -436,7 +436,7 @@ struct wlan_network *_rtw_find_network(struct __queue *scanned_queue, u8 *addr)
 	plist = get_next(phead);
 
 	while (plist != phead) {
-		pnetwork = LIST_CONTAINOR(plist, struct wlan_network , list);
+		pnetwork = container_of(plist, struct wlan_network , list);
 
 		if (_rtw_memcmp(addr, pnetwork->network.MacAddress, ETH_ALEN) == true)
 			break;
@@ -474,7 +474,7 @@ void _rtw_free_network_queue(struct adapter *adapt, u8 isfreeall)
 
 	while (rtw_end_of_queue_search(phead, plist) == false) {
 
-		pnetwork = LIST_CONTAINOR(plist, struct wlan_network, list);
+		pnetwork = container_of(plist, struct wlan_network, list);
 
 		plist = get_next(plist);
 
@@ -691,7 +691,7 @@ struct wlan_network *_rtw_find_same_network(struct __queue *scanned_queue, struc
 	plist = get_next(phead);
 
 	while (plist != phead) {
-		found = LIST_CONTAINOR(plist, struct wlan_network , list);
+		found = container_of(plist, struct wlan_network , list);
 
 		if (is_same_network(&network->network, &found->network, 0))
 			break;
@@ -737,7 +737,7 @@ struct	wlan_network	*rtw_get_oldest_wlan_network(struct __queue *scanned_queue)
 		if (rtw_end_of_queue_search(phead, plist) == true)
 			break;
 
-		pwlan = LIST_CONTAINOR(plist, struct wlan_network, list);
+		pwlan = container_of(plist, struct wlan_network, list);
 
 		if (pwlan->fixed != true) {
 			if (!oldest || time_after(oldest->last_scanned, pwlan->last_scanned))
@@ -856,7 +856,7 @@ bool rtw_update_scanned_network(struct adapter *adapter, struct wlan_bssid_ex *t
 		if (rtw_end_of_queue_search(phead, plist) == true)
 			break;
 
-		pnetwork = LIST_CONTAINOR(plist, struct wlan_network, list);
+		pnetwork = container_of(plist, struct wlan_network, list);
 
 		rtw_bug_check(pnetwork, pnetwork, pnetwork, pnetwork);
 
@@ -3018,7 +3018,7 @@ int rtw_select_roaming_candidate(struct mlme_priv *mlme)
 
 	while (!rtw_end_of_queue_search(phead, mlme->pscanned)) {
 
-		pnetwork = LIST_CONTAINOR(mlme->pscanned, struct wlan_network, list);
+		pnetwork = container_of(mlme->pscanned, struct wlan_network, list);
 		if (!pnetwork) {
 			ret = _FAIL;
 			goto exit;
@@ -3148,7 +3148,7 @@ int rtw_select_and_join_from_scanned_queue(struct mlme_priv *pmlmepriv)
 
 	while (!rtw_end_of_queue_search(phead, pmlmepriv->pscanned)) {
 
-		pnetwork = LIST_CONTAINOR(pmlmepriv->pscanned, struct wlan_network, list);
+		pnetwork = container_of(pmlmepriv->pscanned, struct wlan_network, list);
 		if (!pnetwork) {
 			ret = _FAIL;
 			goto exit;

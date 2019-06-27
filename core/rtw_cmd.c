@@ -245,7 +245,7 @@ struct	cmd_obj	*_rtw_dequeue_cmd(struct __queue *queue)
 	if (rtw_is_list_empty(&(queue->queue)))
 		obj = NULL;
 	else {
-		obj = LIST_CONTAINOR(get_next(&(queue->queue)), struct cmd_obj, list);
+		obj = container_of(get_next(&(queue->queue)), struct cmd_obj, list);
 
 		rtw_list_delete(&obj->list);
 	}
@@ -614,7 +614,7 @@ struct evt_obj *rtw_dequeue_evt(_queue *queue)
 	if (rtw_is_list_empty(&(queue->queue)))
 		pevtobj = NULL;
 	else {
-		pevtobj = LIST_CONTAINOR(get_next(&(queue->queue)), struct evt_obj, list);
+		pevtobj = container_of(get_next(&(queue->queue)), struct evt_obj, list);
 		rtw_list_delete(&pevtobj->list);
 	}
 
@@ -3443,7 +3443,7 @@ static void session_tracker_chk_for_sta(struct adapter *adapter, struct sta_info
 	plist = get_next(phead);
 	pnext = get_next(plist);
 	while (rtw_end_of_queue_search(phead, plist) == false) {
-		st = LIST_CONTAINOR(plist, struct session_tracker, list);
+		st = container_of(plist, struct session_tracker, list);
 		plist = pnext;
 		pnext = get_next(pnext);
 
@@ -3473,7 +3473,7 @@ static void session_tracker_chk_for_sta(struct adapter *adapter, struct sta_info
 
 	plist = get_next(&dlist);
 	while (rtw_end_of_queue_search(&dlist, plist) == false) {
-		st = LIST_CONTAINOR(plist, struct session_tracker, list);
+		st = container_of(plist, struct session_tracker, list);
 		plist = get_next(plist);
 		rtw_mfree((u8 *)st, sizeof(struct session_tracker));
 	}
@@ -3504,7 +3504,7 @@ static void session_tracker_chk_for_adapter(struct adapter *adapter)
 		plist = get_next(phead);
 
 		while ((rtw_end_of_queue_search(phead, plist)) == false) {
-			sta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
+			sta = container_of(plist, struct sta_info, hash_list);
 			plist = get_next(plist);
 
 			session_tracker_chk_for_sta(adapter, sta);
@@ -3560,7 +3560,7 @@ static void session_tracker_cmd_hdl(struct adapter *adapter, struct st_cmd_parm 
 		phead = &st_ctl->tracker_q.queue;
 		plist = get_next(phead);
 		while (rtw_end_of_queue_search(phead, plist) == false) {
-			st = LIST_CONTAINOR(plist, struct session_tracker, list);
+			st = container_of(plist, struct session_tracker, list);
 
 			if (st->local_naddr == local_naddr
 				&& st->local_port == local_port

@@ -873,7 +873,7 @@ void _dump_regd_exc_list(void *sel, struct rf_ctl_t *rfctl)
 	while ((rtw_end_of_queue_search(head, cur)) == false) {
 		u8 has_country;
 
-		ent = LIST_CONTAINOR(cur, struct regd_exc_ent, list);
+		ent = container_of(cur, struct regd_exc_ent, list);
 		cur = get_next(cur);
 		has_country = (ent->country[0] == '\0' && ent->country[1] == '\0') ? 0 : 1;
 
@@ -946,7 +946,7 @@ struct regd_exc_ent *_rtw_regd_exc_search(struct rf_ctl_t *rfctl, const char *co
 	while ((rtw_end_of_queue_search(head, cur)) == false) {
 		u8 has_country;
 
-		ent = LIST_CONTAINOR(cur, struct regd_exc_ent, list);
+		ent = container_of(cur, struct regd_exc_ent, list);
 		cur = get_next(cur);
 		has_country = (ent->country[0] == '\0' && ent->country[1] == '\0') ? 0 : 1;
 
@@ -1002,7 +1002,7 @@ void rtw_regd_exc_list_free(struct rf_ctl_t *rfctl)
 	cur = get_next(head);
 
 	while ((rtw_end_of_queue_search(head, cur)) == false) {
-		ent = LIST_CONTAINOR(cur, struct regd_exc_ent, list);
+		ent = container_of(cur, struct regd_exc_ent, list);
 		cur = get_next(cur);
 		rtw_list_delete(&ent->list);
 		rtw_mfree((u8 *)ent, sizeof(struct regd_exc_ent) + strlen(ent->regd_name) + 1);
@@ -1125,7 +1125,7 @@ void dump_txpwr_lmt(void *sel, struct adapter *adapter)
 					head = &rfctl->txpwr_lmt_list;
 					cur = get_next(head);
 					while ((rtw_end_of_queue_search(head, cur)) == false) {
-						ent = LIST_CONTAINOR(cur, struct txpwr_lmt_ent, list);
+						ent = container_of(cur, struct txpwr_lmt_ent, list);
 						cur = get_next(cur);
 
 						sprintf(fmt, "%%%zus%%s ", strlen(ent->regd_name) < 4 ? 5 - strlen(ent->regd_name) : 1);
@@ -1148,7 +1148,7 @@ void dump_txpwr_lmt(void *sel, struct adapter *adapter)
 						head = &rfctl->txpwr_lmt_list;
 						cur = get_next(head);
 						while ((rtw_end_of_queue_search(head, cur)) == false) {
-							ent = LIST_CONTAINOR(cur, struct txpwr_lmt_ent, list);
+							ent = container_of(cur, struct txpwr_lmt_ent, list);
 							cur = get_next(cur);
 							_RTW_PRINT_SEL(sel, "%3c "
 								, strcmp(ent->regd_name, rfctl->regd_name) == 0 ? rf_path_char(path) : ' ');
@@ -1178,7 +1178,7 @@ void dump_txpwr_lmt(void *sel, struct adapter *adapter)
 						head = &rfctl->txpwr_lmt_list;
 						cur = get_next(head);
 						while ((rtw_end_of_queue_search(head, cur)) == false) {
-							ent = LIST_CONTAINOR(cur, struct txpwr_lmt_ent, list);
+							ent = container_of(cur, struct txpwr_lmt_ent, list);
 							cur = get_next(cur);
 							lmt = phy_get_txpwr_lmt_abs(adapter, ent->regd_name, band, bw, tlrs, ntx_idx, ch, 0);
 							if (lmt == MAX_POWER_INDEX) {
@@ -1234,7 +1234,7 @@ void dump_txpwr_lmt(void *sel, struct adapter *adapter)
 							cur = get_next(head);
 							i = 0;
 							while ((rtw_end_of_queue_search(head, cur)) == false) {
-								ent = LIST_CONTAINOR(cur, struct txpwr_lmt_ent, list);
+								ent = container_of(cur, struct txpwr_lmt_ent, list);
 								cur = get_next(cur);
 								lmt_offset = phy_get_txpwr_lmt(adapter, ent->regd_name, band, bw, path, rs, ntx_idx, ch, 0);
 								if (lmt_offset == MAX_POWER_INDEX) {
@@ -1305,7 +1305,7 @@ void rtw_txpwr_lmt_add_with_nlen(struct rf_ctl_t *rfctl, const char *regd_name, 
 	head = &rfctl->txpwr_lmt_list;
 	cur = get_next(head);
 	while ((rtw_end_of_queue_search(head, cur)) == false) {
-		ent = LIST_CONTAINOR(cur, struct txpwr_lmt_ent, list);
+		ent = container_of(cur, struct txpwr_lmt_ent, list);
 		cur = get_next(cur);
 
 		if (strlen(ent->regd_name) == nlen
@@ -1372,7 +1372,7 @@ struct txpwr_lmt_ent *_rtw_txpwr_lmt_get_by_name(struct rf_ctl_t *rfctl, const c
 	cur = get_next(head);
 
 	while ((rtw_end_of_queue_search(head, cur)) == false) {
-		ent = LIST_CONTAINOR(cur, struct txpwr_lmt_ent, list);
+		ent = container_of(cur, struct txpwr_lmt_ent, list);
 		cur = get_next(cur);
 
 		if (strcmp(ent->regd_name, regd_name) == 0) {
@@ -1410,7 +1410,7 @@ void rtw_txpwr_lmt_list_free(struct rf_ctl_t *rfctl)
 	cur = get_next(head);
 
 	while ((rtw_end_of_queue_search(head, cur)) == false) {
-		ent = LIST_CONTAINOR(cur, struct txpwr_lmt_ent, list);
+		ent = container_of(cur, struct txpwr_lmt_ent, list);
 		cur = get_next(cur);
 		if (ent->regd_name == rfctl->regd_name)
 			rfctl->regd_name = regd_str(TXPWR_LMT_NONE);

@@ -2216,7 +2216,7 @@ s8 phy_get_txpwr_lmt_abs(
 		head = &rfctl->txpwr_lmt_list;
 		cur = get_next(head);
 		while ((rtw_end_of_queue_search(head, cur)) == false) {
-			ent = LIST_CONTAINOR(cur, struct txpwr_lmt_ent, list);
+			ent = container_of(cur, struct txpwr_lmt_ent, list);
 			cur = get_next(cur);
 			if (ent->lmt_2g[bw][tlrs][ch_idx][ntx_idx] != -MAX_POWER_INDEX)
 				lmt = rtw_min(lmt, ent->lmt_2g[bw][tlrs][ch_idx][ntx_idx]);
@@ -2390,7 +2390,7 @@ static void phy_txpwr_lmt_cck_ofdm_mt_chk(struct adapter *adapter)
 	cur = get_next(head);
 
 	while ((rtw_end_of_queue_search(head, cur)) == false) {
-		ent = LIST_CONTAINOR(cur, struct txpwr_lmt_ent, list);
+		ent = container_of(cur, struct txpwr_lmt_ent, list);
 		cur = get_next(cur);
 
 		/* check 2G CCK, OFDM state*/

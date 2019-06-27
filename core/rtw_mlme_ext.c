@@ -2987,7 +2987,7 @@ u16 rtw_rx_ampdu_apply(struct adapter *adapter)
 		while ((rtw_end_of_queue_search(phead, plist)) == false) {
 			int stainfo_offset;
 
-			sta = LIST_CONTAINOR(plist, struct sta_info, asoc_list);
+			sta = container_of(plist, struct sta_info, asoc_list);
 			plist = get_next(plist);
 
 			stainfo_offset = rtw_stainfo_offset(pstapriv, sta);
@@ -9319,7 +9319,7 @@ void issue_action_BSSCoexistPacket(struct adapter *adapt)
 			if (rtw_end_of_queue_search(phead, plist) == true)
 				break;
 
-			pnetwork = LIST_CONTAINOR(plist, struct wlan_network, list);
+			pnetwork = container_of(plist, struct wlan_network, list);
 
 			plist = get_next(plist);
 
@@ -11259,7 +11259,7 @@ bypass_active_keep_alive:
 			phead = &(pstapriv->sta_hash[i]);
 			plist = get_next(phead);
 			while ((rtw_end_of_queue_search(phead, plist)) == false) {
-				psta = LIST_CONTAINOR(plist, struct sta_info, hash_list);
+				psta = container_of(plist, struct sta_info, hash_list);
 				plist = get_next(plist);
 
 				if (is_broadcast_mac_addr(psta->cmn.mac_addr))
@@ -11281,7 +11281,7 @@ bypass_active_keep_alive:
 
 		plist = get_next(&dlist);
 		while (rtw_end_of_queue_search(&dlist, plist) == false) {
-			psta = LIST_CONTAINOR(plist, struct sta_info, list);
+			psta = container_of(plist, struct sta_info, list);
 			plist = get_next(plist);
 			rtw_list_delete(&psta->list);
 			RTW_INFO(FUNC_ADPT_FMT" ibss expire "MAC_FMT"\n"
@@ -13639,7 +13639,7 @@ u8 chk_bmc_sleepq_hdl(struct adapter *adapt, unsigned char *pbuf)
 		xmitframe_plist = get_next(xmitframe_phead);
 
 		while ((rtw_end_of_queue_search(xmitframe_phead, xmitframe_plist)) == false) {
-			pxmitframe = LIST_CONTAINOR(xmitframe_plist, struct xmit_frame, list);
+			pxmitframe = container_of(xmitframe_plist, struct xmit_frame, list);
 
 			xmitframe_plist = get_next(xmitframe_plist);
 
