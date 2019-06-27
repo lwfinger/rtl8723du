@@ -10858,21 +10858,8 @@ static void rtw_mlmeext_disconnect(struct adapter *adapt)
 
 	_cancel_timer_ex(&pmlmeext->link_timer);
 
-	/* pmlmepriv->LinkDetectInfo.TrafficBusyState = false; */
 	pmlmepriv->LinkDetectInfo.TrafficTransitionCount = 0;
 	pmlmepriv->LinkDetectInfo.LowPowerTransitionCount = 0;
-
-#ifdef CONFIG_WMMPS_STA
-	 if (check_fwstate(pmlmepriv, WIFI_STATION_STATE)) {
-		/* reset currently related uapsd setting when the connection has broken */
-		pmlmepriv->qospriv.uapsd_max_sp_len = 0;
-		pmlmepriv->qospriv.uapsd_tid = 0;
-		pmlmepriv->qospriv.uapsd_tid_delivery_enabled = 0;
-		pmlmepriv->qospriv.uapsd_tid_trigger_enabled = 0;
-		pmlmepriv->qospriv.uapsd_ap_supported = 0;
-	}
-#endif /* CONFIG_WMMPS_STA */
-
 }
 
 void mlmeext_joinbss_event_callback(struct adapter *adapt, int join_res)

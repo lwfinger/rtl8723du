@@ -49,15 +49,6 @@ MODULE_PARM_DESC(rtw_lps_level, "The default LPS level");
 */
 static int rtw_smart_ps = 2;
 
-#ifdef CONFIG_WMMPS_STA	
-/* WMMPS: 
- * rtw_smart_ps = 0 => Only for fw test
- * rtw_smart_ps = 1 => Refer to Beacon's TIM Bitmap
- * rtw_smart_ps = 2 => Don't refer to Beacon's TIM Bitmap
-*/
-int rtw_wmm_smart_ps = 2;
-#endif /* CONFIG_WMMPS_STA */
-
 static int rtw_check_fw_ps = 1;
 
 static int rtw_usb_rxagg_mode = 2;/* RX_AGG_DMA=1, RX_AGG_USB=2 */
@@ -92,14 +83,6 @@ static int rtw_software_decrypt = 0;
 static int rtw_acm_method = 0;/* 0:By SW 1:By HW. */
 
 static int rtw_wmm_enable = 1;/* default is set to enable the wmm. */
-
-#ifdef CONFIG_WMMPS_STA
-/* uapsd (unscheduled automatic power-save delivery) = a kind of wmmps */
-/* 0: NO_LIMIT, 1: TWO_MSDU, 2: FOUR_MSDU, 3: SIX_MSDU */
-int rtw_uapsd_max_sp = NO_LIMIT;
-/* BIT0: AC_VO UAPSD, BIT1: AC_VI UAPSD, BIT2: AC_BK UAPSD, BIT3: AC_BE UAPSD */
-int rtw_uapsd_ac_enable = 0x0;
-#endif /* CONFIG_WMMPS_STA */
 
 static int rtw_pwrtrim_enable = 0; /* Default Enalbe  power trim by efuse config */
 
@@ -281,11 +264,6 @@ module_param(rtw_network_mode, int, 0644);
 module_param(rtw_channel, int, 0644);
 module_param(rtw_mp_mode, int, 0644);
 module_param(rtw_wmm_enable, int, 0644);
-#ifdef CONFIG_WMMPS_STA
-module_param(rtw_uapsd_max_sp, int, 0644);
-module_param(rtw_uapsd_ac_enable, int, 0644);
-module_param(rtw_wmm_smart_ps, int, 0644);
-#endif /* CONFIG_WMMPS_STA */
 module_param(rtw_vrtl_carrier_sense, int, 0644);
 module_param(rtw_vcs_type, int, 0644);
 module_param(rtw_busy_thresh, int, 0644);
@@ -635,13 +613,6 @@ uint loadparam(struct adapter *adapt)
 
 	/* WMM */
 	registry_par->wmm_enable = (u8)rtw_wmm_enable;
-
-#ifdef CONFIG_WMMPS_STA
-	/* UAPSD */
-	registry_par->uapsd_max_sp_len= (u8)rtw_uapsd_max_sp;
-	registry_par->uapsd_ac_enable = (u8)rtw_uapsd_ac_enable;
-	registry_par->wmm_smart_ps = (u8)rtw_wmm_smart_ps;
-#endif /* CONFIG_WMMPS_STA */
 
 	registry_par->RegPwrTrimEnable = (u8)rtw_pwrtrim_enable;
 

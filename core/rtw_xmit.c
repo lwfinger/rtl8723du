@@ -803,38 +803,6 @@ static void update_attrib_vcs_info(struct adapter *adapt, struct xmit_frame *pxm
 
 }
 
-#ifdef CONFIG_WMMPS_STA
-/*
- * update_attrib_trigger_frame_info
- * For Station mode, if a specific TID of driver setting and an AP support uapsd function, the data 
- * frame with corresponding TID will be a trigger frame when driver is in wmm power saving mode.
- * 
- * Arguments:
- * @adapt: struct adapter pointer.
- * @pattrib: pkt_attrib pointer.
- *
- * Auther: Arvin Liu
- * Date: 2017/06/05
- */
-static void update_attrib_trigger_frame_info(struct adapter *adapt, struct pkt_attrib *pattrib) {
-	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
-	struct pwrctrl_priv 	*pwrpriv = adapter_to_pwrctl(adapt); 
-	struct qos_priv 	*pqospriv = &pmlmepriv->qospriv;
-	u8 trigger_frame_en = 0;
-
-	if (check_fwstate(pmlmepriv, WIFI_STATION_STATE) == true) {
-		if ((pwrpriv->pwr_mode == PS_MODE_MIN) || (pwrpriv->pwr_mode == PS_MODE_MAX)) {
-			if((pqospriv->uapsd_ap_supported) && ((pqospriv->uapsd_tid & BIT(pattrib->priority)) == true)) {
-				trigger_frame_en = 1;
-				RTW_INFO("[WMMPS]"FUNC_ADPT_FMT": This is a Trigger Frame\n", FUNC_ADPT_ARG(adapt));
-			}
-		}
-	}
-
-	pattrib->trigger_frame = trigger_frame_en;
-}
-#endif /* CONFIG_WMMPS_STA */
-
 static void update_attrib_phy_info(struct adapter *adapt, struct pkt_attrib *pattrib, struct sta_info *psta)
 {
 	struct mlme_ext_priv *mlmeext = &adapt->mlmeextpriv;
@@ -1256,18 +1224,10 @@ static int update_attrib(struct adapter *adapt, struct sk_buff *pkt, struct pkt_
 				pattrib->priority = qos_acm(pmlmepriv->acm_mask, pattrib->priority);
 		}
 	}
-
-#ifdef CONFIG_WMMPS_STA
-	update_attrib_trigger_frame_info(adapt, pattrib);
-#endif /* CONFIG_WMMPS_STA */	
-
-	/* pattrib->priority = 5; */ /* force to used VI queue, for testing */
 	pattrib->hw_ssn_sel = pxmitpriv->hw_ssn_seq_no;
 	rtw_set_tx_chksum_offload(pkt, pattrib);
 
 exit:
-
-
 	return res;
 }
 

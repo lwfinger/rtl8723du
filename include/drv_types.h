@@ -131,9 +131,6 @@ struct registry_priv {
 	u8	ips_mode;
 	u8	lps_level;
 	u8	smart_ps;
-#ifdef CONFIG_WMMPS_STA
-	u8	wmm_smart_ps;
-#endif /* CONFIG_WMMPS_STA */
 	u8   usb_rxagg_mode;
 	u8	dynamic_agg_enable;
 	u8	long_retry_lmt;
@@ -147,13 +144,6 @@ struct registry_priv {
 	u8	acm_method;
 	/* WMM */
 	u8	wmm_enable;
-#ifdef CONFIG_WMMPS_STA
-	/* uapsd (unscheduled automatic power-save delivery) = a kind of wmmps */
-	u8	uapsd_max_sp_len;
-	/* BIT0: AC_VO UAPSD, BIT1: AC_VI UAPSD, BIT2: AC_BK UAPSD, BIT3: AC_BE UAPSD */
-	u8	uapsd_ac_enable;
-#endif /* CONFIG_WMMPS_STA */
-
 	struct wlan_bssid_ex    dev_network;
 
 	u8 tx_bw_mode;

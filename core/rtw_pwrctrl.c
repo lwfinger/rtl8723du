@@ -618,10 +618,6 @@ void rtw_set_ps_mode(struct adapter * adapt, u8 ps_mode, u8 smart_ps, u8 bcn_ant
 			pwrpriv->smart_ps = smart_ps;
 			pwrpriv->bcn_ant_mode = bcn_ant_mode;
 
-#ifdef CONFIG_WMMPS_STA	
-			pwrpriv->wmm_smart_ps = pregistrypriv->wmm_smart_ps;
-#endif /* CONFIG_WMMPS_STA */
-			
 			rtw_hal_set_hwreg(adapt, HW_VAR_H2C_FW_PWRMODE, (u8 *)(&ps_mode));
 
 			/* Set CTWindow after LPS */
@@ -727,12 +723,6 @@ void LPS_Enter(struct adapter * adapt, const char *msg)
 		/* Idle for a while if we connect to AP a while ago. */
 		if (pwrpriv->LpsIdleCount >= 2) { /* 4 Sec */
 			if (pwrpriv->pwr_mode == PS_MODE_ACTIVE) {
-
-#ifdef CONFIG_WMMPS_STA
-				if (rtw_is_wmmps_mode(adapt))
-					msg = "WMMPS_IDLE";
-#endif /* CONFIG_WMMPS_STA */
-				
 				sprintf(buf, "WIFI-%s", msg);
 				pwrpriv->bpower_saving = true;
 				
@@ -769,12 +759,6 @@ void LPS_Leave(struct adapter * adapt, const char *msg)
 
 	if (pwrpriv->bLeisurePs) {
 		if (pwrpriv->pwr_mode != PS_MODE_ACTIVE) {
-
-#ifdef CONFIG_WMMPS_STA
-			if (rtw_is_wmmps_mode(adapt))
-				msg = "WMMPS_BUSY";
-#endif /* CONFIG_WMMPS_STA */
-			
 			sprintf(buf, "WIFI-%s", msg);
 			rtw_set_ps_mode(adapt, PS_MODE_ACTIVE, 0, 0, buf);
 

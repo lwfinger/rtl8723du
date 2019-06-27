@@ -3792,18 +3792,6 @@ static void hw_var_set_correct_tsf(struct adapter *adapter)
 #endif /*CONFIG_MI_WITH_MBSSID_CAM*/
 }
 
-#ifdef CONFIG_WMMPS_STA
-void rtw_hal_update_uapsd_tid(struct adapter *adapter)
-{
-	struct mlme_priv		*pmlmepriv = &adapter->mlmepriv;
-	struct qos_priv		*pqospriv = &pmlmepriv->qospriv;
-
-	/* write complement of pqospriv->uapsd_tid to mac register 0x693 because 
-	    it's designed  for "0" represents "enable" and "1" represents "disable" */
-	rtw_write8(adapter, REG_WMMPS_UAPSD_TID, (u8)(~pqospriv->uapsd_tid));
-}
-#endif /* CONFIG_WMMPS_STA */
-
 #if defined(CONFIG_FW_MULTI_PORT_SUPPORT)
 /* For multi-port support, driver needs to inform the port ID to FW for btc operations */
 int rtw_hal_set_wifi_port_id_cmd(struct adapter *adapter)
@@ -3958,11 +3946,6 @@ u8 SetHwReg(struct adapter *adapter, u8 variable, u8 *val)
 		hal_data->bMacPwrCtrlOn = *val;
 		RTW_INFO("%s: bMacPwrCtrlOn=%d\n", __func__, hal_data->bMacPwrCtrlOn);
 		break;
-#ifdef CONFIG_WMMPS_STA
-	case  HW_VAR_UAPSD_TID:
-		rtw_hal_update_uapsd_tid(adapter);
-		break;
-#endif /* CONFIG_WMMPS_STA */
 	case HW_VAR_ENABLE_RX_BAR:
 		if (*val == true) {
 			/* enable RX BAR */

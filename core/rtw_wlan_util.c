@@ -1382,10 +1382,6 @@ void WMMOnAssocRsp(struct adapter *adapt)
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	struct xmit_priv		*pxmitpriv = &adapt->xmitpriv;
 	struct registry_priv	*pregpriv = &adapt->registrypriv;
-#ifdef CONFIG_WMMPS_STA
-	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
-	struct qos_priv	*pqospriv = &pmlmepriv->qospriv;
-#endif /* CONFIG_WMMPS_STA */	
 
 	acm_mask = 0;
 
@@ -1511,14 +1507,6 @@ void WMMOnAssocRsp(struct adapter *adapt)
 			pxmitpriv->wmm_para_seq[i] = inx[i];
 			RTW_INFO("wmm_para_seq(%d): %d\n", i, pxmitpriv->wmm_para_seq[i]);
 		}
-		
-#ifdef CONFIG_WMMPS_STA
-		/* if AP supports UAPSD function, driver must set each uapsd TID to coresponding mac register 0x693 */
-		if (pmlmeinfo->WMM_param.QoS_info & AP_SUPPORTED_UAPSD) {
-			pqospriv->uapsd_ap_supported = 1;
-			rtw_hal_set_hwreg(adapt, HW_VAR_UAPSD_TID, NULL);
-		}
-#endif /* CONFIG_WMMPS_STA */
 	}
 }
 

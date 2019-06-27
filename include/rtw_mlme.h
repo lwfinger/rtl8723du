@@ -1067,10 +1067,6 @@ void rtw_scan_abort(struct adapter *adapter);
 u32 rtw_join_abort_timeout(struct adapter *adapter, u32 timeout_ms);
 
 extern int rtw_restruct_sec_ie(struct adapter *adapter, u8 *out_ie);
-#ifdef CONFIG_WMMPS_STA
-void rtw_uapsd_use_default_setting(struct adapter *adapt);
-bool rtw_is_wmmps_mode(struct adapter *adapt);
-#endif /* CONFIG_WMMPS_STA */
 extern int rtw_restruct_wmm_ie(struct adapter *adapter, u8 *in_ie, u8 *out_ie, uint in_len, uint initial_out_len);
 extern void rtw_init_registrypriv_dev_network(struct adapter *adapter);
 

@@ -204,10 +204,6 @@ struct pwrctrl_priv {
 	u8	bcn_ant_mode;
 	u8	dtim;
 
-#ifdef CONFIG_WMMPS_STA
-	u8 wmm_smart_ps;
-#endif /* CONFIG_WMMPS_STA */	
-
 	u32	alives;
 	_workitem cpwm_event;
 	_workitem dma_event; /*for handle un-synchronized tx dma*/

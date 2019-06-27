@@ -3319,108 +3319,9 @@ exit:
 
 }
 
-#ifdef CONFIG_WMMPS_STA
-/*
- * rtw_uapsd_use_default_setting
- * This function is used for setting default uapsd max sp length to uapsd_max_sp_len
- * in qos_priv data structure from registry. In additional, it will also map default uapsd 
- * ac to each uapsd TID, delivery-enabled and trigger-enabled of corresponding TID. 
- * 
- * Arguments:
- * @adapt: struct adapter pointer.
- *
- * Auther: Arvin Liu
- * Date: 2017/05/03
- */
-void	rtw_uapsd_use_default_setting(struct adapter *adapt)
-{
-	struct mlme_priv		*pmlmepriv = &adapt->mlmepriv;
-	struct qos_priv		*pqospriv = &pmlmepriv->qospriv;
-	struct registry_priv		*pregistrypriv = &adapt->registrypriv;
-
-	if (pregistrypriv->uapsd_ac_enable != 0) {
-		pqospriv->uapsd_max_sp_len = pregistrypriv->uapsd_max_sp_len;
-		
-		CLEAR_FLAGS(pqospriv->uapsd_tid);
-		CLEAR_FLAGS(pqospriv->uapsd_tid_delivery_enabled);
-		CLEAR_FLAGS(pqospriv->uapsd_tid_trigger_enabled);
-
-		/* check the uapsd setting of AC_VO from registry then map these setting to each TID if necessary  */
-		if(TEST_FLAG(pregistrypriv->uapsd_ac_enable, DRV_CFG_UAPSD_VO)) {
-			SET_FLAG(pqospriv->uapsd_tid, WMM_TID7);
-			SET_FLAG(pqospriv->uapsd_tid_delivery_enabled, WMM_TID7);
-			SET_FLAG(pqospriv->uapsd_tid_trigger_enabled, WMM_TID7);
-			SET_FLAG(pqospriv->uapsd_tid, WMM_TID6);
-			SET_FLAG(pqospriv->uapsd_tid_delivery_enabled, WMM_TID6);
-			SET_FLAG(pqospriv->uapsd_tid_trigger_enabled, WMM_TID6);
-		}
-
-		/* check the uapsd setting of AC_VI from registry then map these setting to each TID if necessary  */
-		if(TEST_FLAG(pregistrypriv->uapsd_ac_enable, DRV_CFG_UAPSD_VI)) {	
-			SET_FLAG(pqospriv->uapsd_tid, WMM_TID5);
-			SET_FLAG(pqospriv->uapsd_tid_delivery_enabled, WMM_TID5);
-			SET_FLAG(pqospriv->uapsd_tid_trigger_enabled, WMM_TID5);
-			SET_FLAG(pqospriv->uapsd_tid, WMM_TID4);
-			SET_FLAG(pqospriv->uapsd_tid_delivery_enabled, WMM_TID4);
-			SET_FLAG(pqospriv->uapsd_tid_trigger_enabled, WMM_TID4);
-		}
-
-		/* check the uapsd setting of AC_BK from registry then map these setting to each TID if necessary  */
-		if(TEST_FLAG(pregistrypriv->uapsd_ac_enable, DRV_CFG_UAPSD_BK)) {
-			SET_FLAG(pqospriv->uapsd_tid, WMM_TID2);
-			SET_FLAG(pqospriv->uapsd_tid_delivery_enabled, WMM_TID2);
-			SET_FLAG(pqospriv->uapsd_tid_trigger_enabled, WMM_TID2);
-			SET_FLAG(pqospriv->uapsd_tid, WMM_TID1);
-			SET_FLAG(pqospriv->uapsd_tid_delivery_enabled, WMM_TID1);
-			SET_FLAG(pqospriv->uapsd_tid_trigger_enabled, WMM_TID1);
-		}
-
-		/* check the uapsd setting of AC_BE from registry then map these setting to each TID if necessary  */
-		if(TEST_FLAG(pregistrypriv->uapsd_ac_enable, DRV_CFG_UAPSD_BE)) {
-			SET_FLAG(pqospriv->uapsd_tid, WMM_TID3);
-			SET_FLAG(pqospriv->uapsd_tid_delivery_enabled, WMM_TID3);
-			SET_FLAG(pqospriv->uapsd_tid_trigger_enabled, WMM_TID3);
-			SET_FLAG(pqospriv->uapsd_tid, WMM_TID0);
-			SET_FLAG(pqospriv->uapsd_tid_delivery_enabled, WMM_TID0);
-			SET_FLAG(pqospriv->uapsd_tid_trigger_enabled, WMM_TID0);
-		}
-
-		RTW_INFO("[WMMPS] UAPSD MAX SP Len = 0x%02x, UAPSD TID enabled = 0x%02x\n", 
-			pqospriv->uapsd_max_sp_len, (u8)pqospriv->uapsd_tid);
-	}
-
-}
-
-/*
- * rtw_is_wmmps_mode
- * This function is used for checking whether Driver and an AP support uapsd function or not.
- * If both of them support uapsd function, it will return true. Otherwise returns false.
- * 
- * Arguments:
- * @adapt: struct adapter pointer.
- *
- * Auther: Arvin Liu
- * Date: 2017/06/12
- */
-bool rtw_is_wmmps_mode(struct adapter *adapt) 
-{
-	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
-	struct qos_priv	*pqospriv = &pmlmepriv->qospriv;
-		
-	if ((pqospriv->uapsd_ap_supported) && ((pqospriv->uapsd_tid & BIT_MASK_TID_TC)  != 0))
-		return true;
-
-	return false;
-}
-#endif /* CONFIG_WMMPS_STA */
-
 /* adjust IEs for rtw_joinbss_cmd in WMM */
 int rtw_restruct_wmm_ie(struct adapter *adapter, u8 *in_ie, u8 *out_ie, uint in_len, uint initial_out_len)
 {
-#ifdef CONFIG_WMMPS_STA
-	struct mlme_priv		*pmlmepriv = &adapter->mlmepriv;
-	struct qos_priv		*pqospriv = &pmlmepriv->qospriv;
-#endif /* CONFIG_WMMPS_STA */
 	unsigned	int ielength = 0;
 	unsigned int i, j;
 	u8 qos_info = 0;
@@ -3439,41 +3340,7 @@ int rtw_restruct_wmm_ie(struct adapter *adapter, u8 *in_ie, u8 *out_ie, uint in_
 			}
 			out_ie[initial_out_len + 1] = 0x07;
 			out_ie[initial_out_len + 6] = 0x00;
-
-#ifdef CONFIG_WMMPS_STA
-			switch(pqospriv->uapsd_max_sp_len) {
-				case NO_LIMIT: 
-					/* do nothing */
-					break;
-				case TWO_MSDU: 
-					SET_FLAG(qos_info, BIT5);
-					break;
-				case FOUR_MSDU: 
-					SET_FLAG(qos_info, BIT6);
-					break;	
-				case SIX_MSDU: 
-					SET_FLAG(qos_info, BIT5);
-					SET_FLAG(qos_info, BIT6);
-					break;
-				default:
-					/* do nothing */
-					break;
-			};
-
-			/* check TID7 and TID6 for AC_VO to set corresponding Qos_info bit in WMM IE  */
-			if((TEST_FLAG(pqospriv->uapsd_tid, WMM_TID7)) && (TEST_FLAG(pqospriv->uapsd_tid, WMM_TID6)))
-				SET_FLAG(qos_info, WMM_IE_UAPSD_VO);
-			/* check TID5 and TID4 for AC_VI to set corresponding Qos_info bit in WMM IE  */
-			if((TEST_FLAG(pqospriv->uapsd_tid, WMM_TID5)) && (TEST_FLAG(pqospriv->uapsd_tid, WMM_TID4)))
-				SET_FLAG(qos_info, WMM_IE_UAPSD_VI);
-			/* check TID2 and TID1 for AC_BK to set corresponding Qos_info bit in WMM IE  */
-			if((TEST_FLAG(pqospriv->uapsd_tid, WMM_TID2)) && (TEST_FLAG(pqospriv->uapsd_tid, WMM_TID1)))
-				SET_FLAG(qos_info, WMM_IE_UAPSD_BK);
-			/* check TID3 and TID0 for AC_BE to set corresponding Qos_info bit in WMM IE  */
-			if((TEST_FLAG(pqospriv->uapsd_tid, WMM_TID3)) && (TEST_FLAG(pqospriv->uapsd_tid, WMM_TID0)))
-				SET_FLAG(qos_info, WMM_IE_UAPSD_BE);
-#endif /* CONFIG_WMMPS_STA */
-			
+		
 			out_ie[initial_out_len + 8] = qos_info;
 
 			break;
@@ -3481,11 +3348,8 @@ int rtw_restruct_wmm_ie(struct adapter *adapter, u8 *in_ie, u8 *out_ie, uint in_
 
 		i += (in_ie[i + 1] + 2); /* to the next IE element */
 	}
-
 	return ielength;
-
 }
-
 
 /*
  * Ported from 8185: IsInPreAuthKeyList(). (Renamed from SecIsInPreAuthKeyList(), 2006-10-13.)

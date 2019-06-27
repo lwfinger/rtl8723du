@@ -1255,9 +1255,6 @@ u8 rtw_joinbss_cmd(struct adapter  *adapt, struct wlan_network *pnetwork)
 	pqospriv->qos_option = 0;
 
 	if (pregistrypriv->wmm_enable) {
-#ifdef CONFIG_WMMPS_STA	
-		rtw_uapsd_use_default_setting(adapt);
-#endif /* CONFIG_WMMPS_STA */		
 		tmp_len = rtw_restruct_wmm_ie(adapt, &pnetwork->network.IEs[0], &psecnetwork->IEs[0], pnetwork->network.IELength, psecnetwork->IELength);
 
 		if (psecnetwork->IELength != tmp_len) {

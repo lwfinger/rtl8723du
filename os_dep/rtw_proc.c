@@ -2339,9 +2339,6 @@ static const struct rtw_proc_hdl adapter_proc_hdls[] = {
 	RTW_PROC_HDL_SSEQ("kfree_bb_gain", proc_get_kfree_bb_gain, proc_set_kfree_bb_gain),
 	RTW_PROC_HDL_SSEQ("kfree_thermal", proc_get_kfree_thermal, proc_set_kfree_thermal),
 	RTW_PROC_HDL_SSEQ("ps_info", proc_get_ps_info, NULL),
-#ifdef CONFIG_WMMPS_STA
-	RTW_PROC_HDL_SSEQ("wmmps_info", proc_get_wmmps_info, proc_set_wmmps_info),
-#endif /* CONFIG_WMMPS_STA */	
 	RTW_PROC_HDL_SSEQ("monitor", proc_get_monitor, proc_set_monitor),
 	RTW_PROC_HDL_SSEQ("efuse_map", proc_get_efuse_map, NULL),
 #ifdef CONFIG_IEEE80211W
