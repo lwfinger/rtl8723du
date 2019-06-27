@@ -86,12 +86,6 @@ static int rtw_ack_policy = NORMAL_ACK;
 
 static int rtw_mp_mode = 0;
 
-#if defined(CONFIG_MP_INCLUDED)
-static uint rtw_mp_customer_str = 0;
-module_param(rtw_mp_customer_str, uint, 0644);
-MODULE_PARM_DESC(rtw_mp_customer_str, "Whether or not to enable customer str support on MP mode");
-#endif
-
 static int rtw_software_encrypt = 0;
 static int rtw_software_decrypt = 0;
 
@@ -338,12 +332,6 @@ MODULE_PARM_DESC(rtw_fw_file_path, "The path of fw image");
 char *rtw_fw_wow_file_path = "/system/etc/firmware/rtlwifi/FW_WoWLAN.BIN";
 module_param(rtw_fw_wow_file_path, charp, 0644);
 MODULE_PARM_DESC(rtw_fw_wow_file_path, "The path of fw for Wake on Wireless image");
-
-#ifdef CONFIG_MP_INCLUDED
-char *rtw_fw_mp_bt_file_path = "";
-module_param(rtw_fw_mp_bt_file_path, charp, 0644);
-MODULE_PARM_DESC(rtw_fw_mp_bt_file_path, "The path of fw for MP-BT image");
-#endif /* CONFIG_MP_INCLUDED */
 #endif /* CONFIG_FILE_FWIMG */
 
 module_param(rtw_mc2u_disable, int, 0644);
@@ -638,9 +626,6 @@ uint loadparam(struct adapter *adapt)
 	/* registry_par->qos_enable = (u8)rtw_qos_enable; */
 	registry_par->ack_policy = (u8)rtw_ack_policy;
 	registry_par->mp_mode = (u8)rtw_mp_mode;
-#if defined(CONFIG_MP_INCLUDED)
-	registry_par->mp_customer_str = (u8)rtw_mp_customer_str;
-#endif
 	registry_par->software_encrypt = (u8)rtw_software_encrypt;
 	registry_par->software_decrypt = (u8)rtw_software_decrypt;
 
@@ -1780,11 +1765,6 @@ u8 rtw_init_drv_sw(struct adapter *adapt)
 	rtw_init_pwrctrl_priv(adapt);
 
 	/* _rtw_memset((u8 *)&adapt->qospriv, 0, sizeof (struct qos_priv)); */ /* move to mlme_priv */
-
-#ifdef CONFIG_MP_INCLUDED
-	if (init_mp_priv(adapt) == _FAIL)
-		RTW_INFO("%s: initialize MP private data Fail!\n", __func__);
-#endif
 
 	rtw_hal_dm_init(adapt);
 	rtw_hal_sw_led_init(adapt);

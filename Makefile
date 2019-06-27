@@ -21,7 +21,6 @@ CONFIG_RTL8723D = y
 ######################### Interface ###########################
 CONFIG_USB_HCI = y
 ########################## Features ###########################
-CONFIG_MP_INCLUDED = y
 CONFIG_EFUSE_CONFIG_FILE = y
 CONFIG_LOAD_PHY_PARA_FROM_FILE = y
 CONFIG_TXPWR_BY_RATE_EN = y
@@ -67,10 +66,6 @@ _OS_INTFS_FILES :=	os_dep/osdep_service.o \
 			os_dep/rtw_android.o \
 			os_dep/rtw_proc.o
 
-ifeq ($(CONFIG_MP_INCLUDED), y)
-_OS_INTFS_FILES += os_dep/ioctl_mp.o
-endif
-
 _HAL_INTFS_FILES :=	hal/hal_intf.o \
 			hal/hal_com.o \
 			hal/hal_com_phycfg.o \
@@ -78,9 +73,8 @@ _HAL_INTFS_FILES :=	hal/hal_intf.o \
 			hal/hal_dm.o \
 			hal/hal_btcoex_wifionly.o \
 			hal/hal_btcoex.o \
-			hal/hal_mp.o \
-			hal/hal_$(HCI_NAME).o \
-			hal/hal_$(HCI_NAME)_led.o
+			hal/hal_usb.o \
+			hal/hal_usb_led.o
 
 
 EXTRA_CFLAGS += -I$(src)/platform
@@ -127,11 +121,6 @@ _BTC_FILES += hal/halbtc8723d1ant.o \
 endif
 
 ########### END OF PATH  #################################
-
-ifeq ($(CONFIG_MP_INCLUDED), y)
-#MODULE_NAME := $(MODULE_NAME)_mp
-EXTRA_CFLAGS += -DCONFIG_MP_INCLUDED
-endif
 
 ifeq ($(CONFIG_INTEL_WIDI), y)
 EXTRA_CFLAGS += -DCONFIG_INTEL_WIDI
@@ -289,8 +278,6 @@ $(MODULE_NAME)-y += $(_HAL_INTFS_FILES)
 $(MODULE_NAME)-y += $(_PHYDM_FILES)
 $(MODULE_NAME)-y += $(_BTC_FILES)
 $(MODULE_NAME)-y += $(_PLATFORM_FILES)
-
-$(MODULE_NAME)-$(CONFIG_MP_INCLUDED) += core/rtw_mp.o
 
 obj-$(CONFIG_RTL8723DU) := $(MODULE_NAME).o
 

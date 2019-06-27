@@ -40,12 +40,7 @@
 /*
  * Auto Configure Section
  */
-#ifdef CONFIG_MP_INCLUDED
-	#define MP_DRIVER	1
-	#define CONFIG_MP_IWPRIV_SUPPORT
-#else /* !CONFIG_MP_INCLUDED */
-	#define MP_DRIVER	0
-#endif /* !CONFIG_MP_INCLUDED */
+#define MP_DRIVER	0
 
 /*
  * Debug Related Configure

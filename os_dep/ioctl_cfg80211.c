@@ -2358,14 +2358,6 @@ static int cfg80211_rtw_scan(struct wiphy *wiphy
 	RTW_INFO(FUNC_ADPT_FMT"%s\n", FUNC_ADPT_ARG(adapt)
 		, wdev == wiphy_to_pd_wdev(wiphy) ? " PD" : "");
 
-#ifdef CONFIG_MP_INCLUDED
-	if (rtw_mp_mode_check(adapt)) {
-		RTW_INFO("MP mode block Scan request\n");
-		ret = -EPERM;
-		goto exit;
-	}
-#endif
-
 	if (adapter_wdev_data(adapt)->block_scan == true) {
 		RTW_INFO(FUNC_ADPT_FMT" wdev_priv.block_scan is set\n", FUNC_ADPT_ARG(adapt));
 		need_indicate_scan_done = true;
@@ -4857,14 +4849,6 @@ static int cfg80211_rtw_remain_on_channel(struct wiphy *wiphy,
 		err = -EFAULT;
 		goto exit;
 	}
-
-#ifdef CONFIG_MP_INCLUDED
-	if (rtw_mp_mode_check(adapt)) {
-		RTW_INFO("MP mode block remain_on_channel request\n");
-		err = -EFAULT;
-		goto exit;
-	}
-#endif
 
 	if (_FAIL == rtw_pwr_wakeup(adapt)) {
 		err = -EFAULT;

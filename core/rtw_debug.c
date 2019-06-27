@@ -1168,13 +1168,6 @@ ssize_t proc_set_survey_info(struct file *file, const char __user *buffer, size_
 
 	if (count < 1)
 		return -EFAULT;
-
-#ifdef CONFIG_MP_INCLUDED
-	if (rtw_mp_mode_check(adapt)) {
-		RTW_INFO("MP mode block Scan request\n");
-		goto exit;
-	}
-#endif
 	if (rtw_is_scan_deny(adapt)) {
 		RTW_INFO(FUNC_ADPT_FMT  ": scan deny\n", FUNC_ADPT_ARG(adapt));
 		goto exit;
@@ -2115,30 +2108,8 @@ int proc_get_rx_signal(struct seq_file *m, void *v)
 	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
 
 	RTW_PRINT_SEL(m, "rssi:%d\n", adapt->recvpriv.rssi);
-	/* RTW_PRINT_SEL(m, "rxpwdb:%d\n", adapt->recvpriv.rxpwdb); */
 	RTW_PRINT_SEL(m, "signal_strength:%u\n", adapt->recvpriv.signal_strength);
 	RTW_PRINT_SEL(m, "signal_qual:%u\n", adapt->recvpriv.signal_qual);
-#ifdef CONFIG_MP_INCLUDED
-	if (adapt->registrypriv.mp_mode == 1) {
-		if (adapt->mppriv.antenna_rx == ANTENNA_A)
-			RTW_PRINT_SEL(m, "Antenna: A\n");
-		else if (adapt->mppriv.antenna_rx == ANTENNA_B)
-			RTW_PRINT_SEL(m, "Antenna: B\n");
-		else if (adapt->mppriv.antenna_rx == ANTENNA_C)
-			RTW_PRINT_SEL(m, "Antenna: C\n");
-		else if (adapt->mppriv.antenna_rx == ANTENNA_D)
-			RTW_PRINT_SEL(m, "Antenna: D\n");
-		else if (adapt->mppriv.antenna_rx == ANTENNA_AB)
-			RTW_PRINT_SEL(m, "Antenna: AB\n");
-		else if (adapt->mppriv.antenna_rx == ANTENNA_BC)
-			RTW_PRINT_SEL(m, "Antenna: BC\n");
-		else if (adapt->mppriv.antenna_rx == ANTENNA_CD)
-			RTW_PRINT_SEL(m, "Antenna: CD\n");
-		else
-			RTW_PRINT_SEL(m, "Antenna: __\n");
-		return 0;
-	}
-#endif
 	return 0;
 }
 

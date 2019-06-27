@@ -470,18 +470,10 @@ void	rtw_hal_set_chnl_bw(struct adapter *adapt, u8 channel, enum channel_width B
 
 	if (rtw_phydm_is_iqk_in_progress(adapt))
 		RTW_ERR("%s, %d, IQK may race condition\n", __func__, __LINE__);
-
-#ifdef CONFIG_MP_INCLUDED
-	/* MP mode channel don't use secondary channel */
-	if (rtw_mp_mode_check(adapt) == false)
-#endif
-	{
-		if (cch_80 != 0)
-			cch_40 = rtw_get_scch_by_cch_offset(cch_80, CHANNEL_WIDTH_80, Offset80);
-		if (cch_40 != 0)
-			cch_20 = rtw_get_scch_by_cch_offset(cch_40, CHANNEL_WIDTH_40, Offset40);
-	}
-
+	if (cch_80 != 0)
+		cch_40 = rtw_get_scch_by_cch_offset(cch_80, CHANNEL_WIDTH_80, Offset80);
+	if (cch_40 != 0)
+		cch_20 = rtw_get_scch_by_cch_offset(cch_40, CHANNEL_WIDTH_40, Offset40);
 	pHalData->cch_80 = cch_80;
 	pHalData->cch_40 = cch_40;
 	pHalData->cch_20 = cch_20;

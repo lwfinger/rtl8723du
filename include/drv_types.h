@@ -80,10 +80,6 @@ struct adapter;
 
 #include <rtw_p2p.h>
 
-#ifdef CONFIG_MP_INCLUDED
-	#include <rtw_mp.h>
-#endif /* CONFIG_MP_INCLUDED */
-
 #include <rtw_br_ext.h>
 
 #include <ip.h>
@@ -145,9 +141,6 @@ struct registry_priv {
 	u16	busy_thresh;
 	u8	ack_policy;
 	u8	mp_mode;
-#if defined(CONFIG_MP_INCLUDED)
-	u8 mp_customer_str;
-#endif
 	u8  mp_dm;
 	u8	software_encrypt;
 	u8	software_decrypt;
@@ -984,10 +977,6 @@ struct adapter {
 #ifdef CONFIG_RTW_NAPI
 	struct	napi_struct napi;
 	u8	napi_state;
-#endif
-
-#ifdef CONFIG_MP_INCLUDED
-	struct	mp_priv	mppriv;
 #endif
 
 	struct	hostapd_priv	*phostapdpriv;

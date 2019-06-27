@@ -880,11 +880,7 @@ static u32 rtl8723du_hal_init(struct adapter * adapt)
 	rtw_write16(adapt, REG_TX_RPT_TIME, 0xCdf0);
 	rtw_write8(adapt, REG_EARLY_MODE_CONTROL_8723D, 0);
 
-	if (adapt->registrypriv.mp_mode == 0
-		#if defined(CONFIG_MP_INCLUDED)
-		|| adapt->registrypriv.mp_customer_str
-		#endif
-	) {
+	if (adapt->registrypriv.mp_mode == 0) {
 		status = rtl8723d_FirmwareDownload(adapt, false);
 		if (status != _SUCCESS) {
 			pHalData->bFWReady = false;
@@ -1463,11 +1459,6 @@ static u32 rtl8723du_hal_deinit(struct adapter * adapt)
 
 	rtw_write32(adapt, REG_HISR0_8723D, 0xFFFFFFFF);
 	rtw_write32(adapt, REG_HISR1_8723D, 0xFFFFFFFF);
-#ifdef CONFIG_MP_INCLUDED
-	if (adapt->registrypriv.mp_mode == 1)
-		MPT_DeInitAdapter(adapt);
-#endif
-
 #ifdef SUPPORT_HW_RFOFF_DETECTED
 	RTW_INFO("%s: bkeepfwalive(%x)\n", __func__, pwrctl->bkeepfwalive);
 

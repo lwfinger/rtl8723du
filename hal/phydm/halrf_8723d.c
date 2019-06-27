@@ -220,11 +220,6 @@ odm_tx_pwr_track_set_pwr_8723d(
 	u8 i = 0;
 
 if (*(p_dm->p_mp_mode) == true) {
-#ifdef CONFIG_MP_INCLUDED
-		struct mpt_context * p_mpt_ctx = &(adapter->mppriv.mpt_ctx);
-
-		tx_rate = mpt_to_mgnt_rate(p_mpt_ctx->mpt_rate_index);
-#endif
 	} else {
 		u16 rate	 = *(p_dm->p_forced_data_rate);
 
@@ -555,11 +550,6 @@ get_delta_swing_table_8723d(
 	u8 channel		 = *p_dm->p_channel;
 
 	if (*(p_dm->p_mp_mode) == true) {
-#ifdef CONFIG_MP_INCLUDED
-		struct mpt_context * p_mpt_ctx = &(adapter->mppriv.mpt_ctx);
-
-		tx_rate = mpt_to_mgnt_rate(p_mpt_ctx->mpt_rate_index);
-#endif
 	} else {
 		u16 rate	 = *(p_dm->p_forced_data_rate);
 

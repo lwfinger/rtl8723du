@@ -170,9 +170,6 @@ enum {
 #ifdef CONFIG_FILE_FWIMG
 	extern char *rtw_fw_file_path;
 	extern char *rtw_fw_wow_file_path;
-	#ifdef CONFIG_MP_INCLUDED
-		extern char *rtw_fw_mp_bt_file_path;
-	#endif /* CONFIG_MP_INCLUDED */
 #endif /* CONFIG_FILE_FWIMG */
 
 /* rtl8723d_hal_init.c */
@@ -240,9 +237,6 @@ void rtl8723d_stop_thread(struct adapter *adapt);
 	void rtl8723ds_hal_check_bt_hang(struct adapter *adapter);
 #endif
 
-#ifdef CONFIG_MP_INCLUDED
-int FirmwareDownloadBT(struct adapter * Adapter, struct rt_mp_firmware *pFirmware);
-#endif
 void CCX_FwC2HTxRpt_8723d(struct adapter * adapt, u8 *pdata, u8 len);
 
 u8 MRateToHwRate8723D(u8 rate);

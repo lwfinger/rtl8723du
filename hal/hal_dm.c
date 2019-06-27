@@ -271,22 +271,12 @@ void Init_ODM_ComInfo(struct adapter *adapter)
 	odm_cmn_info_hook(pDM_Odm, ODM_CMNINFO_HUBUSBMODE, &(dvobj->usb_speed));
 
 	/*halrf info hook*/
-#ifdef CONFIG_MP_INCLUDED
-	halrf_cmn_info_hook(pDM_Odm, HALRF_CMNINFO_CON_TX, &(adapter->mppriv.mpt_ctx.is_start_cont_tx));
-	halrf_cmn_info_hook(pDM_Odm, HALRF_CMNINFO_SINGLE_TONE, &(adapter->mppriv.mpt_ctx.is_single_tone));
-	halrf_cmn_info_hook(pDM_Odm, HALRF_CMNINFO_CARRIER_SUPPRESSION, &(adapter->mppriv.mpt_ctx.is_carrier_suppression));
-	halrf_cmn_info_hook(pDM_Odm, HALRF_CMNINFO_MP_RATE_INDEX, &(adapter->mppriv.mpt_ctx.mpt_rate_index));
-#endif/*CONFIG_MP_INCLUDED*/
 	for (i = 0; i < ODM_ASSOCIATE_ENTRY_NUM; i++)
 		odm_cmn_info_ptr_array_hook(pDM_Odm, ODM_CMNINFO_STA_STATUS, i, NULL);
 
 	phydm_init_debug_setting(pDM_Odm);
 	rtw_phydm_ops_func_init(pDM_Odm);
-	/* TODO */
-	/* odm_cmn_info_hook(pDM_Odm, ODM_CMNINFO_BT_OPERATION, false); */
-	/* odm_cmn_info_hook(pDM_Odm, ODM_CMNINFO_BT_DISABLE_EDCA, false); */
 }
-
 
 static u32 edca_setting_UL[HT_IOT_PEER_MAX] =
 /*UNKNOWN, REALTEK_90, REALTEK_92SE, BROADCOM,*/

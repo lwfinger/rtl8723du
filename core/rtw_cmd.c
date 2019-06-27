@@ -1019,28 +1019,15 @@ exit:
 
 void rtw_getbbrfreg_cmdrsp_callback(struct adapter	*adapt,  struct cmd_obj *pcmd)
 {
-
 	/* rtw_free_cmd_obj(pcmd); */
 	rtw_mfree((unsigned char *) pcmd->parmbuf, pcmd->cmdsz);
 	rtw_mfree((unsigned char *) pcmd, sizeof(struct cmd_obj));
-
-#ifdef CONFIG_MP_INCLUDED
-	if (adapt->registrypriv.mp_mode == 1)
-		adapt->mppriv.workparam.bcompleted = true;
-#endif
 }
 
 void rtw_readtssi_cmdrsp_callback(struct adapter	*adapt,  struct cmd_obj *pcmd)
 {
-
 	rtw_mfree((unsigned char *) pcmd->parmbuf, pcmd->cmdsz);
 	rtw_mfree((unsigned char *) pcmd, sizeof(struct cmd_obj));
-
-#ifdef CONFIG_MP_INCLUDED
-	if (adapt->registrypriv.mp_mode == 1)
-		adapt->mppriv.workparam.bcompleted = true;
-#endif
-
 }
 
 static u8 rtw_createbss_cmd(struct adapter  *adapter, int flags, bool adhoc
@@ -3160,136 +3147,6 @@ exit:
 	return res;
 }
 
-#ifdef CONFIG_MP_INCLUDED
-static int rtw_mp_cmd_hdl(struct adapter *adapt, u8 mp_cmd_id)
-{
-	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
-	int ret = H2C_SUCCESS;
-	uint status = _SUCCESS;
-	u8 rfreg0;
-
-	if (mp_cmd_id == MP_START) {
-		if (adapt->registrypriv.mp_mode == 0) {
-			rtw_intf_stop(adapt);
-			rtw_hal_deinit(adapt);
-			adapt->registrypriv.mp_mode = 1;
-			if (!IS_HARDWARE_TYPE_8814A(adapt) && !IS_HARDWARE_TYPE_8822B(adapt)) {
-				adapt->registrypriv.RegPwrTrimEnable = 1;
-				rtw_hal_read_chip_info(adapt);
-			}
-			rtw_reset_drv_sw(adapt);
-			status = rtw_hal_init(adapt);
-			if (status == _FAIL) {
-				ret = H2C_REJECTED;
-				goto exit;
-			}
-			rtw_intf_start(adapt);
-		}
-
-		if (adapt->registrypriv.mp_mode == 0) {
-			ret = H2C_REJECTED;
-			goto exit;
-		}
-
-		if (adapt->mppriv.mode == MP_OFF) {
-			if (mp_start_test(adapt) == _FAIL) {
-				ret = H2C_REJECTED;
-				goto exit;
-			}
-			adapt->mppriv.mode = MP_ON;
-			MPT_PwrCtlDM(adapt, 0);
-		}
-		adapt->mppriv.bmac_filter = false;
-		odm_write_dig(&pHalData->odmpriv, 0x20);
-
-	} else if (mp_cmd_id == MP_STOP) {
-		if (adapt->registrypriv.mp_mode == 1) {
-			MPT_DeInitAdapter(adapt);
-			rtw_intf_stop(adapt);
-			rtw_hal_deinit(adapt);
-			adapt->registrypriv.mp_mode = 0;
-			rtw_reset_drv_sw(adapt);
-			status = rtw_hal_init(adapt);
-			if (status == _FAIL) {
-				ret = H2C_REJECTED;
-				goto exit;
-			}
-			rtw_intf_start(adapt);
-		}
-
-		if (adapt->mppriv.mode != MP_OFF) {
-			mp_stop_test(adapt);
-			adapt->mppriv.mode = MP_OFF;
-		}
-
-	} else {
-		RTW_INFO(FUNC_ADPT_FMT"invalid id:%d\n", FUNC_ADPT_ARG(adapt), mp_cmd_id);
-		ret = H2C_PARAMETERS_ERROR;
-		rtw_warn_on(1);
-	}
-
-exit:
-	return ret;
-}
-
-u8 rtw_mp_cmd(struct adapter *adapter, u8 mp_cmd_id, u8 flags)
-{
-	struct cmd_obj *cmdobj;
-	struct drvextra_cmd_parm *parm;
-	struct cmd_priv *pcmdpriv = &adapter->cmdpriv;
-	struct submit_ctx sctx;
-	u8	res = _SUCCESS;
-
-	parm = (struct drvextra_cmd_parm *)rtw_zmalloc(sizeof(struct drvextra_cmd_parm));
-	if (parm == NULL) {
-		res = _FAIL;
-		goto exit;
-	}
-
-	parm->ec_id = MP_CMD_WK_CID;
-	parm->type = mp_cmd_id;
-	parm->size = 0;
-	parm->pbuf = NULL;
-
-	if (flags & RTW_CMDF_DIRECTLY) {
-		/* no need to enqueue, do the cmd hdl directly and free cmd parameter */
-		if (H2C_SUCCESS != rtw_mp_cmd_hdl(adapter, mp_cmd_id))
-			res = _FAIL;
-		rtw_mfree((u8 *)parm, sizeof(*parm));
-	} else {
-		/* need enqueue, prepare cmd_obj and enqueue */
-		cmdobj = (struct cmd_obj *)rtw_zmalloc(sizeof(*cmdobj));
-		if (cmdobj == NULL) {
-			res = _FAIL;
-			rtw_mfree((u8 *)parm, sizeof(*parm));
-			goto exit;
-		}
-
-		init_h2fwcmd_w_parm_no_rsp(cmdobj, parm, GEN_CMD_CODE(_Set_Drv_Extra));
-
-		if (flags & RTW_CMDF_WAIT_ACK) {
-			cmdobj->sctx = &sctx;
-			rtw_sctx_init(&sctx, 10 * 1000);
-		}
-
-		res = rtw_enqueue_cmd(pcmdpriv, cmdobj);
-
-		if (res == _SUCCESS && (flags & RTW_CMDF_WAIT_ACK)) {
-			rtw_sctx_wait(&sctx, __func__);
-			_enter_critical_mutex(&pcmdpriv->sctx_mutex, NULL);
-			if (sctx.status == RTW_SCTX_SUBMITTED)
-				cmdobj->sctx = NULL;
-			_exit_critical_mutex(&pcmdpriv->sctx_mutex, NULL);
-			if (sctx.status != RTW_SCTX_DONE_SUCCESS)
-				res = _FAIL;
-		}
-	}
-
-exit:
-	return res;
-}
-#endif	/*CONFIG_MP_INCLUDED*/
-
 static int rtw_customer_str_cmd_hdl(struct adapter *adapter, u8 write, const u8 *cstr)
 {
 	int ret = H2C_SUCCESS;
@@ -3856,9 +3713,6 @@ u8 rtw_drvextra_cmd_hdl(struct adapter *adapt, unsigned char *pbuf)
 		rtw_hal_fill_h2c_cmd(adapt, pdrvextra_cmd->pbuf[0], pdrvextra_cmd->size - 1, &pdrvextra_cmd->pbuf[1]);
 		break;
 	case MP_CMD_WK_CID:
-#ifdef CONFIG_MP_INCLUDED
-		ret = rtw_mp_cmd_hdl(adapt, pdrvextra_cmd->type);
-#endif
 		break;
 	case CUSTOMER_STR_WK_CID:
 		ret = rtw_customer_str_cmd_hdl(adapt, pdrvextra_cmd->type, pdrvextra_cmd->pbuf);
@@ -4048,10 +3902,4 @@ void rtw_getrttbl_cmd_cmdrsp_callback(struct adapter	*adapt,  struct cmd_obj *pc
 {
 
 	rtw_free_cmd_obj(pcmd);
-#ifdef CONFIG_MP_INCLUDED
-	if (adapt->registrypriv.mp_mode == 1)
-		adapt->mppriv.workparam.bcompleted = true;
-#endif
-
-
 }
