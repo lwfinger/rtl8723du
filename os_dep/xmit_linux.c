@@ -303,7 +303,7 @@ static int rtw_mlcst2unicst(struct adapter *adapt, struct sk_buff *skb)
 	plist = get_next(phead);
 
 	/* free sta asoc_queue */
-	while ((rtw_end_of_queue_search(phead, plist)) == false) {
+	while ((!rtw_end_of_queue_search(phead, plist))) {
 		int stainfo_offset;
 		psta = container_of(plist, struct sta_info, asoc_list);
 		plist = get_next(plist);
@@ -322,9 +322,9 @@ static int rtw_mlcst2unicst(struct adapter *adapt, struct sk_buff *skb)
 		}
 
 		/* avoid come from STA1 and send back STA1 */
-		if (_rtw_memcmp(psta->cmn.mac_addr, &skb->data[6], 6) == true
-			|| _rtw_memcmp(psta->cmn.mac_addr, null_addr, 6) == true
-			|| _rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6) == true
+		if (_rtw_memcmp(psta->cmn.mac_addr, &skb->data[6], 6)
+			|| _rtw_memcmp(psta->cmn.mac_addr, null_addr, 6)
+			|| _rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)
 		) {
 			DBG_COUNTER(adapt->tx_logs.os_tx_m2u_ignore_self);
 			continue;
@@ -373,7 +373,7 @@ int _rtw_xmit_entry(struct sk_buff *pkt, struct  net_device * pnetdev)
 	}
 	DBG_COUNTER(adapt->tx_logs.os_tx);
 
-	if (rtw_if_up(adapt) == false) {
+	if (!rtw_if_up(adapt)) {
 		DBG_COUNTER(adapt->tx_logs.os_tx_err_up);
 		goto drop_packet;
 	}
@@ -392,7 +392,7 @@ int _rtw_xmit_entry(struct sk_buff *pkt, struct  net_device * pnetdev)
 	) {
 		if (pxmitpriv->free_xmitframe_cnt > (NR_XMITFRAME / 4)) {
 			res = rtw_mlcst2unicst(adapt, pkt);
-			if (res == true)
+			if (res)
 				goto exit;
 		} else {
 			/* RTW_INFO("Stop M2U(%d, %d)! ", pxmitpriv->free_xmitframe_cnt, pxmitpriv->free_xmitbuf_cnt); */
@@ -424,7 +424,7 @@ int rtw_xmit_entry(struct sk_buff *pkt, struct  net_device * pnetdev)
 	int ret = 0;
 
 	if (pkt) {
-		if (check_fwstate(pmlmepriv, WIFI_MONITOR_STATE) == true) {
+		if (check_fwstate(pmlmepriv, WIFI_MONITOR_STATE)) {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 24))
 			rtw_monitor_xmit_entry((struct sk_buff *)pkt, pnetdev);
 #endif

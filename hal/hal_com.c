@@ -174,7 +174,7 @@ void hal_com_config_channel_plan(
 	if (hw_chplan == 0xFF)
 		goto chk_hw_country_code;
 
-	if (AutoLoadFail == true)
+	if (AutoLoadFail)
 		goto chk_sw_config;
 
 #ifndef CONFIG_FORCE_SW_CHANNEL_PLAN
@@ -198,14 +198,14 @@ chk_hw_country_code:
 
 	if (rtw_is_channel_plan_valid(hw_chplan))
 		chplan = hw_chplan;
-	else if (force_hw_chplan == true) {
+	else if (force_hw_chplan) {
 		RTW_PRINT("%s unsupported hw_chplan:0x%02X\n", __func__, hw_chplan);
 		/* hw infomaton invalid, refer to sw information */
 		force_hw_chplan = false;
 	}
 
 chk_sw_config:
-	if (force_hw_chplan == true)
+	if (force_hw_chplan)
 		goto done;
 
 	if (sw_alpha2 && !IS_ALPHA2_NO_SPECIFIED(sw_alpha2)) {
@@ -250,12 +250,12 @@ HAL_IsLegalChannel(
 	bool bLegalChannel = true;
 
 	if (Channel > 14) {
-		if (is_supported_5g(Adapter->registrypriv.wireless_mode) == false) {
+		if (!is_supported_5g(Adapter->registrypriv.wireless_mode)) {
 			bLegalChannel = false;
 			RTW_INFO("Channel > 14 but wireless_mode do not support 5G\n");
 		}
 	} else if ((Channel <= 14) && (Channel >= 1)) {
-		if (IsSupported24G(Adapter->registrypriv.wireless_mode) == false) {
+		if (!IsSupported24G(Adapter->registrypriv.wireless_mode)) {
 			bLegalChannel = false;
 			RTW_INFO("(Channel <= 14) && (Channel >=1) but wireless_mode do not support 2.4G\n");
 		}
@@ -1160,7 +1160,7 @@ void rtw_hal_c2h_pkt_pre_hdl(struct adapter *adapter, u8 *buf, u16 len)
 		goto exit;
 	}
 
-	hdl_here = rtw_hal_c2h_id_handle_directly(adapter, id, seq, plen, payload) == true ? 1 : 0;
+	hdl_here = rtw_hal_c2h_id_handle_directly(adapter, id, seq, plen, payload) ? 1 : 0;
 	if (hdl_here) 
 		ret = rtw_hal_c2h_handler(adapter, id, seq, plen, payload);
 	else
@@ -1673,7 +1673,7 @@ int rtw_hal_customer_str_write(struct adapter *adapter, const u8 *cs)
 	_enter_critical_mutex(&dvobj->customer_str_mutex, NULL);
 	dvobj->customer_str_sctx = NULL;
 	if (sctx.status == RTW_SCTX_DONE_SUCCESS) {
-		if (_rtw_memcmp(cs, dvobj->customer_str, RTW_CUSTOMER_STR_LEN) != true) {
+		if (!_rtw_memcmp(cs, dvobj->customer_str, RTW_CUSTOMER_STR_LEN)) {
 			RTW_WARN("%s read back check fail\n", __func__);
 			RTW_INFO_DUMP("write req: ", cs, RTW_CUSTOMER_STR_LEN);
 			RTW_INFO_DUMP("read back: ", dvobj->customer_str, RTW_CUSTOMER_STR_LEN);
@@ -1779,7 +1779,7 @@ static void rtw_hal_update_sta_rate_mask(struct adapter * adapt, struct sta_info
 		/* n mode ra_bitmap */
 
 		/* Handling SMPS mode for AP MODE only*/
-		if (check_fwstate(&adapt->mlmepriv, WIFI_AP_STATE) == true) {
+		if (check_fwstate(&adapt->mlmepriv, WIFI_AP_STATE)) {
 			/*0:static SMPS, 1:dynamic SMPS, 3:SMPS disabled, 2:reserved*/
 			if (psta->htpriv.smps_cap == 0 || psta->htpriv.smps_cap == 1) {
 				/*operate with only one active receive chain // 11n-MCS rate <= MSC7*/
@@ -2028,7 +2028,7 @@ static u8 _rtw_mbid_cam_search_by_macaddr(struct adapter *adapter, u8 *mac_addr)
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 
 	for (i = 0; i < TOTAL_MBID_CAM_NUM; i++) {
-		if (mac_addr && _rtw_memcmp(dvobj->mbid_cam_cache[i].mac_addr, mac_addr, ETH_ALEN) == true) {
+		if (mac_addr && _rtw_memcmp(dvobj->mbid_cam_cache[i].mac_addr, mac_addr, ETH_ALEN)) {
 			cam_id = i;
 			break;
 		}
@@ -2208,7 +2208,7 @@ u8 rtw_mbid_cam_assign(struct adapter *adapter, u8 *mac_addr, u8 camid)
 	}
 	_exit_critical_bh(&mbid_cam_ctl->lock, &irqL);
 
-	if (ret == true) {
+	if (ret) {
 		ATOMIC_INC(&mbid_cam_ctl->mbid_entry_num);
 		RTW_INFO("%s mac:"MAC_FMT" - cam_id:%d\n", __func__, MAC_ARG(mac_addr), camid);
 #ifdef CONFIG_MI_WITH_MBSSID_CAM
@@ -2862,11 +2862,11 @@ int rtw_set_default_port_id(struct adapter *adapter)
 	if (adapter->hw_port == dvobj->default_port_id)
 		return ret;
 
-	if (check_fwstate(pmlmepriv, WIFI_STATION_STATE) == true) {
+	if (check_fwstate(pmlmepriv, WIFI_STATION_STATE)) {
 		psta = rtw_get_stainfo(&adapter->stapriv, get_bssid(pmlmepriv));
 		if (psta)
 			ret = rtw_hal_set_default_port_id_cmd(adapter, psta->cmn.mac_id);
-	} else if (check_fwstate(pmlmepriv, WIFI_AP_STATE) == true) {
+	} else if (check_fwstate(pmlmepriv, WIFI_AP_STATE)) {
 
 	} else {
 	}
@@ -3239,7 +3239,7 @@ void rtw_hal_construct_NullFunctionData(
 	SetSeqNum(pwlanhdr, 0);
 	set_duration(pwlanhdr, 0);
 
-	if (bQoS == true) {
+	if (bQoS) {
 		struct rtw_ieee80211_hdr_3addr_qos *pwlanqoshdr;
 
 		set_frame_sub_type(pframe, WIFI_QOS_DATA_NULL);
@@ -3362,7 +3362,7 @@ static void _rtw_hal_set_fw_rsvd_page(struct adapter *adapter, bool finished, u8
 			return;
 		}
 	} else {
-		if (pwrctl->wowlan_mode == true || pwrctl->wowlan_ap_mode == true)
+		if (pwrctl->wowlan_mode || pwrctl->wowlan_ap_mode)
 			RsvdPageNum = rtw_hal_get_txbuff_rsvd_page_num(adapter, true);
 		else
 			RsvdPageNum = rtw_hal_get_txbuff_rsvd_page_num(adapter, false);
@@ -3403,7 +3403,7 @@ static void _rtw_hal_set_fw_rsvd_page(struct adapter *adapter, bool finished, u8
 
 	BufIndex += (CurtPktPageNum * PageSize);
 
-	if (pwrctl->wowlan_ap_mode == true) {
+	if (pwrctl->wowlan_ap_mode) {
 		/* (4) probe response*/
 		RsvdPageLoc.LocProbeRsp = TotalPageNum;
 		rtw_hal_construct_ProbeRsp(
@@ -3436,8 +3436,8 @@ static void _rtw_hal_set_fw_rsvd_page(struct adapter *adapter, bool finished, u8
 
 	BufIndex += (CurtPktPageNum * PageSize);
 
-	if (pwrctl->wowlan_mode == false ||
-		pwrctl->wowlan_in_resume == true) {
+	if (!pwrctl->wowlan_mode ||
+		pwrctl->wowlan_in_resume) {
 		/* BT Qos null data * 1 page */
 		RsvdPageLoc.LocBTQosNull = TotalPageNum;
 
@@ -3479,8 +3479,8 @@ static void _rtw_hal_set_fw_rsvd_page(struct adapter *adapter, bool finished, u8
 
 	BufIndex += (CurtPktPageNum * PageSize);
 
-	if (pwrctl->wowlan_mode == false ||
-		pwrctl->wowlan_in_resume == true) {
+	if (!pwrctl->wowlan_mode ||
+		pwrctl->wowlan_in_resume) {
 		/* Qos null data * 1 page */
 		RsvdPageLoc.LocQosNull = TotalPageNum;
 		RTW_INFO("LocQosNull: %d\n", RsvdPageLoc.LocQosNull);
@@ -3533,7 +3533,7 @@ download_page:
 
 	RTW_INFO("%s: Set RSVD page location to Fw ,TotalPacketLen(%d), TotalPageNum(%d)\n",
 		 __func__, TotalPacketLen, TotalPageNum);
-	if (check_fwstate(pmlmepriv, _FW_LINKED) == true) {
+	if (check_fwstate(pmlmepriv, _FW_LINKED)) {
 		rtw_hal_set_FwRsvdPage_cmd(adapter, &RsvdPageLoc);
 	}
 
@@ -3772,7 +3772,7 @@ static void hw_var_set_correct_tsf(struct adapter *adapter)
 				continue;
 
 			if ((MLME_IS_AP(iface) || MLME_IS_MESH(iface))
-				&& check_fwstate(&iface->mlmepriv, WIFI_ASOC_STATE) == true
+				&& check_fwstate(&iface->mlmepriv, WIFI_ASOC_STATE)
 			) {
 				rtw_hal_correct_tsf(iface, iface->hw_port, tsf);
 				#ifdef CONFIG_TSF_RESET_OFFLOAD
@@ -3918,7 +3918,7 @@ u8 SetHwReg(struct adapter *adapter, u8 variable, u8 *val)
 
 	case HW_VAR_ASIX_IOT:
 		/* enable  ASIX IOT function */
-		if (*((u8 *)val) == true) {
+		if (*((u8 *)val)) {
 			/* 0xa2e[0]=0 (disable rake receiver) */
 			rtw_write8(adapter, rCCK0_FalseAlarmReport + 2,
 				rtw_read8(adapter, rCCK0_FalseAlarmReport + 2) & ~(BIT0));
@@ -3947,7 +3947,7 @@ u8 SetHwReg(struct adapter *adapter, u8 variable, u8 *val)
 		RTW_INFO("%s: bMacPwrCtrlOn=%d\n", __func__, hal_data->bMacPwrCtrlOn);
 		break;
 	case HW_VAR_ENABLE_RX_BAR:
-		if (*val == true) {
+		if (*val) {
 			/* enable RX BAR */
 			u16 val16 = rtw_read16(adapter, REG_RXFLTMAP1);
 
@@ -4593,7 +4593,7 @@ u32 Hal_ReadMACAddrFromFile(struct adapter * adapt, u8 *mac_addr)
 	u32 ret = _FAIL;
 
 	if (rtw_read_macaddr_from_file(WIFIMAC_PATH, mac_addr) == _SUCCESS
-		&& rtw_check_invalid_mac_address(mac_addr, true) == false
+		&& !rtw_check_invalid_mac_address(mac_addr, true)
 	) {
 		hal_data->macaddr_file_status = MACADDR_FILE_LOADED;
 		ret = _SUCCESS;
@@ -4631,7 +4631,7 @@ int hal_config_macaddr(struct adapter *adapter, bool autoload_fail)
 	}
 
 	/* check hw pg data */
-	if (hw_addr && rtw_check_invalid_mac_address(hw_addr, true) == false) {
+	if (hw_addr && !rtw_check_invalid_mac_address(hw_addr, true)) {
 		_rtw_memcpy(hal_data->EEPROMMACAddr, hw_addr, ETH_ALEN);
 		goto exit;
 	}
@@ -5316,20 +5316,20 @@ static void rtw_dump_phy_cap_by_hal(void *sel, struct adapter *adapter)
 
 	/* STBC */
 	rtw_hal_get_def_var(adapter, HAL_DEF_TX_STBC, (u8 *)&phy_cap);
-	RTW_PRINT_SEL(sel, "[HAL] STBC Tx : %s\n", (true == phy_cap) ? "Supported" : "N/A");
+	RTW_PRINT_SEL(sel, "[HAL] STBC Tx : %s\n", (phy_cap) ? "Supported" : "N/A");
 
 	phy_cap = false;
 	rtw_hal_get_def_var(adapter, HAL_DEF_RX_STBC, (u8 *)&phy_cap);
-	RTW_PRINT_SEL(sel, "[HAL] STBC Rx : %s\n\n", (true == phy_cap) ? "Supported" : "N/A");
+	RTW_PRINT_SEL(sel, "[HAL] STBC Rx : %s\n\n", (phy_cap) ? "Supported" : "N/A");
 
 	/* LDPC support */
 	phy_cap = false;
 	rtw_hal_get_def_var(adapter, HAL_DEF_TX_LDPC, (u8 *)&phy_cap);
-	RTW_PRINT_SEL(sel, "[HAL] LDPC Tx : %s\n", (true == phy_cap) ? "Supported" : "N/A");
+	RTW_PRINT_SEL(sel, "[HAL] LDPC Tx : %s\n", (phy_cap) ? "Supported" : "N/A");
 
 	phy_cap = false;
 	rtw_hal_get_def_var(adapter, HAL_DEF_RX_LDPC, (u8 *)&phy_cap);
-	RTW_PRINT_SEL(sel, "[HAL] LDPC Rx : %s\n\n", (true == phy_cap) ? "Supported" : "N/A");
+	RTW_PRINT_SEL(sel, "[HAL] LDPC Rx : %s\n\n", (phy_cap) ? "Supported" : "N/A");
 }
 #endif
 void rtw_dump_phy_cap(void *sel, struct adapter *adapter)

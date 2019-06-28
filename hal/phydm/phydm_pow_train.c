@@ -75,7 +75,7 @@ phydm_update_power_training_state(
 		}
 
 		/* First connect */
-		if ((p_dm->is_linked) && (p_dig_t->is_media_connect == false)) {
+		if (p_dm->is_linked && !p_dig_t->is_media_connect) {
 			p_pow_train_t->pow_train_score = 0;
 			p_dm->phy_dbg_info.num_qry_phy_status_ofdm = 0;
 			p_dm->phy_dbg_info.num_qry_phy_status_cck = 0;

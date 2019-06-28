@@ -697,7 +697,7 @@ phydm_rx_phy_status_jaguar_series_parsing(
 			rx_pwr_all += 6;
 			PWDB_ALL = phydm_query_rx_pwr_percentage(rx_pwr_all);
 
-			if (cck_highpwr == false) {
+			if (!cck_highpwr) {
 				if (PWDB_ALL >= 80)
 					PWDB_ALL = ((PWDB_ALL - 80) << 1) + ((PWDB_ALL - 80) >> 1) + 80;
 				else if ((PWDB_ALL <= 78) && (PWDB_ALL >= 20))
@@ -1391,7 +1391,7 @@ phydm_get_rx_phy_status_type0(
 	}
 
 	/* Modify CCK PWDB if old AGC */
-	if (p_dm->cck_new_agc == false) {
+	if (!p_dm->cck_new_agc) {
 		u8	lna_idx, vga_idx;
 
 		lna_idx = ((p_phy_sta_rpt->lna_h << 3) | p_phy_sta_rpt->lna_l);

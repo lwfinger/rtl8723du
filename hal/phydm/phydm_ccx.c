@@ -139,7 +139,7 @@ phydm_get_fahm_result(
 		ODM_delay_ms(1);
 	}
 
-	if (is_ready == false)
+	if (!is_ready)
 		return;
 
 	/*Get Denumerator*/

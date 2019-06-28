@@ -91,7 +91,7 @@ odm_fa_threshold_check(
 
 		PHYDM_DBG(p_dm, DBG_DIG, ("Manual Fix FA_th\n"));
 		
-	//if (p_dig_t->is_dbg_fa_th == true)
+	//if (p_dig_t->is_dbg_fa_th)
 		//return;
 
 	} else if (p_dm->is_linked && (is_performance || is_dfs_band)) {
@@ -421,7 +421,7 @@ phydm_dig_abs_boundary_decision(
 	if (!p_dm->is_linked) {
 		p_dig_t->dm_dig_max = DIG_MAX_COVERAGR;
 		p_dig_t->dm_dig_min = DIG_MIN_COVERAGE;
-	} else if (is_dfs_band == true) {
+	} else if (is_dfs_band) {
 		if (*p_dm->p_band_width == CHANNEL_WIDTH_20)
 			p_dig_t->dm_dig_min = DIG_MIN_DFS + 2;
 		else
@@ -532,8 +532,8 @@ phydm_dig_abnormal_case(
 	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
 	bool	first_connect = false, first_dis_connect = false;
 
-	first_connect = (p_dm->is_linked) && (p_dig_t->is_media_connect == false);
-	first_dis_connect = (!p_dm->is_linked) && (p_dig_t->is_media_connect == true);
+	first_connect = (p_dm->is_linked) && (!p_dig_t->is_media_connect);
+	first_dis_connect = (!p_dm->is_linked) && (p_dig_t->is_media_connect);
 
 	/* Modify DIG lower bound, deal with abnormal case */
 	if (!p_dm->is_linked && is_dfs_band && is_performance) {
@@ -592,8 +592,8 @@ phydm_dig_igi_start_value(
 	u8		step_size[3] = {0};
 	bool	first_connect = false, first_dis_connect = false;
 
-	first_connect = (p_dm->is_linked) && (p_dig_t->is_media_connect == false);
-	first_dis_connect = (!p_dm->is_linked) && (p_dig_t->is_media_connect == true);
+	first_connect = (p_dm->is_linked) && (!p_dig_t->is_media_connect);
+	first_dis_connect = (!p_dm->is_linked) && (p_dig_t->is_media_connect);
 
 	if (p_dm->is_linked) {
 		if (p_dm->pre_rssi_min <= p_dm->rssi_min) {
@@ -697,14 +697,14 @@ phydm_dig(
 	}
 #endif
 
-	if (odm_dig_abort(p_dm) == true)
+	if (odm_dig_abort(p_dm))
 		return;
 
 	PHYDM_DBG(p_dm, DBG_DIG, ("%s Start===>\n", __func__));
 
 	/* 1 Update status */
-	first_connect = (p_dm->is_linked) && (p_dig_t->is_media_connect == false);
-	first_dis_connect = (!p_dm->is_linked) && (p_dig_t->is_media_connect == true);
+	first_connect = (p_dm->is_linked) && (!p_dig_t->is_media_connect);
+	first_dis_connect = (!p_dm->is_linked) && (p_dig_t->is_media_connect);
 
 	PHYDM_DBG(p_dm, DBG_DIG,
 		("is_linked = %d, RSSI = %d, 1stConnect = %d, 1stDisconnect = %d\n",
@@ -792,7 +792,7 @@ phydm_dig_by_rssi_lps(
 	u8	current_igi = p_dm->rssi_min;
 
 	p_falm_cnt = &p_dm->false_alm_cnt;
-	if (odm_dig_abort(p_dm) == true)
+	if (odm_dig_abort(p_dm))
 		return;
 
 	current_igi = current_igi + RSSI_OFFSET_DIG_LPS;

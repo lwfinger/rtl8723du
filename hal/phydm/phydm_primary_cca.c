@@ -66,14 +66,14 @@ phydm_primary_cca_11n(
 	if (!p_dm->is_linked) { /* is_linked==False */
 		PHYDM_DBG(p_dm, DBG_PRI_CCA, ("[PriCCA][No Link!!!]\n"));
 
-		if (p_primary_cca->pri_cca_is_become_linked == true) {
+		if (p_primary_cca->pri_cca_is_become_linked) {
 			phydm_primary_cca_reset(p_dm);
 			p_primary_cca->pri_cca_is_become_linked = p_dm->is_linked;
 		}
 		return;
 		
 	} else {
-		if (p_primary_cca->pri_cca_is_become_linked == false) {
+		if (!p_primary_cca->pri_cca_is_become_linked) {
 			PHYDM_DBG(p_dm, DBG_PRI_CCA, ("[PriCCA][Linked !!!]\n"));
 			p_primary_cca->pri_cca_is_become_linked = p_dm->is_linked;
 		}

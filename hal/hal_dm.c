@@ -233,7 +233,7 @@ void Init_ODM_ComInfo(struct adapter *adapter)
 	halrf_cmn_info_init(pDM_Odm, HALRF_CMNINFO_FW_VER,
 		((pHalData->firmware_version << 16) | pHalData->firmware_sub_version));
 
-	if (rtw_odm_adaptivity_needed(adapter) == true)
+	if (rtw_odm_adaptivity_needed(adapter))
 		rtw_odm_adaptivity_config_msg(RTW_DBGDUMP, adapter);
 
 #ifdef CONFIG_IQK_PA_OFF
@@ -324,7 +324,7 @@ void rtw_hal_turbo_edca(struct adapter *adapter)
 	if (rtw_mi_check_status(adapter, MI_ASSOC))
 		is_linked = true;
 
-	if (is_linked != true) {
+	if (!is_linked) {
 		precvpriv->is_any_non_be_pkts = false;
 		return;
 	}
@@ -498,7 +498,7 @@ u8 rtw_phydm_is_iqk_in_progress(struct adapter *adapter)
 	struct PHY_DM_STRUCT *podmpriv = adapter_to_phydm(adapter);
 
 	odm_acquire_spin_lock(podmpriv, RT_IQK_SPINLOCK);
-	if (podmpriv->rf_calibrate_info.is_iqk_in_progress == true) {
+	if (podmpriv->rf_calibrate_info.is_iqk_in_progress) {
 		RTW_ERR("IQK InProgress\n");
 		rts = true;
 	}
@@ -780,11 +780,11 @@ void rtw_phydm_watchdog(struct adapter *adapter)
 
 	bBtDisabled = rtw_btcoex_IsBtDisabled(adapter);
 	odm_cmn_info_update(&pHalData->odmpriv, ODM_CMNINFO_BT_ENABLED,
-							(bBtDisabled == true) ? false : true);
+							(bBtDisabled) ? false : true);
 	odm_cmn_info_update(&pHalData->odmpriv, ODM_CMNINFO_POWER_TRAINING,
 							(pHalData->bDisableTXPowerTraining) ? true : false);
 	if (bLinked) {
-		rfk_forbidden = (_rtw_phydm_rfk_condition_check(adapter) == true) ? false : true;
+		rfk_forbidden = (_rtw_phydm_rfk_condition_check(adapter)) ? false : true;
 		halrf_cmn_info_set(&pHalData->odmpriv, HALRF_CMNINFO_RFK_FORBIDDEN, rfk_forbidden);
 	} else {
 		tx_unlinked_low_rate = _rtw_phydm_pwr_tracking_rate_check(adapter);

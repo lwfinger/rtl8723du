@@ -872,8 +872,8 @@ static inline void dev_clr_drv_stopped(struct dvobj_priv *dvobj)
 {
 	ATOMIC_SET(&dvobj->bDriverStopped, false);
 }
-#define dev_is_surprise_removed(dvobj)	(ATOMIC_READ(&dvobj->bSurpriseRemoved) == true)
-#define dev_is_drv_stopped(dvobj)		(ATOMIC_READ(&dvobj->bDriverStopped) == true)
+#define dev_is_surprise_removed(dvobj)	(ATOMIC_READ(&dvobj->bSurpriseRemoved))
+#define dev_is_drv_stopped(dvobj)	(ATOMIC_READ(&dvobj->bDriverStopped))
 
 static struct device *dvobj_to_dev(struct dvobj_priv *dvobj)
 {

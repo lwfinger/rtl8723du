@@ -232,7 +232,7 @@ phydm_cck_pd_th(
 	
 	PHYDM_DBG(p_dm, DBG_CCKPD, ("%s ======>\n", __func__));
 
-	if (phydm_stop_cck_pd_th(p_dm) == true)
+	if (phydm_stop_cck_pd_th(p_dm))
 		return;
 
 #ifdef PHYDM_TDMA_DIG_SUPPORT

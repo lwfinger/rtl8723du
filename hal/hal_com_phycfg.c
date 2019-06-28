@@ -971,7 +971,7 @@ phy_StoreTxPowerByRateBase(
 				if (IS_VHT_RATE_SECTION(rs))
 					continue;
 
-				if (regsty->target_tx_pwr_valid == true)
+				if (regsty->target_tx_pwr_valid)
 					base = 2 * rtw_regsty_get_target_tx_power(pAdapter, band, path, rs);
 				else
 					base = _PHY_GetTxPowerByRate(pAdapter, band, path, rate_sec_base[rs]);
@@ -1612,7 +1612,7 @@ PHY_GetTxPowerIndexBase(
 	u8					txPower = 0;
 	u8					chnlIdx = (Channel - 1);
 
-	if (HAL_IsLegalChannel(pAdapter, Channel) == false) {
+	if (!HAL_IsLegalChannel(pAdapter, Channel)) {
 		chnlIdx = 0;
 		RTW_INFO("Illegal channel!!\n");
 	}
@@ -1702,7 +1702,7 @@ PHY_GetTxPowerTrackingOffset(
 	struct PHY_DM_STRUCT			*pDM_Odm = &pHalData->odmpriv;
 	s8	offset = 0;
 
-	if (pDM_Odm->rf_calibrate_info.txpowertrack_control  == false)
+	if (!pDM_Odm->rf_calibrate_info.txpowertrack_control)
 		return offset;
 
 	if ((Rate == MGN_1M) || (Rate == MGN_2M) || (Rate == MGN_5_5M) || (Rate == MGN_11M)) {
@@ -2215,7 +2215,7 @@ s8 phy_get_txpwr_lmt_abs(
 		lmt = MAX_POWER_INDEX;
 		head = &rfctl->txpwr_lmt_list;
 		cur = get_next(head);
-		while ((rtw_end_of_queue_search(head, cur)) == false) {
+		while ((!rtw_end_of_queue_search(head, cur))) {
 			ent = container_of(cur, struct txpwr_lmt_ent, list);
 			cur = get_next(cur);
 			if (ent->lmt_2g[bw][tlrs][ch_idx][ntx_idx] != -MAX_POWER_INDEX)
@@ -2309,7 +2309,7 @@ PHY_GetTxPowerLimit(struct adapter *adapter
 		goto exit;
 	}
 
-	if (no_sc == true) {
+	if (no_sc) {
 		/* use the input center channel and bandwidth directly */
 		tmp_cch = cch;
 		bw_bmp = ch_width_to_bw_cap(bw);
@@ -2342,7 +2342,7 @@ PHY_GetTxPowerLimit(struct adapter *adapter
 		if (!(ch_width_to_bw_cap(tmp_bw) & bw_bmp))
 			continue;
 
-		if (no_sc == false) {
+		if (!no_sc) {
 			if (tmp_bw == CHANNEL_WIDTH_20)
 				tmp_cch = hal_data->cch_20;
 			else if (tmp_bw == CHANNEL_WIDTH_40)
@@ -2389,7 +2389,7 @@ static void phy_txpwr_lmt_cck_ofdm_mt_chk(struct adapter *adapter)
 	head = &rfctl->txpwr_lmt_list;
 	cur = get_next(head);
 
-	while ((rtw_end_of_queue_search(head, cur)) == false) {
+	while ((!rtw_end_of_queue_search(head, cur))) {
 		ent = container_of(cur, struct txpwr_lmt_ent, list);
 		cur = get_next(cur);
 
@@ -2484,9 +2484,8 @@ phy_set_tx_power_limit(
 	u8 ntx_idx;
 	s8 powerLimit = 0, prevPowerLimit, channelIndex;
 
-	if (GetU1ByteIntegerFromStringInDecimal((char *)Channel, &channel) == false
-		|| GetS1ByteIntegerFromStringInDecimal((char *)PowerLimit, &powerLimit) == false
-	) {
+	if (!GetU1ByteIntegerFromStringInDecimal((char *)Channel, &channel) ||
+	    !GetS1ByteIntegerFromStringInDecimal((char *)PowerLimit, &powerLimit)) {
 		RTW_PRINT("Illegal index of power limit table [ch %s][val %s]\n", Channel, PowerLimit);
 		return;
 	}
@@ -2732,7 +2731,7 @@ int phy_load_tx_power_limit(struct adapter *adapter, u8 chk_file)
 	rtw_regd_exc_list_free(rfctl);
 	rtw_txpwr_lmt_list_free(rfctl);
 
-	if (!hal_data->txpwr_by_rate_loaded && regsty->target_tx_pwr_valid != true) {
+	if (!hal_data->txpwr_by_rate_loaded && !regsty->target_tx_pwr_valid) {
 		RTW_ERR("%s():Read Tx power limit before target tx power is specify\n", __func__);
 		goto exit;
 	}
@@ -2776,9 +2775,9 @@ void phy_load_tx_power_ext_info(struct adapter *adapter, u8 chk_file)
 	regsty->target_tx_pwr_valid = rtw_regsty_chk_target_tx_power_valid(adapter);
 
 	/* power by rate and limit */
-	if (phy_is_tx_power_by_rate_needed(adapter)
-		|| (phy_is_tx_power_limit_needed(adapter) && regsty->target_tx_pwr_valid != true)
-	)
+	if (phy_is_tx_power_by_rate_needed(adapter) ||
+	    (phy_is_tx_power_limit_needed(adapter) &&
+	    !regsty->target_tx_pwr_valid))
 		phy_load_tx_power_by_rate(adapter, chk_file);
 
 #ifdef CONFIG_TXPWR_LIMIT
@@ -2802,7 +2801,7 @@ void dump_tx_power_ext_info(void *sel, struct adapter *adapter)
 	struct registry_priv *regsty = adapter_to_regsty(adapter);
 	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 
-	if (regsty->target_tx_pwr_valid == true)
+	if (regsty->target_tx_pwr_valid)
 		RTW_PRINT_SEL(sel, "target_tx_power: from registry\n");
 	else if (phy_is_tx_power_by_rate_needed(adapter))
 		RTW_PRINT_SEL(sel, "target_tx_power: from power by rate\n"); 
@@ -2839,7 +2838,7 @@ void dump_target_tx_power(void *sel, struct adapter *adapter)
 				break;
 
 			RTW_PRINT_SEL(sel, "[%s][%c]%s\n", band_str(band), rf_path_char(path)
-				, (regsty->target_tx_pwr_valid == false && hal_data->txpwr_by_rate_undefined_band_path[band][path]) ? "(dup)" : "");
+				, (!regsty->target_tx_pwr_valid && hal_data->txpwr_by_rate_undefined_band_path[band][path]) ? "(dup)" : "");
 
 			for (rs = 0; rs < RATE_SECTION_NUM; rs++) {
 				tx_num = rate_section_to_tx_num(rs);
@@ -2970,7 +2969,7 @@ phy_ConfigMACWithParaFile(
 
 	if ((pHalData->mac_reg_len == 0) && (!pHalData->mac_reg)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
-		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
+		if (rtw_is_file_readable(rtw_phy_para_file_path)) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
 			if (rlen > 0) {
 				rtStatus = _SUCCESS;
@@ -3049,7 +3048,7 @@ phy_ConfigBBWithParaFile(
 
 	if ((pBufLen) && (*pBufLen == 0) && (!pBuf)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
-		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
+		if (rtw_is_file_readable(rtw_phy_para_file_path)) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
 			if (rlen > 0) {
 				rtStatus = _SUCCESS;
@@ -3431,7 +3430,7 @@ phy_ConfigBBWithPgParaFile(
 
 	if (!pHalData->bb_phy_reg_pg) {
 		rtw_get_phy_file_path(Adapter, pFileName);
-		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
+		if (rtw_is_file_readable(rtw_phy_para_file_path)) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
 			if (rlen > 0) {
 				rtStatus = _SUCCESS;
@@ -3480,7 +3479,7 @@ phy_ConfigBBWithMpParaFile(
 
 	if ((pHalData->bb_phy_reg_mp_len == 0) && (!pHalData->bb_phy_reg_mp)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
-		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
+		if (rtw_is_file_readable(rtw_phy_para_file_path)) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
 			if (rlen > 0) {
 				rtStatus = _SUCCESS;
@@ -3580,7 +3579,7 @@ PHY_ConfigRFWithParaFile(
 
 	if ((pBufLen) && (*pBufLen == 0) && (!pBuf)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
-		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
+		if (rtw_is_file_readable(rtw_phy_para_file_path)) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
 			if (rlen > 0) {
 				rtStatus = _SUCCESS;
@@ -3775,7 +3774,7 @@ PHY_ConfigRFWithTxPwrTrackParaFile(
 
 	if ((pHalData->rf_tx_pwr_track_len == 0) && (!pHalData->rf_tx_pwr_track)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
-		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
+		if (rtw_is_file_readable(rtw_phy_para_file_path)) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
 			if (rlen > 0) {
 				rtStatus = _SUCCESS;
@@ -3882,7 +3881,7 @@ static u8 parse_reg_exc_config(struct adapter *adapter, char *szLine)
 
 		/* check if all hex */
 		for (j = i_val_s; j < i_val_e; j++)
-			if (IsHexDigit(szLine[j]) == false)
+			if (!IsHexDigit(szLine[j]))
 				return PARSE_RET_FAIL;
 
 		/* get value from hex string */
@@ -3906,7 +3905,7 @@ static u8 parse_reg_exc_config(struct adapter *adapter, char *szLine)
 
 		/* check if all alpha */
 		for (j = i_val_s; j < i_val_e; j++)
-			if (is_alpha(szLine[j]) == false)
+			if (!is_alpha(szLine[j]))
 				return PARSE_RET_FAIL;
 
 		country = szLine + i_val_s;
@@ -4292,7 +4291,7 @@ PHY_ConfigRFWithPowerLimitTableParaFile(
 
 	if (!pHalData->rf_tx_pwr_lmt) {
 		rtw_get_phy_file_path(Adapter, pFileName);
-		if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
+		if (rtw_is_file_readable(rtw_phy_para_file_path)) {
 			rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
 			if (rlen > 0) {
 				rtStatus = _SUCCESS;

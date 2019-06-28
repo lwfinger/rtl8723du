@@ -541,12 +541,12 @@ odm_txpowertracking_thermal_meter_init(
 	p_rf_calibrate_info->tx_powercount = 0;
 	p_rf_calibrate_info->is_txpowertracking_init = false;
 
-	if (*(p_dm->p_mp_mode) == false)
+	if (!*p_dm->p_mp_mode)
 		p_rf_calibrate_info->txpowertrack_control = true;
 	else
 		p_rf_calibrate_info->txpowertrack_control = false;
 
-	if (*(p_dm->p_mp_mode) == false)
+	if (!*p_dm->p_mp_mode)
 		p_rf_calibrate_info->txpowertrack_control = true;
 
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("p_dm txpowertrack_control = %d\n", p_rf_calibrate_info->txpowertrack_control));
@@ -556,7 +556,7 @@ odm_txpowertracking_thermal_meter_init(
 	p_rf_calibrate_info->thermal_value_iqk = p_hal_data->eeprom_thermal_meter;
 	p_rf_calibrate_info->thermal_value_lck = p_hal_data->eeprom_thermal_meter;
 
-	if (p_rf_calibrate_info->default_bb_swing_index_flag != true) {
+	if (!p_rf_calibrate_info->default_bb_swing_index_flag) {
 		/*The index of "0 dB" in SwingTable.*/
 		if (p_dm->support_ic_type == ODM_RTL8188E || p_dm->support_ic_type == ODM_RTL8723B ||
 		    p_dm->support_ic_type == ODM_RTL8192E || p_dm->support_ic_type == ODM_RTL8703B) {

@@ -185,7 +185,7 @@ void rtw_indicate_wx_assoc_event(struct adapter *adapt)
 
 	wrqu.ap_addr.sa_family = ARPHRD_ETHER;
 
-	if (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) == true)
+	if (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE))
 		_rtw_memcpy(wrqu.ap_addr.sa_data, pnetwork->MacAddress, ETH_ALEN);
 	else
 		_rtw_memcpy(wrqu.ap_addr.sa_data, pmlmepriv->cur_network.network.MacAddress, ETH_ALEN);
@@ -269,12 +269,10 @@ static int search_p2p_wfd_ie(struct adapter *adapt,
 					blnGotP2PIE = true;
 			}
 
-			if (blnGotP2PIE == false)
+			if (!blnGotP2PIE)
 				return false;
-
 		}
 	}
-
 	if (SCAN_RESULT_WFD_TYPE == pwdinfo->wfd_info->scan_result_type) {
 		u32	blnGotWFD = false;
 		u8 *wfd_ie;
@@ -304,7 +302,7 @@ static int search_p2p_wfd_ie(struct adapter *adapt,
 			}
 		}
 
-		if (blnGotWFD == false)
+		if (!blnGotWFD)
 			return false;
 	}
 	return true;
@@ -399,24 +397,24 @@ static inline char *iwe_stream_protocol_process(struct adapter *adapt,
 
 	/* Add the protocol name */
 	iwe->cmd = SIOCGIWNAME;
-	if ((rtw_is_cckratesonly_included((u8 *)&pnetwork->network.SupportedRates)) == true) {
-		if (ht_cap == true)
+	if ((rtw_is_cckratesonly_included((u8 *)&pnetwork->network.SupportedRates))) {
+		if (ht_cap)
 			snprintf(iwe->u.name, IFNAMSIZ, "IEEE 802.11bn");
 		else
 			snprintf(iwe->u.name, IFNAMSIZ, "IEEE 802.11b");
-	} else if ((rtw_is_cckrates_included((u8 *)&pnetwork->network.SupportedRates)) == true) {
-		if (ht_cap == true)
+	} else if ((rtw_is_cckrates_included((u8 *)&pnetwork->network.SupportedRates))) {
+		if (ht_cap)
 			snprintf(iwe->u.name, IFNAMSIZ, "IEEE 802.11bgn");
 		else
 			snprintf(iwe->u.name, IFNAMSIZ, "IEEE 802.11bg");
 	} else {
 		if (pnetwork->network.Configuration.DSConfig > 14) {
-			if (ht_cap == true)
+			if (ht_cap)
 				snprintf(iwe->u.name, IFNAMSIZ, "IEEE 802.11an");
 			else
 				snprintf(iwe->u.name, IFNAMSIZ, "IEEE 802.11a");
 		} else {
-			if (ht_cap == true)
+			if (ht_cap)
 				snprintf(iwe->u.name, IFNAMSIZ, "IEEE 802.11gn");
 			else
 				snprintf(iwe->u.name, IFNAMSIZ, "IEEE 802.11g");
@@ -461,7 +459,7 @@ static inline char *iwe_stream_rate_process(struct adapter *adapt,
 			      "%d%s ", rate >> 1, (rate & 1) ? ".5" : "");
 		i++;
 	}
-	if (ht_cap == true) {
+	if (ht_cap) {
 		if (mcs_rate & 0x8000) /* MCS15 */
 			max_rate = (bw_40MHz) ? ((short_GI) ? 300 : 270) : ((short_GI) ? 144 : 130);
 
@@ -605,7 +603,7 @@ static inline char   *iwe_stream_rssi_process(struct adapter *adapt,
 			      | IW_QUAL_NOISE_INVALID
 			      ;
 
-	if (check_fwstate(pmlmepriv, _FW_LINKED) == true &&
+	if (check_fwstate(pmlmepriv, _FW_LINKED) &&
 	    is_same_network(&pmlmepriv->cur_network.network, &pnetwork->network, 0)) {
 		ss = adapt->recvpriv.signal_strength;
 		sq = adapt->recvpriv.signal_qual;
@@ -805,7 +803,7 @@ static int wpa_set_encryption(struct net_device *dev, struct ieee_param *param, 
 		struct sta_info *psta, *pbcmc_sta;
 		struct sta_priv *pstapriv = &adapt->stapriv;
 
-		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_MP_STATE) == true) { /* sta mode */
+		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_MP_STATE)) { /* sta mode */
 			psta = rtw_get_stainfo(pstapriv, get_bssid(pmlmepriv));
 			if (!psta) {
 				/* DEBUG_ERR( ("Set wpa_set_encryption: Obtain Sta_info fail\n")); */
@@ -1007,7 +1005,7 @@ static int rtw_set_wpa_ie(struct adapter *adapt, char *pie, unsigned short ielen
 			while (cnt < ielen) {
 				eid = buf[cnt];
 
-				if ((eid == _VENDOR_SPECIFIC_IE_) && (_rtw_memcmp(&buf[cnt + 2], wps_oui, 4) == true)) {
+				if ((eid == _VENDOR_SPECIFIC_IE_) && (_rtw_memcmp(&buf[cnt + 2], wps_oui, 4))) {
 					RTW_INFO("SET WPS_IE\n");
 
 					adapt->securitypriv.wps_ie_len = ((buf[cnt + 1] + 2) < MAX_WPS_IE_LEN) ? (buf[cnt + 1] + 2) : MAX_WPS_IE_LEN;
@@ -1032,7 +1030,7 @@ static int rtw_set_wpa_ie(struct adapter *adapt, char *pie, unsigned short ielen
 	    || adapt->securitypriv.dot11PrivacyAlgrthm == _TKIP_WTMIC_
 	    || adapt->securitypriv.dot11PrivacyAlgrthm == _AES_)
 		/* WPS open need to enable multicast
-		 * || check_fwstate(&adapt->mlmepriv, WIFI_UNDER_WPS) == true) */
+		 * || check_fwstate(&adapt->mlmepriv, WIFI_UNDER_WPS)) */
 		rtw_hal_set_hwreg(adapt, HW_VAR_OFF_RCR_AM, null_addr);
 
 
@@ -1059,7 +1057,7 @@ static int rtw_wx_get_name(struct net_device *dev,
 
 
 
-	if (check_fwstate(pmlmepriv, _FW_LINKED | WIFI_ADHOC_MASTER_STATE) == true) {
+	if (check_fwstate(pmlmepriv, _FW_LINKED | WIFI_ADHOC_MASTER_STATE)) {
 		/* parsing HT_CAP_IE */
 		p = rtw_get_ie(&pcur_bss->IEs[12], _HT_CAPABILITY_IE_, &ht_ielen, pcur_bss->IELength - 12);
 		if (p && ht_ielen > 0)
@@ -1067,24 +1065,24 @@ static int rtw_wx_get_name(struct net_device *dev,
 
 		prates = &pcur_bss->SupportedRates;
 
-		if (rtw_is_cckratesonly_included((u8 *)prates) == true) {
-			if (ht_cap == true)
+		if (rtw_is_cckratesonly_included((u8 *)prates)) {
+			if (ht_cap)
 				snprintf(wrqu->name, IFNAMSIZ, "IEEE 802.11bn");
 			else
 				snprintf(wrqu->name, IFNAMSIZ, "IEEE 802.11b");
-		} else if ((rtw_is_cckrates_included((u8 *)prates)) == true) {
-			if (ht_cap == true)
+		} else if ((rtw_is_cckrates_included((u8 *)prates))) {
+			if (ht_cap)
 				snprintf(wrqu->name, IFNAMSIZ, "IEEE 802.11bgn");
 			else
 				snprintf(wrqu->name, IFNAMSIZ, "IEEE 802.11bg");
 		} else {
 			if (pcur_bss->Configuration.DSConfig > 14) {
-				if (ht_cap == true)
+				if (ht_cap)
 					snprintf(wrqu->name, IFNAMSIZ, "IEEE 802.11an");
 				else
 					snprintf(wrqu->name, IFNAMSIZ, "IEEE 802.11a");
 			} else {
-				if (ht_cap == true)
+				if (ht_cap)
 					snprintf(wrqu->name, IFNAMSIZ, "IEEE 802.11gn");
 				else
 					snprintf(wrqu->name, IFNAMSIZ, "IEEE 802.11g");
@@ -1113,7 +1111,7 @@ static int rtw_wx_set_freq(struct net_device *dev,
 
 
 	rtw_ps_deny(adapt, PS_DENY_IOCTL);
-	if (rtw_pwr_wakeup(adapt) == false)
+	if (!rtw_pwr_wakeup(adapt))
 		goto exit;
 	if (wrqu->freq.m <= 1000) {
 		if (wrqu->freq.flags == IW_FREQ_AUTO) {
@@ -1170,7 +1168,7 @@ static int rtw_wx_get_freq(struct net_device *dev,
 	struct	mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
 	struct wlan_bssid_ex  *pcur_bss = &pmlmepriv->cur_network.network;
 
-	if (check_fwstate(pmlmepriv, _FW_LINKED) == true && check_fwstate(pmlmepriv, WIFI_MONITOR_STATE) != true) {
+	if (check_fwstate(pmlmepriv, _FW_LINKED) && !check_fwstate(pmlmepriv, WIFI_MONITOR_STATE)) {
 
 		wrqu->freq.m = rtw_ch2freq(pcur_bss->Configuration.DSConfig) * 100000;
 		wrqu->freq.e = 1;
@@ -1247,7 +1245,7 @@ static int rtw_wx_set_mode(struct net_device *dev, struct iw_request_info *a,
 		goto exit;
 	}
 
-	if (rtw_set_802_11_infrastructure_mode(adapt, networkType) == false) {
+	if (!rtw_set_802_11_infrastructure_mode(adapt, networkType)) {
 
 		ret = -EPERM;
 		goto exit;
@@ -1256,7 +1254,7 @@ static int rtw_wx_set_mode(struct net_device *dev, struct iw_request_info *a,
 
 	rtw_setopmode_cmd(adapt, networkType, RTW_CMDF_WAIT_ACK);
 
-	if (check_fwstate(pmlmepriv, WIFI_MONITOR_STATE) == true)
+	if (check_fwstate(pmlmepriv, WIFI_MONITOR_STATE))
 		rtw_indicate_connect(adapt);
 
 exit:
@@ -1274,15 +1272,15 @@ static int rtw_wx_get_mode(struct net_device *dev, struct iw_request_info *a,
 
 
 
-	if (check_fwstate(pmlmepriv, WIFI_STATION_STATE) == true)
+	if (check_fwstate(pmlmepriv, WIFI_STATION_STATE))
 		wrqu->mode = IW_MODE_INFRA;
-	else if ((check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) == true) ||
-		 (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE) == true))
+	else if ((check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE)) ||
+		 (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE)))
 
 		wrqu->mode = IW_MODE_ADHOC;
-	else if (check_fwstate(pmlmepriv, WIFI_AP_STATE) == true)
+	else if (check_fwstate(pmlmepriv, WIFI_AP_STATE))
 		wrqu->mode = IW_MODE_MASTER;
-	else if (check_fwstate(pmlmepriv, WIFI_MONITOR_STATE) == true)
+	else if (check_fwstate(pmlmepriv, WIFI_MONITOR_STATE))
 		wrqu->mode = IW_MODE_MONITOR;
 	else
 		wrqu->mode = IW_MODE_AUTO;
@@ -1309,7 +1307,7 @@ static int rtw_wx_set_pmkid(struct net_device *dev,
 	_rtw_memcpy(strIssueBssid, pPMK->bssid.sa_data, ETH_ALEN);
 	if (pPMK->cmd == IW_PMKSA_ADD) {
 		RTW_INFO("[rtw_wx_set_pmkid] IW_PMKSA_ADD!\n");
-		if (_rtw_memcmp(strIssueBssid, strZeroMacAddress, ETH_ALEN) == true)
+		if (_rtw_memcmp(strIssueBssid, strZeroMacAddress, ETH_ALEN))
 			return intReturn ;
 		else
 			intReturn = true;
@@ -1317,7 +1315,7 @@ static int rtw_wx_set_pmkid(struct net_device *dev,
 
 		/* overwrite PMKID */
 		for (j = 0 ; j < NUM_PMKID_CACHE; j++) {
-			if (_rtw_memcmp(psecuritypriv->PMKIDList[j].Bssid, strIssueBssid, ETH_ALEN) == true) {
+			if (_rtw_memcmp(psecuritypriv->PMKIDList[j].Bssid, strIssueBssid, ETH_ALEN)) {
 				/* BSSID is matched, the same AP => rewrite with new PMKID. */
 
 				RTW_INFO("[rtw_wx_set_pmkid] BSSID exists in the PMKList.\n");
@@ -1347,7 +1345,7 @@ static int rtw_wx_set_pmkid(struct net_device *dev,
 		RTW_INFO("[rtw_wx_set_pmkid] IW_PMKSA_REMOVE!\n");
 		intReturn = true;
 		for (j = 0 ; j < NUM_PMKID_CACHE; j++) {
-			if (_rtw_memcmp(psecuritypriv->PMKIDList[j].Bssid, strIssueBssid, ETH_ALEN) == true) {
+			if (_rtw_memcmp(psecuritypriv->PMKIDList[j].Bssid, strIssueBssid, ETH_ALEN)) {
 				/* BSSID is matched, the same AP => Remove this PMKID information and reset it. */
 				_rtw_memset(psecuritypriv->PMKIDList[j].Bssid, 0x00, ETH_ALEN);
 				psecuritypriv->PMKIDList[j].bUsed = false;
@@ -1375,7 +1373,7 @@ static int rtw_wx_get_sens(struct net_device *dev,
 	*  20110311 Commented by Jeff
 	*  For rockchip platform's wpa_driver_wext_get_rssi
 	*/
-	if (check_fwstate(pmlmepriv, _FW_LINKED) == true) {
+	if (check_fwstate(pmlmepriv, _FW_LINKED)) {
 		/* wrqu->sens.value=-adapt->recvpriv.signal_strength; */
 		wrqu->sens.value = -adapt->recvpriv.rssi;
 		/* RTW_INFO("%s: %d\n", __FUNCTION__, wrqu->sens.value); */
@@ -1553,7 +1551,7 @@ static int rtw_wx_set_wap(struct net_device *dev,
 	enum ndis_802_11_authentication_mode	authmode;
 
 #ifdef CONFIG_CONCURRENT_MODE
-	if (rtw_mi_buddy_check_fwstate(adapt, _FW_UNDER_SURVEY | _FW_UNDER_LINKING) == true) {
+	if (rtw_mi_buddy_check_fwstate(adapt, _FW_UNDER_SURVEY | _FW_UNDER_LINKING)) {
 		RTW_INFO("set bssid, but buddy_intf is under scanning or linking\n");
 
 		ret = -EINVAL;
@@ -1585,7 +1583,7 @@ static int rtw_wx_set_wap(struct net_device *dev,
 	pmlmepriv->pscanned = get_next(phead);
 
 	while (1) {
-		if ((rtw_end_of_queue_search(phead, pmlmepriv->pscanned)) == true) {
+		if ((rtw_end_of_queue_search(phead, pmlmepriv->pscanned))) {
 			break;
 		}
 
@@ -1597,7 +1595,7 @@ static int rtw_wx_set_wap(struct net_device *dev,
 
 		src_bssid = temp->sa_data;
 
-		if ((_rtw_memcmp(dst_bssid, src_bssid, ETH_ALEN)) == true) {
+		if ((_rtw_memcmp(dst_bssid, src_bssid, ETH_ALEN))) {
 			if (!rtw_set_802_11_infrastructure_mode(adapt, pnetwork->network.InfrastructureMode)) {
 				ret = -1;
 				_exit_critical_bh(&queue->lock, &irqL);
@@ -1612,7 +1610,7 @@ static int rtw_wx_set_wap(struct net_device *dev,
 
 	rtw_set_802_11_authentication_mode(adapt, authmode);
 	/* set_802_11_encryption_mode(adapt, adapt->securitypriv.ndisencryptstatus); */
-	if (rtw_set_802_11_bssid(adapt, temp->sa_data) == false) {
+	if (!rtw_set_802_11_bssid(adapt, temp->sa_data)) {
 		ret = -1;
 		goto cancel_ps_deny;
 	}
@@ -1639,9 +1637,9 @@ static int rtw_wx_get_wap(struct net_device *dev,
 
 
 
-	if (((check_fwstate(pmlmepriv, _FW_LINKED)) == true) ||
-	    ((check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE)) == true) ||
-	    ((check_fwstate(pmlmepriv, WIFI_AP_STATE)) == true))
+	if (((check_fwstate(pmlmepriv, _FW_LINKED))) ||
+	    ((check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE))) ||
+	    ((check_fwstate(pmlmepriv, WIFI_AP_STATE))))
 
 		_rtw_memcpy(wrqu->ap_addr.sa_data, pcur_bss->MacAddress, ETH_ALEN);
 	else
@@ -1730,7 +1728,7 @@ static int rtw_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
 		goto cancel_ps_deny;
 	}
 
-	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY | _FW_UNDER_LINKING) == true) {
+	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY | _FW_UNDER_LINKING)) {
 		indicate_wx_scan_complete_event(adapt);
 		goto cancel_ps_deny;
 	}
@@ -1774,7 +1772,7 @@ static int rtw_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
 #endif
 
 		if (wrqu->data.length >= WEXT_CSCAN_HEADER_SIZE
-		    && _rtw_memcmp(extra, WEXT_CSCAN_HEADER, WEXT_CSCAN_HEADER_SIZE) == true
+		    && _rtw_memcmp(extra, WEXT_CSCAN_HEADER, WEXT_CSCAN_HEADER_SIZE)
 		   ) {
 			int len = wrqu->data.length - WEXT_CSCAN_HEADER_SIZE;
 			char *pos = extra + WEXT_CSCAN_HEADER_SIZE;
@@ -1856,7 +1854,7 @@ static int rtw_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
 
 			_status = rtw_set_802_11_bssid_list_scan(adapt, NULL);
 
-	if (_status == false)
+	if (!_status)
 		ret = -1;
 
 cancel_ps_deny:
@@ -1896,7 +1894,7 @@ static int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
 	}
 	wait_status = _FW_UNDER_SURVEY | _FW_UNDER_LINKING;
 
-	while (check_fwstate(pmlmepriv, wait_status) == true)
+	while (check_fwstate(pmlmepriv, wait_status))
 		return -EAGAIN;
 	_enter_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 
@@ -1904,7 +1902,7 @@ static int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		if ((stop - ev) < SCAN_ITEM_SIZE) {
@@ -1916,8 +1914,8 @@ static int rtw_wx_get_scan(struct net_device *dev, struct iw_request_info *a,
 
 		/* report network only if the current channel set contains the channel to which this network belongs */
 		if (rtw_chset_search_ch(adapter_to_chset(adapt), pnetwork->network.Configuration.DSConfig) >= 0
-		    && rtw_mlme_band_check(adapt, pnetwork->network.Configuration.DSConfig) == true
-		    && true == rtw_validate_ssid(&(pnetwork->network.Ssid))
+		    && rtw_mlme_band_check(adapt, pnetwork->network.Configuration.DSConfig)
+		    && rtw_validate_ssid(&(pnetwork->network.Ssid))
 		   )
 			ev = translate_scan(adapt, a, pnetwork, ev, stop);
 
@@ -2018,7 +2016,7 @@ static int rtw_wx_set_essid(struct net_device *dev,
 		pmlmepriv->pscanned = get_next(phead);
 
 		while (1) {
-			if (rtw_end_of_queue_search(phead, pmlmepriv->pscanned) == true) {
+			if (rtw_end_of_queue_search(phead, pmlmepriv->pscanned)) {
 				break;
 			}
 
@@ -2029,15 +2027,15 @@ static int rtw_wx_set_essid(struct net_device *dev,
 			dst_ssid = pnetwork->network.Ssid.Ssid;
 
 
-			if ((_rtw_memcmp(dst_ssid, src_ssid, ndis_ssid.SsidLength) == true) &&
+			if ((_rtw_memcmp(dst_ssid, src_ssid, ndis_ssid.SsidLength)) &&
 			    (pnetwork->network.Ssid.SsidLength == ndis_ssid.SsidLength)) {
 
-				if (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE) == true) {
+				if (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE)) {
 					if (pnetwork->network.InfrastructureMode != pmlmepriv->cur_network.network.InfrastructureMode)
 						continue;
 				}
 
-				if (rtw_set_802_11_infrastructure_mode(adapt, pnetwork->network.InfrastructureMode) == false) {
+				if (!rtw_set_802_11_infrastructure_mode(adapt, pnetwork->network.InfrastructureMode)) {
 					ret = -1;
 					_exit_critical_bh(&queue->lock, &irqL);
 					goto cancel_ps_deny;
@@ -2049,7 +2047,7 @@ static int rtw_wx_set_essid(struct net_device *dev,
 		_exit_critical_bh(&queue->lock, &irqL);
 		rtw_set_802_11_authentication_mode(adapt, authmode);
 		/* set_802_11_encryption_mode(adapt, adapt->securitypriv.ndisencryptstatus); */
-		if (rtw_set_802_11_ssid(adapt, &ndis_ssid) == false) {
+		if (!rtw_set_802_11_ssid(adapt, &ndis_ssid)) {
 			ret = -1;
 			goto cancel_ps_deny;
 		}
@@ -2074,8 +2072,8 @@ static int rtw_wx_get_essid(struct net_device *dev,
 
 
 
-	if ((check_fwstate(pmlmepriv, _FW_LINKED) == true) ||
-	    (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) == true)) {
+	if ((check_fwstate(pmlmepriv, _FW_LINKED)) ||
+	    (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE))) {
 		len = pcur_bss->Ssid.SsidLength;
 
 		wrqu->essid.length = len;
@@ -2408,7 +2406,7 @@ static int rtw_wx_set_enc(struct net_device *dev,
 
 	_rtw_memcpy(wep.KeyMaterial, keybuf, wep.KeyLength);
 
-	if (rtw_set_802_11_add_wep(adapt, &wep) == false) {
+	if (!rtw_set_802_11_add_wep(adapt, &wep)) {
 		if (rf_on == pwrpriv->rf_pwrstate)
 			ret = -EOPNOTSUPP;
 		goto exit;
@@ -2431,8 +2429,8 @@ static int rtw_wx_get_enc(struct net_device *dev,
 	struct	mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
 
 
-	if (check_fwstate(pmlmepriv, _FW_LINKED) != true) {
-		if (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) != true) {
+	if (!check_fwstate(pmlmepriv, _FW_LINKED)) {
+		if (!check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE)) {
 			erq->length = 0;
 			erq->flags |= IW_ENCODE_DISABLED;
 			return 0;
@@ -3110,7 +3108,7 @@ static int rtw_get_ap_info(struct net_device *dev,
 		goto exit;
 	}
 
-	while ((check_fwstate(pmlmepriv, (_FW_UNDER_SURVEY | _FW_UNDER_LINKING))) == true) {
+	while ((check_fwstate(pmlmepriv, (_FW_UNDER_SURVEY | _FW_UNDER_LINKING)))) {
 		rtw_msleep_os(30);
 		cnt++;
 		if (cnt > 100)
@@ -3136,7 +3134,7 @@ static int rtw_get_ap_info(struct net_device *dev,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 
@@ -3150,7 +3148,7 @@ static int rtw_get_ap_info(struct net_device *dev,
 		}
 
 
-		if (_rtw_memcmp(bssid, pnetwork->network.MacAddress, ETH_ALEN) == true) { /* BSSID match, then check if supporting wpa/wpa2 */
+		if (_rtw_memcmp(bssid, pnetwork->network.MacAddress, ETH_ALEN)) { /* BSSID match, then check if supporting wpa/wpa2 */
 			RTW_INFO("BSSID:" MAC_FMT "\n", MAC_ARG(bssid));
 
 			pbuf = rtw_get_wpa_ie(&pnetwork->network.IEs[12], &wpa_ielen, pnetwork->network.IELength - 12);
@@ -3701,7 +3699,7 @@ static int rtw_p2p_get_wps_configmethod(struct net_device *dev,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
@@ -3831,7 +3829,7 @@ static int rtw_p2p_get_go_device_address(struct net_device *dev,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
@@ -3917,7 +3915,7 @@ static int rtw_p2p_get_device_type(struct net_device *dev,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
@@ -3991,7 +3989,7 @@ static int rtw_p2p_get_device_name(struct net_device *dev,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
@@ -4061,7 +4059,7 @@ static int rtw_p2p_get_invitation_procedure(struct net_device *dev,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
@@ -4142,7 +4140,7 @@ static int rtw_p2p_connect(struct net_device *dev,
 	}
 
 #ifdef CONFIG_INTEL_WIDI
-	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY) == true) {
+	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY)) {
 		RTW_INFO("[%s] WiFi is under survey!\n", __FUNCTION__);
 		return ret;
 	}
@@ -4160,7 +4158,7 @@ static int rtw_p2p_connect(struct net_device *dev,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
@@ -4307,7 +4305,7 @@ static int rtw_p2p_invite_req(struct net_device *dev,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
@@ -4577,7 +4575,7 @@ static int rtw_p2p_set_pc(struct net_device *dev,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
@@ -4786,7 +4784,7 @@ static int rtw_p2p_prov_disc(struct net_device *dev,
 		return ret;
 	} else {
 #ifdef CONFIG_INTEL_WIDI
-		if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY) == true) {
+		if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY)) {
 			RTW_INFO("[%s] WiFi is under survey!\n", __FUNCTION__);
 			return ret;
 		}
@@ -4823,7 +4821,7 @@ static int rtw_p2p_prov_disc(struct net_device *dev,
 	plist = get_next(phead);
 
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		if (uintPeerChannel != 0)
@@ -5244,7 +5242,7 @@ static int rtw_rereg_nd_name(struct net_device *dev,
 	if (0 != ret)
 		goto exit;
 
-	if (_rtw_memcmp(rereg_priv->old_ifname, "disable%d", 9) == true) {
+	if (_rtw_memcmp(rereg_priv->old_ifname, "disable%d", 9)) {
 		adapt->ledpriv.bRegUseLed = rereg_priv->old_bRegUseLed;
 		rtw_hal_sw_led_init(adapt);
 	}
@@ -5252,7 +5250,7 @@ static int rtw_rereg_nd_name(struct net_device *dev,
 	strncpy(rereg_priv->old_ifname, new_ifname, IFNAMSIZ);
 	rereg_priv->old_ifname[IFNAMSIZ - 1] = 0;
 
-	if (_rtw_memcmp(new_ifname, "disable%d", 9) == true) {
+	if (_rtw_memcmp(new_ifname, "disable%d", 9)) {
 
 		RTW_INFO("%s disable\n", __FUNCTION__);
 		/* free network queue for Android's timming issue */
@@ -5458,7 +5456,7 @@ static int rtw_dbg_port(struct net_device *dev,
 				phead = &(pstapriv->sta_hash[i]);
 				plist = get_next(phead);
 
-				while ((rtw_end_of_queue_search(phead, plist)) == false) {
+				while ((!rtw_end_of_queue_search(phead, plist))) {
 					psta = container_of(plist, struct sta_info, hash_list);
 
 					plist = get_next(plist);
@@ -6213,7 +6211,7 @@ static int rtw_set_beacon(struct net_device *dev, struct ieee_param *param, int 
 
 	RTW_INFO("%s, len=%d\n", __FUNCTION__, len);
 
-	if (check_fwstate(pmlmepriv, WIFI_AP_STATE) != true)
+	if (!check_fwstate(pmlmepriv, WIFI_AP_STATE))
 		return -EINVAL;
 
 	_rtw_memcpy(&pstapriv->max_num_sta, param->u.bcn_ie.reserved, 2);
@@ -6260,7 +6258,7 @@ static int rtw_add_sta(struct net_device *dev, struct ieee_param *param)
 
 	RTW_INFO("rtw_add_sta(aid=%d)=" MAC_FMT "\n", param->u.add_sta.aid, MAC_ARG(param->sta_addr));
 
-	if (check_fwstate(pmlmepriv, (_FW_LINKED | WIFI_AP_STATE)) != true)
+	if (!check_fwstate(pmlmepriv, (_FW_LINKED | WIFI_AP_STATE)))
 		return -EINVAL;
 
 	if (param->sta_addr[0] == 0xff && param->sta_addr[1] == 0xff &&
@@ -6295,7 +6293,7 @@ static int rtw_add_sta(struct net_device *dev, struct ieee_param *param)
 		} else
 			psta->htpriv.ht_option = false;
 
-		if (pmlmepriv->htpriv.ht_option == false)
+		if (!pmlmepriv->htpriv.ht_option)
 			psta->htpriv.ht_option = false;
 
 		update_sta_info_apmode(adapt, psta);
@@ -6316,7 +6314,7 @@ static int rtw_del_sta(struct net_device *dev, struct ieee_param *param)
 
 	RTW_INFO("rtw_del_sta=" MAC_FMT "\n", MAC_ARG(param->sta_addr));
 
-	if (check_fwstate(pmlmepriv, (_FW_LINKED | WIFI_AP_STATE)) != true)
+	if (!check_fwstate(pmlmepriv, (_FW_LINKED | WIFI_AP_STATE)))
 		return -EINVAL;
 
 	if (param->sta_addr[0] == 0xff && param->sta_addr[1] == 0xff &&
@@ -6331,7 +6329,7 @@ static int rtw_del_sta(struct net_device *dev, struct ieee_param *param)
 		/* RTW_INFO("free psta=%p, aid=%d\n", psta, psta->cmn.aid); */
 
 		_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
-		if (rtw_is_list_empty(&psta->asoc_list) == false) {
+		if (!rtw_is_list_empty(&psta->asoc_list)) {
 			rtw_list_delete(&psta->asoc_list);
 			pstapriv->asoc_list_cnt--;
 			updated = ap_free_sta(adapt, psta, true, WLAN_REASON_DEAUTH_LEAVING, true);
@@ -6366,7 +6364,7 @@ static int rtw_ioctl_get_sta_data(struct net_device *dev, struct ieee_param *par
 
 	RTW_INFO("rtw_ioctl_get_sta_info, sta_addr: " MAC_FMT "\n", MAC_ARG(param_ex->sta_addr));
 
-	if (check_fwstate(pmlmepriv, (_FW_LINKED | WIFI_AP_STATE)) != true)
+	if (!check_fwstate(pmlmepriv, (_FW_LINKED | WIFI_AP_STATE)))
 		return -EINVAL;
 
 	if (param_ex->sta_addr[0] == 0xff && param_ex->sta_addr[1] == 0xff &&
@@ -6425,7 +6423,7 @@ static int rtw_get_sta_wpaie(struct net_device *dev, struct ieee_param *param)
 
 	RTW_INFO("rtw_get_sta_wpaie, sta_addr: " MAC_FMT "\n", MAC_ARG(param->sta_addr));
 
-	if (check_fwstate(pmlmepriv, (_FW_LINKED | WIFI_AP_STATE)) != true)
+	if (!check_fwstate(pmlmepriv, (_FW_LINKED | WIFI_AP_STATE)))
 		return -EINVAL;
 
 	if (param->sta_addr[0] == 0xff && param->sta_addr[1] == 0xff &&
@@ -6469,7 +6467,7 @@ static int rtw_set_wps_beacon(struct net_device *dev, struct ieee_param *param, 
 
 	RTW_INFO("%s, len=%d\n", __FUNCTION__, len);
 
-	if (check_fwstate(pmlmepriv, WIFI_AP_STATE) != true)
+	if (!check_fwstate(pmlmepriv, WIFI_AP_STATE))
 		return -EINVAL;
 
 	ie_len = len - 12 - 2; /* 12 = param header, 2:no packed */
@@ -6510,7 +6508,7 @@ static int rtw_set_wps_probe_resp(struct net_device *dev, struct ieee_param *par
 
 	RTW_INFO("%s, len=%d\n", __FUNCTION__, len);
 
-	if (check_fwstate(pmlmepriv, WIFI_AP_STATE) != true)
+	if (!check_fwstate(pmlmepriv, WIFI_AP_STATE))
 		return -EINVAL;
 
 	ie_len = len - 12 - 2; /* 12 = param header, 2:no packed */
@@ -6545,7 +6543,7 @@ static int rtw_set_wps_assoc_resp(struct net_device *dev, struct ieee_param *par
 
 	RTW_INFO("%s, len=%d\n", __FUNCTION__, len);
 
-	if (check_fwstate(pmlmepriv, WIFI_AP_STATE) != true)
+	if (!check_fwstate(pmlmepriv, WIFI_AP_STATE))
 		return -EINVAL;
 
 	ie_len = len - 12 - 2; /* 12 = param header, 2:no packed */
@@ -6585,7 +6583,7 @@ static int rtw_set_hidden_ssid(struct net_device *dev, struct ieee_param *param,
 	int ssid_len = 0;
 	u8 ignore_broadcast_ssid;
 
-	if (check_fwstate(mlmepriv, WIFI_AP_STATE) != true)
+	if (!check_fwstate(mlmepriv, WIFI_AP_STATE))
 		return -EPERM;
 
 	if (param->u.bcn_ie.reserved[0] != 0xea)
@@ -6622,7 +6620,7 @@ static int rtw_ioctl_acl_remove_sta(struct net_device *dev, struct ieee_param *p
 	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
 
-	if (check_fwstate(pmlmepriv, WIFI_AP_STATE) != true)
+	if (!check_fwstate(pmlmepriv, WIFI_AP_STATE))
 		return -EINVAL;
 
 	if (param->sta_addr[0] == 0xff && param->sta_addr[1] == 0xff &&
@@ -6642,7 +6640,7 @@ static int rtw_ioctl_acl_add_sta(struct net_device *dev, struct ieee_param *para
 	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
 
-	if (check_fwstate(pmlmepriv, WIFI_AP_STATE) != true)
+	if (!check_fwstate(pmlmepriv, WIFI_AP_STATE))
 		return -EINVAL;
 
 	if (param->sta_addr[0] == 0xff && param->sta_addr[1] == 0xff &&
@@ -6662,7 +6660,7 @@ static int rtw_ioctl_set_macaddr_acl(struct net_device *dev, struct ieee_param *
 	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
 
-	if (check_fwstate(pmlmepriv, WIFI_AP_STATE) != true)
+	if (!check_fwstate(pmlmepriv, WIFI_AP_STATE))
 		return -EINVAL;
 
 	rtw_set_macaddr_acl(adapt, param->u.mlme.command);
@@ -6860,7 +6858,7 @@ static int rtw_wx_set_priv(struct net_device *dev,
 		u8 wps_oui[4] = {0x0, 0x50, 0xf2, 0x04};
 
 		if ((_VENDOR_SPECIFIC_IE_ == probereq_wpsie[0]) &&
-		    (_rtw_memcmp(&probereq_wpsie[2], wps_oui, 4) == true)) {
+		    (_rtw_memcmp(&probereq_wpsie[2], wps_oui, 4))) {
 			cp_sz = probereq_wpsie_len > MAX_WPS_IE_LEN ? MAX_WPS_IE_LEN : probereq_wpsie_len;
 
 			if (pmlmepriv->wps_probe_req_ie) {
@@ -6888,7 +6886,7 @@ static int rtw_wx_set_priv(struct net_device *dev,
 	}
 
 	if (len >= WEXT_CSCAN_HEADER_SIZE
-		&& _rtw_memcmp(ext, WEXT_CSCAN_HEADER, WEXT_CSCAN_HEADER_SIZE) == true
+		&& _rtw_memcmp(ext, WEXT_CSCAN_HEADER, WEXT_CSCAN_HEADER_SIZE)
 	) {
 		ret = rtw_wx_set_scan(dev, info, awrq, ext);
 		goto FREE_EXT;
@@ -7500,7 +7498,7 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 		mask_len = sizeof(u8) * rtw_get_efuse_mask_arraylen(adapt);
 		rtw_efuse_mask_array(adapt, mask_buf);
 
-		if (adapt->registrypriv.bFileMaskEfuse == true)
+		if (adapt->registrypriv.bFileMaskEfuse)
 			_rtw_memcpy(mask_buf, maskfileBuffer, mask_len);
 
 		sprintf(extra, "\n");
@@ -7538,13 +7536,13 @@ static int rtw_priv_set(struct net_device *dev,
 	if (!adapt)
 		return -ENETDOWN;
 
-	if (adapt->bup == false) {
+	if (!adapt->bup) {
 		RTW_INFO(" %s fail =>(adapt->bup == false )\n", __FUNCTION__);
 		return -ENETDOWN;
 	}
 
 	if (RTW_CANNOT_RUN(adapt)) {
-		RTW_INFO("%s fail =>(bSurpriseRemoved == true) || ( bDriverStopped == true)\n", __func__);
+		RTW_INFO("%s fail =>(bSurpriseRemoved) || ( bDriverStopped)\n", __func__);
 		return -ENETDOWN;
 	}
 
@@ -7572,13 +7570,13 @@ static int rtw_priv_get(struct net_device *dev,
 	if (!adapt)
 		return -ENETDOWN;
 
-	if (adapt->bup == false) {
+	if (!adapt->bup) {
 		RTW_INFO(" %s fail =>(adapt->bup == false )\n", __FUNCTION__);
 		return -ENETDOWN;
 	}
 
 	if (RTW_CANNOT_RUN(adapt)) {
-		RTW_INFO("%s fail =>(adapt->bSurpriseRemoved == true) || ( adapt->bDriverStopped == true)\n", __func__);
+		RTW_INFO("%s fail =>(adapt->bSurpriseRemoved) || ( adapt->bDriverStopped)\n", __func__);
 		return -ENETDOWN;
 	}
 
@@ -7882,7 +7880,7 @@ static int initpseudoadhoc(struct adapter * adapt)
 
 	networkType = Ndis802_11IBSS;
 	err = rtw_set_802_11_infrastructure_mode(adapt, networkType);
-	if (err == false)
+	if (!err)
 		return _FAIL;
 
 	err = rtw_setopmode_cmd(adapt, networkType, RTW_CMDF_WAIT_ACK);
@@ -7908,7 +7906,7 @@ static int createpseudoadhoc(struct adapter * adapt)
 
 	authmode = Ndis802_11AuthModeOpen;
 	err = rtw_set_802_11_authentication_mode(adapt, authmode);
-	if (err == false)
+	if (!err)
 		return _FAIL;
 
 	passoc_ssid = &pmlmepriv->assoc_ssid;
@@ -8167,11 +8165,11 @@ static u8 pktcmp(struct adapter * adapt, u8 *txbuf, u32 txsz, u8 *rxbuf, u32 rxs
 		ret = _rtw_memcmp(txbuf + TXDESC_SIZE, \
 				  rxbuf + RXDESC_SIZE + drvinfosize, \
 				  txsz - TXDESC_SIZE);
-		if (ret == false)
+		if (!ret)
 			RTW_INFO("%s: ERROR! pkt content mismatch!\n", __func__);
 	}
 
-	if (ret == false) {
+	if (!ret) {
 		RTW_INFO("\n%s: TX PKT total=%d, desc=%d, content=%d\n",
 			 __func__, txsz, TXDESC_SIZE, txsz - TXDESC_SIZE);
 		RTW_INFO("%s: TX DESC size=%d\n", __func__, TXDESC_SIZE);
@@ -8244,7 +8242,7 @@ int lbk_thread(void *context)
 		_rtw_down_sema(&ploopback->sema);
 
 		err = pktcmp(adapt, ploopback->txbuf, ploopback->txsize, ploopback->rxbuf, ploopback->rxsize);
-		if (err == true)
+		if (err)
 			ok++;
 		else
 			fail++;
@@ -8259,7 +8257,7 @@ int lbk_thread(void *context)
 
 		flush_signals_thread();
 
-		if ((ploopback->bstop == true) ||
+		if ((ploopback->bstop) ||
 		    ((ploopback->cnt != 0) && (ploopback->cnt == cnt))) {
 			u32 ok_rate, fail_rate, all;
 			all = cnt;
@@ -8288,7 +8286,7 @@ static void loopbackTest(struct adapter * adapt, u32 cnt, u32 size, u8 *pmsg)
 	ploopback = adapt->ploopback;
 
 	if (ploopback) {
-		if (ploopback->bstop == false) {
+		if (!ploopback->bstop) {
 			ploopback->bstop = true;
 			_rtw_up_sema(&ploopback->sema);
 		}
@@ -8704,14 +8702,12 @@ static struct iw_statistics *rtw_get_wireless_stats(struct net_device *dev)
 	int tmp_qual = 0;
 	int tmp_noise = 0;
 
-	if (check_fwstate(&adapt->mlmepriv, _FW_LINKED) != true) {
+	if (!check_fwstate(&adapt->mlmepriv, _FW_LINKED)) {
 		piwstats->qual.qual = 0;
 		piwstats->qual.level = 0;
 		piwstats->qual.noise = 0;
-		/* RTW_INFO("No link  level:%d, qual:%d, noise:%d\n", tmp_level, tmp_qual, tmp_noise); */
 	} else {
 		/* Do signal scale mapping when using percentage as the unit of signal strength, since the scale mapping is skipped in odm */
-
 		struct hal_com_data *pHal = GET_HAL_DATA(adapt);
 
 		tmp_level = (u8)phydm_signal_scale_mapping(&pHal->odmpriv, adapt->recvpriv.signal_strength);

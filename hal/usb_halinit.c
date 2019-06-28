@@ -101,7 +101,7 @@ static u32 _InitPowerOn_8723du(struct adapter * adapt)
 	u8 value8 = 0;
 
 	rtw_hal_get_hwreg(adapt, HW_VAR_APFM_ON_MAC, &value8);
-	if (value8 == true)
+	if (value8)
 		return _SUCCESS;
 	/* HW Power on sequence */
 	if (!HalPwrSeqCmdParsing(adapt, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_USB_MSK, rtl8723D_card_enable_flow))
@@ -749,42 +749,9 @@ HalDetectSelectiveSuspendMode(
  *	When		Who		Remark
  *	08/23/2010	MHC		HW suspend mode switch test..
  *---------------------------------------------------------------------------*/
-static void
-HwSuspendModeEnable(
-	struct adapter * adapt,
-	u8 Type
-)
+static void HwSuspendModeEnable(struct adapter * adapt, u8 Type)
 {
-	/* PRT_USB_DEVICE pDevice = GET_RT_USB_DEVICE(adapt); */
-	u16 reg = rtw_read16(adapt, REG_GPIO_MUXCFG);
-
-	/* if (!pDevice->RegUsbSS) */
-	{
-		return;
-	}
-
-	/*
-	 * 2010/08/23 MH According to Alfred's suggestion, we need to to prevent HW
-	 * to enter suspend mode automatically. Otherwise, it will shut down major power
-	 * domain and 8051 will stop. When we try to enter selective suspend mode, we
-	 * need to prevent HW to enter D2 mode aumotmatically. Another way, Host will
-	 * issue a S10 signal to power domain. Then it will cleat SIC setting(from Yngli).
-	 * We need to enable HW suspend mode when enter S3/S4 or disable. We need
-	 * to disable HW suspend mode for IPS/radio_off.
-	 */
-	if (Type == false) {
-		reg |= BIT(14);
-		rtw_write16(adapt, REG_GPIO_MUXCFG, reg);
-		reg |= BIT(12);
-		rtw_write16(adapt, REG_GPIO_MUXCFG, reg);
-	} else {
-		reg &= (~BIT(12));
-		rtw_write16(adapt, REG_GPIO_MUXCFG, reg);
-		reg &= (~BIT(14));
-		rtw_write16(adapt, REG_GPIO_MUXCFG, reg);
-	}
-
-}   /* HwSuspendModeEnable */
+}
 
 static enum rt_rf_power_state RfOnOffDetect(struct adapter * adapt)
 {
@@ -892,7 +859,7 @@ static u32 rtl8723du_hal_init(struct adapter * adapt)
 		}
 	}
 
-	if (pwrctrlpriv->reg_rfoff == true)
+	if (pwrctrlpriv->reg_rfoff)
 		pwrctrlpriv->rf_pwrstate = rf_off;
 
 	/* Set RF type for BB/RF configuration */
@@ -1028,7 +995,7 @@ static u32 rtl8723du_hal_init(struct adapter * adapt)
 			} while (rtw_get_passing_time_ms(start_time) <= 400);
 
 			rtw_btcoex_IQKNotify(adapt, true);
-			restore_iqk_rst = (pwrpriv->bips_processing == true) ? true : false;
+			restore_iqk_rst = (pwrpriv->bips_processing) ? true : false;
 			b2Ant = pHalData->EEPROMBluetoothAntNum == Ant_x2 ? true : false;
 			halrf_iqk_trigger(&pHalData->odmpriv, false);
 			/*phy_iq_calibrate_8723d(adapt, false);*/
@@ -1415,7 +1382,7 @@ CardDisableRTL8723du(
 
 	rtw_hal_get_hwreg(adapt, HW_VAR_APFM_ON_MAC, &u1bTmp);
 	RTW_INFO(FUNC_ADPT_FMT ": bMacPwrCtrlOn=%d\n", FUNC_ADPT_ARG(adapt), u1bTmp);
-	if (u1bTmp == false)
+	if (!u1bTmp)
 		return;
 	u1bTmp = false;
 	rtw_hal_set_hwreg(adapt, HW_VAR_APFM_ON_MAC, &u1bTmp);
@@ -1501,7 +1468,7 @@ static unsigned int rtl8723du_inirp_init(struct adapter * adapt)
 	/* issue Rx irp to receive data */
 	precvbuf = (struct recv_buf *)precvpriv->precv_buf;
 	for (i = 0; i < NR_RECVBUFF; i++) {
-		if (_read_port(pintfhdl, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf) == false) {
+		if (!_read_port(pintfhdl, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf)) {
 			status = _FAIL;
 			goto exit;
 		}

@@ -156,7 +156,7 @@ u32 rtw_hal_power_on(struct adapter *adapt)
 
 	ret = adapt->hal_func.hal_power_on(adapt);
 
-	if ((ret == _SUCCESS) && (pHalData->EEPROMBluetoothCoexist == true))
+	if ((ret == _SUCCESS) && (pHalData->EEPROMBluetoothCoexist))
 		rtw_btcoex_PowerOnSetting(adapt);
 	return ret;
 }
@@ -340,7 +340,7 @@ int	rtw_hal_mgnt_xmit(struct adapter *adapt, struct xmit_frame *pmgntframe)
 	update_mgntframe_attrib_addr(adapt, pmgntframe);
 
 #if defined(CONFIG_IEEE80211W) || defined(CONFIG_RTW_MESH)
-	if ((!MLME_IS_MESH(adapt) && SEC_IS_BIP_KEY_INSTALLED(&adapt->securitypriv) == true)
+	if ((!MLME_IS_MESH(adapt) && SEC_IS_BIP_KEY_INSTALLED(&adapt->securitypriv))
 		#ifdef CONFIG_RTW_MESH
 		|| (MLME_IS_MESH(adapt) && adapt->mesh_info.mesh_auth_id)
 		#endif
@@ -626,7 +626,7 @@ int c2h_handler(struct adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 		/* no handle, goto default */
 
 	default:
-		if (phydm_c2H_content_parsing(adapter_to_phydm(adapter), id, plen, payload) != true)
+		if (!phydm_c2H_content_parsing(adapter_to_phydm(adapter), id, plen, payload))
 			ret = _FAIL;
 		break;
 	}
@@ -829,7 +829,7 @@ int rtw_hal_fill_h2c_cmd(struct adapter * adapt, u8 ElementID, u32 CmdLen, u8 *p
 {
 	struct adapter *pri_adapter = GET_PRIMARY_ADAPTER(adapt);
 
-	if (GET_HAL_DATA(pri_adapter)->bFWReady == true)
+	if (GET_HAL_DATA(pri_adapter)->bFWReady)
 		return adapt->hal_func.fill_h2c_cmd(adapt, ElementID, CmdLen, pCmdBuffer);
 	else if (adapt->registrypriv.mp_mode == 0)
 		RTW_PRINT(FUNC_ADPT_FMT" FW doesn't exit when no MP mode, by pass H2C id:0x%02x\n"

@@ -406,7 +406,7 @@ static int usb_reprobe_switch_usb_mode(struct adapter * Adapter)
 	u8 ret = false;
 
 	/* efuse not allow driver to switch usb mode */
-	if (pHalData->EEPROMUsbSwitch == false)
+	if (!pHalData->EEPROMUsbSwitch)
 		goto exit;
 
 	/* registry not allow driver to switch usb mode */
@@ -618,7 +618,7 @@ static int rtw_suspend(struct usb_interface *pusb_intf, pm_message_t message)
 	pdbgpriv = &dvobj->drv_dbg;
 	adapt = dvobj_get_primary_adapter(dvobj);
 
-	if (pwrpriv->bInSuspend == true) {
+	if (pwrpriv->bInSuspend) {
 		RTW_INFO("%s bInSuspend = %d\n", __FUNCTION__, pwrpriv->bInSuspend);
 		pdbgpriv->dbg_suspend_error_cnt++;
 		goto exit;
@@ -653,7 +653,7 @@ static int rtw_resume_process(struct adapter *adapt)
 	struct debug_priv *pdbgpriv = &pdvobj->drv_dbg;
 
 
-	if (pwrpriv->bInSuspend == false) {
+	if (!pwrpriv->bInSuspend) {
 		pdbgpriv->dbg_resume_error_cnt++;
 		RTW_INFO("%s bInSuspend = %d\n", __FUNCTION__, pwrpriv->bInSuspend);
 		return -1;
@@ -669,7 +669,7 @@ static int rtw_resume_process(struct adapter *adapt)
 #endif /* kernel < 2.6.32 */
 
 	RTW_INFO("pwrpriv->bAutoResume (%x)\n", pwrpriv->bAutoResume);
-	if (true == pwrpriv->bAutoResume) {
+	if (pwrpriv->bAutoResume) {
 		pwrpriv->bInternalAutoSuspend = false;
 		pwrpriv->bAutoResume = false;
 		RTW_INFO("pwrpriv->bAutoResume (%x)  pwrpriv->bInternalAutoSuspend(%x)\n", pwrpriv->bAutoResume, pwrpriv->bInternalAutoSuspend);
@@ -698,7 +698,7 @@ static int rtw_resume_process(struct adapter *adapt)
 		}
 #endif
 		RTW_INFO("pwrpriv->bAutoResume (%x)\n", pwrpriv->bAutoResume);
-		if (true == pwrpriv->bAutoResume) {
+		if (pwrpriv->bAutoResume) {
 			pwrpriv->bInternalAutoSuspend = false;
 			pwrpriv->bAutoResume = false;
 			RTW_INFO("pwrpriv->bAutoResume (%x)  pwrpriv->bInternalAutoSuspend(%x)\n", pwrpriv->bAutoResume, pwrpriv->bInternalAutoSuspend);
@@ -1041,7 +1041,7 @@ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device
 		goto free_dvobj;
 	}
 
-	if (usb_reprobe_switch_usb_mode(adapt) == true)
+	if (usb_reprobe_switch_usb_mode(adapt))
 		goto free_if_prim;
 
 #ifdef CONFIG_CONCURRENT_MODE
@@ -1106,11 +1106,11 @@ static void rtw_dev_remove(struct usb_interface *pusb_intf)
 	/* TODO: use rtw_os_ndevs_deinit instead at the first stage of driver's dev deinit function */
 	rtw_os_ndevs_unregister(dvobj);
 
-	if (usb_drv.drv_registered == true) {
-		/* RTW_INFO("r871xu_dev_remove():adapt->bSurpriseRemoved == true\n"); */
+	if (usb_drv.drv_registered) {
+		/* RTW_INFO("r871xu_dev_remove():adapt->bSurpriseRemoved\n"); */
 		rtw_set_surprise_removed(adapt);
 	}
-	if (GET_HAL_DATA(adapt)->bFWReady == true) {
+	if (GET_HAL_DATA(adapt)->bFWReady) {
 		rtw_pm_set_ips(adapt, IPS_NONE);
 		rtw_pm_set_lps(adapt, PS_MODE_ACTIVE);
 

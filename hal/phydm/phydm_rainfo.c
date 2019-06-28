@@ -754,9 +754,9 @@ phydm_ra_h2c(
 	PHYDM_DBG(p_dm, DBG_RA, ("%s ======>\n", __func__));
 	PHYDM_DBG(p_dm, DBG_RA, ("MACID=%d\n", p_sta->mac_id));
 
-	if (p_dm->is_disable_power_training == true)
+	if (p_dm->is_disable_power_training)
 		dis_pt = true;
-	else if (p_dm->is_disable_power_training == false)
+	else if (!p_dm->is_disable_power_training)
 		dis_pt = false;
 
 	h2c_val[0] = p_sta->mac_id;

@@ -86,7 +86,7 @@ phydm_calculate_rssi_min_max(
 				rssi_max_tmp = p_sta->rssi_stat.rssi;
 
 			/*[Send RSSI to FW]*/
-			if (p_sta->ra_info.disable_ra == false)
+			if (!p_sta->ra_info.disable_ra)
 				phydm_rssi_monitor_h2c(p_dm, i);
 
 			if (sta_cnt == p_dm->number_linked_client)

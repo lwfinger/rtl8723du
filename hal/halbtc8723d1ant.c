@@ -1210,7 +1210,7 @@ static bool halbtc8723d1ant_is_wifibt_status_changed(struct btc_coexist
 		}
 		if (coex_sta->under_lps != pre_wifi_under_lps) {
 			pre_wifi_under_lps = coex_sta->under_lps;
-			if (coex_sta->under_lps == true)
+			if (coex_sta->under_lps)
 				return true;
 		}
 		if (coex_sta->cck_lock != pre_cck_lock) {
@@ -1641,7 +1641,7 @@ static void halbtc8723d1ant_coex_table_with_type(struct btc_coexist *btcoexist,
 
 	coex_sta->coex_table_type = type;
 
-	if (coex_sta->concurrent_rx_mode_on == true) {
+	if (coex_sta->concurrent_rx_mode_on) {
 		break_table = 0xf0ffffff;  /* set WL hi-pri can break BT */
 		select_table =
 			0xb;		/* set Tx response = Hi-Pri (ex: Transmitting ACK,BA,CTS) */
@@ -2555,7 +2555,7 @@ static void halbtc8723d1ant_set_ant_path(struct btc_coexist *btcoexist,
 		else /* 0x948 = 0x80, 0x0 while antenna diversity */
 			btcoexist->btc_write_2byte(btcoexist, 0x948, 0x40);
 
-	else if ((is_hw_ant_div_on == false) &&
+	else if ((!is_hw_ant_div_on) &&
 		(phase != BT_8723D_1ANT_PHASE_WLAN_OFF)) {  /* internal switch setting */
 
 		switch (ant_pos_type) {
@@ -4597,7 +4597,7 @@ static bool halbtc8723d1ant_psd_antenna_detection(struct btc_coexist
 
 			psd_scan->ant_det_is_btreply_available = true;
 
-			if (bt_resp == false) {
+			if (!bt_resp) {
 				psd_scan->ant_det_is_btreply_available =
 					false;
 				psd_scan->ant_det_result = 0;
@@ -4744,7 +4744,7 @@ static bool halbtc8723d1ant_psd_antenna_detection_check(struct btc_coexist
 		"xxxxxxxxxxxxxxxx AntennaDetect(), result = %d, fail_count = %d, finish = %s\n",
 		    psd_scan->ant_det_result,
 		    psd_scan->ant_det_fail_count,
-		    ant_det_finish == true ? "Yes" : "No");
+		    ant_det_finish ? "Yes" : "No");
 	BTC_TRACE(trace_buf);
 
 	return ant_det_finish;
@@ -5447,7 +5447,7 @@ void ex_halbtc8723d1ant_lps_notify(struct btc_coexist *btcoexist, u8 type)
 		BTC_TRACE(trace_buf);
 		coex_sta->under_lps = true;
 
-		if (coex_sta->force_lps_ctrl == true) { /* LPS No-32K */
+		if (coex_sta->force_lps_ctrl) { /* LPS No-32K */
 			/* Write WL "Active" in Score-board for PS-TDMA */
 			pre_force_lps_on = true;
 			halbtc8723d1ant_post_state_to_bt(btcoexist,
@@ -5719,7 +5719,7 @@ void ex_halbtc8723d1ant_bt_info_notify(struct btc_coexist *btcoexist,
 		    wifi_busy = false;
 	static bool is_scoreboard_scan = false;
 
-	if (psd_scan->is_AntDet_running == true) {
+	if (psd_scan->is_AntDet_running) {
 		BTC_SPRINTF(trace_buf, BT_TMP_BUF_SIZE,
 			"[BTCoex], bt_info_notify return for AntDet is running\n");
 		BTC_TRACE(trace_buf);

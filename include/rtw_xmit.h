@@ -92,10 +92,10 @@
 * (1, 1) : AMPDU and AMSDU in AMPDU are enable. So, AMSDU is valid to send.
 */
 #define IS_AMSDU_AMPDU_NOT_VALID(pattrib)\
-	 ((pattrib->ampdu_en == true) && (pattrib->amsdu_ampdu_en == false))
+	 ((pattrib->ampdu_en) && (!pattrib->amsdu_ampdu_en))
 
 #define IS_AMSDU_AMPDU_VALID(pattrib)\
-	 !((pattrib->ampdu_en == true) && (pattrib->amsdu_ampdu_en == false))
+	 !((pattrib->ampdu_en) && (!pattrib->amsdu_ampdu_en))
 
 #define HWXMIT_ENTRY	4
 

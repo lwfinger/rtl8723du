@@ -63,7 +63,7 @@ int recvbuf2recvframe(struct adapter * adapt, void *ptr)
 		}
 
 #ifdef CONFIG_RX_PACKET_APPEND_FCS
-		if (check_fwstate(&adapt->mlmepriv, WIFI_MONITOR_STATE) == false)
+		if (!check_fwstate(&adapt->mlmepriv, WIFI_MONITOR_STATE))
 			if ((pattrib->pkt_rpt_type == NORMAL_RX) && rtw_hal_rcr_check(adapt, RCR_APPFCS))
 				pattrib->pkt_len -= IEEE80211_FCS_LEN;
 #endif
@@ -112,12 +112,12 @@ void rtl8723du_xmit_tasklet(void *priv)
 			break;
 		}
 
-		if (rtw_xmit_ac_blocked(adapt) == true)
+		if (rtw_xmit_ac_blocked(adapt))
 			break;
 
 		ret = rtl8723du_xmitframe_complete(adapt, pxmitpriv, NULL);
 
-		if (ret == false)
+		if (!ret)
 			break;
 	}
 }

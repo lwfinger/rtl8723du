@@ -275,7 +275,7 @@ static int napi_recv(struct adapter *adapt, int budget)
 			rx_ok = true;
 
 next:
-		if (rx_ok == true) {
+		if (rx_ok) {
 			work_done++;
 			DBG_COUNTER(adapt->rx_logs.os_netif_ok);
 		} else {
@@ -326,7 +326,7 @@ void rtw_os_recv_indicate_pkt(struct adapter *adapt, struct sk_buff *pkt, union 
 
 			/* RTW_INFO("bmcast=%d\n", bmcast); */
 
-			if (_rtw_memcmp(ehdr->h_dest, adapter_mac_addr(adapt), ETH_ALEN) == false) {
+			if (!_rtw_memcmp(ehdr->h_dest, adapter_mac_addr(adapt), ETH_ALEN)) {
 				/* RTW_INFO("not ap psta=%p, addr=%pM\n", psta, ehdr->h_dest); */
 
 				if (bmcast) {
@@ -361,7 +361,7 @@ void rtw_os_recv_indicate_pkt(struct adapter *adapt, struct sk_buff *pkt, union 
 				DBG_COUNTER(adapt->rx_logs.os_indicate_ap_self);
 			}
 		}
-		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_ADHOC_STATE) == true) {
+		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_ADHOC_STATE)) {
 			/* Insert NAT2.5 RX here! */
 			#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
 			br_port = adapt->pnetdev->br_port;
@@ -546,7 +546,7 @@ void rtw_os_read_port(struct adapter *adapt, struct recv_buf *precvbuf)
 
 	precvbuf->pskb = NULL;
 
-	if (precvbuf->irp_pending == false)
+	if (!precvbuf->irp_pending)
 		rtw_read_port(adapt, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
 }
 

@@ -72,7 +72,7 @@ static void rtw_mask_map_read(struct adapter * adapt, u16 addr, u16 cnts, u8 *da
 	if (adapt->registrypriv.boffefusemask == 0) {
 
 			for (i = 0; i < cnts; i++) {
-				if (adapt->registrypriv.bFileMaskEfuse == true) {
+				if (adapt->registrypriv.bFileMaskEfuse) {
 					if (rtw_file_efuse_IsMasked(adapt, addr + i)) /*use file efuse mask.*/
 						data[i] = 0xff;
 				} else {
@@ -239,7 +239,7 @@ void rtw_efuse_analyze(struct adapter *	adapt, u8 Type, u8 Fake)
 
 		efuse_OneByteRead(adapt, eFuse_Addr++, &efuseHeader, bPseudoTest);
 
-		if (efuseHeader == 0xFF && bank == startBank && Fake != true) {
+		if (efuseHeader == 0xFF && bank == startBank && !Fake) {
 			RTW_INFO("Non-PGed Efuse\n");
 			return;
 		}
@@ -834,7 +834,7 @@ u8 rtw_efuse_access(struct adapter * adapt, u8 bWrite, u16 start_addr, u16 cnts,
 	if (start_addr > real_content_len)
 		return _FAIL;
 
-	if (true == bWrite) {
+	if (bWrite) {
 		if ((start_addr + cnts) > max_available_size)
 			return _FAIL;
 		rw8 = &efuse_write8;
@@ -988,7 +988,7 @@ u8 rtw_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 
 	if (adapt->registrypriv.boffefusemask == 0) {
 		for (i = 0; i < cnts; i++) {
-			if (adapt->registrypriv.bFileMaskEfuse == true) {
+			if (adapt->registrypriv.bFileMaskEfuse) {
 				if (rtw_file_efuse_IsMasked(adapt, addr + i))	/*use file efuse mask. */
 					efuse[addr + i] = map[addr + i];
 			} else {
@@ -1506,7 +1506,7 @@ void EFUSE_ShadowMapUpdate(
 	u16	mapLen = 0;
 	EFUSE_GetEfuseDefinition(pAdapter, efuseType, TYPE_EFUSE_MAP_LEN, (void *)&mapLen, bPseudoTest);
 
-	if (pHalData->bautoload_fail_flag == true) {
+	if (pHalData->bautoload_fail_flag) {
 		_rtw_memset(pHalData->efuse_eeprom_data, 0xFF, mapLen);
 	} else {
 			Efuse_ReadAllMap(pAdapter, efuseType, pHalData->efuse_eeprom_data, bPseudoTest);
@@ -1622,7 +1622,7 @@ u32 rtw_read_efuse_from_file(const char *path, u8 *buf, int map_size)
 	u32 file_size, read_size, pos = 0;
 	u8 *map = NULL;
 
-	if (rtw_is_file_readable_with_size(path, &file_size) != true) {
+	if (!rtw_is_file_readable_with_size(path, &file_size)) {
 		RTW_PRINT("%s %s is not readable\n", __func__, path);
 		goto exit;
 	}
@@ -1659,10 +1659,10 @@ u32 rtw_read_efuse_from_file(const char *path, u8 *buf, int map_size)
 			c = file_data[pos++];
 
 			/* bypass spece or eol or null before first hex digit */
-			if (temp_i == 0 && (is_eol(c) == true || is_space(c) == true || is_null(c) == true))
+			if (temp_i == 0 && (is_eol(c) || is_space(c) || is_null(c)))
 				continue;
 
-			if (IsHexDigit(c) == false) {
+			if (!IsHexDigit(c)) {
 				RTW_ERR("%s invalid 8-bit hex format for offset:0x%03x\n", __func__, i);
 				goto exit;
 			}
@@ -1679,7 +1679,7 @@ u32 rtw_read_efuse_from_file(const char *path, u8 *buf, int map_size)
 			}
 		}
 
-		if (end == true) {
+		if (end) {
 			if (temp_i != 0) {
 				RTW_ERR("%s incomplete 8-bit hex format for offset:0x%03x\n", __func__, i);
 				goto exit;
@@ -1713,7 +1713,7 @@ u32 rtw_read_macaddr_from_file(const char *path, u8 *buf)
 	u32 read_size, pos = 0;
 	u8 addr[ETH_ALEN];
 
-	if (rtw_is_file_readable(path) != true) {
+	if (!rtw_is_file_readable(path)) {
 		RTW_PRINT("%s %s is not readable\n", __func__, path);
 		goto exit;
 	}
@@ -1727,7 +1727,7 @@ u32 rtw_read_macaddr_from_file(const char *path, u8 *buf)
 	temp[2] = 0; /* end of string '\0' */
 
 	for (i = 0 ; i < ETH_ALEN ; i++) {
-		if (IsHexDigit(file_data[i * 3]) == false || IsHexDigit(file_data[i * 3 + 1]) == false) {
+		if (!IsHexDigit(file_data[i * 3]) || !IsHexDigit(file_data[i * 3 + 1])) {
 			RTW_ERR("%s invalid 8-bit hex format for address offset:%u\n", __func__, i);
 			goto exit;
 		}

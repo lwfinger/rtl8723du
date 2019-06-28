@@ -16,9 +16,9 @@ phydm_dig_up_bound_lmt_en(
 	struct phydm_adaptivity_struct	*p_adaptivity = (struct phydm_adaptivity_struct *)phydm_get_structure(p_dm, PHYDM_ADAPTIVITY);
 
 	if (!(p_dm->support_ability & ODM_BB_ADAPTIVITY) ||
-		(p_dm->adaptivity_flag == false) ||
+		(!p_dm->adaptivity_flag) ||
 		(!p_dm->is_linked) ||
-		(p_dm->adaptivity_enable == false)
+		(!p_dm->adaptivity_enable)
 	) {
 		p_adaptivity->igi_up_bound_lmt_cnt = 0;
 		p_adaptivity->igi_lmt_en = false;	
@@ -235,7 +235,7 @@ phydm_check_environment(
 
 	is_clean_environment = phydm_cal_nhm_cnt(p_dm);
 
-	if (is_clean_environment == true) {
+	if (is_clean_environment) {
 		p_dm->th_l2h_ini = adaptivity->th_l2h_ini_backup;			/*adaptivity mode*/
 		p_dm->th_edcca_hl_diff = adaptivity->th_edcca_hl_diff_backup;
 
@@ -409,7 +409,7 @@ phydm_adaptivity_init(
 	s8	igi_target = 0x32;
 	/*struct phydm_dig_struct* p_dig_t = &p_dm->dm_dig_table;*/
 
-	if (p_dm->carrier_sense_enable == false) {
+	if (!p_dm->carrier_sense_enable) {
 		if (p_dm->th_l2h_ini == 0)
 			phydm_set_l2h_th_ini(p_dm);
 	} else
@@ -417,7 +417,7 @@ phydm_adaptivity_init(
 
 	if (p_dm->th_edcca_hl_diff == 0)
 		p_dm->th_edcca_hl_diff = 7;
-	if (p_dm->wifi_test == true || *(p_dm->p_mp_mode) == true)
+	if (p_dm->wifi_test || *(p_dm->p_mp_mode))
 		p_dm->edcca_enable = false;		/*even no adaptivity, we still enable EDCCA, AP side use mib control*/
 	else
 		p_dm->edcca_enable = true;
@@ -497,7 +497,7 @@ phydm_adaptivity(
 	s8			diff = 0, igi_target = 0x32;
 	struct phydm_adaptivity_struct	*adaptivity = (struct phydm_adaptivity_struct *)phydm_get_structure(p_dm, PHYDM_ADAPTIVITY);
 
-	if ((p_dm->edcca_enable == false) || (adaptivity->is_stop_edcca == true)) {
+	if ((!p_dm->edcca_enable) || (adaptivity->is_stop_edcca)) {
 		PHYDM_DBG(p_dm, DBG_ADPTVTY, ("Disable EDCCA!!!\n"));
 		return;
 	}
@@ -505,11 +505,11 @@ phydm_adaptivity(
 	phydm_check_adaptivity(p_dm);	/*Check adaptivity enable*/
 	phydm_dig_up_bound_lmt_en(p_dm);
 
-	if ((!(p_dm->support_ability & ODM_BB_ADAPTIVITY)) && adaptivity->debug_mode == false) {
+	if ((!(p_dm->support_ability & ODM_BB_ADAPTIVITY)) && !adaptivity->debug_mode) {
 		PHYDM_DBG(p_dm, DBG_ADPTVTY, ("adaptivity disable, enable EDCCA mode!!!\n"));
 		p_dm->th_l2h_ini = p_dm->th_l2h_ini_mode2;
 		p_dm->th_edcca_hl_diff = p_dm->th_edcca_hl_diff_mode2;
-	} else if (adaptivity->debug_mode == true) {
+	} else if (adaptivity->debug_mode) {
 		p_dm->th_l2h_ini = adaptivity->th_l2h_ini_debug;
 		p_dm->th_edcca_hl_diff = 7;
 		adaptivity->adajust_igi_level = (u8)((p_dm->th_l2h_ini + igi_target) - pwdb_upper_bound + dfir_loss);	/*IGI = L2H - PwdB - dfir_loss*/
@@ -531,16 +531,16 @@ phydm_adaptivity(
 	PHYDM_DBG(p_dm, DBG_ADPTVTY, ("adajust_igi_level= 0x%x, adaptivity_flag = %d, adaptivity_enable = %d\n",
 		adaptivity->adajust_igi_level, p_dm->adaptivity_flag, p_dm->adaptivity_enable));
 
-	if ((adaptivity->dynamic_link_adaptivity == true) && (!p_dm->is_linked) && (p_dm->adaptivity_enable == false)) {
+	if ((adaptivity->dynamic_link_adaptivity) && (!p_dm->is_linked) && (!p_dm->adaptivity_enable)) {
 		phydm_set_edcca_threshold(p_dm, 0x7f, 0x7f);
 		PHYDM_DBG(p_dm, DBG_ADPTVTY, ("In DynamicLink mode(noisy) and No link, Turn off EDCCA!!\n"));
 		return;
 	}
 
 	if (p_dm->support_ic_type & (ODM_IC_11AC_GAIN_IDX_EDCCA | ODM_IC_11N_GAIN_IDX_EDCCA)) {
-		if ((adaptivity->adajust_igi_level > igi) && (p_dm->adaptivity_enable == true))
+		if ((adaptivity->adajust_igi_level > igi) && (p_dm->adaptivity_enable))
 			diff = adaptivity->adajust_igi_level - igi;
-		else if (p_dm->adaptivity_enable == false)
+		else if (!p_dm->adaptivity_enable)
 			diff = 0x3e - igi;
 
 		th_l2h_dmc = p_dm->th_l2h_ini - diff + igi_target;
@@ -548,7 +548,7 @@ phydm_adaptivity(
 	} else	{
 		diff = igi_target - (s8)igi;
 		th_l2h_dmc = p_dm->th_l2h_ini + diff;
-		if (th_l2h_dmc > 10 && (p_dm->adaptivity_enable == true))
+		if (th_l2h_dmc > 10 && (p_dm->adaptivity_enable))
 			th_l2h_dmc = 10;
 
 		th_h2l_dmc = th_l2h_dmc - p_dm->th_edcca_hl_diff;
@@ -566,7 +566,7 @@ phydm_adaptivity(
 	PHYDM_DBG(p_dm, DBG_ADPTVTY, ("debug_mode = %d\n", adaptivity->debug_mode));
 	phydm_set_edcca_threshold(p_dm, th_h2l_dmc, th_l2h_dmc);
 
-	if (p_dm->adaptivity_enable == true)
+	if (p_dm->adaptivity_enable)
 		odm_set_mac_reg(p_dm, REG_RD_CTRL, BIT(11), 1);
 
 	return;

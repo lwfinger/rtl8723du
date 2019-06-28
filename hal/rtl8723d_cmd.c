@@ -201,7 +201,7 @@ void rtl8723d_set_FwPwrMode_cmd(struct adapter * adapt, u8 psmode)
 	}
 
 	if (psmode > 0) {
-		if (rtw_btcoex_IsBtControlLps(adapt) == true) {
+		if (rtw_btcoex_IsBtControlLps(adapt)) {
 			PowerState = rtw_btcoex_RpwmVal(adapt);
 			byte5 = rtw_btcoex_LpsVal(adapt);
 
@@ -482,7 +482,7 @@ void rtl8723d_download_BTCoex_AP_mode_rsvd_page(struct adapter * adapt)
 		FUNC_ADPT_ARG(adapt), get_hw_port(adapt), get_fwstate(&adapt->mlmepriv));
 
 #ifdef CONFIG_RTW_DEBUG
-	if (check_fwstate(&adapt->mlmepriv, WIFI_AP_STATE) == false) {
+	if (!check_fwstate(&adapt->mlmepriv, WIFI_AP_STATE)) {
 		RTW_INFO(FUNC_ADPT_FMT ": [WARNING] not in AP mode!!\n",
 			 FUNC_ADPT_ARG(adapt));
 	}
@@ -536,7 +536,7 @@ void rtl8723d_download_BTCoex_AP_mode_rsvd_page(struct adapter * adapt)
 		} while (!bcn_valid && (poll % 10) != 0 && !RTW_CANNOT_RUN(adapt));
 	} while (!bcn_valid && (DLBcnCount <= 100) && !RTW_CANNOT_RUN(adapt));
 
-	if (true == bcn_valid) {
+	if (bcn_valid) {
 		struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(adapt);
 
 		pwrctl->fw_psmode_iface_id = adapt->iface_id;

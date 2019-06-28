@@ -18,13 +18,13 @@ phydm_dynamicsoftmletting(
 	u32 ret_val;
 
 #if (RTL8822B_SUPPORT == 1)
-	if (*(p_dm->p_mp_mode) == false) {
+	if (!*p_dm->p_mp_mode) {
 		if (p_dm->support_ic_type & ODM_RTL8822B) {
 
 			if ((!p_dm->is_linked)|(p_dm->iot_table.is_linked_cmw500))
 				return;
 
-			if (true == p_dm->bsomlenabled) {
+			if (p_dm->bsomlenabled) {
 				PHYDM_DBG(p_dm, ODM_COMP_API, ("PHYDM_DynamicSoftMLSetting(): SoML has been enable, skip dynamic SoML switch\n"));
 				return; 		
 			}

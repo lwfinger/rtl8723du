@@ -137,7 +137,7 @@ odm_txpowertracking_callback_thermal_meter(
 	/*p_rf_calibrate_info->txpowertrack_control = p_hal_data->txpowertrack_control;
 	<Kordan> We should keep updating the control variable according to HalData.
 	<Kordan> rf_calibrate_info.rega24 will be initialized when ODM HW configuring, but MP configures with para files. */
-	if (*(p_dm->p_mp_mode) == true)
+	if (*(p_dm->p_mp_mode))
 		p_rf_calibrate_info->rega24 = 0x090e1317;
 
 	ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
@@ -245,7 +245,7 @@ odm_txpowertracking_callback_thermal_meter(
 		ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("(delta, delta_LCK, delta_IQK) = (%d, %d, %d)\n", delta, delta_LCK, delta_IQK));
 
 		/* Wait sacn to do LCK by RF Jenyu*/
-		if ((*p_dm->p_is_scan_in_process == false) && (!p_iqk_info->rfk_forbidden)) {
+		if ((!*p_dm->p_is_scan_in_process) && (!p_iqk_info->rfk_forbidden)) {
 			/* Delta temperature is equal to or larger than 20 centigrade.*/
 			if (delta_LCK >= c.threshold_iqk) {
 				ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("delta_LCK(%d) >= threshold_iqk(%d)\n", delta_LCK, c.threshold_iqk));
@@ -554,7 +554,7 @@ odm_txpowertracking_callback_thermal_meter(
 	}
 
 	/* Wait sacn to do IQK by RF Jenyu*/
-	if ((*p_dm->p_is_scan_in_process == false)  && (!p_iqk_info->rfk_forbidden)) {
+	if ((!*p_dm->p_is_scan_in_process)  && (!p_iqk_info->rfk_forbidden)) {
 		if (!IS_HARDWARE_TYPE_8723B(adapter)) {
 			/*Delta temperature is equal to or larger than 20 centigrade (When threshold is 8).*/
 			if (delta_IQK >= c.threshold_iqk) {

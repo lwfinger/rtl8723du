@@ -568,7 +568,7 @@ phydm_fast_ant_training_hl_smart_antenna_type2(
 	if (!p_dm->is_linked) {
 		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[No Link!!!]\n"));
 
-		if (p_dm_fat_table->is_become_linked == true) {
+		if (p_dm_fat_table->is_become_linked) {
 
 			pdm_sat_table->decision_holding_period = 0;
 			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Link->no Link\n"));
@@ -579,7 +579,7 @@ phydm_fast_ant_training_hl_smart_antenna_type2(
 		return;
 
 	} else {
-		if (p_dm_fat_table->is_become_linked == false) {
+		if (!p_dm_fat_table->is_become_linked) {
 
 			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[Linked !!!]\n"));
 
@@ -1333,7 +1333,7 @@ odm_fast_ant_training_hl_smart_antenna_type1(
 	if (!p_dm->is_linked) {
 		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[No Link!!!]\n"));
 
-		if (p_dm_fat_table->is_become_linked == true) {
+		if (p_dm_fat_table->is_become_linked) {
 
 			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Link->no Link\n"));
 			p_dm_fat_table->fat_state = FAT_BEFORE_LINK_STATE;
@@ -1346,7 +1346,7 @@ odm_fast_ant_training_hl_smart_antenna_type1(
 		return;
 
 	} else {
-		if (p_dm_fat_table->is_become_linked == false) {
+		if (!p_dm_fat_table->is_become_linked) {
 
 			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[Linked !!!]\n"));
 
@@ -1360,8 +1360,8 @@ odm_fast_ant_training_hl_smart_antenna_type1(
 		}
 	}
 
-	if (*(p_dm_fat_table->p_force_tx_ant_by_desc) == false) {
-		if (p_dm->is_one_entry_only == true)
+	if (!*p_dm_fat_table->p_force_tx_ant_by_desc) {
+		if (p_dm->is_one_entry_only)
 			odm_tx_by_tx_desc_or_reg(p_dm, TX_BY_REG);
 		else
 			odm_tx_by_tx_desc_or_reg(p_dm, TX_BY_DESC);

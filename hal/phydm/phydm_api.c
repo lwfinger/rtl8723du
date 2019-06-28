@@ -221,7 +221,7 @@ phydm_stop_ic_trx(
 
 	if (set_type == PHYDM_SET) {
 		/*[Stop TRX]---------------------------------------------------------------------*/
-		if (phydm_set_bb_dbg_port(p_dm, BB_DBGPORT_PRIORITY_3, 0x0) == false) /*set debug port to 0x0*/
+		if (!phydm_set_bb_dbg_port(p_dm, BB_DBGPORT_PRIORITY_3, 0x0)) /*set debug port to 0x0*/
 			return PHYDM_SET_FAIL;
 		
 		for (i = 0; i<10000; i++) {
@@ -795,7 +795,7 @@ phydm_stop_ck320(
 	u8			enable
 ) {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	u32		reg_value = (enable == true) ? 1 : 0;
+	u32		reg_value = (enable) ? 1 : 0;
 	
 	if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {
 		odm_set_bb_reg(p_dm, 0x8b4, BIT(6), reg_value);

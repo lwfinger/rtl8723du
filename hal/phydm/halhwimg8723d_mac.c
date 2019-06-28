@@ -259,7 +259,7 @@ odm_read_and_config_mp_8723d_mac_reg(
 					PHYDM_DBG(p_dm, ODM_COMP_INIT, ("IF or ELSE IF\n"));
 				}
 			} else if (v1 & BIT(30)) { /*negative condition*/
-				if (is_skipped == false) {
+				if (!is_skipped) {
 					if (check_positive(p_dm, pre_v1, pre_v2, v1, v2)) {
 						is_matched = true;
 						is_skipped = true;

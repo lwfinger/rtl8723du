@@ -325,7 +325,7 @@ void halrf_init(void *p_dm_void)
 	
 	ODM_RT_TRACE(p_dm, ODM_COMP_INIT, ODM_DBG_LOUD, ("HALRF_Init\n"));
 
-	if (*(p_dm->p_mp_mode) == true)
+	if (*(p_dm->p_mp_mode))
 		halrf_supportability_init_mp(p_dm);
 	else
 		halrf_supportability_init(p_dm);

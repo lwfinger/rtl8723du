@@ -1004,17 +1004,16 @@ static void LinkLayerStats(struct adapter *adapt)
 	ps_time = 0;
 	trx_total_time = 0;
 
-	if ( adapt->netif_up == true ) {
-
+	if (adapt->netif_up) {
 		pwrpriv->on_time = rtw_get_passing_time_ms(pwrpriv->radio_on_start_time);
 
 		if (rtw_mi_check_fwstate(adapt, _FW_LINKED)) {
-			if ( pwrpriv->bpower_saving == true ) {
+			if (pwrpriv->bpower_saving) {
 				pwrpriv->pwr_saving_time += rtw_get_passing_time_ms(pwrpriv->pwr_saving_start_time);
 				pwrpriv->pwr_saving_start_time = rtw_get_current_time();
 			}
 		} else {		
-			if ( pwrpriv->bpower_saving == true ) {
+			if (pwrpriv->bpower_saving) {
 				pwrpriv->pwr_saving_time += rtw_get_passing_time_ms(pwrpriv->pwr_saving_start_time);
 				pwrpriv->pwr_saving_start_time = rtw_get_current_time();
 			}
@@ -1023,7 +1022,7 @@ static void LinkLayerStats(struct adapter *adapt)
 		ps_time = pwrpriv->pwr_saving_time;
 
 		/* Deviation caused by caculation start time */
-		if ( ps_time > pwrpriv->on_time )
+		if (ps_time > pwrpriv->on_time)
 			ps_time = pwrpriv->on_time;
 
 		tx_bytes = pdvobjpriv->traffic_stat.last_tx_bytes;
@@ -1032,7 +1031,7 @@ static void LinkLayerStats(struct adapter *adapt)
 
 		trx_total_time = pwrpriv->on_time - ps_time;
 		
-		if ( trx_total_bytes == 0) {
+		if (trx_total_bytes == 0) {
 			pwrpriv->tx_time = 0;
 			pwrpriv->rx_time = 0;
 		} else {

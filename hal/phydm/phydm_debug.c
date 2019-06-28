@@ -101,7 +101,7 @@ phydm_bb_dbg_port_clock_en(
 	
 	if (p_dm->support_ic_type & (ODM_RTL8822B | ODM_RTL8821C | ODM_RTL8814A | ODM_RTL8814B)) {
 		
-		reg_value = (enable == true) ? 0x7 : 0;
+		reg_value = (enable) ? 0x7 : 0;
 		odm_set_bb_reg(p_dm, 0x198c, 0x7, reg_value); /*enable/disable debug port clock, for power saving*/
 	}
 }
@@ -2408,7 +2408,7 @@ phydm_fw_trace_handler(
 	/*PHYDM_DBG(p_dm, DBG_FW_TRACE,("pre_seq = (( %d )), current_seq = (( %d ))\n", p_dm->pre_c2h_seq, c2h_seq));*/
 	/*PHYDM_DBG(p_dm, DBG_FW_TRACE,("fw_buff_is_enpty = (( %d ))\n", p_dm->fw_buff_is_enpty));*/
 
-	if ((c2h_seq != p_dm->pre_c2h_seq)  &&  p_dm->fw_buff_is_enpty == false) {
+	if ((c2h_seq != p_dm->pre_c2h_seq)  &&  !p_dm->fw_buff_is_enpty) {
 		p_dm->fw_debug_trace[p_dm->c2h_cmd_start] = '\0';
 		PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[FW Dbg Queue Overflow] %s\n", p_dm->fw_debug_trace));
 		p_dm->c2h_cmd_start = 0;

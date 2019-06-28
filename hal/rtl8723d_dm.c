@@ -54,7 +54,7 @@ static void dm_CheckPbcGPIO(struct adapter *adapt)
 
 	if (tmp1byte & HAL_8192C_HW_GPIO_WPS_BIT)
 		bPbcPressed = true;
-	if (true == bPbcPressed) {
+	if (bPbcPressed) {
 		/* Here we only set bPbcPressed to true */
 		/* After trigger PBC, the variable will be set to false */
 		RTW_INFO("CheckPbcGPIO - PBC is pressed\n");

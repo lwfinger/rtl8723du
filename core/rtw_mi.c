@@ -99,7 +99,7 @@ static int _rtw_mi_get_ch_setting_union(struct adapter *adapter, u8 *ch, u8 *bw,
 		if (check_fwstate(&iface->mlmepriv, WIFI_OP_CH_SWITCHING))
 			continue;
 
-		if (include_self == false && adapter == iface)
+		if (!include_self && adapter == iface)
 			continue;
 
 		if (num == 0) {
@@ -169,29 +169,29 @@ static void _rtw_mi_status(struct adapter *adapter, struct mi_state *mstate, u8 
 		if (target_sel == MI_STATUS_OTHERS_ONLY && iface == adapter)
 			continue;
 
-		if (check_fwstate(&iface->mlmepriv, WIFI_STATION_STATE) == true) {
+		if (check_fwstate(&iface->mlmepriv, WIFI_STATION_STATE)) {
 			MSTATE_STA_NUM(mstate)++;
-			if (check_fwstate(&iface->mlmepriv, _FW_LINKED) == true)
+			if (check_fwstate(&iface->mlmepriv, _FW_LINKED))
 				MSTATE_STA_LD_NUM(mstate)++;
-			if (check_fwstate(&iface->mlmepriv, _FW_UNDER_LINKING) == true)
+			if (check_fwstate(&iface->mlmepriv, _FW_UNDER_LINKING))
 				MSTATE_STA_LG_NUM(mstate)++;
-		} else if (check_fwstate(&iface->mlmepriv, WIFI_AP_STATE) == true ) {
-			if (check_fwstate(&iface->mlmepriv, _FW_LINKED) == true) {
+		} else if (check_fwstate(&iface->mlmepriv, WIFI_AP_STATE) ) {
+			if (check_fwstate(&iface->mlmepriv, _FW_LINKED)) {
 				MSTATE_AP_NUM(mstate)++;
 				if (iface->stapriv.asoc_sta_count > 2)
 					MSTATE_AP_LD_NUM(mstate)++;
 			} else
 				MSTATE_AP_STARTING_NUM(mstate)++;
-		} else if (check_fwstate(&iface->mlmepriv, WIFI_ADHOC_STATE | WIFI_ADHOC_MASTER_STATE) == true
-			&& check_fwstate(&iface->mlmepriv, _FW_LINKED) == true
+		} else if (check_fwstate(&iface->mlmepriv, WIFI_ADHOC_STATE | WIFI_ADHOC_MASTER_STATE)
+			&& check_fwstate(&iface->mlmepriv, _FW_LINKED)
 		) {
 			MSTATE_ADHOC_NUM(mstate)++;
 			if (iface->stapriv.asoc_sta_count > 2)
 				MSTATE_ADHOC_LD_NUM(mstate)++;
 
 #ifdef CONFIG_RTW_MESH
-		} else if (check_fwstate(&iface->mlmepriv, WIFI_MESH_STATE) == true
-			&& check_fwstate(&iface->mlmepriv, _FW_LINKED) == true
+		} else if (check_fwstate(&iface->mlmepriv, WIFI_MESH_STATE)
+			&& check_fwstate(&iface->mlmepriv, _FW_LINKED)
 		) {
 			MSTATE_MESH_NUM(mstate)++;
 			if (iface->stapriv.asoc_sta_count > 2)
@@ -200,10 +200,10 @@ static void _rtw_mi_status(struct adapter *adapter, struct mi_state *mstate, u8 
 
 		}
 
-		if (check_fwstate(&iface->mlmepriv, WIFI_UNDER_WPS) == true)
+		if (check_fwstate(&iface->mlmepriv, WIFI_UNDER_WPS))
 			MSTATE_WPS_NUM(mstate)++;
 
-		if (check_fwstate(&iface->mlmepriv, WIFI_SITE_MONITOR) == true) {
+		if (check_fwstate(&iface->mlmepriv, WIFI_SITE_MONITOR)) {
 			MSTATE_SCAN_NUM(mstate)++;
 
 			if (mlmeext_scan_state(&iface->mlmeextpriv) != SCAN_DISABLE
@@ -214,7 +214,7 @@ static void _rtw_mi_status(struct adapter *adapter, struct mi_state *mstate, u8 
 #ifdef CONFIG_IOCTL_CFG80211
 		if (rtw_cfg80211_get_is_mgmt_tx(iface))
 			MSTATE_MGMT_TX_NUM(mstate)++;
-		if (rtw_cfg80211_get_is_roch(iface) == true)
+		if (rtw_cfg80211_get_is_roch(iface))
 			MSTATE_ROCH_NUM(mstate)++;
 #endif /* CONFIG_IOCTL_CFG80211 */
 
@@ -405,7 +405,7 @@ static u8 _rtw_mi_process(struct adapter *adapt, bool exclude_self,
 				continue;
 
 			if (ops_func)
-				if (true == ops_func(iface, data))
+				if (ops_func(iface, data))
 					ret++;
 		}
 	}
@@ -427,7 +427,7 @@ static u8 _rtw_mi_process_without_schk(struct adapter *adapt, bool exclude_self,
 				continue;
 
 			if (ops_func)
-				if (ops_func(iface, data) == true)
+				if (ops_func(iface, data))
 					ret++;
 		}
 	}
@@ -720,7 +720,7 @@ void rtw_mi_buddy_set_scan_deny(struct adapter *adapter, u32 ms)
 static u8 _rtw_mi_beacon_update(struct adapter *adapt, void *data)
 {
 	if (!MLME_IS_STA(adapt)
-	    && check_fwstate(&adapt->mlmepriv, _FW_LINKED) == true) {
+	    && check_fwstate(&adapt->mlmepriv, _FW_LINKED)) {
 		RTW_INFO(ADPT_FMT" - update_beacon\n", ADPT_ARG(adapt));
 		update_beacon(adapt, 0xFF, NULL, true);
 	}
@@ -760,13 +760,13 @@ static u8 _rtw_mi_busy_traffic_check(struct adapter *adapt, void *data)
 	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 	bool check_sc_interval = *(bool *)data;
 
-	if (pmlmepriv->LinkDetectInfo.bBusyTraffic == true) {
+	if (pmlmepriv->LinkDetectInfo.bBusyTraffic) {
 		if (check_sc_interval) {
 			/* Miracast can't do AP scan*/
 			passtime = rtw_get_passing_time_ms(pmlmepriv->lastscantime);
 			pmlmepriv->lastscantime = rtw_get_current_time();
 			if (passtime > BUSY_TRAFFIC_SCAN_DENY_PERIOD) {
-				RTW_INFO(ADPT_FMT" bBusyTraffic == true\n", ADPT_ARG(adapt));
+				RTW_INFO(ADPT_FMT" bBusyTraffic\n", ADPT_ARG(adapt));
 				return true;
 			}
 		} else
@@ -823,7 +823,7 @@ static u8 _rtw_mi_check_fwstate(struct adapter *adapt, void *data)
 	if ((state == WIFI_FW_NULL_STATE) &&
 	    (adapt->mlmepriv.fw_state == WIFI_FW_NULL_STATE))
 		ret = true;
-	else if (true == check_fwstate(&adapt->mlmepriv, state))
+	else if (check_fwstate(&adapt->mlmepriv, state))
 		ret = true;
 	return ret;
 }
@@ -990,7 +990,7 @@ u8 rtw_mi_buddy_sfreset_adapter_hdl(struct adapter *adapt, u8 bstart)
 static u8 _rtw_mi_tx_beacon_hdl(struct adapter *adapter, void *data)
 {
 	if ((MLME_IS_AP(adapter) || MLME_IS_MESH(adapter)) &&
-	    check_fwstate(&adapter->mlmepriv, WIFI_ASOC_STATE) == true) {
+	    check_fwstate(&adapter->mlmepriv, WIFI_ASOC_STATE)) {
 		adapter->mlmepriv.update_bcn = true;
 		tx_beacon_hdl(adapter, NULL);
 	}
@@ -1010,7 +1010,7 @@ static u8 _rtw_mi_set_tx_beacon_cmd(struct adapter *adapter, void *data)
 	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
 
 	if (MLME_IS_AP(adapter) || MLME_IS_MESH(adapter)) {
-		if (pmlmepriv->update_bcn == true)
+		if (pmlmepriv->update_bcn)
 			set_tx_beacon_cmd(adapter);
 	}
 	return true;
@@ -1123,10 +1123,10 @@ static void rtw_dbg_skb_process(struct adapter *adapt, union recv_frame *precvfr
 	if (precvframe->u.hdr.len != pcloneframe->u.hdr.len)
 		RTW_INFO("%s [WARN]  recv_frame length(%d:%d) compare failed\n", __func__, precvframe->u.hdr.len, pcloneframe->u.hdr.len);
 
-	if (_rtw_memcmp(&precvframe->u.hdr.attrib, &pcloneframe->u.hdr.attrib, sizeof(struct rx_pkt_attrib)) == false)
+	if (!_rtw_memcmp(&precvframe->u.hdr.attrib, &pcloneframe->u.hdr.attrib, sizeof(struct rx_pkt_attrib)))
 		RTW_INFO("%s [WARN]  recv_frame attrib compare failed\n", __func__);
 
-	if (_rtw_memcmp(precvframe->u.hdr.rx_data, pcloneframe->u.hdr.rx_data, precvframe->u.hdr.len) == false)
+	if (!_rtw_memcmp(precvframe->u.hdr.rx_data, pcloneframe->u.hdr.rx_data, precvframe->u.hdr.len))
 		RTW_INFO("%s [WARN]  recv_frame rx_data compare failed\n", __func__);
 
 }
@@ -1189,7 +1189,7 @@ void rtw_mi_buddy_clone_bcmc_packet(struct adapter *adapt, union recv_frame *pre
 		iface = dvobj->adapters[i];
 		if (!iface || iface == adapt)
 			continue;
-		if (rtw_is_adapter_up(iface) == false || iface->registered == 0)
+		if (!rtw_is_adapter_up(iface) || iface->registered == 0)
 			continue;
 		if (type == WIFI_DATA_TYPE && !adapter_allow_bmc_data_rx(iface))
 			continue;

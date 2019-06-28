@@ -193,7 +193,7 @@ odm_cfo_tracking(
 		p_cfo_track->CFO_ave_pre = CFO_ave;
 
 		/* 4 1.4 Dynamic Xtal threshold */
-		if (p_cfo_track->is_adjust == false) {
+		if (!p_cfo_track->is_adjust) {
 			if (CFO_ave > CFO_TH_XTAL_HIGH || CFO_ave < (-CFO_TH_XTAL_HIGH))
 				p_cfo_track->is_adjust = true;
 		} else {

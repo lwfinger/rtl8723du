@@ -542,7 +542,7 @@ int proc_get_rx_stat(struct seq_file *m, void *v)
 	for (i = 0; i < NUM_STA; i++) {
 		phead = &(pstapriv->sta_hash[i]);
 		plist = get_next(phead);
-		while ((rtw_end_of_queue_search(phead, plist)) == false) {
+		while ((!rtw_end_of_queue_search(phead, plist))) {
 			psta = container_of(plist, struct sta_info, hash_list);
 			plist = get_next(plist);
 			pstats = &psta->sta_stats;
@@ -550,8 +550,8 @@ int proc_get_rx_stat(struct seq_file *m, void *v)
 			if (!pstats)
 				continue;
 			if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6) !=  true)
-				&& (_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6) != true)
-				&& (_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapter), 6) != true)) {
+				&& (!_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6))
+				&& (!_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapter), 6))) {
 				RTW_PRINT_SEL(m, "MAC :\t\t"MAC_FMT "\n", MAC_ARG(psta->cmn.mac_addr));
 				RTW_PRINT_SEL(m, "data_rx_cnt :\t%llu\n", sta_rx_data_uc_pkts(psta) - pstats->last_rx_data_uc_pkts);
 				pstats->last_rx_data_uc_pkts = sta_rx_data_uc_pkts(psta);
@@ -592,12 +592,12 @@ int proc_get_tx_stat(struct seq_file *m, void *v)
 		sta_rec[i] = NULL;
 		phead = &(pstapriv->sta_hash[i]);
 		plist = get_next(phead);
-		while ((rtw_end_of_queue_search(phead, plist)) == false) {
+		while ((!rtw_end_of_queue_search(phead, plist))) {
 			psta = container_of(plist, struct sta_info, hash_list);
 			plist = get_next(plist);
-			if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6) !=  true)
-				&& (_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6) != true)
-				&& (_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapter), 6) != true)) {
+			if ((!_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)) &&
+			    (!_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6)) &&
+			    (!_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapter), 6))) {
 				sta_rec[macid_rec_idx++] = psta;
 			}
 		}
@@ -1110,14 +1110,14 @@ int proc_get_survey_info(struct seq_file *m, void *v)
 
 	RTW_PRINT_SEL(m, "%5s  %-17s  %3s  %-3s  %-4s  %-4s  %5s  %32s  %32s\n", "index", "bssid", "ch", "RSSI", "SdBm", "Noise", "age", "flag", "ssid");
 	while (1) {
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
 		if (!pnetwork)
 			break;
 
-		if (check_fwstate(pmlmepriv, _FW_LINKED) == true &&
+		if (check_fwstate(pmlmepriv, _FW_LINKED) &&
 		    is_same_network(&pmlmepriv->cur_network.network, &pnetwork->network, 0)) {
 			notify_signal = translate_percentage_to_dbm(adapt->recvpriv.signal_strength);/* dbm */
 		} else {
@@ -1183,7 +1183,7 @@ ssize_t proc_set_survey_info(struct file *file, const char __user *buffer, size_
 	}
 
 	if (rtw_mi_busy_traffic_check(adapt, false)) {
-		RTW_INFO("scan abort!! BusyTraffic == true\n");
+		RTW_INFO("scan abort!! BusyTraffic\n");
 		goto cancel_ps_deny;
 	}
 
@@ -1191,7 +1191,7 @@ ssize_t proc_set_survey_info(struct file *file, const char __user *buffer, size_
 		RTW_INFO("scan abort!! AP mode process WPS\n");
 		goto cancel_ps_deny;
 	}
-	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY | _FW_UNDER_LINKING) == true) {
+	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY | _FW_UNDER_LINKING)) {
 		RTW_INFO("scan abort!! fwstate=0x%x\n", pmlmepriv->fw_state);
 		goto cancel_ps_deny;
 	}
@@ -1322,7 +1322,7 @@ int proc_get_dis_pwt(struct seq_file *m, void *v)
 	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(dev);
 	u8 dis_pwt = 0;
 	rtw_hal_get_def_var(adapt, HAL_DEF_DBG_DIS_PWT, &(dis_pwt));
-	RTW_PRINT_SEL(m, " Tx Power training mode:%s\n", (dis_pwt == true) ? "Disable" : "Enable");
+	RTW_PRINT_SEL(m, " Tx Power training mode:%s\n", (dis_pwt) ? "Disable" : "Enable");
 	return 0;
 }
 ssize_t proc_set_dis_pwt(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
@@ -1343,7 +1343,7 @@ ssize_t proc_set_dis_pwt(struct file *file, const char __user *buffer, size_t co
 	if (buffer && !copy_from_user(tmp, buffer, count)) {
 
 		int num = sscanf(tmp, "%hhx", &dis_pwt);
-		RTW_INFO("Set Tx Power training mode:%s\n", (dis_pwt == true) ? "Disable" : "Enable");
+		RTW_INFO("Set Tx Power training mode:%s\n", (dis_pwt) ? "Disable" : "Enable");
 
 		if (num >= 1)
 			rtw_hal_set_def_var(adapt, HAL_DEF_DBG_DIS_PWT, &(dis_pwt));
@@ -2880,7 +2880,7 @@ int proc_get_all_sta_info(struct seq_file *m, void *v)
 		phead = &(pstapriv->sta_hash[i]);
 		plist = get_next(phead);
 
-		while ((rtw_end_of_queue_search(phead, plist)) == false) {
+		while ((!rtw_end_of_queue_search(phead, plist))) {
 			psta = container_of(plist, struct sta_info, hash_list);
 
 			plist = get_next(plist);
@@ -3272,12 +3272,12 @@ ssize_t proc_set_tx_sa_query(struct file *file, const char __user *buffer, size_
 		RTW_INFO("0: set sa query request , key_type=%d\n", key_type);
 	}
 
-	if ((check_fwstate(pmlmepriv, WIFI_STATION_STATE) == true)
-	    && (check_fwstate(pmlmepriv, _FW_LINKED) == true) && SEC_IS_BIP_KEY_INSTALLED(&adapt->securitypriv) == true) {
+	if ((check_fwstate(pmlmepriv, WIFI_STATION_STATE))
+	    && (check_fwstate(pmlmepriv, _FW_LINKED)) && SEC_IS_BIP_KEY_INSTALLED(&adapt->securitypriv)) {
 		RTW_INFO("STA:"MAC_FMT"\n", MAC_ARG(get_my_bssid(&(pmlmeinfo->network))));
 		/* TX unicast sa_query to AP */
 		issue_action_SA_Query(adapt, get_my_bssid(&(pmlmeinfo->network)), 0, 0, (u8)key_type);
-	} else if (check_fwstate(pmlmepriv, WIFI_AP_STATE) == true && SEC_IS_BIP_KEY_INSTALLED(&adapt->securitypriv) == true) {
+	} else if (check_fwstate(pmlmepriv, WIFI_AP_STATE) && SEC_IS_BIP_KEY_INSTALLED(&adapt->securitypriv)) {
 		/* TX unicast sa_query to every client STA */
 		_enter_critical_bh(&pstapriv->sta_hash_lock, &irqL);
 		for (index = 0; index < NUM_STA; index++) {
@@ -3286,7 +3286,7 @@ ssize_t proc_set_tx_sa_query(struct file *file, const char __user *buffer, size_
 			phead = &(pstapriv->sta_hash[index]);
 			plist = get_next(phead);
 
-			while ((rtw_end_of_queue_search(phead, plist)) == false) {
+			while ((!rtw_end_of_queue_search(phead, plist))) {
 				psta = container_of(plist, struct sta_info, hash_list);
 				plist = get_next(plist);
 				_rtw_memcpy(&mac_addr[psta->cmn.mac_id][0], psta->cmn.mac_addr, ETH_ALEN);
@@ -3355,13 +3355,13 @@ ssize_t proc_set_tx_deauth(struct file *file, const char __user *buffer, size_t 
 	if (key_type < 0 || key_type > 4)
 		return count;
 
-	if ((check_fwstate(pmlmepriv, WIFI_STATION_STATE) == true)
-	    && (check_fwstate(pmlmepriv, _FW_LINKED) == true)) {
+	if ((check_fwstate(pmlmepriv, WIFI_STATION_STATE))
+	    && (check_fwstate(pmlmepriv, _FW_LINKED))) {
 		if (key_type == 3) /* key_type 3 only for AP mode */
 			return count;
 		/* TX unicast deauth to AP */
 		issue_deauth_11w(adapt, get_my_bssid(&(pmlmeinfo->network)), 0, (u8)key_type);
-	} else if (check_fwstate(pmlmepriv, WIFI_AP_STATE) == true) {
+	} else if (check_fwstate(pmlmepriv, WIFI_AP_STATE)) {
 
 		if (key_type == 3)
 			issue_deauth_11w(adapt, bc_addr, 0, IEEE80211W_RIGHT_KEY);
@@ -3374,7 +3374,7 @@ ssize_t proc_set_tx_deauth(struct file *file, const char __user *buffer, size_t 
 			phead = &(pstapriv->sta_hash[index]);
 			plist = get_next(phead);
 
-			while ((rtw_end_of_queue_search(phead, plist)) == false) {
+			while ((!rtw_end_of_queue_search(phead, plist))) {
 				psta = container_of(plist, struct sta_info, hash_list);
 				plist = get_next(plist);
 				_rtw_memcpy(&mac_addr[psta->cmn.mac_id][0], psta->cmn.mac_addr, ETH_ALEN);
@@ -3393,7 +3393,7 @@ ssize_t proc_set_tx_deauth(struct file *file, const char __user *buffer, size_t 
 						u8 updated = false;
 
 						_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
-						if (rtw_is_list_empty(&psta->asoc_list) == false) {
+						if (!rtw_is_list_empty(&psta->asoc_list)) {
 							rtw_list_delete(&psta->asoc_list);
 							pstapriv->asoc_list_cnt--;
 							updated = ap_free_sta(adapt, psta, false, WLAN_REASON_PREV_AUTH_NOT_VALID, true);
@@ -3458,8 +3458,8 @@ ssize_t proc_set_tx_auth(struct file *file, const char __user *buffer, size_t co
 		RTW_INFO("1: setnd auth, 2: send assoc request. tx_auth=%d\n", tx_auth);
 	}
 
-	if ((check_fwstate(pmlmepriv, WIFI_STATION_STATE) == true)
-	    && (check_fwstate(pmlmepriv, _FW_LINKED) == true)) {
+	if ((check_fwstate(pmlmepriv, WIFI_STATION_STATE))
+	    && (check_fwstate(pmlmepriv, _FW_LINKED))) {
 		if (tx_auth == 1) {
 			/* TX unicast auth to AP */
 			issue_auth(adapt, NULL, 0);

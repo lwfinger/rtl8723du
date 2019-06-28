@@ -91,7 +91,7 @@ void rtw_wfd_st_switch(struct sta_info *sta, bool on);
 #define MLME_IS_WPS(adapter) CHK_MLME_STATE(adapter, WIFI_UNDER_WPS)
 
 #if defined(CONFIG_IOCTL_CFG80211)
-#define MLME_IS_ROCH(adapter) (rtw_cfg80211_get_is_roch(adapter) == true)
+#define MLME_IS_ROCH(adapter) (rtw_cfg80211_get_is_roch(adapter))
 #else
 #define MLME_IS_ROCH(adapter) 0
 #endif
@@ -575,11 +575,11 @@ struct ft_roam_info {
 #define RTW_MAX_NB_RPT_NUM	8
 
 #define rtw_roam_busy_scan(a, nb)	\
-	(((a)->mlmepriv.LinkDetectInfo.bBusyTraffic == true) && \
+	(((a)->mlmepriv.LinkDetectInfo.bBusyTraffic) && \
 	(((a)->mlmepriv.ch_cnt) < ((nb)->nb_rpt_ch_list_num)))
 
 #define rtw_wnm_btm_preference_cap(a) \
-	((a)->mlmepriv.nb_info.preference_en == true)
+	((a)->mlmepriv.nb_info.preference_en)
 
 #define rtw_wnm_btm_diff_bss(a) \
 	((rtw_wnm_btm_preference_cap(a)) && \

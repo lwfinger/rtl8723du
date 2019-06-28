@@ -640,16 +640,15 @@ uint loadparam(struct adapter *adapt)
 
 	registry_par->wifi_spec = (u8)rtw_wifi_spec;
 
-	if (strlen(rtw_country_code) != 2
-		|| is_alpha(rtw_country_code[0]) == false
-		|| is_alpha(rtw_country_code[1]) == false
-	) {
+	if (strlen(rtw_country_code) != 2 ||
+	    !is_alpha(rtw_country_code[0]) ||
+	    !is_alpha(rtw_country_code[1])) {
 		if (rtw_country_code != rtw_country_unspecified)
 			RTW_ERR("%s discard rtw_country_code not in alpha2\n", __func__);
 		_rtw_memset(registry_par->alpha2, 0xFF, 2);
-	} else
+	} else {
 		_rtw_memcpy(registry_par->alpha2, rtw_country_code, 2);
-
+	}
 	registry_par->channel_plan = (u8)rtw_channel_plan;
 	rtw_regsty_load_excl_chs(registry_par);
 
@@ -786,7 +785,7 @@ static int rtw_net_set_mac_address(struct net_device *pnetdev, void *addr)
 	int ret = -1;
 
 	/* only the net_device is in down state to permit modifying mac addr */
-	if ((pnetdev->flags & IFF_UP) == true) {
+	if ((pnetdev->flags & IFF_UP)) {
 		RTW_INFO(FUNC_ADPT_FMT": The net_device's is not in down state\n"
 			 , FUNC_ADPT_ARG(adapt));
 
@@ -804,7 +803,7 @@ static int rtw_net_set_mac_address(struct net_device *pnetdev, void *addr)
 	}
 
 	/* check whether the input mac address is valid to permit modifying mac addr */
-	if (rtw_check_invalid_mac_address(sa->sa_data, false) == true) {
+	if (rtw_check_invalid_mac_address(sa->sa_data, false)) {
 		RTW_INFO(FUNC_ADPT_FMT": Invalid Mac Addr for "MAC_FMT"\n"
 			 , FUNC_ADPT_ARG(adapt), MAC_ARG(sa->sa_data));
 
@@ -1874,14 +1873,14 @@ int _netdev_vir_if_open(struct net_device *pnetdev)
 	if (!primary_adapt)
 		goto _netdev_virtual_iface_open_error;
 
-	if (primary_adapt->bup == false || !rtw_is_hw_init_completed(primary_adapt))
+	if (!primary_adapt->bup || !rtw_is_hw_init_completed(primary_adapt))
 		_netdev_open(primary_adapt->pnetdev);
 
-	if (adapt->bup == false && primary_adapt->bup == true &&
+	if (!adapt->bup && primary_adapt->bup &&
 	    rtw_is_hw_init_completed(primary_adapt)) {
 	}
 
-	if (adapt->bup == false) {
+	if (!adapt->bup) {
 		if (rtw_start_drv_threads(adapt) == _FAIL)
 			goto _netdev_virtual_iface_open_error;
 	}
@@ -2092,7 +2091,7 @@ void rtw_drv_stop_vir_if(struct adapter *adapt)
 		free_mlme_ap_info(adapt);
 	}
 
-	if (adapt->bup == true) {
+	if (adapt->bup) {
 		if (adapt->xmitpriv.ack_tx)
 			rtw_ack_tx_done(&adapt->xmitpriv, RTW_SCTX_DONE_DRV_STOP);
 		rtw_intf_stop(adapt);
@@ -2403,7 +2402,7 @@ void netdev_br_init(struct net_device *netdev)
 	rcu_read_lock();
 #endif /* (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 35)) */
 
-	/* if(check_fwstate(pmlmepriv, WIFI_STATION_STATE|WIFI_ADHOC_STATE) == true) */
+	/* if(check_fwstate(pmlmepriv, WIFI_STATION_STATE|WIFI_ADHOC_STATE)) */
 	{
 		/* struct net_bridge	*br = netdev->br_port->br; */ /* ->dev->dev_addr; */
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
@@ -2453,13 +2452,13 @@ int _netdev_open(struct net_device *pnetdev)
 	adapt->netif_up = true;
 
 	#ifdef CONFIG_AUTOSUSPEND
-	if (pwrctrlpriv->ps_flag == true) {
+	if (pwrctrlpriv->ps_flag) {
 		adapt->net_closed = false;
 		goto netdev_open_normal_process;
 	}
 	#endif
 
-	if (adapt->bup == false) {
+	if (!adapt->bup) {
 		rtw_clr_surprise_removed(adapt);
 		rtw_clr_drv_stopped(adapt);
 
@@ -2512,7 +2511,7 @@ netdev_open_normal_process:
 		struct adapter *secstruct adapter = adapter_to_dvobj(adapt)->adapters[IFACE_ID1];
 
 		#ifndef CONFIG_RTW_DYNAMIC_NDEV
-		if (secstruct adapter && (secstruct adapter->bup == false))
+		if (secstruct adapter && (!secstruct adapter->bup))
 			_netdev_vir_if_open(secstruct adapter->pnetdev);
 		#endif
 	}
@@ -2555,7 +2554,7 @@ int netdev_open(struct net_device *pnetdev)
 	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(pnetdev);
 	struct pwrctrl_priv *pwrctrlpriv = adapter_to_pwrctl(adapt);
 
-	if (pwrctrlpriv->bInSuspend == true) {
+	if (pwrctrlpriv->bInSuspend) {
 		RTW_INFO(" [WARN] "ADPT_FMT" %s  failed, bInSuspend=%d\n", ADPT_ARG(adapt), __func__, pwrctrlpriv->bInSuspend);
 		return 0;
 	}
@@ -2652,7 +2651,7 @@ static int pm_netdev_open(struct net_device *pnetdev, u8 bnormal)
 
 	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(pnetdev);
 
-	if (true == bnormal) {
+	if (bnormal) {
 		_enter_critical_mutex(&(adapter_to_dvobj(adapt)->hw_init_mutex), NULL);
 		status = _netdev_open(pnetdev);
 		_exit_critical_mutex(&(adapter_to_dvobj(adapt)->hw_init_mutex), NULL);
@@ -2670,7 +2669,7 @@ static int netdev_close(struct net_device *pnetdev)
 
 	RTW_INFO(FUNC_NDEV_FMT" , bup=%d\n", FUNC_NDEV_ARG(pnetdev), adapt->bup);
 	#ifdef CONFIG_AUTOSUSPEND
-	if (pwrctl->bInternalAutoSuspend == true) {
+	if (pwrctl->bInternalAutoSuspend) {
 		/* rtw_pwr_wakeup(adapt); */
 		if (pwrctl->rf_pwrstate == rf_off)
 			pwrctl->ps_flag = true;
@@ -3037,7 +3036,7 @@ void rtw_dev_unload(struct adapter * adapt)
 	u8 cnt = 0;
 
 
-	if (adapt->bup == true) {
+	if (adapt->bup) {
 		RTW_INFO("==> "FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(adapt));
 
 		rtw_set_drv_stopped(adapt);
@@ -3051,13 +3050,13 @@ void rtw_dev_unload(struct adapter * adapt)
 		{
 			rtw_stop_drv_threads(adapt);
 
-			if (ATOMIC_READ(&(pcmdpriv->cmdthd_running)) == true) {
+			if (ATOMIC_READ(&(pcmdpriv->cmdthd_running))) {
 				RTW_ERR("cmd_thread not stop !!\n");
 				rtw_warn_on(1);
 			}
 		}
 		/* check the status of IPS */
-		if (rtw_hal_check_ips_status(adapt) == true || pwrctl->rf_pwrstate == rf_off) { /* check HW status and SW state */
+		if (rtw_hal_check_ips_status(adapt) || pwrctl->rf_pwrstate == rf_off) { /* check HW status and SW state */
 			RTW_PRINT("%s: driver in IPS-FWLPS\n", __func__);
 			pdbgpriv->dbg_dev_unload_inIPS_cnt++;
 		} else
@@ -3122,7 +3121,7 @@ int rtw_suspend_free_assoc_resource(struct adapter *adapt)
 		clr_fwstate(pmlmepriv, _FW_UNDER_SURVEY);
 	}
 
-	if (check_fwstate(pmlmepriv, _FW_UNDER_LINKING) == true) {
+	if (check_fwstate(pmlmepriv, _FW_UNDER_LINKING)) {
 		RTW_PRINT("%s: fw_under_linking\n", __FUNCTION__);
 		rtw_indicate_disconnect(adapt, 0, false);
 	}
@@ -3146,7 +3145,7 @@ static int rtw_suspend_normal(struct adapter *adapt)
 
 	rtw_led_control(adapt, LED_CTL_POWER_OFF);
 
-	if ((rtw_hal_check_ips_status(adapt) == true)
+	if ((rtw_hal_check_ips_status(adapt))
 	    || (adapter_to_pwrctl(adapt)->rf_pwrstate == rf_off))
 		RTW_PRINT("%s: ### ERROR #### driver in IPS ####ERROR###!!!\n", __FUNCTION__);
 
@@ -3179,7 +3178,7 @@ int rtw_suspend_common(struct adapter *adapt)
 
 	pwrpriv->bInSuspend = true;
 
-	while (pwrpriv->bips_processing == true)
+	while (pwrpriv->bips_processing)
 		rtw_msleep_os(1);
 
 	if ((!adapt->bup) || RTW_CANNOT_RUN(adapt)) {
@@ -3197,7 +3196,7 @@ int rtw_suspend_common(struct adapter *adapt)
 
 	rtw_ps_deny_cancel(adapt, PS_DENY_SUSPEND);
 
-	if (rtw_mi_check_status(adapt, MI_AP_MODE) == false) {
+	if (!rtw_mi_check_status(adapt, MI_AP_MODE)) {
 		rtw_suspend_normal(adapt);
 	} else if (rtw_mi_check_status(adapt, MI_AP_MODE)) {
 		rtw_suspend_normal(adapt);
@@ -3303,13 +3302,13 @@ int rtw_resume_common(struct adapter *adapt)
 	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 
 
-	if (pwrpriv->bInSuspend == false)
+	if (!pwrpriv->bInSuspend)
 		return 0;
 
 	RTW_PRINT("resume start\n");
 	RTW_INFO("==> %s (%s:%d)\n", __FUNCTION__, current->comm, current->pid);
 
-	if (rtw_mi_check_status(adapt, WIFI_AP_STATE) == false) {
+	if (!rtw_mi_check_status(adapt, WIFI_AP_STATE)) {
 		rtw_resume_process_normal(adapt);
 	} else if (rtw_mi_check_status(adapt, WIFI_AP_STATE)) {
 		rtw_resume_process_normal(adapt);

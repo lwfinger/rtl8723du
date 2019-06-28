@@ -98,7 +98,7 @@ PHY_RFShadowCompare(
 {
 	u32	reg;
 	/* Check if we need to check the register */
-	if (RF_Shadow[eRFPath][Offset].Compare == true) {
+	if (RF_Shadow[eRFPath][Offset].Compare) {
 		reg = rtw_hal_read_rfreg(Adapter, eRFPath, Offset, bRFRegOffsetMask);
 		/* Compare shadow and real rf register for 20bits!! */
 		if (RF_Shadow[eRFPath][Offset].Value != reg) {
@@ -118,9 +118,9 @@ PHY_RFShadowRecorver(
 	u32				Offset)
 {
 	/* Check if the address is error */
-	if (RF_Shadow[eRFPath][Offset].ErrorOrNot == true) {
+	if (RF_Shadow[eRFPath][Offset].ErrorOrNot) {
 		/* Check if we need to recorver the register. */
-		if (RF_Shadow[eRFPath][Offset].Recorver == true) {
+		if (RF_Shadow[eRFPath][Offset].Recorver) {
 			rtw_hal_write_rfreg(Adapter, eRFPath, Offset, bRFRegOffsetMask,
 					    RF_Shadow[eRFPath][Offset].Value);
 		}

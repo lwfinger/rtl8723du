@@ -310,7 +310,7 @@ static void halbtcoutsrc_EnterLps(struct btc_coexist * pBtCoexist)
 
 	adapt = pBtCoexist->Adapter;
 
-	if (pBtCoexist->bdontenterLPS == false) {
+	if (!pBtCoexist->bdontenterLPS) {
 		pBtCoexist->bt_info.bt_ctrl_lps = true;
 		pBtCoexist->bt_info.bt_lps_on = true;
 
@@ -475,14 +475,14 @@ static u32 _halbtcoutsrc_GetWifiLinkStatus(struct adapter * adapt)
 	if (!rtw_p2p_chk_state(&adapt->wdinfo, P2P_STATE_NONE))
 		bp2p = true;
 
-	if (check_fwstate(pmlmepriv, WIFI_ASOC_STATE) == true) {
-		if (check_fwstate(pmlmepriv, WIFI_AP_STATE) == true) {
-			if (true == bp2p)
+	if (check_fwstate(pmlmepriv, WIFI_ASOC_STATE)) {
+		if (check_fwstate(pmlmepriv, WIFI_AP_STATE)) {
+			if (bp2p)
 				portConnectedStatus |= WIFI_P2P_GO_CONNECTED;
 			else
 				portConnectedStatus |= WIFI_AP_CONNECTED;
 		} else {
-			if (true == bp2p)
+			if (bp2p)
 				portConnectedStatus |= WIFI_P2P_GC_CONNECTED;
 			else
 				portConnectedStatus |= WIFI_STA_CONNECTED;
@@ -534,7 +534,7 @@ static void _btmpoper_timer_hdl(void *p)
 static void _btmpoper_timer_hdl(struct timer_list *t)
 #endif
 {
-	if (GLBtcBtMpRptWait == true) {
+	if (GLBtcBtMpRptWait) {
 		GLBtcBtMpRptWait = false;
 		_rtw_up_sema(&GLBtcBtMpRptSema);
 	}
@@ -583,12 +583,12 @@ static u8 _btmpoper_cmd(struct btc_coexist * pBtCoexist, u8 opcode, u8 opcodever
 	_rtw_down_sema(&GLBtcBtMpRptSema);
 	/* GLBtcBtMpRptWait should be false here*/
 
-	if (GLBtcBtMpRptWiFiOK == false) {
+	if (!GLBtcBtMpRptWiFiOK) {
 		RTW_ERR("%s: Didn't get H2C Rsp Event!\n", __FUNCTION__);
 		ret = BT_STATUS_H2C_TIMTOUT;
 		goto exit;
 	}
-	if (GLBtcBtMpRptBTOK == false) {
+	if (!GLBtcBtMpRptBTOK) {
 		RTW_DBG("%s: Didn't get BT response!\n", __FUNCTION__);
 		ret = BT_STATUS_H2C_BT_NO_RSP;
 		goto exit;
@@ -632,7 +632,7 @@ exit:
 static u32 halbtcoutsrc_GetBtPatchVer(struct btc_coexist * pBtCoexist)
 {
 	if (pBtCoexist->bt_info.get_bt_fw_ver_cnt <= 5) {
-		if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist) == true) {
+		if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist)) {
 			unsigned long irqL;
 			u8 ret;
 
@@ -666,7 +666,7 @@ static u32 halbtcoutsrc_GetBtCoexSupportedFeature(void *pBtcContext)
 
 	pBtCoexist = (struct btc_coexist *)pBtcContext;
 
-	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist) == true) {
+	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist)) {
 		u8 buf[3] = {0};
 		unsigned long irqL;
 		u8 op_code;
@@ -697,7 +697,7 @@ static u32 halbtcoutsrc_GetBtCoexSupportedVersion(void *pBtcContext)
 
 	pBtCoexist = (struct btc_coexist *)pBtcContext;
 
-	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist) == true) {
+	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist)) {
 		u8 buf[3] = {0};
 		unsigned long irqL;
 		u8 op_code;
@@ -728,7 +728,7 @@ static u32 halbtcoutsrc_GetBtDeviceInfo(void *pBtcContext)
 
 	pBtCoexist = (struct btc_coexist *)pBtcContext;
 
-	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist) == true) {
+	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist)) {
 		u8 buf[3] = {0};
 		unsigned long irqL;
 		u8 op_code;
@@ -759,7 +759,7 @@ static u32 halbtcoutsrc_GetBtForbiddenSlotVal(void *pBtcContext)
 
 	pBtCoexist = (struct btc_coexist *)pBtcContext;
 
-	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist) == true) {
+	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist)) {
 		u8 buf[3] = {0};
 		unsigned long irqL;
 		u8 op_code;
@@ -792,7 +792,7 @@ static u8 halbtcoutsrc_GetWifiScanAPNum(struct adapter * adapt)
 	pmlmepriv = &adapt->mlmepriv;
 	pmlmeext = &adapt->mlmeextpriv;
 
-	if (GLBtcWiFiInScanState == false) {
+	if (!GLBtcWiFiInScanState) {
 		if (pmlmepriv->num_of_scanned > 0xFF)
 			scan_AP_num = 0xFF;
 		else
@@ -1207,7 +1207,7 @@ static u8 halbtcoutsrc_Set(void *pBtcContext, u8 setType, void *pInBuf)
 		/*
 		pBtCoexist->bt_info.ra_mask = *pU4Tmp;
 
-		if (check_fwstate(&adapt->mlmepriv, WIFI_ASOC_STATE) == true) {
+		if (check_fwstate(&adapt->mlmepriv, WIFI_ASOC_STATE)) {
 			struct sta_info *psta;
 			struct wlan_bssid_ex * cur_network;
 
@@ -1230,7 +1230,7 @@ static u8 halbtcoutsrc_Set(void *pBtcContext, u8 setType, void *pInBuf)
 		else if (*pU1Tmp == 1)
 			newMimoPsMode = WLAN_HT_CAP_SM_PS_DISABLED;
 
-		if (check_fwstate(&adapt->mlmepriv , WIFI_ASOC_STATE) == true) {
+		if (check_fwstate(&adapt->mlmepriv , WIFI_ASOC_STATE)) {
 			/* issue_action_SM_PS(adapt, get_my_bssid(&(pmlmeinfo->network)), newMimoPsMode); */
 			issue_action_SM_PS_wait_ack(adapt , get_my_bssid(&(pmlmeinfo->network)) , newMimoPsMode, 3 , 1);
 		}
@@ -1265,7 +1265,7 @@ static u8 halbtcoutsrc_UnderIps(struct btc_coexist * pBtCoexist)
 	pwrpriv = &adapt->dvobj->pwrctl_priv;
 	bMacPwrCtrlOn = false;
 
-	if ((true == pwrpriv->bips_processing)
+	if ((pwrpriv->bips_processing)
 	    && (IPS_NONE != pwrpriv->ips_mode_req)
 	   )
 		return true;
@@ -1345,7 +1345,7 @@ static void halbtcoutsrc_DisplayWifiStatus(struct btc_coexist * pBtCoexist)
 	pBtCoexist->btc_get(pBtCoexist, BTC_GET_U4_WIFI_IQK_FAIL, &iqk_cnt_fail);
 	CL_SPRINTF(cliBuf, BT_TMP_BUF_SIZE, "\r\n %-35s = %d/ %d/ %d %s %s",
 		"IQK All/ OK/ Fail/AutoLoad/FWDL", iqk_cnt_total, iqk_cnt_ok, iqk_cnt_fail,
-		((halbtcoutsrc_is_autoload_fail(pBtCoexist) == true) ? "fail":"ok"), ((halbtcoutsrc_is_fw_ready(pBtCoexist) == true) ? "ok":"fail"));
+		((halbtcoutsrc_is_autoload_fail(pBtCoexist)) ? "fail":"ok"), ((halbtcoutsrc_is_fw_ready(pBtCoexist)) ? "ok":"fail"));
 	CL_PRINTF(cliBuf);
 	
 	if (wifiLinkStatus & WIFI_STA_CONNECTED) {
@@ -1377,9 +1377,9 @@ static void halbtcoutsrc_DisplayWifiStatus(struct btc_coexist * pBtCoexist)
 
 	/* power status */
 	CL_SPRINTF(cliBuf, BT_TMP_BUF_SIZE, "\r\n %-35s = %s%s%s", "Power Status", \
-		((halbtcoutsrc_UnderIps(pBtCoexist) == true) ? "IPS ON" : "IPS OFF"),
-		((halbtcoutsrc_UnderLps(pBtCoexist) == true) ? ", LPS ON" : ", LPS OFF"),
-		((halbtcoutsrc_Under32K(pBtCoexist) == true) ? ", 32k" : ""));
+		((halbtcoutsrc_UnderIps(pBtCoexist)) ? "IPS ON" : "IPS OFF"),
+		((halbtcoutsrc_UnderLps(pBtCoexist)) ? ", LPS ON" : ", LPS OFF"),
+		((halbtcoutsrc_Under32K(pBtCoexist)) ? ", 32k" : ""));
 	CL_PRINTF(cliBuf);
 
 	CL_SPRINTF(cliBuf, BT_TMP_BUF_SIZE, "\r\n %-35s = %02x %02x %02x %02x %02x %02x (0x%x/0x%x)", "Power mode cmd(lps/rpwm)",
@@ -1582,7 +1582,7 @@ static u16 halbtcoutsrc_SetBtReg(void *pBtcContext, u8 RegType, u32 RegAddr, u32
 
 	pBtCoexist = (struct btc_coexist *)pBtcContext;
 
-	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist) == true) {
+	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist)) {
 		u8 buf[3] = {0};
 		unsigned long irqL;
 		u8 op_code;
@@ -1635,7 +1635,7 @@ static u16 halbtcoutsrc_GetBtReg_with_status(void *pBtcContext, u8 RegType, u32 
 
 	pBtCoexist = (struct btc_coexist *)pBtcContext;
 
-	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist) == true) {
+	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist)) {
 		u8 buf[3] = {0};
 		unsigned long irqL;
 		u8 op_code;
@@ -1801,7 +1801,7 @@ static u8 halbtcoutsrc_GetBleScanTypeFromBt(void *pBtcContext)
 
 	pBtCoexist = (struct btc_coexist *)pBtcContext;
 
-	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist) == true) {
+	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist)) {
 		u8 buf[3] = {0};
 		unsigned long irqL;
 		u8 op_code;
@@ -1833,7 +1833,7 @@ static u32 halbtcoutsrc_GetBleScanParaFromBt(void *pBtcContext, u8 scanType)
 
 	pBtCoexist = (struct btc_coexist *)pBtcContext;
 
-	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist) == true) {
+	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist)) {
 		u8 buf[3] = {0};
 		unsigned long irqL;
 		u8 op_code;
@@ -1869,7 +1869,7 @@ static u8 halbtcoutsrc_GetBtAFHMapFromBt(void *pBtcContext, u8 mapType, u8 *afhM
 	u8 status;
 	u32 ret = BT_STATUS_BT_OP_SUCCESS;
 
-	if (halbtcoutsrc_IsHwMailboxExist(pBtCoexist) == false)
+	if (!halbtcoutsrc_IsHwMailboxExist(pBtCoexist))
 		return false;
 
 	buf[0] = 0;
@@ -3045,14 +3045,14 @@ void hal_btcoex_ConnectNotify(struct adapter * adapt, u8 action)
 
 	is_5g_band = (adapt->mlmeextpriv.cur_channel > 14) ? true : false;
 
-	if (action == true) {
-		if (is_5g_band == true)
+	if (action) {
+		if (is_5g_band)
 			assoType = BTC_ASSOCIATE_5G_START;
 		else
 			assoType = BTC_ASSOCIATE_START;
 	}
 	else {
-		if (is_5g_band == true)
+		if (is_5g_band)
 			assoType = BTC_ASSOCIATE_5G_FINISH;
 		else
 			assoType = BTC_ASSOCIATE_FINISH;
@@ -3078,7 +3078,7 @@ void hal_btcoex_IQKNotify(struct adapter * adapt, u8 state)
 
 void hal_btcoex_BtInfoNotify(struct adapter * adapt, u8 length, u8 *tmpBuf)
 {
-	if (GLBtcWiFiInIQKState == true)
+	if (GLBtcWiFiInIQKState)
 		return;
 
 	EXhalbtcoutsrc_bt_info_notify(&GLBtCoexist, tmpBuf, length);
@@ -3089,7 +3089,7 @@ void hal_btcoex_BtMpRptNotify(struct adapter * adapt, u8 length, u8 *tmpBuf)
 	u8 extid, status, len, seq;
 
 
-	if (GLBtcBtMpRptWait == false)
+	if (!GLBtcBtMpRptWait)
 		return;
 
 	if ((length < 3) || (!tmpBuf))
@@ -3120,7 +3120,7 @@ void hal_btcoex_BtMpRptNotify(struct adapter * adapt, u8 length, u8 *tmpBuf)
 		return;
 	}
 
-	if ((GLBtcBtMpRptWiFiOK == true) && (GLBtcBtMpRptBTOK == true)) {
+	if ((GLBtcBtMpRptWiFiOK) && (GLBtcBtMpRptBTOK)) {
 		GLBtcBtMpRptWait = false;
 		_cancel_timer_ex(&GLBtcBtMpOperTimer);
 		_rtw_up_sema(&GLBtcBtMpRptSema);
@@ -3195,7 +3195,7 @@ void hal_btcoex_SetManualControl(struct adapter * adapt, u8 bmanual)
 
 u8 hal_btcoex_1Ant(struct adapter * adapt)
 {
-	if (hal_btcoex_IsBtExist(adapt) == false)
+	if (!hal_btcoex_IsBtExist(adapt))
 		return false;
 
 	if (GLBtCoexist.board_info.btdm_ant_num == 1)
@@ -3206,10 +3206,10 @@ u8 hal_btcoex_1Ant(struct adapter * adapt)
 
 u8 hal_btcoex_IsBtControlLps(struct adapter * adapt)
 {
-	if (GLBtCoexist.bdontenterLPS == true)
+	if (GLBtCoexist.bdontenterLPS)
 		return true;
 	
-	if (hal_btcoex_IsBtExist(adapt) == false)
+	if (!hal_btcoex_IsBtExist(adapt))
 		return false;
 
 	if (GLBtCoexist.bt_info.bt_disabled)
@@ -3223,10 +3223,10 @@ u8 hal_btcoex_IsBtControlLps(struct adapter * adapt)
 
 u8 hal_btcoex_IsLpsOn(struct adapter * adapt)
 {
-	if (GLBtCoexist.bdontenterLPS == true)
+	if (GLBtCoexist.bdontenterLPS)
 		return false;
 	
-	if (hal_btcoex_IsBtExist(adapt) == false)
+	if (!hal_btcoex_IsBtExist(adapt))
 		return false;
 
 	if (GLBtCoexist.bt_info.bt_disabled)
@@ -3523,7 +3523,7 @@ hal_btcoex_AntIsolationConfig_ParaFile(
 	_rtw_memset(pHalData->para_file_buf , 0 , MAX_PARA_FILE_BUF_LEN);
 
 	rtw_get_phy_file_path(Adapter, pFileName);
-	if (rtw_is_file_readable(rtw_phy_para_file_path) == true) {
+	if (rtw_is_file_readable(rtw_phy_para_file_path)) {
 		rlen = rtw_retrieve_from_file(rtw_phy_para_file_path, pHalData->para_file_buf, MAX_PARA_FILE_BUF_LEN);
 		if (rlen > 0)
 			rtStatus = _SUCCESS;

@@ -437,7 +437,7 @@ phydm_supportability_init(
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u64	support_ability;
 	
-	if (*(p_dm->p_mp_mode) == true) {
+	if (*(p_dm->p_mp_mode)) {
 		support_ability = 0;
 
 		/**/
@@ -868,7 +868,7 @@ phydm_stop_dm_watchdog_check(
 		PHYDM_DBG(p_dm, DBG_COMMON_FLOW, ("Disable phydm\n"));
 		return true;
 		
-	} else if (phydm_acs_check(p_dm) == true) {
+	} else if (phydm_acs_check(p_dm)) {
 	
 		PHYDM_DBG(p_dm, DBG_COMMON_FLOW, ("Disable phydm by ACS\n"));
 		return true;
@@ -896,7 +896,7 @@ phydm_watchdog(
 	phydm_auto_dbg_engine(p_dm);
 	phydm_receiver_blocking(p_dm);
 	
-	if (phydm_stop_dm_watchdog_check(p_dm) == true)
+	if (phydm_stop_dm_watchdog_check(p_dm))
 		return;
 
 	phydm_hw_setting(p_dm);
@@ -1737,7 +1737,7 @@ phydm_receiver_blocking(
 
 	if ((p_dm->support_ic_type & ODM_RTL8188E && ((bb_regf0 & 0xf000) >> 12) < 8) ||
 		p_dm->support_ic_type & ODM_RTL8192E) { /*8188E_T version*/
-		if (p_dm->consecutive_idlel_time > 10 && *p_dm->p_mp_mode == false && p_dm->adaptivity_enable == true) {
+		if (p_dm->consecutive_idlel_time > 10 && !*p_dm->p_mp_mode && p_dm->adaptivity_enable) {
 			if ((bw == CHANNEL_WIDTH_20) && (channel == 1)) {
 				phydm_nbi_setting(p_dm, FUNC_ENABLE, channel, 20, 2410, PHYDM_DONT_CARE);
 				p_dm->is_receiver_blocking_en = true;
@@ -1752,7 +1752,7 @@ phydm_receiver_blocking(
 			return;
 		}
 	} else if ((p_dm->support_ic_type & ODM_RTL8188E && ((bb_regf0 & 0xf000) >> 12) >= 8)) { /*8188E_S version*/
-		if (p_dm->consecutive_idlel_time > 10 && *p_dm->p_mp_mode == false && p_dm->adaptivity_enable == true) {
+		if (p_dm->consecutive_idlel_time > 10 && !*p_dm->p_mp_mode && p_dm->adaptivity_enable) {
 			if ((bw == CHANNEL_WIDTH_20) && (channel == 13)) {
 				phydm_nbi_setting(p_dm, FUNC_ENABLE, channel, 20, 2473, PHYDM_DONT_CARE);
 				p_dm->is_receiver_blocking_en = true;

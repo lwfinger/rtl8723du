@@ -100,7 +100,7 @@ static void c2h_wk_callback(_workitem *work)
 			continue;
 		}
 
-		if (direct_hdl_filter(adapter, id, seq, plen, payload) == true) {
+		if (direct_hdl_filter(adapter, id, seq, plen, payload)) {
 			/* Handle directly */
 			rtw_hal_c2h_handler(adapter, id, seq, plen, payload);
 			rtw_mfree(c2h_evt, C2H_REG_LEN);
@@ -304,8 +304,8 @@ int rtw_cmd_filter(struct cmd_priv *pcmdpriv, struct cmd_obj *cmd_obj)
 	if (cmd_obj->no_io)
 		bAllow = true;
 
-	if ((!rtw_is_hw_init_completed(pcmdpriv->adapt) && (bAllow == false))
-	    || ATOMIC_READ(&(pcmdpriv->cmdthd_running)) == false	/* com_thread not running */
+	if ((!rtw_is_hw_init_completed(pcmdpriv->adapt) && (!bAllow))
+	    || !ATOMIC_READ(&(pcmdpriv->cmdthd_running))	/* com_thread not running */
 	   ) {
 		if (DBG_CMD_EXECUTE)
 			RTW_INFO(ADPT_FMT" drop "CMD_FMT" hw_init_completed:%u, cmdthd_running:%u\n", ADPT_ARG(cmd_obj->adapt)
@@ -702,10 +702,10 @@ u8 rtw_sitesurvey_cmd(struct adapter *adapt, struct sitesurvey_parm *pparm)
 	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
 	struct wifidirect_info *pwdinfo = &(adapt->wdinfo);
 
-	if (check_fwstate(pmlmepriv, _FW_LINKED) == true)
+	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		rtw_lps_ctrl_wk_cmd(adapt, LPS_CTRL_SCAN, 1);
 
-	if (check_fwstate(pmlmepriv, _FW_LINKED) == true)
+	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		p2p_ps_wk_cmd(adapt, P2P_PS_SCAN, 1);
 
 	ph2c = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
@@ -1191,7 +1191,7 @@ u8 rtw_joinbss_cmd(struct adapter  *adapt, struct wlan_network *pnetwork)
 
 
 	/* for hidden ap to set fw_state here */
-	if (check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_ADHOC_STATE) != true) {
+	if (!check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_ADHOC_STATE)) {
 		switch (ndis_network_mode) {
 		case Ndis802_11IBSS:
 			set_fwstate(pmlmepriv, WIFI_ADHOC_STATE);
@@ -1242,7 +1242,7 @@ u8 rtw_joinbss_cmd(struct adapter  *adapt, struct wlan_network *pnetwork)
 	/* If not,  we have to copy the connecting AP's MAC address to it so that */
 	/* the driver just has the bssid information for PMKIDList searching. */
 
-	if (pmlmepriv->assoc_by_bssid == false)
+	if (!pmlmepriv->assoc_by_bssid)
 		_rtw_memcpy(&pmlmepriv->assoc_bssid[0], &pnetwork->network.MacAddress[0], ETH_ALEN);
 
 	/* copy fixed ie */
@@ -1917,7 +1917,7 @@ static u8 _rtw_set_chplan_cmd(struct adapter *adapter, int flags, u8 chplan, con
 
 
 	/* check if allow software config */
-	if (swconfig && rtw_hal_is_disable_sw_channel_plan(adapter) == true) {
+	if (swconfig && rtw_hal_is_disable_sw_channel_plan(adapter)) {
 		res = _FAIL;
 		goto exit;
 	}
@@ -1988,8 +1988,8 @@ inline u8 rtw_set_country_cmd(struct adapter *adapter, int flags, const char *co
 {
 	const struct country_chplan *ent;
 
-	if (is_alpha(country_code[0]) == false
-	    || is_alpha(country_code[1]) == false
+	if (!is_alpha(country_code[0])
+	    || !is_alpha(country_code[1])
 	   ) {
 		RTW_PRINT("%s input country_code is not alpha2\n", __func__);
 		return _FAIL;
@@ -2140,7 +2140,7 @@ u8 traffic_status_watchdog(struct adapter *adapt, u8 from_timer)
 	/*  */
 	/* Determine if our traffic is busy now */
 	/*  */
-	if ((check_fwstate(pmlmepriv, _FW_LINKED) == true)
+	if ((check_fwstate(pmlmepriv, _FW_LINKED))
 	    /*&& !MgntInitAdapterInProgress(pMgntInfo)*/) {
 		/* if we raise bBusyTraffic in last watchdog, using lower threshold. */
 		if (pmlmepriv->LinkDetectInfo.bBusyTraffic)
@@ -2199,7 +2199,7 @@ u8 traffic_status_watchdog(struct adapter *adapt, u8 from_timer)
 				/* rtw_hal_dm_watchdog_in_lps(adapt); */
 			}
 #ifdef CONFIG_DYNAMIC_DTIM
-			if (adapter_to_pwrctl(adapt)->bFwCurrentInPSMode == true)
+			if (adapter_to_pwrctl(adapt)->bFwCurrentInPSMode)
 				pmlmepriv->LinkDetectInfo.LowPowerTransitionCount++;
 #endif /* CONFIG_DYNAMIC_DTIM */
 		} else {
@@ -2331,15 +2331,15 @@ void lps_ctrl_wk_hdl(struct adapter *adapt, u8 lps_ctrl_type)
 	u8	mstatus;
 
 
-	if ((check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) == true)
-	    || (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE) == true))
+	if ((check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE))
+	    || (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE)))
 		return;
 
 	switch (lps_ctrl_type) {
 	case LPS_CTRL_SCAN:
 		/* RTW_INFO("LPS_CTRL_SCAN\n"); */
 		rtw_btcoex_ScanNotify(adapt, true);
-		if (check_fwstate(pmlmepriv, _FW_LINKED) == true) {
+		if (check_fwstate(pmlmepriv, _FW_LINKED)) {
 			/* connect */
 			LPS_Leave(adapt, "LPS_CTRL_SCAN");
 		}
@@ -2484,7 +2484,7 @@ static void rtw_lps_change_dtim_hdl(struct adapter *adapt, u8 dtim)
 	if (dtim <= 0 || dtim > 16)
 		return;
 
-	if (rtw_btcoex_IsBtControlLps(adapt) == true)
+	if (rtw_btcoex_IsBtControlLps(adapt))
 		return;
 	if (pwrpriv->dtim != dtim) {
 		RTW_INFO("change DTIM from %d to %d, bFwCurrentInPSMode=%d, ps_mode=%d\n", pwrpriv->dtim, dtim,
@@ -2493,7 +2493,7 @@ static void rtw_lps_change_dtim_hdl(struct adapter *adapt, u8 dtim)
 		pwrpriv->dtim = dtim;
 	}
 
-	if ((pwrpriv->bFwCurrentInPSMode == true) && (pwrpriv->pwr_mode > PS_MODE_ACTIVE)) {
+	if ((pwrpriv->bFwCurrentInPSMode) && (pwrpriv->pwr_mode > PS_MODE_ACTIVE)) {
 		u8 ps_mode = pwrpriv->pwr_mode;
 
 		rtw_hal_set_hwreg(adapt, HW_VAR_H2C_FW_PWRMODE, (u8 *)(&ps_mode));
@@ -2924,7 +2924,7 @@ static void rtw_chk_hi_queue_hdl(struct adapter *adapt)
 			rtw_tim_map_clear(adapt, pstapriv->tim_bitmap, 0);
 			rtw_tim_map_clear(adapt, pstapriv->sta_dz_bitmap, 0);
 
-			if (update_tim == true)
+			if (update_tim)
 				_update_beacon(adapt, _TIM_IE_, NULL, true, "bmc sleepq and HIQ empty");
 		} else /* re check again */
 			rtw_chk_hi_queue_cmd(adapt);
@@ -3336,7 +3336,7 @@ int c2h_evt_hdl(struct adapter *adapter, u8 *c2h_evt, c2h_id_filter filter)
 
 	rtw_hal_c2h_reg_hdr_parse(adapter, c2h_evt, &id, &seq, &plen, &payload);
 
-	if (filter && filter(adapter, id, seq, plen, payload) == false)
+	if (filter && !filter(adapter, id, seq, plen, payload))
 		goto exit;
 
 	ret = rtw_hal_c2h_handler(adapter, id, seq, plen, payload);
@@ -3442,7 +3442,7 @@ static void session_tracker_chk_for_sta(struct adapter *adapter, struct sta_info
 	phead = &st_ctl->tracker_q.queue;
 	plist = get_next(phead);
 	pnext = get_next(plist);
-	while (rtw_end_of_queue_search(phead, plist) == false) {
+	while (!rtw_end_of_queue_search(phead, plist)) {
 		st = container_of(plist, struct session_tracker, list);
 		plist = pnext;
 		pnext = get_next(pnext);
@@ -3472,7 +3472,7 @@ static void session_tracker_chk_for_sta(struct adapter *adapter, struct sta_info
 	_exit_critical_bh(&st_ctl->tracker_q.lock, &irqL);
 
 	plist = get_next(&dlist);
-	while (rtw_end_of_queue_search(&dlist, plist) == false) {
+	while (!rtw_end_of_queue_search(&dlist, plist)) {
 		st = container_of(plist, struct session_tracker, list);
 		plist = get_next(plist);
 		rtw_mfree((u8 *)st, sizeof(struct session_tracker));
@@ -3503,7 +3503,7 @@ static void session_tracker_chk_for_adapter(struct adapter *adapter)
 		phead = &(stapriv->sta_hash[i]);
 		plist = get_next(phead);
 
-		while ((rtw_end_of_queue_search(phead, plist)) == false) {
+		while ((!rtw_end_of_queue_search(phead, plist))) {
 			sta = container_of(plist, struct sta_info, hash_list);
 			plist = get_next(plist);
 
@@ -3559,7 +3559,7 @@ static void session_tracker_cmd_hdl(struct adapter *adapter, struct st_cmd_parm 
 
 		phead = &st_ctl->tracker_q.queue;
 		plist = get_next(phead);
-		while (rtw_end_of_queue_search(phead, plist) == false) {
+		while (!rtw_end_of_queue_search(phead, plist)) {
 			st = container_of(plist, struct session_tracker, list);
 
 			if (st->local_naddr == local_naddr
@@ -3571,7 +3571,7 @@ static void session_tracker_cmd_hdl(struct adapter *adapter, struct st_cmd_parm 
 			plist = get_next(plist);
 		}
 
-		if (rtw_end_of_queue_search(phead, plist) == true)
+		if (rtw_end_of_queue_search(phead, plist))
 			st = NULL;
 
 		switch (cmd) {
@@ -3883,7 +3883,7 @@ void rtw_setassocsta_cmdrsp_callback(struct adapter	*adapt,  struct cmd_obj *pcm
 
 	_enter_critical_bh(&pmlmepriv->lock, &irqL);
 
-	if ((check_fwstate(pmlmepriv, WIFI_MP_STATE) == true) && (check_fwstate(pmlmepriv, _FW_UNDER_LINKING) == true))
+	if ((check_fwstate(pmlmepriv, WIFI_MP_STATE)) && (check_fwstate(pmlmepriv, _FW_UNDER_LINKING)))
 		_clr_fwstate_(pmlmepriv, _FW_UNDER_LINKING);
 
 	set_fwstate(pmlmepriv, _FW_LINKED);

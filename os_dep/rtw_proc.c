@@ -524,34 +524,28 @@ static int proc_get_tx_info_msg(struct seq_file *m, void *v)
 		phead = &(pstapriv->sta_hash[i]);
 		plist = get_next(phead);
 
-		while ((rtw_end_of_queue_search(phead, plist)) == false) {
+		while ((!rtw_end_of_queue_search(phead, plist))) {
 
 			psta = container_of(plist, struct sta_info, hash_list);
 
 			plist = get_next(plist);
 
-			if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)  !=  true)
-				&& (_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6) != true)
-				&& (_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapt), 6) != true)) {
-
+			if ((!_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)) &&
+			    (!_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6)) &&
+			    (!_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapt), 6))) {
 				switch (psta->cmn.bw_mode) {
-
 				case CHANNEL_WIDTH_20:
 					BW = "20M";
 					break;
-
 				case CHANNEL_WIDTH_40:
 					BW = "40M";
 					break;
-
 				case CHANNEL_WIDTH_80:
 					BW = "80M";
 					break;
-
 				case CHANNEL_WIDTH_160:
 					BW = "160M";
 					break;
-
 				default:
 					BW = "";
 					break;
@@ -878,7 +872,7 @@ static ssize_t proc_set_macaddr_acl(struct file *file, const char __user *buffer
 			if (sscanf(c, MAC_SFMT, MAC_SARG(addr)) != 6)
 				break;
 
-			if (rtw_check_invalid_mac_address(addr, 0) == false)
+			if (!rtw_check_invalid_mac_address(addr, 0))
 				rtw_acl_add_sta(adapter, addr);
 
 			c = strsep(&next, " \t");
@@ -963,7 +957,7 @@ ssize_t proc_set_pre_link_sta(struct file *file, const char __user *buffer, size
 			if (sscanf(c, MAC_SFMT, MAC_SARG(addr)) != 6)
 				break;
 
-			if (rtw_check_invalid_mac_address(addr, 0) == false) {
+			if (!rtw_check_invalid_mac_address(addr, 0)) {
 				if (cmd_id == PRE_LINK_STA_CMD_ADD)
 					rtw_pre_link_sta_add(&adapter->stapriv, addr);
 				else
@@ -1300,7 +1294,7 @@ static ssize_t proc_set_tx_bw_mode(struct file *file, const char __user *buffer,
 		}
 		adapter->driver_tx_bw_mode = bw_mode;
 
-		if (update == true) {
+		if (update) {
 			struct sta_info *sta;
 			int i;
 
@@ -1395,7 +1389,7 @@ static ssize_t proc_set_tx_power_ext_info(struct file *file, const char __user *
 		#endif
 
 		rtw_ps_deny(adapter, PS_DENY_IOCTL);
-		if (rtw_pwr_wakeup(adapter) == false)
+		if (!rtw_pwr_wakeup(adapter))
 			goto clear_ps_deny;
 
 		if (strcmp("default", cmd) == 0)

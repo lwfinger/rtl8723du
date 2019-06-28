@@ -784,7 +784,7 @@ u32 rtw_tkip_decrypt(struct adapter *adapt, u8 *precvframe)
 				static u32 no_gkey_bc_cnt = 0;
 				static u32 no_gkey_mc_cnt = 0;
 
-				if (psecuritypriv->binstallGrpkey == false) {
+				if (!psecuritypriv->binstallGrpkey) {
 					res = _FAIL;
 
 					if (start == 0)
@@ -1855,9 +1855,7 @@ u32	rtw_aes_decrypt(struct adapter *adapt, u8 *precvframe)
 				static u32 no_gkey_bc_cnt = 0;
 				static u32 no_gkey_mc_cnt = 0;
 
-				/* RTW_INFO("rx bc/mc packets, to perform sw rtw_aes_decrypt\n"); */
-				/* prwskey = psecuritypriv->dot118021XGrpKey[psecuritypriv->dot118021XGrpKeyid].skey; */
-				if (psecuritypriv->binstallGrpkey == false) {
+				if (!psecuritypriv->binstallGrpkey) {
 					res = _FAIL;
 
 					if (start == 0)
@@ -2726,7 +2724,7 @@ u8 rtw_handle_tkip_countermeasure(struct adapter *adapter, const char *caller)
 	struct security_priv *securitypriv = &(adapter->securitypriv);
 	u8 status = _SUCCESS;
 
-	if (securitypriv->btkip_countermeasure == true) {
+	if (securitypriv->btkip_countermeasure) {
 		u32 passing_ms = rtw_get_passing_time_ms(securitypriv->btkip_countermeasure_time);
 		if (passing_ms > 60 * 1000) {
 			RTW_PRINT("%s("ADPT_FMT") countermeasure time:%ds > 60s\n",

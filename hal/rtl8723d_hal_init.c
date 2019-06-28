@@ -400,7 +400,7 @@ int rtl8723d_FirmwareDownload(struct adapter * adapt, bool  bUsedWoWLANFw)
 #endif /* CONFIG_FILE_FWIMG */
 
 #ifdef CONFIG_FILE_FWIMG
-	if (rtw_is_file_readable(fwfilepath) == true) {
+	if (rtw_is_file_readable(fwfilepath)) {
 		RTW_INFO("%s acquire FW from file:%s\n", __FUNCTION__, fwfilepath);
 		pFirmware->eFWSource = FW_SOURCE_IMG_FILE;
 	} else
@@ -786,7 +786,7 @@ static void Hal_BT_EfusePowerSwitch(
 {
 	u8 tempval;
 
-	if (PwrState == true) {
+	if (PwrState) {
 		/* enable BT power cut */
 		/* 0x6A[14] = 1 */
 		tempval = rtw_read8(adapt, 0x6B);
@@ -829,7 +829,7 @@ Hal_EfusePowerSwitch(
 	u16	tmpV16;
 
 
-	if (PwrState == true) {
+	if (PwrState) {
 		rtw_write8(adapt, REG_EFUSE_ACCESS_8723, EFUSE_ACCESS_ON_8723);
 
 		/* Reset: 0x0000h[28], default valid */
@@ -846,7 +846,7 @@ Hal_EfusePowerSwitch(
 			rtw_write16(adapt, REG_SYS_CLKR, tmpV16);
 		}
 
-		if (bWrite == true) {
+		if (bWrite) {
 			/* Enable LDO 2.5V before read/write action */
 			tempval = rtw_read8(adapt, EFUSE_TEST + 3);
 			tempval &= 0x0F;
@@ -858,7 +858,7 @@ Hal_EfusePowerSwitch(
 	} else {
 		rtw_write8(adapt, REG_EFUSE_ACCESS, EFUSE_ACCESS_OFF);
 
-		if (bWrite == true) {
+		if (bWrite) {
 			/* Disable LDO 2.5V after read/write action */
 			tempval = rtw_read8(adapt, EFUSE_TEST + 3);
 			rtw_write8(adapt, EFUSE_TEST + 3, (tempval & 0x7F));
@@ -1021,7 +1021,7 @@ static void hal_ReadEFuse_BT(struct adapter * adapt, u16 _offset, u16 _size_byte
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_BT, TYPE_AVAILABLE_EFUSE_BYTES_BANK, &total, bPseudoTest);
 
 	for (bank = 1; bank < 3; bank++) { /* 8723d Max bake 0~2 */
-		if (hal_EfuseSwitchToBank(adapt, bank, bPseudoTest) == false) {
+		if (!hal_EfuseSwitchToBank(adapt, bank, bPseudoTest)) {
 			RTW_INFO("%s: hal_EfuseSwitchToBank Fail!!\n", __FUNCTION__);
 			goto exit;
 		}
@@ -1157,7 +1157,7 @@ static u16 hal_EfuseGetCurrentSize_WiFi(struct adapter * adapt, bool bPseudoTest
 
 	count = 0;
 	while (AVAILABLE_EFUSE_ADDR(efuse_addr)) {
-		if (efuse_OneByteRead(adapt, efuse_addr, &efuse_data, bPseudoTest) == false) {
+		if (!efuse_OneByteRead(adapt, efuse_addr, &efuse_data, bPseudoTest)) {
 			RTW_INFO(KERN_ERR "%s: efuse_OneByteRead Fail! addr=0x%X !!\n", __FUNCTION__, efuse_addr);
 			goto error;
 		}
@@ -1260,7 +1260,7 @@ hal_EfuseGetCurrentSize_BT(
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_BT, TYPE_AVAILABLE_EFUSE_BYTES_BANK, &retU2, bPseudoTest);
 
 	for (bank = startBank; bank < 3; bank++) {
-		if (hal_EfuseSwitchToBank(adapt, bank, bPseudoTest) == false) {
+		if (!hal_EfuseSwitchToBank(adapt, bank, bPseudoTest)) {
 			RTW_INFO(KERN_ERR "%s: switch bank(%d) Fail!!\n", __FUNCTION__, bank);
 			/* bank = EFUSE_MAX_BANK; */
 			break;
@@ -1271,7 +1271,7 @@ hal_EfuseGetCurrentSize_BT(
 			efuse_addr = 0;
 
 		while (AVAILABLE_EFUSE_ADDR(efuse_addr)) {
-			if (efuse_OneByteRead(adapt, efuse_addr, &efuse_data, bPseudoTest) == false) {
+			if (!efuse_OneByteRead(adapt, efuse_addr, &efuse_data, bPseudoTest)) {
 				RTW_INFO(KERN_ERR "%s: efuse_OneByteRead Fail! addr=0x%X !!\n", __FUNCTION__, efuse_addr);
 				/* bank = EFUSE_MAX_BANK; */
 				break;
@@ -1428,7 +1428,7 @@ static bool Hal_EfusePgPacketRead(struct adapter *	adapt,
 	/* By pass right now. 2009.02.19. */
 	/* */
 	while (AVAILABLE_EFUSE_ADDR(efuse_addr)) {
-		if (efuse_OneByteRead(adapt, efuse_addr++, &efuse_data, bPseudoTest) == false) {
+		if (!efuse_OneByteRead(adapt, efuse_addr++, &efuse_data, bPseudoTest)) {
 			ret = false;
 			break;
 		}
@@ -1847,7 +1847,7 @@ void rtl8723d_InitBeaconParameters(struct adapter * adapt)
 
 	/* Firmware will control REG_DRVERLYINT when power saving is enable, */
 	/* so don't set this register on STA mode. */
-	if (check_fwstate(&adapt->mlmepriv, WIFI_STATION_STATE) == false)
+	if (!check_fwstate(&adapt->mlmepriv, WIFI_STATION_STATE))
 		rtw_write8(adapt, REG_DRVERLYINT, DRIVER_EARLY_INT_TIME_8723D); /* 5ms */
 	rtw_write8(adapt, REG_BCNDMATIM, BCN_DMA_ATIME_INT_TIME_8723D); /* 2ms */
 
@@ -1951,7 +1951,7 @@ static void rtl8723d_SetBeaconRelatedRegisters(struct adapter * adapt)
 	rtw_write32(adapt, REG_TCR, value32);
 
 	/* NOTE: Fix test chip's bug (about contention windows's randomness) */
-	if (check_fwstate(&adapt->mlmepriv, WIFI_ADHOC_STATE | WIFI_ADHOC_MASTER_STATE | WIFI_AP_STATE | WIFI_MESH_STATE) == true) {
+	if (check_fwstate(&adapt->mlmepriv, WIFI_ADHOC_STATE | WIFI_ADHOC_MASTER_STATE | WIFI_AP_STATE | WIFI_MESH_STATE)) {
 		rtw_write8(adapt, REG_RXTSF_OFFSET_CCK, 0x50);
 		rtw_write8(adapt, REG_RXTSF_OFFSET_OFDM, 0x50);
 	}
@@ -2061,14 +2061,14 @@ void rtl8723d_fill_fake_txdesc(
 	SET_TX_DESC_QUEUE_SEL_8723D(pDesc, QSLT_MGNT); /* Fixed queue of Mgnt queue */
 
 	/* Set NAVUSEHDR to prevent Ps-poll AId filed to be changed to error vlaue by Hw. */
-	if (true == IsPsPoll)
+	if (IsPsPoll)
 		SET_TX_DESC_NAV_USE_HDR_8723D(pDesc, 1);
 	else {
 		SET_TX_DESC_HWSEQ_EN_8723D(pDesc, 1); /* Hw set sequence number */
 		SET_TX_DESC_HWSEQ_SEL_8723D(pDesc, 0);
 	}
 
-	if (true == IsBTQosNull)
+	if (IsBTQosNull)
 		SET_TX_DESC_BT_INT_8723D(pDesc, 1);
 
 	SET_TX_DESC_USE_RATE_8723D(pDesc, 1); /* use data rate which is set by Sw */
@@ -2078,7 +2078,7 @@ void rtl8723d_fill_fake_txdesc(
 	/* */
 	/* Encrypt the data frame if under security mode excepct null data. Suggested by CCW. */
 	/* */
-	if (true == bDataFrame) {
+	if (bDataFrame) {
 		u32 EncAlg;
 
 		EncAlg = adapt->securitypriv.dot11PrivacyAlgrthm;
@@ -2546,7 +2546,7 @@ Hal_InitPGData(
 	if (false == pHalData->bautoload_fail_flag) {
 		/* autoload OK.
 		*		if (IS_BOOT_FROM_EEPROM(adapt)) */
-		if (true == pHalData->EepromOrEfuse) {
+		if (pHalData->EepromOrEfuse) {
 			/* Read all Content from EEPROM or EFUSE. */
 			for (i = 0; i < HWSET_MAX_SIZE_8723D; i += 2) {
 				/*				value16 = EF2Byte(ReadEEprom(pAdapter, (u16) (i>>1)));
@@ -2567,7 +2567,7 @@ Hal_InitPGData(
 	}
 
 #ifdef CONFIG_EFUSE_CONFIG_FILE
-	if (check_phy_efuse_tx_power_info_valid(adapt) == false) {
+	if (!check_phy_efuse_tx_power_info_valid(adapt)) {
 		if (Hal_readPGDataFromConfigFile(adapt) != _SUCCESS)
 			RTW_ERR("invalid phy efuse and read from file fail, will use driver default!!\n");
 	}
@@ -2726,7 +2726,7 @@ Hal_EfuseParseBTCoexistInfo_8723D(
 
 	RTW_INFO("%s: %s BT-coex, ant_num=%d\n"
 		 , __func__
-		, pHalData->EEPROMBluetoothCoexist == true ? "Enable" : "Disable"
+		, pHalData->EEPROMBluetoothCoexist ? "Enable" : "Disable"
 		 , pHalData->EEPROMBluetoothAntNum == Ant_x2 ? 2 : 1);
 }
 
@@ -2873,7 +2873,7 @@ void Hal_EfuseParseThermalMeter_8723D(struct adapter * adapt, u8 *PROMContent,
 	else
 		pHalData->eeprom_thermal_meter = EEPROM_Default_ThermalMeter_8723D;
 
-	if ((pHalData->eeprom_thermal_meter == 0xff) || (true == AutoLoadFail)) {
+	if ((pHalData->eeprom_thermal_meter == 0xff) || (AutoLoadFail)) {
 		pHalData->odmpriv.rf_calibrate_info.is_apk_thermal_meter_ignore = true;
 		pHalData->eeprom_thermal_meter = EEPROM_Default_ThermalMeter_8723D;
 	}
@@ -3126,7 +3126,7 @@ static void rtl8723d_fill_default_txdesc(
 		    (drv_userate != 1)) {
 			/* Non EAP & ARP & DHCP type data packet */
 
-			if (pattrib->ampdu_en == true) {
+			if (pattrib->ampdu_en) {
 				SET_TX_DESC_AGG_ENABLE_8723D(pbuf, 1);
 				SET_TX_DESC_MAX_AGG_NUM_8723D(pbuf, 0x1F);
 				SET_TX_DESC_AMPDU_DENSITY_8723D(pbuf, pattrib->ampdu_spacing);
@@ -3137,7 +3137,7 @@ static void rtl8723d_fill_default_txdesc(
 
 			SET_TX_DESC_DATA_RATE_FB_LIMIT_8723D(pbuf, 0x1F);
 
-			if (pHalData->fw_ractrl == false) {
+			if (!pHalData->fw_ractrl) {
 				SET_TX_DESC_USE_RATE_8723D(pbuf, 1);
 
 				if (pHalData->INIDATA_RATE[pattrib->mac_id] & BIT(7))
@@ -3188,7 +3188,7 @@ static void rtl8723d_fill_default_txdesc(
 		SET_TX_DESC_MBSSID_8723D(pbuf, pattrib->mbssid & 0xF);
 
 		SET_TX_DESC_RETRY_LIMIT_ENABLE_8723D(pbuf, 1);
-		if (pattrib->retry_ctrl == true)
+		if (pattrib->retry_ctrl)
 			SET_TX_DESC_DATA_RETRY_LIMIT_8723D(pbuf, 6);
 		else
 			SET_TX_DESC_DATA_RETRY_LIMIT_8723D(pbuf, 12);
@@ -3289,7 +3289,7 @@ static void hw_var_set_opmode(struct adapter * adapt, u8 variable, u8 *val)
 
 	struct hal_com_data			*pHalData = GET_HAL_DATA(adapt);
 
-	if (isMonitor == true) {
+	if (isMonitor) {
 		/* reset RCR from backup */
 		rtw_hal_set_hwreg(adapt, HW_VAR_RCR, (u8 *)&pHalData->rcr_backup);
 		rtw_hal_rcr_set_chk_bssid(adapt, MLME_ACTION_NONE);
@@ -3495,7 +3495,7 @@ static void hw_var_set_mlme_disconnect(struct adapter * adapt, u8 variable, u8 *
 
 	/* reject all data frames */
 #ifdef CONFIG_CONCURRENT_MODE
-	if (rtw_mi_check_status(adapt, MI_LINKED) == false)
+	if (!rtw_mi_check_status(adapt, MI_LINKED))
 #endif
 		rtw_write16(adapt, REG_RXFLTMAP2, 0);
 
@@ -3544,13 +3544,13 @@ static void hw_var_set_mlme_join(struct adapter * adapt, u8 variable, u8 *val)
 		/* enable to rx data frame.Accept all data frame */
 		rtw_write16(adapt, REG_RXFLTMAP2, 0xFFFF);
 
-		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE) == true)
+		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE))
 			RetryLimit = (pHalData->CustomerID == RT_CID_CCX) ? RL_VAL_AP : RL_VAL_STA;
 		else /* Ad-hoc Mode */
 			RetryLimit = RL_VAL_AP;
 		} else if (type == 1) {
 			/* joinbss_event call back when join res < 0 */
-			if (rtw_mi_check_status(adapt, MI_LINKED) == false)
+			if (!rtw_mi_check_status(adapt, MI_LINKED))
 				rtw_write16(adapt, REG_RXFLTMAP2, 0x00);
 
 			if (rtw_mi_get_ap_num(adapt) || rtw_mi_get_mesh_num(adapt)) {
@@ -3596,7 +3596,7 @@ static void hw_var_set_mlme_join(struct adapter * adapt, u8 variable, u8 *val)
 			/* enable to rx data frame.Accept all data frame */
 			rtw_write16(adapt, REG_RXFLTMAP2, 0xFFFF);
 
-			if (check_fwstate(pmlmepriv, WIFI_STATION_STATE) == true)
+			if (check_fwstate(pmlmepriv, WIFI_STATION_STATE))
 				RetryLimit = (pHalData->CustomerID == RT_CID_CCX) ? RL_VAL_AP : RL_VAL_STA;
 			else /* Ad-hoc Mode */
 				RetryLimit = RL_VAL_AP;
@@ -3902,7 +3902,7 @@ u8 SetHwReg8723D(struct adapter * adapt, u8 variable, u8 *val)
 		/* keep sn */
 		adapt->xmitpriv.nqos_ssn = rtw_read16(adapt, REG_NQOS_SEQ);
 
-		if (pwrpriv->bkeepfwalive != true) {
+		if (!pwrpriv->bkeepfwalive) {
 			/* RX DMA stop */
 			val32 = rtw_read32(adapt, REG_RXPKT_NUM);
 			val32 |= RW_RELEASE_EN;
@@ -4015,7 +4015,7 @@ u8 SetHwReg8723D(struct adapter * adapt, u8 variable, u8 *val)
 		break;
 
 	case HW_VAR_DL_RSVD_PAGE:
-		if (check_fwstate(&adapt->mlmepriv, WIFI_AP_STATE) == true)
+		if (check_fwstate(&adapt->mlmepriv, WIFI_AP_STATE))
 			rtl8723d_download_BTCoex_AP_mode_rsvd_page(adapt);
 		else
 			rtl8723d_download_rsvd_page(adapt, RT_MEDIA_CONNECT);

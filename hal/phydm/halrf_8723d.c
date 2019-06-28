@@ -166,7 +166,7 @@ void do_iqk_8723d(
 
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
-	if (*(p_dm->p_mp_mode) == false)
+	if (!*p_dm->p_mp_mode)
 		is_bt_enable = odm_get_mac_reg(p_dm, 0xa8, MASKDWORD) & BIT(17);
 
 	if (is_bt_enable) {
@@ -219,7 +219,7 @@ odm_tx_pwr_track_set_pwr_8723d(
 	u8 final_cck_swing_index = 0;
 	u8 i = 0;
 
-if (*(p_dm->p_mp_mode) == true) {
+if (*(p_dm->p_mp_mode)) {
 	} else {
 		u16 rate	 = *(p_dm->p_forced_data_rate);
 
@@ -549,7 +549,7 @@ get_delta_swing_table_8723d(
 	u8 tx_rate			= 0xFF;
 	u8 channel		 = *p_dm->p_channel;
 
-	if (*(p_dm->p_mp_mode) == true) {
+	if (*(p_dm->p_mp_mode)) {
 	} else {
 		u16 rate	 = *(p_dm->p_forced_data_rate);
 
@@ -1966,7 +1966,7 @@ phy_iq_calibrate_8723d(
 		return;
 	}
 	/*Check & wait if BT is doing IQK*/
-	if (*(p_dm->p_mp_mode) == false)
+	if (!*p_dm->p_mp_mode)
 		_phy_check_coex_status_8723d(p_dm, true);
 
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("IQK:Start!!!\n"));
@@ -2104,7 +2104,7 @@ phy_iq_calibrate_8723d(
 	ODM_RT_TRACE(p_dm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("\nIQK OK indexforchannel %d.\n", indexforchannel));
 	_phy_save_adda_registers_8723d(p_dm, IQK_BB_REG_92C, p_dm->rf_calibrate_info.IQK_BB_backup_recover, IQK_BB_REG_NUM);
 
-	if (*(p_dm->p_mp_mode) == false)
+	if (!*p_dm->p_mp_mode)
 		_phy_check_coex_status_8723d(p_dm, false);
 
 	odm_set_bb_reg(p_dm, 0x948, MASKDWORD, path_sel_bb_phy_iqk);

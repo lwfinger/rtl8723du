@@ -84,7 +84,7 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 				}
 			}
 
-			if (rtw_inc_and_chk_continual_io_error(pdvobjpriv) == true) {
+			if (rtw_inc_and_chk_continual_io_error(pdvobjpriv)) {
 				rtw_set_surprise_removed(adapt);
 				break;
 			}
@@ -454,7 +454,7 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 	/* Commented by Albert 2009/10/13
 	 * We add the URB_ZERO_PACKET flag to urb so that the host will send the zero packet automatically. */
 	/*
-		if(bwritezero == true)
+		if(bwritezero)
 		{
 			usb_bulkout_zero(pintfhdl, addr);
 		}
@@ -582,7 +582,7 @@ static void usb_read_port_complete(struct urb *purb, struct pt_regs *regs)
 
 		RTW_INFO("###=> usb_read_port_complete => urb.status(%d)\n", purb->status);
 
-		if (rtw_inc_and_chk_continual_io_error(adapter_to_dvobj(adapt)) == true)
+		if (rtw_inc_and_chk_continual_io_error(adapter_to_dvobj(adapt)))
 			rtw_set_surprise_removed(adapt);
 
 		switch (purb->status) {

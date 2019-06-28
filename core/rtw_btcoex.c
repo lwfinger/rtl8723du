@@ -112,7 +112,7 @@ void rtw_btcoex_MediaStatusNotify(struct adapter * adapt, u8 mediaStatus)
 #endif /* CONFIG_CONCURRENT_MODE */
 
 	if ((RT_MEDIA_CONNECT == mediaStatus)
-	    && (check_fwstate(&adapt->mlmepriv, WIFI_AP_STATE) == true))
+	    && (check_fwstate(&adapt->mlmepriv, WIFI_AP_STATE)))
 		rtw_hal_set_hwreg(adapt, HW_VAR_DL_RSVD_PAGE, NULL);
 
 	hal_btcoex_MediaStatusNotify(adapt, mediaStatus);
@@ -271,7 +271,7 @@ u32 rtw_btcoex_GetAMPDUSize(struct adapter * adapt)
 
 void rtw_btcoex_SetManualControl(struct adapter * adapt, u8 manual)
 {
-	if (true == manual)
+	if (manual)
 		hal_btcoex_SetManualControl(adapt, true);
 	else
 		hal_btcoex_SetManualControl(adapt, false);
@@ -461,12 +461,12 @@ void rtw_btcoex_set_ant_info(struct adapter * adapt)
 {
 	struct hal_com_data * hal = GET_HAL_DATA(adapt);
 
-	if (hal->EEPROMBluetoothCoexist == true) {
+	if (hal->EEPROMBluetoothCoexist) {
 		u8 bMacPwrCtrlOn = false;
 
 		rtw_btcoex_AntInfoSetting(adapt);
 		rtw_hal_get_hwreg(adapt, HW_VAR_APFM_ON_MAC, &bMacPwrCtrlOn);
-		if (bMacPwrCtrlOn == true)
+		if (bMacPwrCtrlOn)
 			rtw_btcoex_PowerOnSetting(adapt);
 	} else {
 		rtw_btcoex_wifionly_AntInfoSetting(adapt);

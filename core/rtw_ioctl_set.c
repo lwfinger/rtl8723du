@@ -85,14 +85,14 @@ u8 rtw_do_join(struct adapter *adapt)
 	_rtw_memcpy(&parm.ssid[0], &pmlmepriv->assoc_ssid, sizeof(struct ndis_802_11_ssid));
 	parm.ssid_num = 1;
 
-	if (_rtw_queue_empty(queue) == true) {
+	if (_rtw_queue_empty(queue)) {
 		_exit_critical_bh(&(pmlmepriv->scanned_queue.lock), &irqL);
 		_clr_fwstate_(pmlmepriv, _FW_UNDER_LINKING);
 
 		/* when set_ssid/set_bssid for rtw_do_join(), but scanning queue is empty */
 		/* we try to issue sitesurvey firstly	 */
 
-		if (pmlmepriv->LinkDetectInfo.bBusyTraffic == false
+		if (!pmlmepriv->LinkDetectInfo.bBusyTraffic
 		    || rtw_to_roam(adapt) > 0
 		   ) {
 			/* submit site_survey_cmd */
@@ -114,7 +114,7 @@ u8 rtw_do_join(struct adapter *adapt)
 			pmlmepriv->to_join = false;
 			_set_timer(&pmlmepriv->assoc_timer, MAX_JOIN_TIMEOUT);
 		} else {
-			if (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE) == true) {
+			if (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE)) {
 				/* submit createbss_cmd to change to a ADHOC_MASTER */
 
 				/* pmlmepriv->lock has been acquired by caller... */
@@ -145,7 +145,7 @@ u8 rtw_do_join(struct adapter *adapt)
 				_clr_fwstate_(pmlmepriv, _FW_UNDER_LINKING);
 				/* when set_ssid/set_bssid for rtw_do_join(), but there are no desired bss in scanning queue */
 				/* we try to issue sitesurvey firstly			 */
-				if (pmlmepriv->LinkDetectInfo.bBusyTraffic == false
+				if (!pmlmepriv->LinkDetectInfo.bBusyTraffic
 				    || rtw_to_roam(adapt) > 0
 				   ) {
 					/* RTW_INFO("rtw_do_join() when   no desired bss in scanning queue\n"); */
@@ -188,26 +188,26 @@ u8 rtw_set_802_11_bssid(struct adapter *adapt, u8 *bssid)
 
 
 	RTW_INFO("Set BSSID under fw_state=0x%08x\n", get_fwstate(pmlmepriv));
-	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY) == true)
+	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY))
 		goto handle_tkip_countermeasure;
-	else if (check_fwstate(pmlmepriv, _FW_UNDER_LINKING) == true)
+	else if (check_fwstate(pmlmepriv, _FW_UNDER_LINKING))
 		goto release_mlme_lock;
 
-	if (check_fwstate(pmlmepriv, _FW_LINKED | WIFI_ADHOC_MASTER_STATE) == true) {
+	if (check_fwstate(pmlmepriv, _FW_LINKED | WIFI_ADHOC_MASTER_STATE)) {
 
-		if (_rtw_memcmp(&pmlmepriv->cur_network.network.MacAddress, bssid, ETH_ALEN) == true) {
-			if (check_fwstate(pmlmepriv, WIFI_STATION_STATE) == false)
+		if (_rtw_memcmp(&pmlmepriv->cur_network.network.MacAddress, bssid, ETH_ALEN)) {
+			if (!check_fwstate(pmlmepriv, WIFI_STATION_STATE))
 				goto release_mlme_lock;/* it means driver is in WIFI_ADHOC_MASTER_STATE, we needn't create bss again. */
 		} else {
 
 			rtw_disassoc_cmd(adapt, 0, 0);
 
-			if (check_fwstate(pmlmepriv, _FW_LINKED) == true)
+			if (check_fwstate(pmlmepriv, _FW_LINKED))
 				rtw_indicate_disconnect(adapt, 0, false);
 
 			rtw_free_assoc_resources(adapt, 1);
 
-			if ((check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) == true)) {
+			if ((check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE))) {
 				_clr_fwstate_(pmlmepriv, WIFI_ADHOC_MASTER_STATE);
 				set_fwstate(pmlmepriv, WIFI_ADHOC_STATE);
 			}
@@ -224,7 +224,7 @@ handle_tkip_countermeasure:
 	_rtw_memcpy(&pmlmepriv->assoc_bssid, bssid, ETH_ALEN);
 	pmlmepriv->assoc_by_bssid = true;
 
-	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY) == true)
+	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY))
 		pmlmepriv->to_join = true;
 	else
 		status = rtw_do_join(adapt);
@@ -259,27 +259,27 @@ u8 rtw_set_802_11_ssid(struct adapter *adapt, struct ndis_802_11_ssid *ssid)
 	_enter_critical_bh(&pmlmepriv->lock, &irqL);
 
 	RTW_INFO("Set SSID under fw_state=0x%08x\n", get_fwstate(pmlmepriv));
-	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY) == true)
+	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY))
 		goto handle_tkip_countermeasure;
-	else if (check_fwstate(pmlmepriv, _FW_UNDER_LINKING) == true)
+	else if (check_fwstate(pmlmepriv, _FW_UNDER_LINKING))
 		goto release_mlme_lock;
 
-	if (check_fwstate(pmlmepriv, _FW_LINKED | WIFI_ADHOC_MASTER_STATE) == true) {
+	if (check_fwstate(pmlmepriv, _FW_LINKED | WIFI_ADHOC_MASTER_STATE)) {
 
 		if ((pmlmepriv->assoc_ssid.SsidLength == ssid->SsidLength) &&
-		    (_rtw_memcmp(&pmlmepriv->assoc_ssid.Ssid, ssid->Ssid, ssid->SsidLength) == true)) {
-			if ((check_fwstate(pmlmepriv, WIFI_STATION_STATE) == false)) {
+		    (_rtw_memcmp(&pmlmepriv->assoc_ssid.Ssid, ssid->Ssid, ssid->SsidLength))) {
+			if ((!check_fwstate(pmlmepriv, WIFI_STATION_STATE))) {
 
-				if (rtw_is_same_ibss(adapt, pnetwork) == false) {
+				if (!rtw_is_same_ibss(adapt, pnetwork)) {
 					/* if in WIFI_ADHOC_MASTER_STATE | WIFI_ADHOC_STATE, create bss or rejoin again */
 					rtw_disassoc_cmd(adapt, 0, 0);
 
-					if (check_fwstate(pmlmepriv, _FW_LINKED) == true)
+					if (check_fwstate(pmlmepriv, _FW_LINKED))
 						rtw_indicate_disconnect(adapt, 0, false);
 
 					rtw_free_assoc_resources(adapt, 1);
 
-					if (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) == true) {
+					if (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE)) {
 						_clr_fwstate_(pmlmepriv, WIFI_ADHOC_MASTER_STATE);
 						set_fwstate(pmlmepriv, WIFI_ADHOC_STATE);
 					}
@@ -293,12 +293,12 @@ u8 rtw_set_802_11_ssid(struct adapter *adapt, struct ndis_802_11_ssid *ssid)
 
 			rtw_disassoc_cmd(adapt, 0, 0);
 
-			if (check_fwstate(pmlmepriv, _FW_LINKED) == true)
+			if (check_fwstate(pmlmepriv, _FW_LINKED))
 				rtw_indicate_disconnect(adapt, 0, false);
 
 			rtw_free_assoc_resources(adapt, 1);
 
-			if (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) == true) {
+			if (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE)) {
 				_clr_fwstate_(pmlmepriv, WIFI_ADHOC_MASTER_STATE);
 				set_fwstate(pmlmepriv, WIFI_ADHOC_STATE);
 			}
@@ -311,7 +311,7 @@ handle_tkip_countermeasure:
 		goto release_mlme_lock;
 	}
 
-	if (rtw_validate_ssid(ssid) == false) {
+	if (!rtw_validate_ssid(ssid)) {
 		status = _FAIL;
 		goto release_mlme_lock;
 	}
@@ -319,7 +319,7 @@ handle_tkip_countermeasure:
 	_rtw_memcpy(&pmlmepriv->assoc_ssid, ssid, sizeof(struct ndis_802_11_ssid));
 	pmlmepriv->assoc_by_bssid = false;
 
-	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY) == true)
+	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY))
 		pmlmepriv->to_join = true;
 	else
 		status = rtw_do_join(adapt);
@@ -344,13 +344,13 @@ u8 rtw_set_802_11_connect(struct adapter *adapt, u8 *bssid, struct ndis_802_11_s
 	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 
 
-	if (!ssid || rtw_validate_ssid(ssid) == false)
+	if (!ssid || !rtw_validate_ssid(ssid))
 		ssid_valid = false;
 
-	if (!bssid || rtw_validate_bssid(bssid) == false)
+	if (!bssid || !rtw_validate_bssid(bssid))
 		bssid_valid = false;
 
-	if (ssid_valid == false && bssid_valid == false) {
+	if (!ssid_valid && !bssid_valid) {
 		RTW_INFO(FUNC_ADPT_FMT" ssid:%p, ssid_valid:%d, bssid:%p, bssid_valid:%d\n",
 			FUNC_ADPT_ARG(adapt), ssid, ssid_valid, bssid, bssid_valid);
 		status = _FAIL;
@@ -367,9 +367,9 @@ u8 rtw_set_802_11_connect(struct adapter *adapt, u8 *bssid, struct ndis_802_11_s
 	RTW_PRINT(FUNC_ADPT_FMT"  fw_state=0x%08x\n",
 		  FUNC_ADPT_ARG(adapt), get_fwstate(pmlmepriv));
 
-	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY) == true)
+	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY))
 		goto handle_tkip_countermeasure;
-	else if (check_fwstate(pmlmepriv, _FW_UNDER_LINKING) == true)
+	else if (check_fwstate(pmlmepriv, _FW_UNDER_LINKING))
 		goto release_mlme_lock;
 
 handle_tkip_countermeasure:
@@ -389,7 +389,7 @@ handle_tkip_countermeasure:
 	} else
 		pmlmepriv->assoc_by_bssid = false;
 
-	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY) == true)
+	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY))
 		pmlmepriv->to_join = true;
 	else
 		status = rtw_do_join(adapt);
@@ -425,15 +425,15 @@ u8 rtw_set_802_11_infrastructure_mode(struct adapter *adapt,
 
 		_enter_critical_bh(&pmlmepriv->lock, &irqL);
 
-		if ((check_fwstate(pmlmepriv, _FW_LINKED) == true) || (*pold_state == Ndis802_11IBSS))
+		if ((check_fwstate(pmlmepriv, _FW_LINKED)) || (*pold_state == Ndis802_11IBSS))
 			rtw_disassoc_cmd(adapt, 0, 0);
 
-		if ((check_fwstate(pmlmepriv, _FW_LINKED) == true) ||
-		    (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) == true))
+		if ((check_fwstate(pmlmepriv, _FW_LINKED)) ||
+		    (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE)))
 			rtw_free_assoc_resources(adapt, 1);
 
 		if ((*pold_state == Ndis802_11Infrastructure) || (*pold_state == Ndis802_11IBSS)) {
-			if (check_fwstate(pmlmepriv, _FW_LINKED) == true) {
+			if (check_fwstate(pmlmepriv, _FW_LINKED)) {
 				rtw_indicate_disconnect(adapt, 0, false); /*will clr Linked_state; before this function, we must have checked whether issue dis-assoc_cmd or not*/
 			}
 		}
@@ -482,7 +482,7 @@ u8 rtw_set_802_11_disassociate(struct adapter *adapt)
 
 	_enter_critical_bh(&pmlmepriv->lock, &irqL);
 
-	if (check_fwstate(pmlmepriv, _FW_LINKED) == true) {
+	if (check_fwstate(pmlmepriv, _FW_LINKED)) {
 
 		rtw_disassoc_cmd(adapt, 0, 0);
 		rtw_indicate_disconnect(adapt, 0, false);
@@ -602,8 +602,8 @@ u16 rtw_get_cur_max_rate(struct adapter *adapter)
 	u8	short_GI = 0;
 	u8	rf_type = 0;
 
-	if ((check_fwstate(pmlmepriv, _FW_LINKED) != true)
-	    && (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE) != true))
+	if (!check_fwstate(pmlmepriv, _FW_LINKED) &&
+	    !check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE))
 		return 0;
 
 	psta = rtw_get_stainfo(&adapter->stapriv, get_bssid(pmlmepriv));

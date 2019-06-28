@@ -249,7 +249,7 @@ static int pre_xmitframe(struct adapter * adapt, struct xmit_frame *pxmitframe)
 	if (rtw_txframes_sta_ac_pending(adapt, pattrib) > 0)
 		goto enqueue;
 
-	if (rtw_xmit_ac_blocked(adapt) == true)
+	if (rtw_xmit_ac_blocked(adapt))
 		goto enqueue;
 
 	if (DEV_STA_LG_NUM(adapt->dvobj))

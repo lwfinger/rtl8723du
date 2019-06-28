@@ -1047,7 +1047,7 @@ phy_SwChnl8723D(
 	/* 2.4G CCK TX DFIR */
 	/* 2016.01.20 Suggest from RS BB mingzhi*/
 	if (channelToSW >= 1 && channelToSW <= 13) {
-		if (pHalData->need_restore == true) {
+		if (pHalData->need_restore) {
 			for (i = 0 ; i < 3 ; i++) {
 				phy_set_bb_reg(pAdapter,
 					     pHalData->RegForRecover[i].offset,

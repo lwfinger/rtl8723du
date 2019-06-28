@@ -92,7 +92,7 @@ phydm_set_kfree_to_rf_8814a(
 		break;
 	}
 
-	if (is_odd == false) {
+	if (!is_odd) {
 		/*that means Kfree offset is negative, we need to record it.*/
 		p_rf_calibrate_info->kfree_offset[e_rf_path] = (-1) * p_rf_calibrate_info->kfree_offset[e_rf_path];
 		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("phy_ConfigKFree8814A(): kfree_offset = %d\n", p_rf_calibrate_info->kfree_offset[e_rf_path]));
@@ -185,7 +185,7 @@ phydm_set_kfree_to_rf_8821c(
 	odm_set_rf_reg(p_dm, e_rf_path, 0x55, BIT(6), 1);
 	odm_set_rf_reg(p_dm, e_rf_path, 0x65, BIT(6), 1);
 
-	if (wlg_btg == true) {
+	if (wlg_btg) {
 		wlg = data & 0xf;
 		btg = (data & 0xf0) >> 4;
 
@@ -734,7 +734,7 @@ phydm_config_kfree(
 		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] phy_ConfigKFree(): reg_rf_kfree_enable == 2, Disable\n"));
 		return;
 	} else if (p_rf_calibrate_info->reg_rf_kfree_enable == 1 || p_rf_calibrate_info->reg_rf_kfree_enable == 0) {
-		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] phy_ConfigKFree(): reg_rf_kfree_enable == true\n"));
+		ODM_RT_TRACE(p_dm, ODM_COMP_MP, ODM_DBG_LOUD, ("[kfree] phy_ConfigKFree(): reg_rf_kfree_enable\n"));
 		/*Make sure the targetval is defined*/
 		if (p_power_trim_info->flag & KFREE_FLAG_ON) {
 			/*if kfree_table[0] == 0xff, means no Kfree*/
