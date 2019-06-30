@@ -976,7 +976,7 @@ free_hal_data:
 		rtw_hal_free_data(adapt);
 free_adapter:
 	if (status != _SUCCESS && adapt) {
-		rtw_vmfree((u8 *)adapt, sizeof(*adapt));
+		vfree(adapt);
 		adapt = NULL;
 	}
 exit:
@@ -1016,7 +1016,7 @@ static void rtw_usb_primary_adapter_deinit(struct adapter *adapt)
 	/* TODO: use rtw_os_ndevs_deinit instead at the first stage of driver's dev deinit function */
 	rtw_os_ndev_free(adapt);
 
-	rtw_vmfree((u8 *)adapt, sizeof(struct adapter));
+	vfree(adapt);
 }
 
 static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device_id *pdid)

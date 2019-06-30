@@ -62,11 +62,6 @@ inline void *_rtw_zvmalloc(u32 sz)
 	return pbuf;
 }
 
-inline void _rtw_vmfree(void *pbuf, u32 sz)
-{
-	vfree(pbuf);
-}
-
 void *_rtw_malloc(u32 sz)
 {
 	void *pbuf = NULL;

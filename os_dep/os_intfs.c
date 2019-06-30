@@ -2063,7 +2063,7 @@ free_drv_sw:
 		rtw_free_drv_sw(adapt);
 free_adapter:
 	if (res != _SUCCESS && adapt) {
-		rtw_vmfree((u8 *)adapt, sizeof(*adapt));
+		vfree(adapt);
 		adapt = NULL;
 	}
 exit:
@@ -2109,9 +2109,8 @@ void rtw_drv_free_vir_if(struct adapter *adapt)
 	/* TODO: use rtw_os_ndevs_deinit instead at the first stage of driver's dev deinit function */
 	rtw_os_ndev_free(adapt);
 
-	rtw_vmfree((u8 *)adapt, sizeof(struct adapter));
+	vfree(adapt);
 }
-
 
 void rtw_drv_stop_vir_ifaces(struct dvobj_priv *dvobj)
 {

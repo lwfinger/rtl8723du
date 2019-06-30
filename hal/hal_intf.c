@@ -103,7 +103,7 @@ void rtw_hal_data_deinit(struct adapter *adapt)
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
 			phy_free_filebuf(adapt);
 #endif
-			rtw_vmfree(adapt->HalData, adapt->hal_data_sz);
+			vfree(adapt->HalData);
 			adapt->HalData = NULL;
 			adapt->hal_data_sz = 0;
 		}

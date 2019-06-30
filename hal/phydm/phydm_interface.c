@@ -177,7 +177,7 @@ odm_free_memory(
 	u32		length
 )
 {
-	rtw_vmfree(p_ptr, length);
+	vfree(p_ptr);
 }
 
 void

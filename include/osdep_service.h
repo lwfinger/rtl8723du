@@ -113,7 +113,6 @@ enum mstat_status {
 #define rtw_mstat_dump(sel) do {} while (0)
 void *_rtw_vmalloc(u32 sz);
 void *_rtw_zvmalloc(u32 sz);
-void _rtw_vmfree(void *pbuf, u32 sz);
 void *_rtw_zmalloc(u32 sz);
 void *_rtw_malloc(u32 sz);
 void _rtw_mfree(void *pbuf, u32 sz);
@@ -134,17 +133,13 @@ void _rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr, dma_a
 #ifdef CONFIG_USE_VMALLOC
 #define rtw_vmalloc(sz)			_rtw_vmalloc((sz))
 #define rtw_zvmalloc(sz)			_rtw_zvmalloc((sz))
-#define rtw_vmfree(pbuf, sz)		_rtw_vmfree((pbuf), (sz))
 #define rtw_vmalloc_f(sz, mstat_f)			_rtw_vmalloc((sz))
 #define rtw_zvmalloc_f(sz, mstat_f)		_rtw_zvmalloc((sz))
-#define rtw_vmfree_f(pbuf, sz, mstat_f)	_rtw_vmfree((pbuf), (sz))
 #else /* CONFIG_USE_VMALLOC */
 #define rtw_vmalloc(sz)			_rtw_malloc((sz))
 #define rtw_zvmalloc(sz)			_rtw_zmalloc((sz))
-#define rtw_vmfree(pbuf, sz)		_rtw_mfree((pbuf), (sz))
 #define rtw_vmalloc_f(sz, mstat_f)			_rtw_malloc((sz))
 #define rtw_zvmalloc_f(sz, mstat_f)		_rtw_zmalloc((sz))
-#define rtw_vmfree_f(pbuf, sz, mstat_f)	_rtw_mfree((pbuf), (sz))
 #endif /* CONFIG_USE_VMALLOC */
 #define rtw_malloc(sz)			_rtw_malloc((sz))
 #define rtw_zmalloc(sz)			_rtw_zmalloc((sz))

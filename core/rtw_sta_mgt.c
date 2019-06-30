@@ -291,7 +291,7 @@ u32	_rtw_init_sta_priv(struct	sta_priv *pstapriv)
 exit:
 	if (ret != _SUCCESS) {
 		if (pstapriv->pallocated_stainfo_buf)
-			rtw_vmfree(pstapriv->pallocated_stainfo_buf, sizeof(struct sta_info) * NUM_STA + 4);
+			vfree(pstapriv->pallocated_stainfo_buf);
 		if (pstapriv->sta_aid)
 			rtw_mfree(pstapriv->sta_aid, sz);
 		if (pstapriv->sta_dz_bitmap)
@@ -437,7 +437,7 @@ u32	_rtw_free_sta_priv(struct	sta_priv *pstapriv)
 #endif
 
 		if (pstapriv->pallocated_stainfo_buf)
-			rtw_vmfree(pstapriv->pallocated_stainfo_buf, sizeof(struct sta_info) * NUM_STA + 4);
+			vfree(pstapriv->pallocated_stainfo_buf);
 		sz = pstapriv->max_aid * sizeof(struct sta_info *);
 		if (pstapriv->sta_aid)
 			rtw_mfree(pstapriv->sta_aid, sz);
