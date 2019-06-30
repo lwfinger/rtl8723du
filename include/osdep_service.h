@@ -222,9 +222,6 @@ static __inline void thread_enter(char *name)
 	allow_signal(SIGTERM);
 }
 void thread_exit(struct completion *comp);
-void _rtw_init_completion(struct completion *comp);
-void _rtw_wait_for_comp_timeout(struct completion *comp);
-void _rtw_wait_for_comp(struct completion *comp);
 
 static inline bool rtw_thread_stop(void * th)
 {

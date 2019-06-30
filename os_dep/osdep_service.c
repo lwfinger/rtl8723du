@@ -214,19 +214,6 @@ inline void thread_exit(struct completion *comp)
 	complete_and_exit(comp, 0);
 }
 
-inline void _rtw_init_completion(struct completion *comp)
-{
-	init_completion(comp);
-}
-inline void _rtw_wait_for_comp_timeout(struct completion *comp)
-{
-	wait_for_completion_timeout(comp, msecs_to_jiffies(3000));
-}
-inline void _rtw_wait_for_comp(struct completion *comp)
-{
-	wait_for_completion(comp);
-}
-
 void	_rtw_mutex_init(_mutex *pmutex)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
