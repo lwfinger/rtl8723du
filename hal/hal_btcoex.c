@@ -1724,7 +1724,7 @@ static enum col_h2c_status halbtcoutsrc_check_c2h_ack(struct adapter * Adapter, 
 	}
 	/* else */
 	{
-		_rtw_memmove(&pH2cRecord->c2h_ack_buf[0], &coex_offload.c2h_ack_buf[req_num], coex_offload.c2h_ack_len[req_num]);
+		memmove(&pH2cRecord->c2h_ack_buf[0], &coex_offload.c2h_ack_buf[req_num], coex_offload.c2h_ack_len[req_num]);
 		pH2cRecord->c2h_ack_len = coex_offload.c2h_ack_len[req_num];
 	}
 
@@ -1757,7 +1757,7 @@ static enum col_h2c_status halbtcoutsrc_CoexH2cProcess(void *pBtCoexist,
 	coex_offload.h2c_req_num++;
 	coex_offload.h2c_req_num %= 16;
 
-	_rtw_memmove(&pcol_h2c->buf[0], ph2c_par, h2c_par_len);
+	memmove(&pcol_h2c->buf[0], ph2c_par, h2c_par_len);
 
 
 	col_h2c_len = h2c_par_len + 2;	/* 2=sizeof(OPCode, OPCode_version and  Request number) */
@@ -1767,7 +1767,7 @@ static enum col_h2c_status halbtcoutsrc_CoexH2cProcess(void *pBtCoexist,
 
 	coex_offload.h2c_record[opcode].count++;
 	coex_offload.h2c_record[opcode].h2c_len = col_h2c_len;
-	_rtw_memmove((void *)&coex_offload.h2c_record[opcode].h2c_buf[0], (void *)pcol_h2c, col_h2c_len);
+	memmove((void *)&coex_offload.h2c_record[opcode].h2c_buf[0], (void *)pcol_h2c, col_h2c_len);
 
 	h2c_status = halbtcoutsrc_send_h2c(Adapter, pcol_h2c, col_h2c_len);
 

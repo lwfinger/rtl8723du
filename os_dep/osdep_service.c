@@ -215,11 +215,6 @@ void _rtw_memcpy(void *dst, const void *src, u32 sz)
 	memcpy(dst, src, sz);
 }
 
-inline void _rtw_memmove(void *dst, const void *src, u32 sz)
-{
-	memmove(dst, src, sz);
-}
-
 int	_rtw_memcmp(const void *dst, const void *src, u32 sz)
 {
 
