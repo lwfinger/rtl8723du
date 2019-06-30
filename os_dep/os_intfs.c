@@ -645,7 +645,7 @@ uint loadparam(struct adapter *adapt)
 	    !is_alpha(rtw_country_code[1])) {
 		if (rtw_country_code != rtw_country_unspecified)
 			RTW_ERR("%s discard rtw_country_code not in alpha2\n", __func__);
-		_rtw_memset(registry_par->alpha2, 0xFF, 2);
+		memset(registry_par->alpha2, 0xFF, 2);
 	} else {
 		_rtw_memcpy(registry_par->alpha2, rtw_country_code, 2);
 	}
@@ -1512,7 +1512,7 @@ struct dvobj_priv *devobj_init(void)
 	_rtw_mutex_init(&pdvobj->rf_read_reg_mutex);
 
 	_rtw_mutex_init(&pdvobj->customer_str_mutex);
-	_rtw_memset(pdvobj->customer_str, 0xFF, RTW_CUSTOMER_STR_LEN);
+	memset(pdvobj->customer_str, 0xFF, RTW_CUSTOMER_STR_LEN);
 
 	pdvobj->processing_dev_remove = false;
 
@@ -1713,7 +1713,7 @@ u8 rtw_init_drv_sw(struct adapter *adapt)
 	_rtw_spinlock_init(&adapt->security_key_mutex);
 
 	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by rtw_zvmalloc(). */
-	/* _rtw_memset((unsigned char *)&adapt->securitypriv, 0, sizeof (struct security_priv)); */
+	/* memset((unsigned char *)&adapt->securitypriv, 0, sizeof (struct security_priv)); */
 
 	if (_rtw_init_sta_priv(&adapt->stapriv) == _FAIL) {
 		RTW_INFO("Can't _rtw_init_sta_priv\n");
@@ -1734,7 +1734,7 @@ u8 rtw_init_drv_sw(struct adapter *adapt)
 
 	rtw_init_pwrctrl_priv(adapt);
 
-	/* _rtw_memset((u8 *)&adapt->qospriv, 0, sizeof (struct qos_priv)); */ /* move to mlme_priv */
+	/* memset((u8 *)&adapt->qospriv, 0, sizeof (struct qos_priv)); */ /* move to mlme_priv */
 
 	rtw_hal_dm_init(adapt);
 	rtw_hal_sw_led_init(adapt);
@@ -2185,7 +2185,7 @@ static int rtw_inetaddr_notifier_call(struct notifier_block *nb,
 					ifa->ifa_label, pmlmeinfo->ip_addr);
 	break;
 	case NETDEV_DOWN:
-		_rtw_memset(pmlmeinfo->ip_addr, 0, RTW_IP_ADDR_LEN);
+		memset(pmlmeinfo->ip_addr, 0, RTW_IP_ADDR_LEN);
 		RTW_DBG("%s[%s]: down IP: %pI4\n", __func__,
 					ifa->ifa_label, pmlmeinfo->ip_addr);
 	break;
@@ -2236,7 +2236,7 @@ static int rtw_inet6addr_notifier_call(struct notifier_block *nb,
 					pmlmeinfo->ip6_addr);
 			break;
 	case NETDEV_DOWN:
-		_rtw_memset(pmlmeinfo->ip6_addr, 0, RTW_IPv6_ADDR_LEN);
+		memset(pmlmeinfo->ip6_addr, 0, RTW_IPv6_ADDR_LEN);
 		RTW_DBG("%s: down IPv6 addrs: %pI6\n", __func__,
 					pmlmeinfo->ip6_addr);
 		break;

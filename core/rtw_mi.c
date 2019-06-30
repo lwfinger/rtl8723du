@@ -159,7 +159,7 @@ static void _rtw_mi_status(struct adapter *adapter, struct mi_state *mstate, u8 
 	struct adapter *iface;
 	int i;
 
-	_rtw_memset(mstate, 0, sizeof(struct mi_state));
+	memset(mstate, 0, sizeof(struct mi_state));
 
 	for (i = 0; i < dvobj->iface_nums; i++) {
 		iface = dvobj->adapters[i];

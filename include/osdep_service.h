@@ -183,7 +183,6 @@ u32 rtw_os_pkt_len(struct sk_buff *pkt);
 extern void	_rtw_memcpy(void *dec, const void *sour, u32 sz);
 extern void _rtw_memmove(void *dst, const void *src, u32 sz);
 extern int	_rtw_memcmp(const void *dst, const void *src, u32 sz);
-extern void	_rtw_memset(void *pbuf, int c, u32 sz);
 
 extern void	_rtw_init_listhead(struct list_head *list);
 extern u32	rtw_is_list_empty(struct list_head *phead);

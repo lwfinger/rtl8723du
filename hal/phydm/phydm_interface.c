@@ -198,7 +198,7 @@ void odm_memory_set(
 	u32		length
 )
 {
-	_rtw_memset(pbuf, value, length);
+	memset(pbuf, value, length);
 }
 s32 odm_compare_memory(
 	struct PHY_DM_STRUCT		*p_dm,

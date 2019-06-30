@@ -21,7 +21,7 @@ void	_rtw_init_sta_xmit_priv(struct sta_xmit_priv *psta_xmitpriv)
 {
 
 
-	_rtw_memset((unsigned char *)psta_xmitpriv, 0, sizeof(struct sta_xmit_priv));
+	memset((unsigned char *)psta_xmitpriv, 0, sizeof(struct sta_xmit_priv));
 
 	_rtw_spinlock_init(&psta_xmitpriv->lock);
 
@@ -63,7 +63,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 
 
 	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by rtw_zvmalloc(). */
-	/* _rtw_memset((unsigned char *)pxmitpriv, 0, sizeof(struct xmit_priv)); */
+	/* memset((unsigned char *)pxmitpriv, 0, sizeof(struct xmit_priv)); */
 
 	_rtw_spinlock_init(&pxmitpriv->lock);
 	_rtw_spinlock_init(&pxmitpriv->lock_sctx);
@@ -863,8 +863,8 @@ static int update_attrib_sec_info(struct adapter *adapt, struct pkt_attrib *patt
 	struct security_priv *psecuritypriv = &adapt->securitypriv;
 	int bmcast = IS_MCAST(pattrib->ra);
 
-	_rtw_memset(pattrib->dot118021x_UncstKey.skey,  0, 16);
-	_rtw_memset(pattrib->dot11tkiptxmickey.skey,  0, 16);
+	memset(pattrib->dot118021x_UncstKey.skey,  0, 16);
+	memset(pattrib->dot11tkiptxmickey.skey,  0, 16);
 	pattrib->mac_id = psta->cmn.mac_id;
 
 	if (psta->ieee8021x_blocked) {
@@ -1412,7 +1412,7 @@ int rtw_make_wlanhdr(struct adapter *adapt , u8 *hdr, struct pkt_attrib *pattrib
 		}
 	*/
 
-	_rtw_memset(hdr, 0, WLANHDR_OFFSET);
+	memset(hdr, 0, WLANHDR_OFFSET);
 
 	set_frame_sub_type(fctrl, pattrib->subtype);
 
@@ -1769,7 +1769,7 @@ int rtw_xmitframe_coalesce_amsdu(struct adapter *adapt, struct xmit_frame *pxmit
 		if(padding == 4)
 			padding = 0;
 
-		//_rtw_memset(pframe,0xaa, padding);
+		//memset(pframe,0xaa, padding);
 		pframe += padding;
 
 		pattrib->last_txcmdsz += ETH_HLEN + llc_sz + mem_sz + padding ;
@@ -2100,7 +2100,7 @@ int rtw_mgmt_xmitframe_coalesce(struct adapter *adapt, struct sk_buff *pkt, stru
 				goto xmitframe_coalesce_success;
 			}
 
-			_rtw_memset(MME, 0, _MME_IE_LENGTH_);
+			memset(MME, 0, _MME_IE_LENGTH_);
 
 			MGMT_body = pframe + sizeof(struct rtw_ieee80211_hdr_3addr);
 			pframe += pattrib->pktlen;
@@ -2449,7 +2449,7 @@ struct xmit_frame *__rtw_alloc_cmdxmitframe(struct xmit_priv *pxmitpriv,
 	pcmdframe->buf_addr = pxmitbuf->pbuf;
 
 	/* initial memory to zero */
-	_rtw_memset(pcmdframe->buf_addr, 0, MAX_CMDBUF_SZ);
+	memset(pcmdframe->buf_addr, 0, MAX_CMDBUF_SZ);
 
 	pxmitbuf->priv_data = pcmdframe;
 
@@ -2599,7 +2599,7 @@ static void rtw_init_xmitframe(struct xmit_frame *pxframe)
 		pxframe->buf_addr = NULL;
 		pxframe->pxmitbuf = NULL;
 
-		_rtw_memset(&pxframe->attrib, 0, sizeof(struct pkt_attrib));
+		memset(&pxframe->attrib, 0, sizeof(struct pkt_attrib));
 		/* pxframe->attrib.psta = NULL; */
 
 		pxframe->frame_tag = DATA_FRAMETAG;
@@ -3440,7 +3440,7 @@ int rtw_monitor_xmit_entry(struct sk_buff *skb, struct net_device *ndev)
 
 		pattrib->retry_ctrl = false;
 
-		_rtw_memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
+		memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
 
 		pframe = (u8 *)(pmgntframe->buf_addr) + TXDESC_OFFSET;
 
@@ -3481,7 +3481,7 @@ int rtw_monitor_xmit_entry(struct sk_buff *skb, struct net_device *ndev)
 		update_mgntframe_attrib(adapt, pattrib);
 		pattrib->retry_ctrl = false;
 
-		_rtw_memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
+		memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
 
 		pframe = (u8 *)(pmgntframe->buf_addr) + TXDESC_OFFSET;
 

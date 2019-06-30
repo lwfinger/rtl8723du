@@ -896,7 +896,7 @@ static void hal_ReadEFuse_WiFi(struct adapter * adapt, u16 _offset, u16 _size_by
 		return;
 	}
 	/* 0xff will be efuse default value instead of 0x00. */
-	_rtw_memset(efuseTbl, 0xFF, EFUSE_MAX_MAP_LEN);
+	memset(efuseTbl, 0xFF, EFUSE_MAX_MAP_LEN);
 
 	/* switch bank back to bank 0 for later BT and wifi use. */
 	hal_EfuseSwitchToBank(adapt, 0, bPseudoTest);
@@ -1015,7 +1015,7 @@ static void hal_ReadEFuse_BT(struct adapter * adapt, u16 _offset, u16 _size_byte
 		return;
 	}
 	/* 0xff will be efuse default value instead of 0x00. */
-	_rtw_memset(efuseTbl, 0xFF, EFUSE_BT_MAP_LEN);
+	memset(efuseTbl, 0xFF, EFUSE_BT_MAP_LEN);
 
 	total = 0;
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_BT, TYPE_AVAILABLE_EFUSE_BYTES_BANK, &total, bPseudoTest);
@@ -1350,7 +1350,7 @@ Hal_EfuseWordEnableDataWrite(
 
 
 	/*	RTW_INFO("%s: efuse_addr=%#x word_en=%#x\n", __FUNCTION__, efuse_addr, word_en); */
-	_rtw_memset(tmpdata, 0xFF, PGPKT_DATA_SIZE);
+	memset(tmpdata, 0xFF, PGPKT_DATA_SIZE);
 
 	if (!(word_en & BIT(0))) {
 		tmpaddr = start_addr;
@@ -1419,7 +1419,7 @@ static bool Hal_EfusePgPacketRead(struct adapter *	adapt,
 		return false;
 	}
 
-	_rtw_memset(data, 0xFF, PGPKT_DATA_SIZE);
+	memset(data, 0xFF, PGPKT_DATA_SIZE);
 	ret = true;
 
 	/* */
@@ -1503,7 +1503,7 @@ hal_EfuseConstructPGPkt(
 	u8				*pData,
 	struct pg_pkt_struct *	pTargetPkt)
 {
-	_rtw_memset(pTargetPkt->data, 0xFF, PGPKT_DATA_SIZE);
+	memset(pTargetPkt->data, 0xFF, PGPKT_DATA_SIZE);
 	pTargetPkt->offset = offset;
 	pTargetPkt->word_en = word_en;
 	efuse_WordEnableDataRead(word_en, pData, pTargetPkt->data);
@@ -2053,7 +2053,7 @@ void rtl8723d_fill_fake_txdesc(
 	u8			bDataFrame)
 {
 	/* Clear all status */
-	_rtw_memset(pDesc, 0, TXDESC_SIZE);
+	memset(pDesc, 0, TXDESC_SIZE);
 
 	SET_TX_DESC_OFFSET_8723D(pDesc, 0x28); /* Offset = 32 */
 
@@ -2178,18 +2178,18 @@ void rtl8723d_init_default_value(struct adapter * adapt)
 #ifdef HAL_EFUSE_MEMORY
 	pHalData->EfuseHal.fakeEfuseBank = 0;
 	pHalData->EfuseHal.fakeEfuseUsedBytes = 0;
-	_rtw_memset(pHalData->EfuseHal.fakeEfuseContent, 0xFF, EFUSE_MAX_HW_SIZE);
-	_rtw_memset(pHalData->EfuseHal.fakeEfuseInitMap, 0xFF, EFUSE_MAX_MAP_LEN);
-	_rtw_memset(pHalData->EfuseHal.fakeEfuseModifiedMap, 0xFF, EFUSE_MAX_MAP_LEN);
+	memset(pHalData->EfuseHal.fakeEfuseContent, 0xFF, EFUSE_MAX_HW_SIZE);
+	memset(pHalData->EfuseHal.fakeEfuseInitMap, 0xFF, EFUSE_MAX_MAP_LEN);
+	memset(pHalData->EfuseHal.fakeEfuseModifiedMap, 0xFF, EFUSE_MAX_MAP_LEN);
 	pHalData->EfuseHal.BTEfuseUsedBytes = 0;
 	pHalData->EfuseHal.BTEfuseUsedPercentage = 0;
-	_rtw_memset(pHalData->EfuseHal.BTEfuseContent, 0xFF, EFUSE_MAX_BT_BANK * EFUSE_MAX_HW_SIZE);
-	_rtw_memset(pHalData->EfuseHal.BTEfuseInitMap, 0xFF, EFUSE_BT_MAX_MAP_LEN);
-	_rtw_memset(pHalData->EfuseHal.BTEfuseModifiedMap, 0xFF, EFUSE_BT_MAX_MAP_LEN);
+	memset(pHalData->EfuseHal.BTEfuseContent, 0xFF, EFUSE_MAX_BT_BANK * EFUSE_MAX_HW_SIZE);
+	memset(pHalData->EfuseHal.BTEfuseInitMap, 0xFF, EFUSE_BT_MAX_MAP_LEN);
+	memset(pHalData->EfuseHal.BTEfuseModifiedMap, 0xFF, EFUSE_BT_MAX_MAP_LEN);
 	pHalData->EfuseHal.fakeBTEfuseUsedBytes = 0;
-	_rtw_memset(pHalData->EfuseHal.fakeBTEfuseContent, 0xFF, EFUSE_MAX_BT_BANK * EFUSE_MAX_HW_SIZE);
-	_rtw_memset(pHalData->EfuseHal.fakeBTEfuseInitMap, 0xFF, EFUSE_BT_MAX_MAP_LEN);
-	_rtw_memset(pHalData->EfuseHal.fakeBTEfuseModifiedMap, 0xFF, EFUSE_BT_MAX_MAP_LEN);
+	memset(pHalData->EfuseHal.fakeBTEfuseContent, 0xFF, EFUSE_MAX_BT_BANK * EFUSE_MAX_HW_SIZE);
+	memset(pHalData->EfuseHal.fakeBTEfuseInitMap, 0xFF, EFUSE_BT_MAX_MAP_LEN);
+	memset(pHalData->EfuseHal.fakeBTEfuseModifiedMap, 0xFF, EFUSE_BT_MAX_MAP_LEN);
 #endif
 	pHalData->need_restore = false;
 }
@@ -3086,7 +3086,7 @@ static void rtl8723d_fill_default_txdesc(
 	struct pkt_attrib *pattrib;
 	int bmcst;
 
-	_rtw_memset(pbuf, 0, TXDESC_SIZE);
+	memset(pbuf, 0, TXDESC_SIZE);
 
 	adapt = pxmitframe->adapt;
 	pHalData = GET_HAL_DATA(adapt);

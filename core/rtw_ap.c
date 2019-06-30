@@ -381,7 +381,7 @@ void	expire_timeout_chk(struct adapter *adapt)
 		struct mlme_ext_priv *pmlmeext = &adapt->mlmeextpriv;
 		char del_asoc_list[NUM_STA];
 
-		_rtw_memset(del_asoc_list, NUM_STA, NUM_STA);
+		memset(del_asoc_list, NUM_STA, NUM_STA);
 
 		if (pmlmeext->active_keep_alive_check) {
 			if (!rtw_mi_get_ch_setting_union(adapt, &union_ch, &union_bw, &union_offset)
@@ -689,7 +689,7 @@ void update_bmc_sta(struct adapter *adapt)
 
 		psta->ieee8021x_blocked = 0;
 
-		_rtw_memset((void *)&psta->sta_stats, 0, sizeof(struct stainfo_stats));
+		memset((void *)&psta->sta_stats, 0, sizeof(struct stainfo_stats));
 
 		/* psta->dot118021XPrivacy = _NO_PRIVACY_; */ /* !!! remove it, because it has been set before this. */
 
@@ -822,7 +822,7 @@ void update_sta_info_apmode(struct adapter *adapt, struct sta_info *psta)
 
 	/* todo: init other variables */
 
-	_rtw_memset((void *)&psta->sta_stats, 0, sizeof(struct stainfo_stats));
+	memset((void *)&psta->sta_stats, 0, sizeof(struct stainfo_stats));
 
 
 	/* add ratid */
@@ -1398,7 +1398,7 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 
 	pbss_network->IELength = len;
 
-	_rtw_memset(ie, 0, MAX_IE_SZ);
+	memset(ie, 0, MAX_IE_SZ);
 
 	_rtw_memcpy(ie, pbuf, pbss_network->IELength);
 
@@ -1429,7 +1429,7 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 	/* SSID */
 	p = rtw_get_ie(ie + _BEACON_IE_OFFSET_, _SSID_IE_, &ie_len, (pbss_network->IELength - _BEACON_IE_OFFSET_));
 	if (p && ie_len > 0) {
-		_rtw_memset(&pbss_network->Ssid, 0, sizeof(struct ndis_802_11_ssid));
+		memset(&pbss_network->Ssid, 0, sizeof(struct ndis_802_11_ssid));
 		_rtw_memcpy(pbss_network->Ssid.Ssid, (p + 2), ie_len);
 		pbss_network->Ssid.SsidLength = ie_len;
 		_rtw_memcpy(adapt->wdinfo.p2p_group_ssid, pbss_network->Ssid.Ssid, pbss_network->Ssid.SsidLength);
@@ -1446,7 +1446,7 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 	pbss_network->Configuration.DSConfig = channel;
 
 
-	_rtw_memset(supportRate, 0, NDIS_802_11_LENGTH_RATES_EX);
+	memset(supportRate, 0, NDIS_802_11_LENGTH_RATES_EX);
 	/* get supported rates */
 	p = rtw_get_ie(ie + _BEACON_IE_OFFSET_, _SUPPORTEDRATES_IE_, &ie_len, (pbss_network->IELength - _BEACON_IE_OFFSET_));
 	if (p !=  NULL) {
@@ -1957,7 +1957,7 @@ static int rtw_ap_set_key(struct adapter *adapt, u8 *key, u8 alg, int keyid, u8 
 		goto exit;
 	}
 
-	_rtw_memset(psetkeyparm, 0, sizeof(struct setkey_parm));
+	memset(psetkeyparm, 0, sizeof(struct setkey_parm));
 
 	psetkeyparm->keyid = (u8)keyid;
 	if (is_wep_enc(alg))
@@ -3167,7 +3167,7 @@ void start_ap_mode(struct adapter *adapt)
 	pmlmepriv->ht_op_mode = 0;
 	pmlmepriv->sw_to_20mhz = 0;
 
-	_rtw_memset(pmlmepriv->ext_capab_ie_data, 0, sizeof(pmlmepriv->ext_capab_ie_data));
+	memset(pmlmepriv->ext_capab_ie_data, 0, sizeof(pmlmepriv->ext_capab_ie_data));
 	pmlmepriv->ext_capab_ie_len = 0;
 
 #ifdef CONFIG_CONCURRENT_MODE
@@ -3237,7 +3237,7 @@ void stop_ap_mode(struct adapter *adapt)
 	/* _rtw_spinlock_free(&pmlmepriv->bcn_update_lock); */
 
 	/* reset and init security priv , this can refine with rtw_reset_securitypriv */
-	_rtw_memset((unsigned char *)&adapt->securitypriv, 0, sizeof(struct security_priv));
+	memset((unsigned char *)&adapt->securitypriv, 0, sizeof(struct security_priv));
 	adapt->securitypriv.ndisauthtype = Ndis802_11AuthModeOpen;
 	adapt->securitypriv.ndisencryptstatus = Ndis802_11WEPDisabled;
 
@@ -3592,7 +3592,7 @@ u16 rtw_ap_parse_sta_security_ie(struct adapter *adapter, struct sta_info *sta, 
 	sta->wpa2_group_cipher = 0;
 	sta->wpa_pairwise_cipher = 0;
 	sta->wpa2_pairwise_cipher = 0;
-	_rtw_memset(sta->wpa_ie, 0, sizeof(sta->wpa_ie));
+	memset(sta->wpa_ie, 0, sizeof(sta->wpa_ie));
 
 	if ((sec->wpa_psk & BIT(1)) && elems->rsn_ie) {
 		wpa_ie = elems->rsn_ie;
@@ -3783,7 +3783,7 @@ void rtw_ap_parse_sta_ht_ie(struct adapter *adapter, struct sta_info *sta, struc
 		goto exit;
 
 	/* save HT capabilities in the sta object */
-	_rtw_memset(&sta->htpriv.ht_cap, 0, sizeof(struct rtw_ieee80211_ht_cap));
+	memset(&sta->htpriv.ht_cap, 0, sizeof(struct rtw_ieee80211_ht_cap));
 	if (elems->ht_capabilities && elems->ht_capabilities_len >= sizeof(struct rtw_ieee80211_ht_cap)) {
 		sta->flags |= WLAN_STA_HT;
 		sta->flags |= WLAN_STA_WME;

@@ -441,7 +441,7 @@ void rtw_handle_tkip_mic_err(struct adapter *adapt, struct sta_info *sta, u8 bgr
 	cfg80211_michael_mic_failure(adapt->pnetdev, sta->cmn.mac_addr, key_type, -1, NULL, GFP_ATOMIC);
 #endif
 
-	_rtw_memset(&ev, 0x00, sizeof(ev));
+	memset(&ev, 0x00, sizeof(ev));
 	if (bgroup)
 		ev.flags |= IW_MICFAILURE_GROUP;
 	else
@@ -450,7 +450,7 @@ void rtw_handle_tkip_mic_err(struct adapter *adapt, struct sta_info *sta, u8 bgr
 	ev.src_addr.sa_family = ARPHRD_ETHER;
 	_rtw_memcpy(ev.src_addr.sa_data, sta->cmn.mac_addr, ETH_ALEN);
 
-	_rtw_memset(&wrqu, 0x00, sizeof(wrqu));
+	memset(&wrqu, 0x00, sizeof(wrqu));
 	wrqu.data.length = sizeof(ev);
 
 #ifndef CONFIG_IOCTL_CFG80211

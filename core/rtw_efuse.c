@@ -223,8 +223,8 @@ void rtw_efuse_analyze(struct adapter *	adapt, u8 Type, u8 Fake)
 	EFUSE_GetEfuseDefinition(adapt, efuseType, TYPE_EFUSE_CONTENT_LEN_BANK, (void *)&efuse_max, bPseudoTest);
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI, TYPE_EFUSE_REAL_CONTENT_LEN, (void *)&maprawlen, false);
 
-	_rtw_memset(eFuseWord, 0xff, EFUSE_MAX_SECTION_NUM * (EFUSE_MAX_WORD_UNIT * 2));
-	_rtw_memset(pEfuseHal->fakeEfuseInitMap, 0xff, EFUSE_MAX_MAP_LEN);
+	memset(eFuseWord, 0xff, EFUSE_MAX_SECTION_NUM * (EFUSE_MAX_WORD_UNIT * 2));
+	memset(pEfuseHal->fakeEfuseInitMap, 0xff, EFUSE_MAX_MAP_LEN);
 
 	if (IS_HARDWARE_TYPE_8821(adapt))
 		endBank = 3 - 1;/*EFUSE_MAX_BANK_8821A - 1;*/
@@ -276,7 +276,7 @@ void rtw_efuse_analyze(struct adapter *	adapt, u8 Type, u8 Fake)
 				wden = (efuseHeader & 0x0f);
 			}
 
-			_rtw_memset(efuseData, '\0', EFUSE_MAX_WORD_UNIT * 2);
+			memset(efuseData, '\0', EFUSE_MAX_WORD_UNIT * 2);
 			dataCnt = 0;
 
 			if (offset < max_section) {
@@ -977,7 +977,7 @@ u8 rtw_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 		return _FAIL;
 	}
 
-	_rtw_memset(map, 0xFF, mapLen);
+	memset(map, 0xFF, mapLen);
 
 	ret = rtw_efuse_map_read(adapt, 0, mapLen, map);
 	if (ret == _FAIL)
@@ -1329,19 +1329,19 @@ Efuse_InitSomeVar(
 {
 	u8 i;
 
-	_rtw_memset((void *)&fakeEfuseContent[0], 0xff, EFUSE_MAX_HW_SIZE);
-	_rtw_memset((void *)&fakeEfuseInitMap[0], 0xff, EFUSE_MAX_MAP_LEN);
-	_rtw_memset((void *)&fakeEfuseModifiedMap[0], 0xff, EFUSE_MAX_MAP_LEN);
+	memset((void *)&fakeEfuseContent[0], 0xff, EFUSE_MAX_HW_SIZE);
+	memset((void *)&fakeEfuseInitMap[0], 0xff, EFUSE_MAX_MAP_LEN);
+	memset((void *)&fakeEfuseModifiedMap[0], 0xff, EFUSE_MAX_MAP_LEN);
 
 	for (i = 0; i < EFUSE_MAX_BT_BANK; i++)
-		_rtw_memset((void *)&BTEfuseContent[i][0], EFUSE_MAX_HW_SIZE, 0xff);
-	_rtw_memset((void *)&BTEfuseInitMap[0], 0xff, EFUSE_BT_MAX_MAP_LEN);
-	_rtw_memset((void *)&BTEfuseModifiedMap[0], 0xff, EFUSE_BT_MAX_MAP_LEN);
+		memset((void *)&BTEfuseContent[i][0], EFUSE_MAX_HW_SIZE, 0xff);
+	memset((void *)&BTEfuseInitMap[0], 0xff, EFUSE_BT_MAX_MAP_LEN);
+	memset((void *)&BTEfuseModifiedMap[0], 0xff, EFUSE_BT_MAX_MAP_LEN);
 
 	for (i = 0; i < EFUSE_MAX_BT_BANK; i++)
-		_rtw_memset((void *)&fakeBTEfuseContent[i][0], 0xff, EFUSE_MAX_HW_SIZE);
-	_rtw_memset((void *)&fakeBTEfuseInitMap[0], 0xff, EFUSE_BT_MAX_MAP_LEN);
-	_rtw_memset((void *)&fakeBTEfuseModifiedMap[0], 0xff, EFUSE_BT_MAX_MAP_LEN);
+		memset((void *)&fakeBTEfuseContent[i][0], 0xff, EFUSE_MAX_HW_SIZE);
+	memset((void *)&fakeBTEfuseInitMap[0], 0xff, EFUSE_BT_MAX_MAP_LEN);
+	memset((void *)&fakeBTEfuseModifiedMap[0], 0xff, EFUSE_BT_MAX_MAP_LEN);
 }
 
 /*-----------------------------------------------------------------------------
@@ -1507,7 +1507,7 @@ void EFUSE_ShadowMapUpdate(
 	EFUSE_GetEfuseDefinition(pAdapter, efuseType, TYPE_EFUSE_MAP_LEN, (void *)&mapLen, bPseudoTest);
 
 	if (pHalData->bautoload_fail_flag) {
-		_rtw_memset(pHalData->efuse_eeprom_data, 0xFF, mapLen);
+		memset(pHalData->efuse_eeprom_data, 0xFF, mapLen);
 	} else {
 			Efuse_ReadAllMap(pAdapter, efuseType, pHalData->efuse_eeprom_data, bPseudoTest);
 
@@ -1644,7 +1644,7 @@ u32 rtw_read_efuse_from_file(const char *path, u8 *buf, int map_size)
 		RTW_ERR("%s rtw_vmalloc(%d) fail\n", __func__, map_size);
 		goto exit;
 	}
-	_rtw_memset(map, 0xff, map_size);
+	memset(map, 0xff, map_size);
 
 	temp[2] = 0; /* end of string '\0' */
 

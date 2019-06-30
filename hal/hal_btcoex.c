@@ -205,7 +205,7 @@ static void DBG_BT_INFO_INIT(struct btcoexdbginfo * pinfo, u8 *pbuf, u32 size)
 	if (NULL == pinfo)
 		return;
 
-	_rtw_memset(pinfo, 0, sizeof(struct btcoexdbginfo));
+	memset(pinfo, 0, sizeof(struct btcoexdbginfo));
 
 	if (pbuf && size) {
 		pinfo->info = pbuf;
@@ -2065,7 +2065,7 @@ bool EXhalbtcoutsrc_InitlizeVariables(void *adapt)
 	_rtw_init_sema(&GLBtcBtMpRptSema, 0);
 	GLBtcBtMpRptSeq = 0;
 	GLBtcBtMpRptStatus = 0;
-	_rtw_memset(GLBtcBtMpRptRsp, 0, C2H_MAX_SIZE);
+	memset(GLBtcBtMpRptRsp, 0, C2H_MAX_SIZE);
 	GLBtcBtMpRptRspSize = 0;
 	GLBtcBtMpRptWait = false;
 	GLBtcBtMpRptWiFiOK = false;
@@ -2980,7 +2980,7 @@ u8 hal_btcoex_Initialize(struct adapter * adapt)
 	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
 	u8 ret;
 
-	_rtw_memset(&GLBtCoexist, 0, sizeof(GLBtCoexist));
+	memset(&GLBtCoexist, 0, sizeof(GLBtCoexist));
 
 	ret = EXhalbtcoutsrc_InitlizeVariables((void *)adapt);
 
@@ -3470,7 +3470,7 @@ hal_btcoex_ParseAntIsolationConfigFile(
 							RTW_INFO("Fail to parse parameters , format error!\n");
 							break;
 						}
-						_rtw_memset((void *)param_value_string , 0 , 10);
+						memset((void *)param_value_string , 0 , 10);
 						if (!ParseQualifiedString(szLine , &i , param_value_string , '"' , '"')) {
 							RTW_INFO("Fail to parse parameters\n");
 							return _FAIL;
@@ -3520,7 +3520,7 @@ hal_btcoex_AntIsolationConfig_ParaFile(
 	struct hal_com_data *pHalData = GET_HAL_DATA(Adapter);
 	int	rlen = 0 , rtStatus = _FAIL;
 
-	_rtw_memset(pHalData->para_file_buf , 0 , MAX_PARA_FILE_BUF_LEN);
+	memset(pHalData->para_file_buf , 0 , MAX_PARA_FILE_BUF_LEN);
 
 	rtw_get_phy_file_path(Adapter, pFileName);
 	if (rtw_is_file_readable(rtw_phy_para_file_path)) {

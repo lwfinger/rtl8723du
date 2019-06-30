@@ -150,7 +150,7 @@ static void issue_group_disc_req(struct wifidirect_info *pwdinfo, u8 *da)
 	pattrib = &pmgntframe->attrib;
 	update_mgntframe_attrib(adapt, pattrib);
 
-	_rtw_memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
+	memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
 
 	pframe = (u8 *)(pmgntframe->buf_addr) + TXDESC_OFFSET;
 	pwlanhdr = (struct rtw_ieee80211_hdr *)pframe;
@@ -210,7 +210,7 @@ static void issue_p2p_devdisc_resp(struct wifidirect_info *pwdinfo, u8 *da, u8 s
 	pattrib = &pmgntframe->attrib;
 	update_mgntframe_attrib(adapt, pattrib);
 
-	_rtw_memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
+	memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
 
 	pframe = (u8 *)(pmgntframe->buf_addr) + TXDESC_OFFSET;
 	pwlanhdr = (struct rtw_ieee80211_hdr *)pframe;
@@ -285,7 +285,7 @@ static void issue_p2p_provision_resp(struct wifidirect_info *pwdinfo, u8 *raddr,
 	pattrib = &pmgntframe->attrib;
 	update_mgntframe_attrib(adapt, pattrib);
 
-	_rtw_memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
+	memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
 
 	pframe = (u8 *)(pmgntframe->buf_addr) + TXDESC_OFFSET;
 	pwlanhdr = (struct rtw_ieee80211_hdr *)pframe;
@@ -372,7 +372,7 @@ static void issue_p2p_presence_resp(struct wifidirect_info *pwdinfo, u8 *da, u8 
 	pattrib = &pmgntframe->attrib;
 	update_mgntframe_attrib(adapt, pattrib);
 
-	_rtw_memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
+	memset(pmgntframe->buf_addr, 0, WLANHDR_OFFSET + TXDESC_OFFSET);
 
 	pframe = (u8 *)(pmgntframe->buf_addr) + TXDESC_OFFSET;
 	pwlanhdr = (struct rtw_ieee80211_hdr *)pframe;
@@ -568,7 +568,7 @@ u32 build_beacon_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -680,7 +680,7 @@ u32 build_probe_req_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -823,7 +823,7 @@ u32 build_probe_resp_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf, u8 tunnel
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -942,7 +942,7 @@ u32 build_assoc_req_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -1041,7 +1041,7 @@ u32 build_assoc_resp_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -1140,7 +1140,7 @@ u32 build_nego_req_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -1239,7 +1239,7 @@ u32 build_nego_resp_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -1339,7 +1339,7 @@ u32 build_nego_confirm_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -1439,7 +1439,7 @@ u32 build_invitation_req_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -1552,7 +1552,7 @@ u32 build_invitation_resp_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -1665,7 +1665,7 @@ u32 build_provdisc_req_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -1765,7 +1765,7 @@ u32 build_provdisc_resp_wfd_ie(struct wifidirect_info *pwdinfo, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		_rtw_memcpy(wfdie + wfdielen, &pmlmepriv->assoc_bssid[0], ETH_ALEN);
 	else
-		_rtw_memset(wfdie + wfdielen, 0x00, ETH_ALEN);
+		memset(wfdie + wfdielen, 0x00, ETH_ALEN);
 
 	wfdielen += ETH_ALEN;
 
@@ -2625,7 +2625,7 @@ u8 process_p2p_group_negotation_req(struct wifidirect_info *pwdinfo, u8 *pframe,
 		attr_contentlen = 0;
 		if (rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_INTENDED_IF_ADDR, pwdinfo->p2p_peer_interface_addr, &attr_contentlen)) {
 			if (attr_contentlen != ETH_ALEN)
-				_rtw_memset(pwdinfo->p2p_peer_interface_addr, 0x00, ETH_ALEN);
+				memset(pwdinfo->p2p_peer_interface_addr, 0x00, ETH_ALEN);
 		}
 
 		if (rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_CH_LIST, ch_content, &ch_cnt)) {
@@ -2756,7 +2756,7 @@ u8 process_p2p_group_negotation_resp(struct wifidirect_info *pwdinfo, u8 *pframe
 			attr_contentlen = 0;
 			if (rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_INTENDED_IF_ADDR, pwdinfo->p2p_peer_interface_addr, &attr_contentlen)) {
 				if (attr_contentlen != ETH_ALEN)
-					_rtw_memset(pwdinfo->p2p_peer_interface_addr, 0x00, ETH_ALEN);
+					memset(pwdinfo->p2p_peer_interface_addr, 0x00, ETH_ALEN);
 			}
 
 			/*	Try to get the peer's intent and tie breaker value. */
@@ -2861,7 +2861,7 @@ u8 process_p2p_group_negotation_resp(struct wifidirect_info *pwdinfo, u8 *pframe
 
 			/*	Try to get the group id information if peer is GO */
 			attr_contentlen = 0;
-			_rtw_memset(groupid, 0x00, 38);
+			memset(groupid, 0x00, 38);
 			if (rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_GROUP_ID, groupid, &attr_contentlen)) {
 				_rtw_memcpy(pwdinfo->groupid_info.go_device_addr, &groupid[0], ETH_ALEN);
 				_rtw_memcpy(pwdinfo->groupid_info.ssid, &groupid[6], attr_contentlen - ETH_ALEN);
@@ -2937,7 +2937,7 @@ u8 process_p2p_group_negotation_confirm(struct wifidirect_info *pwdinfo, u8 *pfr
 
 		/*	Try to get the group id information */
 		attr_contentlen = 0;
-		_rtw_memset(groupid, 0x00, 38);
+		memset(groupid, 0x00, 38);
 		if (rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_GROUP_ID, groupid, &attr_contentlen)) {
 			RTW_INFO("[%s] Ssid = %s, ssidlen = %zu\n", __FUNCTION__, &groupid[ETH_ALEN], strlen(&groupid[ETH_ALEN]));
 			_rtw_memcpy(pwdinfo->groupid_info.go_device_addr, &groupid[0], ETH_ALEN);
@@ -3772,7 +3772,7 @@ static u8 *dump_p2p_attr_ch_list(u8 *p2p_ie, uint p2p_ielen, u8 *buf, u32 buf_le
 
 		attr_contentlen -= 3;
 
-		_rtw_memset(ch_list, 0, 40);
+		memset(ch_list, 0, 40);
 
 		while (attr_contentlen > 0) {
 			num_of_ch = *(pattr_temp + 1);
@@ -4187,7 +4187,7 @@ void rtw_init_cfg80211_wifidirect_info(struct adapter	*adapt)
 {
 	struct cfg80211_wifidirect_info *pcfg80211_wdinfo = &adapt->cfg80211_wdinfo;
 
-	_rtw_memset(pcfg80211_wdinfo, 0x00, sizeof(struct cfg80211_wifidirect_info));
+	memset(pcfg80211_wdinfo, 0x00, sizeof(struct cfg80211_wifidirect_info));
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	rtw_init_timer(&pcfg80211_wdinfo->remain_on_ch_timer, adapt, ro_ch_timer_process, adapt);
@@ -4699,8 +4699,8 @@ int rtw_init_wifi_display_info(struct adapter *adapt)
 	pwfd_info->wfd_pc = false;
 
 	/* Used in TDLS */
-	_rtw_memset(pwfd_info->ip_address, 0x00, 4);
-	_rtw_memset(pwfd_info->peer_ip_address, 0x00, 4);
+	memset(pwfd_info->ip_address, 0x00, 4);
+	memset(pwfd_info->peer_ip_address, 0x00, 4);
 	return res;
 
 }
@@ -4991,43 +4991,43 @@ void init_wifidirect_info(struct adapter *adapt, enum P2P_ROLE role)
 
 	_rtw_memcpy((void *) pwdinfo->p2p_wildcard_ssid, "DIRECT-", 7);
 
-	_rtw_memset(pwdinfo->device_name, 0x00, WPS_MAX_DEVICE_NAME_LEN);
+	memset(pwdinfo->device_name, 0x00, WPS_MAX_DEVICE_NAME_LEN);
 	pwdinfo->device_name_len = 0;
 
-	_rtw_memset(&pwdinfo->invitereq_info, 0x00, sizeof(struct tx_invite_req_info));
+	memset(&pwdinfo->invitereq_info, 0x00, sizeof(struct tx_invite_req_info));
 	pwdinfo->invitereq_info.token = 3;	/*	Token used for P2P invitation request frame. */
 
-	_rtw_memset(&pwdinfo->inviteresp_info, 0x00, sizeof(struct tx_invite_resp_info));
+	memset(&pwdinfo->inviteresp_info, 0x00, sizeof(struct tx_invite_resp_info));
 	pwdinfo->inviteresp_info.token = 0;
 
 	pwdinfo->profileindex = 0;
-	_rtw_memset(&pwdinfo->profileinfo[0], 0x00, sizeof(struct profile_info) * P2P_MAX_PERSISTENT_GROUP_NUM);
+	memset(&pwdinfo->profileinfo[0], 0x00, sizeof(struct profile_info) * P2P_MAX_PERSISTENT_GROUP_NUM);
 
 	rtw_p2p_findphase_ex_set(pwdinfo, P2P_FINDPHASE_EX_NONE);
 
 	pwdinfo->listen_dwell = (u8)((rtw_get_current_time() % 3) + 1);
 	/* RTW_INFO( "[%s] listen_dwell time is %d00ms\n", __FUNCTION__, pwdinfo->listen_dwell ); */
 
-	_rtw_memset(&pwdinfo->tx_prov_disc_info, 0x00, sizeof(struct tx_provdisc_req_info));
+	memset(&pwdinfo->tx_prov_disc_info, 0x00, sizeof(struct tx_provdisc_req_info));
 	pwdinfo->tx_prov_disc_info.wps_config_method_request = WPS_CM_NONE;
 
-	_rtw_memset(&pwdinfo->nego_req_info, 0x00, sizeof(struct tx_nego_req_info));
+	memset(&pwdinfo->nego_req_info, 0x00, sizeof(struct tx_nego_req_info));
 
 	pwdinfo->device_password_id_for_nego = WPS_DPID_PBC;
 	pwdinfo->negotiation_dialog_token = 1;
 
-	_rtw_memset(pwdinfo->nego_ssid, 0x00, WLAN_SSID_MAXLEN);
+	memset(pwdinfo->nego_ssid, 0x00, WLAN_SSID_MAXLEN);
 	pwdinfo->nego_ssidlen = 0;
 
 	pwdinfo->ui_got_wps_info = P2P_NO_WPSINFO;
 	pwdinfo->supported_wps_cm = WPS_CONFIG_METHOD_DISPLAY  | WPS_CONFIG_METHOD_PBC;
 	pwdinfo->wfd_info = pwfd_info;
 	pwdinfo->channel_list_attr_len = 0;
-	_rtw_memset(pwdinfo->channel_list_attr, 0x00, 100);
+	memset(pwdinfo->channel_list_attr, 0x00, 100);
 
-	_rtw_memset(pwdinfo->rx_prov_disc_info.strconfig_method_desc_of_prov_disc_req, 0x00, 4);
-	_rtw_memset(pwdinfo->rx_prov_disc_info.strconfig_method_desc_of_prov_disc_req, '0', 3);
-	_rtw_memset(&pwdinfo->groupid_info, 0x00, sizeof(struct group_id_info));
+	memset(pwdinfo->rx_prov_disc_info.strconfig_method_desc_of_prov_disc_req, 0x00, 4);
+	memset(pwdinfo->rx_prov_disc_info.strconfig_method_desc_of_prov_disc_req, '0', 3);
+	memset(&pwdinfo->groupid_info, 0x00, sizeof(struct group_id_info));
 #ifdef CONFIG_CONCURRENT_MODE
 #ifdef CONFIG_IOCTL_CFG80211
 	pwdinfo->ext_listen_interval = 1000; /* The interval to be available with legacy AP during p2p0-find/scan */
@@ -5049,8 +5049,8 @@ void init_wifidirect_info(struct adapter *adapt, enum P2P_ROLE role)
 #endif /* CONFIG_IOCTL_CFG80211 */
 
 	pwdinfo->wfd_tdls_enable = 0;
-	_rtw_memset(pwdinfo->p2p_peer_interface_addr, 0x00, ETH_ALEN);
-	_rtw_memset(pwdinfo->p2p_peer_device_addr, 0x00, ETH_ALEN);
+	memset(pwdinfo->p2p_peer_interface_addr, 0x00, ETH_ALEN);
+	memset(pwdinfo->p2p_peer_device_addr, 0x00, ETH_ALEN);
 
 	pwdinfo->rx_invitereq_info.operation_ch[0] = 0;
 	pwdinfo->rx_invitereq_info.operation_ch[1] = 0;	/*	Used to indicate the scan end in site survey function */
@@ -5145,10 +5145,10 @@ int rtw_p2p_enable(struct adapter *adapt, enum P2P_ROLE role)
 			rtw_p2p_set_state(pwdinfo, P2P_STATE_NONE);
 			rtw_p2p_set_pre_state(pwdinfo, P2P_STATE_NONE);
 			rtw_p2p_set_role(pwdinfo, P2P_ROLE_DISABLE);
-			_rtw_memset(&pwdinfo->rx_prov_disc_info, 0x00, sizeof(struct rx_provdisc_req_info));
+			memset(&pwdinfo->rx_prov_disc_info, 0x00, sizeof(struct rx_provdisc_req_info));
 
 			/* Remove profiles in wifidirect_info structure. */
-			_rtw_memset(&pwdinfo->profileinfo[0], 0x00, sizeof(struct profile_info) * P2P_MAX_PERSISTENT_GROUP_NUM);
+			memset(&pwdinfo->profileinfo[0], 0x00, sizeof(struct profile_info) * P2P_MAX_PERSISTENT_GROUP_NUM);
 			pwdinfo->profileindex = 0;
 		}
 

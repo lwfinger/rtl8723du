@@ -265,7 +265,7 @@ void get_rate_set(struct adapter *adapt, unsigned char *pbssrate, int *bssrate_l
 {
 	unsigned char supportedrates[NumRates];
 
-	_rtw_memset(supportedrates, 0, NumRates);
+	memset(supportedrates, 0, NumRates);
 	*bssrate_len = ratetbl2rateset(adapt, supportedrates);
 	_rtw_memcpy(pbssrate, supportedrates, *bssrate_len);
 }
@@ -654,7 +654,7 @@ void invalidate_cam_all(struct adapter *adapt)
 
 	_enter_critical_bh(&cam_ctl->lock, &irqL);
 	rtw_sec_cam_map_clr_all(&cam_ctl->used);
-	_rtw_memset(dvobj->cam_cache, 0, sizeof(struct sec_cam_ent) * SEC_CAM_ENT_NUM_SW_LIMIT);
+	memset(dvobj->cam_cache, 0, sizeof(struct sec_cam_ent) * SEC_CAM_ENT_NUM_SW_LIMIT);
 	_exit_critical_bh(&cam_ctl->lock, &irqL);
 }
 
@@ -718,7 +718,7 @@ void clear_cam_cache(struct adapter *adapter, u8 id)
 
 	_enter_critical_bh(&cam_ctl->lock, &irqL);
 
-	_rtw_memset(&(dvobj->cam_cache[id]), 0, sizeof(struct sec_cam_ent));
+	memset(&(dvobj->cam_cache[id]), 0, sizeof(struct sec_cam_ent));
 
 	_exit_critical_bh(&cam_ctl->lock, &irqL);
 }
@@ -1902,7 +1902,7 @@ int rtw_get_bcn_keys(struct adapter *Adapter, u8 *pframe, u32 packet_len,
 	struct rtw_ieee80211_ht_cap *pht_cap = NULL;
 	struct HT_info_element *pht_info = NULL;
 
-	_rtw_memset(recv_beacon, 0, sizeof(*recv_beacon));
+	memset(recv_beacon, 0, sizeof(*recv_beacon));
 
 	/* checking capabilities */
 	capability = le16_to_cpu(*(__le16 *)(pframe + WLAN_HDR_A3_LEN + 10));
@@ -2409,7 +2409,7 @@ void update_tx_basic_rate(struct adapter *adapt, u8 wirelessmode)
 		return;
 #endif /* CONFIG_INTEL_WIDI */
 
-	_rtw_memset(supported_rates, 0, NDIS_802_11_LENGTH_RATES_EX);
+	memset(supported_rates, 0, NDIS_802_11_LENGTH_RATES_EX);
 
 	/* clear B mod if current channel is in 5G band, avoid tx cck rate in 5G band. */
 	if (pmlmeext->cur_channel > 14)

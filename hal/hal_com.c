@@ -1113,7 +1113,7 @@ int c2h_evt_read_88xx(struct adapter *adapter, u8 *buf)
 		goto clear_evt; /* Not a valid value */
 	}
 
-	_rtw_memset(buf, 0, C2H_REG_LEN);
+	memset(buf, 0, C2H_REG_LEN);
 
 	/* Read ID, LEN, SEQ */
 	SET_C2H_ID_88XX(buf, rtw_read8(adapter, REG_C2HEVT_MSG_NORMAL));
@@ -1998,7 +1998,7 @@ void rtw_mbid_cam_init(struct dvobj_priv *dvobj)
 	_rtw_spinlock_init(&mbid_cam_ctl->lock);
 	mbid_cam_ctl->bitmap = 0;
 	ATOMIC_SET(&mbid_cam_ctl->mbid_entry_num, 0);
-	_rtw_memset(&dvobj->mbid_cam_cache, 0, sizeof(dvobj->mbid_cam_cache));
+	memset(&dvobj->mbid_cam_cache, 0, sizeof(dvobj->mbid_cam_cache));
 }
 
 void rtw_mbid_cam_deinit(struct dvobj_priv *dvobj)
@@ -2016,7 +2016,7 @@ void rtw_mbid_cam_reset(struct adapter *adapter)
 
 	_enter_critical_bh(&mbid_cam_ctl->lock, &irqL);
 	mbid_cam_ctl->bitmap = 0;
-	_rtw_memset(&dvobj->mbid_cam_cache, 0, sizeof(dvobj->mbid_cam_cache));
+	memset(&dvobj->mbid_cam_cache, 0, sizeof(dvobj->mbid_cam_cache));
 	_exit_critical_bh(&mbid_cam_ctl->lock, &irqL);
 
 	ATOMIC_SET(&mbid_cam_ctl->mbid_entry_num, 0);
@@ -2122,7 +2122,7 @@ static inline void mbid_cam_cache_init(struct adapter *adapter, struct mbid_cam_
 static inline void mbid_cam_cache_clr(struct mbid_cam_cache *pmbid_cam)
 {
 	if (pmbid_cam) {
-		_rtw_memset(pmbid_cam->mac_addr, 0, ETH_ALEN);
+		memset(pmbid_cam->mac_addr, 0, ETH_ALEN);
 		pmbid_cam->iface_id = CONFIG_IFACE_NUMBER;
 	}
 }
@@ -2327,7 +2327,7 @@ int rtw_mbid_cam_dump(void *sel, const char *fun_name, struct adapter *adapter)
 	/*_enter_critical_bh(&mbid_cam_ctl->lock, &irqL);*/
 	for (i = 0; i < TOTAL_MBID_CAM_NUM; i++) {
 		RTW_PRINT_SEL(sel, "CAM_ID = %d\t", i);
-		_rtw_memset(mac_addr, 0, ETH_ALEN);
+		memset(mac_addr, 0, ETH_ALEN);
 		read_mbssid_cam(adapter, i, mac_addr);
 		RTW_PRINT_SEL(sel, "MAC Addr:"MAC_FMT"\n", MAC_ARG(mac_addr));
 	}
@@ -2446,7 +2446,7 @@ static void rtw_hal_get_macaddr_port(struct adapter *adapter, u8 *mac_addr)
 	if (!mac_addr)
 		return;
 
-	_rtw_memset(mac_addr, 0, ETH_ALEN);
+	memset(mac_addr, 0, ETH_ALEN);
 	switch (adapter->hw_port) {
 	case HW_PORT0:
 	default:
@@ -3386,7 +3386,7 @@ static void _rtw_hal_set_fw_rsvd_page(struct adapter *adapter, bool finished, u8
 		ReservedPagePacket = pcmdframe->buf_addr;
 	}
 
-	_rtw_memset(&RsvdPageLoc, 0, sizeof(struct rsvd_page));
+	memset(&RsvdPageLoc, 0, sizeof(struct rsvd_page));
 
 	/* beacon * 1 pages */
 	BufIndex = TxDescOffset;
@@ -4646,7 +4646,7 @@ bypass_hw_pg:
 	}
 #endif
 
-	_rtw_memset(hal_data->EEPROMMACAddr, 0, ETH_ALEN);
+	memset(hal_data->EEPROMMACAddr, 0, ETH_ALEN);
 	ret = _FAIL;
 
 exit:

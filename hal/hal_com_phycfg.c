@@ -300,7 +300,7 @@ static inline void hal_init_pg_txpwr_info_2g(struct adapter *adapter, struct TxP
 	if (!pwr_info)
 		return;
 
-	_rtw_memset(pwr_info, 0, sizeof(struct TxPowerInfo24G));
+	memset(pwr_info, 0, sizeof(struct TxPowerInfo24G));
 
 	/* init with invalid value */
 	for (path = 0; path < MAX_RF_PATH; path++) {
@@ -2965,7 +2965,7 @@ phy_ConfigMACWithParaFile(
 	if (!(Adapter->registrypriv.load_phy_file & LOAD_MAC_PARA_FILE))
 		return rtStatus;
 
-	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
+	memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
 	if ((pHalData->mac_reg_len == 0) && (!pHalData->mac_reg)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
@@ -3044,7 +3044,7 @@ phy_ConfigBBWithParaFile(
 		break;
 	}
 
-	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
+	memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
 	if ((pBufLen) && (*pBufLen == 0) && (!pBuf)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
@@ -3426,7 +3426,7 @@ phy_ConfigBBWithPgParaFile(
 	if (!(Adapter->registrypriv.load_phy_file & LOAD_BB_PG_PARA_FILE))
 		return rtStatus;
 
-	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
+	memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
 	if (!pHalData->bb_phy_reg_pg) {
 		rtw_get_phy_file_path(Adapter, pFileName);
@@ -3475,7 +3475,7 @@ phy_ConfigBBWithMpParaFile(
 	if (!(Adapter->registrypriv.load_phy_file & LOAD_BB_MP_PARA_FILE))
 		return rtStatus;
 
-	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
+	memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
 	if ((pHalData->bb_phy_reg_mp_len == 0) && (!pHalData->bb_phy_reg_mp)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
@@ -3575,7 +3575,7 @@ PHY_ConfigRFWithParaFile(
 		break;
 	}
 
-	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
+	memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
 	if ((pBufLen) && (*pBufLen == 0) && (!pBuf)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
@@ -3770,7 +3770,7 @@ PHY_ConfigRFWithTxPwrTrackParaFile(
 	if (!(Adapter->registrypriv.load_phy_file & LOAD_RF_TXPWR_TRACK_PARA_FILE))
 		return rtStatus;
 
-	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
+	memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
 	if ((pHalData->rf_tx_pwr_track_len == 0) && (!pHalData->rf_tx_pwr_track)) {
 		rtw_get_phy_file_path(Adapter, pFileName);
@@ -4002,10 +4002,10 @@ phy_ParsePowerLimitTableFile(
 			szLine[--i] = ' '; /* return the space in front of the regulation info */
 
 			/* Parse the label of the table */
-			_rtw_memset((void *) band, 0, 10);
-			_rtw_memset((void *) bandwidth, 0, 10);
-			_rtw_memset((void *) ntx, 0, 10);
-			_rtw_memset((void *) rateSection, 0, 10);
+			memset((void *) band, 0, 10);
+			memset((void *) bandwidth, 0, 10);
+			memset((void *) ntx, 0, 10);
+			memset((void *) rateSection, 0, 10);
 			if (!ParseQualifiedString(szLine, &i, band, ' ', ',')) {
 				RTW_ERR("Fail to parse band!\n");
 				goto exit;
@@ -4050,7 +4050,7 @@ phy_ParsePowerLimitTableFile(
 			while (szLine[i] == ' ' || szLine[i] == '\t')
 				++i;
 
-			_rtw_memset((void *) colNumBuf, 0, 10);
+			memset((void *) colNumBuf, 0, 10);
 			if (!ParseQualifiedString(szLine, &i, colNumBuf, '#', '#')) {
 				RTW_ERR("Fail to parse column number!\n");
 				goto exit;
@@ -4148,7 +4148,7 @@ phy_ParsePowerLimitTableFile(
 				cnt = 0;
 				fraction = 0;
 				negative = 0;
-				_rtw_memset((void *) powerLimit, 0, 10);
+				memset((void *) powerLimit, 0, 10);
 
 				while ((szLine[i] >= '0' && szLine[i] <= '9') || szLine[i] == '.'
 					|| szLine[i] == '+' || szLine[i] == '-'
@@ -4287,7 +4287,7 @@ PHY_ConfigRFWithPowerLimitTableParaFile(
 	if (!(Adapter->registrypriv.load_phy_file & LOAD_RF_TXPWR_LMT_PARA_FILE))
 		return rtStatus;
 
-	_rtw_memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
+	memset(pHalData->para_file_buf, 0, MAX_PARA_FILE_BUF_LEN);
 
 	if (!pHalData->rf_tx_pwr_lmt) {
 		rtw_get_phy_file_path(Adapter, pFileName);

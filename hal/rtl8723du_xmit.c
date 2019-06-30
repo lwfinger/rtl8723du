@@ -88,7 +88,7 @@ static int update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, int sz, u8 bag
 		pxmitframe->pkt_offset--;
 	}
 
-	_rtw_memset(ptxdesc, 0, sizeof(struct tx_desc));
+	memset(ptxdesc, 0, sizeof(struct tx_desc));
 
 	rtl8723d_update_txdesc(pxmitframe, (u8 *)ptxdesc);
 	_dbg_dump_tx_info(adapt, pxmitframe->frame_tag, ptxdesc);

@@ -143,7 +143,7 @@ void Init_ODM_ComInfo(struct adapter *adapter)
 	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(adapter);
 	int i;
 
-	_rtw_memset(pDM_Odm, 0, sizeof(*pDM_Odm));
+	memset(pDM_Odm, 0, sizeof(*pDM_Odm));
 
 	pDM_Odm->adapter = adapter;
 

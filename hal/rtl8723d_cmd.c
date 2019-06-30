@@ -404,7 +404,7 @@ static void SetFwRsvdPagePkt_BTCoex(struct adapter * adapt)
 	}
 
 	ReservedPagePacket = pcmdframe->buf_addr;
-	_rtw_memset(&RsvdPageLoc, 0, sizeof(struct rsvd_page));
+	memset(&RsvdPageLoc, 0, sizeof(struct rsvd_page));
 
 	/* 3 (1) beacon */
 	BufIndex = TxDescOffset;
@@ -584,7 +584,7 @@ void rtl8723d_set_p2p_ps_offload_cmd(struct adapter *adapt, u8 p2p_ps_state)
 	switch (p2p_ps_state) {
 	case P2P_PS_DISABLE:
 		RTW_INFO("P2P_PS_DISABLE\n");
-		_rtw_memset(p2p_ps_offload, 0 , 1);
+		memset(p2p_ps_offload, 0 , 1);
 		break;
 	case P2P_PS_ENABLE:
 		RTW_INFO("P2P_PS_ENABLE\n");
