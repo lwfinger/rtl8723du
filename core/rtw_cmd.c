@@ -936,7 +936,7 @@ u8 rtw_getbbreg_cmd(struct adapter  *adapt, u8 offset, u8 *pval)
 		return _FAIL;
 	}
 
-	_rtw_init_listhead(&ph2c->list);
+	INIT_LIST_HEAD(&ph2c->list);
 	ph2c->cmdcode = GEN_CMD_CODE(_GetBBReg);
 	ph2c->parmbuf = (unsigned char *)prdbbparm;
 	ph2c->cmdsz =  sizeof(struct readBB_parm);
@@ -1000,7 +1000,7 @@ u8 rtw_getrfreg_cmd(struct adapter  *adapt, u8 offset, u8 *pval)
 		goto exit;
 	}
 
-	_rtw_init_listhead(&ph2c->list);
+	INIT_LIST_HEAD(&ph2c->list);
 	ph2c->cmdcode = GEN_CMD_CODE(_GetRFReg);
 	ph2c->parmbuf = (unsigned char *)prdrfparm;
 	ph2c->cmdsz =  sizeof(struct readRF_parm);
@@ -1291,7 +1291,7 @@ u8 rtw_joinbss_cmd(struct adapter  *adapt, struct wlan_network *pnetwork)
 
 	pcmd->cmdsz = sizeof(struct wlan_bssid_ex);
 
-	_rtw_init_listhead(&pcmd->list);
+	INIT_LIST_HEAD(&pcmd->list);
 	pcmd->cmdcode = _JoinBss_CMD_;/* GEN_CMD_CODE(_JoinBss) */
 	pcmd->parmbuf = (unsigned char *)psecnetwork;
 	pcmd->rsp = NULL;
@@ -1586,7 +1586,7 @@ u8 rtw_getrttbl_cmd(struct adapter  *adapt, struct getratable_rsp *pval)
 
 	/*	init_h2fwcmd_w_parm_no_rsp(ph2c, psetrttblparm, GEN_CMD_CODE(_SetRaTable)); */
 
-	_rtw_init_listhead(&ph2c->list);
+	INIT_LIST_HEAD(&ph2c->list);
 	ph2c->cmdcode = GEN_CMD_CODE(_GetRaTable);
 	ph2c->parmbuf = (unsigned char *)pgetrttblparm;
 	ph2c->cmdsz =  sizeof(struct getratable_parm);
@@ -3435,7 +3435,7 @@ static void session_tracker_chk_for_sta(struct adapter *adapter, struct sta_info
 	if (i >= SESSION_TRACKER_REG_ID_NUM)
 		goto chk_sta;
 
-	_rtw_init_listhead(&dlist);
+	INIT_LIST_HEAD(&dlist);
 
 	_enter_critical_bh(&st_ctl->tracker_q.lock, &irqL);
 

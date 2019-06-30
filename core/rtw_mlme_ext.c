@@ -691,8 +691,8 @@ void rtw_rfctl_init(struct adapter *adapter)
 
 #ifdef CONFIG_TXPWR_LIMIT
 	_rtw_mutex_init(&rfctl->txpwr_lmt_mutex);
-	_rtw_init_listhead(&rfctl->reg_exc_list);
-	_rtw_init_listhead(&rfctl->txpwr_lmt_list);
+	INIT_LIST_HEAD(&rfctl->reg_exc_list);
+	INIT_LIST_HEAD(&rfctl->txpwr_lmt_list);
 #endif
 }
 
@@ -10351,7 +10351,7 @@ void report_survey_event(struct adapter *adapt, union recv_frame *precv_frame)
 		return;
 	}
 
-	_rtw_init_listhead(&pcmd_obj->list);
+	INIT_LIST_HEAD(&pcmd_obj->list);
 
 	pcmd_obj->cmdcode = GEN_CMD_CODE(_Set_MLME_EVT);
 	pcmd_obj->cmdsz = cmdsz;
@@ -10414,7 +10414,7 @@ void report_surveydone_event(struct adapter *adapt)
 		return;
 	}
 
-	_rtw_init_listhead(&pcmd_obj->list);
+	INIT_LIST_HEAD(&pcmd_obj->list);
 
 	pcmd_obj->cmdcode = GEN_CMD_CODE(_Set_MLME_EVT);
 	pcmd_obj->cmdsz = cmdsz;
@@ -10462,7 +10462,7 @@ u32 report_join_res(struct adapter *adapt, int res)
 		goto exit;
 	}
 
-	_rtw_init_listhead(&pcmd_obj->list);
+	INIT_LIST_HEAD(&pcmd_obj->list);
 
 	pcmd_obj->cmdcode = GEN_CMD_CODE(_Set_MLME_EVT);
 	pcmd_obj->cmdsz = cmdsz;
@@ -10514,7 +10514,7 @@ void report_wmm_edca_update(struct adapter *adapt)
 		return;
 	}
 
-	_rtw_init_listhead(&pcmd_obj->list);
+	INIT_LIST_HEAD(&pcmd_obj->list);
 
 	pcmd_obj->cmdcode = GEN_CMD_CODE(_Set_MLME_EVT);
 	pcmd_obj->cmdsz = cmdsz;
@@ -10586,7 +10586,7 @@ u32 report_del_sta_event(struct adapter *adapt, unsigned char *MacAddr, unsigned
 			goto exit;
 		}
 
-		_rtw_init_listhead(&pcmd_obj->list);
+		INIT_LIST_HEAD(&pcmd_obj->list);
 		pcmd_obj->cmdcode = GEN_CMD_CODE(_Set_MLME_EVT);
 		pcmd_obj->cmdsz = cmdsz;
 		pcmd_obj->parmbuf = pevtcmd;
@@ -10626,7 +10626,7 @@ void report_add_sta_event(struct adapter *adapt, unsigned char *MacAddr)
 		return;
 	}
 
-	_rtw_init_listhead(&pcmd_obj->list);
+	INIT_LIST_HEAD(&pcmd_obj->list);
 
 	pcmd_obj->cmdcode = GEN_CMD_CODE(_Set_MLME_EVT);
 	pcmd_obj->cmdsz = cmdsz;
@@ -11250,7 +11250,7 @@ bypass_active_keep_alive:
 		unsigned long irqL;
 		struct list_head *phead, *plist, dlist;
 
-		_rtw_init_listhead(&dlist);
+		INIT_LIST_HEAD(&dlist);
 
 		_enter_critical_bh(&pstapriv->sta_hash_lock, &irqL);
 
@@ -11471,7 +11471,7 @@ void report_sta_timeout_event(struct adapter *adapt, u8 *MacAddr, unsigned short
 		return;
 	}
 
-	_rtw_init_listhead(&pcmd_obj->list);
+	INIT_LIST_HEAD(&pcmd_obj->list);
 
 	pcmd_obj->cmdcode = GEN_CMD_CODE(_Set_MLME_EVT);
 	pcmd_obj->cmdsz = cmdsz;
@@ -11880,7 +11880,7 @@ void rtw_ft_report_reassoc_evt(struct adapter *adapt, u8 *pMacAddr)
 		return;
 	}
 
-	_rtw_init_listhead(&pcmd_obj->list);
+	INIT_LIST_HEAD(&pcmd_obj->list);
 	pcmd_obj->cmdcode = GEN_CMD_CODE(_Set_MLME_EVT);
 	pcmd_obj->cmdsz = cmdsz;
 	pcmd_obj->parmbuf = pevtcmd;

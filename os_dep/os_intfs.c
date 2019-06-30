@@ -1656,7 +1656,7 @@ u8 rtw_init_drv_sw(struct adapter *adapt)
 {
 	u8	ret8 = _SUCCESS;
 
-	_rtw_init_listhead(&adapt->list);
+	INIT_LIST_HEAD(&adapt->list);
 
 	ret8 = rtw_init_default_value(adapt);
 

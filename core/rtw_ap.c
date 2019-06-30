@@ -1740,11 +1740,11 @@ static void rtw_macaddr_acl_init(struct adapter *adapter)
 	unsigned long irqL;
 
 	_enter_critical_bh(&(acl_node_q->lock), &irqL);
-	_rtw_init_listhead(&(acl_node_q->queue));
+	INIT_LIST_HEAD(&(acl_node_q->queue));
 	acl->num = 0;
 	acl->mode = RTW_ACL_MODE_DISABLED;
 	for (i = 0; i < NUM_ACL; i++) {
-		_rtw_init_listhead(&acl->aclnode[i].list);
+		INIT_LIST_HEAD(&acl->aclnode[i].list);
 		acl->aclnode[i].valid = false;
 	}
 	_exit_critical_bh(&(acl_node_q->lock), &irqL);
@@ -1831,7 +1831,7 @@ int rtw_acl_add_sta(struct adapter *adapter, const u8 *addr)
 		acl_node = &acl->aclnode[i];
 		if (!acl_node->valid) {
 
-			_rtw_init_listhead(&acl_node->list);
+			INIT_LIST_HEAD(&acl_node->list);
 			memcpy(acl_node->addr, addr, ETH_ALEN);
 			acl_node->valid = true;
 
@@ -1990,7 +1990,7 @@ static int rtw_ap_set_key(struct adapter *adapt, u8 *key, u8 alg, int keyid, u8 
 	pcmd->rspsz = 0;
 
 
-	_rtw_init_listhead(&pcmd->list);
+	INIT_LIST_HEAD(&pcmd->list);
 
 	res = rtw_enqueue_cmd(pcmdpriv, pcmd);
 

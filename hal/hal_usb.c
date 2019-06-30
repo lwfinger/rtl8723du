@@ -35,7 +35,7 @@ int	usb_init_recv_priv(struct adapter *adapt, u16 ini_in_buf_sz)
 	precvbuf = (struct recv_buf *)precvpriv->precv_buf;
 
 	for (i = 0; i < NR_RECVBUFF ; i++) {
-		_rtw_init_listhead(&precvbuf->list);
+		INIT_LIST_HEAD(&precvbuf->list);
 
 		_rtw_spinlock_init(&precvbuf->recvbuf_lock);
 

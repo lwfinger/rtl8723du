@@ -168,11 +168,6 @@ void rtw_mfree2d(void *pbuf, int h, int w, int size)
 	rtw_mfree((u8 *)pbuf, h * sizeof(void *) + w * h * size);
 }
 
-void _rtw_init_listhead(struct list_head *list)
-{
-	INIT_LIST_HEAD(list);
-}
-
 /*
 For the following list_xxx operations,
 caller must guarantee the atomic context.
@@ -301,7 +296,7 @@ void	_rtw_spinunlock_ex(spinlock_t *plock)
 
 void _rtw_init_queue(struct __queue *pqueue)
 {
-	_rtw_init_listhead(&(pqueue->queue));
+	INIT_LIST_HEAD(&(pqueue->queue));
 	_rtw_spinlock_init(&(pqueue->lock));
 }
 

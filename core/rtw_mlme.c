@@ -80,7 +80,7 @@ static int	_rtw_init_mlme_priv(struct adapter *adapt)
 	pnetwork = (struct wlan_network *)pbuf;
 
 	for (i = 0; i < MAX_BSS_CNT; i++) {
-		_rtw_init_listhead(&(pnetwork->list));
+		INIT_LIST_HEAD(&(pnetwork->list));
 
 		rtw_list_insert_tail(&(pnetwork->list), &(pmlmepriv->free_bss_pool.queue));
 
@@ -3222,7 +3222,7 @@ int rtw_set_auth(struct adapter *adapter, struct security_priv *psecuritypriv)
 	pcmd->rspsz = 0;
 
 
-	_rtw_init_listhead(&pcmd->list);
+	INIT_LIST_HEAD(&pcmd->list);
 
 
 	res = rtw_enqueue_cmd(pcmdpriv, pcmd);
@@ -3304,7 +3304,7 @@ int rtw_set_key(struct adapter *adapter, struct security_priv *psecuritypriv, in
 		pcmd->rsp = NULL;
 		pcmd->rspsz = 0;
 
-		_rtw_init_listhead(&pcmd->list);
+		INIT_LIST_HEAD(&pcmd->list);
 
 		/* _rtw_init_sema(&(pcmd->cmd_sem), 0); */
 

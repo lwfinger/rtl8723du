@@ -160,7 +160,6 @@ void _rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr, dma_a
 extern void	*rtw_malloc2d(int h, int w, size_t size);
 extern void	rtw_mfree2d(void *pbuf, int h, int w, int size);
 
-extern void	_rtw_init_listhead(struct list_head *list);
 extern u32	rtw_is_list_empty(struct list_head *phead);
 extern void	rtw_list_insert_head(struct list_head *plist, struct list_head *phead);
 extern void	rtw_list_insert_tail(struct list_head *plist, struct list_head *phead);

@@ -912,7 +912,7 @@ void rtw_regd_exc_add_with_nlen(struct rf_ctl_t *rfctl, const char *country, u8 
 	if (!ent)
 		goto exit;
 
-	_rtw_init_listhead(&ent->list);
+	INIT_LIST_HEAD(&ent->list);
 	if (country)
 		memcpy(ent->country, country, 2);
 	ent->domain = domain;
@@ -1318,7 +1318,7 @@ void rtw_txpwr_lmt_add_with_nlen(struct rf_ctl_t *rfctl, const char *regd_name, 
 	if (!ent)
 		goto release_lock;
 
-	_rtw_init_listhead(&ent->list);
+	INIT_LIST_HEAD(&ent->list);
 	memcpy(ent->regd_name, regd_name, nlen);
 	{
 		u8 j, k, l, m;

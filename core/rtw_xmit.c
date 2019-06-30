@@ -11,7 +11,7 @@ static u8 RFC1042_OUI[P80211_OUI_LEN] = { 0x00, 0x00, 0x00 };
 
 static void _init_txservq(struct tx_servq *ptxservq)
 {
-	_rtw_init_listhead(&ptxservq->tx_pending);
+	INIT_LIST_HEAD(&ptxservq->tx_pending);
 	_rtw_init_queue(&ptxservq->sta_pending);
 	ptxservq->qcnt = 0;
 }
@@ -32,8 +32,8 @@ void	_rtw_init_sta_xmit_priv(struct sta_xmit_priv *psta_xmitpriv)
 	_init_txservq(&psta_xmitpriv->bk_q);
 	_init_txservq(&psta_xmitpriv->vi_q);
 	_init_txservq(&psta_xmitpriv->vo_q);
-	_rtw_init_listhead(&psta_xmitpriv->legacy_dz);
-	_rtw_init_listhead(&psta_xmitpriv->apsd);
+	INIT_LIST_HEAD(&psta_xmitpriv->legacy_dz);
+	INIT_LIST_HEAD(&psta_xmitpriv->apsd);
 
 
 }
@@ -109,7 +109,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	pxframe = (struct xmit_frame *) pxmitpriv->pxmit_frame_buf;
 
 	for (i = 0; i < NR_XMITFRAME; i++) {
-		_rtw_init_listhead(&(pxframe->list));
+		INIT_LIST_HEAD(&(pxframe->list));
 
 		pxframe->adapt = adapt;
 		pxframe->frame_tag = NULL_FRAMETAG;
@@ -147,7 +147,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	pxmitbuf = (struct xmit_buf *)pxmitpriv->pxmitbuf;
 
 	for (i = 0; i < NR_XMITBUFF; i++) {
-		_rtw_init_listhead(&pxmitbuf->list);
+		INIT_LIST_HEAD(&pxmitbuf->list);
 
 		pxmitbuf->priv_data = NULL;
 		pxmitbuf->adapt = adapt;
@@ -183,7 +183,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	pxframe = (struct xmit_frame *)pxmitpriv->xframe_ext;
 
 	for (i = 0; i < NR_XMIT_EXTBUFF; i++) {
-		_rtw_init_listhead(&(pxframe->list));
+		INIT_LIST_HEAD(&(pxframe->list));
 
 		pxframe->adapt = adapt;
 		pxframe->frame_tag = NULL_FRAMETAG;
@@ -216,7 +216,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	pxmitbuf = (struct xmit_buf *)pxmitpriv->pxmit_extbuf;
 
 	for (i = 0; i < NR_XMIT_EXTBUFF; i++) {
-		_rtw_init_listhead(&pxmitbuf->list);
+		INIT_LIST_HEAD(&pxmitbuf->list);
 
 		pxmitbuf->priv_data = NULL;
 		pxmitbuf->adapt = adapt;
@@ -237,7 +237,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	for (i = 0; i < CMDBUF_MAX; i++) {
 		pxmitbuf = &pxmitpriv->pcmd_xmitbuf[i];
 		if (pxmitbuf) {
-			_rtw_init_listhead(&pxmitbuf->list);
+			INIT_LIST_HEAD(&pxmitbuf->list);
 
 			pxmitbuf->priv_data = NULL;
 			pxmitbuf->adapt = adapt;
@@ -3156,7 +3156,7 @@ void rtw_init_hwxmits(struct hw_xmit *phwxmit, int entry)
 	int i;
 	for (i = 0; i < entry; i++, phwxmit++) {
 		/* _rtw_spinlock_init(&phwxmit->xmit_lock); */
-		/* _rtw_init_listhead(&phwxmit->pending);		 */
+		/* INIT_LIST_HEAD(&phwxmit->pending);		 */
 		/* phwxmit->txcmdcnt = 0; */
 		phwxmit->accnt = 0;
 	}
