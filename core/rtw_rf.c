@@ -1309,7 +1309,7 @@ void rtw_txpwr_lmt_add_with_nlen(struct rf_ctl_t *rfctl, const char *regd_name, 
 		cur = get_next(cur);
 
 		if (strlen(ent->regd_name) == nlen
-			&& _rtw_memcmp(ent->regd_name, regd_name, nlen))
+			&& !memcmp(ent->regd_name, regd_name, nlen))
 			goto chk_lmt_val;
 	}
 

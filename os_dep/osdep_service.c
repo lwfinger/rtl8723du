@@ -173,17 +173,6 @@ inline void *rtw_os_pkt_data(struct sk_buff *pkt)
 	return pkt->data;
 }
 
-int	_rtw_memcmp(const void *dst, const void *src, u32 sz)
-{
-
-	/* under Linux/GNU/GLibc, the return value of memcmp for two same mem. chunk is 0 */
-
-	if (!(memcmp(dst, src, sz)))
-		return true;
-	else
-		return false;
-}
-
 void _rtw_init_listhead(struct list_head *list)
 {
 	INIT_LIST_HEAD(list);

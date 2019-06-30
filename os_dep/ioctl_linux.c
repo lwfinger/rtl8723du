@@ -261,7 +261,7 @@ static int search_p2p_wfd_ie(struct adapter *adapt,
 			/*	If not, the driver should ignore this AP and go to the next AP. */
 
 			/*	Verifying the SSID */
-			if (_rtw_memcmp(pnetwork->network.Ssid.Ssid, pwdinfo->p2p_wildcard_ssid, P2P_WILDCARD_SSID_LEN)) {
+			if (!memcmp(pnetwork->network.Ssid.Ssid, pwdinfo->p2p_wildcard_ssid, P2P_WILDCARD_SSID_LEN)) {
 				u32	p2pielen = 0;
 
 				/*	Verifying the P2P IE */
@@ -1005,7 +1005,7 @@ static int rtw_set_wpa_ie(struct adapter *adapt, char *pie, unsigned short ielen
 			while (cnt < ielen) {
 				eid = buf[cnt];
 
-				if ((eid == _VENDOR_SPECIFIC_IE_) && (_rtw_memcmp(&buf[cnt + 2], wps_oui, 4))) {
+				if ((eid == _VENDOR_SPECIFIC_IE_) && (!memcmp(&buf[cnt + 2], wps_oui, 4))) {
 					RTW_INFO("SET WPS_IE\n");
 
 					adapt->securitypriv.wps_ie_len = ((buf[cnt + 1] + 2) < MAX_WPS_IE_LEN) ? (buf[cnt + 1] + 2) : MAX_WPS_IE_LEN;
@@ -1307,7 +1307,7 @@ static int rtw_wx_set_pmkid(struct net_device *dev,
 	memcpy(strIssueBssid, pPMK->bssid.sa_data, ETH_ALEN);
 	if (pPMK->cmd == IW_PMKSA_ADD) {
 		RTW_INFO("[rtw_wx_set_pmkid] IW_PMKSA_ADD!\n");
-		if (_rtw_memcmp(strIssueBssid, strZeroMacAddress, ETH_ALEN))
+		if (!memcmp(strIssueBssid, strZeroMacAddress, ETH_ALEN))
 			return intReturn ;
 		else
 			intReturn = true;
@@ -1315,7 +1315,7 @@ static int rtw_wx_set_pmkid(struct net_device *dev,
 
 		/* overwrite PMKID */
 		for (j = 0 ; j < NUM_PMKID_CACHE; j++) {
-			if (_rtw_memcmp(psecuritypriv->PMKIDList[j].Bssid, strIssueBssid, ETH_ALEN)) {
+			if (!memcmp(psecuritypriv->PMKIDList[j].Bssid, strIssueBssid, ETH_ALEN)) {
 				/* BSSID is matched, the same AP => rewrite with new PMKID. */
 
 				RTW_INFO("[rtw_wx_set_pmkid] BSSID exists in the PMKList.\n");
@@ -1345,7 +1345,7 @@ static int rtw_wx_set_pmkid(struct net_device *dev,
 		RTW_INFO("[rtw_wx_set_pmkid] IW_PMKSA_REMOVE!\n");
 		intReturn = true;
 		for (j = 0 ; j < NUM_PMKID_CACHE; j++) {
-			if (_rtw_memcmp(psecuritypriv->PMKIDList[j].Bssid, strIssueBssid, ETH_ALEN)) {
+			if (!memcmp(psecuritypriv->PMKIDList[j].Bssid, strIssueBssid, ETH_ALEN)) {
 				/* BSSID is matched, the same AP => Remove this PMKID information and reset it. */
 				memset(psecuritypriv->PMKIDList[j].Bssid, 0x00, ETH_ALEN);
 				psecuritypriv->PMKIDList[j].bUsed = false;
@@ -1595,7 +1595,7 @@ static int rtw_wx_set_wap(struct net_device *dev,
 
 		src_bssid = temp->sa_data;
 
-		if ((_rtw_memcmp(dst_bssid, src_bssid, ETH_ALEN))) {
+		if ((!memcmp(dst_bssid, src_bssid, ETH_ALEN))) {
 			if (!rtw_set_802_11_infrastructure_mode(adapt, pnetwork->network.InfrastructureMode)) {
 				ret = -1;
 				_exit_critical_bh(&queue->lock, &irqL);
@@ -1772,7 +1772,7 @@ static int rtw_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
 #endif
 
 		if (wrqu->data.length >= WEXT_CSCAN_HEADER_SIZE
-		    && _rtw_memcmp(extra, WEXT_CSCAN_HEADER, WEXT_CSCAN_HEADER_SIZE)
+		    && !memcmp(extra, WEXT_CSCAN_HEADER, WEXT_CSCAN_HEADER_SIZE)
 		   ) {
 			int len = wrqu->data.length - WEXT_CSCAN_HEADER_SIZE;
 			char *pos = extra + WEXT_CSCAN_HEADER_SIZE;
@@ -2027,7 +2027,7 @@ static int rtw_wx_set_essid(struct net_device *dev,
 			dst_ssid = pnetwork->network.Ssid.Ssid;
 
 
-			if ((_rtw_memcmp(dst_ssid, src_ssid, ndis_ssid.SsidLength)) &&
+			if ((!memcmp(dst_ssid, src_ssid, ndis_ssid.SsidLength)) &&
 			    (pnetwork->network.Ssid.SsidLength == ndis_ssid.SsidLength)) {
 
 				if (check_fwstate(pmlmepriv, WIFI_ADHOC_STATE)) {
@@ -3148,7 +3148,7 @@ static int rtw_get_ap_info(struct net_device *dev,
 		}
 
 
-		if (_rtw_memcmp(bssid, pnetwork->network.MacAddress, ETH_ALEN)) { /* BSSID match, then check if supporting wpa/wpa2 */
+		if (!memcmp(bssid, pnetwork->network.MacAddress, ETH_ALEN)) { /* BSSID match, then check if supporting wpa/wpa2 */
 			RTW_INFO("BSSID:" MAC_FMT "\n", MAC_ARG(bssid));
 
 			pbuf = rtw_get_wpa_ie(&pnetwork->network.IEs[12], &wpa_ielen, pnetwork->network.IELength - 12);
@@ -3703,7 +3703,7 @@ static int rtw_p2p_get_wps_configmethod(struct net_device *dev,
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
-		if (_rtw_memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
+		if (!memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
 			u8 *wpsie;
 			uint	wpsie_len = 0;
 
@@ -3833,7 +3833,7 @@ static int rtw_p2p_get_go_device_address(struct net_device *dev,
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
-		if (_rtw_memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
+		if (!memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
 			/*	Commented by Albert 2011/05/18 */
 			/*	Match the device address located in the P2P IE */
 			/*	This is for the case that the P2P device address is not the same as the P2P interface address. */
@@ -3919,7 +3919,7 @@ static int rtw_p2p_get_device_type(struct net_device *dev,
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
-		if (_rtw_memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
+		if (!memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
 			u8 *wpsie;
 			uint	wpsie_len = 0;
 
@@ -3993,7 +3993,7 @@ static int rtw_p2p_get_device_name(struct net_device *dev,
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
-		if (_rtw_memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
+		if (!memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
 			u8 *wpsie;
 			uint	wpsie_len = 0;
 
@@ -4063,7 +4063,7 @@ static int rtw_p2p_get_invitation_procedure(struct net_device *dev,
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
-		if (_rtw_memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
+		if (!memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
 			/*	Commented by Albert 20121226 */
 			/*	Match the device address located in the P2P IE */
 			/*	This is for the case that the P2P device address is not the same as the P2P interface address. */
@@ -4162,7 +4162,7 @@ static int rtw_p2p_connect(struct net_device *dev,
 			break;
 
 		pnetwork = container_of(plist, struct wlan_network, list);
-		if (_rtw_memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
+		if (!memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
 			if (pnetwork->network.Configuration.DSConfig != 0)
 				uintPeerChannel = pnetwork->network.Configuration.DSConfig;
 			else if (pwdinfo->nego_req_info.peer_ch != 0)
@@ -4321,13 +4321,13 @@ static int rtw_p2p_invite_req(struct net_device *dev,
 
 			if (rtw_get_p2p_attr_content(p2pie, p2pielen, P2P_ATTR_DEVICE_ID, attr_content, &attr_contentlen)) {
 				/*	Handle the P2P Device ID attribute of Beacon first */
-				if (_rtw_memcmp(attr_content, pinvite_req_info->peer_macaddr, ETH_ALEN)) {
+				if (!memcmp(attr_content, pinvite_req_info->peer_macaddr, ETH_ALEN)) {
 					uintPeerChannel = pnetwork->network.Configuration.DSConfig;
 					break;
 				}
 			} else if (rtw_get_p2p_attr_content(p2pie, p2pielen, P2P_ATTR_DEVICE_INFO, attr_content, &attr_contentlen)) {
 				/*	Handle the P2P Device Info attribute of probe response */
-				if (_rtw_memcmp(attr_content, pinvite_req_info->peer_macaddr, ETH_ALEN)) {
+				if (!memcmp(attr_content, pinvite_req_info->peer_macaddr, ETH_ALEN)) {
 					uintPeerChannel = pnetwork->network.Configuration.DSConfig;
 					break;
 				}
@@ -4592,14 +4592,14 @@ static int rtw_p2p_set_pc(struct net_device *dev,
 			if (rtw_get_p2p_attr_content(p2pie, p2pielen, P2P_ATTR_DEVICE_ID, attr_content, &attr_contentlen)) {
 				/*	Handle the P2P Device ID attribute of Beacon first */
 				printk("[%s] P2P_ATTR_DEVICE_ID\n", __FUNCTION__);
-				if (_rtw_memcmp(attr_content, peerMAC, ETH_ALEN)) {
+				if (!memcmp(attr_content, peerMAC, ETH_ALEN)) {
 					uintPeerChannel = pnetwork->network.Configuration.DSConfig;
 					break;
 				}
 			} else if (rtw_get_p2p_attr_content(p2pie, p2pielen, P2P_ATTR_DEVICE_INFO, attr_content, &attr_contentlen)) {
 				/*	Handle the P2P Device Info attribute of probe response */
 				printk("[%s] P2P_ATTR_DEVICE_INFO\n", __FUNCTION__);
-				if (_rtw_memcmp(attr_content, peerMAC, ETH_ALEN)) {
+				if (!memcmp(attr_content, peerMAC, ETH_ALEN)) {
 					uintPeerChannel = pnetwork->network.Configuration.DSConfig;
 					break;
 				}
@@ -4802,13 +4802,13 @@ static int rtw_p2p_prov_disc(struct net_device *dev,
 	for (jj = 0, kk = 0; jj < ETH_ALEN; jj++, kk += 3)
 		peerMAC[jj] = key_2char2num(extra[kk], extra[kk + 1]);
 
-	if (_rtw_memcmp(&extra[18], "display", 7))
+	if (!memcmp(&extra[18], "display", 7))
 		pwdinfo->tx_prov_disc_info.wps_config_method_request = WPS_CM_DISPLYA;
-	else if (_rtw_memcmp(&extra[18], "keypad", 7))
+	else if (!memcmp(&extra[18], "keypad", 7))
 		pwdinfo->tx_prov_disc_info.wps_config_method_request = WPS_CM_KEYPAD;
-	else if (_rtw_memcmp(&extra[18], "pbc", 3))
+	else if (!memcmp(&extra[18], "pbc", 3))
 		pwdinfo->tx_prov_disc_info.wps_config_method_request = WPS_CM_PUSH_BUTTON;
-	else if (_rtw_memcmp(&extra[18], "label", 5))
+	else if (!memcmp(&extra[18], "label", 5))
 		pwdinfo->tx_prov_disc_info.wps_config_method_request = WPS_CM_LABEL;
 	else {
 		RTW_INFO("[%s] Unknown WPS config methodn", __FUNCTION__);
@@ -4841,13 +4841,13 @@ static int rtw_p2p_prov_disc(struct net_device *dev,
 
 				if (rtw_get_p2p_attr_content(p2pie, p2pielen, P2P_ATTR_DEVICE_ID, attr_content, &attr_contentlen)) {
 					/*	Handle the P2P Device ID attribute of Beacon first */
-					if (_rtw_memcmp(attr_content, peerMAC, ETH_ALEN)) {
+					if (!memcmp(attr_content, peerMAC, ETH_ALEN)) {
 						uintPeerChannel = pnetwork->network.Configuration.DSConfig;
 						break;
 					}
 				} else if (rtw_get_p2p_attr_content(p2pie, p2pielen, P2P_ATTR_DEVICE_INFO, attr_content, &attr_contentlen)) {
 					/*	Handle the P2P Device Info attribute of probe response */
-					if (_rtw_memcmp(attr_content, peerMAC, ETH_ALEN)) {
+					if (!memcmp(attr_content, peerMAC, ETH_ALEN)) {
 						uintPeerChannel = pnetwork->network.Configuration.DSConfig;
 						break;
 					}
@@ -4864,7 +4864,7 @@ static int rtw_p2p_prov_disc(struct net_device *dev,
 		/* so we could only compare mac addr by 802.11 Source Address */
 		if (pmlmepriv->widi_state == INTEL_WIDI_STATE_WFD_CONNECTION
 		    && uintPeerChannel == 0) {
-			if (_rtw_memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
+			if (!memcmp(pnetwork->network.MacAddress, peerMAC, ETH_ALEN)) {
 				uintPeerChannel = pnetwork->network.Configuration.DSConfig;
 				break;
 			}
@@ -5023,71 +5023,71 @@ static int rtw_p2p_set(struct net_device *dev,
 
 	RTW_INFO("[%s] extra = %s\n", __FUNCTION__, extra);
 
-	if (_rtw_memcmp(extra, "enable=", 7))
+	if (!memcmp(extra, "enable=", 7))
 		rtw_wext_p2p_enable(dev, info, wrqu, &extra[7]);
-	else if (_rtw_memcmp(extra, "setDN=", 6)) {
+	else if (!memcmp(extra, "setDN=", 6)) {
 		wrqu->data.length -= 6;
 		rtw_p2p_setDN(dev, info, wrqu, &extra[6]);
-	} else if (_rtw_memcmp(extra, "profilefound=", 13)) {
+	} else if (!memcmp(extra, "profilefound=", 13)) {
 		wrqu->data.length -= 13;
 		rtw_p2p_profilefound(dev, info, wrqu, &extra[13]);
-	} else if (_rtw_memcmp(extra, "prov_disc=", 10)) {
+	} else if (!memcmp(extra, "prov_disc=", 10)) {
 		wrqu->data.length -= 10;
 		rtw_p2p_prov_disc(dev, info, wrqu, &extra[10]);
-	} else if (_rtw_memcmp(extra, "nego=", 5)) {
+	} else if (!memcmp(extra, "nego=", 5)) {
 		wrqu->data.length -= 5;
 		rtw_p2p_connect(dev, info, wrqu, &extra[5]);
-	} else if (_rtw_memcmp(extra, "intent=", 7)) {
+	} else if (!memcmp(extra, "intent=", 7)) {
 		/*	Commented by Albert 2011/03/23 */
 		/*	The wrqu->data.length will include the null character */
 		/*	So, we will decrease 7 + 1 */
 		wrqu->data.length -= 8;
 		rtw_p2p_set_intent(dev, info, wrqu, &extra[7]);
-	} else if (_rtw_memcmp(extra, "ssid=", 5)) {
+	} else if (!memcmp(extra, "ssid=", 5)) {
 		wrqu->data.length -= 5;
 		rtw_p2p_set_go_nego_ssid(dev, info, wrqu, &extra[5]);
-	} else if (_rtw_memcmp(extra, "got_wpsinfo=", 12)) {
+	} else if (!memcmp(extra, "got_wpsinfo=", 12)) {
 		wrqu->data.length -= 12;
 		rtw_p2p_got_wpsinfo(dev, info, wrqu, &extra[12]);
-	} else if (_rtw_memcmp(extra, "listen_ch=", 10)) {
+	} else if (!memcmp(extra, "listen_ch=", 10)) {
 		/*	Commented by Albert 2011/05/24 */
 		/*	The wrqu->data.length will include the null character */
 		/*	So, we will decrease (10 + 1)	 */
 		wrqu->data.length -= 11;
 		rtw_p2p_set_listen_ch(dev, info, wrqu, &extra[10]);
-	} else if (_rtw_memcmp(extra, "op_ch=", 6)) {
+	} else if (!memcmp(extra, "op_ch=", 6)) {
 		/*	Commented by Albert 2011/05/24 */
 		/*	The wrqu->data.length will include the null character */
 		/*	So, we will decrease (6 + 1)	 */
 		wrqu->data.length -= 7;
 		rtw_p2p_set_op_ch(dev, info, wrqu, &extra[6]);
-	} else if (_rtw_memcmp(extra, "invite=", 7)) {
+	} else if (!memcmp(extra, "invite=", 7)) {
 		wrqu->data.length -= 8;
 		rtw_p2p_invite_req(dev, info, wrqu, &extra[7]);
-	} else if (_rtw_memcmp(extra, "persistent=", 11)) {
+	} else if (!memcmp(extra, "persistent=", 11)) {
 		wrqu->data.length -= 11;
 		rtw_p2p_set_persistent(dev, info, wrqu, &extra[11]);
-	} else if (_rtw_memcmp(extra, "uuid=", 5)) {
+	} else if (!memcmp(extra, "uuid=", 5)) {
 		wrqu->data.length -= 5;
 		ret = rtw_p2p_set_wps_uuid(dev, info, wrqu, &extra[5]);
 	}
 
 	if (hal_chk_wl_func(adapt, WL_FUNC_MIRACAST)) {
-		if (_rtw_memcmp(extra, "sa=", 3)) {
+		if (!memcmp(extra, "sa=", 3)) {
 			/* sa: WFD Session Available information */
 			wrqu->data.length -= 3;
 			rtw_p2p_set_sa(dev, info, wrqu, &extra[3]);
-		} else if (_rtw_memcmp(extra, "pc=", 3)) {
+		} else if (!memcmp(extra, "pc=", 3)) {
 			/* pc: WFD Preferred Connection */
 			wrqu->data.length -= 3;
 			rtw_p2p_set_pc(dev, info, wrqu, &extra[3]);
-		} else if (_rtw_memcmp(extra, "wfd_type=", 9)) {
+		} else if (!memcmp(extra, "wfd_type=", 9)) {
 			wrqu->data.length -= 9;
 			rtw_p2p_set_wfd_device_type(dev, info, wrqu, &extra[9]);
-		} else if (_rtw_memcmp(extra, "wfd_enable=", 11)) {
+		} else if (!memcmp(extra, "wfd_enable=", 11)) {
 			wrqu->data.length -= 11;
 			rtw_p2p_set_wfd_enable(dev, info, wrqu, &extra[11]);
-		} else if (_rtw_memcmp(extra, "driver_iface=", 13)) {
+		} else if (!memcmp(extra, "driver_iface=", 13)) {
 			wrqu->data.length -= 13;
 			rtw_p2p_set_driver_iface(dev, info, wrqu, &extra[13]);
 		}
@@ -5110,31 +5110,31 @@ static int rtw_p2p_get(struct net_device *dev,
 	if (adapt->bShowGetP2PState)
 		RTW_INFO("[%s] extra = %s\n", __FUNCTION__, (char *) wrqu->data.pointer);
 
-	if (_rtw_memcmp(wrqu->data.pointer, "status", 6))
+	if (!memcmp(wrqu->data.pointer, "status", 6))
 		rtw_p2p_get_status(dev, info, wrqu, extra);
-	else if (_rtw_memcmp(wrqu->data.pointer, "role", 4))
+	else if (!memcmp(wrqu->data.pointer, "role", 4))
 		rtw_p2p_get_role(dev, info, wrqu, extra);
-	else if (_rtw_memcmp(wrqu->data.pointer, "peer_ifa", 8))
+	else if (!memcmp(wrqu->data.pointer, "peer_ifa", 8))
 		rtw_p2p_get_peer_ifaddr(dev, info, wrqu, extra);
-	else if (_rtw_memcmp(wrqu->data.pointer, "req_cm", 6))
+	else if (!memcmp(wrqu->data.pointer, "req_cm", 6))
 		rtw_p2p_get_req_cm(dev, info, wrqu, extra);
-	else if (_rtw_memcmp(wrqu->data.pointer, "peer_deva", 9)) {
+	else if (!memcmp(wrqu->data.pointer, "peer_deva", 9)) {
 		/*	Get the P2P device address when receiving the provision discovery request frame. */
 		rtw_p2p_get_peer_devaddr(dev, info, wrqu, extra);
-	} else if (_rtw_memcmp(wrqu->data.pointer, "group_id", 8))
+	} else if (!memcmp(wrqu->data.pointer, "group_id", 8))
 		rtw_p2p_get_groupid(dev, info, wrqu, extra);
-	else if (_rtw_memcmp(wrqu->data.pointer, "inv_peer_deva", 13)) {
+	else if (!memcmp(wrqu->data.pointer, "inv_peer_deva", 13)) {
 		/*	Get the P2P device address when receiving the P2P Invitation request frame. */
 		rtw_p2p_get_peer_devaddr_by_invitation(dev, info, wrqu, extra);
-	} else if (_rtw_memcmp(wrqu->data.pointer, "op_ch", 5))
+	} else if (!memcmp(wrqu->data.pointer, "op_ch", 5))
 		rtw_p2p_get_op_ch(dev, info, wrqu, extra);
 
 	if (hal_chk_wl_func(adapt, WL_FUNC_MIRACAST)) {
-		if (_rtw_memcmp(wrqu->data.pointer, "peer_port", 9))
+		if (!memcmp(wrqu->data.pointer, "peer_port", 9))
 			rtw_p2p_get_peer_wfd_port(dev, info, wrqu, extra);
-		else if (_rtw_memcmp(wrqu->data.pointer, "wfd_sa", 6))
+		else if (!memcmp(wrqu->data.pointer, "wfd_sa", 6))
 			rtw_p2p_get_peer_wfd_session_available(dev, info, wrqu, extra);
-		else if (_rtw_memcmp(wrqu->data.pointer, "wfd_pc", 6))
+		else if (!memcmp(wrqu->data.pointer, "wfd_pc", 6))
 			rtw_p2p_get_peer_wfd_preferred_connection(dev, info, wrqu, extra);
 	}
 
@@ -5162,15 +5162,15 @@ static int rtw_p2p_get2(struct net_device *dev,
 
 	RTW_INFO("[%s] buffer = %s\n", __FUNCTION__, buffer);
 
-	if (_rtw_memcmp(buffer, "wpsCM=", 6))
+	if (!memcmp(buffer, "wpsCM=", 6))
 		ret = rtw_p2p_get_wps_configmethod(dev, info, wrqu, extra, &buffer[6]);
-	else if (_rtw_memcmp(buffer, "devN=", 5))
+	else if (!memcmp(buffer, "devN=", 5))
 		ret = rtw_p2p_get_device_name(dev, info, wrqu, extra, &buffer[5]);
-	else if (_rtw_memcmp(buffer, "dev_type=", 9))
+	else if (!memcmp(buffer, "dev_type=", 9))
 		ret = rtw_p2p_get_device_type(dev, info, wrqu, extra, &buffer[9]);
-	else if (_rtw_memcmp(buffer, "go_devadd=", 10))
+	else if (!memcmp(buffer, "go_devadd=", 10))
 		ret = rtw_p2p_get_go_device_address(dev, info, wrqu, extra, &buffer[10]);
-	else if (_rtw_memcmp(buffer, "InvProc=", 8))
+	else if (!memcmp(buffer, "InvProc=", 8))
 		ret = rtw_p2p_get_invitation_procedure(dev, info, wrqu, extra, &buffer[8]);
 	else {
 		snprintf(extra, sizeof("Command not found."), "Command not found.");
@@ -5242,7 +5242,7 @@ static int rtw_rereg_nd_name(struct net_device *dev,
 	if (0 != ret)
 		goto exit;
 
-	if (_rtw_memcmp(rereg_priv->old_ifname, "disable%d", 9)) {
+	if (!memcmp(rereg_priv->old_ifname, "disable%d", 9)) {
 		adapt->ledpriv.bRegUseLed = rereg_priv->old_bRegUseLed;
 		rtw_hal_sw_led_init(adapt);
 	}
@@ -5250,7 +5250,7 @@ static int rtw_rereg_nd_name(struct net_device *dev,
 	strncpy(rereg_priv->old_ifname, new_ifname, IFNAMSIZ);
 	rereg_priv->old_ifname[IFNAMSIZ - 1] = 0;
 
-	if (_rtw_memcmp(new_ifname, "disable%d", 9)) {
+	if (!memcmp(new_ifname, "disable%d", 9)) {
 
 		RTW_INFO("%s disable\n", __FUNCTION__);
 		/* free network queue for Android's timming issue */
@@ -6858,7 +6858,7 @@ static int rtw_wx_set_priv(struct net_device *dev,
 		u8 wps_oui[4] = {0x0, 0x50, 0xf2, 0x04};
 
 		if ((_VENDOR_SPECIFIC_IE_ == probereq_wpsie[0]) &&
-		    (_rtw_memcmp(&probereq_wpsie[2], wps_oui, 4))) {
+		    (!memcmp(&probereq_wpsie[2], wps_oui, 4))) {
 			cp_sz = probereq_wpsie_len > MAX_WPS_IE_LEN ? MAX_WPS_IE_LEN : probereq_wpsie_len;
 
 			if (pmlmepriv->wps_probe_req_ie) {
@@ -6886,7 +6886,7 @@ static int rtw_wx_set_priv(struct net_device *dev,
 	}
 
 	if (len >= WEXT_CSCAN_HEADER_SIZE
-		&& _rtw_memcmp(ext, WEXT_CSCAN_HEADER, WEXT_CSCAN_HEADER_SIZE)
+		&& !memcmp(ext, WEXT_CSCAN_HEADER, WEXT_CSCAN_HEADER_SIZE)
 	) {
 		ret = rtw_wx_set_scan(dev, info, awrq, ext);
 		goto FREE_EXT;
@@ -6913,13 +6913,13 @@ static int rtw_pm_set(struct net_device *dev,
 
 	RTW_INFO("[%s] extra = %s\n", __FUNCTION__, extra);
 
-	if (_rtw_memcmp(extra, "lps=", 4)) {
+	if (!memcmp(extra, "lps=", 4)) {
 		sscanf(extra + 4, "%u", &mode);
 		ret = rtw_pm_set_lps(adapt, mode);
-	} else if (_rtw_memcmp(extra, "ips=", 4)) {
+	} else if (!memcmp(extra, "ips=", 4)) {
 		sscanf(extra + 4, "%u", &mode);
 		ret = rtw_pm_set_ips(adapt, mode);
-	} else if (_rtw_memcmp(extra, "lps_level=", 10)) {
+	} else if (!memcmp(extra, "lps_level=", 10)) {
 		if (sscanf(extra + 10, "%u", &mode) > 0)
 			ret = rtw_pm_set_lps_level(adapt, mode);
 	} else
@@ -8162,7 +8162,7 @@ static u8 pktcmp(struct adapter * adapt, u8 *txbuf, u32 txsz, u8 *rxbuf, u32 rxs
 			 __func__, txsz - TXDESC_SIZE, rxpktsize - fcssize);
 		ret = false;
 	} else {
-		ret = _rtw_memcmp(txbuf + TXDESC_SIZE, \
+		ret = !memcmp(txbuf + TXDESC_SIZE, \
 				  rxbuf + RXDESC_SIZE + drvinfosize, \
 				  txsz - TXDESC_SIZE);
 		if (!ret)

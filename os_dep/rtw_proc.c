@@ -530,9 +530,9 @@ static int proc_get_tx_info_msg(struct seq_file *m, void *v)
 
 			plist = get_next(plist);
 
-			if ((!_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)) &&
-			    (!_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6)) &&
-			    (!_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapt), 6))) {
+			if ((memcmp(psta->cmn.mac_addr, bc_addr, 6)) &&
+			    (memcmp(psta->cmn.mac_addr, null_addr, 6)) &&
+			    (memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapt), 6))) {
 				switch (psta->cmn.bw_mode) {
 				case CHANNEL_WIDTH_20:
 					BW = "20M";

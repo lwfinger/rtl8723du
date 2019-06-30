@@ -1279,13 +1279,13 @@ static int xmitframe_addmic(struct adapter *adapt, struct xmit_frame *pxmitframe
 			pframe = pxmitframe->buf_addr + hw_hdr_offset;
 
 			if (bmcst) {
-				if (_rtw_memcmp(psecuritypriv->dot118021XGrptxmickey[psecuritypriv->dot118021XGrpKeyid].skey, null_key, 16)) {
+				if (!memcmp(psecuritypriv->dot118021XGrptxmickey[psecuritypriv->dot118021XGrpKeyid].skey, null_key, 16)) {
 					return _FAIL;
 				}
 				/* start to calculate the mic code */
 				rtw_secmicsetkey(&micdata, psecuritypriv->dot118021XGrptxmickey[psecuritypriv->dot118021XGrpKeyid].skey);
 			} else {
-				if (_rtw_memcmp(&pattrib->dot11tkiptxmickey.skey[0], null_key, 16)) {
+				if (!memcmp(&pattrib->dot11tkiptxmickey.skey[0], null_key, 16)) {
 					return _FAIL;
 				}
 				/* start to calculate the mic code */

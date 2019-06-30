@@ -229,9 +229,9 @@ struct sk_buff *rtw_os_alloc_msdu_pkt(union recv_frame *prframe, u16 nSubframe_L
 	eth_type = RTW_GET_BE16(&sub_skb->data[6]);
 
 	if (sub_skb->len >= 8 &&
-	    ((_rtw_memcmp(sub_skb->data, rtw_rfc1042_header, SNAP_SIZE) &&
+	    ((!memcmp(sub_skb->data, rtw_rfc1042_header, SNAP_SIZE) &&
 	      eth_type != ETH_P_AARP && eth_type != ETH_P_IPX) ||
-	     _rtw_memcmp(sub_skb->data, rtw_bridge_tunnel_header, SNAP_SIZE))) {
+	     !memcmp(sub_skb->data, rtw_bridge_tunnel_header, SNAP_SIZE))) {
 		/* remove RFC1042 or Bridge-Tunnel encapsulation and replace EtherType */
 		skb_pull(sub_skb, SNAP_SIZE);
 		memcpy(skb_push(sub_skb, ETH_ALEN), pdata + 6, ETH_ALEN);
@@ -326,7 +326,7 @@ void rtw_os_recv_indicate_pkt(struct adapter *adapt, struct sk_buff *pkt, union 
 
 			/* RTW_INFO("bmcast=%d\n", bmcast); */
 
-			if (!_rtw_memcmp(ehdr->h_dest, adapter_mac_addr(adapt), ETH_ALEN)) {
+			if (memcmp(ehdr->h_dest, adapter_mac_addr(adapt), ETH_ALEN)) {
 				/* RTW_INFO("not ap psta=%p, addr=%pM\n", psta, ehdr->h_dest); */
 
 				if (bmcast) {

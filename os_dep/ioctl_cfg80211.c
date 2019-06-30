@@ -577,7 +577,7 @@ static int rtw_cfg80211_clear_wps_sr_of_non_target_bss(struct adapter *adapt, st
 	u8 *wpsie = NULL;
 
 	if (pssid->SsidLength == req_ssid->ssid_len
-		&& _rtw_memcmp(pssid->Ssid, req_ssid->ssid, req_ssid->ssid_len))
+		&& !memcmp(pssid->Ssid, req_ssid->ssid, req_ssid->ssid_len))
 		goto exit;
 
 	wpsie = rtw_get_wps_ie(pnetwork->network.IEs + _FIXED_IE_LENGTH_
@@ -805,10 +805,10 @@ void rtw_cfg80211_ibss_indicate_connect(struct adapter *adapt)
 			if (!scanned)
 				rtw_warn_on(1);
 
-			if (_rtw_memcmp(&(scanned->network.Ssid),
+			if (!memcmp(&(scanned->network.Ssid),
 				        &(pnetwork->Ssid),
 				        sizeof(struct ndis_802_11_ssid)) &&
-			    _rtw_memcmp(scanned->network.MacAddress,
+			    !memcmp(scanned->network.MacAddress,
 					pnetwork->MacAddress, 6)) {
 				if (!rtw_cfg80211_inform_bss(adapt, scanned))
 					RTW_INFO(FUNC_ADPT_FMT" inform fail !!\n", FUNC_ADPT_ARG(adapt));
@@ -877,8 +877,8 @@ void rtw_cfg80211_indicate_connect(struct adapter *adapt)
 			goto check_bss;
 		}
 
-		if (_rtw_memcmp(scanned->network.MacAddress, pnetwork->MacAddress, 6)
-			&& _rtw_memcmp(&(scanned->network.Ssid), &(pnetwork->Ssid), sizeof(struct ndis_802_11_ssid))
+		if (!memcmp(scanned->network.MacAddress, pnetwork->MacAddress, 6)
+			&& !memcmp(&(scanned->network.Ssid), &(pnetwork->Ssid), sizeof(struct ndis_802_11_ssid))
 		) {
 			if (!rtw_cfg80211_inform_bss(adapt, scanned))
 				RTW_INFO(FUNC_ADPT_FMT" inform fail !!\n", FUNC_ADPT_ARG(adapt));
@@ -1806,7 +1806,7 @@ static int cfg80211_rtw_get_station(struct wiphy *wiphy,
 	) {
 		struct wlan_network  *cur_network = &(pmlmepriv->cur_network);
 
-		if (!_rtw_memcmp((u8 *)mac, cur_network->network.MacAddress, ETH_ALEN)) {
+		if (memcmp((u8 *)mac, cur_network->network.MacAddress, ETH_ALEN)) {
 			RTW_INFO("%s, mismatch bssid="MAC_FMT"\n", __func__, MAC_ARG(cur_network->network.MacAddress));
 			ret = -ENOENT;
 			goto exit;
@@ -2373,7 +2373,7 @@ static int cfg80211_rtw_scan(struct wiphy *wiphy
 
 	if (pwdinfo->driver_interface == DRIVER_CFG80211) {
 		if (ssids->ssid
-			&& _rtw_memcmp(ssids->ssid, "DIRECT-", 7)
+			&& !memcmp(ssids->ssid, "DIRECT-", 7)
 			&& rtw_get_p2p_ie((u8 *)request->ie, request->ie_len, NULL, NULL)
 		) {
 			if (rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE))
@@ -3276,7 +3276,7 @@ static int cfg80211_rtw_set_pmksa(struct wiphy *wiphy,
 	RTW_INFO(FUNC_NDEV_FMT" "MAC_FMT" "KEY_FMT"\n", FUNC_NDEV_ARG(ndev)
 		, MAC_ARG(pmksa->bssid), KEY_ARG(pmksa->pmkid));
 
-	if (_rtw_memcmp((u8 *)pmksa->bssid, strZeroMacAddress, ETH_ALEN))
+	if (!memcmp((u8 *)pmksa->bssid, strZeroMacAddress, ETH_ALEN))
 		return -EINVAL;
 
 	if (!check_fwstate(mlme, _FW_LINKED)) {
@@ -3288,7 +3288,7 @@ static int cfg80211_rtw_set_pmksa(struct wiphy *wiphy,
 
 	/* overwrite PMKID */
 	for (index = 0 ; index < NUM_PMKID_CACHE; index++) {
-		if (_rtw_memcmp(psecuritypriv->PMKIDList[index].Bssid, (u8 *)pmksa->bssid, ETH_ALEN)) {
+		if (!memcmp(psecuritypriv->PMKIDList[index].Bssid, (u8 *)pmksa->bssid, ETH_ALEN)) {
 			/* BSSID is matched, the same AP => rewrite with new PMKID. */
 			RTW_INFO(FUNC_NDEV_FMT" BSSID exists in the PMKList.\n", FUNC_NDEV_ARG(ndev));
 
@@ -3329,7 +3329,7 @@ static int cfg80211_rtw_del_pmksa(struct wiphy *wiphy,
 		, MAC_ARG(pmksa->bssid), KEY_ARG(pmksa->pmkid));
 
 	for (index = 0 ; index < NUM_PMKID_CACHE; index++) {
-		if (_rtw_memcmp(psecuritypriv->PMKIDList[index].Bssid, (u8 *)pmksa->bssid, ETH_ALEN)) {
+		if (!memcmp(psecuritypriv->PMKIDList[index].Bssid, (u8 *)pmksa->bssid, ETH_ALEN)) {
 			/* BSSID is matched, the same AP => Remove this PMKID information and reset it. */
 			memset(psecuritypriv->PMKIDList[index].Bssid, 0x00, ETH_ALEN);
 			memset(psecuritypriv->PMKIDList[index].PMKID, 0x00, WLAN_PMKID_LEN);
@@ -4128,7 +4128,7 @@ static int	cfg80211_rtw_del_station(struct wiphy *wiphy, struct net_device *ndev
 
 		plist = get_next(plist);
 
-		if (_rtw_memcmp((u8 *)target_mac, psta->cmn.mac_addr, ETH_ALEN)) {
+		if (!memcmp((u8 *)target_mac, psta->cmn.mac_addr, ETH_ALEN)) {
 			if (psta->dot8021xalg == 1 && !psta->bpairwise_key_installed)
 				RTW_INFO("%s, sta's dot8021xalg = 1 and key_installed = false\n", __func__);
 			else {

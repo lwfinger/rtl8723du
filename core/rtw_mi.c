@@ -1082,7 +1082,7 @@ struct adapter *rtw_get_iface_by_macddr(struct adapter *adapt, u8 *mac_addr)
 
 	for (i = 0; i < dvobj->iface_nums; i++) {
 		iface = dvobj->adapters[i];
-		if ((iface) && (_rtw_memcmp(mac_addr, adapter_mac_addr(iface), ETH_ALEN))) {
+		if ((iface) && (!memcmp(mac_addr, adapter_mac_addr(iface), ETH_ALEN))) {
 			bmatch = true;
 			break;
 		}
@@ -1123,10 +1123,10 @@ static void rtw_dbg_skb_process(struct adapter *adapt, union recv_frame *precvfr
 	if (precvframe->u.hdr.len != pcloneframe->u.hdr.len)
 		RTW_INFO("%s [WARN]  recv_frame length(%d:%d) compare failed\n", __func__, precvframe->u.hdr.len, pcloneframe->u.hdr.len);
 
-	if (!_rtw_memcmp(&precvframe->u.hdr.attrib, &pcloneframe->u.hdr.attrib, sizeof(struct rx_pkt_attrib)))
+	if (memcmp(&precvframe->u.hdr.attrib, &pcloneframe->u.hdr.attrib, sizeof(struct rx_pkt_attrib)))
 		RTW_INFO("%s [WARN]  recv_frame attrib compare failed\n", __func__);
 
-	if (!_rtw_memcmp(precvframe->u.hdr.rx_data, pcloneframe->u.hdr.rx_data, precvframe->u.hdr.len))
+	if (memcmp(precvframe->u.hdr.rx_data, pcloneframe->u.hdr.rx_data, precvframe->u.hdr.len))
 		RTW_INFO("%s [WARN]  recv_frame rx_data compare failed\n", __func__);
 
 }

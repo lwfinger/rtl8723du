@@ -1506,7 +1506,7 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 	psecuritypriv->wpa_pairwise_cipher = _NO_PRIVACY_;
 	for (p = ie + _BEACON_IE_OFFSET_; ; p += (ie_len + 2)) {
 		p = rtw_get_ie(p, _SSN_IE_1_, &ie_len, (pbss_network->IELength - _BEACON_IE_OFFSET_ - (ie_len + 2)));
-		if ((p) && (_rtw_memcmp(p + 2, OUI1, 4))) {
+		if ((p) && (!memcmp(p + 2, OUI1, 4))) {
 			if (rtw_parse_wpa_ie(p, ie_len + 2, &group_cipher, &pairwise_cipher, NULL) == _SUCCESS) {
 				psecuritypriv->dot11AuthAlgrthm = dot11AuthAlgrthm_8021X;
 
@@ -1536,7 +1536,7 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 	if (pregistrypriv->wmm_enable) {
 		for (p = ie + _BEACON_IE_OFFSET_; ; p += (ie_len + 2)) {
 			p = rtw_get_ie(p, _VENDOR_SPECIFIC_IE_, &ie_len, (pbss_network->IELength - _BEACON_IE_OFFSET_ - (ie_len + 2)));
-			if ((p) && _rtw_memcmp(p + 2, WMM_PARA_IE, 6)) {
+			if ((p) && !memcmp(p + 2, WMM_PARA_IE, 6)) {
 				pmlmepriv->qospriv.qos_option = 1;
 
 				*(p + 8) |= BIT(7); /* QoS Info, support U-APSD */
@@ -1812,7 +1812,7 @@ int rtw_acl_add_sta(struct adapter *adapter, const u8 *addr)
 		acl_node = container_of(list, struct rtw_wlan_acl_node, list);
 		list = get_next(list);
 
-		if (_rtw_memcmp(acl_node->addr, addr, ETH_ALEN)) {
+		if (!memcmp(acl_node->addr, addr, ETH_ALEN)) {
 			if (acl_node->valid) {
 				existed = 1;
 				break;
@@ -1876,7 +1876,7 @@ int rtw_acl_remove_sta(struct adapter *adapter, const u8 *addr)
 		acl_node = container_of(list, struct rtw_wlan_acl_node, list);
 		list = get_next(list);
 
-		if (is_baddr || _rtw_memcmp(acl_node->addr, addr, ETH_ALEN)) {
+		if (is_baddr || !memcmp(acl_node->addr, addr, ETH_ALEN)) {
 			if (acl_node->valid) {
 				acl_node->valid = false;
 				rtw_list_delete(&acl_node->list);
@@ -2172,7 +2172,7 @@ static void update_bcn_ext_capab_ie(struct adapter *adapt)
 		rtw_remove_bcn_ie(adapt, pnetwork, _EXT_CAP_IE_);
 
 	if ((pmlmepriv->ext_capab_ie_len > 0) &&
-	    (!_rtw_memcmp(pmlmepriv->ext_capab_ie_data, null_extcap_data, sizeof(null_extcap_data))))
+	    (memcmp(pmlmepriv->ext_capab_ie_data, null_extcap_data, sizeof(null_extcap_data))))
 		rtw_add_bcn_ie(adapt, pnetwork, _EXT_CAP_IE_, pmlmepriv->ext_capab_ie_data, pmlmepriv->ext_capab_ie_len);
 
 }
@@ -2377,13 +2377,13 @@ static void update_bcn_vendor_spec_ie(struct adapter *adapt, u8 *oui)
 {
 	RTW_INFO("%s\n", __FUNCTION__);
 
-	if (_rtw_memcmp(RTW_WPA_OUI, oui, 4))
+	if (!memcmp(RTW_WPA_OUI, oui, 4))
 		update_bcn_wpa_ie(adapt);
-	else if (_rtw_memcmp(WMM_OUI, oui, 4))
+	else if (!memcmp(WMM_OUI, oui, 4))
 		update_bcn_wmm_ie(adapt);
-	else if (_rtw_memcmp(WPS_OUI, oui, 4))
+	else if (!memcmp(WPS_OUI, oui, 4))
 		update_bcn_wps_ie(adapt);
-	else if (_rtw_memcmp(P2P_OUI, oui, 4))
+	else if (!memcmp(P2P_OUI, oui, 4))
 		update_bcn_p2p_ie(adapt);
 	else
 		RTW_INFO("unknown OUI type!\n");

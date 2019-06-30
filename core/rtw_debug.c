@@ -549,9 +549,9 @@ int proc_get_rx_stat(struct seq_file *m, void *v)
 
 			if (!pstats)
 				continue;
-			if ((_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6) !=  true)
-				&& (!_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6))
-				&& (!_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapter), 6))) {
+			if ((memcmp(psta->cmn.mac_addr, bc_addr, 6))
+				&& (memcmp(psta->cmn.mac_addr, null_addr, 6))
+				&& (memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapter), 6))) {
 				RTW_PRINT_SEL(m, "MAC :\t\t"MAC_FMT "\n", MAC_ARG(psta->cmn.mac_addr));
 				RTW_PRINT_SEL(m, "data_rx_cnt :\t%llu\n", sta_rx_data_uc_pkts(psta) - pstats->last_rx_data_uc_pkts);
 				pstats->last_rx_data_uc_pkts = sta_rx_data_uc_pkts(psta);
@@ -595,9 +595,9 @@ int proc_get_tx_stat(struct seq_file *m, void *v)
 		while ((!rtw_end_of_queue_search(phead, plist))) {
 			psta = container_of(plist, struct sta_info, hash_list);
 			plist = get_next(plist);
-			if ((!_rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)) &&
-			    (!_rtw_memcmp(psta->cmn.mac_addr, null_addr, 6)) &&
-			    (!_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapter), 6))) {
+			if ((memcmp(psta->cmn.mac_addr, bc_addr, 6)) &&
+			    (memcmp(psta->cmn.mac_addr, null_addr, 6)) &&
+			    (memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapter), 6))) {
 				sta_rec[macid_rec_idx++] = psta;
 			}
 		}
@@ -3296,7 +3296,7 @@ ssize_t proc_set_tx_sa_query(struct file *file, const char __user *buffer, size_
 
 		for (index = 0; index < macid_ctl->num && index < NUM_STA; index++) {
 			if (rtw_macid_is_used(macid_ctl, index) && !rtw_macid_is_bmc(macid_ctl, index)) {
-				if (!_rtw_memcmp(get_my_bssid(&(pmlmeinfo->network)), &mac_addr[index][0], ETH_ALEN)
+				if (memcmp(get_my_bssid(&(pmlmeinfo->network)), &mac_addr[index][0], ETH_ALEN)
 				    && !IS_MCAST(&mac_addr[index][0])) {
 					issue_action_SA_Query(adapt, &mac_addr[index][0], 0, 0, (u8)key_type);
 					RTW_INFO("STA[%u]:"MAC_FMT"\n", index , MAC_ARG(&mac_addr[index][0]));
@@ -3384,7 +3384,7 @@ ssize_t proc_set_tx_deauth(struct file *file, const char __user *buffer, size_t 
 
 		for (index = 0; index < macid_ctl->num && index < NUM_STA; index++) {
 			if (rtw_macid_is_used(macid_ctl, index) && !rtw_macid_is_bmc(macid_ctl, index)) {
-				if (!_rtw_memcmp(get_my_bssid(&(pmlmeinfo->network)), &mac_addr[index][0], ETH_ALEN)) {
+				if (memcmp(get_my_bssid(&(pmlmeinfo->network)), &mac_addr[index][0], ETH_ALEN)) {
 					if (key_type != 3)
 						issue_deauth_11w(adapt, &mac_addr[index][0], 0, (u8)key_type);
 

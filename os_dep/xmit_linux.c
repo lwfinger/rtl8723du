@@ -322,9 +322,9 @@ static int rtw_mlcst2unicst(struct adapter *adapt, struct sk_buff *skb)
 		}
 
 		/* avoid come from STA1 and send back STA1 */
-		if (_rtw_memcmp(psta->cmn.mac_addr, &skb->data[6], 6)
-			|| _rtw_memcmp(psta->cmn.mac_addr, null_addr, 6)
-			|| _rtw_memcmp(psta->cmn.mac_addr, bc_addr, 6)
+		if (!memcmp(psta->cmn.mac_addr, &skb->data[6], 6)
+			|| !memcmp(psta->cmn.mac_addr, null_addr, 6)
+			|| !memcmp(psta->cmn.mac_addr, bc_addr, 6)
 		) {
 			DBG_COUNTER(adapt->tx_logs.os_tx_m2u_ignore_self);
 			continue;

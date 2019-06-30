@@ -1673,7 +1673,7 @@ int rtw_hal_customer_str_write(struct adapter *adapter, const u8 *cs)
 	_enter_critical_mutex(&dvobj->customer_str_mutex, NULL);
 	dvobj->customer_str_sctx = NULL;
 	if (sctx.status == RTW_SCTX_DONE_SUCCESS) {
-		if (!_rtw_memcmp(cs, dvobj->customer_str, RTW_CUSTOMER_STR_LEN)) {
+		if (memcmp(cs, dvobj->customer_str, RTW_CUSTOMER_STR_LEN)) {
 			RTW_WARN("%s read back check fail\n", __func__);
 			RTW_INFO_DUMP("write req: ", cs, RTW_CUSTOMER_STR_LEN);
 			RTW_INFO_DUMP("read back: ", dvobj->customer_str, RTW_CUSTOMER_STR_LEN);
@@ -2028,7 +2028,7 @@ static u8 _rtw_mbid_cam_search_by_macaddr(struct adapter *adapter, u8 *mac_addr)
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 
 	for (i = 0; i < TOTAL_MBID_CAM_NUM; i++) {
-		if (mac_addr && _rtw_memcmp(dvobj->mbid_cam_cache[i].mac_addr, mac_addr, ETH_ALEN)) {
+		if (mac_addr && !memcmp(dvobj->mbid_cam_cache[i].mac_addr, mac_addr, ETH_ALEN)) {
 			cam_id = i;
 			break;
 		}

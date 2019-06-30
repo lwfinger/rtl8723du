@@ -1974,7 +1974,7 @@ u32	rtw_BIP_verify(struct adapter *adapt, u8 *whdr_pos, int flen
 		goto BIP_exit;
 
 	/* MIC field should be last 8 bytes of packet (packet without FCS) */
-	if (_rtw_memcmp(mic, whdr_pos + flen - 8, 8)) {
+	if (!memcmp(mic, whdr_pos + flen - 8, 8)) {
 		*ipn = pkt_ipn;
 		res = _SUCCESS;
 	} else

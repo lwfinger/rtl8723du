@@ -994,7 +994,7 @@ static bool cam_cache_chk(struct adapter *adapter, u8 id, u8 *addr, s16 kid, s8 
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	bool ret = false;
 
-	if (addr && !_rtw_memcmp(dvobj->cam_cache[id].mac, addr, ETH_ALEN))
+	if (addr && memcmp(dvobj->cam_cache[id].mac, addr, ETH_ALEN))
 		goto exit;
 	if (kid >= 0 && kid != (dvobj->cam_cache[id].ctrl & 0x03))
 		goto exit;
@@ -1363,7 +1363,7 @@ int WMM_param_handler(struct adapter *adapt, struct ndis_802_11_variable_ies *	p
 		return false;
 	}
 
-	if (_rtw_memcmp(&(pmlmeinfo->WMM_param), (pIE->data + 6), sizeof(struct WMM_para_element)))
+	if (!memcmp(&(pmlmeinfo->WMM_param), (pIE->data + 6), sizeof(struct WMM_para_element)))
 		return false;
 	else
 		memcpy(&(pmlmeinfo->WMM_param), (pIE->data + 6), sizeof(struct WMM_para_element));
@@ -2008,7 +2008,7 @@ int rtw_check_bcn_info(struct adapter *Adapter, u8 *pframe, u32 packet_len)
 		return _FAIL;
 	}
 
-	if (!_rtw_memcmp(cur_network->network.MacAddress, pbssid, 6)) {
+	if (memcmp(cur_network->network.MacAddress, pbssid, 6)) {
 		RTW_WARN("Oops: rtw_check_network_encrypt linked but recv other bssid bcn\n" MAC_FMT MAC_FMT,
 			MAC_ARG(pbssid), MAC_ARG(cur_network->network.MacAddress));
 		return true;
@@ -2024,10 +2024,10 @@ int rtw_check_bcn_info(struct adapter *Adapter, u8 *pframe, u32 packet_len)
 		recv_beacon.ssid_len = pmlmepriv->cur_beacon_keys.ssid_len;
 	}
 
-	if (_rtw_memcmp(&recv_beacon, &pmlmepriv->cur_beacon_keys, sizeof(recv_beacon)))
+	if (!memcmp(&recv_beacon, &pmlmepriv->cur_beacon_keys, sizeof(recv_beacon)))
 		pmlmepriv->new_beacon_cnts = 0;
 	else if ((pmlmepriv->new_beacon_cnts == 0) ||
-		!_rtw_memcmp(&recv_beacon, &pmlmepriv->new_beacon_keys, sizeof(recv_beacon))) {
+		memcmp(&recv_beacon, &pmlmepriv->new_beacon_keys, sizeof(recv_beacon))) {
 		RTW_DBG("%s: start new beacon (seq=%d)\n", __func__, GetSequence(pframe));
 
 		if (pmlmepriv->new_beacon_cnts == 0) {
@@ -2050,7 +2050,7 @@ int rtw_check_bcn_info(struct adapter *Adapter, u8 *pframe, u32 packet_len)
 		/* check bw mode change only? */
 		pmlmepriv->cur_beacon_keys.ht_cap_info = recv_beacon.ht_cap_info;
 		pmlmepriv->cur_beacon_keys.ht_info_infos_0_sco = recv_beacon.ht_info_infos_0_sco;
-		if (!_rtw_memcmp(&recv_beacon, &pmlmepriv->cur_beacon_keys,
+		if (memcmp(&recv_beacon, &pmlmepriv->cur_beacon_keys,
 				sizeof(recv_beacon))) {
 			/* beacon is changed, have to do disconnect/connect */
 			RTW_WARN("%s: new beacon occur!!\n", __func__);
@@ -2092,7 +2092,7 @@ void update_beacon_info(struct adapter *adapt, u8 *pframe, uint pkt_len, struct 
 		switch (pIE->ElementID) {
 		case _VENDOR_SPECIFIC_IE_:
 			/* to update WMM paramter set while receiving beacon */
-			if (_rtw_memcmp(pIE->data, WMM_PARA_OUI, 6) && pIE->Length == WLAN_WMM_LEN)	/* WMM */
+			if (!memcmp(pIE->data, WMM_PARA_OUI, 6) && pIE->Length == WLAN_WMM_LEN)	/* WMM */
 				if (WMM_param_handler(adapt, pIE))
 					 report_wmm_edca_update(adapt);
 			break;
@@ -2158,12 +2158,12 @@ unsigned int is_ap_in_tkip(struct adapter *adapt)
 
 			switch (pIE->ElementID) {
 			case _VENDOR_SPECIFIC_IE_:
-				if ((_rtw_memcmp(pIE->data, RTW_WPA_OUI, 4)) && (_rtw_memcmp((pIE->data + 12), WPA_TKIP_CIPHER, 4)))
+				if ((!memcmp(pIE->data, RTW_WPA_OUI, 4)) && (!memcmp((pIE->data + 12), WPA_TKIP_CIPHER, 4)))
 					return true;
 				break;
 
 			case _RSN_IE_2_:
-				if (_rtw_memcmp((pIE->data + 8), RSN_TKIP_CIPHER, 4))
+				if (!memcmp((pIE->data + 8), RSN_TKIP_CIPHER, 4))
 					return true;
 
 			default:
@@ -2192,15 +2192,15 @@ unsigned int should_forbid_n_rate(struct adapter *adapt)
 
 			switch (pIE->ElementID) {
 			case _VENDOR_SPECIFIC_IE_:
-				if (_rtw_memcmp(pIE->data, RTW_WPA_OUI, 4) &&
-				    ((_rtw_memcmp((pIE->data + 12), WPA_CIPHER_SUITE_CCMP, 4)) ||
-				     (_rtw_memcmp((pIE->data + 16), WPA_CIPHER_SUITE_CCMP, 4))))
+				if (!memcmp(pIE->data, RTW_WPA_OUI, 4) &&
+				    ((!memcmp((pIE->data + 12), WPA_CIPHER_SUITE_CCMP, 4)) ||
+				     (!memcmp((pIE->data + 16), WPA_CIPHER_SUITE_CCMP, 4))))
 					return false;
 				break;
 
 			case _RSN_IE_2_:
-				if ((_rtw_memcmp((pIE->data + 8), RSN_CIPHER_SUITE_CCMP, 4))  ||
-				    (_rtw_memcmp((pIE->data + 12), RSN_CIPHER_SUITE_CCMP, 4)))
+				if ((!memcmp((pIE->data + 8), RSN_CIPHER_SUITE_CCMP, 4))  ||
+				    (!memcmp((pIE->data + 12), RSN_CIPHER_SUITE_CCMP, 4)))
 					return false;
 
 			default:
@@ -2231,7 +2231,7 @@ unsigned int is_ap_in_wep(struct adapter *adapt)
 
 			switch (pIE->ElementID) {
 			case _VENDOR_SPECIFIC_IE_:
-				if (_rtw_memcmp(pIE->data, RTW_WPA_OUI, 4))
+				if (!memcmp(pIE->data, RTW_WPA_OUI, 4))
 					return false;
 				break;
 
@@ -2440,24 +2440,24 @@ unsigned char check_assoc_AP(u8 *pframe, uint len)
 
 		switch (pIE->ElementID) {
 		case _VENDOR_SPECIFIC_IE_:
-			if ((_rtw_memcmp(pIE->data, ARTHEROS_OUI1, 3)) || (_rtw_memcmp(pIE->data, ARTHEROS_OUI2, 3))) {
+			if ((!memcmp(pIE->data, ARTHEROS_OUI1, 3)) || (!memcmp(pIE->data, ARTHEROS_OUI2, 3))) {
 				RTW_INFO("link to Artheros AP\n");
 				return HT_IOT_PEER_ATHEROS;
-			} else if ((_rtw_memcmp(pIE->data, BROADCOM_OUI1, 3))
-				   || (_rtw_memcmp(pIE->data, BROADCOM_OUI2, 3))
-				|| (_rtw_memcmp(pIE->data, BROADCOM_OUI3, 3))) {
+			} else if ((!memcmp(pIE->data, BROADCOM_OUI1, 3))
+				   || (!memcmp(pIE->data, BROADCOM_OUI2, 3))
+				|| (!memcmp(pIE->data, BROADCOM_OUI3, 3))) {
 				RTW_INFO("link to Broadcom AP\n");
 				return HT_IOT_PEER_BROADCOM;
-			} else if (_rtw_memcmp(pIE->data, MARVELL_OUI, 3)) {
+			} else if (!memcmp(pIE->data, MARVELL_OUI, 3)) {
 				RTW_INFO("link to Marvell AP\n");
 				return HT_IOT_PEER_MARVELL;
-			} else if (_rtw_memcmp(pIE->data, RALINK_OUI, 3)) {
+			} else if (!memcmp(pIE->data, RALINK_OUI, 3)) {
 				RTW_INFO("link to Ralink AP\n");
 				return HT_IOT_PEER_RALINK;
-			} else if (_rtw_memcmp(pIE->data, CISCO_OUI, 3)) {
+			} else if (!memcmp(pIE->data, CISCO_OUI, 3)) {
 				RTW_INFO("link to Cisco AP\n");
 				return HT_IOT_PEER_CISCO;
-			} else if (_rtw_memcmp(pIE->data, REALTEK_OUI, 3)) {
+			} else if (!memcmp(pIE->data, REALTEK_OUI, 3)) {
 				u32	Vender = HT_IOT_PEER_REALTEK;
 
 				if (pIE->Length >= 5) {
@@ -2488,7 +2488,7 @@ unsigned char check_assoc_AP(u8 *pframe, uint len)
 
 				RTW_INFO("link to Realtek AP\n");
 				return Vender;
-			} else if (_rtw_memcmp(pIE->data, AIRGOCAP_OUI, 3)) {
+			} else if (!memcmp(pIE->data, AIRGOCAP_OUI, 3)) {
 				RTW_INFO("link to Airgo Cap\n");
 				return HT_IOT_PEER_AIRGO;
 			} else
@@ -3015,12 +3015,12 @@ void rtw_alloc_macid(struct adapter *adapt, struct sta_info *psta)
 	u8 last_id = 0;
 	u8 is_bc_sta = false;
 
-	if (_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapt), ETH_ALEN)) {
+	if (!memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapt), ETH_ALEN)) {
 		psta->cmn.mac_id = macid_ctl->num;
 		return;
 	}
 
-	if (_rtw_memcmp(psta->cmn.mac_addr, bc_addr, ETH_ALEN)) {
+	if (!memcmp(psta->cmn.mac_addr, bc_addr, ETH_ALEN)) {
 		is_bc_sta = true;
 		rtw_iface_bcmc_id_set(adapt, INVALID_SEC_MAC_CAM_ID);	/*init default value*/
 	}
@@ -3101,7 +3101,7 @@ void rtw_release_macid(struct adapter *adapt, struct sta_info *psta)
 	u8 ifbmp;
 	int i;
 
-	if (_rtw_memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapt), ETH_ALEN))
+	if (!memcmp(psta->cmn.mac_addr, adapter_mac_addr(adapt), ETH_ALEN))
 		goto exit;
 
 	if (psta->cmn.mac_id >= macid_ctl->num) {
@@ -3136,7 +3136,7 @@ void rtw_release_macid(struct adapter *adapt, struct sta_info *psta)
 		goto exit;
 	}
 
-	if (_rtw_memcmp(psta->cmn.mac_addr, bc_addr, ETH_ALEN)) {
+	if (!memcmp(psta->cmn.mac_addr, bc_addr, ETH_ALEN)) {
 		struct cam_ctl_t *cam_ctl = dvobj_to_sec_camctl(dvobj);
 		u8 id = rtw_iface_bcmc_id_get(adapt);
 
@@ -3392,7 +3392,7 @@ struct adapter *dvobj_get_adapter_by_addr(struct dvobj_priv *dvobj, u8 *addr)
 	int i;
 
 	for (i = 0; i < dvobj->iface_nums; i++) {
-		if (_rtw_memcmp(dvobj->adapters[i]->mac_addr, addr, ETH_ALEN))
+		if (!memcmp(dvobj->adapters[i]->mac_addr, addr, ETH_ALEN))
 			break;
 	}
 

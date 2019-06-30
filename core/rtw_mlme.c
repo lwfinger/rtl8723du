@@ -425,7 +425,7 @@ struct wlan_network *_rtw_find_network(struct __queue *scanned_queue, u8 *addr)
 	u8 zero_addr[ETH_ALEN] = {0, 0, 0, 0, 0, 0};
 
 
-	if (_rtw_memcmp(zero_addr, addr, ETH_ALEN)) {
+	if (!memcmp(zero_addr, addr, ETH_ALEN)) {
 		pnetwork = NULL;
 		goto exit;
 	}
@@ -438,7 +438,7 @@ struct wlan_network *_rtw_find_network(struct __queue *scanned_queue, u8 *addr)
 	while (plist != phead) {
 		pnetwork = container_of(plist, struct wlan_network , list);
 
-		if (_rtw_memcmp(addr, pnetwork->network.MacAddress, ETH_ALEN))
+		if (!memcmp(addr, pnetwork->network.MacAddress, ETH_ALEN))
 			break;
 
 		plist = get_next(plist);
@@ -629,7 +629,7 @@ int rtw_is_same_ibss(struct adapter *adapter, struct wlan_network *pnetwork)
 inline int is_same_ess(struct wlan_bssid_ex *a, struct wlan_bssid_ex *b)
 {
 	return (a->Ssid.SsidLength == b->Ssid.SsidLength)
-	       &&  _rtw_memcmp(a->Ssid.Ssid, b->Ssid.Ssid, a->Ssid.SsidLength);
+	       &&  !memcmp(a->Ssid.Ssid, b->Ssid.Ssid, a->Ssid.SsidLength);
 }
 
 int is_same_network(struct wlan_bssid_ex *src, struct wlan_bssid_ex *dst, u8 feature)
@@ -647,7 +647,7 @@ int is_same_network(struct wlan_bssid_ex *src, struct wlan_bssid_ex *dst, u8 fea
 	d_cap = le16_to_cpu(le_tmp);
 
 	if ((feature == 1) && /* 1: P2P supported */
-	    (_rtw_memcmp(src->MacAddress, dst->MacAddress, ETH_ALEN))
+	    (!memcmp(src->MacAddress, dst->MacAddress, ETH_ALEN))
 	   )
 		return true;
 
@@ -666,11 +666,11 @@ int is_same_network(struct wlan_bssid_ex *src, struct wlan_bssid_ex *dst, u8 fea
 	  * For customer request.
 	  */
 	  
-	if (((_rtw_memcmp(src->MacAddress, dst->MacAddress, ETH_ALEN))) &&
+	if (((!memcmp(src->MacAddress, dst->MacAddress, ETH_ALEN))) &&
 		((s_cap & WLAN_CAPABILITY_IBSS) == (d_cap & WLAN_CAPABILITY_IBSS)) &&
 		((s_cap & WLAN_CAPABILITY_BSS) == (d_cap & WLAN_CAPABILITY_BSS))) {
 		if ((src->Ssid.SsidLength == dst->Ssid.SsidLength) && 
-			(((_rtw_memcmp(src->Ssid.Ssid, dst->Ssid.Ssid, src->Ssid.SsidLength))) || //Case of normal AP
+			(((!memcmp(src->Ssid.Ssid, dst->Ssid.Ssid, src->Ssid.SsidLength))) || //Case of normal AP
 			(is_all_null(src->Ssid.Ssid, src->Ssid.SsidLength) || is_all_null(dst->Ssid.Ssid, dst->Ssid.SsidLength)))) //Case of hidden AP
 			return true;
 		else if ((src->Ssid.SsidLength == 0 || dst->Ssid.SsidLength == 0)) //Case of hidden AP
@@ -861,7 +861,7 @@ bool rtw_update_scanned_network(struct adapter *adapter, struct wlan_bssid_ex *t
 		rtw_bug_check(pnetwork, pnetwork, pnetwork, pnetwork);
 
 		if (!rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE) &&
-		    (_rtw_memcmp(pnetwork->network.MacAddress, target->MacAddress, ETH_ALEN))) {
+		    (!memcmp(pnetwork->network.MacAddress, target->MacAddress, ETH_ALEN))) {
 			target_find = 1;
 			break;
 		}
@@ -1080,7 +1080,7 @@ void rtw_survey_event_callback(struct adapter	*adapter, u8 *pbuf)
 
 	/* update IBSS_network 's timestamp */
 	if ((check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE))) {
-		if (_rtw_memcmp(&(pmlmepriv->cur_network.network.MacAddress), pnetwork->MacAddress, ETH_ALEN)) {
+		if (!memcmp(&(pmlmepriv->cur_network.network.MacAddress), pnetwork->MacAddress, ETH_ALEN)) {
 			struct wlan_network *ibss_wlan = NULL;
 			unsigned long	irqL;
 
@@ -1752,7 +1752,7 @@ void rtw_joinbss_event_prehandle(struct adapter *adapter, u8 *pbuf)
 
 	rtw_get_encrypt_decrypt_from_registrypriv(adapter);
 
-	the_same_macaddr = _rtw_memcmp(pnetwork->network.MacAddress, cur_network->network.MacAddress, ETH_ALEN);
+	the_same_macaddr = !memcmp(pnetwork->network.MacAddress, cur_network->network.MacAddress, ETH_ALEN);
 
 	pnetwork->network.Length = get_wlan_bssid_ex_sz(&pnetwork->network);
 	if (pnetwork->network.Length > sizeof(struct wlan_bssid_ex)) {
@@ -2154,7 +2154,7 @@ u8 rtw_ft_chk_roaming_candidate(
 			_MDIE_, &mdie_len, competitor->network.IELength-12)))
 		return false;
 
-	if (!_rtw_memcmp(&pft_roam->mdid, (pmdie+2), 2))
+	if (memcmp(&pft_roam->mdid, (pmdie+2), 2))
 		return false;
 
 	/*The candidate don't support over-the-DS*/
@@ -2964,7 +2964,7 @@ static int rtw_check_roaming_candidate(struct mlme_priv *mlme
 
 	/* got specific addr to roam */
 	if (!is_zero_mac_addr(mlme->roam_tgt_addr)) {
-		if (_rtw_memcmp(mlme->roam_tgt_addr, competitor->network.MacAddress, ETH_ALEN))
+		if (!memcmp(mlme->roam_tgt_addr, competitor->network.MacAddress, ETH_ALEN))
 			goto update;
 		else
 			goto exit;
@@ -3038,7 +3038,7 @@ int rtw_select_roaming_candidate(struct mlme_priv *mlme)
 			 candidate->network.Configuration.DSConfig);
 		mlme->roam_network = candidate;
 
-		if (_rtw_memcmp(candidate->network.MacAddress, mlme->roam_tgt_addr, ETH_ALEN))
+		if (!memcmp(candidate->network.MacAddress, mlme->roam_tgt_addr, ETH_ALEN))
 			memset(mlme->roam_tgt_addr, 0, ETH_ALEN);
 	}
 
@@ -3065,14 +3065,14 @@ static int rtw_check_join_candidate(struct mlme_priv *mlme
 
 	/* check bssid, if needed */
 	if (mlme->assoc_by_bssid) {
-		if (!_rtw_memcmp(competitor->network.MacAddress, mlme->assoc_bssid, ETH_ALEN))
+		if (memcmp(competitor->network.MacAddress, mlme->assoc_bssid, ETH_ALEN))
 			goto exit;
 	}
 
 	/* check ssid, if needed */
 	if (mlme->assoc_ssid.Ssid[0] && mlme->assoc_ssid.SsidLength) {
 		if (competitor->network.Ssid.SsidLength != mlme->assoc_ssid.SsidLength
-		    || !_rtw_memcmp(competitor->network.Ssid.Ssid, mlme->assoc_ssid.Ssid, mlme->assoc_ssid.SsidLength)
+		    || memcmp(competitor->network.Ssid.Ssid, mlme->assoc_ssid.Ssid, mlme->assoc_ssid.SsidLength)
 		   )
 			goto exit;
 	}
@@ -3368,7 +3368,7 @@ static int SecIsInPMKIDList(struct adapter *Adapter, u8 *bssid)
 
 	do {
 		if ((psecuritypriv->PMKIDList[i].bUsed) &&
-		    (_rtw_memcmp(psecuritypriv->PMKIDList[i].Bssid, bssid, ETH_ALEN)))
+		    (!memcmp(psecuritypriv->PMKIDList[i].Bssid, bssid, ETH_ALEN)))
 			break;
 		else {
 			i++;
@@ -3405,7 +3405,7 @@ static int rtw_rsn_sync_pmkid(struct adapter *adapter, u8 *ie, uint ie_len, int 
 	if (i_ent < 0 && info.pmkid_cnt == 0)
 		goto exit;
 
-	if (i_ent >= 0 && info.pmkid_cnt == 1 && _rtw_memcmp(info.pmkid_list, sec->PMKIDList[i_ent].PMKID, 16)) {
+	if (i_ent >= 0 && info.pmkid_cnt == 1 && !memcmp(info.pmkid_list, sec->PMKIDList[i_ent].PMKID, 16)) {
 		RTW_INFO(FUNC_ADPT_FMT" has carried the same PMKID:"KEY_FMT"\n"
 			, FUNC_ADPT_ARG(adapter), KEY_ARG(&sec->PMKIDList[i_ent].PMKID));
 		goto exit;
@@ -4053,7 +4053,7 @@ void rtw_append_exented_cap(struct adapter *adapt, u8 *out_ie, uint *pout_len)
 		in the Extended Capabilities element, then the STA is not required to
 		transmit the Extended Capabilities element.
 	*/
-	if (false == _rtw_memcmp(cap_content, null_content, 8))
+	if (false == !memcmp(cap_content, null_content, 8))
 		pframe = rtw_set_ie(out_ie + *pout_len, EID_EXTCapability, 8, cap_content , pout_len);
 }
 
