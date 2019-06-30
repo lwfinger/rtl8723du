@@ -615,7 +615,7 @@ union recv_frame *portctrl(struct adapter *adapter, union recv_frame *precv_fram
 
 			/* get ether_type */
 			ptr = ptr + pfhdr->attrib.hdrlen + pfhdr->attrib.iv_len + LLC_HEADER_SIZE;
-			_rtw_memcpy(&be_tmp, ptr, 2);
+			memcpy(&be_tmp, ptr, 2);
 			ether_type = ntohs((__be16)be_tmp);
 
 			if (ether_type == eapol_type)
@@ -712,7 +712,7 @@ int recv_ucast_pn_decache(union recv_frame *precv_frame)
 			/* return _FAIL; */
 		} else {
 			prxcache->last_tid = tid;
-			_rtw_memcpy(prxcache->iv[tid],
+			memcpy(prxcache->iv[tid],
 				    (pdata + pattrib->hdrlen),
 				    sizeof(prxcache->iv[tid]));
 		}
@@ -930,11 +930,11 @@ static int sta2sta_data_frame(
 		}
 
 	} else if (check_fwstate(pmlmepriv, WIFI_MP_STATE)) {
-		_rtw_memcpy(pattrib->dst, GetAddr1Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->src, get_addr2_ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->bssid, GetAddr3Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->ra, pattrib->dst, ETH_ALEN);
-		_rtw_memcpy(pattrib->ta, pattrib->src, ETH_ALEN);
+		memcpy(pattrib->dst, GetAddr1Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->src, get_addr2_ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->bssid, GetAddr3Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->ra, pattrib->dst, ETH_ALEN);
+		memcpy(pattrib->ta, pattrib->src, ETH_ALEN);
 
 		sta_addr = mybssid;
 	} else
@@ -1015,11 +1015,11 @@ static int ap2sta_data_frame(
 
 	} else if ((check_fwstate(pmlmepriv, WIFI_MP_STATE)) &&
 		   (check_fwstate(pmlmepriv, _FW_LINKED))) {
-		_rtw_memcpy(pattrib->dst, GetAddr1Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->src, get_addr2_ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->bssid, GetAddr3Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->ra, pattrib->dst, ETH_ALEN);
-		_rtw_memcpy(pattrib->ta, pattrib->src, ETH_ALEN);
+		memcpy(pattrib->dst, GetAddr1Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->src, get_addr2_ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->bssid, GetAddr3Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->ra, pattrib->dst, ETH_ALEN);
+		memcpy(pattrib->ta, pattrib->src, ETH_ALEN);
 
 
 		*psta = rtw_get_stainfo(pstapriv, pattrib->bssid); /* get sta_info */
@@ -1106,11 +1106,11 @@ static int sta2ap_data_frame(
 	} else if ((check_fwstate(pmlmepriv, WIFI_MP_STATE)) &&
 		   (check_fwstate(pmlmepriv, _FW_LINKED))) {
 		/* RTW_INFO("%s ,in WIFI_MP_STATE\n",__func__); */
-		_rtw_memcpy(pattrib->dst, GetAddr1Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->src, get_addr2_ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->bssid, GetAddr3Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->ra, pattrib->dst, ETH_ALEN);
-		_rtw_memcpy(pattrib->ta, pattrib->src, ETH_ALEN);
+		memcpy(pattrib->dst, GetAddr1Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->src, get_addr2_ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->bssid, GetAddr3Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->ra, pattrib->dst, ETH_ALEN);
+		memcpy(pattrib->ta, pattrib->src, ETH_ALEN);
 
 
 		*psta = rtw_get_stainfo(pstapriv, pattrib->bssid); /* get sta_info */
@@ -1439,8 +1439,8 @@ bip_verify:
 
 	/* set iv and icv length */
 	SET_ICE_IV_LEN(pattrib->iv_len, pattrib->icv_len, pattrib->encrypt);
-	_rtw_memcpy(pattrib->ra, GetAddr1Ptr(ptr), ETH_ALEN);
-	_rtw_memcpy(pattrib->ta, get_addr2_ptr(ptr), ETH_ALEN);
+	memcpy(pattrib->ra, GetAddr1Ptr(ptr), ETH_ALEN);
+	memcpy(pattrib->ta, get_addr2_ptr(ptr), ETH_ALEN);
 
 	/* actual management data frame body */
 	data_len = pattrib->pkt_len - pattrib->hdrlen - pattrib->iv_len - pattrib->icv_len;
@@ -1464,9 +1464,9 @@ bip_verify:
 
 	precv_frame = decryptor(adapter, precv_frame);
 	/* save actual management data frame body */
-	_rtw_memcpy(mgmt_DATA, ptr + pattrib->hdrlen + pattrib->iv_len, data_len);
+	memcpy(mgmt_DATA, ptr + pattrib->hdrlen + pattrib->iv_len, data_len);
 	/* overwrite the iv field */
-	_rtw_memcpy(ptr + pattrib->hdrlen, mgmt_DATA, data_len);
+	memcpy(ptr + pattrib->hdrlen, mgmt_DATA, data_len);
 	/* remove the iv and icv length */
 	pattrib->pkt_len = pattrib->pkt_len - pattrib->iv_len - pattrib->icv_len;
 	rtw_mfree(mgmt_DATA, data_len);
@@ -1554,29 +1554,29 @@ static int validate_recv_data_frame(struct adapter *adapter, union recv_frame *p
 
 	switch (pattrib->to_fr_ds) {
 	case 0:
-		_rtw_memcpy(pattrib->ra, GetAddr1Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->ta, get_addr2_ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->dst, GetAddr1Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->src, get_addr2_ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->bssid, GetAddr3Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->ra, GetAddr1Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->ta, get_addr2_ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->dst, GetAddr1Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->src, get_addr2_ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->bssid, GetAddr3Ptr(ptr), ETH_ALEN);
 		ret = sta2sta_data_frame(adapter, precv_frame, &psta);
 		break;
 
 	case 1:
-		_rtw_memcpy(pattrib->ra, GetAddr1Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->ta, get_addr2_ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->dst, GetAddr1Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->src, GetAddr3Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->bssid, get_addr2_ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->ra, GetAddr1Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->ta, get_addr2_ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->dst, GetAddr1Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->src, GetAddr3Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->bssid, get_addr2_ptr(ptr), ETH_ALEN);
 		ret = ap2sta_data_frame(adapter, precv_frame, &psta);
 		break;
 
 	case 2:
-		_rtw_memcpy(pattrib->ra, GetAddr1Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->ta, get_addr2_ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->dst, GetAddr3Ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->src, get_addr2_ptr(ptr), ETH_ALEN);
-		_rtw_memcpy(pattrib->bssid, GetAddr1Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->ra, GetAddr1Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->ta, get_addr2_ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->dst, GetAddr3Ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->src, get_addr2_ptr(ptr), ETH_ALEN);
+		memcpy(pattrib->bssid, GetAddr1Ptr(ptr), ETH_ALEN);
 		ret = sta2ap_data_frame(adapter, precv_frame, &psta);
 		break;
 
@@ -1794,7 +1794,7 @@ static int wlanhdr_to_ethhdr(union recv_frame *precvframe)
 	len = precvframe->u.hdr.len - rmv_len;
 
 
-	_rtw_memcpy(&be_tmp, ptr + rmv_len, 2);
+	memcpy(&be_tmp, ptr + rmv_len, 2);
 	eth_type = ntohs(be_tmp); /* pattrib->ether_type */
 	pattrib->eth_type = cpu_to_le16(eth_type);
 
@@ -1811,7 +1811,7 @@ static int wlanhdr_to_ethhdr(union recv_frame *precvframe)
 			ret = _FAIL;
 			goto exiting;
 		}
-		_rtw_memcpy(ptr, get_rxmem(precvframe), 24);
+		memcpy(ptr, get_rxmem(precvframe), 24);
 		ptr += 24;
 	} else {
 		ptr = recvframe_pull(precvframe, (rmv_len - sizeof(struct ethhdr) + (bsnaphdr ? 2 : 0)));
@@ -1822,12 +1822,12 @@ static int wlanhdr_to_ethhdr(union recv_frame *precvframe)
 	}
 
 	if (ptr) {
-		_rtw_memcpy(ptr, pattrib->dst, ETH_ALEN);
-		_rtw_memcpy(ptr + ETH_ALEN, pattrib->src, ETH_ALEN);
+		memcpy(ptr, pattrib->dst, ETH_ALEN);
+		memcpy(ptr + ETH_ALEN, pattrib->src, ETH_ALEN);
 
 		if (!bsnaphdr) {
 			len = htons(len);
-			_rtw_memcpy(ptr + 12, &len, 2);
+			memcpy(ptr + 12, &len, 2);
 		}
 	}
 
@@ -1902,7 +1902,7 @@ union recv_frame *recvframe_defrag(struct adapter *adapter, struct __queue *defr
 		recvframe_pull_tail(prframe, pfhdr->attrib.icv_len);
 
 		/* memcpy */
-		_rtw_memcpy(pfhdr->rx_tail, pnfhdr->rx_data, pnfhdr->len);
+		memcpy(pfhdr->rx_tail, pnfhdr->rx_data, pnfhdr->len);
 
 		recvframe_put(prframe, cpu_to_le16(pnfhdr->len));
 

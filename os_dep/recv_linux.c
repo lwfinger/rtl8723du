@@ -77,7 +77,7 @@ int rtw_os_alloc_recvframe(struct adapter *adapt, union recv_frame *precvframe, 
 		precvframe->u.hdr.rx_end = pkt_copy->data + alloc_sz;
 		skb_reserve(pkt_copy, 8 - ((SIZE_PTR)(pkt_copy->data) & 7));  /* force pkt_copy->data at 8-byte alignment address */
 		skb_reserve(pkt_copy, shift_sz);/* force ip_hdr at 8-byte alignment address according to shift_sz. */
-		_rtw_memcpy(pkt_copy->data, pdata, skb_len);
+		memcpy(pkt_copy->data, pdata, skb_len);
 		precvframe->u.hdr.rx_data = precvframe->u.hdr.rx_tail = pkt_copy->data;
 	} else {
 		if ((pattrib->mfrag == 1) && (pattrib->frag_num == 0)) {
@@ -213,7 +213,7 @@ struct sk_buff *rtw_os_alloc_msdu_pkt(union recv_frame *prframe, u16 nSubframe_L
 	if (sub_skb) {
 		skb_reserve(sub_skb, 14);
 		data_ptr = (u8 *)skb_put(sub_skb, nSubframe_Length);
-		_rtw_memcpy(data_ptr, (pdata + ETH_HLEN), nSubframe_Length);
+		memcpy(data_ptr, (pdata + ETH_HLEN), nSubframe_Length);
 	} else {
 		sub_skb = rtw_skb_clone(prframe->u.hdr.pkt);
 		if (sub_skb) {
@@ -234,15 +234,15 @@ struct sk_buff *rtw_os_alloc_msdu_pkt(union recv_frame *prframe, u16 nSubframe_L
 	     _rtw_memcmp(sub_skb->data, rtw_bridge_tunnel_header, SNAP_SIZE))) {
 		/* remove RFC1042 or Bridge-Tunnel encapsulation and replace EtherType */
 		skb_pull(sub_skb, SNAP_SIZE);
-		_rtw_memcpy(skb_push(sub_skb, ETH_ALEN), pdata + 6, ETH_ALEN);
-		_rtw_memcpy(skb_push(sub_skb, ETH_ALEN), pdata, ETH_ALEN);
+		memcpy(skb_push(sub_skb, ETH_ALEN), pdata + 6, ETH_ALEN);
+		memcpy(skb_push(sub_skb, ETH_ALEN), pdata, ETH_ALEN);
 	} else {
 		u16 len;
 		/* Leave Ethernet header part of hdr and full payload */
 		len = htons(sub_skb->len);
-		_rtw_memcpy(skb_push(sub_skb, 2), &len, 2);
-		_rtw_memcpy(skb_push(sub_skb, ETH_ALEN), pdata + 6, ETH_ALEN);
-		_rtw_memcpy(skb_push(sub_skb, ETH_ALEN), pdata, ETH_ALEN);
+		memcpy(skb_push(sub_skb, 2), &len, 2);
+		memcpy(skb_push(sub_skb, ETH_ALEN), pdata + 6, ETH_ALEN);
+		memcpy(skb_push(sub_skb, ETH_ALEN), pdata, ETH_ALEN);
 	}
 
 	return sub_skb;
@@ -448,7 +448,7 @@ void rtw_handle_tkip_mic_err(struct adapter *adapt, struct sta_info *sta, u8 bgr
 		ev.flags |= IW_MICFAILURE_PAIRWISE;
 
 	ev.src_addr.sa_family = ARPHRD_ETHER;
-	_rtw_memcpy(ev.src_addr.sa_data, sta->cmn.mac_addr, ETH_ALEN);
+	memcpy(ev.src_addr.sa_data, sta->cmn.mac_addr, ETH_ALEN);
 
 	memset(&wrqu, 0x00, sizeof(wrqu));
 	wrqu.data.length = sizeof(ev);

@@ -2555,7 +2555,7 @@ Hal_InitPGData(
 		} else {
 			/* Read EFUSE real map to shadow. */
 			EFUSE_ShadowMapUpdate(adapt, EFUSE_WIFI, false);
-			_rtw_memcpy((void *)PROMContent, (void *)pHalData->efuse_eeprom_data, HWSET_MAX_SIZE_8723D);
+			memcpy((void *)PROMContent, (void *)pHalData->efuse_eeprom_data, HWSET_MAX_SIZE_8723D);
 		}
 	} else {
 		/* autoload fail */
@@ -2563,7 +2563,7 @@ Hal_InitPGData(
 		/* update to default value 0xFF */
 		if (false == pHalData->EepromOrEfuse)
 			EFUSE_ShadowMapUpdate(adapt, EFUSE_WIFI, false);
-		_rtw_memcpy((void *)PROMContent, (void *)pHalData->efuse_eeprom_data, HWSET_MAX_SIZE_8723D);
+		memcpy((void *)PROMContent, (void *)pHalData->efuse_eeprom_data, HWSET_MAX_SIZE_8723D);
 	}
 
 #ifdef CONFIG_EFUSE_CONFIG_FILE
@@ -2794,7 +2794,7 @@ Hal_EfuseParseVoltage_8723D(
 {
 	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 
-	/* _rtw_memcpy(pHalData->adjuseVoltageVal, &hwinfo[EEPROM_Voltage_ADDR_8723D], 1); */
+	/* memcpy(pHalData->adjuseVoltageVal, &hwinfo[EEPROM_Voltage_ADDR_8723D], 1); */
 	RTW_INFO("%s hwinfo[EEPROM_Voltage_ADDR_8723D] =%02x\n", __func__, hwinfo[EEPROM_Voltage_ADDR_8723D]);
 	pHalData->adjuseVoltageVal = (hwinfo[EEPROM_Voltage_ADDR_8723D] & 0xf0) >> 4;
 	RTW_INFO("%s pHalData->adjuseVoltageVal =%x\n", __func__, pHalData->adjuseVoltageVal);

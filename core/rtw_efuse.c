@@ -983,8 +983,8 @@ u8 rtw_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 	if (ret == _FAIL)
 		goto exit;
 
-	_rtw_memcpy(efuse , map, mapLen);
-	_rtw_memcpy(efuse + addr, data, cnts);
+	memcpy(efuse , map, mapLen);
+	memcpy(efuse + addr, data, cnts);
 
 	if (adapt->registrypriv.boffefusemask == 0) {
 		for (i = 0; i < cnts; i++) {
@@ -1047,7 +1047,7 @@ u8 rtw_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 	while (idx < cnts) {
 		word_en = 0xF;
 		j = (addr + idx) & 0x7;
-		_rtw_memcpy(newdata, &map[offset << 3], PGPKT_DATA_SIZE);
+		memcpy(newdata, &map[offset << 3], PGPKT_DATA_SIZE);
 		for (i = j; i < PGPKT_DATA_SIZE && idx < cnts; i++, idx++) {
 			if (efuse[addr + idx] != map[addr + idx]) {
 				word_en &= ~BIT(i >> 1);
@@ -1131,7 +1131,7 @@ u8 rtw_BT_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 	while (idx < cnts) {
 		word_en = 0xF;
 		j = (addr + idx) & 0x7;
-		_rtw_memcpy(newdata, &map[offset << 3], PGPKT_DATA_SIZE);
+		memcpy(newdata, &map[offset << 3], PGPKT_DATA_SIZE);
 		for (i = j; i < PGPKT_DATA_SIZE && idx < cnts; i++, idx++) {
 			if (data[idx] != map[addr + idx]) {
 				word_en &= ~BIT(i >> 1);
@@ -1690,7 +1690,7 @@ u32 rtw_read_efuse_from_file(const char *path, u8 *buf, int map_size)
 
 	RTW_PRINT("efuse file:%s, 0x%03x byte content read\n", path, i);
 
-	_rtw_memcpy(buf, map, map_size);
+	memcpy(buf, map, map_size);
 
 	ret = _SUCCESS;
 
@@ -1745,7 +1745,7 @@ u32 rtw_read_macaddr_from_file(const char *path, u8 *buf)
 		}
 	}
 
-	_rtw_memcpy(buf, addr, ETH_ALEN);
+	memcpy(buf, addr, ETH_ALEN);
 
 	RTW_PRINT("wifi_mac file: %s\n", path);
 #ifdef CONFIG_RTW_DEBUG

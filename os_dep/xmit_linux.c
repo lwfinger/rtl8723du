@@ -335,7 +335,7 @@ static int rtw_mlcst2unicst(struct adapter *adapt, struct sk_buff *skb)
 		newskb = rtw_skb_copy(skb);
 
 		if (newskb) {
-			_rtw_memcpy(newskb->data, psta->cmn.mac_addr, 6);
+			memcpy(newskb->data, psta->cmn.mac_addr, 6);
 			res = rtw_xmit(adapt, &newskb);
 			if (res < 0) {
 				DBG_COUNTER(adapt->tx_logs.os_tx_m2u_entry_err_xmit);

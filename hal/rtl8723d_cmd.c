@@ -68,7 +68,7 @@ int FillH2CCmd8723D(struct adapter * adapt, u8 ElementID, u32 CmdLen, u8 *pCmdBu
 		goto exit;
 
 	h2c[0] = ElementID;
-	_rtw_memcpy(h2c + 1, pCmdBuffer, CmdLen);
+	memcpy(h2c + 1, pCmdBuffer, CmdLen);
 	
 	/* pay attention to if  race condition happened in  H2C cmd setting. */
 	do {
@@ -80,12 +80,12 @@ int FillH2CCmd8723D(struct adapter * adapt, u8 ElementID, u32 CmdLen, u8 *pCmdBu
 		}
 		/* Write Ext command (byte 4~7) */
 		msgbox_ex_addr = REG_HMEBOX_EXT0_8723D + (h2c_box_num * RTL8723D_EX_MESSAGE_BOX_SIZE);
-		_rtw_memcpy((u8 *)(&le_tmp), h2c + 4, RTL8723D_EX_MESSAGE_BOX_SIZE);
+		memcpy((u8 *)(&le_tmp), h2c + 4, RTL8723D_EX_MESSAGE_BOX_SIZE);
 		h2c_cmd_ex = le32_to_cpu(le_tmp);
 		rtw_write32(adapt, msgbox_ex_addr, h2c_cmd_ex);
 		/* Write command (byte 0~3) */
 		msgbox_addr = REG_HMEBOX_0_8723D + (h2c_box_num * MESSAGE_BOX_SIZE);
-		_rtw_memcpy((u8 *)(&le_tmp), h2c, 4);
+		memcpy((u8 *)(&le_tmp), h2c, 4);
 		h2c_cmd = le32_to_cpu(le_tmp);
 		rtw_write32(adapt, msgbox_addr, h2c_cmd);
 

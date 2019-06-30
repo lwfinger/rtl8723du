@@ -1500,7 +1500,7 @@ int c2h_customer_str_rpt_hdl(struct adapter *adapter, u8 *data, u8 len)
 	if (dvobj->customer_str_sctx) {
 		if (dvobj->customer_str_sctx->status != RTW_SCTX_SUBMITTED)
 			RTW_WARN("%s invalid sctx.status:%d\n", __func__, dvobj->customer_str_sctx->status);
-		_rtw_memcpy(dvobj->customer_str,  C2H_CUSTOMER_STR_RPT_BYTE0(data), CUSTOMER_STR_RPT_LEN);
+		memcpy(dvobj->customer_str,  C2H_CUSTOMER_STR_RPT_BYTE0(data), CUSTOMER_STR_RPT_LEN);
 		dvobj->customer_str_sctx->status = RTX_SCTX_CSTR_WAIT_RPT2;
 	} else
 		RTW_WARN("%s sctx not set\n", __func__);
@@ -1532,7 +1532,7 @@ int c2h_customer_str_rpt_2_hdl(struct adapter *adapter, u8 *data, u8 len)
 	if (dvobj->customer_str_sctx) {
 		if (dvobj->customer_str_sctx->status != RTX_SCTX_CSTR_WAIT_RPT2)
 			RTW_WARN("%s rpt not ready\n", __func__);
-		_rtw_memcpy(dvobj->customer_str + CUSTOMER_STR_RPT_LEN,  C2H_CUSTOMER_STR_RPT_2_BYTE8(data), CUSTOMER_STR_RPT_2_LEN);
+		memcpy(dvobj->customer_str + CUSTOMER_STR_RPT_LEN,  C2H_CUSTOMER_STR_RPT_2_BYTE8(data), CUSTOMER_STR_RPT_2_LEN);
 		rtw_sctx_done(&dvobj->customer_str_sctx);
 	} else
 		RTW_WARN("%s sctx not set\n", __func__);
@@ -1581,7 +1581,7 @@ int rtw_hal_customer_str_read(struct adapter *adapter, u8 *cs)
 	_enter_critical_mutex(&dvobj->customer_str_mutex, NULL);
 	dvobj->customer_str_sctx = NULL;
 	if (sctx.status == RTW_SCTX_DONE_SUCCESS)
-		_rtw_memcpy(cs, dvobj->customer_str, RTW_CUSTOMER_STR_LEN);
+		memcpy(cs, dvobj->customer_str, RTW_CUSTOMER_STR_LEN);
 	else
 		ret = _FAIL;
 	_exit_critical_mutex(&dvobj->customer_str_mutex, NULL);
@@ -1598,13 +1598,13 @@ int rtw_hal_h2c_customer_str_write(struct adapter *adapter, const u8 *cs)
 	int ret;
 
 	SET_H2CCMD_CUSTOMER_STR_W1_EN(h2c_data_w1, 1);
-	_rtw_memcpy(H2CCMD_CUSTOMER_STR_W1_BYTE0(h2c_data_w1), cs, 6);
+	memcpy(H2CCMD_CUSTOMER_STR_W1_BYTE0(h2c_data_w1), cs, 6);
 
 	SET_H2CCMD_CUSTOMER_STR_W2_EN(h2c_data_w2, 1);
-	_rtw_memcpy(H2CCMD_CUSTOMER_STR_W2_BYTE6(h2c_data_w2), cs + 6, 6);
+	memcpy(H2CCMD_CUSTOMER_STR_W2_BYTE6(h2c_data_w2), cs + 6, 6);
 
 	SET_H2CCMD_CUSTOMER_STR_W3_EN(h2c_data_w3, 1);
-	_rtw_memcpy(H2CCMD_CUSTOMER_STR_W3_BYTE12(h2c_data_w3), cs + 6 + 6, 4);
+	memcpy(H2CCMD_CUSTOMER_STR_W3_BYTE12(h2c_data_w3), cs + 6 + 6, 4);
 
 	ret = rtw_hal_fill_h2c_cmd(adapter, H2C_CUSTOMER_STR_W1, H2C_CUSTOMER_STR_W1_LEN, h2c_data_w1);
 	if (ret != _SUCCESS) {
@@ -1919,17 +1919,17 @@ void rtw_sec_read_cam_ent(struct adapter *adapter, u8 id, u8 *ctrl, u8 *mac, u8 
 		switch (i) {
 		case 0:
 			if (ctrl)
-				_rtw_memcpy(ctrl, (u8 *)(&rdata), 2);
+				memcpy(ctrl, (u8 *)(&rdata), 2);
 			if (mac)
-				_rtw_memcpy(mac, ((u8 *)(&rdata)) + 2, 2);
+				memcpy(mac, ((u8 *)(&rdata)) + 2, 2);
 			break;
 		case 1:
 			if (mac)
-				_rtw_memcpy(mac + 2, (u8 *)(&rdata), 4);
+				memcpy(mac + 2, (u8 *)(&rdata), 4);
 			break;
 		default:
 			if (key)
-				_rtw_memcpy(key + (i - 2) * 4, (u8 *)(&rdata), 4);
+				memcpy(key + (i - 2) * 4, (u8 *)(&rdata), 4);
 			break;
 		}
 	}
@@ -2115,7 +2115,7 @@ inline u8 rtw_get_mbid_cam_entry_num(struct adapter *adapter)
 static inline void mbid_cam_cache_init(struct adapter *adapter, struct mbid_cam_cache *pmbid_cam, u8 *mac_addr)
 {
 	if (adapter && pmbid_cam && mac_addr) {
-		_rtw_memcpy(pmbid_cam->mac_addr, mac_addr, ETH_ALEN);
+		memcpy(pmbid_cam->mac_addr, mac_addr, ETH_ALEN);
 		pmbid_cam->iface_id = adapter->iface_id;
 	}
 }
@@ -3013,9 +3013,9 @@ int rtw_hal_get_rsvd_page(struct adapter *adapter, u32 page_offset,
 		rtw_write32(adapter, REG_PKTBUF_DBG_CTRL, offset + i);
 		data_low = rtw_read32(adapter, REG_PKTBUF_DBG_DATA_L);
 		data_high = rtw_read32(adapter, REG_PKTBUF_DBG_DATA_H);
-		_rtw_memcpy(buffer + (i * 8),
+		memcpy(buffer + (i * 8),
 			&data_low, sizeof(data_low));
-		_rtw_memcpy(buffer + ((i * 8) + 4),
+		memcpy(buffer + ((i * 8) + 4),
 			&data_high, sizeof(data_high));
 	}
 	rtw_write8(adapter, REG_PKT_BUFF_ACCESS_CTRL, 0x0);
@@ -3072,9 +3072,9 @@ void rtw_hal_construct_beacon(struct adapter *adapt,
 	fctrl = &(pwlanhdr->frame_ctl);
 	*(fctrl) = 0;
 
-	_rtw_memcpy(pwlanhdr->addr1, bc_addr, ETH_ALEN);
-	_rtw_memcpy(pwlanhdr->addr2, adapter_mac_addr(adapt), ETH_ALEN);
-	_rtw_memcpy(pwlanhdr->addr3, get_my_bssid(cur_network), ETH_ALEN);
+	memcpy(pwlanhdr->addr1, bc_addr, ETH_ALEN);
+	memcpy(pwlanhdr->addr2, adapter_mac_addr(adapt), ETH_ALEN);
+	memcpy(pwlanhdr->addr3, get_my_bssid(cur_network), ETH_ALEN);
 
 	SetSeqNum(pwlanhdr, 0/*pmlmeext->mgnt_seq*/);
 	/* pmlmeext->mgnt_seq++; */
@@ -3088,13 +3088,13 @@ void rtw_hal_construct_beacon(struct adapter *adapt,
 	pktlen += 8;
 
 	/* beacon interval: 2 bytes */
-	_rtw_memcpy(pframe, (unsigned char *)(rtw_get_beacon_interval_from_ie(cur_network->IEs)), 2);
+	memcpy(pframe, (unsigned char *)(rtw_get_beacon_interval_from_ie(cur_network->IEs)), 2);
 
 	pframe += 2;
 	pktlen += 2;
 
 	/* capability info: 2 bytes */
-	_rtw_memcpy(pframe, (unsigned char *)(rtw_get_capability_from_ie(cur_network->IEs)), 2);
+	memcpy(pframe, (unsigned char *)(rtw_get_capability_from_ie(cur_network->IEs)), 2);
 
 	pframe += 2;
 	pktlen += 2;
@@ -3102,7 +3102,7 @@ void rtw_hal_construct_beacon(struct adapter *adapt,
 	if ((pmlmeinfo->state & 0x03) == WIFI_FW_AP_STATE) {
 		/* RTW_INFO("ie len=%d\n", cur_network->IELength); */
 		pktlen += cur_network->IELength - sizeof(struct ndis_802_11_fixed_ies);
-		_rtw_memcpy(pframe, cur_network->IEs + sizeof(struct ndis_802_11_fixed_ies), pktlen);
+		memcpy(pframe, cur_network->IEs + sizeof(struct ndis_802_11_fixed_ies), pktlen);
 
 		goto _ConstructBeacon;
 	}
@@ -3174,10 +3174,10 @@ static void rtw_hal_construct_PSPoll(struct adapter *adapt,
 	set_duration(pframe, (pmlmeinfo->aid | 0xc000));
 
 	/* BSSID. */
-	_rtw_memcpy(pwlanhdr->addr1, get_my_bssid(&(pmlmeinfo->network)), ETH_ALEN);
+	memcpy(pwlanhdr->addr1, get_my_bssid(&(pmlmeinfo->network)), ETH_ALEN);
 
 	/* TA. */
-	_rtw_memcpy(pwlanhdr->addr2, adapter_mac_addr(adapt), ETH_ALEN);
+	memcpy(pwlanhdr->addr2, adapter_mac_addr(adapt), ETH_ALEN);
 
 	*pLength = 16;
 }
@@ -3211,28 +3211,28 @@ void rtw_hal_construct_NullFunctionData(
 		SetPwrMgt(fctrl);
 
 	if (NULL == StaAddr) {
-		_rtw_memcpy(bssid, adapter_mac_addr(adapt), ETH_ALEN);
+		memcpy(bssid, adapter_mac_addr(adapt), ETH_ALEN);
 		StaAddr = bssid;
 	}
 
 	switch (cur_network->network.InfrastructureMode) {
 	case Ndis802_11Infrastructure:
 		SetToDs(fctrl);
-		_rtw_memcpy(pwlanhdr->addr1, get_my_bssid(&(pmlmeinfo->network)), ETH_ALEN);
-		_rtw_memcpy(pwlanhdr->addr2, adapter_mac_addr(adapt), ETH_ALEN);
-		_rtw_memcpy(pwlanhdr->addr3, StaAddr, ETH_ALEN);
+		memcpy(pwlanhdr->addr1, get_my_bssid(&(pmlmeinfo->network)), ETH_ALEN);
+		memcpy(pwlanhdr->addr2, adapter_mac_addr(adapt), ETH_ALEN);
+		memcpy(pwlanhdr->addr3, StaAddr, ETH_ALEN);
 		break;
 	case Ndis802_11APMode:
 		SetFrDs(fctrl);
-		_rtw_memcpy(pwlanhdr->addr1, StaAddr, ETH_ALEN);
-		_rtw_memcpy(pwlanhdr->addr2, get_my_bssid(&(pmlmeinfo->network)), ETH_ALEN);
-		_rtw_memcpy(pwlanhdr->addr3, adapter_mac_addr(adapt), ETH_ALEN);
+		memcpy(pwlanhdr->addr1, StaAddr, ETH_ALEN);
+		memcpy(pwlanhdr->addr2, get_my_bssid(&(pmlmeinfo->network)), ETH_ALEN);
+		memcpy(pwlanhdr->addr3, adapter_mac_addr(adapt), ETH_ALEN);
 		break;
 	case Ndis802_11IBSS:
 	default:
-		_rtw_memcpy(pwlanhdr->addr1, StaAddr, ETH_ALEN);
-		_rtw_memcpy(pwlanhdr->addr2, adapter_mac_addr(adapt), ETH_ALEN);
-		_rtw_memcpy(pwlanhdr->addr3, get_my_bssid(&(pmlmeinfo->network)), ETH_ALEN);
+		memcpy(pwlanhdr->addr1, StaAddr, ETH_ALEN);
+		memcpy(pwlanhdr->addr2, adapter_mac_addr(adapt), ETH_ALEN);
+		memcpy(pwlanhdr->addr3, get_my_bssid(&(pmlmeinfo->network)), ETH_ALEN);
 		break;
 	}
 
@@ -3278,9 +3278,9 @@ static void rtw_hal_construct_ProbeRsp(struct adapter *adapt, u8 *pframe, u32 *p
 
 	fctrl = &(pwlanhdr->frame_ctl);
 	*(fctrl) = 0;
-	_rtw_memcpy(pwlanhdr->addr1, StaAddr, ETH_ALEN);
-	_rtw_memcpy(pwlanhdr->addr2, mac, ETH_ALEN);
-	_rtw_memcpy(pwlanhdr->addr3, bssid, ETH_ALEN);
+	memcpy(pwlanhdr->addr1, StaAddr, ETH_ALEN);
+	memcpy(pwlanhdr->addr2, mac, ETH_ALEN);
+	memcpy(pwlanhdr->addr3, bssid, ETH_ALEN);
 
 	SetSeqNum(pwlanhdr, 0);
 	set_frame_sub_type(fctrl, WIFI_PROBERSP);
@@ -3291,7 +3291,7 @@ static void rtw_hal_construct_ProbeRsp(struct adapter *adapt, u8 *pframe, u32 *p
 	if (cur_network->IELength > MAX_IE_SZ)
 		return;
 
-	_rtw_memcpy(pframe, cur_network->IEs, cur_network->IELength);
+	memcpy(pframe, cur_network->IEs, cur_network->IELength);
 	pframe += cur_network->IELength;
 	pktlen += cur_network->IELength;
 
@@ -4632,7 +4632,7 @@ int hal_config_macaddr(struct adapter *adapter, bool autoload_fail)
 
 	/* check hw pg data */
 	if (hw_addr && !rtw_check_invalid_mac_address(hw_addr, true)) {
-		_rtw_memcpy(hal_data->EEPROMMACAddr, hw_addr, ETH_ALEN);
+		memcpy(hal_data->EEPROMMACAddr, hw_addr, ETH_ALEN);
 		goto exit;
 	}
 
@@ -4641,7 +4641,7 @@ bypass_hw_pg:
 #ifdef CONFIG_EFUSE_CONFIG_FILE
 	/* check wifi mac file */
 	if (Hal_ReadMACAddrFromFile(adapter, addr) == _SUCCESS) {
-		_rtw_memcpy(hal_data->EEPROMMACAddr, addr, ETH_ALEN);
+		memcpy(hal_data->EEPROMMACAddr, addr, ETH_ALEN);
 		goto exit;
 	}
 #endif
@@ -4803,7 +4803,7 @@ void rtw_hal_ch_sw_iqk_info_backup(struct adapter *adapt)
 
 	/* Else, overwrite the oldest record */
 	for (i = 1; i < MAX_IQK_INFO_BACKUP_CHNL_NUM; i++)
-		_rtw_memcpy(&(pHalData->iqk_reg_backup[i - 1]), &(pHalData->iqk_reg_backup[i]), sizeof(struct hal_iqk_reg_backup));
+		memcpy(&(pHalData->iqk_reg_backup[i - 1]), &(pHalData->iqk_reg_backup[i]), sizeof(struct hal_iqk_reg_backup));
 
 	rtw_hal_set_hwreg(adapt, HW_VAR_CH_SW_IQK_INFO_BACKUP, (u8 *)&(pHalData->iqk_reg_backup[MAX_IQK_INFO_BACKUP_CHNL_NUM - 1]));
 }

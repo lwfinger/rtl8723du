@@ -230,7 +230,7 @@ void DBG_BT_INFO(u8 *dbgmsg)
 		return;
 
 	pbuf = pinfo->info + pinfo->len;
-	_rtw_memcpy(pbuf, dbgmsg, msglen);
+	memcpy(pbuf, dbgmsg, msglen);
 	pinfo->len += msglen;
 }
 
@@ -566,7 +566,7 @@ static u8 _btmpoper_cmd(struct btc_coexist * pBtCoexist, u8 opcode, u8 opcodever
 	buf[0] = (opcodever & 0xF) | (seq << 4);
 	buf[1] = opcode;
 	if (cmd && size)
-		_rtw_memcpy(buf + 2, cmd, size);
+		memcpy(buf + 2, cmd, size);
 
 	GLBtcBtMpRptWait = true;
 	GLBtcBtMpRptWiFiOK = false;
@@ -3111,7 +3111,7 @@ void hal_btcoex_BtMpRptNotify(struct adapter * adapt, u8 length, u8 *tmpBuf)
 
 		GLBtcBtMpRptSeq = seq;
 		GLBtcBtMpRptStatus = status;
-		_rtw_memcpy(GLBtcBtMpRptRsp, tmpBuf + 3, len);
+		memcpy(GLBtcBtMpRptRsp, tmpBuf + 3, len);
 		GLBtcBtMpRptRspSize = len;
 
 		break;
@@ -3268,7 +3268,7 @@ u32 hal_btcoex_GetRaMask(struct adapter * adapt)
 void hal_btcoex_RecordPwrMode(struct adapter * adapt, u8 *pCmdBuf, u8 cmdLen)
 {
 
-	_rtw_memcpy(GLBtCoexist.pwrModeVal, pCmdBuf, cmdLen);
+	memcpy(GLBtCoexist.pwrModeVal, pCmdBuf, cmdLen);
 }
 
 void hal_btcoex_DisplayBtCoexInfo(struct adapter * adapt, u8 *pbuf, u32 bufsize)

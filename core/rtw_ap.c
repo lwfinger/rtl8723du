@@ -66,7 +66,7 @@ u8 rtw_set_tim_ie(u8 dtim_cnt, u8 dtim_period
 	*p++ = dtim_cnt;
 	*p++ = dtim_period;
 	*p++ = (rtw_bmp_is_set(tim_bmp, tim_bmp_len, 0) ? BIT0 : 0) | n1;
-	_rtw_memcpy(p, tim_bmp + n1, bmp_len);
+	memcpy(p, tim_bmp + n1, bmp_len);
 
 	return 2 + 2 + 1 + bmp_len;
 }
@@ -126,7 +126,7 @@ static void update_BCNTIM(struct adapter *adapt)
 		if (remainder_ielen > 0) {
 			pbackup_remainder_ie = rtw_malloc(remainder_ielen);
 			if (pbackup_remainder_ie && premainder_ie)
-				_rtw_memcpy(pbackup_remainder_ie, premainder_ie, remainder_ielen);
+				memcpy(pbackup_remainder_ie, premainder_ie, remainder_ielen);
 		}
 
 		/* append TIM IE */
@@ -134,7 +134,7 @@ static void update_BCNTIM(struct adapter *adapt)
 
 		/*copy remainder IE*/
 		if (pbackup_remainder_ie) {
-			_rtw_memcpy(dst_ie, pbackup_remainder_ie, remainder_ielen);
+			memcpy(dst_ie, pbackup_remainder_ie, remainder_ielen);
 
 			rtw_mfree(pbackup_remainder_ie, remainder_ielen);
 		}
@@ -191,18 +191,18 @@ void rtw_add_bcn_ie(struct adapter *adapt, struct wlan_bssid_ex *pnetwork, u8 in
 	if (remainder_ielen > 0) {
 		pbackup_remainder_ie = rtw_malloc(remainder_ielen);
 		if (pbackup_remainder_ie && premainder_ie)
-			_rtw_memcpy(pbackup_remainder_ie, premainder_ie, remainder_ielen);
+			memcpy(pbackup_remainder_ie, premainder_ie, remainder_ielen);
 	}
 
 	*dst_ie++ = index;
 	*dst_ie++ = len;
 
-	_rtw_memcpy(dst_ie, data, len);
+	memcpy(dst_ie, data, len);
 	dst_ie += len;
 
 	/* copy remainder IE */
 	if (pbackup_remainder_ie) {
-		_rtw_memcpy(dst_ie, pbackup_remainder_ie, remainder_ielen);
+		memcpy(dst_ie, pbackup_remainder_ie, remainder_ielen);
 
 		rtw_mfree(pbackup_remainder_ie, remainder_ielen);
 	}
@@ -234,12 +234,12 @@ void rtw_remove_bcn_ie(struct adapter *adapt, struct wlan_bssid_ex *pnetwork, u8
 	if (remainder_ielen > 0) {
 		pbackup_remainder_ie = rtw_malloc(remainder_ielen);
 		if (pbackup_remainder_ie && premainder_ie)
-			_rtw_memcpy(pbackup_remainder_ie, premainder_ie, remainder_ielen);
+			memcpy(pbackup_remainder_ie, premainder_ie, remainder_ielen);
 	}
 
 	/* copy remainder IE */
 	if (pbackup_remainder_ie) {
-		_rtw_memcpy(dst_ie, pbackup_remainder_ie, remainder_ielen);
+		memcpy(dst_ie, pbackup_remainder_ie, remainder_ielen);
 
 		rtw_mfree(pbackup_remainder_ie, remainder_ielen);
 	}
@@ -444,7 +444,7 @@ void	expire_timeout_chk(struct adapter *adapt)
 				continue;
 
 			psta = rtw_get_stainfo_by_offset(pstapriv, del_asoc_list[i]);
-			_rtw_memcpy(sta_addr, psta->cmn.mac_addr, ETH_ALEN);
+			memcpy(sta_addr, psta->cmn.mac_addr, ETH_ALEN);
 
 			RTW_INFO("asoc expire "MAC_FMT", state=0x%x\n", MAC_ARG(psta->cmn.mac_addr), psta->state);
 			updated = ap_free_sta(adapt, psta, false, WLAN_REASON_DEAUTH_LEAVING, false);
@@ -849,7 +849,7 @@ static void update_ap_info(struct adapter *adapt, struct sta_info *psta)
 	psta->wireless_mode = pmlmeext->cur_wireless_mode;
 
 	psta->bssratelen = rtw_get_rateset_len(pnetwork->SupportedRates);
-	_rtw_memcpy(psta->bssrateset, pnetwork->SupportedRates, psta->bssratelen);
+	memcpy(psta->bssrateset, pnetwork->SupportedRates, psta->bssratelen);
 
 	/* HT related cap */
 	if (phtpriv_ap->ht_option) {
@@ -877,7 +877,7 @@ static void update_ap_info(struct adapter *adapt, struct sta_info *psta)
 	phtpriv_ap->agg_enable_bitmap = 0x0;/* reset */
 	phtpriv_ap->candidate_tid_bitmap = 0x0;/* reset */
 
-	_rtw_memcpy(&psta->htpriv, &pmlmepriv->htpriv, sizeof(struct ht_priv));
+	memcpy(&psta->htpriv, &pmlmepriv->htpriv, sizeof(struct ht_priv));
 
 	psta->state |= WIFI_AP_STATE; /* Aries, add,fix bug of flush_cam_entry at STOP AP mode , 0724 */
 }
@@ -1214,7 +1214,7 @@ void start_bss_network(struct adapter *adapt, struct createbss_parm *parm)
 	} else {
 		/* inform this request comes from upper layer */
 		req_ch = 0;
-		_rtw_memcpy(pnetwork_mlmeext, pnetwork, pnetwork->Length);
+		memcpy(pnetwork_mlmeext, pnetwork, pnetwork->Length);
 	}
 
 	bcn_interval = (u16)pnetwork->Configuration.BeaconPeriod;
@@ -1278,7 +1278,7 @@ chbw_decision:
 		     , &ch_to_set, &bw_to_set, &offset_to_set, &chbw_allow);
 
 	/* let pnetwork_mlme == pnetwork_mlmeext */
-	_rtw_memcpy(pnetwork, pnetwork_mlmeext, pnetwork_mlmeext->Length);
+	memcpy(pnetwork, pnetwork_mlmeext, pnetwork_mlmeext->Length);
 
 	rtw_start_bss_hdl_after_chbw_decided(adapt);
 
@@ -1400,7 +1400,7 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 
 	memset(ie, 0, MAX_IE_SZ);
 
-	_rtw_memcpy(ie, pbuf, pbss_network->IELength);
+	memcpy(ie, pbuf, pbss_network->IELength);
 
 
 	if (pbss_network->InfrastructureMode != Ndis802_11APMode) {
@@ -1414,7 +1414,7 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 
 	pbss_network->Rssi = 0;
 
-	_rtw_memcpy(pbss_network->MacAddress, adapter_mac_addr(adapt), ETH_ALEN);
+	memcpy(pbss_network->MacAddress, adapter_mac_addr(adapt), ETH_ALEN);
 
 	/* beacon interval */
 	p = rtw_get_beacon_interval_from_ie(ie);/* ie + 8;	 */ /* 8: TimeStamp, 2: Beacon Interval 2:Capability */
@@ -1430,9 +1430,9 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 	p = rtw_get_ie(ie + _BEACON_IE_OFFSET_, _SSID_IE_, &ie_len, (pbss_network->IELength - _BEACON_IE_OFFSET_));
 	if (p && ie_len > 0) {
 		memset(&pbss_network->Ssid, 0, sizeof(struct ndis_802_11_ssid));
-		_rtw_memcpy(pbss_network->Ssid.Ssid, (p + 2), ie_len);
+		memcpy(pbss_network->Ssid.Ssid, (p + 2), ie_len);
 		pbss_network->Ssid.SsidLength = ie_len;
-		_rtw_memcpy(adapt->wdinfo.p2p_group_ssid, pbss_network->Ssid.Ssid, pbss_network->Ssid.SsidLength);
+		memcpy(adapt->wdinfo.p2p_group_ssid, pbss_network->Ssid.Ssid, pbss_network->Ssid.SsidLength);
 		adapt->wdinfo.p2p_group_ssid_len = pbss_network->Ssid.SsidLength;
 	}
 
@@ -1450,14 +1450,14 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 	/* get supported rates */
 	p = rtw_get_ie(ie + _BEACON_IE_OFFSET_, _SUPPORTEDRATES_IE_, &ie_len, (pbss_network->IELength - _BEACON_IE_OFFSET_));
 	if (p !=  NULL) {
-		_rtw_memcpy(supportRate, p + 2, ie_len);
+		memcpy(supportRate, p + 2, ie_len);
 		supportRateNum = ie_len;
 	}
 
 	/* get ext_supported rates */
 	p = rtw_get_ie(ie + _BEACON_IE_OFFSET_, _EXT_SUPPORTEDRATES_IE_, &ie_len, pbss_network->IELength - _BEACON_IE_OFFSET_);
 	if (p !=  NULL) {
-		_rtw_memcpy(supportRate + supportRateNum, p + 2, ie_len);
+		memcpy(supportRate + supportRateNum, p + 2, ie_len);
 		supportRateNum += ie_len;
 
 	}
@@ -1596,7 +1596,7 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 		rtw_hal_get_def_var(adapt, HW_VAR_MAX_RX_AMPDU_FACTOR, &max_rx_ampdu_factor);
 		pht_cap->ampdu_params_info |= (IEEE80211_HT_CAP_AMPDU_FACTOR & max_rx_ampdu_factor); /* set  Max Rx AMPDU size  to 64K */
 
-		_rtw_memcpy(&(pmlmeinfo->HT_caps), pht_cap, sizeof(struct HT_caps_element));
+		memcpy(&(pmlmeinfo->HT_caps), pht_cap, sizeof(struct HT_caps_element));
 
 		/* Update Supported MCS Set field */
 		{
@@ -1628,7 +1628,7 @@ int rtw_check_beacon_data(struct adapter *adapt, u8 *pbuf,  int len)
 				*(HT_CAP_ELE_RX_MCS_MAP(pht_cap) + i) &= adapt->mlmeextpriv.default_supported_mcs_set[i];
 		}
 
-		_rtw_memcpy(&pmlmepriv->htpriv.ht_cap, p + 2, ie_len);
+		memcpy(&pmlmepriv->htpriv.ht_cap, p + 2, ie_len);
 	}
 
 	/* parsing HT_INFO_IE */
@@ -1832,7 +1832,7 @@ int rtw_acl_add_sta(struct adapter *adapter, const u8 *addr)
 		if (!acl_node->valid) {
 
 			_rtw_init_listhead(&acl_node->list);
-			_rtw_memcpy(acl_node->addr, addr, ETH_ALEN);
+			memcpy(acl_node->addr, addr, ETH_ALEN);
 			acl_node->valid = true;
 
 			rtw_list_insert_tail(&acl_node->list, get_list_head(acl_node_q));
@@ -1922,9 +1922,9 @@ u8 rtw_ap_set_pairwise_key(struct adapter *adapt, struct sta_info *psta)
 
 	psetstakey_para->algorithm = (u8)psta->dot118021XPrivacy;
 
-	_rtw_memcpy(psetstakey_para->addr, psta->cmn.mac_addr, ETH_ALEN);
+	memcpy(psetstakey_para->addr, psta->cmn.mac_addr, ETH_ALEN);
 
-	_rtw_memcpy(psetstakey_para->key, &psta->dot118021x_UncstKey, 16);
+	memcpy(psetstakey_para->key, &psta->dot118021x_UncstKey, 16);
 
 
 	res = rtw_enqueue_cmd(pcmdpriv, ph2c);
@@ -1981,7 +1981,7 @@ static int rtw_ap_set_key(struct adapter *adapt, u8 *key, u8 alg, int keyid, u8 
 		keylen = 16;
 	}
 
-	_rtw_memcpy(&(psetkeyparm->key[0]), key, keylen);
+	memcpy(&(psetkeyparm->key[0]), key, keylen);
 
 	pcmd->cmdcode = _SetKey_CMD_;
 	pcmd->parmbuf = (u8 *)psetkeyparm;
@@ -2350,16 +2350,16 @@ static void update_bcn_wps_ie(struct adapter *adapt)
 	if (remainder_ielen > 0) {
 		pbackup_remainder_ie = rtw_malloc(remainder_ielen);
 		if (pbackup_remainder_ie)
-			_rtw_memcpy(pbackup_remainder_ie, premainder_ie, remainder_ielen);
+			memcpy(pbackup_remainder_ie, premainder_ie, remainder_ielen);
 	}
 
 	wps_ielen = (uint)pwps_ie_src[1];/* to get ie data len */
 	if ((wps_offset + wps_ielen + 2 + remainder_ielen) <= MAX_IE_SZ) {
-		_rtw_memcpy(pwps_ie, pwps_ie_src, wps_ielen + 2);
+		memcpy(pwps_ie, pwps_ie_src, wps_ielen + 2);
 		pwps_ie += (wps_ielen + 2);
 
 		if (pbackup_remainder_ie)
-			_rtw_memcpy(pwps_ie, pbackup_remainder_ie, remainder_ielen);
+			memcpy(pwps_ie, pbackup_remainder_ie, remainder_ielen);
 
 		/* update IELength */
 		pnetwork->IELength = wps_offset + (wps_ielen + 2) + remainder_ielen;
@@ -3556,7 +3556,7 @@ u16 rtw_ap_parse_sta_supported_rates(struct adapter *adapter, struct sta_info *s
 		goto exit;
 	}
 
-	_rtw_memcpy(sta->bssrateset, rate_set, rate_num);
+	memcpy(sta->bssrateset, rate_set, rate_num);
 	sta->bssratelen = rate_num;
 
 	if (MLME_IS_AP(adapter)) {
@@ -3708,7 +3708,7 @@ u16 rtw_ap_parse_sta_security_ie(struct adapter *adapter, struct sta_info *sta, 
 			copy_len = ((wpa_ie_len + 2) > sizeof(sta->wpa_ie)) ? (sizeof(sta->wpa_ie)) : (wpa_ie_len + 2);
 
 		if (copy_len > 0)
-			_rtw_memcpy(sta->wpa_ie, wpa_ie - 2, copy_len);
+			memcpy(sta->wpa_ie, wpa_ie - 2, copy_len);
 	}
 
 exit:
@@ -3787,7 +3787,7 @@ void rtw_ap_parse_sta_ht_ie(struct adapter *adapter, struct sta_info *sta, struc
 	if (elems->ht_capabilities && elems->ht_capabilities_len >= sizeof(struct rtw_ieee80211_ht_cap)) {
 		sta->flags |= WLAN_STA_HT;
 		sta->flags |= WLAN_STA_WME;
-		_rtw_memcpy(&sta->htpriv.ht_cap, elems->ht_capabilities, sizeof(struct rtw_ieee80211_ht_cap));
+		memcpy(&sta->htpriv.ht_cap, elems->ht_capabilities, sizeof(struct rtw_ieee80211_ht_cap));
 	}
 exit:
 
