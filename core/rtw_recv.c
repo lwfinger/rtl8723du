@@ -52,7 +52,7 @@ int _rtw_init_recv_priv(struct recv_priv *precvpriv, struct adapter *adapt)
 	int	res = _SUCCESS;
 
 
-	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by rtw_zvmalloc(). */
+	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by vzalloc(). */
 	/* memset((unsigned char *)precvpriv, 0, sizeof (struct  recv_priv)); */
 
 	_rtw_spinlock_init(&precvpriv->lock);
@@ -73,7 +73,7 @@ int _rtw_init_recv_priv(struct recv_priv *precvpriv, struct adapter *adapt)
 
 	rtw_os_recv_resource_init(precvpriv, adapt);
 
-	precvpriv->pallocated_frame_buf = rtw_zvmalloc(NR_RECVFRAME * sizeof(union recv_frame) + RXFRAME_ALIGN_SZ);
+	precvpriv->pallocated_frame_buf = vzalloc(NR_RECVFRAME * sizeof(union recv_frame) + RXFRAME_ALIGN_SZ);
 
 	if (precvpriv->pallocated_frame_buf == NULL) {
 		res = _FAIL;

@@ -62,7 +62,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	int	res = _SUCCESS;
 
 
-	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by rtw_zvmalloc(). */
+	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by vzalloc(). */
 	/* memset((unsigned char *)pxmitpriv, 0, sizeof(struct xmit_priv)); */
 
 	_rtw_spinlock_init(&pxmitpriv->lock);
@@ -95,7 +95,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	Please also apply  free_txobj to link_up all the xmit_frames...
 	*/
 
-	pxmitpriv->pallocated_frame_buf = rtw_zvmalloc(NR_XMITFRAME * sizeof(struct xmit_frame) + 4);
+	pxmitpriv->pallocated_frame_buf = vzalloc(NR_XMITFRAME * sizeof(struct xmit_frame) + 4);
 
 	if (!pxmitpriv->pallocated_frame_buf ) {
 		pxmitpriv->pxmit_frame_buf = NULL;
@@ -133,7 +133,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	_rtw_init_queue(&pxmitpriv->free_xmitbuf_queue);
 	_rtw_init_queue(&pxmitpriv->pending_xmitbuf_queue);
 
-	pxmitpriv->pallocated_xmitbuf = rtw_zvmalloc(NR_XMITBUFF * sizeof(struct xmit_buf) + 4);
+	pxmitpriv->pallocated_xmitbuf = vzalloc(NR_XMITBUFF * sizeof(struct xmit_buf) + 4);
 
 	if (!pxmitpriv->pallocated_xmitbuf ) {
 		res = _FAIL;
@@ -172,7 +172,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	/* init xframe_ext queue,  the same count as extbuf */
 	_rtw_init_queue(&pxmitpriv->free_xframe_ext_queue);
 
-	pxmitpriv->xframe_ext_alloc_addr = rtw_zvmalloc(NR_XMIT_EXTBUFF * sizeof(struct xmit_frame) + 4);
+	pxmitpriv->xframe_ext_alloc_addr = vzalloc(NR_XMIT_EXTBUFF * sizeof(struct xmit_frame) + 4);
 
 	if (!pxmitpriv->xframe_ext_alloc_addr ) {
 		pxmitpriv->xframe_ext = NULL;
@@ -204,7 +204,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	/* Init xmit extension buff */
 	_rtw_init_queue(&pxmitpriv->free_xmit_extbuf_queue);
 
-	pxmitpriv->pallocated_xmit_extbuf = rtw_zvmalloc(NR_XMIT_EXTBUFF * sizeof(struct xmit_buf) + 4);
+	pxmitpriv->pallocated_xmit_extbuf = vzalloc(NR_XMIT_EXTBUFF * sizeof(struct xmit_buf) + 4);
 
 	if (!pxmitpriv->pallocated_xmit_extbuf ) {
 		res = _FAIL;

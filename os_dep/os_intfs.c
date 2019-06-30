@@ -1708,7 +1708,7 @@ u8 rtw_init_drv_sw(struct adapter *adapt)
 	/* add for CONFIG_IEEE80211W, none 11w also can use */
 	_rtw_spinlock_init(&adapt->security_key_mutex);
 
-	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by rtw_zvmalloc(). */
+	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by vzalloc(). */
 	/* memset((unsigned char *)&adapt->securitypriv, 0, sizeof (struct security_priv)); */
 
 	if (_rtw_init_sta_priv(&adapt->stapriv) == _FAIL) {
@@ -1994,7 +1994,7 @@ struct adapter *rtw_drv_add_vir_if(struct adapter *primary_adapt,
 	u8 mac[ETH_ALEN];
 
 	/****** init adapter ******/
-	adapt = (struct adapter *)rtw_zvmalloc(sizeof(*adapt));
+	adapt = (struct adapter *)vzalloc(sizeof(*adapt));
 	if (!adapt)
 		goto exit;
 

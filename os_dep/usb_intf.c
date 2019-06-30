@@ -856,7 +856,7 @@ static struct adapter *rtw_usb_primary_adapter_init(struct dvobj_priv *dvobj,
 	struct adapter *adapt = NULL;
 	int status = _FAIL;
 
-	adapt = (struct adapter *)rtw_zvmalloc(sizeof(*adapt));
+	adapt = (struct adapter *)vzalloc(sizeof(*adapt));
 	if (!adapt)
 		goto exit;
 

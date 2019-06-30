@@ -1146,7 +1146,7 @@ int	init_mlme_ext_priv(struct adapter *adapt)
 	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
-	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by rtw_zvmalloc(). */
+	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by vzalloc(). */
 	/* memset((u8 *)pmlmeext, 0, sizeof(struct mlme_ext_priv)); */
 
 	pmlmeext->adapt = adapt;

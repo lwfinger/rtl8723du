@@ -87,7 +87,7 @@ u8 rtw_hal_data_init(struct adapter *adapt)
 {
 	if (is_primary_adapter(adapt)) {
 		adapt->hal_data_sz = sizeof(struct hal_com_data);
-		adapt->HalData = rtw_zvmalloc(adapt->hal_data_sz);
+		adapt->HalData = vzalloc(adapt->hal_data_sz);
 		if (!adapt->HalData) {
 			RTW_INFO("cant not alloc memory for HAL DATA\n");
 			return _FAIL;

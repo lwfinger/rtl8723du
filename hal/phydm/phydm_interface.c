@@ -166,7 +166,7 @@ odm_allocate_memory(
 	u32		length
 )
 {
-	*p_ptr = rtw_zvmalloc(length);
+	*p_ptr = vzalloc(length);
 }
 
 /* length could be ignored, used to detect memory leakage. */

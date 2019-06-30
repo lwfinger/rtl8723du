@@ -218,7 +218,7 @@ u32	_rtw_init_sta_priv(struct	sta_priv *pstapriv)
 
 	pstapriv->adapt = adapter;
 
-	pstapriv->pallocated_stainfo_buf = rtw_zvmalloc(sizeof(struct sta_info) * NUM_STA + 4);
+	pstapriv->pallocated_stainfo_buf = vzalloc(sizeof(struct sta_info) * NUM_STA + 4);
 	if (!pstapriv->pallocated_stainfo_buf)
 		goto exit;
 

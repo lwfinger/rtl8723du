@@ -45,15 +45,6 @@ u32 rtw_atoi(u8 *s)
 
 }
 
-inline void *_rtw_zvmalloc(u32 sz)
-{
-	void *pbuf;
-	pbuf = vmalloc(sz);
-	if (pbuf)
-		memset(pbuf, 0, sz);
-	return pbuf;
-}
-
 void *_rtw_malloc(u32 sz)
 {
 	void *pbuf = NULL;
@@ -879,7 +870,7 @@ struct net_device *rtw_alloc_etherdev(int sizeof_priv)
 
 	pnpi = netdev_priv(pnetdev);
 
-	pnpi->priv = rtw_zvmalloc(sizeof_priv);
+	pnpi->priv = vzalloc(sizeof_priv);
 	if (!pnpi->priv) {
 		free_netdev(pnetdev);
 		pnetdev = NULL;

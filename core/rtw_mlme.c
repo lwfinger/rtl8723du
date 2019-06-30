@@ -40,7 +40,7 @@ static int	_rtw_init_mlme_priv(struct adapter *adapt)
 	int	res = _SUCCESS;
 
 
-	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by rtw_zvmalloc(). */
+	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by vzalloc(). */
 	/* memset((u8 *)pmlmepriv, 0, sizeof(struct mlme_priv)); */
 
 
@@ -69,7 +69,7 @@ static int	_rtw_init_mlme_priv(struct adapter *adapt)
 
 	memset(&pmlmepriv->assoc_ssid, 0, sizeof(struct ndis_802_11_ssid));
 
-	pbuf = rtw_zvmalloc(MAX_BSS_CNT * (sizeof(struct wlan_network)));
+	pbuf = vzalloc(MAX_BSS_CNT * (sizeof(struct wlan_network)));
 
 	if (!pbuf) {
 		res = _FAIL;

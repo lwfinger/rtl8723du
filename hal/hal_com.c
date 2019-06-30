@@ -3039,7 +3039,7 @@ void rtw_dump_rsvd_page(void *sel, struct adapter *adapter, u8 page_offset, u8 p
 	rtw_hal_get_def_var(adapter, HAL_DEF_TX_PAGE_SIZE, &page_size);
 	if (page_size) {
 		buf_size = page_size * page_num;
-		buffer = rtw_zvmalloc(buf_size);
+		buffer = vzalloc(buf_size);
 
 		if (buffer) {
 			rtw_hal_get_rsvd_page(adapter, page_offset, page_num, buffer, buf_size);
