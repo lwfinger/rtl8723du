@@ -3250,7 +3250,7 @@ static int rtw_br_client_tx(struct adapter *adapt, struct sk_buff **pskb)
 						/* goto stop_proc; */
 						return -1;
 					}
-					rtw_skb_free(skb);
+					dev_kfree_skb_any(skb);
 
 					*pskb = skb = newskb;
 					if (is_vlan_tag) {
@@ -3503,7 +3503,7 @@ int rtw_monitor_xmit_entry(struct sk_buff *skb, struct net_device *ndev)
 
 fail:
 
-	rtw_skb_free(skb);
+	dev_kfree_skb_any(skb);
 
 	return 0;
 }

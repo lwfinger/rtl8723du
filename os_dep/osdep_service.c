@@ -107,11 +107,6 @@ inline struct sk_buff *_rtw_skb_alloc(u32 sz)
 	return __dev_alloc_skb(sz, in_interrupt() ? GFP_ATOMIC : GFP_KERNEL);
 }
 
-inline void _rtw_skb_free(struct sk_buff *skb)
-{
-	dev_kfree_skb_any(skb);
-}
-
 inline struct sk_buff *_rtw_skb_copy(const struct sk_buff *skb)
 {
 	return skb_copy(skb, in_interrupt() ? GFP_ATOMIC : GFP_KERNEL);
@@ -154,7 +149,7 @@ void _rtw_skb_queue_purge(struct sk_buff_head *list)
 	struct sk_buff *skb;
 
 	while ((skb = skb_dequeue(list)))
-		_rtw_skb_free(skb);
+		dev_kfree_skb_any(skb);
 }
 
 inline void *_rtw_usb_buffer_alloc(struct usb_device *dev, size_t size, dma_addr_t *dma)
@@ -193,11 +188,6 @@ void *rtw_malloc2d(int h, int w, size_t size)
 void rtw_mfree2d(void *pbuf, int h, int w, int size)
 {
 	rtw_mfree((u8 *)pbuf, h * sizeof(void *) + w * h * size);
-}
-
-inline void rtw_os_pkt_free(struct sk_buff *pkt)
-{
-	rtw_skb_free(pkt);
 }
 
 inline void *rtw_os_pkt_data(struct sk_buff *pkt)

@@ -3567,7 +3567,7 @@ dump:
 
 fail:
 
-	rtw_skb_free(skb);
+	dev_kfree_skb_any(skb);
 
 	return 0;
 

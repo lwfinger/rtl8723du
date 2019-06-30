@@ -524,7 +524,7 @@ void usb_recv_tasklet(void *priv)
 				 "True" : "False",
 				 rtw_is_surprise_removed(adapt) ?
 				 "True" : "False");
-				rtw_skb_free(pskb);
+				dev_kfree_skb_any(pskb);
 			break;
 		}
 

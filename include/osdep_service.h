@@ -119,7 +119,6 @@ void *_rtw_malloc(u32 sz);
 void _rtw_mfree(void *pbuf, u32 sz);
 
 struct sk_buff *_rtw_skb_alloc(u32 sz);
-void _rtw_skb_free(struct sk_buff *skb);
 struct sk_buff *_rtw_skb_copy(const struct sk_buff *skb);
 struct sk_buff *_rtw_skb_clone(struct sk_buff *skb);
 int _rtw_netif_rx(struct  net_device * ndev, struct sk_buff *skb);
@@ -155,9 +154,7 @@ void _rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr, dma_a
 #define rtw_mfree_f(pbuf, sz, mstat_f)		_rtw_mfree((pbuf), (sz))
 
 #define rtw_skb_alloc(size) _rtw_skb_alloc((size))
-#define rtw_skb_free(skb) _rtw_skb_free((skb))
 #define rtw_skb_alloc_f(size, mstat_f)	_rtw_skb_alloc((size))
-#define rtw_skb_free_f(skb, mstat_f)	_rtw_skb_free((skb))
 #define rtw_skb_copy(skb)	_rtw_skb_copy((skb))
 #define rtw_skb_clone(skb)	_rtw_skb_clone((skb))
 #define rtw_skb_copy_f(skb, mstat_f)	_rtw_skb_copy((skb))
@@ -176,7 +173,6 @@ void _rtw_usb_buffer_free(struct usb_device *dev, size_t size, void *addr, dma_a
 extern void	*rtw_malloc2d(int h, int w, size_t size);
 extern void	rtw_mfree2d(void *pbuf, int h, int w, int size);
 
-void rtw_os_pkt_free(struct sk_buff *pkt);
 void *rtw_os_pkt_data(struct sk_buff *pkt);
 u32 rtw_os_pkt_len(struct sk_buff *pkt);
 

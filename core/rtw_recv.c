@@ -2088,7 +2088,7 @@ static int amsdu_to_msdu(struct adapter *adapt, union recv_frame *prframe)
 		if (rtw_recv_indicatepkt_check(prframe, rtw_os_pkt_data(sub_pkt), rtw_os_pkt_len(sub_pkt)) == _SUCCESS)
 			subframes[nr_subframes++] = sub_pkt;
 		else
-			rtw_os_pkt_free(sub_pkt);
+			dev_kfree_skb_any(sub_pkt);
 
 		/* move the data point to data content */
 		pdata += ETH_HLEN;

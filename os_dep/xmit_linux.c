@@ -200,7 +200,7 @@ void rtw_os_pkt_complete(struct adapter *adapt, struct sk_buff *pkt)
 	}
 #endif
 
-	rtw_skb_free(pkt);
+	dev_kfree_skb_any(pkt);
 }
 
 void rtw_os_xmit_complete(struct adapter *adapt, struct xmit_frame *pxframe)
@@ -341,18 +341,18 @@ static int rtw_mlcst2unicst(struct adapter *adapt, struct sk_buff *skb)
 				DBG_COUNTER(adapt->tx_logs.os_tx_m2u_entry_err_xmit);
 				RTW_INFO("%s()-%d: rtw_xmit() return error! res=%d\n", __FUNCTION__, __LINE__, res);
 				pxmitpriv->tx_drop++;
-				rtw_skb_free(newskb);
+				dev_kfree_skb_any(newskb);
 			}
 		} else {
 			DBG_COUNTER(adapt->tx_logs.os_tx_m2u_entry_err_skb);
 			RTW_INFO("%s-%d: rtw_skb_copy() failed!\n", __FUNCTION__, __LINE__);
 			pxmitpriv->tx_drop++;
-			/* rtw_skb_free(skb); */
+			/* dev_kfree_skb_any(skb); */
 			return false;	/* Caller shall tx this multicast frame via normal way. */
 		}
 	}
 
-	rtw_skb_free(skb);
+	dev_kfree_skb_any(skb);
 	return true;
 }
 

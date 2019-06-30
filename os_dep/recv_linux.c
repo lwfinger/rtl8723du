@@ -113,7 +113,7 @@ exit_rtw_os_recv_resource_alloc:
 void rtw_os_free_recvframe(union recv_frame *precvframe)
 {
 	if (precvframe->u.hdr.pkt) {
-		rtw_os_pkt_free(precvframe->u.hdr.pkt);
+		dev_kfree_skb_any(precvframe->u.hdr.pkt);
 		precvframe->u.hdr.pkt = NULL;
 	}
 }
@@ -196,7 +196,7 @@ int rtw_os_recvbuf_resource_free(struct adapter *adapt, struct recv_buf *precvbu
 		usb_free_urb(precvbuf->purb);
 	}
 	if (precvbuf->pskb)
-			rtw_skb_free(precvbuf->pskb);
+			dev_kfree_skb_any(precvbuf->pskb);
 	return ret;
 }
 
@@ -542,7 +542,7 @@ void rtw_os_read_port(struct adapter *adapt, struct recv_buf *precvbuf)
 	precvbuf->ref_cnt--;
 
 	/* free skb in recv_buf */
-	rtw_skb_free(precvbuf->pskb);
+	dev_kfree_skb_any(precvbuf->pskb);
 
 	precvbuf->pskb = NULL;
 
