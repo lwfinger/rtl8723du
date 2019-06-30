@@ -20,9 +20,9 @@ int	_rtw_init_cmd_priv(struct	cmd_priv *pcmdpriv)
 	int res = _SUCCESS;
 
 
-	_rtw_init_sema(&(pcmdpriv->cmd_queue_sema), 0);
-	/* _rtw_init_sema(&(pcmdpriv->cmd_done_sema), 0); */
-	_rtw_init_sema(&(pcmdpriv->start_cmdthread_sema), 0);
+	sema_init(&(pcmdpriv->cmd_queue_sema), 0);
+	/* sema_init(&(pcmdpriv->cmd_done_sema), 0); */
+	sema_init(&(pcmdpriv->start_cmdthread_sema), 0);
 
 	_rtw_init_queue(&(pcmdpriv->cmd_queue));
 
@@ -121,7 +121,7 @@ int _rtw_init_evt_priv(struct evt_priv *pevtpriv)
 
 
 #ifdef CONFIG_H2CLBK
-	_rtw_init_sema(&(pevtpriv->lbkevt_done), 0);
+	sema_init(&(pevtpriv->lbkevt_done), 0);
 	pevtpriv->lbkevt_limit = 0;
 	pevtpriv->lbkevt_num = 0;
 	pevtpriv->cmdevt_parm = NULL;
@@ -133,7 +133,7 @@ int _rtw_init_evt_priv(struct evt_priv *pevtpriv)
 
 #ifdef CONFIG_EVENT_THREAD_MODE
 
-	_rtw_init_sema(&(pevtpriv->evt_notify), 0);
+	sema_init(&(pevtpriv->evt_notify), 0);
 
 	pevtpriv->evt_allocated_buf = rtw_zmalloc(MAX_EVTSZ + 4);
 	if (pevtpriv->evt_allocated_buf == NULL) {

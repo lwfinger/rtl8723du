@@ -2062,7 +2062,7 @@ bool EXhalbtcoutsrc_InitlizeVariables(void *adapt)
 #else
 	timer_setup(&GLBtcBtMpOperTimer, _btmpoper_timer_hdl, 0);
 #endif
-	_rtw_init_sema(&GLBtcBtMpRptSema, 0);
+	sema_init(&GLBtcBtMpRptSema, 0);
 	GLBtcBtMpRptSeq = 0;
 	GLBtcBtMpRptStatus = 0;
 	memset(GLBtcBtMpRptRsp, 0, C2H_MAX_SIZE);

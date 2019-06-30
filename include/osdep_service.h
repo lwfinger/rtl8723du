@@ -163,7 +163,6 @@ extern void	rtw_mfree2d(void *pbuf, int h, int w, int size);
 extern u32	rtw_is_list_empty(struct list_head *phead);
 extern void	rtw_list_delete(struct list_head *plist);
 
-extern void	_rtw_init_sema(struct semaphore *sema, int init_val);
 extern void	_rtw_free_sema(struct semaphore	*sema);
 extern void	_rtw_up_sema(struct semaphore	*sema);
 extern u32	_rtw_down_sema(struct semaphore *sema);

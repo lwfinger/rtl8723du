@@ -3306,7 +3306,7 @@ int rtw_set_key(struct adapter *adapter, struct security_priv *psecuritypriv, in
 
 		INIT_LIST_HEAD(&pcmd->list);
 
-		/* _rtw_init_sema(&(pcmd->cmd_sem), 0); */
+		/* sema_init(&(pcmd->cmd_sem), 0); */
 
 		res = rtw_enqueue_cmd(pcmdpriv, pcmd);
 	} else {
