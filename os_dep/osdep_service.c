@@ -173,11 +173,6 @@ inline void *rtw_os_pkt_data(struct sk_buff *pkt)
 	return pkt->data;
 }
 
-inline u32 rtw_os_pkt_len(struct sk_buff *pkt)
-{
-	return pkt->len;
-}
-
 void _rtw_memcpy(void *dst, const void *src, u32 sz)
 {
 	memcpy(dst, src, sz);

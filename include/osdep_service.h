@@ -161,7 +161,6 @@ extern void	*rtw_malloc2d(int h, int w, size_t size);
 extern void	rtw_mfree2d(void *pbuf, int h, int w, int size);
 
 void *rtw_os_pkt_data(struct sk_buff *pkt);
-u32 rtw_os_pkt_len(struct sk_buff *pkt);
 
 extern void	_rtw_memcpy(void *dec, const void *sour, u32 sz);
 extern int	_rtw_memcmp(const void *dst, const void *src, u32 sz);
