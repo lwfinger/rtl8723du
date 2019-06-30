@@ -559,7 +559,7 @@ int rtw_hw_suspend(struct adapter *adapt)
 	rtw_ips_dev_unload(adapt);
 	pwrpriv->rf_pwrstate = rf_off;
 	pwrpriv->bips_processing = false;
-	_exit_pwrlock(&pwrpriv->lock);
+	up(&pwrpriv->lock);
 
 	return 0;
 
@@ -581,7 +581,7 @@ int rtw_hw_resume(struct adapter *adapt)
 	rtw_reset_drv_sw(adapt);
 
 	if (pm_netdev_open(pnetdev, false) != 0) {
-		_exit_pwrlock(&pwrpriv->lock);
+		up(&pwrpriv->lock);
 		goto error_exit;
 	}
 	rtw_netif_device_attach(pnetdev);
@@ -594,8 +594,7 @@ int rtw_hw_resume(struct adapter *adapt)
 
 	pwrpriv->rf_pwrstate = rf_on;
 	pwrpriv->bips_processing = false;
-	_exit_pwrlock(&pwrpriv->lock);
-
+	up(&pwrpriv->lock);
 
 	return 0;
 error_exit:

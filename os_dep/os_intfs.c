@@ -1397,7 +1397,7 @@ void rtw_stop_drv_threads(struct adapter *adapt)
 
 #ifdef CONFIG_EVENT_THREAD_MODE
 	if (adapt->evtThread) {
-		_rtw_up_sema(&adapt->evtpriv.evt_notify);
+		up(&adapt->evtpriv.evt_notify);
 		rtw_thread_stop(adapt->evtThread);
 		adapt->evtThread = NULL;
 	}

@@ -8288,7 +8288,7 @@ static void loopbackTest(struct adapter * adapt, u32 cnt, u32 size, u8 *pmsg)
 	if (ploopback) {
 		if (!ploopback->bstop) {
 			ploopback->bstop = true;
-			_rtw_up_sema(&ploopback->sema);
+			up(&ploopback->sema);
 		}
 		len = 0;
 		do {

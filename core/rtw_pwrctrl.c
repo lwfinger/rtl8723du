@@ -50,7 +50,7 @@ int rtw_fw_ps_state(struct adapter * adapt)
 
 
 exit_fw_ps_state:
-	_exit_pwrlock(&pwrpriv->check_32k_lock);
+	up(&pwrpriv->check_32k_lock);
 	return ret;
 }
 
@@ -90,7 +90,7 @@ void ips_enter(struct adapter *adapt)
 
 	_enter_pwrlock(&pwrpriv->lock);
 	_ips_enter(adapt);
-	_exit_pwrlock(&pwrpriv->lock);
+	up(&pwrpriv->lock);
 }
 
 int _ips_leave(struct adapter *adapt)
@@ -134,7 +134,7 @@ int ips_leave(struct adapter *adapt)
 
 	_enter_pwrlock(&pwrpriv->lock);
 	ret = _ips_leave(adapt);
-	_exit_pwrlock(&pwrpriv->lock);
+	up(&pwrpriv->lock);
 
 	if (_SUCCESS == ret)
 		odm_dm_reset(&GET_HAL_DATA(adapt)->odmpriv);
@@ -244,7 +244,7 @@ void rtw_ps_processor(struct adapter *adapt)
 
 	_enter_pwrlock(&adapter_to_pwrctl(adapt)->lock);
 	ps_deny = rtw_ps_deny_get(adapt);
-	_exit_pwrlock(&adapter_to_pwrctl(adapt)->lock);
+	up(&adapter_to_pwrctl(adapt)->lock);
 	if (ps_deny != 0) {
 		RTW_INFO(FUNC_ADPT_FMT ": ps_deny=0x%08X, skip power save!\n",
 			 FUNC_ADPT_ARG(adapt), ps_deny);
@@ -1202,7 +1202,7 @@ void rtw_ps_deny(struct adapter * adapt, enum ps_deny_reason reason)
 			 FUNC_ADPT_ARG(adapt), reason);
 	}
 	pwrpriv->ps_deny |= BIT(reason);
-	_exit_pwrlock(&pwrpriv->lock);
+	up(&pwrpriv->lock);
 
 	/* 	RTW_INFO("-" FUNC_ADPT_FMT ": Now PS deny for 0x%08X\n",
 	 *		FUNC_ADPT_ARG(adapt), pwrpriv->ps_deny); */
@@ -1228,7 +1228,7 @@ void rtw_ps_deny_cancel(struct adapter * adapt, enum ps_deny_reason reason)
 			 FUNC_ADPT_ARG(adapt), reason);
 	}
 	pwrpriv->ps_deny &= ~BIT(reason);
-	_exit_pwrlock(&pwrpriv->lock);
+	up(&pwrpriv->lock);
 
 	/* 	RTW_INFO("-" FUNC_ADPT_FMT ": Now PS deny for 0x%08X\n",
 	 *		FUNC_ADPT_ARG(adapt), pwrpriv->ps_deny); */

@@ -275,7 +275,7 @@ static void halbtcoutsrc_ExitPwrLock(struct btc_coexist * pBtCoexist)
 	struct dvobj_priv *dvobj = adapter_to_dvobj((struct adapter *)pBtCoexist->Adapter);
 	struct pwrctrl_priv *pwrpriv = dvobj_to_pwrctl(dvobj);
 
-	_exit_pwrlock(&pwrpriv->lock);
+	up(&pwrpriv->lock);
 }
 
 static u8 halbtcoutsrc_IsHwMailboxExist(struct btc_coexist * pBtCoexist)
@@ -536,7 +536,7 @@ static void _btmpoper_timer_hdl(struct timer_list *t)
 {
 	if (GLBtcBtMpRptWait) {
 		GLBtcBtMpRptWait = false;
-		_rtw_up_sema(&GLBtcBtMpRptSema);
+		up(&GLBtcBtMpRptSema);
 	}
 }
 
@@ -3123,7 +3123,7 @@ void hal_btcoex_BtMpRptNotify(struct adapter * adapt, u8 length, u8 *tmpBuf)
 	if ((GLBtcBtMpRptWiFiOK) && (GLBtcBtMpRptBTOK)) {
 		GLBtcBtMpRptWait = false;
 		_cancel_timer_ex(&GLBtcBtMpOperTimer);
-		_rtw_up_sema(&GLBtcBtMpRptSema);
+		up(&GLBtcBtMpRptSema);
 	}
 }
 

@@ -349,7 +349,7 @@ u32 rtw_enqueue_cmd(struct cmd_priv *pcmdpriv, struct cmd_obj *cmd_obj)
 	res = _rtw_enqueue_cmd(&pcmdpriv->cmd_queue, cmd_obj, 0);
 
 	if (res == _SUCCESS)
-		_rtw_up_sema(&pcmdpriv->cmd_queue_sema);
+		up(&pcmdpriv->cmd_queue_sema);
 
 exit:
 
@@ -370,7 +370,6 @@ struct	cmd_obj	*rtw_dequeue_cmd(struct cmd_priv *pcmdpriv)
 void rtw_cmd_clr_isr(struct	cmd_priv *pcmdpriv)
 {
 	pcmdpriv->cmd_done_cnt++;
-	/* _rtw_up_sema(&(pcmdpriv->cmd_done_sema)); */
 }
 
 void rtw_free_cmd_obj(struct cmd_obj *pcmd)
@@ -397,7 +396,7 @@ void rtw_free_cmd_obj(struct cmd_obj *pcmd)
 void rtw_stop_cmd_thread(struct adapter *adapter)
 {
 	if (adapter->cmdThread) {
-		_rtw_up_sema(&adapter->cmdpriv.cmd_queue_sema);
+		up(&adapter->cmdpriv.cmd_queue_sema);
 		rtw_thread_stop(adapter->cmdThread);
 		adapter->cmdThread = NULL;
 	}
@@ -422,7 +421,7 @@ int rtw_cmd_thread(void *context)
 	pcmdbuf = pcmdpriv->cmd_buf;
 	prspbuf = pcmdpriv->rsp_buf;
 	ATOMIC_SET(&(pcmdpriv->cmdthd_running), true);
-	_rtw_up_sema(&pcmdpriv->start_cmdthread_sema);
+	up(&pcmdpriv->start_cmdthread_sema);
 
 
 	while (1) {
@@ -632,7 +631,7 @@ void rtw_free_evt_obj(struct evt_obj *pevtobj)
 void rtw_evt_notify_isr(struct evt_priv *pevtpriv)
 {
 	pevtpriv->evt_done_cnt++;
-	_rtw_up_sema(&(pevtpriv->evt_notify));
+	up(&(pevtpriv->evt_notify));
 }
 #endif
 

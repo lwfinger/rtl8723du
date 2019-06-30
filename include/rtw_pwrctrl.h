@@ -104,12 +104,6 @@ __inline static void _enter_pwrlock(struct semaphore *plock)
 	_rtw_down_sema(plock);
 }
 
-
-__inline static void _exit_pwrlock(struct semaphore *plock)
-{
-	_rtw_up_sema(plock);
-}
-
 #define LPS_DELAY_MS	1000 /* 1 sec */
 
 #define EXE_PWR_NONE	0x01

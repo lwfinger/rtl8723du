@@ -265,49 +265,6 @@ static void usb_write_port_complete(struct urb *purb, struct pt_regs *regs)
 	default:
 		break;
 	}
-
-
-	/*
-		_enter_critical(&pxmitpriv->lock, &irqL);
-
-		pxmitpriv->txirp_cnt--;
-
-		switch(pattrib->priority)
-		{
-			case 1:
-			case 2:
-				pxmitpriv->bkq_cnt--;
-
-				break;
-			case 4:
-			case 5:
-				pxmitpriv->viq_cnt--;
-
-				break;
-			case 6:
-			case 7:
-				pxmitpriv->voq_cnt--;
-
-				break;
-			case 0:
-			case 3:
-			default:
-				pxmitpriv->beq_cnt--;
-
-				break;
-
-		}
-
-		_exit_critical(&pxmitpriv->lock, &irqL);
-
-
-		if(pxmitpriv->txirp_cnt==0)
-		{
-			_rtw_up_sema(&(pxmitpriv->tx_retevt));
-		}
-	*/
-	/* rtw_free_xmitframe(pxmitpriv, pxmitframe); */
-
 	if (RTW_CANNOT_TX(adapt)) {
 		RTW_INFO("%s(): TX Warning! bDriverStopped(%s) OR bSurpriseRemoved(%s) pxmitbuf->buf_tag(%x)\n"
 			 , __func__
@@ -324,28 +281,21 @@ static void usb_write_port_complete(struct urb *purb, struct pt_regs *regs)
 	} else {
 		RTW_INFO("###=> urb_write_port_complete status(%d)\n", purb->status);
 		if ((purb->status == -EPIPE) || (purb->status == -EPROTO)) {
-			/* usb_clear_halt(pusbdev, purb->pipe);	 */
-			/* msleep(10); */
 			sreset_set_wifi_error_status(adapt, USB_WRITE_PORT_FAIL);
 		} else if (purb->status == -EINPROGRESS) {
 			goto check_completion;
-
 		} else if (purb->status == -ENOENT) {
 			RTW_INFO("%s: -ENOENT\n", __func__);
 			goto check_completion;
-
 		} else if (purb->status == -ECONNRESET) {
 			RTW_INFO("%s: -ECONNRESET\n", __func__);
 			goto check_completion;
-
 		} else if (purb->status == -ESHUTDOWN) {
 			rtw_set_drv_stopped(adapt);
-
 			goto check_completion;
 		} else {
 			rtw_set_surprise_removed(adapt);
 			RTW_INFO("bSurpriseRemoved=true\n");
-
 			goto check_completion;
 		}
 	}
@@ -358,12 +308,7 @@ check_completion:
 
 	rtw_free_xmitbuf(pxmitpriv, pxmitbuf);
 
-	/* if(rtw_txframes_pending(adapt))	 */
-	{
-		tasklet_hi_schedule(&pxmitpriv->xmit_tasklet);
-	}
-
-
+	tasklet_hi_schedule(&pxmitpriv->xmit_tasklet);
 }
 
 u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)

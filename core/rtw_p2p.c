@@ -4423,7 +4423,7 @@ void p2p_ps_wk_hdl(struct adapter *adapt, u8 p2p_ps_state)
 	case P2P_PS_ENABLE:
 		_enter_pwrlock(&adapter_to_pwrctl(adapt)->lock);
 		ps_deny = rtw_ps_deny_get(adapt);
-		_exit_pwrlock(&adapter_to_pwrctl(adapt)->lock);
+		up(&adapter_to_pwrctl(adapt)->lock);
 
 		if ((ps_deny & (PS_DENY_SCAN | PS_DENY_JOIN))
 			|| rtw_mi_check_fwstate(adapt, (_FW_UNDER_SURVEY | _FW_UNDER_LINKING))) {
