@@ -6085,9 +6085,9 @@ int rtw_wdev_alloc(struct adapter *adapt, struct wiphy *wiphy)
 	pwdev_priv->ifname_mon[0] = '\0';
 	pwdev_priv->adapt = adapt;
 	pwdev_priv->scan_request = NULL;
-	_rtw_spinlock_init(&pwdev_priv->scan_req_lock);
+	spin_lock_init(&pwdev_priv->scan_req_lock);
 	pwdev_priv->connect_req = NULL;
-	_rtw_spinlock_init(&pwdev_priv->connect_req_lock);
+	spin_lock_init(&pwdev_priv->connect_req_lock);
 
 	pwdev_priv->p2p_enabled = false;
 	pwdev_priv->probe_resp_ie_update_time = rtw_get_current_time();
@@ -6124,12 +6124,9 @@ void rtw_wdev_free(struct wireless_dev *wdev)
 		struct rtw_wdev_priv *wdev_priv = adapter_wdev_data(adapter);
 		unsigned long irqL;
 
-		_rtw_spinlock_free(&wdev_priv->scan_req_lock);
-
 		_enter_critical_bh(&wdev_priv->connect_req_lock, &irqL);
 		rtw_wdev_free_connect_req(wdev_priv);
 		_exit_critical_bh(&wdev_priv->connect_req_lock, &irqL);
-		_rtw_spinlock_free(&wdev_priv->connect_req_lock);
 
 		_rtw_mutex_free(&wdev_priv->roch_mutex);
 	}

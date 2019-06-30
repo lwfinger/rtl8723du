@@ -23,7 +23,7 @@ void	_rtw_init_sta_xmit_priv(struct sta_xmit_priv *psta_xmitpriv)
 
 	memset((unsigned char *)psta_xmitpriv, 0, sizeof(struct sta_xmit_priv));
 
-	_rtw_spinlock_init(&psta_xmitpriv->lock);
+	spin_lock_init(&psta_xmitpriv->lock);
 
 	/* for(i = 0 ; i < MAX_NUMBLKS; i++) */
 	/*	_init_txservq(&(psta_xmitpriv->blk_q[i])); */
@@ -42,7 +42,7 @@ void rtw_init_xmit_block(struct adapter *adapt)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapt);
 
-	_rtw_spinlock_init(&dvobj->xmit_block_lock);
+	spin_lock_init(&dvobj->xmit_block_lock);
 	dvobj->xmit_block = XMIT_BLOCK_NONE;
 
 }
@@ -51,7 +51,6 @@ static void rtw_free_xmit_block(struct adapter *adapt)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapt);
 
-	_rtw_spinlock_free(&dvobj->xmit_block_lock);
 }
 
 int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
@@ -65,8 +64,8 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by vzalloc(). */
 	/* memset((unsigned char *)pxmitpriv, 0, sizeof(struct xmit_priv)); */
 
-	_rtw_spinlock_init(&pxmitpriv->lock);
-	_rtw_spinlock_init(&pxmitpriv->lock_sctx);
+	spin_lock_init(&pxmitpriv->lock);
+	spin_lock_init(&pxmitpriv->lock_sctx);
 	sema_init(&pxmitpriv->xmit_sema, 0);
 
 	/*
@@ -304,22 +303,7 @@ exit:
 void  rtw_mfree_xmit_priv_lock(struct xmit_priv *pxmitpriv);
 void  rtw_mfree_xmit_priv_lock(struct xmit_priv *pxmitpriv)
 {
-	_rtw_spinlock_free(&pxmitpriv->lock);
-
-	_rtw_spinlock_free(&pxmitpriv->be_pending.lock);
-	_rtw_spinlock_free(&pxmitpriv->bk_pending.lock);
-	_rtw_spinlock_free(&pxmitpriv->vi_pending.lock);
-	_rtw_spinlock_free(&pxmitpriv->vo_pending.lock);
-	_rtw_spinlock_free(&pxmitpriv->bm_pending.lock);
-
-	/* _rtw_spinlock_free(&pxmitpriv->legacy_dz_queue.lock); */
-	/* _rtw_spinlock_free(&pxmitpriv->apsd_queue.lock); */
-
-	_rtw_spinlock_free(&pxmitpriv->free_xmit_queue.lock);
-	_rtw_spinlock_free(&pxmitpriv->free_xmitbuf_queue.lock);
-	_rtw_spinlock_free(&pxmitpriv->pending_xmitbuf_queue.lock);
 }
-
 
 void _rtw_free_xmit_priv(struct xmit_priv *pxmitpriv)
 {
@@ -363,10 +347,6 @@ void _rtw_free_xmit_priv(struct xmit_priv *pxmitpriv)
 	}
 	if (pxmitpriv->xframe_ext_alloc_addr)
 		vfree(pxmitpriv->xframe_ext_alloc_addr);
-	_rtw_spinlock_free(&pxmitpriv->free_xframe_ext_queue.lock);
-
-	/* free xmit extension buff */
-	_rtw_spinlock_free(&pxmitpriv->free_xmit_extbuf_queue.lock);
 
 	pxmitbuf = (struct xmit_buf *)pxmitpriv->pxmit_extbuf;
 	for (i = 0; i < NR_XMIT_EXTBUFF; i++) {
@@ -3154,7 +3134,7 @@ void rtw_init_hwxmits(struct hw_xmit *phwxmit, int entry)
 {
 	int i;
 	for (i = 0; i < entry; i++, phwxmit++) {
-		/* _rtw_spinlock_init(&phwxmit->xmit_lock); */
+		/* spin_lock_init(&phwxmit->xmit_lock); */
 		/* INIT_LIST_HEAD(&phwxmit->pending);		 */
 		/* phwxmit->txcmdcnt = 0; */
 		phwxmit->accnt = 0;

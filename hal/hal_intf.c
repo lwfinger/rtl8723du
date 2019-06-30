@@ -122,7 +122,7 @@ void rtw_hal_dm_init(struct adapter *adapt)
 
 		adapt->hal_func.dm_init(adapt);
 
-		_rtw_spinlock_init(&pHalData->IQKSpinLock);
+		spin_lock_init(&pHalData->IQKSpinLock);
 
 		phy_load_tx_power_ext_info(adapt, 1);
 	}
@@ -133,8 +133,6 @@ void rtw_hal_dm_deinit(struct adapter *adapt)
 		struct hal_com_data *	pHalData = GET_HAL_DATA(adapt);
 
 		adapt->hal_func.dm_deinit(adapt);
-
-		_rtw_spinlock_free(&pHalData->IQKSpinLock);
 	}
 }
 void	rtw_hal_sw_led_init(struct adapter *adapt)

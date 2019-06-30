@@ -1995,7 +1995,7 @@ void rtw_mbid_cam_init(struct dvobj_priv *dvobj)
 {
 	struct mbid_cam_ctl_t *mbid_cam_ctl = &dvobj->mbid_cam_ctl;
 
-	_rtw_spinlock_init(&mbid_cam_ctl->lock);
+	spin_lock_init(&mbid_cam_ctl->lock);
 	mbid_cam_ctl->bitmap = 0;
 	ATOMIC_SET(&mbid_cam_ctl->mbid_entry_num, 0);
 	memset(&dvobj->mbid_cam_cache, 0, sizeof(dvobj->mbid_cam_cache));
@@ -2003,9 +2003,6 @@ void rtw_mbid_cam_init(struct dvobj_priv *dvobj)
 
 void rtw_mbid_cam_deinit(struct dvobj_priv *dvobj)
 {
-	struct mbid_cam_ctl_t *mbid_cam_ctl = &dvobj->mbid_cam_ctl;
-
-	_rtw_spinlock_free(&mbid_cam_ctl->lock);
 }
 
 void rtw_mbid_cam_reset(struct adapter *adapter)

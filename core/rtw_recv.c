@@ -34,7 +34,7 @@ void _rtw_init_sta_recv_priv(struct sta_recv_priv *psta_recvpriv)
 
 	memset((u8 *)psta_recvpriv, 0, sizeof(struct sta_recv_priv));
 
-	_rtw_spinlock_init(&psta_recvpriv->lock);
+	spin_lock_init(&psta_recvpriv->lock);
 
 	/* for(i=0; i<MAX_RX_NUMBLKS; i++) */
 	/*	_rtw_init_queue(&psta_recvpriv->blk_strms[i]); */
@@ -55,7 +55,7 @@ int _rtw_init_recv_priv(struct recv_priv *precvpriv, struct adapter *adapt)
 	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by vzalloc(). */
 	/* memset((unsigned char *)precvpriv, 0, sizeof (struct  recv_priv)); */
 
-	_rtw_spinlock_init(&precvpriv->lock);
+	spin_lock_init(&precvpriv->lock);
 
 	_rtw_init_queue(&precvpriv->free_recv_queue);
 	_rtw_init_queue(&precvpriv->recv_pending_queue);
@@ -123,11 +123,6 @@ exit:
 
 void rtw_mfree_recv_priv_lock(struct recv_priv *precvpriv)
 {
-	_rtw_spinlock_free(&precvpriv->lock);
-	_rtw_spinlock_free(&precvpriv->free_recv_queue.lock);
-	_rtw_spinlock_free(&precvpriv->recv_pending_queue.lock);
-
-	_rtw_spinlock_free(&precvpriv->free_recv_buf_queue.lock);
 }
 
 void _rtw_free_recv_priv(struct recv_priv *precvpriv)
@@ -286,7 +281,7 @@ int rtw_enqueue_recvframe(union recv_frame *precvframe, struct __queue *queue)
 	/* _spinlock(&pfree_recv_queue->lock); */
 	_enter_critical_bh(&queue->lock, &irqL);
 	ret = _rtw_enqueue_recvframe(precvframe, queue);
-	/* _rtw_spinunlock(&pfree_recv_queue->lock); */
+	/* spin_unlock(&pfree_recv_queue->lock); */
 	_exit_critical_bh(&queue->lock, &irqL);
 
 	return ret;
@@ -315,7 +310,7 @@ void rtw_free_recvframe_queue(struct __queue *pframequeue,  struct __queue *pfre
 	union	recv_frame	*precvframe;
 	struct list_head	*plist, *phead;
 
-	_rtw_spinlock(&pframequeue->lock);
+	spin_lock(&pframequeue->lock);
 
 	phead = get_list_head(pframequeue);
 	plist = get_next(phead);
@@ -330,7 +325,7 @@ void rtw_free_recvframe_queue(struct __queue *pframequeue,  struct __queue *pfre
 		rtw_free_recvframe(precvframe, pfree_recv_queue);
 	}
 
-	_rtw_spinunlock(&pframequeue->lock);
+	spin_unlock(&pframequeue->lock);
 
 
 }
@@ -1974,10 +1969,10 @@ union recv_frame *recvframe_chk_defrag(struct adapter * adapt, union recv_frame 
 
 			/* Then enqueue the 0~(n-1) fragment into the defrag_q */
 
-			/* _rtw_spinlock(&pdefrag_q->lock); */
+			/* spin_lock(&pdefrag_q->lock); */
 			phead = get_list_head(pdefrag_q);
 			list_add_tail(&pfhdr->list, phead);
-			/* _rtw_spinunlock(&pdefrag_q->lock); */
+			/* spin_unlock(&pdefrag_q->lock); */
 
 
 			prtnframe = NULL;
@@ -1994,10 +1989,10 @@ union recv_frame *recvframe_chk_defrag(struct adapter * adapt, union recv_frame 
 		/* the last fragment frame */
 		/* enqueue the last fragment */
 		if (pdefrag_q) {
-			/* _rtw_spinlock(&pdefrag_q->lock); */
+			/* spin_lock(&pdefrag_q->lock); */
 			phead = get_list_head(pdefrag_q);
 			list_add_tail(&pfhdr->list, phead);
-			/* _rtw_spinunlock(&pdefrag_q->lock); */
+			/* spin_unlock(&pdefrag_q->lock); */
 
 			/* call recvframe_defrag to defrag */
 			precv_frame = recvframe_defrag(adapt, pdefrag_q);
@@ -2275,7 +2270,7 @@ static int recv_indicatepkts_in_order(struct adapter *adapt, struct recv_reorder
 		precvpriv->dbg_rx_ampdu_forced_indicate_count++;
 		if (rtw_is_list_empty(phead)) {
 			/* _exit_critical_ex(&ppending_recvframe_queue->lock, &irql); */
-			/* _rtw_spinunlock_ex(&ppending_recvframe_queue->lock); */
+			/* spin_unlock(&ppending_recvframe_queue->lock); */
 			return true;
 		}
 

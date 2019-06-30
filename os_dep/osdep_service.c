@@ -227,44 +227,14 @@ void	_rtw_mutex_free(_mutex *pmutex)
 #endif
 }
 
-void	_rtw_spinlock_init(spinlock_t *plock)
-{
-	spin_lock_init(plock);
-}
-
-void	_rtw_spinlock_free(spinlock_t *plock)
-{
-}
-
-void	_rtw_spinlock(spinlock_t	*plock)
-{
-	spin_lock(plock);
-}
-
-void	_rtw_spinunlock(spinlock_t *plock)
-{
-	spin_unlock(plock);
-}
-
-void	_rtw_spinlock_ex(spinlock_t	*plock)
-{
-	spin_lock(plock);
-}
-
-void	_rtw_spinunlock_ex(spinlock_t *plock)
-{
-	spin_unlock(plock);
-}
-
 void _rtw_init_queue(struct __queue *pqueue)
 {
 	INIT_LIST_HEAD(&(pqueue->queue));
-	_rtw_spinlock_init(&(pqueue->lock));
+	spin_lock_init(&(pqueue->lock));
 }
 
 void _rtw_deinit_queue(struct __queue *pqueue)
 {
-	_rtw_spinlock_free(&(pqueue->lock));
 }
 
 u32	  _rtw_queue_empty(struct __queue	*pqueue)

@@ -17,7 +17,7 @@ void init_mlme_ap_info(struct adapter *adapt)
 	struct mlme_ext_priv *pmlmeext = &adapt->mlmeextpriv;
 	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
 
-	_rtw_spinlock_init(&pmlmepriv->bcn_update_lock);
+	spin_lock_init(&pmlmepriv->bcn_update_lock);
 
 	/* pmlmeext->bstart_bss = false; */
 
@@ -28,8 +28,6 @@ void free_mlme_ap_info(struct adapter *adapt)
 	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
 
 	stop_ap_mode(adapt);
-	_rtw_spinlock_free(&pmlmepriv->bcn_update_lock);
-
 }
 
 /*
@@ -3232,11 +3230,7 @@ void stop_ap_mode(struct adapter *adapt)
 		rtw_warn_on(1);
 
 	pmlmepriv->update_bcn = false;
-	/*pmlmeext->bstart_bss = false;*/
 	adapt->netif_up = false;
-	/* _rtw_spinlock_free(&pmlmepriv->bcn_update_lock); */
-
-	/* reset and init security priv , this can refine with rtw_reset_securitypriv */
 	memset((unsigned char *)&adapt->securitypriv, 0, sizeof(struct security_priv));
 	adapt->securitypriv.ndisauthtype = Ndis802_11AuthModeOpen;
 	adapt->securitypriv.ndisencryptstatus = Ndis802_11WEPDisabled;

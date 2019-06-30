@@ -1515,7 +1515,7 @@ struct dvobj_priv *devobj_init(void)
 	ATOMIC_SET(&pdvobj->disable_func, 0);
 
 	rtw_macid_ctl_init(&pdvobj->macid_ctl);
-	_rtw_spinlock_init(&pdvobj->cam_ctl.lock);
+	spin_lock_init(&pdvobj->cam_ctl.lock);
 	_rtw_mutex_init(&pdvobj->cam_ctl.sec_cam_access_mutex);
 #ifdef CONFIG_MI_WITH_MBSSID_CAM
 	rtw_mbid_cam_init(pdvobj);
@@ -1560,15 +1560,11 @@ void devobj_deinit(struct dvobj_priv *pdvobj)
 	_rtw_mutex_free(&pdvobj->rf_read_reg_mutex);
 
 	rtw_macid_ctl_deinit(&pdvobj->macid_ctl);
-	_rtw_spinlock_free(&pdvobj->cam_ctl.lock);
 	_rtw_mutex_free(&pdvobj->cam_ctl.sec_cam_access_mutex);
 
 #ifdef CONFIG_MI_WITH_MBSSID_CAM
 	rtw_mbid_cam_deinit(pdvobj);
 #endif
-
-	_rtw_spinlock_free(&(pdvobj->ap_if_q.lock));
-
 	rtw_mfree((u8 *)pdvobj, sizeof(*pdvobj));
 }
 
@@ -1706,7 +1702,7 @@ u8 rtw_init_drv_sw(struct adapter *adapt)
 		goto exit;
 	}
 	/* add for CONFIG_IEEE80211W, none 11w also can use */
-	_rtw_spinlock_init(&adapt->security_key_mutex);
+	spin_lock_init(&adapt->security_key_mutex);
 
 	/* We don't need to memset adapt->XXX to zero, because adapter is allocated by vzalloc(). */
 	/* memset((unsigned char *)&adapt->securitypriv, 0, sizeof (struct security_priv)); */
@@ -1743,7 +1739,7 @@ u8 rtw_init_drv_sw(struct adapter *adapt)
 	}
 #endif /* CONFIG_INTEL_WIDI */
 
-	_rtw_spinlock_init(&adapt->br_ext_lock);
+	spin_lock_init(&adapt->br_ext_lock);
 
 exit:
 
@@ -1803,11 +1799,6 @@ u8 rtw_free_drv_sw(struct adapter *adapt)
 		#endif /* CONFIG_CONCURRENT_MODE */
 		rtw_p2p_set_state(pwdinfo, P2P_STATE_NONE);
 	}
-	/* add for CONFIG_IEEE80211W, none 11w also can use */
-	_rtw_spinlock_free(&adapt->security_key_mutex);
-
-	_rtw_spinlock_free(&adapt->br_ext_lock);
-
 #ifdef CONFIG_INTEL_WIDI
 	rtw_free_intel_widi(adapt);
 #endif /* CONFIG_INTEL_WIDI */
