@@ -2085,7 +2085,8 @@ static int amsdu_to_msdu(struct adapter *adapt, union recv_frame *prframe)
 			break;
 		}
 
-		if (rtw_recv_indicatepkt_check(prframe, rtw_os_pkt_data(sub_pkt), sub_pkt->len) == _SUCCESS)
+		if (rtw_recv_indicatepkt_check(prframe, sub_pkt->data,
+					       sub_pkt->len) == _SUCCESS)
 			subframes[nr_subframes++] = sub_pkt;
 		else
 			dev_kfree_skb_any(sub_pkt);
