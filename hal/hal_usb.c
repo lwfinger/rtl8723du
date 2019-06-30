@@ -48,7 +48,7 @@ int	usb_init_recv_priv(struct adapter *adapt, u16 ini_in_buf_sz)
 		precvbuf->ref_cnt = 0;
 		precvbuf->adapter = adapt;
 
-		/* rtw_list_insert_tail(&precvbuf->list, &(precvpriv->free_recv_buf_queue.queue)); */
+		/* list_add_tail(&precvbuf->list, &(precvpriv->free_recv_buf_queue.queue)); */
 
 		precvbuf++;
 	}

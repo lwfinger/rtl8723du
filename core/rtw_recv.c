@@ -88,7 +88,7 @@ int _rtw_init_recv_priv(struct recv_priv *precvpriv, struct adapter *adapt)
 	for (i = 0; i < NR_RECVFRAME ; i++) {
 		INIT_LIST_HEAD(&(precvframe->u.list));
 
-		rtw_list_insert_tail(&(precvframe->u.list), &(precvpriv->free_recv_queue.queue));
+		list_add_tail(&(precvframe->u.list), &(precvpriv->free_recv_queue.queue));
 
 		res = rtw_os_recv_resource_alloc(adapt, precvframe);
 
@@ -239,7 +239,7 @@ int rtw_free_recvframe(union recv_frame *precvframe, struct __queue *pfree_recv_
 
 	precvframe->u.hdr.len = 0;
 
-	rtw_list_insert_tail(&(precvframe->u.hdr.list), get_list_head(pfree_recv_queue));
+	list_add_tail(&(precvframe->u.hdr.list), get_list_head(pfree_recv_queue));
 
 	if (adapt) {
 		if (pfree_recv_queue == &precvpriv->free_recv_queue)
@@ -267,7 +267,7 @@ int _rtw_enqueue_recvframe(union recv_frame *precvframe, struct __queue *queue)
 	rtw_list_delete(&(precvframe->u.hdr.list));
 
 
-	rtw_list_insert_tail(&(precvframe->u.hdr.list), get_list_head(queue));
+	list_add_tail(&(precvframe->u.hdr.list), get_list_head(queue));
 
 	if (adapt) {
 		if (queue == &precvpriv->free_recv_queue)
@@ -372,7 +372,7 @@ int rtw_enqueue_recvbuf(struct recv_buf *precvbuf, struct __queue *queue)
 
 	rtw_list_delete(&precvbuf->list);
 
-	rtw_list_insert_tail(&precvbuf->list, get_list_head(queue));
+	list_add_tail(&precvbuf->list, get_list_head(queue));
 	_exit_critical_ex(&queue->lock, &irqL);
 	return _SUCCESS;
 
@@ -1976,7 +1976,7 @@ union recv_frame *recvframe_chk_defrag(struct adapter * adapt, union recv_frame 
 
 			/* _rtw_spinlock(&pdefrag_q->lock); */
 			phead = get_list_head(pdefrag_q);
-			rtw_list_insert_tail(&pfhdr->list, phead);
+			list_add_tail(&pfhdr->list, phead);
 			/* _rtw_spinunlock(&pdefrag_q->lock); */
 
 
@@ -1996,7 +1996,7 @@ union recv_frame *recvframe_chk_defrag(struct adapter * adapt, union recv_frame 
 		if (pdefrag_q) {
 			/* _rtw_spinlock(&pdefrag_q->lock); */
 			phead = get_list_head(pdefrag_q);
-			rtw_list_insert_tail(&pfhdr->list, phead);
+			list_add_tail(&pfhdr->list, phead);
 			/* _rtw_spinunlock(&pdefrag_q->lock); */
 
 			/* call recvframe_defrag to defrag */
@@ -2238,7 +2238,7 @@ static int enqueue_reorder_recvframe(struct recv_reorder_ctrl *preorder_ctrl, un
 	}
 	rtw_list_delete(&(prframe->u.hdr.list));
 
-	rtw_list_insert_tail(&(prframe->u.hdr.list), plist);
+	list_add_tail(&(prframe->u.hdr.list), plist);
 
 	return true;
 }

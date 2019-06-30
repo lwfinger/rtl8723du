@@ -920,7 +920,7 @@ void rtw_regd_exc_add_with_nlen(struct rf_ctl_t *rfctl, const char *country, u8 
 
 	_enter_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
 
-	rtw_list_insert_tail(&ent->list, &rfctl->reg_exc_list);
+	list_add_tail(&ent->list, &rfctl->reg_exc_list);
 	rfctl->regd_exc_num++;
 
 	_exit_critical_mutex(&rfctl->txpwr_lmt_mutex, &irqL);
@@ -1330,7 +1330,7 @@ void rtw_txpwr_lmt_add_with_nlen(struct rf_ctl_t *rfctl, const char *regd_name, 
 						ent->lmt_2g[j][k][m][l] = MAX_POWER_INDEX;
 	}
 
-	rtw_list_insert_tail(&ent->list, &rfctl->txpwr_lmt_list);
+	list_add_tail(&ent->list, &rfctl->txpwr_lmt_list);
 	rfctl->txpwr_regd_num++;
 
 chk_lmt_val:

@@ -226,7 +226,7 @@ int _rtw_enqueue_cmd(struct __queue *queue, struct cmd_obj *obj, bool to_head)
 	if (to_head)
 		list_add(&obj->list, &queue->queue);
 	else
-		rtw_list_insert_tail(&obj->list, &queue->queue);
+		list_add_tail(&obj->list, &queue->queue);
 
 	_exit_critical(&queue->lock, &irqL);
 
@@ -591,7 +591,7 @@ u32 rtw_enqueue_evt(struct evt_priv *pevtpriv, struct evt_obj *obj)
 
 	_enter_critical_bh(&queue->lock, &irqL);
 
-	rtw_list_insert_tail(&obj->list, &queue->queue);
+	list_add_tail(&obj->list, &queue->queue);
 
 	_exit_critical_bh(&queue->lock, &irqL);
 
@@ -3451,7 +3451,7 @@ static void session_tracker_chk_for_sta(struct adapter *adapter, struct sta_info
 			&& rtw_get_passing_time_ms(st->set_time) > ST_EXPIRE_MS
 		) {
 			rtw_list_delete(&st->list);
-			rtw_list_insert_tail(&st->list, &dlist);
+			list_add_tail(&st->list, &dlist);
 		}
 
 		/* TODO: check OS for status update */
@@ -3607,7 +3607,7 @@ unlock:
 			st->status = ST_STATUS_CHECK;
 
 			_enter_critical_bh(&st_ctl->tracker_q.lock, &irqL);
-			rtw_list_insert_tail(&st->list, phead);
+			list_add_tail(&st->list, phead);
 			_exit_critical_bh(&st_ctl->tracker_q.lock, &irqL);
 		}
 	}
@@ -3823,7 +3823,7 @@ void rtw_create_ibss_post_hdl(struct adapter *adapt, int status)
 			}
 			pwlan->last_scanned = rtw_get_current_time();
 		} else
-			rtw_list_insert_tail(&(pwlan->list), &pmlmepriv->scanned_queue.queue);
+			list_add_tail(&(pwlan->list), &pmlmepriv->scanned_queue.queue);
 
 		pdev_network->Length = get_wlan_bssid_ex_sz(pdev_network);
 		memcpy(&(pwlan->network), pdev_network, pdev_network->Length);

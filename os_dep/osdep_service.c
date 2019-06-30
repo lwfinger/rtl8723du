@@ -181,11 +181,6 @@ u32	rtw_is_list_empty(struct list_head *phead)
 		return false;
 }
 
-void rtw_list_insert_tail(struct list_head *plist, struct list_head *phead)
-{
-	list_add_tail(plist, phead);
-}
-
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void rtw_init_timer(struct timer_list *ptimer, void *adapt, void *pfunc, void *ctx)
 {

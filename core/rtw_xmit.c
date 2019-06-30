@@ -119,7 +119,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 		pxframe->buf_addr = NULL;
 		pxframe->pxmitbuf = NULL;
 
-		rtw_list_insert_tail(&(pxframe->list), &(pxmitpriv->free_xmit_queue.queue));
+		list_add_tail(&(pxframe->list), &(pxmitpriv->free_xmit_queue.queue));
 
 		pxframe++;
 	}
@@ -163,7 +163,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 		}
 		pxmitbuf->flags = XMIT_VO_QUEUE;
 
-		rtw_list_insert_tail(&pxmitbuf->list, &(pxmitpriv->free_xmitbuf_queue.queue));
+		list_add_tail(&pxmitbuf->list, &(pxmitpriv->free_xmitbuf_queue.queue));
 		pxmitbuf++;
 	}
 
@@ -195,7 +195,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 
 		pxframe->ext_tag = 1;
 
-		rtw_list_insert_tail(&(pxframe->list), &(pxmitpriv->free_xframe_ext_queue.queue));
+		list_add_tail(&(pxframe->list), &(pxmitpriv->free_xframe_ext_queue.queue));
 
 		pxframe++;
 	}
@@ -228,7 +228,7 @@ int	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *adapt)
 			goto exit;
 		}
 
-		rtw_list_insert_tail(&pxmitbuf->list, &(pxmitpriv->free_xmit_extbuf_queue.queue));
+		list_add_tail(&pxmitbuf->list, &(pxmitpriv->free_xmit_extbuf_queue.queue));
 		pxmitbuf++;
 	}
 
@@ -2509,7 +2509,7 @@ int rtw_free_xmitbuf_ext(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf)
 
 	rtw_list_delete(&pxmitbuf->list);
 
-	rtw_list_insert_tail(&(pxmitbuf->list), get_list_head(pfree_queue));
+	list_add_tail(&(pxmitbuf->list), get_list_head(pfree_queue));
 	pxmitpriv->free_xmit_extbuf_cnt++;
 
 	_exit_critical(&pfree_queue->lock, &irqL);
@@ -2584,7 +2584,7 @@ int rtw_free_xmitbuf(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf)
 
 		rtw_list_delete(&pxmitbuf->list);
 
-		rtw_list_insert_tail(&(pxmitbuf->list), get_list_head(pfree_xmitbuf_queue));
+		list_add_tail(&(pxmitbuf->list), get_list_head(pfree_xmitbuf_queue));
 
 		pxmitpriv->free_xmitbuf_cnt++;
 		_exit_critical(&pfree_xmitbuf_queue->lock, &irqL);
@@ -2749,7 +2749,7 @@ int rtw_free_xmitframe(struct xmit_priv *pxmitpriv, struct xmit_frame *pxmitfram
 	_enter_critical_bh(&queue->lock, &irqL);
 
 	rtw_list_delete(&pxmitframe->list);
-	rtw_list_insert_tail(&pxmitframe->list, get_list_head(queue));
+	list_add_tail(&pxmitframe->list, get_list_head(queue));
 	if (pxmitframe->ext_tag == 0) {
 		pxmitpriv->free_xmitframe_cnt++;
 	} else if (pxmitframe->ext_tag == 1) {
@@ -3059,11 +3059,11 @@ int rtw_xmit_classifier(struct adapter *adapt, struct xmit_frame *pxmitframe)
 	/* _enter_critical(&pstapending->lock, &irqL0); */
 
 	if (rtw_is_list_empty(&ptxservq->tx_pending))
-		rtw_list_insert_tail(&ptxservq->tx_pending, get_list_head(phwxmits[ac_index].sta_queue));
+		list_add_tail(&ptxservq->tx_pending, get_list_head(phwxmits[ac_index].sta_queue));
 
 	/* _enter_critical(&ptxservq->sta_pending.lock, &irqL1); */
 
-	rtw_list_insert_tail(&pxmitframe->list, get_list_head(&ptxservq->sta_pending));
+	list_add_tail(&pxmitframe->list, get_list_head(&ptxservq->sta_pending));
 	ptxservq->qcnt++;
 	phwxmits[ac_index].accnt++;
 
@@ -3678,7 +3678,7 @@ int xmitframe_enqueue_for_sleeping_sta(struct adapter *adapt, struct xmit_frame 
 
 			/*_enter_critical_bh(&psta->sleep_q.lock, &irqL);*/
 
-			rtw_list_insert_tail(&pxmitframe->list, get_list_head(&psta->sleep_q));
+			list_add_tail(&pxmitframe->list, get_list_head(&psta->sleep_q));
 
 			psta->sleepq_len++;
 
@@ -3722,7 +3722,7 @@ int xmitframe_enqueue_for_sleeping_sta(struct adapter *adapt, struct xmit_frame 
 
 			/* _enter_critical_bh(&psta->sleep_q.lock, &irqL);	 */
 
-			rtw_list_insert_tail(&pxmitframe->list, get_list_head(&psta->sleep_q));
+			list_add_tail(&pxmitframe->list, get_list_head(&psta->sleep_q));
 
 			psta->sleepq_len++;
 

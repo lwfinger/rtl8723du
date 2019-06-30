@@ -1835,7 +1835,7 @@ int rtw_acl_add_sta(struct adapter *adapter, const u8 *addr)
 			memcpy(acl_node->addr, addr, ETH_ALEN);
 			acl_node->valid = true;
 
-			rtw_list_insert_tail(&acl_node->list, get_list_head(acl_node_q));
+			list_add_tail(&acl_node->list, get_list_head(acl_node_q));
 			acl->num++;
 			break;
 		}

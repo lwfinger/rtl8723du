@@ -242,7 +242,7 @@ u32	_rtw_init_sta_priv(struct	sta_priv *pstapriv)
 
 		INIT_LIST_HEAD(&(pstapriv->sta_hash[i]));
 
-		rtw_list_insert_tail(&psta->list, get_list_head(&pstapriv->free_sta_queue));
+		list_add_tail(&psta->list, get_list_head(&pstapriv->free_sta_queue));
 
 		psta++;
 	}
@@ -499,7 +499,7 @@ struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 		}
 		phash_list = &(pstapriv->sta_hash[index]);
 
-		rtw_list_insert_tail(&psta->hash_list, phash_list);
+		list_add_tail(&psta->hash_list, phash_list);
 
 		pstapriv->asoc_sta_count++;
 
@@ -749,7 +749,7 @@ u32	rtw_free_stainfo(struct adapter *adapt , struct sta_info *psta)
 
 		/* _enter_critical_bh(&(pfree_sta_queue->lock), &irqL0); */
 		_enter_critical_bh(&(pstapriv->sta_hash_lock), &irqL0);
-		rtw_list_insert_tail(&psta->list, get_list_head(pfree_sta_queue));
+		list_add_tail(&psta->list, get_list_head(pfree_sta_queue));
 		_exit_critical_bh(&(pstapriv->sta_hash_lock), &irqL0);
 		/* _exit_critical_bh(&(pfree_sta_queue->lock), &irqL0); */
 	}

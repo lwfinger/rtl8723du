@@ -1833,7 +1833,7 @@ unsigned int OnAuth(struct adapter *adapt, union recv_frame *precv_frame)
 		_enter_critical_bh(&pstapriv->auth_list_lock, &irqL);
 		if (rtw_is_list_empty(&pstat->auth_list)) {
 
-			rtw_list_insert_tail(&pstat->auth_list, &pstapriv->auth_list);
+			list_add_tail(&pstat->auth_list, &pstapriv->auth_list);
 			pstapriv->auth_list_cnt++;
 		}
 		_exit_critical_bh(&pstapriv->auth_list_lock, &irqL);
@@ -2215,7 +2215,7 @@ unsigned int OnAssocReq(struct adapter *adapt, union recv_frame *precv_frame)
 		_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
 		if (rtw_is_list_empty(&pstat->asoc_list)) {
 			pstat->expire_to = pstapriv->expire_to;
-			rtw_list_insert_tail(&pstat->asoc_list, &pstapriv->asoc_list);
+			list_add_tail(&pstat->asoc_list, &pstapriv->asoc_list);
 			pstapriv->asoc_list_cnt++;
 		}
 		_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
@@ -11272,7 +11272,7 @@ bypass_active_keep_alive:
 
 				if (psta->expire_to <= 0) {
 					rtw_list_delete(&psta->list);
-					rtw_list_insert_tail(&psta->list, &dlist);
+					list_add_tail(&psta->list, &dlist);
 				}
 			}
 		}
