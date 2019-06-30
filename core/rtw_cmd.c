@@ -224,7 +224,7 @@ int _rtw_enqueue_cmd(struct __queue *queue, struct cmd_obj *obj, bool to_head)
 	_enter_critical(&queue->lock, &irqL);
 
 	if (to_head)
-		rtw_list_insert_head(&obj->list, &queue->queue);
+		list_add(&obj->list, &queue->queue);
 	else
 		rtw_list_insert_tail(&obj->list, &queue->queue);
 
