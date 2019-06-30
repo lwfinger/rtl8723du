@@ -196,10 +196,6 @@ Caller must check if the list is empty before calling rtw_list_delete
 
 */
 
-void _rtw_free_sema(struct semaphore	*sema)
-{
-}
-
 void _rtw_up_sema(struct semaphore	*sema)
 {
 	up(sema);
