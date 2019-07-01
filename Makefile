@@ -344,13 +344,14 @@ config_r:
 
 clean:
 	#$(MAKE) -C $(KSRC) M=$(shell pwd) clean
-	cd hal ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko
-	cd hal ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
-	cd core ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
-	cd os_dep ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
-	cd platform ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
+	cd hal ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d
+	cd hal ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	cd core ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	cd os_dep ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	cd os_dep/linux ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	cd platform ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
 	rm -fr Module.symvers ; rm -fr Module.markers ; rm -fr modules.order
-	rm -fr *.mod.c *.mod *.o .*.cmd *.ko *~
+	rm -fr *.mod.c *.mod *.o .*.cmd *.ko *~ .*.d
 	rm -fr .tmp_versions
 endif
 

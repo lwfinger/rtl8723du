@@ -954,14 +954,14 @@ extern int rtw_select_and_join_from_scanned_queue(struct mlme_priv *pmlmepriv);
 extern int rtw_set_key(struct adapter *adapter, struct security_priv *psecuritypriv, int keyid, u8 set_tx, bool enqueue);
 extern int rtw_set_auth(struct adapter *adapter, struct security_priv *psecuritypriv);
 
-__inline static u8 *get_bssid(struct mlme_priv *pmlmepriv)
+static inline u8 *get_bssid(struct mlme_priv *pmlmepriv)
 {
 	/* if sta_mode:pmlmepriv->cur_network.network.MacAddress=> bssid */
 	/* if adhoc_mode:pmlmepriv->cur_network.network.MacAddress=> ibss mac address */
 	return pmlmepriv->cur_network.network.MacAddress;
 }
 
-__inline static int check_fwstate(struct mlme_priv *pmlmepriv, int state)
+static inline int check_fwstate(struct mlme_priv *pmlmepriv, int state)
 {
 	if ((state == WIFI_NULL_STATE) &&
 		(pmlmepriv->fw_state == WIFI_NULL_STATE))
@@ -973,7 +973,7 @@ __inline static int check_fwstate(struct mlme_priv *pmlmepriv, int state)
 	return false;
 }
 
-__inline static int get_fwstate(struct mlme_priv *pmlmepriv)
+static inline int get_fwstate(struct mlme_priv *pmlmepriv)
 {
 	return pmlmepriv->fw_state;
 }
@@ -1027,7 +1027,7 @@ static inline void up_scanned_network(struct mlme_priv *pmlmepriv)
 }
 u8 rtw_is_adapter_up(struct adapter *adapt);
 
-__inline static void down_scanned_network(struct mlme_priv *pmlmepriv)
+static inline void down_scanned_network(struct mlme_priv *pmlmepriv)
 {
 	unsigned long irqL;
 
@@ -1036,7 +1036,7 @@ __inline static void down_scanned_network(struct mlme_priv *pmlmepriv)
 	_exit_critical_bh(&pmlmepriv->lock, &irqL);
 }
 
-__inline static void set_scanned_network_val(struct mlme_priv *pmlmepriv, int val)
+static inline void set_scanned_network_val(struct mlme_priv *pmlmepriv, int val)
 {
 	unsigned long irqL;
 

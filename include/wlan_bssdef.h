@@ -261,7 +261,7 @@ struct wlan_bssid_ex {
 #define BSS_EX_TLV_IES(bss_ex) (BSS_EX_IES((bss_ex)) + BSS_EX_FIXED_IE_OFFSET((bss_ex)))
 #define BSS_EX_TLV_IES_LEN(bss_ex) (BSS_EX_IES_LEN((bss_ex)) - BSS_EX_FIXED_IE_OFFSET((bss_ex)))
 
-__inline  static uint get_wlan_bssid_ex_sz(struct wlan_bssid_ex *bss)
+inline  static uint get_wlan_bssid_ex_sz(struct wlan_bssid_ex *bss)
 {
 	return sizeof(struct wlan_bssid_ex) - MAX_IE_SZ + bss->IELength;
 }

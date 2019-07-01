@@ -564,7 +564,7 @@ void set_channel_bwmode(struct adapter *adapt, unsigned char channel, unsigned c
 	_exit_critical_mutex(&(adapter_to_dvobj(adapt)->setch_mutex), NULL);
 }
 
-__inline u8 *get_my_bssid(struct wlan_bssid_ex *pnetwork)
+inline u8 *get_my_bssid(struct wlan_bssid_ex *pnetwork)
 {
 	return pnetwork->MacAddress;
 }

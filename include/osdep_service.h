@@ -200,7 +200,7 @@ extern void rtw_yield_os(void);
 extern void rtw_init_timer(struct timer_list *ptimer, void *adapt, void *pfunc, void *ctx);
 #endif
 
-__inline static unsigned char _cancel_timer_ex(struct timer_list *ptimer)
+static inline unsigned char _cancel_timer_ex(struct timer_list *ptimer)
 {
 	u8 bcancelled;
 
@@ -209,7 +209,7 @@ __inline static unsigned char _cancel_timer_ex(struct timer_list *ptimer)
 	return bcancelled;
 }
 
-static __inline void thread_enter(char *name)
+static inline void thread_enter(char *name)
 {
 	allow_signal(SIGTERM);
 }
@@ -229,25 +229,25 @@ static inline void rtw_thread_wait_stop(void)
 	__set_current_state(TASK_RUNNING);
 }
 
-__inline static void flush_signals_thread(void)
+static inline void flush_signals_thread(void)
 {
 	if (signal_pending(current))
 		flush_signals(current);
 }
 
-__inline static int res_to_status(int res)
+static inline int res_to_status(int res)
 {
 	return res;
 }
 
-__inline static void rtw_dump_stack(void)
+static inline void rtw_dump_stack(void)
 {
 	dump_stack();
 }
 
 #define rtw_warn_on(condition) WARN_ON(condition)
 
-__inline static int rtw_bug_check(void *parg1, void *parg2, void *parg3, void *parg4)
+static inline int rtw_bug_check(void *parg1, void *parg2, void *parg3, void *parg4)
 {
 	int ret = true;
 
@@ -258,7 +258,7 @@ __inline static int rtw_bug_check(void *parg1, void *parg2, void *parg3, void *p
 #define _RND(sz, r) ((((sz)+((r)-1))/(r))*(r))
 #define RND4(x)	(((x >> 2) + (((x & 3) == 0) ? 0 : 1)) << 2)
 
-__inline static u32 _RND4(u32 sz)
+static inline u32 _RND4(u32 sz)
 {
 
 	u32	val;
@@ -269,7 +269,7 @@ __inline static u32 _RND4(u32 sz)
 
 }
 
-__inline static u32 _RND8(u32 sz)
+static inline u32 _RND8(u32 sz)
 {
 
 	u32	val;
@@ -280,7 +280,7 @@ __inline static u32 _RND8(u32 sz)
 
 }
 
-__inline static u32 _RND128(u32 sz)
+static inline u32 _RND128(u32 sz)
 {
 
 	u32	val;
@@ -291,7 +291,7 @@ __inline static u32 _RND128(u32 sz)
 
 }
 
-__inline static u32 _RND256(u32 sz)
+static inline u32 _RND256(u32 sz)
 {
 
 	u32	val;
@@ -302,7 +302,7 @@ __inline static u32 _RND256(u32 sz)
 
 }
 
-__inline static u32 _RND512(u32 sz)
+static inline u32 _RND512(u32 sz)
 {
 
 	u32	val;
@@ -313,7 +313,7 @@ __inline static u32 _RND512(u32 sz)
 
 }
 
-__inline static u32 bitshift(u32 bitmask)
+static inline u32 bitshift(u32 bitmask)
 {
 	u32 i;
 

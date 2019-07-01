@@ -385,7 +385,7 @@ enum WIFI_REG_DOMAIN {
 	  (addr[4] == 0xff) && (addr[5] == 0xff)) ? true : false \
 	)
 
-__inline static int IS_MCAST(const u8 *da)
+static inline int IS_MCAST(const u8 *da)
 {
 	if ((*da) & 0x01)
 		return true;
@@ -393,13 +393,13 @@ __inline static int IS_MCAST(const u8 *da)
 		return false;
 }
 
-__inline static unsigned char *get_ra(unsigned char *pframe)
+static inline unsigned char *get_ra(unsigned char *pframe)
 {
 	unsigned char	*ra;
 	ra = GetAddr1Ptr(pframe);
 	return ra;
 }
-__inline static unsigned char *get_ta(unsigned char *pframe)
+static inline unsigned char *get_ta(unsigned char *pframe)
 {
 	unsigned char	*ta;
 	ta = get_addr2_ptr(pframe);
@@ -407,7 +407,7 @@ __inline static unsigned char *get_ta(unsigned char *pframe)
 }
 
 /* can't apply to mesh mode */
-__inline static unsigned char *get_da(unsigned char *pframe)
+static inline unsigned char *get_da(unsigned char *pframe)
 {
 	unsigned char	*da;
 	u16	to_fr_ds	= (GetToDs(pframe) << 1) | GetFrDs(pframe);
@@ -431,7 +431,7 @@ __inline static unsigned char *get_da(unsigned char *pframe)
 }
 
 /* can't apply to mesh mode */
-__inline static unsigned char *get_sa(unsigned char *pframe)
+static inline unsigned char *get_sa(unsigned char *pframe)
 {
 	unsigned char	*sa;
 	u16	to_fr_ds	= (GetToDs(pframe) << 1) | GetFrDs(pframe);
@@ -455,7 +455,7 @@ __inline static unsigned char *get_sa(unsigned char *pframe)
 }
 
 /* can't apply to mesh mode */
-__inline static unsigned char *get_hdr_bssid(unsigned char *pframe)
+static inline unsigned char *get_hdr_bssid(unsigned char *pframe)
 {
 	unsigned char	*sa = NULL;
 	u16	to_fr_ds	= (GetToDs(pframe) << 1) | GetFrDs(pframe);
@@ -479,7 +479,7 @@ __inline static unsigned char *get_hdr_bssid(unsigned char *pframe)
 }
 
 
-__inline static int IsFrameTypeCtrl(unsigned char *pframe)
+static inline int IsFrameTypeCtrl(unsigned char *pframe)
 {
 	if (WIFI_CTRL_TYPE == GetFrameType(pframe))
 		return true;

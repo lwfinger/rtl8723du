@@ -478,7 +478,7 @@ struct	sta_priv {
 	struct submit_ctx *gotc2h;
 };
 
-__inline static u32 wifi_mac_hash(const u8 *mac)
+static inline u32 wifi_mac_hash(const u8 *mac)
 {
 	u32 x;
 

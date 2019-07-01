@@ -1162,14 +1162,14 @@ static inline void rtw_clr_drv_stopped(struct adapter *adapt)
 
 /* #define RTW_DISABLE_FUNC(adapt, func) (ATOMIC_ADD(&adapter_to_dvobj(adapt)->disable_func, (func))) */
 /* #define RTW_ENABLE_FUNC(adapt, func) (ATOMIC_SUB(&adapter_to_dvobj(adapt)->disable_func, (func))) */
-__inline static void RTW_DISABLE_FUNC(struct adapter *adapt, int func_bit)
+static inline void RTW_DISABLE_FUNC(struct adapter *adapt, int func_bit)
 {
 	int	df = ATOMIC_READ(&adapter_to_dvobj(adapt)->disable_func);
 	df |= func_bit;
 	ATOMIC_SET(&adapter_to_dvobj(adapt)->disable_func, df);
 }
 
-__inline static void RTW_ENABLE_FUNC(struct adapter *adapt, int func_bit)
+static inline void RTW_ENABLE_FUNC(struct adapter *adapt, int func_bit)
 {
 	int	df = ATOMIC_READ(&adapter_to_dvobj(adapt)->disable_func);
 	df &= ~(func_bit);
