@@ -493,7 +493,7 @@ static void process_spec_devid(const struct usb_device_id *pdid)
 		if ((pdid->idVendor == vid) && (pdid->idProduct == pid) && (flags & SPEC_DEV_ID_ASSIGN_IFNAME)) {
 			extern char *ifname;
 			strncpy(ifname, "wlan10", 6);
-			/* RTW_INFO("%s()-%d: ifname=%s, vid=%04X, pid=%04X\n", __FUNCTION__, __LINE__, ifname, vid, pid); */
+			/* RTW_INFO("%s()-%d: ifname=%s, vid=%04X, pid=%04X\n", __func__, __LINE__, ifname, vid, pid); */
 		}
 #endif /* RTK_DMP_PLATFORM */
 
@@ -564,7 +564,7 @@ int rtw_hw_suspend(struct adapter *adapt)
 	return 0;
 
 error_exit:
-	RTW_INFO("%s, failed\n", __FUNCTION__);
+	RTW_INFO("%s, failed\n", __func__);
 	return -1;
 
 }
@@ -598,7 +598,7 @@ int rtw_hw_resume(struct adapter *adapt)
 
 	return 0;
 error_exit:
-	RTW_INFO("%s, Open net dev failed\n", __FUNCTION__);
+	RTW_INFO("%s, Open net dev failed\n", __func__);
 	return -1;
 }
 #endif
@@ -618,7 +618,7 @@ static int rtw_suspend(struct usb_interface *pusb_intf, pm_message_t message)
 	adapt = dvobj_get_primary_adapter(dvobj);
 
 	if (pwrpriv->bInSuspend) {
-		RTW_INFO("%s bInSuspend = %d\n", __FUNCTION__, pwrpriv->bInSuspend);
+		RTW_INFO("%s bInSuspend = %d\n", __func__, pwrpriv->bInSuspend);
 		pdbgpriv->dbg_suspend_error_cnt++;
 		goto exit;
 	}
@@ -654,7 +654,7 @@ static int rtw_resume_process(struct adapter *adapt)
 
 	if (!pwrpriv->bInSuspend) {
 		pdbgpriv->dbg_resume_error_cnt++;
-		RTW_INFO("%s bInSuspend = %d\n", __FUNCTION__, pwrpriv->bInSuspend);
+		RTW_INFO("%s bInSuspend = %d\n", __func__, pwrpriv->bInSuspend);
 		return -1;
 	}
 
@@ -727,7 +727,7 @@ static int rtw_resume(struct usb_interface *pusb_intf)
 	adapt = dvobj_get_primary_adapter(dvobj);
 	pmlmeext = &adapt->mlmeextpriv;
 
-	RTW_INFO("==> %s (%s:%d)\n", __FUNCTION__, current->comm, current->pid);
+	RTW_INFO("==> %s (%s:%d)\n", __func__, current->comm, current->pid);
 	pdbgpriv->dbg_resume_cnt++;
 
 	#ifdef CONFIG_AUTOSUSPEND
@@ -753,7 +753,7 @@ static int rtw_resume(struct usb_interface *pusb_intf)
 	}
 
 	pmlmeext->last_scan_time = rtw_get_current_time();
-	RTW_INFO("<========  %s return %d\n", __FUNCTION__, ret);
+	RTW_INFO("<========  %s return %d\n", __func__, ret);
 
 	return ret;
 }
@@ -940,9 +940,9 @@ static struct adapter *rtw_usb_primary_adapter_init(struct dvobj_priv *dvobj,
 			/* usb_autopm_get_interface(adapter_to_dvobj(adapt)->pusbintf ); */ /* init pm_usage_cnt ,let it start from 1 */
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 32))
-			RTW_INFO("%s...pm_usage_cnt(%d).....\n", __FUNCTION__, atomic_read(&(dvobj->pusbintf->pm_usage_cnt)));
+			RTW_INFO("%s...pm_usage_cnt(%d).....\n", __func__, atomic_read(&(dvobj->pusbintf->pm_usage_cnt)));
 #else
-			RTW_INFO("%s...pm_usage_cnt(%d).....\n", __FUNCTION__, dvobj->pusbintf->pm_usage_cnt);
+			RTW_INFO("%s...pm_usage_cnt(%d).....\n", __func__, dvobj->pusbintf->pm_usage_cnt);
 #endif
 		}
 	}
@@ -1150,7 +1150,7 @@ static int __init rtw_drv_entry(void)
 
 	ret = platform_wifi_power_on();
 	if (ret != 0) {
-		RTW_INFO("%s: power on failed!!(%d)\n", __FUNCTION__, ret);
+		RTW_INFO("%s: power on failed!!(%d)\n", __func__, ret);
 		ret = -1;
 		goto exit;
 	}

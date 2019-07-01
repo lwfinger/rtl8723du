@@ -623,7 +623,7 @@ struct cfg80211_bss *rtw_cfg80211_inform_bss(struct adapter *adapt, struct wlan_
 
 	pbuf = rtw_zmalloc(buf_size);
 	if (!pbuf) {
-		RTW_INFO("%s pbuf allocate failed  !!\n", __FUNCTION__);
+		RTW_INFO("%s pbuf allocate failed  !!\n", __func__);
 		return bss;
 	}
 
@@ -631,7 +631,7 @@ struct cfg80211_bss *rtw_cfg80211_inform_bss(struct adapter *adapt, struct wlan_
 
 	bssinf_len = pnetwork->network.IELength + sizeof(struct rtw_ieee80211_hdr_3addr);
 	if (bssinf_len > buf_size) {
-		RTW_INFO("%s IE Length too long > %zu byte\n", __FUNCTION__, buf_size);
+		RTW_INFO("%s IE Length too long > %zu byte\n", __func__, buf_size);
 		goto exit;
 	}
 
@@ -640,7 +640,7 @@ struct cfg80211_bss *rtw_cfg80211_inform_bss(struct adapter *adapt, struct wlan_
 
 		if (rtw_get_wapi_ie(pnetwork->network.IEs, pnetwork->network.IELength, NULL, &wapi_len) > 0) {
 			if (wapi_len > 0) {
-				RTW_INFO("%s, no support wapi!\n", __FUNCTION__);
+				RTW_INFO("%s, no support wapi!\n", __func__);
 				goto exit;
 			}
 		}
@@ -1038,7 +1038,7 @@ static int rtw_cfg80211_ap_set_encryption(struct net_device *dev, struct ieee_pa
 	struct security_priv *psecuritypriv = &(adapt->securitypriv);
 	struct sta_priv *pstapriv = &adapt->stapriv;
 
-	RTW_INFO("%s\n", __FUNCTION__);
+	RTW_INFO("%s\n", __func__);
 
 	param->u.crypt.err = 0;
 	param->u.crypt.alg[IEEE_CRYPT_ALG_NAME_LEN - 1] = '\0';
@@ -2161,7 +2161,7 @@ static int rtw_cfg80211_set_probe_req_wpsp2pie(struct adapter *adapt, char *buf,
 
 			pmlmepriv->wps_probe_req_ie = rtw_malloc(wps_ielen);
 			if (!pmlmepriv->wps_probe_req_ie) {
-				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
+				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __func__, __LINE__);
 				return -EINVAL;
 
 			}
@@ -2187,7 +2187,7 @@ static int rtw_cfg80211_set_probe_req_wpsp2pie(struct adapter *adapt, char *buf,
 
 			pmlmepriv->p2p_probe_req_ie = rtw_malloc(p2p_ielen);
 			if (!pmlmepriv->p2p_probe_req_ie) {
-				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
+				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __func__, __LINE__);
 				return -EINVAL;
 
 			}
@@ -2808,7 +2808,7 @@ static int rtw_cfg80211_set_wpa_ie(struct adapter *adapt, u8 *pie, size_t ielen)
 
 			pmlmepriv->p2p_assoc_req_ie = rtw_malloc(p2p_ielen);
 			if (!pmlmepriv->p2p_assoc_req_ie) {
-				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
+				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __func__, __LINE__);
 				goto exit;
 			}
 			memcpy(pmlmepriv->p2p_assoc_req_ie, p2p_ie, p2p_ielen);
@@ -2886,7 +2886,7 @@ static int cfg80211_rtw_join_ibss(struct wiphy *wiphy, struct net_device *ndev,
 
 #ifdef CONFIG_CONCURRENT_MODE
 	if (rtw_mi_buddy_check_fwstate(adapt, _FW_UNDER_LINKING)) {
-		RTW_INFO("%s, but buddy_intf is under linking\n", __FUNCTION__);
+		RTW_INFO("%s, but buddy_intf is under linking\n", __func__);
 		ret = -EINVAL;
 		goto cancel_ps_deny;
 	}
@@ -3001,7 +3001,7 @@ static int cfg80211_rtw_connect(struct wiphy *wiphy, struct net_device *ndev,
 
 	if (pwdev_priv->block) {
 		ret = -EBUSY;
-		RTW_INFO("%s wdev_priv.block is set\n", __FUNCTION__);
+		RTW_INFO("%s wdev_priv.block is set\n", __func__);
 		goto exit;
 	}
 	if (!sme->ssid || !sme->ssid_len) {
@@ -3072,7 +3072,7 @@ static int cfg80211_rtw_connect(struct wiphy *wiphy, struct net_device *ndev,
 	if (sme->key_len > 0 && sme->key) {
 		u32 wep_key_idx, wep_key_len, wep_total_len;
 		struct ndis_802_11_wep	*pwep = NULL;
-		RTW_INFO("%s(): Shared/Auto WEP\n", __FUNCTION__);
+		RTW_INFO("%s(): Shared/Auto WEP\n", __func__);
 
 		wep_key_idx = sme->key_idx;
 		wep_key_len = sme->key_len;
@@ -3170,7 +3170,7 @@ cancel_ps_deny:
 	rtw_ps_deny_cancel(adapt, PS_DENY_JOIN);
 
 exit:
-	RTW_INFO("<=%s, ret %d\n", __FUNCTION__, ret);
+	RTW_INFO("<=%s, ret %d\n", __func__, ret);
 
 	rtw_wdev_set_not_indic_disco(pwdev_priv, 0);
 
@@ -3827,7 +3827,7 @@ static int rtw_add_beacon(struct adapter *adapter, const u8 *head, size_t head_l
 	/* struct sta_priv *pstapriv = &adapt->stapriv; */
 
 
-	RTW_INFO("%s beacon_head_len=%zu, beacon_tail_len=%zu\n", __FUNCTION__, head_len, tail_len);
+	RTW_INFO("%s beacon_head_len=%zu, beacon_tail_len=%zu\n", __func__, head_len, tail_len);
 
 
 	if (!check_fwstate(pmlmepriv, WIFI_AP_STATE))
@@ -4562,7 +4562,7 @@ void rtw_cfg80211_issue_p2p_provision_request(struct adapter *adapt, const u8 *b
 	size_t frame_body_len = len - sizeof(struct rtw_ieee80211_hdr_3addr);
 
 
-	RTW_INFO("[%s] In\n", __FUNCTION__);
+	RTW_INFO("[%s] In\n", __func__);
 
 	/* prepare for building provision_request frame	 */
 	memcpy(pwdinfo->tx_prov_disc_info.peerIFAddr, GetAddr1Ptr(buf), ETH_ALEN);
@@ -5407,7 +5407,7 @@ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, 
 
 			pmlmepriv->wps_beacon_ie = rtw_malloc(wps_ielen);
 			if (!pmlmepriv->wps_beacon_ie) {
-				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
+				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __func__, __LINE__);
 				return -EINVAL;
 
 			}
@@ -5433,7 +5433,7 @@ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, 
 
 			pmlmepriv->p2p_beacon_ie = rtw_malloc(p2p_ielen);
 			if (!pmlmepriv->p2p_beacon_ie) {
-				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
+				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __func__, __LINE__);
 				return -EINVAL;
 
 			}
@@ -5493,7 +5493,7 @@ static int rtw_cfg80211_set_probe_resp_wpsp2pie(struct net_device *net, char *bu
 
 			pmlmepriv->wps_probe_resp_ie = rtw_malloc(wps_ielen);
 			if (!pmlmepriv->wps_probe_resp_ie) {
-				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
+				RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __func__, __LINE__);
 				return -EINVAL;
 
 			}
@@ -5549,7 +5549,7 @@ static int rtw_cfg80211_set_probe_resp_wpsp2pie(struct net_device *net, char *bu
 
 				pmlmepriv->p2p_probe_resp_ie = rtw_malloc(p2p_ielen);
 				if (!pmlmepriv->p2p_probe_resp_ie) {
-					RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
+					RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __func__, __LINE__);
 					return -EINVAL;
 
 				}
@@ -5565,7 +5565,7 @@ static int rtw_cfg80211_set_probe_resp_wpsp2pie(struct net_device *net, char *bu
 
 				pmlmepriv->p2p_go_probe_resp_ie = rtw_malloc(p2p_ielen);
 				if (!pmlmepriv->p2p_go_probe_resp_ie) {
-					RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
+					RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __func__, __LINE__);
 					return -EINVAL;
 
 				}
@@ -5610,7 +5610,7 @@ static int rtw_cfg80211_set_assoc_resp_wpsp2pie(struct net_device *net, char *bu
 
 		pmlmepriv->wps_assoc_resp_ie = rtw_malloc(ie_len);
 		if (!pmlmepriv->wps_assoc_resp_ie) {
-			RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
+			RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __func__, __LINE__);
 			return -EINVAL;
 		}
 		memcpy(pmlmepriv->wps_assoc_resp_ie, ie, ie_len);
@@ -5629,7 +5629,7 @@ static int rtw_cfg80211_set_assoc_resp_wpsp2pie(struct net_device *net, char *bu
 
 		pmlmepriv->p2p_assoc_resp_ie = rtw_malloc(ie_len);
 		if (!pmlmepriv->p2p_assoc_resp_ie) {
-			RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __FUNCTION__, __LINE__);
+			RTW_INFO("%s()-%d: rtw_malloc() ERROR!\n", __func__, __LINE__);
 			return -EINVAL;
 		}
 		memcpy(pmlmepriv->p2p_assoc_resp_ie, ie, ie_len);

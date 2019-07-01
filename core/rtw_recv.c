@@ -2076,7 +2076,7 @@ static int amsdu_to_msdu(struct adapter *adapt, union recv_frame *prframe)
 
 		sub_pkt = rtw_os_alloc_msdu_pkt(prframe, nSubframe_Length, pdata);
 		if (sub_pkt == NULL) {
-			RTW_INFO("%s(): allocate sub packet fail !!!\n", __FUNCTION__);
+			RTW_INFO("%s(): allocate sub packet fail !!!\n", __func__);
 			break;
 		}
 

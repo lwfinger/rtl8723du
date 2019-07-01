@@ -118,7 +118,7 @@ static u8 hal_EfuseSwitchToBank(
 #endif
 
 
-	RTW_INFO("%s: Efuse switch bank to %d\n", __FUNCTION__, bank);
+	RTW_INFO("%s: Efuse switch bank to %d\n", __func__, bank);
 	if (bPseudoTest) {
 #ifdef HAL_EFUSE_MEMORY
 		pEfuseHal->fakeEfuseBank = bank;
@@ -671,8 +671,8 @@ efuse_OneByteRead(
 	} else {
 		*data = 0xff;
 		bResult = false;
-		RTW_INFO("%s: [ERROR] addr=0x%x bResult=%d time out 1s !!!\n", __FUNCTION__, addr, bResult);
-		RTW_INFO("%s: [ERROR] EFUSE_CTRL =0x%08x !!!\n", __FUNCTION__, rtw_read32(pAdapter, EFUSE_CTRL));
+		RTW_INFO("%s: [ERROR] addr=0x%x bResult=%d time out 1s !!!\n", __func__, addr, bResult);
+		RTW_INFO("%s: [ERROR] EFUSE_CTRL =0x%08x !!!\n", __func__, rtw_read32(pAdapter, EFUSE_CTRL));
 	}
 
 	return bResult;
@@ -735,8 +735,8 @@ efuse_OneByteWrite(
 	else {
 		bResult = false;
 		RTW_INFO("%s: [ERROR] addr=0x%x ,efuseValue=0x%x ,bResult=%d time out 1s !!!\n",
-			 __FUNCTION__, addr, efuseValue, bResult);
-		RTW_INFO("%s: [ERROR] EFUSE_CTRL =0x%08x !!!\n", __FUNCTION__, rtw_read32(pAdapter, EFUSE_CTRL));
+			 __func__, addr, efuseValue, bResult);
+		RTW_INFO("%s: [ERROR] EFUSE_CTRL =0x%08x !!!\n", __func__, rtw_read32(pAdapter, EFUSE_CTRL));
 	}
 
 	/* disable Efuse program enable */
@@ -942,7 +942,7 @@ u8 rtw_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 #define RT_ASSERT_RET(expr)												\
 	if (!(expr)) {															\
 		printk("Assertion failed! %s at ......\n", #expr);							\
-		printk("      ......%s,%s, line=%d\n",__FILE__, __FUNCTION__, __LINE__);	\
+		printk("      ......%s,%s, line=%d\n",__FILE__, __func__, __LINE__);	\
 		return _FAIL;	\
 	}
 
@@ -1087,7 +1087,7 @@ u8 rtw_BT_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 #define RT_ASSERT_RET(expr)												\
 	if (!(expr)) {															\
 		printk("Assertion failed! %s at ......\n", #expr);							\
-		printk("      ......%s,%s, line=%d\n",__FILE__, __FUNCTION__, __LINE__);	\
+		printk("      ......%s,%s, line=%d\n",__FILE__, __func__, __LINE__);	\
 		return _FAIL;	\
 	}
 
@@ -1142,7 +1142,7 @@ u8 rtw_BT_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 		if (word_en != 0xF) {
 			RTW_INFO("offset=%x\n", offset);
 			RTW_INFO("word_en=%x\n", word_en);
-			RTW_INFO("%s: data=", __FUNCTION__);
+			RTW_INFO("%s: data=", __func__);
 			for (i = 0; i < PGPKT_DATA_SIZE; i++)
 				RTW_INFO("0x%02X ", newdata[i]);
 			RTW_INFO("\n");
@@ -1567,7 +1567,7 @@ u8 rtw_efuse_file_read(struct adapter * adapt, u8 *filepatch, u8 *buf, u32 len)
 	count = rtw_retrieve_from_file(filepatch, ptmpbuf, bufsize);
 	if (count <= 90) {
 		rtw_mfree(ptmpbuf, bufsize);
-		RTW_ERR("%s, filepatch %s, size=%d, FAIL!!\n", __FUNCTION__, filepatch, count);
+		RTW_ERR("%s, filepatch %s, size=%d, FAIL!!\n", __func__, filepatch, count);
 		return false;
 	}
 
@@ -1604,7 +1604,7 @@ u8 rtw_efuse_file_read(struct adapter * adapt, u8 *filepatch, u8 *buf, u32 len)
 	}
 
 	rtw_mfree(ptmpbuf, bufsize);
-	RTW_INFO("%s, filepatch %s, size=%d, done\n", __FUNCTION__, filepatch, count);
+	RTW_INFO("%s, filepatch %s, size=%d, done\n", __func__, filepatch, count);
 	return true;
 }
 

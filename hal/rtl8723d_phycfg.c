@@ -1189,11 +1189,11 @@ PHY_SetSwChnlBWMode8723D(
 	u8					Offset80
 )
 {
-	/* RTW_INFO("%s()===>\n",__FUNCTION__); */
+	/* RTW_INFO("%s()===>\n",__func__); */
 
 	PHY_HandleSwChnlAndSetBW8723D(Adapter, true, true, channel, Bandwidth, Offset40, Offset80, channel);
 
-	/* RTW_INFO("<==%s()\n",__FUNCTION__); */
+	/* RTW_INFO("<==%s()\n",__func__); */
 }
 
 static void

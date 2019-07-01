@@ -1714,11 +1714,11 @@ static int btreg_parse_str(char const *input, u8 *type, u16 *addr, u16 *val)
 
 	num = sscanf(input, "%s %x %x", str, &a, &v);
 	if (num < 2) {
-		RTW_INFO("%s: INVALID input!(%s)\n", __FUNCTION__, input);
+		RTW_INFO("%s: INVALID input!(%s)\n", __func__, input);
 		return -EINVAL;
 	}
 	if ((num < 3) && val) {
-		RTW_INFO("%s: INVALID input!(%s)\n", __FUNCTION__, input);
+		RTW_INFO("%s: INVALID input!(%s)\n", __func__, input);
 		return -EINVAL;
 	}
 
@@ -1734,7 +1734,7 @@ static int btreg_parse_str(char const *input, u8 *type, u16 *addr, u16 *val)
 		}
 	}
 	if (i == n) {
-		RTW_INFO("%s: unknown type(%s)!\n", __FUNCTION__, str);
+		RTW_INFO("%s: unknown type(%s)!\n", __func__, str);
 		return -EINVAL;
 	}
 
@@ -1743,7 +1743,7 @@ static int btreg_parse_str(char const *input, u8 *type, u16 *addr, u16 *val)
 		/* RF */
 		if (a & 0xFFFFFF80) {
 			RTW_INFO("%s: INVALID address(0x%X) for type %s(%d)!\n",
-				 __FUNCTION__, a, btreg_type[t], t);
+				 __func__, a, btreg_type[t], t);
 			return -EINVAL;
 		}
 		break;
@@ -1751,7 +1751,7 @@ static int btreg_parse_str(char const *input, u8 *type, u16 *addr, u16 *val)
 		/* Modem */
 		if (a & 0xFFFFFE00) {
 			RTW_INFO("%s: INVALID address(0x%X) for type %s(%d)!\n",
-				 __FUNCTION__, a, btreg_type[t], t);
+				 __func__, a, btreg_type[t], t);
 			return -EINVAL;
 		}
 		break;
@@ -1759,7 +1759,7 @@ static int btreg_parse_str(char const *input, u8 *type, u16 *addr, u16 *val)
 		/* Others(Bluewize, Vendor, LE) */
 		if (a & 0xFFFFF000) {
 			RTW_INFO("%s: INVALID address(0x%X) for type %s(%d)!\n",
-				 __FUNCTION__, a, btreg_type[t], t);
+				 __func__, a, btreg_type[t], t);
 			return -EINVAL;
 		}
 		break;
@@ -1767,7 +1767,7 @@ static int btreg_parse_str(char const *input, u8 *type, u16 *addr, u16 *val)
 
 	if (val) {
 		if (v & 0xFFFF0000) {
-			RTW_INFO("%s: INVALID value(0x%x)!\n", __FUNCTION__, v);
+			RTW_INFO("%s: INVALID value(0x%x)!\n", __func__, v);
 			return -EINVAL;
 		}
 		*val = (u16)v;
@@ -2133,7 +2133,7 @@ static ssize_t proc_set_napi_th(struct file *file, const char __user *buffer, si
 		return -EFAULT;
 	}
 
-	RTW_INFO("%s: Last threshold = %d Mbps\n", __FUNCTION__, registry->napi_threshold);
+	RTW_INFO("%s: Last threshold = %d Mbps\n", __func__, registry->napi_threshold);
 
 	if (buffer && !copy_from_user(tmp, buffer, count)) {
 		num = sscanf(tmp, "%d", &thrshld);
@@ -2142,9 +2142,9 @@ static ssize_t proc_set_napi_th(struct file *file, const char __user *buffer, si
 				registry->napi_threshold = thrshld;
 		}
 	}
-	RTW_INFO("%s: New threshold = %d Mbps\n", __FUNCTION__, registry->napi_threshold);
+	RTW_INFO("%s: New threshold = %d Mbps\n", __func__, registry->napi_threshold);
 	RTW_INFO("%s: Current RX throughput = %d Mbps\n",
-		 __FUNCTION__, adapter_to_dvobj(adapter)->traffic_stat.cur_rx_tp);
+		 __func__, adapter_to_dvobj(adapter)->traffic_stat.cur_rx_tp);
 
 	return count;
 }

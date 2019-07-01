@@ -1603,7 +1603,7 @@ static struct sta_info *rtw_joinbss_update_stainfo(struct adapter *adapt, struct
 		psta = rtw_alloc_stainfo(pstapriv, pnetwork->network.MacAddress);
 
 	if (psta) { /* update ptarget_sta */
-		RTW_INFO("%s\n", __FUNCTION__);
+		RTW_INFO("%s\n", __func__);
 
 		psta->cmn.aid  = pnetwork->join_res;
 
@@ -1684,7 +1684,7 @@ static void rtw_joinbss_update_network(struct adapter *adapt, struct wlan_networ
 	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
 	struct wlan_network  *cur_network = &(pmlmepriv->cur_network);
 
-	RTW_INFO("%s\n", __FUNCTION__);
+	RTW_INFO("%s\n", __func__);
 
 
 
@@ -2521,7 +2521,7 @@ void rtw_join_timeout_handler (void *FunctionContext)
 	unsigned long irqL;
 	struct	mlme_priv *pmlmepriv = &adapter->mlmepriv;
 
-	RTW_INFO("%s, fw_state=%x\n", __FUNCTION__, get_fwstate(pmlmepriv));
+	RTW_INFO("%s, fw_state=%x\n", __func__, get_fwstate(pmlmepriv));
 
 	if (RTW_CANNOT_RUN(adapter))
 		return;
@@ -2534,10 +2534,10 @@ void rtw_join_timeout_handler (void *FunctionContext)
 			rtw_dec_to_roam(adapter);
 			if (rtw_to_roam(adapter) != 0) { /* try another */
 				int do_join_r;
-				RTW_INFO("%s try another roaming\n", __FUNCTION__);
+				RTW_INFO("%s try another roaming\n", __func__);
 				do_join_r = rtw_do_join(adapter);
 				if (_SUCCESS != do_join_r) {
-					RTW_INFO("%s roaming do_join return %d\n", __FUNCTION__ , do_join_r);
+					RTW_INFO("%s roaming do_join return %d\n", __func__ , do_join_r);
 					continue;
 				}
 				break;
@@ -2549,7 +2549,7 @@ void rtw_join_timeout_handler (void *FunctionContext)
 					RTW_INFO("change to widi listen\n");
 				}
 #endif /* CONFIG_INTEL_WIDI */
-				RTW_INFO("%s We've try roaming but fail\n", __FUNCTION__);
+				RTW_INFO("%s We've try roaming but fail\n", __func__);
 #ifdef CONFIG_RTW_80211R
 				rtw_ft_clr_flags(adapter, RTW_FT_PEER_EN|RTW_FT_PEER_OTD_EN);
 				rtw_ft_reset_status(adapter);
@@ -3026,11 +3026,11 @@ int rtw_select_roaming_candidate(struct mlme_priv *mlme)
 	}
 
 	if (!candidate) {
-		RTW_INFO("%s: return _FAIL(candidate is NULL)\n", __FUNCTION__);
+		RTW_INFO("%s: return _FAIL(candidate is NULL)\n", __func__);
 		ret = _FAIL;
 		goto exit;
 	} else {
-		RTW_INFO("%s: candidate: %s("MAC_FMT", ch:%u)\n", __FUNCTION__,
+		RTW_INFO("%s: candidate: %s("MAC_FMT", ch:%u)\n", __func__,
 			candidate->network.Ssid.Ssid, MAC_ARG(candidate->network.MacAddress),
 			 candidate->network.Configuration.DSConfig);
 		mlme->roam_network = candidate;
@@ -3157,11 +3157,11 @@ int rtw_select_and_join_from_scanned_queue(struct mlme_priv *pmlmepriv)
 	}
 
 	if (!candidate) {
-		RTW_INFO("%s: return _FAIL(candidate is NULL)\n", __FUNCTION__);
+		RTW_INFO("%s: return _FAIL(candidate is NULL)\n", __func__);
 		ret = _FAIL;
 		goto exit;
 	} else {
-		RTW_INFO("%s: candidate: %s("MAC_FMT", ch:%u)\n", __FUNCTION__,
+		RTW_INFO("%s: candidate: %s("MAC_FMT", ch:%u)\n", __func__,
 			candidate->network.Ssid.Ssid, MAC_ARG(candidate->network.MacAddress),
 			 candidate->network.Configuration.DSConfig);
 		goto candidate_exist;
@@ -3171,7 +3171,7 @@ candidate_exist:
 
 	/* check for situation of  _FW_LINKED */
 	if (check_fwstate(pmlmepriv, _FW_LINKED)) {
-		RTW_INFO("%s: _FW_LINKED while ask_for_joinbss!!!\n", __FUNCTION__);
+		RTW_INFO("%s: _FW_LINKED while ask_for_joinbss!!!\n", __func__);
 
 		rtw_disassoc_cmd(adapter, 0, 0);
 		rtw_indicate_disconnect(adapter, 0, false);
@@ -3809,7 +3809,7 @@ unsigned int rtw_restructure_ht_ie(struct adapter *adapt, u8 *in_ie, u8 *out_ie,
 		rtw_hal_get_def_var(adapt, HAL_DEF_RX_PACKET_OFFSET, &rx_packet_offset);
 		rtw_hal_get_def_var(adapt, HAL_DEF_MAX_RECVBUF_SZ, &max_recvbuf_sz);
 		if (max_recvbuf_sz - rx_packet_offset >= (8191 - 256)) {
-			RTW_INFO("%s IEEE80211_HT_CAP_MAX_AMSDU is set\n", __FUNCTION__);
+			RTW_INFO("%s IEEE80211_HT_CAP_MAX_AMSDU is set\n", __func__);
 			ht_capie.cap_info |= cpu_to_le16(IEEE80211_HT_CAP_MAX_AMSDU);
 		}
 	}
@@ -3977,7 +3977,7 @@ void rtw_update_ht_cap(struct adapter *adapt, u8 *pie, uint ie_len, u8 channel)
 	/*  */
 	pmlmeinfo->SM_PS = (le16_to_cpu(pmlmeinfo->HT_caps.u.HT_cap_element.HT_caps_info) & 0x0C) >> 2;
 	if (pmlmeinfo->SM_PS == WLAN_HT_CAP_SM_PS_STATIC)
-		RTW_INFO("%s(): WLAN_HT_CAP_SM_PS_STATIC\n", __FUNCTION__);
+		RTW_INFO("%s(): WLAN_HT_CAP_SM_PS_STATIC\n", __func__);
 
 	/*  */
 	/* Config current HT Protection mode. */
@@ -4106,7 +4106,7 @@ void _rtw_roaming(struct adapter *adapt, struct wlan_network *tgt_network)
 				if (rtw_to_roam(adapt) > 0)
 					continue;
 				else {
-					RTW_INFO("%s(%d) -to roaming fail, indicate_disconnect\n", __FUNCTION__, __LINE__);
+					RTW_INFO("%s(%d) -to roaming fail, indicate_disconnect\n", __func__, __LINE__);
 #ifdef CONFIG_RTW_80211R
 					rtw_ft_clr_flags(adapt, RTW_FT_PEER_EN|RTW_FT_PEER_OTD_EN);
 					rtw_ft_reset_status(adapt);

@@ -205,7 +205,7 @@ void rtw_sink_rtp_seq_dbg(struct adapter *adapter, u8 *ehdr_pos)
 			precvpriv->pre_rtp_rxseq = precvpriv->cur_rtp_rxseq;
 			precvpriv->cur_rtp_rxseq = be16_to_cpu(*((__be16 *)(ehdr_pos + 0x2C)));
 			if (precvpriv->pre_rtp_rxseq + 1 != precvpriv->cur_rtp_rxseq)
-				RTW_INFO("%s : RTP Seq num from %d to %d\n", __FUNCTION__, precvpriv->pre_rtp_rxseq, precvpriv->cur_rtp_rxseq);
+				RTW_INFO("%s : RTP Seq num from %d to %d\n", __func__, precvpriv->pre_rtp_rxseq, precvpriv->cur_rtp_rxseq);
 		}
 	}
 }

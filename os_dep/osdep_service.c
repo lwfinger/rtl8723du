@@ -153,7 +153,7 @@ void *rtw_malloc2d(int h, int w, size_t size)
 
 	void **a = (void **) rtw_zmalloc(h * sizeof(void *) + h * w * size);
 	if (!a) {
-		RTW_INFO("%s: alloc memory fail!\n", __FUNCTION__);
+		RTW_INFO("%s: alloc memory fail!\n", __func__);
 		return NULL;
 	}
 
@@ -624,7 +624,7 @@ static int retriveFromFile(const char *path, u8 *buf, u32 sz)
 	if (path && buf) {
 		ret = openFile(&fp, path, O_RDONLY, 0);
 		if (0 == ret) {
-			RTW_INFO("%s openFile path:%s fp=%p\n", __FUNCTION__, path , fp);
+			RTW_INFO("%s openFile path:%s fp=%p\n", __func__, path , fp);
 
 			oldfs = KERNEL_DS;
 			set_fs(KERNEL_DS);
@@ -632,12 +632,12 @@ static int retriveFromFile(const char *path, u8 *buf, u32 sz)
 			set_fs(oldfs);
 			closeFile(fp);
 
-			RTW_INFO("%s readFile, ret:%d\n", __FUNCTION__, ret);
+			RTW_INFO("%s readFile, ret:%d\n", __func__, ret);
 
 		} else
-			RTW_INFO("%s openFile path:%s Fail, ret:%d\n", __FUNCTION__, path, ret);
+			RTW_INFO("%s openFile path:%s Fail, ret:%d\n", __func__, path, ret);
 	} else {
-		RTW_INFO("%s NULL pointer\n", __FUNCTION__);
+		RTW_INFO("%s NULL pointer\n", __func__);
 		ret =  -EINVAL;
 	}
 	return ret;
@@ -659,7 +659,7 @@ static int storeToFile(const char *path, u8 *buf, u32 sz)
 	if (path && buf) {
 		ret = openFile(&fp, path, O_CREAT | O_WRONLY, 0666);
 		if (0 == ret) {
-			RTW_INFO("%s openFile path:%s fp=%p\n", __FUNCTION__, path , fp);
+			RTW_INFO("%s openFile path:%s fp=%p\n", __func__, path , fp);
 
 			oldfs = get_fs();
 			set_fs(KERNEL_DS);
@@ -667,12 +667,12 @@ static int storeToFile(const char *path, u8 *buf, u32 sz)
 			set_fs(oldfs);
 			closeFile(fp);
 
-			RTW_INFO("%s writeFile, ret:%d\n", __FUNCTION__, ret);
+			RTW_INFO("%s writeFile, ret:%d\n", __func__, ret);
 
 		} else
-			RTW_INFO("%s openFile path:%s Fail, ret:%d\n", __FUNCTION__, path, ret);
+			RTW_INFO("%s openFile path:%s Fail, ret:%d\n", __func__, path, ret);
 	} else {
-		RTW_INFO("%s NULL pointer\n", __FUNCTION__);
+		RTW_INFO("%s NULL pointer\n", __func__);
 		ret =  -EINVAL;
 	}
 	return ret;

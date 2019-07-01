@@ -906,7 +906,7 @@ SwLedBlink9(
 	} else {
 		SwLedOff(Adapter, pLed);
 	}
-	/* RTW_INFO("%s, pLed->CurrLedState=%d, pLed->BlinkingLedState=%d\n", __FUNCTION__, pLed->CurrLedState, pLed->BlinkingLedState); */
+	/* RTW_INFO("%s, pLed->CurrLedState=%d, pLed->BlinkingLedState=%d\n", __func__, pLed->CurrLedState, pLed->BlinkingLedState); */
 
 
 	switch (pLed->CurrLedState) {
@@ -1722,7 +1722,7 @@ void BlinkHandler(struct led_usb * pLed)
 	struct adapter		*adapt = pLed->adapt;
 	struct led_priv	*ledpriv = &(adapt->ledpriv);
 
-	/* RTW_INFO("%s (%s:%d)\n",__FUNCTION__, current->comm, current->pid); */
+	/* RTW_INFO("%s (%s:%d)\n",__func__, current->comm, current->pid); */
 
 	if (RTW_CANNOT_RUN(adapt) || (!rtw_is_hw_init_completed(adapt))) {
 		/*RTW_INFO("%s bDriverStopped:%s, bSurpriseRemoved:%s\n"
@@ -1821,7 +1821,7 @@ void BlinkTimerCallback(void *data)
 #endif
 	struct adapter		*adapt = pLed->adapt;
 
-	/* RTW_INFO("%s\n", __FUNCTION__); */
+	/* RTW_INFO("%s\n", __func__); */
 
 	if (RTW_CANNOT_RUN(adapt) || (!rtw_is_hw_init_completed(adapt))) {
 		/*RTW_INFO("%s bDriverStopped:%s, bSurpriseRemoved:%s\n"

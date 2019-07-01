@@ -1426,7 +1426,7 @@ phydm_lna_sat_chk_init(
 
 	struct phydm_lna_sat_info_struct *p_lna_info = &p_dm->dm_lna_sat_info;
 
-	PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK, ("%s ==>\n", __FUNCTION__));
+	PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK, ("%s ==>\n", __func__));
 
 	p_lna_info->check_time = 0;
 	p_lna_info->sat_cnt_acc_patha = 0;
@@ -1481,7 +1481,7 @@ phydm_lna_sat_chk(
 	u1Byte			agc_tab;
 	u4Byte			max_check_time = 0;
 
-	PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK, ("\n%s ==>\n", __FUNCTION__));
+	PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK, ("\n%s ==>\n", __func__));
 
 	if (!(p_dm->support_ability & ODM_BB_LNA_SAT_CHK)) {
 		PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK,
@@ -1611,7 +1611,7 @@ void phydm_lna_sat_chk_callback(struct timer_list *t)
 struct PHY_DM_STRUCT    *p_dm = from_timer(p_dm, t, dm_lna_sat_info.phydm_lna_sat_chk_timer);
 #endif
 
-	PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK, ("\n%s ==>\n", __FUNCTION__));
+	PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK, ("\n%s ==>\n", __func__));
 	phydm_lna_sat_chk(p_dm);
 }
 
@@ -1649,7 +1649,7 @@ phydm_lna_sat_chk_watchdog(
 
 	u1Byte rssi_min = p_dm->rssi_min;
 
-	PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK, ("\n%s ==>\n", __FUNCTION__));
+	PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK, ("\n%s ==>\n", __func__));
 
 	if (!(p_dm->support_ability & ODM_BB_LNA_SAT_CHK)) {
 		PHYDM_DBG(p_dm, DBG_LNA_SAT_CHK,

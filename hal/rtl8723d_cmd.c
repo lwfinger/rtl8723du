@@ -399,7 +399,7 @@ static void SetFwRsvdPagePkt_BTCoex(struct adapter * adapt)
 
 	pcmdframe = rtw_alloc_cmdxmitframe(pxmitpriv);
 	if (!pcmdframe) {
-		RTW_INFO("%s: alloc ReservedPagePacket fail!\n", __FUNCTION__);
+		RTW_INFO("%s: alloc ReservedPagePacket fail!\n", __func__);
 		return;
 	}
 

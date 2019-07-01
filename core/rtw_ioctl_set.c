@@ -489,7 +489,7 @@ u8 rtw_set_802_11_disassociate(struct adapter *adapt)
 		/* modify for CONFIG_IEEE80211W, none 11w can use it */
 		rtw_free_assoc_resources_cmd(adapt);
 		if (_FAIL == rtw_pwr_wakeup(adapt))
-			RTW_INFO("%s(): rtw_pwr_wakeup fail !!!\n", __FUNCTION__);
+			RTW_INFO("%s(): rtw_pwr_wakeup fail !!!\n", __func__);
 	}
 
 	_exit_critical_bh(&pmlmepriv->lock, &irqL);

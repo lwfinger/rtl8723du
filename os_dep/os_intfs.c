@@ -2416,7 +2416,7 @@ void netdev_br_init(struct net_device *netdev)
 				memcpy(adapter->br_mac, br_netdev->dev_addr, ETH_ALEN);
 				dev_put(br_netdev);
 			} else
-				printk("%s()-%d: dev_get_by_name(%s) failed!", __FUNCTION__, __LINE__, CONFIG_BR_EXT_BRNAME);
+				printk("%s()-%d: dev_get_by_name(%s) failed!", __func__, __LINE__, CONFIG_BR_EXT_BRNAME);
 		}
 
 		adapter->ethBrExtInfo.addPPPoETag = 1;
@@ -2564,7 +2564,7 @@ static int  ips_netdrv_open(struct adapter *adapt)
 
 	adapt->net_closed = false;
 
-	RTW_INFO("===> %s.........\n", __FUNCTION__);
+	RTW_INFO("===> %s.........\n", __func__);
 
 
 	rtw_clr_drv_stopped(adapt);
@@ -2621,7 +2621,7 @@ void rtw_ips_dev_unload(struct adapter *adapt)
 	struct net_device *pnetdev = (struct net_device *)adapt->pnetdev;
 	struct xmit_priv	*pxmitpriv = &(adapt->xmitpriv);
 	struct hal_com_data * pHalData = GET_HAL_DATA(adapt);
-	RTW_INFO("====> %s...\n", __FUNCTION__);
+	RTW_INFO("====> %s...\n", __func__);
 
 	rtw_hal_set_hwreg(adapt, HW_VAR_FIFO_CLEARN_UP, NULL);
 	rtw_intf_stop(adapt);
@@ -3003,8 +3003,8 @@ int	rtw_gw_addr_query(struct adapter *adapt)
 		pmlmepriv->gw_ip[2] = (gw_addr & 0xff0000) >> 16;
 		pmlmepriv->gw_ip[3] = (gw_addr & 0xff000000) >> 24;
 		memcpy(pmlmepriv->gw_mac_addr, gw_mac, 6);
-		RTW_INFO("%s Gateway Mac:\t" MAC_FMT "\n", __FUNCTION__, MAC_ARG(pmlmepriv->gw_mac_addr));
-		RTW_INFO("%s Gateway IP:\t" IP_FMT "\n", __FUNCTION__, IP_ARG(pmlmepriv->gw_ip));
+		RTW_INFO("%s Gateway Mac:\t" MAC_FMT "\n", __func__, MAC_ARG(pmlmepriv->gw_mac_addr));
+		RTW_INFO("%s Gateway IP:\t" IP_FMT "\n", __func__, IP_ARG(pmlmepriv->gw_ip));
 	} else
 		RTW_INFO("Get Gateway IP/MAC fail!\n");
 
@@ -3058,7 +3058,7 @@ void rtw_dev_unload(struct adapter * adapt)
 
 		RTW_INFO("<== "FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(adapt));
 	} else {
-		RTW_INFO("%s: bup==false\n", __FUNCTION__);
+		RTW_INFO("%s: bup==false\n", __func__);
 	}
 	rtw_cancel_all_timer(adapt);
 }
@@ -3075,7 +3075,7 @@ int rtw_suspend_free_assoc_resource(struct adapter *adapt)
 		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE) &&
 		    check_fwstate(pmlmepriv, _FW_LINKED) &&
 		    rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE)) {
-			RTW_INFO("%s %s(" MAC_FMT "), length:%d assoc_ssid.length:%d\n", __FUNCTION__,
+			RTW_INFO("%s %s(" MAC_FMT "), length:%d assoc_ssid.length:%d\n", __func__,
 				pmlmepriv->cur_network.network.Ssid.Ssid,
 				MAC_ARG(pmlmepriv->cur_network.network.MacAddress),
 				pmlmepriv->cur_network.network.Ssid.SsidLength,
@@ -3108,7 +3108,7 @@ int rtw_suspend_free_assoc_resource(struct adapter *adapt)
 	}
 
 	if (check_fwstate(pmlmepriv, _FW_UNDER_LINKING)) {
-		RTW_PRINT("%s: fw_under_linking\n", __FUNCTION__);
+		RTW_PRINT("%s: fw_under_linking\n", __func__);
 		rtw_indicate_disconnect(adapt, 0, false);
 	}
 
@@ -3133,7 +3133,7 @@ static int rtw_suspend_normal(struct adapter *adapt)
 
 	if ((rtw_hal_check_ips_status(adapt))
 	    || (adapter_to_pwrctl(adapt)->rf_pwrstate == rf_off))
-		RTW_PRINT("%s: ### ERROR #### driver in IPS ####ERROR###!!!\n", __FUNCTION__);
+		RTW_PRINT("%s: ### ERROR #### driver in IPS ####ERROR###!!!\n", __func__);
 
 
 #ifdef CONFIG_CONCURRENT_MODE
@@ -3158,7 +3158,7 @@ int rtw_suspend_common(struct adapter *adapt)
 	unsigned long start_time = rtw_get_current_time();
 
 	RTW_PRINT(" suspend start\n");
-	RTW_INFO("==> %s (%s:%d)\n", __FUNCTION__, current->comm, current->pid);
+	RTW_INFO("==> %s (%s:%d)\n", __func__, current->comm, current->pid);
 
 	pdbgpriv->dbg_suspend_cnt++;
 
@@ -3193,7 +3193,7 @@ int rtw_suspend_common(struct adapter *adapt)
 		  rtw_get_passing_time_ms(start_time));
 
 exit:
-	RTW_INFO("<===  %s return %d.............. in %dms\n", __FUNCTION__
+	RTW_INFO("<===  %s return %d.............. in %dms\n", __func__
 		 , ret, rtw_get_passing_time_ms(start_time));
 
 	return ret;
@@ -3292,7 +3292,7 @@ int rtw_resume_common(struct adapter *adapt)
 		return 0;
 
 	RTW_PRINT("resume start\n");
-	RTW_INFO("==> %s (%s:%d)\n", __FUNCTION__, current->comm, current->pid);
+	RTW_INFO("==> %s (%s:%d)\n", __func__, current->comm, current->pid);
 
 	if (!rtw_mi_check_status(adapt, WIFI_AP_STATE)) {
 		rtw_resume_process_normal(adapt);
@@ -3304,7 +3304,7 @@ int rtw_resume_common(struct adapter *adapt)
 		pwrpriv->bInSuspend = false;
 		pwrpriv->wowlan_in_resume = false;
 	}
-	RTW_PRINT("%s:%d in %d ms\n", __FUNCTION__ , ret,
+	RTW_PRINT("%s:%d in %d ms\n", __func__ , ret,
 		  rtw_get_passing_time_ms(start_time));
 
 

@@ -33,7 +33,7 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 	}
 
 	if (len > MAX_VENDOR_REQ_CMD_SIZE) {
-		RTW_INFO("[%s] Buffer len error ,vendor request failed\n", __FUNCTION__);
+		RTW_INFO("[%s] Buffer len error ,vendor request failed\n", __func__);
 		status = -EINVAL;
 		goto exit;
 	}
@@ -43,7 +43,7 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 	pIo_buf = pdvobjpriv->usb_vendor_req_buf;
 
 	if (!pIo_buf) {
-		RTW_INFO("[%s] pIo_buf is NULL\n", __FUNCTION__);
+		RTW_INFO("[%s] pIo_buf is NULL\n", __func__);
 		status = -ENOMEM;
 		goto release_mutex;
 	}
@@ -508,7 +508,7 @@ static void usb_read_port_complete(struct urb *purb, struct pt_regs *regs)
 
 		if ((purb->actual_length > MAX_RECVBUF_SZ) || (purb->actual_length < RXDESC_SIZE)) {
 			RTW_INFO("%s()-%d: urb->actual_length:%u, MAX_RECVBUF_SZ:%u, RXDESC_SIZE:%u\n"
-				, __FUNCTION__, __LINE__, purb->actual_length, MAX_RECVBUF_SZ, RXDESC_SIZE);
+				, __func__, __LINE__, purb->actual_length, MAX_RECVBUF_SZ, RXDESC_SIZE);
 			rtw_read_port(adapt, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
 		} else {
 			rtw_reset_continual_io_error(adapter_to_dvobj(adapt));

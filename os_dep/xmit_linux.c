@@ -71,11 +71,11 @@ void rtw_set_tx_chksum_offload(struct sk_buff *pkt, struct pkt_attrib *pattrib)
 				/* RTW_INFO("CHECKSUM_PARTIAL UDP\n"); */
 				skb_checksum_help(skb);
 			} else {
-				RTW_INFO("%s-%d TCP CSUM offload Error!!\n", __FUNCTION__, __LINE__);
+				RTW_INFO("%s-%d TCP CSUM offload Error!!\n", __func__, __LINE__);
 				WARN_ON(1);     /* we need a WARN() */
 			}
 		} else { /* IP fragmentation case */
-			RTW_INFO("%s-%d nr_frags != 0, using skb_checksum_help(skb);!!\n", __FUNCTION__, __LINE__);
+			RTW_INFO("%s-%d nr_frags != 0, using skb_checksum_help(skb);!!\n", __func__, __LINE__);
 			skb_checksum_help(skb);
 		}
 	}
@@ -339,13 +339,13 @@ static int rtw_mlcst2unicst(struct adapter *adapt, struct sk_buff *skb)
 			res = rtw_xmit(adapt, &newskb);
 			if (res < 0) {
 				DBG_COUNTER(adapt->tx_logs.os_tx_m2u_entry_err_xmit);
-				RTW_INFO("%s()-%d: rtw_xmit() return error! res=%d\n", __FUNCTION__, __LINE__, res);
+				RTW_INFO("%s()-%d: rtw_xmit() return error! res=%d\n", __func__, __LINE__, res);
 				pxmitpriv->tx_drop++;
 				dev_kfree_skb_any(newskb);
 			}
 		} else {
 			DBG_COUNTER(adapt->tx_logs.os_tx_m2u_entry_err_skb);
-			RTW_INFO("%s-%d: rtw_skb_copy() failed!\n", __FUNCTION__, __LINE__);
+			RTW_INFO("%s-%d: rtw_skb_copy() failed!\n", __func__, __LINE__);
 			pxmitpriv->tx_drop++;
 			/* dev_kfree_skb_any(skb); */
 			return false;	/* Caller shall tx this multicast frame via normal way. */

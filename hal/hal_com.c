@@ -130,7 +130,7 @@ void rtw_hal_config_rftype(struct adapter *  adapt)
 		pHalData->NumTotalRFPath = 1;
 	}
 
-	RTW_INFO("%s RF_Type is %d TotalTxPath is %d\n", __FUNCTION__, pHalData->rf_type, pHalData->NumTotalRFPath);
+	RTW_INFO("%s RF_Type is %d TotalTxPath is %d\n", __func__, pHalData->rf_type, pHalData->NumTotalRFPath);
 }
 
 #define	EEPROM_CHANNEL_PLAN_BY_HW_MASK	0x80
@@ -3062,7 +3062,7 @@ void rtw_hal_construct_beacon(struct adapter *adapt,
 	u8	bc_addr[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
 
-	/* RTW_INFO("%s\n", __FUNCTION__); */
+	/* RTW_INFO("%s\n", __func__); */
 
 	pwlanhdr = (struct rtw_ieee80211_hdr *)pframe;
 
@@ -3144,7 +3144,7 @@ _ConstructBeacon:
 
 	*pLength = pktlen;
 
-	/* RTW_INFO("%s bcn_sz=%d\n", __FUNCTION__, pktlen); */
+	/* RTW_INFO("%s bcn_sz=%d\n", __func__, pktlen); */
 
 }
 
@@ -3157,7 +3157,7 @@ static void rtw_hal_construct_PSPoll(struct adapter *adapt,
 	struct mlme_ext_priv	*pmlmeext = &(adapt->mlmeextpriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
-	/* RTW_INFO("%s\n", __FUNCTION__); */
+	/* RTW_INFO("%s\n", __func__); */
 
 	pwlanhdr = (struct rtw_ieee80211_hdr *)pframe;
 
@@ -3198,7 +3198,7 @@ void rtw_hal_construct_NullFunctionData(
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	u8 bssid[ETH_ALEN];
 
-	/* RTW_INFO("%s:%d\n", __FUNCTION__, bForcePowerSave); */
+	/* RTW_INFO("%s:%d\n", __func__, bForcePowerSave); */
 
 	pwlanhdr = (struct rtw_ieee80211_hdr *)pframe;
 
@@ -3266,7 +3266,7 @@ static void rtw_hal_construct_ProbeRsp(struct adapter *adapt, u8 *pframe, u32 *p
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	struct wlan_bssid_ex  *cur_network = &(pmlmeinfo->network);
 
-	/*RTW_INFO("%s\n", __FUNCTION__);*/
+	/*RTW_INFO("%s\n", __func__);*/
 
 	pwlanhdr = (struct rtw_ieee80211_hdr *)pframe;
 
@@ -3354,7 +3354,7 @@ static void _rtw_hal_set_fw_rsvd_page(struct adapter *adapter, bool finished, u8
 	if (page_num) {
 		ReservedPagePacket = rtw_zmalloc(MAX_CMDBUF_SZ);
 		if (!ReservedPagePacket) {
-			RTW_WARN("%s: alloc ReservedPagePacket fail!\n", __FUNCTION__);
+			RTW_WARN("%s: alloc ReservedPagePacket fail!\n", __func__);
 			*page_num = 0xFF;
 			return;
 		}
@@ -3376,7 +3376,7 @@ static void _rtw_hal_set_fw_rsvd_page(struct adapter *adapter, bool finished, u8
 
 		pcmdframe = rtw_alloc_cmdxmitframe(pxmitpriv);
 		if (!pcmdframe) {
-			RTW_ERR("%s: alloc ReservedPagePacket fail!\n", __FUNCTION__);
+			RTW_ERR("%s: alloc ReservedPagePacket fail!\n", __func__);
 			return;
 		}
 
@@ -3515,7 +3515,7 @@ download_page:
 
 	if (TotalPacketLen > MaxRsvdPageBufSize) {
 		RTW_ERR("%s(ERROR): rsvd page size is not enough!!TotalPacketLen %d, MaxRsvdPageBufSize %d\n",
-			 __FUNCTION__, TotalPacketLen, MaxRsvdPageBufSize);
+			 __func__, TotalPacketLen, MaxRsvdPageBufSize);
 		rtw_warn_on(1);
 		goto error;
 	} else {
@@ -4065,7 +4065,7 @@ SetHalDefVar(struct adapter *adapter, enum hal_def_variable variable, void *valu
 		hal_data->bDisableTXPowerTraining = *((u8 *)value);
 		break;
 	default:
-		RTW_PRINT("%s: [WARNING] hal_def_variable(%d) not defined!\n", __FUNCTION__, variable);
+		RTW_PRINT("%s: [WARNING] hal_def_variable(%d) not defined!\n", __func__, variable);
 		bResult = _FAIL;
 		break;
 	}
@@ -4114,7 +4114,7 @@ GetHalDefVar(struct adapter *adapter, enum hal_def_variable variable, void *valu
 		*(u8 *)value = false;
 		break;
 	default:
-		RTW_PRINT("%s: [WARNING] hal_def_variable(%d) not defined!\n", __FUNCTION__, variable);
+		RTW_PRINT("%s: [WARNING] hal_def_variable(%d) not defined!\n", __func__, variable);
 		bResult = _FAIL;
 		break;
 	}
@@ -4393,7 +4393,7 @@ void linked_info_dump(struct adapter *adapt, u8 benable)
 	if (adapt->bLinkInfoDump == benable)
 		return;
 
-	RTW_INFO("%s %s\n", __FUNCTION__, (benable) ? "enable" : "disable");
+	RTW_INFO("%s %s\n", __func__, (benable) ? "enable" : "disable");
 
 	if (benable) {
 		pwrctrlpriv->org_power_mgnt = pwrctrlpriv->power_mgnt;/* keep org value */

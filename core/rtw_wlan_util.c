@@ -539,7 +539,7 @@ void set_channel_bwmode(struct adapter *adapt, unsigned char channel, unsigned c
 	struct mlme_ext_priv *pmlmeext = &adapt->mlmeextpriv;
 
 	if (adapt->bNotifyChannelChange)
-		RTW_INFO("[%s] ch = %d, offset = %d, bwmode = %d\n", __FUNCTION__, channel, channel_offset, bwmode);
+		RTW_INFO("[%s] ch = %d, offset = %d, bwmode = %d\n", __func__, channel, channel_offset, bwmode);
 
 	center_ch = rtw_get_center_ch(channel, bwmode, channel_offset);
 
@@ -1742,7 +1742,7 @@ void HTOnAssocRsp(struct adapter *adapt)
 	struct mlme_ext_priv	*pmlmeext = &adapt->mlmeextpriv;
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
-	RTW_INFO("%s\n", __FUNCTION__);
+	RTW_INFO("%s\n", __func__);
 
 	if ((pmlmeinfo->HT_info_enable) && (pmlmeinfo->HT_caps_enable))
 		pmlmeinfo->HT_enable = 1;

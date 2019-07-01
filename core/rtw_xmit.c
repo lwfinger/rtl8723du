@@ -1672,7 +1672,7 @@ int rtw_xmitframe_coalesce_amsdu(struct adapter *adapt, struct xmit_frame *pxmit
 	int res = _SUCCESS;
 
 	if (!pxmitframe->buf_addr) {
-		RTW_INFO("==> %s buf_addr==NULL\n", __FUNCTION__);
+		RTW_INFO("==> %s buf_addr==NULL\n", __func__);
 		return _FAIL;
 	}
 
@@ -1844,7 +1844,7 @@ int rtw_xmitframe_coalesce(struct adapter *adapt, struct sk_buff *pkt, struct xm
 	int res = _SUCCESS;
 
 	if (!pxmitframe->buf_addr) {
-		RTW_INFO("==> %s buf_addr==NULL\n", __FUNCTION__);
+		RTW_INFO("==> %s buf_addr==NULL\n", __func__);
 		return _FAIL;
 	}
 
@@ -2409,13 +2409,13 @@ struct xmit_frame *__rtw_alloc_cmdxmitframe(struct xmit_priv *pxmitpriv,
 
 	pcmdframe = rtw_alloc_xmitframe(pxmitpriv);
 	if (!pcmdframe) {
-		RTW_INFO("%s, alloc xmitframe fail\n", __FUNCTION__);
+		RTW_INFO("%s, alloc xmitframe fail\n", __func__);
 		return NULL;
 	}
 
 	pxmitbuf = __rtw_alloc_cmd_xmitbuf(pxmitpriv, buf_type);
 	if (!pxmitbuf) {
-		RTW_INFO("%s, alloc xmitbuf fail\n", __FUNCTION__);
+		RTW_INFO("%s, alloc xmitbuf fail\n", __func__);
 		rtw_free_xmitframe(pxmitpriv, pcmdframe);
 		return NULL;
 	}
@@ -3240,7 +3240,7 @@ static int rtw_br_client_tx(struct adapter *adapt, struct sk_buff **pskb)
 				}
 
 				if (skb_is_nonlinear(skb))
-					DEBUG_ERR("%s(): skb_is_nonlinear!!\n", __FUNCTION__);
+					DEBUG_ERR("%s(): skb_is_nonlinear!!\n", __func__);
 
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 18))
@@ -3264,7 +3264,7 @@ static int rtw_br_client_tx(struct adapter *adapt, struct sk_buff **pskb)
 
 					}
 					/* we just print warning message and let it go */
-					/* DEBUG_WARN("%s()-%d: nat25_db_handle INSERT Warning!\n", __FUNCTION__, __LINE__); */
+					/* DEBUG_WARN("%s()-%d: nat25_db_handle INSERT Warning!\n", __func__, __LINE__); */
 					/* return -1; */ /* return -1 will cause system crash on 2011/08/30! */
 					return 0;
 				}
@@ -3517,7 +3517,7 @@ int rtw_xmit(struct adapter *adapt, struct sk_buff **ppkt)
 
 	if (rtw_get_passing_time_ms(start) > 2000) {
 		if (drop_cnt)
-			RTW_INFO("DBG_TX_DROP_FRAME %s no more pxmitframe, drop_cnt:%u\n", __FUNCTION__, drop_cnt);
+			RTW_INFO("DBG_TX_DROP_FRAME %s no more pxmitframe, drop_cnt:%u\n", __func__, drop_cnt);
 		start = rtw_get_current_time();
 		drop_cnt = 0;
 	}
@@ -4141,7 +4141,7 @@ void rtw_amsdu_be_timeout_handler(void *FunctionContext)
 	adapter->xmitpriv.amsdu_be_timeout = RTW_AMSDU_TIMER_TIMEOUT;
 
 	if (printk_ratelimit())
-		RTW_INFO("%s Timeout!\n",__FUNCTION__);
+		RTW_INFO("%s Timeout!\n",__func__);
 
 	tasklet_hi_schedule(&adapter->xmitpriv.xmit_tasklet);
 }

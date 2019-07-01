@@ -222,7 +222,7 @@ void _8051Reset8723(struct adapter * adapt)
 	cpu_rst |= BIT(2);
 	rtw_write8(adapt, REG_SYS_FUNC_EN + 1, cpu_rst);
 
-	RTW_INFO("%s: Finish\n", __FUNCTION__);
+	RTW_INFO("%s: Finish\n", __func__);
 }
 
 static int polling_fwdl_chksum(struct adapter *adapter, u32 min_cnt, u32 timeout_ms)
@@ -250,7 +250,7 @@ static int polling_fwdl_chksum(struct adapter *adapter, u32 min_cnt, u32 timeout
 	ret = _SUCCESS;
 
 exit:
-	RTW_INFO("%s: Checksum report %s! (%u, %dms), REG_MCUFWDL:0x%08x\n", __FUNCTION__
+	RTW_INFO("%s: Checksum report %s! (%u, %dms), REG_MCUFWDL:0x%08x\n", __func__
 		, (ret == _SUCCESS) ? "OK" : "Fail", cnt, rtw_get_passing_time_ms(start), value32);
 
 	return ret;
@@ -291,7 +291,7 @@ static int _FWFreeToGo(struct adapter *adapter, u32 min_cnt, u32 timeout_ms)
 	ret = _SUCCESS;
 
 exit:
-	RTW_INFO("%s: Polling FW ready %s! (%u, %dms), REG_MCUFWDL:0x%08x\n", __FUNCTION__
+	RTW_INFO("%s: Polling FW ready %s! (%u, %dms), REG_MCUFWDL:0x%08x\n", __func__
 		, (ret == _SUCCESS) ? "OK" : "Fail", cnt, rtw_get_passing_time_ms(start), value32);
 
 	return ret;
@@ -401,7 +401,7 @@ int rtl8723d_FirmwareDownload(struct adapter * adapt, bool  bUsedWoWLANFw)
 
 #ifdef CONFIG_FILE_FWIMG
 	if (rtw_is_file_readable(fwfilepath)) {
-		RTW_INFO("%s acquire FW from file:%s\n", __FUNCTION__, fwfilepath);
+		RTW_INFO("%s acquire FW from file:%s\n", __func__, fwfilepath);
 		pFirmware->eFWSource = FW_SOURCE_IMG_FILE;
 	} else
 #endif /* CONFIG_FILE_FWIMG */
@@ -427,7 +427,7 @@ int rtl8723d_FirmwareDownload(struct adapter * adapt, bool  bUsedWoWLANFw)
 		} else {
 			pFirmware->szFwBuffer = array_mp_8723d_fw_nic;
 			pFirmware->ulFwLength = array_length_mp_8723d_fw_nic;
-			RTW_INFO("%s fw: %s, size: %d\n", __FUNCTION__, "FW_NIC", pFirmware->ulFwLength);
+			RTW_INFO("%s fw: %s, size: %d\n", __func__, "FW_NIC", pFirmware->ulFwLength);
 		}
 		break;
 	}
@@ -455,7 +455,7 @@ int rtl8723d_FirmwareDownload(struct adapter * adapt, bool  bUsedWoWLANFw)
 		 , pFwHdr->Month, pFwHdr->Date, pFwHdr->Hour, pFwHdr->Minute);
 
 	if (IS_FW_HEADER_EXIST_8723D(pFwHdr)) {
-		RTW_INFO("%s(): Shift for fw header!\n", __FUNCTION__);
+		RTW_INFO("%s(): Shift for fw header!\n", __func__);
 		/* Shift 32 bytes for FW header */
 		pFirmwareBuf = pFirmwareBuf + 32;
 		FirmwareLen = FirmwareLen - 32;
@@ -549,7 +549,7 @@ int rtl8723d_FirmwareDownload(struct adapter * adapt, bool  bUsedWoWLANFw)
 				rtw_read8(adapt, REG_MCUFWDL + 1) | BIT(5));
 
 			if (false == send_fw_packet(adapt, pFirmwareBuf + mem_offset, send_pkt_size)) {
-				RTW_INFO("%s: Send FW fail !\n", __FUNCTION__);
+				RTW_INFO("%s: Send FW fail !\n", __func__);
 				rtStatus = _FAIL;
 				goto DLFW_FAIL;
 			}
@@ -559,7 +559,7 @@ int rtl8723d_FirmwareDownload(struct adapter * adapt, bool  bUsedWoWLANFw)
 			pkt_size_tmp -= send_pkt_size;
 		}
 	} else {
-		RTW_INFO("%s: Download FW fail since MCUFWDL_RDY is not set!\n", __FUNCTION__);
+		RTW_INFO("%s: Download FW fail since MCUFWDL_RDY is not set!\n", __func__);
 		rtStatus = _FAIL;
 		goto DLFW_FAIL;
 	}
@@ -584,7 +584,7 @@ DLFW_FAIL:
 	}
 
 	RTW_INFO("%s %s. write_fw:%u, %dms\n"
-		 , __FUNCTION__, (rtStatus == _SUCCESS) ? "success" : "fail"
+		 , __func__, (rtStatus == _SUCCESS) ? "success" : "fail"
 		 , write_fw
 		 , rtw_get_passing_time_ms(fwdl_start_time)
 		);
@@ -595,7 +595,7 @@ exit:
 
 	rtl8723d_InitializeFirmwareVars(adapt);
 
-	RTW_INFO(" <=== %s()\n", __FUNCTION__);
+	RTW_INFO(" <=== %s()\n", __func__);
 
 	return rtStatus;
 }
@@ -634,7 +634,7 @@ hal_EfuseSwitchToBank(
 #endif
 
 
-	RTW_INFO("%s: Efuse switch bank to %d\n", __FUNCTION__, bank);
+	RTW_INFO("%s: Efuse switch bank to %d\n", __func__, bank);
 	if (bPseudoTest) {
 #ifdef HAL_EFUSE_MEMORY
 		pEfuseHal->fakeEfuseBank = bank;
@@ -886,13 +886,13 @@ static void hal_ReadEFuse_WiFi(struct adapter * adapt, u16 _offset, u16 _size_by
 	/* Do NOT excess total size of EFuse table. Added by Roger, 2008.11.10. */
 	/* */
 	if ((_offset + _size_byte) > EFUSE_MAX_MAP_LEN) {
-		RTW_INFO("%s: Invalid offset(%#x) with read bytes(%#x)!!\n", __FUNCTION__, _offset, _size_byte);
+		RTW_INFO("%s: Invalid offset(%#x) with read bytes(%#x)!!\n", __func__, _offset, _size_byte);
 		return;
 	}
 
 	efuseTbl = (u8 *)rtw_malloc(EFUSE_MAX_MAP_LEN);
 	if (!efuseTbl) {
-		RTW_INFO("%s: alloc efuseTbl fail!\n", __FUNCTION__);
+		RTW_INFO("%s: alloc efuseTbl fail!\n", __func__);
 		return;
 	}
 	/* 0xff will be efuse default value instead of 0x00. */
@@ -905,19 +905,19 @@ static void hal_ReadEFuse_WiFi(struct adapter * adapt, u16 _offset, u16 _size_by
 		/* ReadEFuseByte(adapt, eFuse_Addr++, &efuseHeader, bPseudoTest); */
 		efuse_OneByteRead(adapt, eFuse_Addr++, &efuseHeader, bPseudoTest);
 		if (efuseHeader == 0xFF) {
-			RTW_INFO("%s: data end at address=%#x\n", __FUNCTION__, eFuse_Addr - 1);
+			RTW_INFO("%s: data end at address=%#x\n", __func__, eFuse_Addr - 1);
 			break;
 		}
-		/* RTW_INFO("%s: efuse[0x%X]=0x%02X\n", __FUNCTION__, eFuse_Addr-1, efuseHeader); */
+		/* RTW_INFO("%s: efuse[0x%X]=0x%02X\n", __func__, eFuse_Addr-1, efuseHeader); */
 
 		/* Check PG header for section num. */
 		if (EXT_HEADER(efuseHeader)) {	/* extended header */
 			offset = GET_HDR_OFFSET_2_0(efuseHeader);
-			/* RTW_INFO("%s: extended header offset=0x%X\n", __FUNCTION__, offset); */
+			/* RTW_INFO("%s: extended header offset=0x%X\n", __func__, offset); */
 
 			/* ReadEFuseByte(adapt, eFuse_Addr++, &efuseExtHdr, bPseudoTest); */
 			efuse_OneByteRead(adapt, eFuse_Addr++, &efuseExtHdr, bPseudoTest);
-			/* RTW_INFO("%s: efuse[0x%X]=0x%02X\n", __FUNCTION__, eFuse_Addr-1, efuseExtHdr); */
+			/* RTW_INFO("%s: efuse[0x%X]=0x%02X\n", __func__, eFuse_Addr-1, efuseExtHdr); */
 			if (ALL_WORDS_DISABLED(efuseExtHdr))
 				continue;
 
@@ -927,12 +927,12 @@ static void hal_ReadEFuse_WiFi(struct adapter * adapt, u16 _offset, u16 _size_by
 			offset = ((efuseHeader >> 4) & 0x0f);
 			wden = (efuseHeader & 0x0f);
 		}
-		/* RTW_INFO("%s: Offset=%d Worden=0x%X\n", __FUNCTION__, offset, wden); */
+		/* RTW_INFO("%s: Offset=%d Worden=0x%X\n", __func__, offset, wden); */
 
 		if (offset < EFUSE_MAX_SECTION_8723D) {
 			u16 addr;
 			/* Get word enable value from PG header
-			*			RTW_INFO("%s: Offset=%d Worden=0x%X\n", __FUNCTION__, offset, wden); */
+			*			RTW_INFO("%s: Offset=%d Worden=0x%X\n", __func__, offset, wden); */
 
 			addr = offset * PGPKT_DATA_SIZE;
 			for (i = 0; i < EFUSE_MAX_WORD_UNIT; i++) {
@@ -941,19 +941,19 @@ static void hal_ReadEFuse_WiFi(struct adapter * adapt, u16 _offset, u16 _size_by
 					efuseData = 0;
 					/* ReadEFuseByte(adapt, eFuse_Addr++, &efuseData, bPseudoTest); */
 					efuse_OneByteRead(adapt, eFuse_Addr++, &efuseData, bPseudoTest);
-					/*					RTW_INFO("%s: efuse[%#X]=0x%02X\n", __FUNCTION__, eFuse_Addr-1, efuseData); */
+					/*					RTW_INFO("%s: efuse[%#X]=0x%02X\n", __func__, eFuse_Addr-1, efuseData); */
 					efuseTbl[addr] = efuseData;
 
 					efuseData = 0;
 					/* ReadEFuseByte(adapt, eFuse_Addr++, &efuseData, bPseudoTest); */
 					efuse_OneByteRead(adapt, eFuse_Addr++, &efuseData, bPseudoTest);
-					/*					RTW_INFO("%s: efuse[%#X]=0x%02X\n", __FUNCTION__, eFuse_Addr-1, efuseData); */
+					/*					RTW_INFO("%s: efuse[%#X]=0x%02X\n", __func__, eFuse_Addr-1, efuseData); */
 					efuseTbl[addr + 1] = efuseData;
 				}
 				addr += 2;
 			}
 		} else {
-			RTW_INFO(KERN_ERR "%s: offset(%d) is illegal!!\n", __FUNCTION__, offset);
+			RTW_INFO(KERN_ERR "%s: offset(%d) is illegal!!\n", __func__, offset);
 			eFuse_Addr += Efuse_CalculateWordCnts(wden) * 2;
 		}
 	}
@@ -1005,13 +1005,13 @@ static void hal_ReadEFuse_BT(struct adapter * adapt, u16 _offset, u16 _size_byte
 	/* Do NOT excess total size of EFuse table. Added by Roger, 2008.11.10. */
 	/* */
 	if ((_offset + _size_byte) > EFUSE_BT_MAP_LEN) {
-		RTW_INFO("%s: Invalid offset(%#x) with read bytes(%#x)!!\n", __FUNCTION__, _offset, _size_byte);
+		RTW_INFO("%s: Invalid offset(%#x) with read bytes(%#x)!!\n", __func__, _offset, _size_byte);
 		return;
 	}
 
 	efuseTbl = rtw_malloc(EFUSE_BT_MAP_LEN);
 	if (!efuseTbl) {
-		RTW_INFO("%s: efuseTbl malloc fail!\n", __FUNCTION__);
+		RTW_INFO("%s: efuseTbl malloc fail!\n", __func__);
 		return;
 	}
 	/* 0xff will be efuse default value instead of 0x00. */
@@ -1022,7 +1022,7 @@ static void hal_ReadEFuse_BT(struct adapter * adapt, u16 _offset, u16 _size_byte
 
 	for (bank = 1; bank < 3; bank++) { /* 8723d Max bake 0~2 */
 		if (!hal_EfuseSwitchToBank(adapt, bank, bPseudoTest)) {
-			RTW_INFO("%s: hal_EfuseSwitchToBank Fail!!\n", __FUNCTION__);
+			RTW_INFO("%s: hal_EfuseSwitchToBank Fail!!\n", __func__);
 			goto exit;
 		}
 
@@ -1033,16 +1033,16 @@ static void hal_ReadEFuse_BT(struct adapter * adapt, u16 _offset, u16 _size_byte
 			efuse_OneByteRead(adapt, eFuse_Addr++, &efuseHeader, bPseudoTest);
 			if (efuseHeader == 0xFF)
 				break;
-			RTW_INFO("%s: efuse[%#X]=0x%02x (header)\n", __FUNCTION__, (((bank - 1) * EFUSE_REAL_CONTENT_LEN_8723D) + eFuse_Addr - 1), efuseHeader);
+			RTW_INFO("%s: efuse[%#X]=0x%02x (header)\n", __func__, (((bank - 1) * EFUSE_REAL_CONTENT_LEN_8723D) + eFuse_Addr - 1), efuseHeader);
 
 			/* Check PG header for section num. */
 			if (EXT_HEADER(efuseHeader)) {	/* extended header */
 				offset = GET_HDR_OFFSET_2_0(efuseHeader);
-				RTW_INFO("%s: extended header offset_2_0=0x%X\n", __FUNCTION__, offset);
+				RTW_INFO("%s: extended header offset_2_0=0x%X\n", __func__, offset);
 
 				/* ReadEFuseByte(adapt, eFuse_Addr++, &efuseExtHdr, bPseudoTest); */
 				efuse_OneByteRead(adapt, eFuse_Addr++, &efuseExtHdr, bPseudoTest);
-				RTW_INFO("%s: efuse[%#X]=0x%02x (ext header)\n", __FUNCTION__, (((bank - 1) * EFUSE_REAL_CONTENT_LEN_8723D) + eFuse_Addr - 1), efuseExtHdr);
+				RTW_INFO("%s: efuse[%#X]=0x%02x (ext header)\n", __func__, (((bank - 1) * EFUSE_REAL_CONTENT_LEN_8723D) + eFuse_Addr - 1), efuseExtHdr);
 				if (ALL_WORDS_DISABLED(efuseExtHdr))
 					continue;
 
@@ -1057,7 +1057,7 @@ static void hal_ReadEFuse_BT(struct adapter * adapt, u16 _offset, u16 _size_byte
 				u16 addr;
 
 				/* Get word enable value from PG header */
-				RTW_INFO("%s: Offset=%d Worden=%#X\n", __FUNCTION__, offset, wden);
+				RTW_INFO("%s: Offset=%d Worden=%#X\n", __func__, offset, wden);
 
 				addr = offset * PGPKT_DATA_SIZE;
 				for (i = 0; i < EFUSE_MAX_WORD_UNIT; i++) {
@@ -1066,25 +1066,25 @@ static void hal_ReadEFuse_BT(struct adapter * adapt, u16 _offset, u16 _size_byte
 						efuseData = 0;
 						/* ReadEFuseByte(adapt, eFuse_Addr++, &efuseData, bPseudoTest); */
 						efuse_OneByteRead(adapt, eFuse_Addr++, &efuseData, bPseudoTest);
-						RTW_INFO("%s: efuse[%#X]=0x%02X\n", __FUNCTION__, eFuse_Addr - 1, efuseData);
+						RTW_INFO("%s: efuse[%#X]=0x%02X\n", __func__, eFuse_Addr - 1, efuseData);
 						efuseTbl[addr] = efuseData;
 
 						efuseData = 0;
 						/* ReadEFuseByte(adapt, eFuse_Addr++, &efuseData, bPseudoTest); */
 						efuse_OneByteRead(adapt, eFuse_Addr++, &efuseData, bPseudoTest);
-						RTW_INFO("%s: efuse[%#X]=0x%02X\n", __FUNCTION__, eFuse_Addr - 1, efuseData);
+						RTW_INFO("%s: efuse[%#X]=0x%02X\n", __func__, eFuse_Addr - 1, efuseData);
 						efuseTbl[addr + 1] = efuseData;
 					}
 					addr += 2;
 				}
 			} else {
-				RTW_INFO("%s: offset(%d) is illegal!!\n", __FUNCTION__, offset);
+				RTW_INFO("%s: offset(%d) is illegal!!\n", __func__, offset);
 				eFuse_Addr += Efuse_CalculateWordCnts(wden) * 2;
 			}
 		}
 
 		if ((eFuse_Addr - 1) < total) {
-			RTW_INFO("%s: bank(%d) data end at %#x\n", __FUNCTION__, bank, eFuse_Addr - 1);
+			RTW_INFO("%s: bank(%d) data end at %#x\n", __func__, bank, eFuse_Addr - 1);
 			break;
 		}
 	}
@@ -1101,7 +1101,7 @@ static void hal_ReadEFuse_BT(struct adapter * adapt, u16 _offset, u16 _size_byte
 	/* */
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_BT, TYPE_AVAILABLE_EFUSE_BYTES_TOTAL, &total, bPseudoTest);
 	used = (EFUSE_BT_REAL_BANK_CONTENT_LEN * (bank - 1)) + eFuse_Addr - 1;
-	RTW_INFO("%s: bank(%d) data end at %#x ,used =%d\n", __FUNCTION__, bank, eFuse_Addr - 1, used);
+	RTW_INFO("%s: bank(%d) data end at %#x ,used =%d\n", __func__, bank, eFuse_Addr - 1, used);
 	efuse_usage = (u8)((used * 100) / total);
 	if (bPseudoTest) {
 #ifdef HAL_EFUSE_MEMORY
@@ -1150,7 +1150,7 @@ static u16 hal_EfuseGetCurrentSize_WiFi(struct adapter * adapt, bool bPseudoTest
 	} else
 		rtw_hal_get_hwreg(adapt, HW_VAR_EFUSE_BYTES, (u8 *)&efuse_addr);
 	start_addr = efuse_addr;
-	RTW_INFO("%s: start_efuse_addr=0x%X\n", __FUNCTION__, efuse_addr);
+	RTW_INFO("%s: start_efuse_addr=0x%X\n", __func__, efuse_addr);
 
 	/* switch bank back to bank 0 for later BT and wifi use. */
 	hal_EfuseSwitchToBank(adapt, 0, bPseudoTest);
@@ -1158,7 +1158,7 @@ static u16 hal_EfuseGetCurrentSize_WiFi(struct adapter * adapt, bool bPseudoTest
 	count = 0;
 	while (AVAILABLE_EFUSE_ADDR(efuse_addr)) {
 		if (!efuse_OneByteRead(adapt, efuse_addr, &efuse_data, bPseudoTest)) {
-			RTW_INFO(KERN_ERR "%s: efuse_OneByteRead Fail! addr=0x%X !!\n", __FUNCTION__, efuse_addr);
+			RTW_INFO(KERN_ERR "%s: efuse_OneByteRead Fail! addr=0x%X !!\n", __func__, efuse_addr);
 			goto error;
 		}
 		if (efuse_data == 0xFF)
@@ -1219,7 +1219,7 @@ error:
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI, TYPE_AVAILABLE_EFUSE_BYTES_TOTAL, &efuse_addr, bPseudoTest);
 
 exit:
-	RTW_INFO("%s: CurrentSize=%d\n", __FUNCTION__, efuse_addr);
+	RTW_INFO("%s: CurrentSize=%d\n", __func__, efuse_addr);
 
 	return efuse_addr;
 }
@@ -1255,13 +1255,13 @@ hal_EfuseGetCurrentSize_BT(
 	efuse_addr = (u16)((btusedbytes % EFUSE_BT_REAL_BANK_CONTENT_LEN));
 	startBank = (u8)(1 + (btusedbytes / EFUSE_BT_REAL_BANK_CONTENT_LEN));
 
-	RTW_INFO("%s: start from bank=%d addr=0x%X\n", __FUNCTION__, startBank, efuse_addr);
+	RTW_INFO("%s: start from bank=%d addr=0x%X\n", __func__, startBank, efuse_addr);
 
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_BT, TYPE_AVAILABLE_EFUSE_BYTES_BANK, &retU2, bPseudoTest);
 
 	for (bank = startBank; bank < 3; bank++) {
 		if (!hal_EfuseSwitchToBank(adapt, bank, bPseudoTest)) {
-			RTW_INFO(KERN_ERR "%s: switch bank(%d) Fail!!\n", __FUNCTION__, bank);
+			RTW_INFO(KERN_ERR "%s: switch bank(%d) Fail!!\n", __func__, bank);
 			/* bank = EFUSE_MAX_BANK; */
 			break;
 		}
@@ -1272,11 +1272,11 @@ hal_EfuseGetCurrentSize_BT(
 
 		while (AVAILABLE_EFUSE_ADDR(efuse_addr)) {
 			if (!efuse_OneByteRead(adapt, efuse_addr, &efuse_data, bPseudoTest)) {
-				RTW_INFO(KERN_ERR "%s: efuse_OneByteRead Fail! addr=0x%X !!\n", __FUNCTION__, efuse_addr);
+				RTW_INFO(KERN_ERR "%s: efuse_OneByteRead Fail! addr=0x%X !!\n", __func__, efuse_addr);
 				/* bank = EFUSE_MAX_BANK; */
 				break;
 			}
-			RTW_INFO("%s: efuse_OneByteRead ! addr=0x%X !efuse_data=0x%X! bank =%d\n", __FUNCTION__, efuse_addr, efuse_data, bank);
+			RTW_INFO("%s: efuse_OneByteRead ! addr=0x%X !efuse_data=0x%X! bank =%d\n", __func__, efuse_addr, efuse_data, bank);
 
 			if (efuse_data == 0xFF)
 				break;
@@ -1285,7 +1285,7 @@ hal_EfuseGetCurrentSize_BT(
 				hoffset = GET_HDR_OFFSET_2_0(efuse_data);
 				efuse_addr++;
 				efuse_OneByteRead(adapt, efuse_addr, &efuse_data, bPseudoTest);
-				RTW_INFO("%s: efuse_OneByteRead EXT_HEADER ! addr=0x%X !efuse_data=0x%X! bank =%d\n", __FUNCTION__, efuse_addr, efuse_data, bank);
+				RTW_INFO("%s: efuse_OneByteRead EXT_HEADER ! addr=0x%X !efuse_data=0x%X! bank =%d\n", __func__, efuse_addr, efuse_data, bank);
 
 				if (ALL_WORDS_DISABLED(efuse_data)) {
 					efuse_addr++;
@@ -1318,7 +1318,7 @@ hal_EfuseGetCurrentSize_BT(
 		pEfuseHal->BTEfuseUsedBytes = retU2;
 	}
 
-	RTW_INFO("%s: CurrentSize=%d\n", __FUNCTION__, retU2);
+	RTW_INFO("%s: CurrentSize=%d\n", __func__, retU2);
 	return retU2;
 }
 
@@ -1349,7 +1349,7 @@ Hal_EfuseWordEnableDataWrite(
 	u8	tmpdata[PGPKT_DATA_SIZE];
 
 
-	/*	RTW_INFO("%s: efuse_addr=%#x word_en=%#x\n", __FUNCTION__, efuse_addr, word_en); */
+	/*	RTW_INFO("%s: efuse_addr=%#x word_en=%#x\n", __func__, efuse_addr, word_en); */
 	memset(tmpdata, 0xFF, PGPKT_DATA_SIZE);
 
 	if (!(word_en & BIT(0))) {
@@ -1415,7 +1415,7 @@ static bool Hal_EfusePgPacketRead(struct adapter *	adapt,
 
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI, TYPE_EFUSE_MAX_SECTION, &max_section, bPseudoTest);
 	if (offset > max_section) {
-		RTW_INFO("%s: Packet offset(%d) is illegal(>%d)!\n", __FUNCTION__, offset, max_section);
+		RTW_INFO("%s: Packet offset(%d) is illegal(>%d)!\n", __func__, offset, max_section);
 		return false;
 	}
 
@@ -1440,7 +1440,7 @@ static bool Hal_EfusePgPacketRead(struct adapter *	adapt,
 			hoffset = GET_HDR_OFFSET_2_0(efuse_data);
 			efuse_OneByteRead(adapt, efuse_addr++, &efuse_data, bPseudoTest);
 			if (ALL_WORDS_DISABLED(efuse_data)) {
-				RTW_INFO("%s: Error!! All words disabled!\n", __FUNCTION__);
+				RTW_INFO("%s: Error!! All words disabled!\n", __func__);
 				continue;
 			}
 
@@ -1457,12 +1457,12 @@ static bool Hal_EfusePgPacketRead(struct adapter *	adapt,
 				if (!(hworden & (0x01 << i))) {
 					/* ReadEFuseByte(adapt, efuse_addr++, &efuse_data, bPseudoTest); */
 					efuse_OneByteRead(adapt, efuse_addr++, &efuse_data, bPseudoTest);
-					/*					RTW_INFO("%s: efuse[%#X]=0x%02X\n", __FUNCTION__, efuse_addr+tmpidx, efuse_data); */
+					/*					RTW_INFO("%s: efuse[%#X]=0x%02X\n", __func__, efuse_addr+tmpidx, efuse_data); */
 					data[i * 2] = efuse_data;
 
 					/* ReadEFuseByte(adapt, efuse_addr++, &efuse_data, bPseudoTest); */
 					efuse_OneByteRead(adapt, efuse_addr++, &efuse_data, bPseudoTest);
-					/*					RTW_INFO("%s: efuse[%#X]=0x%02X\n", __FUNCTION__, efuse_addr+tmpidx, efuse_data); */
+					/*					RTW_INFO("%s: efuse[%#X]=0x%02X\n", __func__, efuse_addr+tmpidx, efuse_data); */
 					data[(i * 2) + 1] = efuse_data;
 				}
 			}
@@ -1486,11 +1486,11 @@ hal_EfusePgCheckAvailableAddr(
 
 
 	EFUSE_GetEfuseDefinition(pAdapter, efuseType, TYPE_AVAILABLE_EFUSE_BYTES_TOTAL, &max_available, bPseudoTest);
-	/*	RTW_INFO("%s: max_available=%d\n", __FUNCTION__, max_available); */
+	/*	RTW_INFO("%s: max_available=%d\n", __func__, max_available); */
 
 	current_size = Efuse_GetCurrentSize(pAdapter, efuseType, bPseudoTest);
 	if (current_size >= max_available) {
-		RTW_INFO("%s: Error!! current_size(%d)>max_available(%d)\n", __FUNCTION__, current_size, max_available);
+		RTW_INFO("%s: Error!! current_size(%d)>max_available(%d)\n", __func__, current_size, max_available);
 		return false;
 	}
 	return true;
@@ -1547,25 +1547,25 @@ hal_EfusePartialWriteCheck(
 			rtw_hal_get_hwreg(adapt, HW_VAR_EFUSE_BT_BYTES, (u8 *)&startAddr);
 	}
 	startAddr %= efuse_max;
-	RTW_INFO("%s: startAddr=%#X\n", __FUNCTION__, startAddr);
+	RTW_INFO("%s: startAddr=%#X\n", __func__, startAddr);
 
 	while (1) {
 		if (startAddr >= efuse_max_available_len) {
 			bRet = false;
 			RTW_INFO("%s: startAddr(%d) >= efuse_max_available_len(%d)\n",
-				__FUNCTION__, startAddr, efuse_max_available_len);
+				__func__, startAddr, efuse_max_available_len);
 			break;
 		}
 
 		if (efuse_OneByteRead(adapt, startAddr, &efuse_data, bPseudoTest) && (efuse_data != 0xFF)) {
 			bRet = false;
 			RTW_INFO("%s: Something Wrong! last bytes(%#X=0x%02X) is not 0xFF\n",
-				 __FUNCTION__, startAddr, efuse_data);
+				 __func__, startAddr, efuse_data);
 			break;
 		} else {
 			/* not used header, 0xff */
 			*pAddr = startAddr;
-			/*			RTW_INFO("%s: Started from unused header offset=%d\n", __FUNCTION__, startAddr)); */
+			/*			RTW_INFO("%s: Started from unused header offset=%d\n", __func__, startAddr)); */
 			bRet = true;
 			break;
 		}
@@ -1588,7 +1588,7 @@ hal_EfusePgPacketWrite1ByteHeader(
 	u8	repeatcnt = 0;
 
 
-	/*	RTW_INFO("%s\n", __FUNCTION__); */
+	/*	RTW_INFO("%s\n", __func__); */
 	pg_header = ((pTargetPkt->offset << 4) & 0xf0) | pTargetPkt->word_en;
 
 	do {
@@ -1597,13 +1597,13 @@ hal_EfusePgPacketWrite1ByteHeader(
 		if (tmp_header != 0xFF)
 			break;
 		if (repeatcnt++ > EFUSE_REPEAT_THRESHOLD_) {
-			RTW_INFO("%s: Repeat over limit for pg_header!!\n", __FUNCTION__);
+			RTW_INFO("%s: Repeat over limit for pg_header!!\n", __func__);
 			return false;
 		}
 	} while (1);
 
 	if (tmp_header != pg_header) {
-		RTW_INFO(KERN_ERR "%s: PG Header Fail!!(pg=0x%02X read=0x%02X)\n", __FUNCTION__, pg_header, tmp_header);
+		RTW_INFO(KERN_ERR "%s: PG Header Fail!!(pg=0x%02X read=0x%02X)\n", __func__, pg_header, tmp_header);
 		return false;
 	}
 
@@ -1625,17 +1625,17 @@ hal_EfusePgPacketWrite2ByteHeader(
 	u8	repeatcnt = 0;
 
 
-	/*	RTW_INFO("%s\n", __FUNCTION__); */
+	/*	RTW_INFO("%s\n", __func__); */
 	EFUSE_GetEfuseDefinition(adapt, efuseType, TYPE_AVAILABLE_EFUSE_BYTES_BANK, &efuse_max_available_len, bPseudoTest);
 
 	efuse_addr = *pAddr;
 	if (efuse_addr >= efuse_max_available_len) {
-		RTW_INFO("%s: addr(%d) over available(%d)!!\n", __FUNCTION__, efuse_addr, efuse_max_available_len);
+		RTW_INFO("%s: addr(%d) over available(%d)!!\n", __func__, efuse_addr, efuse_max_available_len);
 		return false;
 	}
 
 	pg_header = ((pTargetPkt->offset & 0x07) << 5) | 0x0F;
-	/*	RTW_INFO("%s: pg_header=0x%x\n", __FUNCTION__, pg_header); */
+	/*	RTW_INFO("%s: pg_header=0x%x\n", __func__, pg_header); */
 
 	do {
 		efuse_OneByteWrite(adapt, efuse_addr, pg_header, bPseudoTest);
@@ -1643,13 +1643,13 @@ hal_EfusePgPacketWrite2ByteHeader(
 		if (tmp_header != 0xFF)
 			break;
 		if (repeatcnt++ > EFUSE_REPEAT_THRESHOLD_) {
-			RTW_INFO("%s: Repeat over limit for pg_header!!\n", __FUNCTION__);
+			RTW_INFO("%s: Repeat over limit for pg_header!!\n", __func__);
 			return false;
 		}
 	} while (1);
 
 	if (tmp_header != pg_header) {
-		RTW_INFO(KERN_ERR "%s: PG Header Fail!!(pg=0x%02X read=0x%02X)\n", __FUNCTION__, pg_header, tmp_header);
+		RTW_INFO(KERN_ERR "%s: PG Header Fail!!(pg=0x%02X read=0x%02X)\n", __func__, pg_header, tmp_header);
 		return false;
 	}
 
@@ -1663,13 +1663,13 @@ hal_EfusePgPacketWrite2ByteHeader(
 		if (tmp_header != 0xFF)
 			break;
 		if (repeatcnt++ > EFUSE_REPEAT_THRESHOLD_) {
-			RTW_INFO("%s: Repeat over limit for ext_header!!\n", __FUNCTION__);
+			RTW_INFO("%s: Repeat over limit for ext_header!!\n", __func__);
 			return false;
 		}
 	} while (1);
 
 	if (tmp_header != pg_header) {	/* offset PG fail */
-		RTW_INFO(KERN_ERR "%s: PG EXT Header Fail!!(pg=0x%02X read=0x%02X)\n", __FUNCTION__, pg_header, tmp_header);
+		RTW_INFO(KERN_ERR "%s: PG EXT Header Fail!!(pg=0x%02X read=0x%02X)\n", __func__, pg_header, tmp_header);
 		return false;
 	}
 
@@ -1711,11 +1711,11 @@ hal_EfusePgPacketWriteData(
 	efuse_addr = *pAddr;
 	badworden = Efuse_WordEnableDataWrite(pAdapter, efuse_addr + 1, pTargetPkt->word_en, pTargetPkt->data, bPseudoTest);
 	if (badworden != 0x0F) {
-		RTW_INFO("%s: Fail!!\n", __FUNCTION__);
+		RTW_INFO("%s: Fail!!\n", __func__);
 		return false;
 	}
 
-	/*	RTW_INFO("%s: ok\n", __FUNCTION__); */
+	/*	RTW_INFO("%s: ok\n", __func__); */
 	return true;
 }
 
@@ -2239,7 +2239,7 @@ int rtl8723d_InitLLTTable(struct adapter * adapt)
 		passing_time = rtw_get_passing_time_ms(start);
 		if (passing_time > 1000) {
 			RTW_INFO("%s: FAIL!! REG_AUTO_LLT(0x%X)=%08x\n",
-				 __FUNCTION__, REG_AUTO_LLT, val32);
+				 __func__, REG_AUTO_LLT, val32);
 			break;
 		}
 
@@ -3375,7 +3375,7 @@ static void hw_var_set_opmode(struct adapter * adapt, u8 variable, u8 *val)
 				(WIFI_STATION_STATE | WIFI_ASOC_STATE))) {
 				if (rtw_hal_reset_tsf(adapt, HW_PORT1) == _FAIL)
 					RTW_INFO("ERROR! %s()-%d: Reset port1 TSF fail\n",
-						 __FUNCTION__, __LINE__);
+						 __func__, __LINE__);
 			}
 #endif /* CONFIG_TSF_RESET_OFFLOAD */
 		}
@@ -3454,7 +3454,7 @@ static void hw_var_set_opmode(struct adapter * adapt, u8 variable, u8 *val)
 				(WIFI_STATION_STATE | WIFI_ASOC_STATE))) {
 				if (rtw_hal_reset_tsf(adapt, HW_PORT0) == _FAIL)
 					RTW_INFO("ERROR! %s()-%d: Reset port0 TSF fail\n",
-						 __FUNCTION__, __LINE__);
+						 __func__, __LINE__);
 			}
 #endif /* CONFIG_TSF_RESET_OFFLOAD */
 		}
@@ -3913,7 +3913,7 @@ u8 SetHwReg8723D(struct adapter * adapt, u8 variable, u8 *val)
 				if (val32)
 					break;
 
-				RTW_INFO("%s: [HW_VAR_FIFO_CLEARN_UP] val=%x times:%d\n", __FUNCTION__, val32, trycnt);
+				RTW_INFO("%s: [HW_VAR_FIFO_CLEARN_UP] val=%x times:%d\n", __func__, val32, trycnt);
 			} while (--trycnt);
 			if (trycnt == 0)
 				RTW_INFO("[HW_VAR_FIFO_CLEARN_UP] Stop RX DMA failed......\n");

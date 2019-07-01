@@ -44,7 +44,7 @@ int rtw_fw_ps_state(struct adapter * adapt)
 			ret = _SUCCESS;
 		else {
 			pdbgpriv->dbg_poll_fail_cnt++;
-			RTW_INFO("%s: fw_ps_state=%04x\n", __FUNCTION__, fw_ps_state);
+			RTW_INFO("%s: fw_ps_state=%04x\n", __func__, fw_ps_state);
 		}
 	}
 
@@ -253,7 +253,7 @@ void rtw_ps_processor(struct adapter *adapt)
 
 	if (pwrpriv->bInSuspend) { /* system suspend or autosuspend */
 		pdbgpriv->dbg_ps_insuspend_cnt++;
-		RTW_INFO("%s, pwrpriv->bInSuspend ignore this process\n", __FUNCTION__);
+		RTW_INFO("%s, pwrpriv->bInSuspend ignore this process\n", __func__);
 		return;
 	}
 
@@ -272,7 +272,7 @@ void rtw_ps_processor(struct adapter *adapt)
 					pwrpriv->ps_flag = true;
 
 				rfpwrstate = RfOnOffDetect(adapt);
-				RTW_INFO("@@@@- #1  %s==> rfstate:%s\n", __FUNCTION__, (rfpwrstate == rf_on) ? "rf_on" : "rf_off");
+				RTW_INFO("@@@@- #1  %s==> rfstate:%s\n", __func__, (rfpwrstate == rf_on) ? "rf_on" : "rf_off");
 				if (rfpwrstate != pwrpriv->rf_pwrstate) {
 					if (rfpwrstate == rf_off) {
 						pwrpriv->change_rfpwrstate = rf_off;
@@ -288,7 +288,7 @@ void rtw_ps_processor(struct adapter *adapt)
 #endif /* CONFIG_AUTOSUSPEND */
 		{
 			rfpwrstate = RfOnOffDetect(adapt);
-			RTW_INFO("@@@@- #2  %s==> rfstate:%s\n", __FUNCTION__, (rfpwrstate == rf_on) ? "rf_on" : "rf_off");
+			RTW_INFO("@@@@- #2  %s==> rfstate:%s\n", __func__, (rfpwrstate == rf_on) ? "rf_on" : "rf_off");
 
 			if (rfpwrstate != pwrpriv->rf_pwrstate) {
 				if (rfpwrstate == rf_off) {
@@ -313,7 +313,7 @@ void rtw_ps_processor(struct adapter *adapt)
 		goto exit;
 
 	if ((pwrpriv->rf_pwrstate == rf_on) && ((adapt->pwr_state_check_cnts % 4) == 0)) {
-		RTW_INFO("==>%s .fw_state(%x)\n", __FUNCTION__, get_fwstate(pmlmepriv));
+		RTW_INFO("==>%s .fw_state(%x)\n", __func__, get_fwstate(pmlmepriv));
 #if defined (CONFIG_AUTOSUSPEND)
 #else
 		pwrpriv->change_rfpwrstate = rf_off;
@@ -328,10 +328,10 @@ void rtw_ps_processor(struct adapter *adapt)
 
 #if defined (CONFIG_AUTOSUSPEND)
 			if (pwrpriv->bInternalAutoSuspend)
-				RTW_INFO("<==%s .pwrpriv->bInternalAutoSuspend)(%x)\n", __FUNCTION__, pwrpriv->bInternalAutoSuspend);
+				RTW_INFO("<==%s .pwrpriv->bInternalAutoSuspend)(%x)\n", __func__, pwrpriv->bInternalAutoSuspend);
 			else {
 				pwrpriv->change_rfpwrstate = rf_off;
-				RTW_INFO("<==%s .pwrpriv->bInternalAutoSuspend)(%x) call autosuspend_enter\n", __FUNCTION__, pwrpriv->bInternalAutoSuspend);
+				RTW_INFO("<==%s .pwrpriv->bInternalAutoSuspend)(%x) call autosuspend_enter\n", __func__, pwrpriv->bInternalAutoSuspend);
 				autosuspend_enter(adapt);
 			}
 #else
@@ -660,13 +660,13 @@ int LPS_RF_ON_check(struct adapter * adapt, u32 delay_ms)
 
 		if (rtw_is_surprise_removed(adapt)) {
 			err = -2;
-			RTW_INFO("%s: device surprise removed!!\n", __FUNCTION__);
+			RTW_INFO("%s: device surprise removed!!\n", __func__);
 			break;
 		}
 
 		if (rtw_get_passing_time_ms(start_time) > delay_ms) {
 			err = -1;
-			RTW_INFO("%s: Wait for FW LPS leave more than %u ms!!!\n", __FUNCTION__, delay_ms);
+			RTW_INFO("%s: Wait for FW LPS leave more than %u ms!!!\n", __func__, delay_ms);
 			break;
 		}
 		rtw_usleep_os(100);
@@ -789,7 +789,7 @@ void LeaveAllPowerSaveModeDirect(struct adapter * Adapter)
 #endif /* CONFIG_DETECT_CPWM_BY_POLLING */
 
 
-	RTW_INFO("%s.....\n", __FUNCTION__);
+	RTW_INFO("%s.....\n", __func__);
 
 	if (rtw_is_surprise_removed(Adapter)) {
 		RTW_INFO(FUNC_ADPT_FMT ": bSurpriseRemoved=true Skip!\n", FUNC_ADPT_ARG(Adapter));
@@ -799,7 +799,7 @@ void LeaveAllPowerSaveModeDirect(struct adapter * Adapter)
 	if (rtw_mi_check_status(Adapter, MI_LINKED)) { /*connect*/
 
 		if (pwrpriv->pwr_mode == PS_MODE_ACTIVE) {
-			RTW_INFO("%s: Driver Already Leave LPS\n", __FUNCTION__);
+			RTW_INFO("%s: Driver Already Leave LPS\n", __func__);
 			return;
 		}
 		p2p_ps_wk_cmd(pri_adapt, P2P_PS_DISABLE, 0);
@@ -840,7 +840,7 @@ void LeaveAllPowerSaveMode(struct adapter * Adapter)
 	int i;
 
 
-	/* RTW_INFO("%s.....\n",__FUNCTION__); */
+	/* RTW_INFO("%s.....\n",__func__); */
 
 	if (false == Adapter->bup) {
 		RTW_INFO(FUNC_ADPT_FMT ": bup=%d Skip!\n",
@@ -1091,7 +1091,7 @@ int _rtw_pwr_wakeup(struct adapter *adapt, u32 ips_deffer_ms, const char *caller
 			ret = _FAIL;
 			goto exit;
 		} else if (adapt->registrypriv.usbss_enable) {
-			RTW_INFO("%s call autoresume_enter....\n", __FUNCTION__);
+			RTW_INFO("%s call autoresume_enter....\n", __func__);
 			if (_FAIL ==  autoresume_enter(adapt)) {
 				RTW_INFO("======> autoresume fail.............\n");
 				ret = _FAIL;
@@ -1100,7 +1100,7 @@ int _rtw_pwr_wakeup(struct adapter *adapt, u32 ips_deffer_ms, const char *caller
 		} else
 #endif
 		{
-			RTW_INFO("%s call ips_leave....\n", __FUNCTION__);
+			RTW_INFO("%s call ips_leave....\n", __func__);
 			if (_FAIL ==  ips_leave(adapt)) {
 				RTW_INFO("======> ips_leave fail.............\n");
 				ret = _FAIL;
@@ -1169,11 +1169,11 @@ int rtw_pm_set_ips(struct adapter *adapt, u8 mode)
 
 	if (mode == IPS_NORMAL || mode == IPS_LEVEL_2) {
 		rtw_ips_mode_req(pwrctrlpriv, mode);
-		RTW_INFO("%s %s\n", __FUNCTION__, mode == IPS_NORMAL ? "IPS_NORMAL" : "IPS_LEVEL_2");
+		RTW_INFO("%s %s\n", __func__, mode == IPS_NORMAL ? "IPS_NORMAL" : "IPS_LEVEL_2");
 		return 0;
 	} else if (mode == IPS_NONE) {
 		rtw_ips_mode_req(pwrctrlpriv, mode);
-		RTW_INFO("%s %s\n", __FUNCTION__, "IPS_NONE");
+		RTW_INFO("%s %s\n", __func__, "IPS_NONE");
 		if (!rtw_is_surprise_removed(adapt) && (_FAIL == rtw_pwr_wakeup(adapt)))
 			return -EFAULT;
 	} else
