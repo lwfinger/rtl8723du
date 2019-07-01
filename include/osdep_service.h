@@ -168,7 +168,6 @@ extern void	_rtw_mutex_init(_mutex *pmutex);
 extern void	_rtw_mutex_free(_mutex *pmutex);
 
 extern void	_rtw_init_queue(struct __queue *pqueue);
-extern void _rtw_deinit_queue(struct __queue *pqueue);
 extern u32	_rtw_queue_empty(struct __queue	*pqueue);
 extern u32	rtw_end_of_queue_search(struct list_head *queue, struct list_head *pelement);
 
