@@ -329,10 +329,6 @@ void rtl8723d_FirmwareSelfReset(struct adapter * adapt)
 	}
 }
 
-#ifdef CONFIG_FILE_FWIMG
-	u8 FwBuffer[FW_8723D_SIZE];
-#endif /* CONFIG_FILE_FWIMG */
-
 /*
  *	Description:
  *		Download 8192C firmware code.

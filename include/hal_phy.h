@@ -155,68 +155,24 @@ struct shadow_compare_map {
 
 /*--------------------------Exported Function prototype---------------------*/
 
-u32
-PHY_CalculateBitShift(
-	u32 BitMask
-);
+u32 PHY_CalculateBitShift(u32 BitMask);
 
-u32
-PHY_RFShadowRead(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset);
-
-void
-PHY_RFShadowWrite(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset,
-	u32				Data);
-
-bool
-PHY_RFShadowCompare(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset);
-
-void
-PHY_RFShadowRecorver(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset);
-
-void
-PHY_RFShadowCompareAll(
-	struct adapter *		Adapter);
-
-void
-PHY_RFShadowRecorverAll(
-	struct adapter *		Adapter);
-
-void
-PHY_RFShadowCompareFlagSet(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset,
-	u8				Type);
-
-void
-PHY_RFShadowRecorverFlagSet(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset,
-	u8				Type);
-
-void
-PHY_RFShadowCompareFlagSetAll(
-	struct adapter *		Adapter);
-
-void
-PHY_RFShadowRecorverFlagSetAll(
-	struct adapter *		Adapter);
-
-void
-PHY_RFShadowRefresh(
-	struct adapter *		Adapter);
+u32 PHY_RFShadowRead(struct adapter * Adapter, enum rf_path eRFPath,
+		     u32 Offset); 
+void PHY_RFShadowWrite(struct adapter * Adapter, enum rf_path eRFPath,
+		       u32 Offset, u32 Data); 
+bool PHY_RFShadowCompare(struct adapter * Adapter, enum rf_path eRFPath,
+			 u32 Offset); 
+void PHY_RFShadowRecorver(struct adapter *Adapter, enum rf_path eRFPath,
+			  u32 Offset); 
+void PHY_RFShadowCompareAll(struct adapter *Adapter); 
+void PHY_RFShadowRecorverAll(struct adapter *Adapter); 
+void PHY_RFShadowCompareFlagSet(struct adapter *Adapter, enum rf_path eRFPath,
+				u32 Offset, u8 Type); 
+void PHY_RFShadowRecorverFlagSet(struct adapter *Adapter, enum rf_path eRFPath,
+				 u32 Offset, u8 Type); 
+void PHY_RFShadowCompareFlagSetAll(struct adapter *Adapter); 
+void PHY_RFShadowRecorverFlagSetAll(struct adapter *Adapter); 
+void PHY_RFShadowRefresh(struct adapter *Adapter); 
 
 #endif /* __HAL_COMMON_H__ */

@@ -9,23 +9,23 @@
 #include "../hal/HalEfuseMask8723D_USB.h"
 
 /*------------------------Define local variable------------------------------*/
-u8	fakeEfuseBank = {0};
-u32	fakeEfuseUsedBytes = {0};
-u8	fakeEfuseContent[EFUSE_MAX_HW_SIZE] = {0};
-u8	fakeEfuseInitMap[EFUSE_MAX_MAP_LEN] = {0};
-u8	fakeEfuseModifiedMap[EFUSE_MAX_MAP_LEN] = {0};
+u8 fakeEfuseBank = {0};
+u32 fakeEfuseUsedBytes = {0};
+u8 fakeEfuseContent[EFUSE_MAX_HW_SIZE] = {0};
+u8 fakeEfuseInitMap[EFUSE_MAX_MAP_LEN] = {0};
+u8 fakeEfuseModifiedMap[EFUSE_MAX_MAP_LEN] = {0};
 
-u32	BTEfuseUsedBytes = {0};
-u8	BTEfuseContent[EFUSE_MAX_BT_BANK][EFUSE_MAX_HW_SIZE];
-u8	BTEfuseInitMap[EFUSE_BT_MAX_MAP_LEN] = {0};
-u8	BTEfuseModifiedMap[EFUSE_BT_MAX_MAP_LEN] = {0};
+u32 BTEfuseUsedBytes = {0};
+u8 BTEfuseContent[EFUSE_MAX_BT_BANK][EFUSE_MAX_HW_SIZE];
+u8 BTEfuseInitMap[EFUSE_BT_MAX_MAP_LEN] = {0};
+u8 BTEfuseModifiedMap[EFUSE_BT_MAX_MAP_LEN] = {0};
 
-u32	fakeBTEfuseUsedBytes = {0};
-u8	fakeBTEfuseContent[EFUSE_MAX_BT_BANK][EFUSE_MAX_HW_SIZE];
-u8	fakeBTEfuseInitMap[EFUSE_BT_MAX_MAP_LEN] = {0};
-u8	fakeBTEfuseModifiedMap[EFUSE_BT_MAX_MAP_LEN] = {0};
+u32 fakeBTEfuseUsedBytes = {0};
+u8 fakeBTEfuseContent[EFUSE_MAX_BT_BANK][EFUSE_MAX_HW_SIZE];
+u8 fakeBTEfuseInitMap[EFUSE_BT_MAX_MAP_LEN] = {0};
+u8 fakeBTEfuseModifiedMap[EFUSE_BT_MAX_MAP_LEN] = {0};
 
-u8	maskfileBuffer[64];
+u8 maskfileBuffer[64];
 /*------------------------Define local variable------------------------------*/
 static bool rtw_file_efuse_IsMasked(struct adapter * pAdapter, u16 Offset)
 {
@@ -65,50 +65,44 @@ u16 rtw_get_efuse_mask_arraylen(struct adapter * pAdapter)
 	return 0;
 }
 
-static void rtw_mask_map_read(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
+static void rtw_mask_map_read(struct adapter * adapt, u16 addr, u16 cnts,
+			      u8 *data)
 {
 	u16 i = 0;
 
 	if (adapt->registrypriv.boffefusemask == 0) {
-
 			for (i = 0; i < cnts; i++) {
 				if (adapt->registrypriv.bFileMaskEfuse) {
-					if (rtw_file_efuse_IsMasked(adapt, addr + i)) /*use file efuse mask.*/
+					/*use file efuse mask.*/
+					if (rtw_file_efuse_IsMasked(adapt,
+								    addr + i))
 						data[i] = 0xff;
 				} else {
-					/*RTW_INFO(" %s , data[%d] = %x\n", __func__, i, data[i]);*/
-					if (efuse_IsMasked(adapt, addr + i)) {
+					if (efuse_IsMasked(adapt, addr + i))
 						data[i] = 0xff;
-						/*RTW_INFO(" %s ,mask data[%d] = %x\n", __func__, i, data[i]);*/
-					}
 				}
 			}
-
 	}
 }
 
 u8 rtw_efuse_mask_map_read(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 {
-	u8	ret = _SUCCESS;
-	u16	mapLen = 0;
+	u8 ret;
+	u16 mapLen;
 
-	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI, TYPE_EFUSE_MAP_LEN, (void *)&mapLen, false);
-
+	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI, TYPE_EFUSE_MAP_LEN,
+				 (void *)&mapLen, false);
 	ret = rtw_efuse_map_read(adapt, addr, cnts , data);
 
 	rtw_mask_map_read(adapt, addr, cnts , data);
 
 	return ret;
-
 }
 
 /* ***********************************************************
  *				Efuse related code
  * *********************************************************** */
-static u8 hal_EfuseSwitchToBank(
-	struct adapter *	adapt,
-	u8			bank,
-	u8			bPseudoTest)
+static u8 hal_EfuseSwitchToBank(struct adapter *adapt, u8 bank, u8 bPseudoTest)
 {
 	u8 bRet = false;
 	u32 value32 = 0;
@@ -116,7 +110,6 @@ static u8 hal_EfuseSwitchToBank(
 	struct hal_com_data * pHalData = GET_HAL_DATA(adapt);
 	struct efuse_hal * pEfuseHal = &pHalData->EfuseHal;
 #endif
-
 
 	RTW_INFO("%s: Efuse switch bank to %d\n", __func__, bank);
 	if (bPseudoTest) {
@@ -131,55 +124,61 @@ static u8 hal_EfuseSwitchToBank(
 		bRet = true;
 		switch (bank) {
 		case 0:
-			value32 = (value32 & ~EFUSE_SEL_MASK) | EFUSE_SEL(EFUSE_WIFI_SEL_0);
+			value32 = (value32 & ~EFUSE_SEL_MASK) |
+					      EFUSE_SEL(EFUSE_WIFI_SEL_0);
 			break;
 		case 1:
-			value32 = (value32 & ~EFUSE_SEL_MASK) | EFUSE_SEL(EFUSE_BT_SEL_0);
+			value32 = (value32 & ~EFUSE_SEL_MASK) |
+					     EFUSE_SEL(EFUSE_BT_SEL_0);
 			break;
 		case 2:
-			value32 = (value32 & ~EFUSE_SEL_MASK) | EFUSE_SEL(EFUSE_BT_SEL_1);
+			value32 = (value32 & ~EFUSE_SEL_MASK) |
+					     EFUSE_SEL(EFUSE_BT_SEL_1);
 			break;
 		case 3:
-			value32 = (value32 & ~EFUSE_SEL_MASK) | EFUSE_SEL(EFUSE_BT_SEL_2);
+			value32 = (value32 & ~EFUSE_SEL_MASK) |
+					     EFUSE_SEL(EFUSE_BT_SEL_2);
 			break;
 		default:
-			value32 = (value32 & ~EFUSE_SEL_MASK) | EFUSE_SEL(EFUSE_WIFI_SEL_0);
+			value32 = (value32 & ~EFUSE_SEL_MASK) |
+					     EFUSE_SEL(EFUSE_WIFI_SEL_0);
 			bRet = false;
 			break;
 		}
 		rtw_write32(adapt, 0x34, value32);
 	}
-
 	return bRet;
 }
 
 void rtw_efuse_analyze(struct adapter *	adapt, u8 Type, u8 Fake)
 {
-	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
-	struct efuse_hal *		pEfuseHal = &(pHalData->EfuseHal);
-	u16	eFuse_Addr = 0;
+	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
+	struct efuse_hal *pEfuseHal = &(pHalData->EfuseHal);
+	u16 eFuse_Addr = 0;
 	u8 offset, wden;
-	u16	 i, j;
-	u8	u1temp = 0;
-	u8	efuseHeader = 0, efuseExtHdr = 0, efuseData[EFUSE_MAX_WORD_UNIT*2] = {0}, dataCnt = 0;
-	u16	efuseHeader2Byte = 0;
-	u8	*eFuseWord = NULL;// [EFUSE_MAX_SECTION_NUM][EFUSE_MAX_WORD_UNIT];
-	u8	offset_2_0 = 0;
-	u8	pgSectionCnt = 0;
-	u8	wd_cnt = 0;
-	u8	max_section = 64;
-	u16	mapLen = 0, maprawlen = 0;
-	bool	bExtHeader = false;
-	u8	efuseType = EFUSE_WIFI;
-	bool	bPseudoTest = false;
-	u8	bank = 0, startBank = 0, endBank = 1-1;
-	bool	bCheckNextBank = false;
-	u8	protectBytesBank = 0;
-	u16	efuse_max = 0;
-	u8	ParseEfuseExtHdr, ParseEfuseHeader, ParseOffset, ParseWDEN, ParseOffset2_0;
+	u16  i, j;
+	u8 u1temp = 0;
+	u8 efuseHeader = 0, efuseExtHdr = 0;
+	u8 efuseData[EFUSE_MAX_WORD_UNIT*2] = {0}, dataCnt = 0;
+	u16 efuseHeader2Byte = 0;
+	u8 *eFuseWord = NULL;
+	u8 offset_2_0 = 0;
+	u8 pgSectionCnt = 0;
+	u8 wd_cnt = 0;
+	u8 max_section = 64;
+	u16 mapLen = 0, maprawlen = 0;
+	bool bExtHeader = false;
+	u8 efuseType = EFUSE_WIFI;
+	bool bPseudoTest = false;
+	u8 bank = 0, startBank = 0, endBank = 1-1;
+	bool bCheckNextBank = false;
+	u8 protectBytesBank = 0;
+	u16 efuse_max = 0;
+	u8 ParseEfuseExtHdr, ParseEfuseHeader, ParseOffset, ParseWDEN;
+	u8 ParseOffset2_0;
 
-	eFuseWord = rtw_zmalloc(EFUSE_MAX_SECTION_NUM * (EFUSE_MAX_WORD_UNIT * 2));
-
+	eFuseWord = rtw_zmalloc(EFUSE_MAX_SECTION_NUM *
+				(EFUSE_MAX_WORD_UNIT * 2));
 	RTW_INFO("\n");
 	if (Type == 0) {
 		if (Fake == 0) {
@@ -217,13 +216,21 @@ void rtw_efuse_analyze(struct adapter *	adapt, u8 Type, u8 Fake)
 	RTW_INFO("\n\r 2Byte header, header[7:5]=offset[2:0], header[4:0]=0x0F\n");
 	RTW_INFO("\n\r 2Byte header, extHeader[7:4]=offset[6:3], extHeader[3:0]=word enable\n");
 
-	EFUSE_GetEfuseDefinition(adapt, efuseType, TYPE_EFUSE_MAP_LEN, (void *)&mapLen, bPseudoTest);
-	EFUSE_GetEfuseDefinition(adapt, efuseType, TYPE_EFUSE_MAX_SECTION, (void *)&max_section, bPseudoTest);
-	EFUSE_GetEfuseDefinition(adapt, efuseType, TYPE_EFUSE_PROTECT_BYTES_BANK, (void *)&protectBytesBank, bPseudoTest);
-	EFUSE_GetEfuseDefinition(adapt, efuseType, TYPE_EFUSE_CONTENT_LEN_BANK, (void *)&efuse_max, bPseudoTest);
-	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI, TYPE_EFUSE_REAL_CONTENT_LEN, (void *)&maprawlen, false);
-
-	memset(eFuseWord, 0xff, EFUSE_MAX_SECTION_NUM * (EFUSE_MAX_WORD_UNIT * 2));
+	EFUSE_GetEfuseDefinition(adapt, efuseType, TYPE_EFUSE_MAP_LEN,
+				 (void *)&mapLen, bPseudoTest);
+	EFUSE_GetEfuseDefinition(adapt, efuseType, TYPE_EFUSE_MAX_SECTION,
+				 (void *)&max_section, bPseudoTest);
+	EFUSE_GetEfuseDefinition(adapt, efuseType,
+				 TYPE_EFUSE_PROTECT_BYTES_BANK,
+				 (void *)&protectBytesBank, bPseudoTest);
+	EFUSE_GetEfuseDefinition(adapt, efuseType,
+				 TYPE_EFUSE_CONTENT_LEN_BANK,
+				 (void *)&efuse_max, bPseudoTest);
+	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI,
+				 TYPE_EFUSE_REAL_CONTENT_LEN,
+				 (void *)&maprawlen, false);
+	memset(eFuseWord, 0xff, EFUSE_MAX_SECTION_NUM *
+	       (EFUSE_MAX_WORD_UNIT * 2));
 	memset(pEfuseHal->fakeEfuseInitMap, 0xff, EFUSE_MAX_MAP_LEN);
 
 	if (IS_HARDWARE_TYPE_8821(adapt))
@@ -245,20 +252,23 @@ void rtw_efuse_analyze(struct adapter *	adapt, u8 Type, u8 Fake)
 		}
 		RTW_INFO("EFUSE_REAL_CONTENT_LEN = %d\n", maprawlen);
 
-		while ((efuseHeader != 0xFF) && ((efuseType == EFUSE_WIFI && (eFuse_Addr < maprawlen)) || (efuseType == EFUSE_BT && (eFuse_Addr < (endBank + 1) * EFUSE_MAX_BANK_SIZE)))) {
-
+		while ((efuseHeader != 0xFF) && ((efuseType == EFUSE_WIFI &&
+		       (eFuse_Addr < maprawlen)) || (efuseType == EFUSE_BT &&
+		       (eFuse_Addr < (endBank + 1) * EFUSE_MAX_BANK_SIZE)))) {
 			RTW_INFO("Analyzing: Offset: 0x%X\n", eFuse_Addr);
-
 			/* Check PG header for section num.*/
 			if (EXT_HEADER(efuseHeader)) {
 				bExtHeader = true;
 				offset_2_0 = GET_HDR_OFFSET_2_0(efuseHeader);
-				efuse_OneByteRead(adapt, eFuse_Addr++, &efuseExtHdr, bPseudoTest);
-
+				efuse_OneByteRead(adapt, eFuse_Addr++,
+						  &efuseExtHdr, bPseudoTest);
 				if (efuseExtHdr != 0xff) {
 					if (ALL_WORDS_DISABLED(efuseExtHdr)) {
 						/* Read next pg header*/
-						efuse_OneByteRead(adapt, eFuse_Addr++, &efuseHeader, bPseudoTest);
+						efuse_OneByteRead(adapt,
+								  eFuse_Addr++,
+								  &efuseHeader,
+								  bPseudoTest);
 						continue;
 					} else {
 						offset = ((efuseExtHdr & 0xF0) >> 1) | offset_2_0;
@@ -400,13 +410,13 @@ static void efuse_PostUpdateAction(
 bool
 Efuse_Read1ByteFromFakeContent(
 		struct adapter *	pAdapter,
-		u16		Offset,
-	u8		*Value);
+		u16 Offset,
+	u8 *Value);
 bool
 Efuse_Read1ByteFromFakeContent(
 		struct adapter *	pAdapter,
-		u16		Offset,
-	u8		*Value)
+		u16 Offset,
+	u8 *Value)
 {
 	if (Offset >= EFUSE_MAX_HW_SIZE)
 		return false;
@@ -421,13 +431,13 @@ Efuse_Read1ByteFromFakeContent(
 bool
 Efuse_Write1ByteToFakeContent(
 		struct adapter *	pAdapter,
-		u16		Offset,
-		u8		Value);
+		u16 Offset,
+		u8 Value);
 bool
 Efuse_Write1ByteToFakeContent(
 		struct adapter *	pAdapter,
-		u16		Offset,
-		u8		Value)
+		u16 Offset,
+		u8 Value)
 {
 	if (Offset >= EFUSE_MAX_HW_SIZE)
 		return false;
@@ -459,8 +469,8 @@ Efuse_Write1ByteToFakeContent(
 void
 Efuse_PowerSwitch(
 	struct adapter *	pAdapter,
-	u8		bWrite,
-	u8		PwrState)
+	u8 bWrite,
+	u8 PwrState)
 {
 	pAdapter->hal_func.EfusePowerSwitch(pAdapter, bWrite, PwrState);
 }
@@ -468,8 +478,8 @@ Efuse_PowerSwitch(
 void
 BTEfuse_PowerSwitch(
 	struct adapter *	pAdapter,
-	u8		bWrite,
-	u8		PwrState)
+	u8 bWrite,
+	u8 PwrState)
 {
 	if (pAdapter->hal_func.BTEfusePowerSwitch)
 		pAdapter->hal_func.BTEfusePowerSwitch(pAdapter, bWrite, PwrState);
@@ -494,8 +504,8 @@ BTEfuse_PowerSwitch(
 u16
 Efuse_GetCurrentSize(
 	struct adapter *		pAdapter,
-	u8			efuseType,
-	bool		bPseudoTest)
+	u8 efuseType,
+	bool bPseudoTest)
 {
 	u16 ret = 0;
 
@@ -518,13 +528,13 @@ Efuse_GetCurrentSize(
 void
 ReadEFuseByte(
 	struct adapter *	Adapter,
-	u16			_offset,
-	u8			*pbuf,
-	bool	bPseudoTest)
+	u16 _offset,
+	u8 *pbuf,
+	bool bPseudoTest)
 {
-	u32	value32;
-	u8	readbyte;
-	u16	retry;
+	u32 value32;
+	u8 readbyte;
+	u16 retry;
 	/* unsigned long start=rtw_get_current_time(); */
 
 	if (bPseudoTest) {
@@ -587,20 +597,20 @@ ReadEFuseByte(
 void
 efuse_ReadEFuse(
 	struct adapter *	Adapter,
-	u8		efuseType,
-	u16		_offset,
-	u16		_size_byte,
-	u8	*pbuf,
-	bool	bPseudoTest
+	u8 efuseType,
+	u16 _offset,
+	u16 _size_byte,
+	u8 *pbuf,
+	bool bPseudoTest
 );
 void
 efuse_ReadEFuse(
 	struct adapter *	Adapter,
-	u8		efuseType,
-	u16		_offset,
-	u16		_size_byte,
-	u8	*pbuf,
-	bool	bPseudoTest
+	u8 efuseType,
+	u16 _offset,
+	u16 _size_byte,
+	u8 *pbuf,
+	bool bPseudoTest
 )
 {
 	Adapter->hal_func.ReadEFuse(Adapter, efuseType, _offset, _size_byte, pbuf, bPseudoTest);
@@ -609,10 +619,10 @@ efuse_ReadEFuse(
 void
 EFUSE_GetEfuseDefinition(
 		struct adapter *	pAdapter,
-		u8		efuseType,
-		u8		type,
+		u8 efuseType,
+		u8 type,
 	void		*pOut,
-		bool		bPseudoTest
+		bool bPseudoTest
 )
 {
 	pAdapter->hal_func.EFUSEGetEfuseDefinition(pAdapter, efuseType, type, pOut, bPseudoTest);
@@ -623,13 +633,13 @@ EFUSE_GetEfuseDefinition(
 u8
 efuse_OneByteRead(
 	struct adapter *	pAdapter,
-	u16			addr,
-	u8			*data,
-	bool		bPseudoTest)
+	u16 addr,
+	u8 *data,
+	bool bPseudoTest)
 {
-	u32	tmpidx = 0;
-	u8	bResult;
-	u8	readbyte;
+	u32 tmpidx = 0;
+	u8 bResult;
+	u8 readbyte;
 	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 
 	/* RTW_INFO("===> EFUSE_OneByteRead(), addr = %x\n", addr); */
@@ -682,12 +692,12 @@ efuse_OneByteRead(
 u8
 efuse_OneByteWrite(
 	struct adapter *	pAdapter,
-	u16			addr,
-	u8			data,
-	bool		bPseudoTest)
+	u16 addr,
+	u8 data,
+	bool bPseudoTest)
 {
-	u8	tmpidx = 0;
-	u8	bResult = false;
+	u8 tmpidx = 0;
+	u8 bResult = false;
 	u32 efuseValue = 0;
 	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
 
@@ -752,8 +762,8 @@ efuse_OneByteWrite(
 }
 
 int Efuse_PgPacketRead(struct adapter *	pAdapter, u8 offset,
-		   u8			*data,
-		   bool		bPseudoTest)
+		   u8 *data,
+		   bool bPseudoTest)
 {
 	int	ret = 0;
 
@@ -764,10 +774,10 @@ int Efuse_PgPacketRead(struct adapter *	pAdapter, u8 offset,
 
 int
 Efuse_PgPacketWrite(struct adapter *	pAdapter,
-		    u8			offset,
-		    u8			word_en,
-		    u8			*data,
-		    bool		bPseudoTest)
+		    u8 offset,
+		    u8 word_en,
+		    u8 *data,
+		    bool bPseudoTest)
 {
 	int ret;
 
@@ -779,10 +789,10 @@ Efuse_PgPacketWrite(struct adapter *	pAdapter,
 
 static int
 Efuse_PgPacketWrite_BT(struct adapter *	pAdapter,
-		       u8			offset,
-		       u8			word_en,
-		       u8			*data,
-		       bool		bPseudoTest)
+		       u8 offset,
+		       u8 word_en,
+		       u8 *data,
+		       bool bPseudoTest)
 {
 	int ret;
 
@@ -794,12 +804,12 @@ Efuse_PgPacketWrite_BT(struct adapter *	pAdapter,
 
 u8
 Efuse_WordEnableDataWrite(struct adapter *	pAdapter,
-			  u16		efuse_addr,
-			  u8		word_en,
-			  u8		*data,
-			  bool		bPseudoTest)
+			  u16 efuse_addr,
+			  u8 word_en,
+			  u8 *data,
+			  bool bPseudoTest)
 {
-	u8	ret = 0;
+	u8 ret = 0;
 
 	ret =  pAdapter->hal_func.Efuse_WordEnableDataWrite(pAdapter, efuse_addr, word_en, data, bPseudoTest);
 
@@ -822,10 +832,10 @@ static u8 efuse_write8(struct adapter * adapt, u16 address, u8 *value)
 u8 rtw_efuse_access(struct adapter * adapt, u8 bWrite, u16 start_addr, u16 cnts, u8 *data)
 {
 	int i = 0;
-	u16	real_content_len = 0, max_available_size = 0;
+	u16 real_content_len = 0, max_available_size = 0;
 	u8 res = _FAIL ;
 	u8(*rw8)(struct adapter *, u16, u8 *);
-	u32	backupRegs[4] = {0};
+	u32 backupRegs[4] = {0};
 
 
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI, TYPE_EFUSE_REAL_CONTENT_LEN, (void *)&real_content_len, false);
@@ -866,7 +876,7 @@ u8 rtw_efuse_access(struct adapter * adapt, u8 bWrite, u16 start_addr, u16 cnts,
 /* ------------------------------------------------------------------------------ */
 u16 efuse_GetMaxSize(struct adapter * adapt)
 {
-	u16	max_size;
+	u16 max_size;
 
 	max_size = 0;
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI , TYPE_AVAILABLE_EFUSE_BYTES_TOTAL, (void *)&max_size, false);
@@ -884,7 +894,7 @@ u8 efuse_GetCurrentSize(struct adapter * adapt, u16 *size)
 /* ------------------------------------------------------------------------------ */
 u16 efuse_bt_GetMaxSize(struct adapter * adapt)
 {
-	u16	max_size;
+	u16 max_size;
 
 	max_size = 0;
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_BT , TYPE_AVAILABLE_EFUSE_BYTES_TOTAL, (void *)&max_size, false);
@@ -902,7 +912,7 @@ u8 efuse_bt_GetCurrentSize(struct adapter * adapt, u16 *size)
 
 u8 rtw_efuse_map_read(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 {
-	u16	mapLen = 0;
+	u16 mapLen = 0;
 
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI, TYPE_EFUSE_MAP_LEN, (void *)&mapLen, false);
 
@@ -920,7 +930,7 @@ u8 rtw_efuse_map_read(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 
 u8 rtw_BT_efuse_map_read(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 {
-	u16	mapLen = 0;
+	u16 mapLen = 0;
 
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_BT, TYPE_EFUSE_MAP_LEN, (void *)&mapLen, false);
 
@@ -947,13 +957,13 @@ u8 rtw_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 	}
 
 	u8 *efuse = NULL;
-	u8	offset, word_en;
-	u8	*map = NULL;
-	u8	newdata[PGPKT_DATA_SIZE];
+	u8 offset, word_en;
+	u8 *map = NULL;
+	u8 newdata[PGPKT_DATA_SIZE];
 	int	i, j, idx, chk_total_byte;
-	u8	ret = _SUCCESS;
-	u16	mapLen = 0, startAddr = 0, efuse_max_available_len = 0;
-	u32	backupRegs[4] = {0};
+	u8 ret = _SUCCESS;
+	u16 mapLen = 0, startAddr = 0, efuse_max_available_len = 0;
+	u32 backupRegs[4] = {0};
 	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
 	struct efuse_hal *	pEfuseHal = &pHalData->EfuseHal;
 
@@ -1091,12 +1101,12 @@ u8 rtw_BT_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 		return _FAIL;	\
 	}
 
-	u8	offset, word_en;
-	u8	*map;
-	u8	newdata[PGPKT_DATA_SIZE];
+	u8 offset, word_en;
+	u8 *map;
+	u8 newdata[PGPKT_DATA_SIZE];
 	int	i = 0, j = 0, idx;
-	u8	ret = _SUCCESS;
-	u16	mapLen = 0;
+	u8 ret = _SUCCESS;
+	u16 mapLen = 0;
 
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_BT, TYPE_EFUSE_MAP_LEN, (void *)&mapLen, false);
 
@@ -1182,17 +1192,17 @@ exit:
 void
 Efuse_ReadAllMap(
 		struct adapter *	pAdapter,
-		u8		efuseType,
-	u8		*Efuse,
-		bool		bPseudoTest);
+		u8 efuseType,
+	u8 *Efuse,
+		bool bPseudoTest);
 void
 Efuse_ReadAllMap(
 		struct adapter *	pAdapter,
-		u8		efuseType,
-	u8		*Efuse,
-		bool		bPseudoTest)
+		u8 efuseType,
+	u8 *Efuse,
+		bool bPseudoTest)
 {
-	u16	mapLen = 0;
+	u16 mapLen = 0;
 
 	Efuse_PowerSwitch(pAdapter, false, true);
 
@@ -1225,14 +1235,14 @@ Efuse_ReadAllMap(
 static void
 efuse_ShadowWrite1Byte(
 	struct adapter *	pAdapter,
-	u16		Offset,
-	u8		Value);
+	u16 Offset,
+	u8 Value);
 #endif /* PLATFORM */
 static void
 efuse_ShadowWrite1Byte(
 	struct adapter *	pAdapter,
-	u16		Offset,
-	u8		Value)
+	u16 Offset,
+	u8 Value)
 {
 	struct hal_com_data * pHalData = GET_HAL_DATA(pAdapter);
 
@@ -1244,8 +1254,8 @@ efuse_ShadowWrite1Byte(
 static void
 efuse_ShadowWrite2Byte(
 	struct adapter *	pAdapter,
-	u16		Offset,
-	u16		Value)
+	u16 Offset,
+	u16 Value)
 {
 
 	struct hal_com_data * pHalData = GET_HAL_DATA(pAdapter);
@@ -1260,8 +1270,8 @@ efuse_ShadowWrite2Byte(
 static void
 efuse_ShadowWrite4Byte(
 	struct adapter *	pAdapter,
-	u16		Offset,
-	u32		Value)
+	u16 Offset,
+	u32 Value)
 {
 	struct hal_com_data * pHalData = GET_HAL_DATA(pAdapter);
 
@@ -1292,15 +1302,15 @@ efuse_ShadowWrite4Byte(
 void
 EFUSE_ShadowWrite(
 	struct adapter *	pAdapter,
-	u8		Type,
-	u16		Offset,
-	u32		Value);
+	u8 Type,
+	u16 Offset,
+	u32 Value);
 void
 EFUSE_ShadowWrite(
 	struct adapter *	pAdapter,
-	u8		Type,
-	u16		Offset,
-	u32		Value)
+	u8 Type,
+	u16 Offset,
+	u32 Value)
 {
 #if (MP_DRIVER == 0)
 	return;
@@ -1365,8 +1375,8 @@ Efuse_InitSomeVar(
 static void
 efuse_ShadowRead1Byte(
 	struct adapter *	pAdapter,
-	u16		Offset,
-	u8		*Value)
+	u16 Offset,
+	u8 *Value)
 {
 	struct hal_com_data * pHalData = GET_HAL_DATA(pAdapter);
 
@@ -1378,8 +1388,8 @@ efuse_ShadowRead1Byte(
 static void
 efuse_ShadowRead2Byte(
 	struct adapter *	pAdapter,
-	u16		Offset,
-	u16		*Value)
+	u16 Offset,
+	u16 *Value)
 {
 	struct hal_com_data * pHalData = GET_HAL_DATA(pAdapter);
 
@@ -1392,8 +1402,8 @@ efuse_ShadowRead2Byte(
 static void
 efuse_ShadowRead4Byte(
 	struct adapter *	pAdapter,
-	u16		Offset,
-	u32		*Value)
+	u16 Offset,
+	u32 *Value)
 {
 	struct hal_com_data * pHalData = GET_HAL_DATA(pAdapter);
 
@@ -1412,9 +1422,9 @@ efuse_ShadowRead4Byte(
 void
 EFUSE_ShadowRead(
 		struct adapter *	pAdapter,
-		u8		Type,
-		u16		Offset,
-	u32		*Value)
+		u8 Type,
+		u16 Offset,
+	u32 *Value)
 {
 	if (Type == 1)
 		efuse_ShadowRead1Byte(pAdapter, Offset, (u8 *)Value);
@@ -1427,7 +1437,7 @@ EFUSE_ShadowRead(
 
 /*  11/16/2008 MH Add description. Get current efuse area enabled word!!. */
 u8
-Efuse_CalculateWordCnts(u8	word_en)
+Efuse_CalculateWordCnts(u8 word_en)
 {
 	u8 word_cnts = 0;
 	if (!(word_en & BIT(0)))
@@ -1459,9 +1469,9 @@ Efuse_CalculateWordCnts(u8	word_en)
  *
  *---------------------------------------------------------------------------*/
 void
-efuse_WordEnableDataRead(u8	word_en,
-			 u8	*sourdata,
-			 u8	*targetdata)
+efuse_WordEnableDataRead(u8 word_en,
+			 u8 *sourdata,
+			 u8 *targetdata)
 {
 	if (!(word_en & BIT(0))) {
 		targetdata[0] = sourdata[0];
@@ -1499,11 +1509,11 @@ efuse_WordEnableDataRead(u8	word_en,
  *---------------------------------------------------------------------------*/
 void EFUSE_ShadowMapUpdate(
 	struct adapter *	pAdapter,
-	u8		efuseType,
-	bool	bPseudoTest)
+	u8 efuseType,
+	bool bPseudoTest)
 {
 	struct hal_com_data * pHalData = GET_HAL_DATA(pAdapter);
-	u16	mapLen = 0;
+	u16 mapLen = 0;
 	EFUSE_GetEfuseDefinition(pAdapter, efuseType, TYPE_EFUSE_MAP_LEN, (void *)&mapLen, bPseudoTest);
 
 	if (pHalData->bautoload_fail_flag) {

@@ -66,40 +66,26 @@ PHY_CalculateBitShift(
  * 11/20/2008	MHC		Create Version 0.
  *
  *---------------------------------------------------------------------------*/
-u32
-PHY_RFShadowRead(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset)
+u32 PHY_RFShadowRead(struct adapter *Adapter, enum rf_path eRFPath, u32 Offset)
 {
 	return	RF_Shadow[eRFPath][Offset].Value;
-
 }	/* PHY_RFShadowRead */
 
-
-void
-PHY_RFShadowWrite(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset,
-	u32				Data)
+void PHY_RFShadowWrite(struct adapter *Adapter, enum rf_path eRFPath,
+		       u32 Offset, u32 Data)
 {
 	RF_Shadow[eRFPath][Offset].Value = (Data & bRFRegOffsetMask);
 	RF_Shadow[eRFPath][Offset].Driver_Write = true;
-
 }	/* PHY_RFShadowWrite */
 
-
-bool
-PHY_RFShadowCompare(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset)
+bool PHY_RFShadowCompare(struct adapter *Adapter, enum rf_path eRFPath,
+			 u32 Offset)
 {
-	u32	reg;
+	u32 reg;
 	/* Check if we need to check the register */
 	if (RF_Shadow[eRFPath][Offset].Compare) {
-		reg = rtw_hal_read_rfreg(Adapter, eRFPath, Offset, bRFRegOffsetMask);
+		reg = rtw_hal_read_rfreg(Adapter, eRFPath, Offset,
+					 bRFRegOffsetMask);
 		/* Compare shadow and real rf register for 20bits!! */
 		if (RF_Shadow[eRFPath][Offset].Value != reg) {
 			/* Locate error position. */
@@ -110,12 +96,8 @@ PHY_RFShadowCompare(
 	return false;
 }	/* PHY_RFShadowCompare */
 
-
-void
-PHY_RFShadowRecorver(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset)
+void PHY_RFShadowRecorver(struct adapter *Adapter, enum rf_path eRFPath,
+			  u32 Offset)
 {
 	/* Check if the address is error */
 	if (RF_Shadow[eRFPath][Offset].ErrorOrNot) {
@@ -125,13 +107,9 @@ PHY_RFShadowRecorver(
 					    RF_Shadow[eRFPath][Offset].Value);
 		}
 	}
-
 }	/* PHY_RFShadowRecorver */
 
-
-void
-PHY_RFShadowCompareAll(
-	struct adapter *			Adapter)
+void PHY_RFShadowCompareAll(struct adapter *Adapter)
 {
 	enum rf_path	eRFPath = RF_PATH_A;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
@@ -140,96 +118,77 @@ PHY_RFShadowCompareAll(
 		for (Offset = 0; Offset < maxReg; Offset++)
 			PHY_RFShadowCompare(Adapter, eRFPath, Offset);
 	}
-
 }	/* PHY_RFShadowCompareAll */
 
-
-void
-PHY_RFShadowRecorverAll(
-	struct adapter *			Adapter)
+void PHY_RFShadowRecorverAll(struct adapter *Adapter)
 {
-	enum rf_path		eRFPath = RF_PATH_A;
-	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
+	enum rf_path eRFPath = RF_PATH_A;
+	u32 Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
 
 	for (eRFPath = 0; eRFPath < RF6052_MAX_PATH; eRFPath++) {
 		for (Offset = 0; Offset < maxReg; Offset++)
 			PHY_RFShadowRecorver(Adapter, eRFPath, Offset);
 	}
-
 }	/* PHY_RFShadowRecorverAll */
 
-
-void
-PHY_RFShadowCompareFlagSet(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset,
-	u8				Type)
+void PHY_RFShadowCompareFlagSet(struct adapter *Adapter, enum rf_path eRFPath,
+				u32 Offset, u8 Type)
 {
 	/* Set True or False!!! */
 	RF_Shadow[eRFPath][Offset].Compare = Type;
-
 }	/* PHY_RFShadowCompareFlagSet */
 
-
-void
-PHY_RFShadowRecorverFlagSet(
-	struct adapter *		Adapter,
-	enum rf_path		eRFPath,
-	u32				Offset,
-	u8				Type)
+void PHY_RFShadowRecorverFlagSet(struct adapter *Adapter,
+				 enum rf_path eRFPath, u32 Offset, u8 Type)
 {
 	/* Set True or False!!! */
 	RF_Shadow[eRFPath][Offset].Recorver = Type;
-
 }	/* PHY_RFShadowRecorverFlagSet */
 
-
-void
-PHY_RFShadowCompareFlagSetAll(
-	struct adapter *			Adapter)
+void PHY_RFShadowCompareFlagSetAll(struct adapter *Adapter)
 {
-	enum rf_path	eRFPath = RF_PATH_A;
-	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
+	enum rf_path eRFPath = RF_PATH_A;
+	u32 Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
 
 	for (eRFPath = 0; eRFPath < RF6052_MAX_PATH; eRFPath++) {
 		for (Offset = 0; Offset < maxReg; Offset++) {
-			/* 2008/11/20 MH For S3S4 test, we only check reg 26/27 now!!!! */
+			/* 2008/11/20 MH For S3S4 test,
+			 * we only check reg 26/27 now!!!!
+			 */
 			if (Offset != 0x26 && Offset != 0x27)
-				PHY_RFShadowCompareFlagSet(Adapter, eRFPath, Offset, false);
+				PHY_RFShadowCompareFlagSet(Adapter, eRFPath,
+							   Offset, false);
 			else
-				PHY_RFShadowCompareFlagSet(Adapter, eRFPath, Offset, true);
+				PHY_RFShadowCompareFlagSet(Adapter, eRFPath,
+							   Offset, true);
 		}
 	}
-
 }	/* PHY_RFShadowCompareFlagSetAll */
 
-
-void
-PHY_RFShadowRecorverFlagSetAll(
-	struct adapter *			Adapter)
+void PHY_RFShadowRecorverFlagSetAll(struct adapter *Adapter)
 {
-	enum rf_path		eRFPath = RF_PATH_A;
-	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
+	enum rf_path eRFPath = RF_PATH_A;
+	u32 Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
 
 	for (eRFPath = 0; eRFPath < RF6052_MAX_PATH; eRFPath++) {
 		for (Offset = 0; Offset < maxReg; Offset++) {
-			/* 2008/11/20 MH For S3S4 test, we only check reg 26/27 now!!!! */
+			/* 2008/11/20 MH For S3S4 test,
+			 * we only check reg 26/27 now!!!!
+			 */
 			if (Offset != 0x26 && Offset != 0x27)
-				PHY_RFShadowRecorverFlagSet(Adapter, eRFPath, Offset, false);
+				PHY_RFShadowRecorverFlagSet(Adapter, eRFPath,
+							    Offset, false);
 			else
-				PHY_RFShadowRecorverFlagSet(Adapter, eRFPath, Offset, true);
+				PHY_RFShadowRecorverFlagSet(Adapter, eRFPath,
+							    Offset, true);
 		}
 	}
-
 }	/* PHY_RFShadowCompareFlagSetAll */
 
-void
-PHY_RFShadowRefresh(
-	struct adapter *			Adapter)
+void PHY_RFShadowRefresh(struct adapter *Adapter)
 {
-	enum rf_path		eRFPath = RF_PATH_A;
-	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
+	enum rf_path eRFPath = RF_PATH_A;
+	u32 Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
 
 	for (eRFPath = 0; eRFPath < RF6052_MAX_PATH; eRFPath++) {
 		for (Offset = 0; Offset < maxReg; Offset++) {
@@ -240,5 +199,4 @@ PHY_RFShadowRefresh(
 			RF_Shadow[eRFPath][Offset].Driver_Write = false;
 		}
 	}
-
 }	/* PHY_RFShadowRead */
