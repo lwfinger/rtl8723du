@@ -2077,14 +2077,8 @@ phy_set_tx_power_level_by_path(
 		phy_set_tx_power_index_by_rate_section(Adapter, path, channel, OFDM);
 		phy_set_tx_power_index_by_rate_section(Adapter, path, channel, HT_MCS0_MCS7);
 
-		if (pHalData->NumTotalRFPath >= 2) {
+		if (pHalData->NumTotalRFPath >= 2)
 			phy_set_tx_power_index_by_rate_section(Adapter, path, channel, HT_MCS8_MCS15);
-
-			if (IS_HARDWARE_TYPE_8814A(Adapter)) {
-				phy_set_tx_power_index_by_rate_section(Adapter, path, channel, HT_MCS16_MCS23);
-				phy_set_tx_power_index_by_rate_section(Adapter, path, channel, VHT_3SSMCS0_3SSMCS9);
-			}
-		}
 	}
 }
 
@@ -2577,12 +2571,7 @@ PHY_SetTxPowerIndex(
 	u8				Rate
 )
 {
-	if (IS_HARDWARE_TYPE_8723D(pAdapter)) {
-		PHY_SetTxPowerIndex_8723D(pAdapter, PowerIndex, RFPath, Rate);
-	} else if (IS_HARDWARE_TYPE_8822B(pAdapter))
-		rtw_hal_set_tx_power_index(pAdapter, PowerIndex, RFPath, Rate);
-	else if (IS_HARDWARE_TYPE_8821C(pAdapter))
-		rtw_hal_set_tx_power_index(pAdapter, PowerIndex, RFPath, Rate);
+	PHY_SetTxPowerIndex_8723D(pAdapter, PowerIndex, RFPath, Rate);
 }
 
 void dump_tx_power_idx_title(void *sel, struct adapter *adapter)

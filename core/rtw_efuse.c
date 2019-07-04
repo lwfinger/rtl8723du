@@ -51,9 +51,7 @@ static bool efuse_IsMasked(struct adapter * pAdapter, u16 Offset)
 	if (pAdapter->registrypriv.boffefusemask)
 		return false;
 
-	if (IS_HARDWARE_TYPE_8723D(pAdapter))
-		return (IS_MASKED(8723D, _MUSB, Offset)) ? true : false;
-	return false;
+	return (IS_MASKED(8723D, _MUSB, Offset)) ? true : false;
 }
 
 void rtw_efuse_mask_array(struct adapter * pAdapter, u8 *pArray)
@@ -207,8 +205,6 @@ void rtw_efuse_analyze(struct adapter *	adapt, u8 Type, u8 Fake)
 			bPseudoTest = true;
 			startBank = 1;
 			endBank = EFUSE_MAX_BANK - 1;
-			if (IS_HARDWARE_TYPE_8821(adapt))
-				endBank = 3 - 1;/*EFUSE_MAX_BANK_8821A - 1;*/
 		}
 	}
 
@@ -232,9 +228,6 @@ void rtw_efuse_analyze(struct adapter *	adapt, u8 Type, u8 Fake)
 	memset(eFuseWord, 0xff, EFUSE_MAX_SECTION_NUM *
 	       (EFUSE_MAX_WORD_UNIT * 2));
 	memset(pEfuseHal->fakeEfuseInitMap, 0xff, EFUSE_MAX_MAP_LEN);
-
-	if (IS_HARDWARE_TYPE_8821(adapt))
-		endBank = 3 - 1;/*EFUSE_MAX_BANK_8821A - 1;*/
 
 	for (bank = startBank; bank <= endBank; bank++) {
 		if (!hal_EfuseSwitchToBank(adapt, bank, bPseudoTest)) {
@@ -541,11 +534,6 @@ ReadEFuseByte(
 		Efuse_Read1ByteFromFakeContent(Adapter, _offset, pbuf);
 		return;
 	}
-	if (IS_HARDWARE_TYPE_8723B(Adapter)) {
-		/* <20130121, Kordan> For SMIC S55 EFUSE specificatoin. */
-		/* 0x34[11]: SW force PGMEN input of efuse to high. (for the bank selected by 0x34[9:8]) */
-		phy_set_mac_reg(Adapter, EFUSE_TEST, BIT11, 0);
-	}
 	/* Write Address */
 	rtw_write8(Adapter, EFUSE_CTRL + 1, (_offset & 0xff));
 	readbyte = rtw_read8(Adapter, EFUSE_CTRL + 2);
@@ -649,14 +637,9 @@ efuse_OneByteRead(
 		bResult = Efuse_Read1ByteFromFakeContent(pAdapter, addr, data);
 		return bResult;
 	}
-
-	if (IS_HARDWARE_TYPE_8723B(pAdapter) ||
-	    (IS_HARDWARE_TYPE_8192E(pAdapter) && (!IS_A_CUT(pHalData->version_id))) ||
-	    (IS_VENDOR_8188E_I_CUT_SERIES(pAdapter)) || (IS_CHIP_VENDOR_SMIC(pHalData->version_id))
-	   ) {
+	if (IS_CHIP_VENDOR_SMIC(pHalData->version_id)) {
 		/* <20130121, Kordan> For SMIC EFUSE specificatoin. */
-		/* 0x34[11]: SW force PGMEN input of efuse to high. (for the bank selected by 0x34[9:8])	 */
-		/* phy_set_mac_reg(pAdapter, 0x34, BIT11, 0); */
+		/* 0x34[11]: SW force PGMEN input of efuse to high. (for the bank selected by 0x34[9:8])         */
 		rtw_write16(pAdapter, 0x34, rtw_read16(pAdapter, 0x34) & (~BIT11));
 	}
 
@@ -720,19 +703,14 @@ efuse_OneByteWrite(
 	efuseValue &= ~(0x3FFFF);
 	efuseValue |= ((addr << 8 | data) & 0x3FFFF);
 
-	/* <20130227, Kordan> 8192E MP chip A-cut had better not set 0x34[11] until B-Cut. */
-	if (IS_HARDWARE_TYPE_8723B(pAdapter) ||
-	    (IS_HARDWARE_TYPE_8192E(pAdapter) && (!IS_A_CUT(pHalData->version_id))) ||
-	    (IS_VENDOR_8188E_I_CUT_SERIES(pAdapter)) || (IS_CHIP_VENDOR_SMIC(pHalData->version_id))
-	   ) {
+	if (IS_CHIP_VENDOR_SMIC(pHalData->version_id)) {
 		/* <20130121, Kordan> For SMIC EFUSE specificatoin. */
 		/* 0x34[11]: SW force PGMEN input of efuse to high. (for the bank selected by 0x34[9:8]) */
-		/* phy_set_mac_reg(pAdapter, 0x34, BIT11, 1); */
 		rtw_write16(pAdapter, 0x34, rtw_read16(pAdapter, 0x34) | (BIT11));
 		rtw_write32(pAdapter, EFUSE_CTRL, 0x90600000 | ((addr << 8 | data)));
-	} else
+	} else {
 		rtw_write32(pAdapter, EFUSE_CTRL, efuseValue);
-
+	}
 	rtw_mdelay_os(1);
 
 	while ((0x80 &  rtw_read8(pAdapter, EFUSE_CTRL + 3)) && (tmpidx < 100)) {
@@ -750,10 +728,7 @@ efuse_OneByteWrite(
 	}
 
 	/* disable Efuse program enable */
-	if (IS_HARDWARE_TYPE_8723B(pAdapter) ||
-	    (IS_HARDWARE_TYPE_8192E(pAdapter) && (!IS_A_CUT(pHalData->version_id))) ||
-	    (IS_VENDOR_8188E_I_CUT_SERIES(pAdapter)) || (IS_CHIP_VENDOR_SMIC(pHalData->version_id))
-	   )
+	if (IS_CHIP_VENDOR_SMIC(pHalData->version_id))
 		phy_set_mac_reg(pAdapter, EFUSE_TEST, BIT(11), 0);
 
 	Efuse_PowerSwitch(pAdapter, true, false);

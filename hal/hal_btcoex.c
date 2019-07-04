@@ -284,10 +284,7 @@ static u8 halbtcoutsrc_IsHwMailboxExist(struct btc_coexist * pBtCoexist)
 	    || pBtCoexist->board_info.bt_chip_type == BTC_CHIP_CSR_BC8
 	   )
 		return false;
-	else if (IS_HARDWARE_TYPE_8812(pBtCoexist->Adapter))
-		return false;
-	else
-		return true;
+	return true;
 }
 
 static u8 halbtcoutsrc_LeaveLps(struct btc_coexist * pBtCoexist)
@@ -2083,12 +2080,10 @@ void EXhalbtcoutsrc_PowerOnSetting(struct btc_coexist * pBtCoexist)
 
 	pHalData = GET_HAL_DATA((struct adapter *)pBtCoexist->Adapter);
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_power_on_setting(pBtCoexist);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_power_on_setting(pBtCoexist);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_power_on_setting(pBtCoexist);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_power_on_setting(pBtCoexist);
 }
 
 void EXhalbtcoutsrc_PreLoadFirmware(struct btc_coexist * pBtCoexist)
@@ -2098,13 +2093,10 @@ void EXhalbtcoutsrc_PreLoadFirmware(struct btc_coexist * pBtCoexist)
 
 	pBtCoexist->statistics.cnt_pre_load_firmware++;
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_pre_load_firmware(pBtCoexist);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_pre_load_firmware(pBtCoexist);
-	}
-
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_pre_load_firmware(pBtCoexist);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_pre_load_firmware(pBtCoexist);
 }
 
 static void EXhalbtcoutsrc_init_hw_config(struct btc_coexist * pBtCoexist, u8 bWifiOnly)
@@ -2114,12 +2106,10 @@ static void EXhalbtcoutsrc_init_hw_config(struct btc_coexist * pBtCoexist, u8 bW
 
 	pBtCoexist->statistics.cnt_init_hw_config++;
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_init_hw_config(pBtCoexist, bWifiOnly);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_init_hw_config(pBtCoexist, bWifiOnly);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_init_hw_config(pBtCoexist, bWifiOnly);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_init_hw_config(pBtCoexist, bWifiOnly);
 }
 
 static void EXhalbtcoutsrc_init_coex_dm(struct btc_coexist * pBtCoexist)
@@ -2129,12 +2119,10 @@ static void EXhalbtcoutsrc_init_coex_dm(struct btc_coexist * pBtCoexist)
 
 	pBtCoexist->statistics.cnt_init_coex_dm++;
 	pBtCoexist->initilized = true;
-       if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-               if (pBtCoexist->board_info.btdm_ant_num == 2)
-                       ex_halbtc8723d2ant_init_coex_dm(pBtCoexist);
-               else if (pBtCoexist->board_info.btdm_ant_num == 1)
-                       ex_halbtc8723d1ant_init_coex_dm(pBtCoexist);
-       }
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_init_coex_dm(pBtCoexist);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_init_coex_dm(pBtCoexist);
 }
 
 static void EXhalbtcoutsrc_ips_notify(struct btc_coexist * pBtCoexist, u8 type)
@@ -2159,13 +2147,10 @@ static void EXhalbtcoutsrc_ips_notify(struct btc_coexist * pBtCoexist, u8 type)
 	/* All notify is called in cmd thread, don't need to leave low power again
 	*	halbtcoutsrc_LeaveLowPower(pBtCoexist); */
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_ips_notify(pBtCoexist, ipsType);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_ips_notify(pBtCoexist, ipsType);
-	}
-	/*	halbtcoutsrc_NormalLowPower(pBtCoexist); */
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_ips_notify(pBtCoexist, ipsType);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_ips_notify(pBtCoexist, ipsType);
 }
 
 static void EXhalbtcoutsrc_lps_notify(struct btc_coexist * pBtCoexist, u8 type)
@@ -2188,12 +2173,10 @@ static void EXhalbtcoutsrc_lps_notify(struct btc_coexist * pBtCoexist, u8 type)
 		GLBtcWiFiInLPS = true;
 	}
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_lps_notify(pBtCoexist, lpsType);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_lps_notify(pBtCoexist, lpsType);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_lps_notify(pBtCoexist, lpsType);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_lps_notify(pBtCoexist, lpsType);
 }
 
 static void EXhalbtcoutsrc_scan_notify(struct btc_coexist * pBtCoexist, u8 type)
@@ -2217,12 +2200,10 @@ static void EXhalbtcoutsrc_scan_notify(struct btc_coexist * pBtCoexist, u8 type)
 	/* All notify is called in cmd thread, don't need to leave low power again
 	*	halbtcoutsrc_LeaveLowPower(pBtCoexist); */
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_scan_notify(pBtCoexist, scanType);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_scan_notify(pBtCoexist, scanType);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_scan_notify(pBtCoexist, scanType);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_scan_notify(pBtCoexist, scanType);
 }
 
 void EXhalbtcoutsrc_SetAntennaPathNotify(struct btc_coexist * pBtCoexist, u8 type)
@@ -2239,12 +2220,10 @@ static void EXhalbtcoutsrc_connect_notify(struct btc_coexist * pBtCoexist, u8 as
 	
 	/* All notify is called in cmd thread, don't need to leave low power again
 	*	halbtcoutsrc_LeaveLowPower(pBtCoexist); */
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_connect_notify(pBtCoexist, assoType);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_connect_notify(pBtCoexist, assoType);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_connect_notify(pBtCoexist, assoType);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_connect_notify(pBtCoexist, assoType);
 }
 
 static void EXhalbtcoutsrc_media_status_notify(struct btc_coexist * pBtCoexist, enum rt_media_status mediaStatus)
@@ -2265,12 +2244,10 @@ static void EXhalbtcoutsrc_media_status_notify(struct btc_coexist * pBtCoexist, 
 
 	/* All notify is called in cmd thread, don't need to leave low power again
 	*	halbtcoutsrc_LeaveLowPower(pBtCoexist); */
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_media_status_notify(pBtCoexist, mStatus);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_media_status_notify(pBtCoexist, mStatus);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_media_status_notify(pBtCoexist, mStatus);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_media_status_notify(pBtCoexist, mStatus);
 }
 
 static void EXhalbtcoutsrc_specific_packet_notify(struct btc_coexist * pBtCoexist, u8 pktType)
@@ -2296,12 +2273,10 @@ static void EXhalbtcoutsrc_specific_packet_notify(struct btc_coexist * pBtCoexis
 
 	/* All notify is called in cmd thread, don't need to leave low power again
 	*	halbtcoutsrc_LeaveLowPower(pBtCoexist); */
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_specific_packet_notify(pBtCoexist, packetType);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_specific_packet_notify(pBtCoexist, packetType);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_specific_packet_notify(pBtCoexist, packetType);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_specific_packet_notify(pBtCoexist, packetType);
 }
 
 static void EXhalbtcoutsrc_bt_info_notify(struct btc_coexist * pBtCoexist, u8 *tmpBuf, u8 length)
@@ -2313,12 +2288,10 @@ static void EXhalbtcoutsrc_bt_info_notify(struct btc_coexist * pBtCoexist, u8 *t
 
 	/* All notify is called in cmd thread, don't need to leave low power again
 	*	halbtcoutsrc_LeaveLowPower(pBtCoexist); */
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_bt_info_notify(pBtCoexist, tmpBuf, length);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_bt_info_notify(pBtCoexist, tmpBuf, length);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_bt_info_notify(pBtCoexist, tmpBuf, length);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_bt_info_notify(pBtCoexist, tmpBuf, length);
 }
 
 void EXhalbtcoutsrc_WlFwDbgInfoNotify(struct btc_coexist * pBtCoexist, u8* tmpBuf, u8 length)
@@ -2326,12 +2299,10 @@ void EXhalbtcoutsrc_WlFwDbgInfoNotify(struct btc_coexist * pBtCoexist, u8* tmpBu
 	if (!halbtcoutsrc_IsBtCoexistAvailable(pBtCoexist))
 		return;
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_wl_fwdbginfo_notify(pBtCoexist, tmpBuf, length);
-		else if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_wl_fwdbginfo_notify(pBtCoexist, tmpBuf, length);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_wl_fwdbginfo_notify(pBtCoexist, tmpBuf, length);
+	else if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_wl_fwdbginfo_notify(pBtCoexist, tmpBuf, length);
 }
 
 void EXhalbtcoutsrc_rx_rate_change_notify(struct btc_coexist * pBtCoexist, bool is_data_frame, u8 btc_rate_id)
@@ -2341,12 +2312,10 @@ void EXhalbtcoutsrc_rx_rate_change_notify(struct btc_coexist * pBtCoexist, bool 
 
 	pBtCoexist->statistics.cnt_rate_id_notify++;
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_rx_rate_change_notify(pBtCoexist, is_data_frame, btc_rate_id);
-		else if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_rx_rate_change_notify(pBtCoexist, is_data_frame, btc_rate_id);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_rx_rate_change_notify(pBtCoexist, is_data_frame, btc_rate_id);
+	else if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_rx_rate_change_notify(pBtCoexist, is_data_frame, btc_rate_id);
 }
 
 void
@@ -2359,10 +2328,8 @@ EXhalbtcoutsrc_RfStatusNotify(
 		return;
 	pBtCoexist->statistics.cnt_rf_status_notify++;
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_rf_status_notify(pBtCoexist, type);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_rf_status_notify(pBtCoexist, type);
 }
 
 void EXhalbtcoutsrc_StackOperationNotify(struct btc_coexist * pBtCoexist, u8 type)
@@ -2374,23 +2341,14 @@ static void EXhalbtcoutsrc_halt_notify(struct btc_coexist * pBtCoexist)
 	if (!halbtcoutsrc_IsBtCoexistAvailable(pBtCoexist))
 		return;
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_halt_notify(pBtCoexist);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_halt_notify(pBtCoexist);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_halt_notify(pBtCoexist);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_halt_notify(pBtCoexist);
 }
 
 static void EXhalbtcoutsrc_SwitchBtTRxMask(struct btc_coexist * pBtCoexist)
 {
-	if (IS_HARDWARE_TYPE_8723B(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2) {
-			halbtcoutsrc_SetBtReg(pBtCoexist, 0, 0x3c, 0x01); /* BT goto standby while GNT_BT 1-->0 */
-		} else if (pBtCoexist->board_info.btdm_ant_num == 1) {
-			halbtcoutsrc_SetBtReg(pBtCoexist, 0, 0x3c, 0x15); /* BT goto standby while GNT_BT 1-->0 */
-		}
-	}
 }
 
 static void EXhalbtcoutsrc_pnp_notify(struct btc_coexist * pBtCoexist, u8 pnpState)
@@ -2402,12 +2360,10 @@ static void EXhalbtcoutsrc_pnp_notify(struct btc_coexist * pBtCoexist, u8 pnpSta
 	/* currently only 1ant we have to do the notification, */
 	/* once pnp is notified to sleep state, we have to leave LPS that we can sleep normally. */
 	/*  */
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_pnp_notify(pBtCoexist, pnpState);
-		else if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_pnp_notify(pBtCoexist, pnpState);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_pnp_notify(pBtCoexist, pnpState);
+	else if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_pnp_notify(pBtCoexist, pnpState);
 }
 
 void EXhalbtcoutsrc_CoexDmSwitch(struct btc_coexist * pBtCoexist)
@@ -2418,15 +2374,13 @@ void EXhalbtcoutsrc_CoexDmSwitch(struct btc_coexist * pBtCoexist)
 
 	halbtcoutsrc_LeaveLowPower(pBtCoexist);
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 1) {
-			pBtCoexist->stop_coex_dm = true;
-			ex_halbtc8723d1ant_coex_dm_reset(pBtCoexist);
-			EXhalbtcoutsrc_SetAntNum(BT_COEX_ANT_TYPE_DETECTED, 2);
-			ex_halbtc8723d2ant_init_hw_config(pBtCoexist, false);
-			ex_halbtc8723d2ant_init_coex_dm(pBtCoexist);
-			pBtCoexist->stop_coex_dm = false;
-		}
+	if (pBtCoexist->board_info.btdm_ant_num == 1) {
+		pBtCoexist->stop_coex_dm = true;
+		ex_halbtc8723d1ant_coex_dm_reset(pBtCoexist);
+		EXhalbtcoutsrc_SetAntNum(BT_COEX_ANT_TYPE_DETECTED, 2);
+		ex_halbtc8723d2ant_init_hw_config(pBtCoexist, false);
+		ex_halbtc8723d2ant_init_coex_dm(pBtCoexist);
+		pBtCoexist->stop_coex_dm = false;
 	}
 	halbtcoutsrc_NormalLowPower(pBtCoexist);
 }
@@ -2440,12 +2394,10 @@ static void EXhalbtcoutsrc_periodical(struct btc_coexist * pBtCoexist)
 	/* Periodical should be called in cmd thread, */
 	/* don't need to leave low power again
 	*	halbtcoutsrc_LeaveLowPower(pBtCoexist); */
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_periodical(pBtCoexist);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_periodical(pBtCoexist);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_periodical(pBtCoexist);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_periodical(pBtCoexist);
 }
 
 static void EXhalbtcoutsrc_dbg_control(struct btc_coexist * pBtCoexist, u8 opCode, u8 opLen, u8 *pData)
@@ -2551,12 +2503,10 @@ void EXhalbtcoutsrc_DisplayBtCoexInfo(struct btc_coexist * pBtCoexist)
 	/* To prevent the racing with IPS enter */
 	halbtcoutsrc_EnterPwrLock(pBtCoexist);
 
-	if (IS_HARDWARE_TYPE_8723D(pBtCoexist->Adapter)) {
-		if (pBtCoexist->board_info.btdm_ant_num == 2)
-			ex_halbtc8723d2ant_display_coex_info(pBtCoexist);
-		else if (pBtCoexist->board_info.btdm_ant_num == 1)
-			ex_halbtc8723d1ant_display_coex_info(pBtCoexist);
-	}
+	if (pBtCoexist->board_info.btdm_ant_num == 2)
+		ex_halbtc8723d2ant_display_coex_info(pBtCoexist);
+	else if (pBtCoexist->board_info.btdm_ant_num == 1)
+		ex_halbtc8723d1ant_display_coex_info(pBtCoexist);
 	halbtcoutsrc_ExitPwrLock(pBtCoexist);
 
 	halbtcoutsrc_NormalLowPower(pBtCoexist);
@@ -2583,19 +2533,6 @@ static void EXhalbtcoutsrc_set_rfe_type(u8 type)
 
 static void EXhalbtcoutsrc_switchband_notify(struct btc_coexist *pBtCoexist, u8 type)
 {
-	if(!halbtcoutsrc_IsBtCoexistAvailable(pBtCoexist))
-		return;
-	
-	if(pBtCoexist->manual_control)
-		return;
-
-	/* Driver should guarantee that the HW status isn't in low power mode */
-	/* halbtcoutsrc_LeaveLowPower(pBtCoexist); */
-
-	if(IS_HARDWARE_TYPE_8822B(pBtCoexist->Adapter)) {
-	}
-
-	/* halbtcoutsrc_NormalLowPower(pBtCoexist); */
 }
 
 static u8 EXhalbtcoutsrc_rate_id_to_btc_rate_id(u8 rate_id)
@@ -3004,9 +2941,7 @@ void hal_btcoex_AntInfoSetting(struct adapter * adapt)
 void hal_btcoex_PowerOffSetting(struct adapter * adapt)
 {
 	/* Clear the WiFi on/off bit in scoreboard reg. if necessary */
-	if (IS_HARDWARE_TYPE_8703B(adapt) || IS_HARDWARE_TYPE_8723D(adapt)
-		|| IS_HARDWARE_TYPE_8821C(adapt) || IS_HARDWARE_TYPE_8822B(adapt))
-		rtw_write16(adapt, 0xaa, 0x8000);
+	rtw_write16(adapt, 0xaa, 0x8000);
 }
 
 void hal_btcoex_PreLoadFirmware(struct adapter * adapt)

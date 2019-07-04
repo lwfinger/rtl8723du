@@ -577,11 +577,7 @@ void SetHalODMVar(
 
 		if (podmpriv->is_linked) {
 			_RTW_PRINT_SEL(sel, "rx_rate = %s", HDATA_RATE(podmpriv->rx_rate));
-			if (IS_HARDWARE_TYPE_8814A(Adapter))
-				_RTW_PRINT_SEL(sel, " RSSI_A = %d(%%), RSSI_B = %d(%%), RSSI_C = %d(%%), RSSI_D = %d(%%)\n",
-					podmpriv->RSSI_A, podmpriv->RSSI_B, podmpriv->RSSI_C, podmpriv->RSSI_D);
-			else
-				_RTW_PRINT_SEL(sel, " RSSI_A = %d(%%), RSSI_B = %d(%%)\n", podmpriv->RSSI_A, podmpriv->RSSI_B);
+			_RTW_PRINT_SEL(sel, " RSSI_A = %d(%%), RSSI_B = %d(%%)\n", podmpriv->RSSI_A, podmpriv->RSSI_B);
 		}
 	}
 		break;

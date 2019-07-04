@@ -1746,16 +1746,8 @@ static void rtw_hal_update_sta_smps_cap(struct adapter *adapter, struct sta_info
 
 u8 rtw_get_mgntframe_raid(struct adapter *adapter, unsigned char network_type)
 {
-	u8 raid;
-
-	if (IS_NEW_GENERATION_IC(adapter)) {
-		raid = (network_type & WIRELESS_11B)	? RATEID_IDX_B
-		       : RATEID_IDX_G;
-	} else {
-		raid = (network_type & WIRELESS_11B)	? RATR_INX_WIRELESS_B
-		       : RATR_INX_WIRELESS_G;
-	}
-	return raid;
+	return (network_type & WIRELESS_11B) ? RATR_INX_WIRELESS_B :
+					       RATR_INX_WIRELESS_G;
 }
 
 static void rtw_hal_update_sta_rate_mask(struct adapter * adapt, struct sta_info *psta)
@@ -2788,12 +2780,8 @@ void hw_var_port_switch(struct adapter *adapter)
 
 	/* write bcn ctl */
 	/* always enable port0 beacon function for PSTDMA */
-	if (IS_HARDWARE_TYPE_8723B(adapter) || IS_HARDWARE_TYPE_8703B(adapter)
-	    || IS_HARDWARE_TYPE_8723D(adapter))
-		bcn_ctrl_1 |= EN_BCN_FUNCTION;
+	bcn_ctrl_1 |= EN_BCN_FUNCTION;
 	/* always disable port1 beacon function for PSTDMA */
-	if (IS_HARDWARE_TYPE_8723B(adapter) || IS_HARDWARE_TYPE_8703B(adapter))
-		bcn_ctrl &= ~EN_BCN_FUNCTION;
 	rtw_write8(adapter, REG_BCN_CTRL, bcn_ctrl_1);
 	rtw_write8(adapter, REG_BCN_CTRL_1, bcn_ctrl);
 
@@ -4858,10 +4846,7 @@ void rtw_reset_mac_rx_counters(struct adapter *adapt)
 {
 
 	/* If no packet rx, MaxRx clock be gating ,BIT_DISGCLK bit19 set 1 for fix*/
-	if (IS_HARDWARE_TYPE_8703B(adapt) ||
-	    IS_HARDWARE_TYPE_8723D(adapt) ||
-	    IS_HARDWARE_TYPE_8188F(adapt))
-		phy_set_mac_reg(adapt, REG_RCR, BIT19, 0x1);
+	phy_set_mac_reg(adapt, REG_RCR, BIT19, 0x1);
 
 	/* reset mac counter */
 	phy_set_mac_reg(adapt, REG_RXERR_RPT, BIT27, 0x1);
@@ -5262,12 +5247,7 @@ void hw_var_set_opmode_mbid(struct adapter *Adapter, u8 mode)
 		#ifdef CONFIG_BCN_XMIT_PROTECT
 		rtw_write8(Adapter, REG_CCK_CHECK, rtw_read8(Adapter, REG_CCK_CHECK) | BIT_EN_BCN_PKT_REL);
 		#endif
-
-		if (IS_HARDWARE_TYPE_8821(Adapter) || IS_HARDWARE_TYPE_8192E(Adapter))/* select BCN on port 0 for DualBeacon*/
-			rtw_write8(Adapter, REG_CCK_CHECK, rtw_read8(Adapter, REG_CCK_CHECK) & (~BIT_BCN_PORT_SEL));
-
 	}
-
 }
 #endif
 

@@ -1025,20 +1025,6 @@ u8 rtw_hal_ops_check(struct adapter *adapt)
 		ret = _FAIL;
 	}
 
-	if ((IS_HARDWARE_TYPE_8814A(adapt)
-	     || IS_HARDWARE_TYPE_8822BU(adapt) || IS_HARDWARE_TYPE_8822BS(adapt))
-	    && !adapt->hal_func.fw_correct_bcn) {
-		rtw_hal_error_msg("fw_correct_bcn");
-		ret = _FAIL;
-	}
-
-	if (IS_HARDWARE_TYPE_8822B(adapt) || IS_HARDWARE_TYPE_8821C(adapt)) {
-		if (!adapt->hal_func.set_tx_power_index_handler) {
-			rtw_hal_error_msg("set_tx_power_index_handler");
-			ret = _FAIL;
-		}
-	}
-
 	if (!adapt->hal_func.get_tx_power_index_handler) {
 		rtw_hal_error_msg("get_tx_power_index_handler");
 		ret = _FAIL;

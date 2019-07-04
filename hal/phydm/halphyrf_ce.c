@@ -554,17 +554,6 @@ odm_txpowertracking_callback_thermal_meter(
 	}
 
 	/* Wait sacn to do IQK by RF Jenyu*/
-	if ((!*p_dm->p_is_scan_in_process)  && (!p_iqk_info->rfk_forbidden)) {
-		if (!IS_HARDWARE_TYPE_8723B(adapter)) {
-			/*Delta temperature is equal to or larger than 20 centigrade (When threshold is 8).*/
-			if (delta_IQK >= c.threshold_iqk) {
-				p_rf_calibrate_info->thermal_value_iqk = thermal_value;
-				ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("delta_IQK(%d) >= threshold_iqk(%d)\n", delta_IQK, c.threshold_iqk));
-				if (!p_rf_calibrate_info->is_iqk_in_progress)
-					(*c.do_iqk)(p_dm, delta_IQK, thermal_value, 8);
-			}
-		}
-	}
 	if (p_rf_calibrate_info->dpk_thermal[RF_PATH_A] != 0) {
 		if (diff_DPK[RF_PATH_A] >= c.threshold_dpk) {
 			odm_set_bb_reg(p_dm, 0x82c, BIT(31), 0x1);
@@ -643,9 +632,6 @@ odm_iq_calibrate(
 {
 	struct adapter	*adapter = p_dm->adapter;
 	struct _IQK_INFORMATION	*p_iqk_info = &p_dm->IQK_info;
-
-	if (IS_HARDWARE_TYPE_8812AU(adapter))
-		return;
 
 	if ((p_dm->is_linked) && (!p_iqk_info->rfk_forbidden)) {
 		if ((*p_dm->p_channel != p_dm->pre_channel) && (!*p_dm->p_is_scan_in_process)) {

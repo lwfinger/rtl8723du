@@ -360,83 +360,6 @@ enum hardware_type {
 	HARDWARE_TYPE_MAX,
 };
 
-#define IS_NEW_GENERATION_IC(_Adapter)		false
-/*
- * RTL8188E Series
- *   */
-#define IS_HARDWARE_TYPE_8188EE(_Adapter)	false
-#define IS_HARDWARE_TYPE_8188EU(_Adapter)	false
-#define IS_HARDWARE_TYPE_8188ES(_Adapter)	false
-#define	IS_HARDWARE_TYPE_8188E(_Adapter)	false
-
-/* RTL8812 Series */
-#define IS_HARDWARE_TYPE_8812E(_Adapter)	false
-#define IS_HARDWARE_TYPE_8812AU(_Adapter)	false
-#define IS_HARDWARE_TYPE_8812(_Adapter)		false
-
-/* RTL8821 Series */
-#define IS_HARDWARE_TYPE_8821E(_Adapter)	false
-#define IS_HARDWARE_TYPE_8811AU(_Adapter)	false
-#define IS_HARDWARE_TYPE_8821U(_Adapter)	false
-#define IS_HARDWARE_TYPE_8821S(_Adapter)	false
-#define IS_HARDWARE_TYPE_8821(_Adapter)		false
-
-#define IS_HARDWARE_TYPE_JAGUAR(_Adapter)	false
-
-/* RTL8192E Series */
-#define IS_HARDWARE_TYPE_8192EE(_Adapter)	false
-#define IS_HARDWARE_TYPE_8192EU(_Adapter)	false
-#define IS_HARDWARE_TYPE_8192ES(_Adapter)	false
-
-#define IS_HARDWARE_TYPE_8192E(_Adapter)	false
-
-#define IS_HARDWARE_TYPE_8723BE(_Adapter)	false
-#define IS_HARDWARE_TYPE_8723BU(_Adapter)	false
-#define IS_HARDWARE_TYPE_8723BS(_Adapter)	false
-
-#define IS_HARDWARE_TYPE_8723B(_Adapter) 	false
-
-/* RTL8814A Series */
-#define IS_HARDWARE_TYPE_8814AE(_Adapter)	false
-#define IS_HARDWARE_TYPE_8814AU(_Adapter)	false
-#define IS_HARDWARE_TYPE_8814AS(_Adapter)	false
-
-#define IS_HARDWARE_TYPE_8814A(_Adapter)	false
-
-/* RTL8703B Series */
-#define IS_HARDWARE_TYPE_8703BE(_Adapter)	false
-#define IS_HARDWARE_TYPE_8703BS(_Adapter)	false
-#define IS_HARDWARE_TYPE_8703BU(_Adapter)	false
-#define	IS_HARDWARE_TYPE_8703B(_Adapter)	false
-
-/* RTL8723D Series */
-#define IS_HARDWARE_TYPE_8723DE(_Adapter)	false
-#define IS_HARDWARE_TYPE_8723DS(_Adapter)	false
-#define IS_HARDWARE_TYPE_8723DU(_Adapter)	true
-#define	IS_HARDWARE_TYPE_8723D(_Adapter)	true
-
-/* RTL8188F Series */
-#define IS_HARDWARE_TYPE_8188FE(_Adapter)	false
-#define IS_HARDWARE_TYPE_8188FS(_Adapter)	false
-#define IS_HARDWARE_TYPE_8188FU(_Adapter)	false
-#define	IS_HARDWARE_TYPE_8188F(_Adapter)	false
-
-#define IS_HARDWARE_TYPE_8821BE(_Adapter)	false
-#define IS_HARDWARE_TYPE_8821BU(_Adapter)	false
-#define IS_HARDWARE_TYPE_8821BS(_Adapter)	false
-
-#define IS_HARDWARE_TYPE_8821B(_Adapter)	false
-
-#define IS_HARDWARE_TYPE_8822BE(_Adapter)	false
-#define IS_HARDWARE_TYPE_8822BU(_Adapter)	false
-#define IS_HARDWARE_TYPE_8822BS(_Adapter)	false
-#define IS_HARDWARE_TYPE_8822B(_Adapter)	false
-
-#define IS_HARDWARE_TYPE_8821CE(_Adapter)	false
-#define IS_HARDWARE_TYPE_8821CU(_Adapter)	false
-#define IS_HARDWARE_TYPE_8821CS(_Adapter)	false
-#define IS_HARDWARE_TYPE_8821C(_Adapter)	false
-
 enum wowlan_subcode {
 	WOWLAN_ENABLE			= 0,
 	WOWLAN_DISABLE			= 1,
@@ -444,11 +367,6 @@ enum wowlan_subcode {
 	WOWLAN_AP_DISABLE		= 3,
 	WOWLAN_PATTERN_CLEAN		= 4
 };
-
-#define IS_HARDWARE_TYPE_JAGUAR2(_Adapter)	false
-
-#define IS_HARDWARE_TYPE_JAGUAR_AND_JAGUAR2(_Adapter) false
-
 
 struct wowlan_ioctl_param {
 	unsigned int subcode;
