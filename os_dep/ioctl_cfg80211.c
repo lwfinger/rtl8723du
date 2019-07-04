@@ -4211,7 +4211,7 @@ static int	cfg80211_rtw_dump_station(struct wiphy *wiphy, struct net_device *nde
 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
-	if (NULL == psta) {
+	if (!psta) {
 		RTW_INFO("Station is not found\n");
 		ret = -ENOENT;
 		goto exit;

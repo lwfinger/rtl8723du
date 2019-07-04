@@ -546,7 +546,7 @@ u32	rtw_free_stainfo(struct adapter *adapt , struct sta_info *psta)
 	int pending_qcnt[4];
 	u8 is_pre_link_sta = false;
 
-	if (psta == NULL)
+	if (!psta)
 		goto exit;
 
 	is_pre_link_sta = rtw_is_pre_link_sta(pstapriv, psta->cmn.mac_addr);
@@ -790,7 +790,7 @@ struct sta_info *rtw_get_stainfo(struct sta_priv *pstapriv, const u8 *hwaddr)
 	u8 bc_addr[ETH_ALEN] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
 
-	if (hwaddr == NULL)
+	if (!hwaddr)
 		return NULL;
 
 	if (IS_MCAST(hwaddr))
@@ -837,7 +837,7 @@ u32 rtw_init_bcmc_stainfo(struct adapter *adapt)
 
 	psta = rtw_alloc_stainfo(pstapriv, bcast_addr);
 
-	if (psta == NULL) {
+	if (!psta) {
 		res = _FAIL;
 		goto exit;
 	}
@@ -866,7 +866,7 @@ u16 rtw_aid_alloc(struct adapter *adapter, struct sta_info *sta)
 
 	for (i = 0; i < stapriv->max_aid; i++) {
 		aid = ((i + stapriv->started_aid - 1) % stapriv->max_aid) + 1;
-		if (stapriv->sta_aid[aid - 1] == NULL)
+		if (!stapriv->sta_aid[aid - 1])
 			break;
 		if (++used_cnt >= stapriv->max_num_sta)
 			break;
@@ -1022,7 +1022,7 @@ struct sta_info *rtw_pre_link_sta_add(struct sta_priv *stapriv, u8 *hwaddr)
 			break;
 		}
 
-		if (node == NULL && !pre_link_sta_ctl->node[i].valid)
+		if (!node && !pre_link_sta_ctl->node[i].valid)
 			node = &pre_link_sta_ctl->node[i];
 	}
 
@@ -1033,7 +1033,7 @@ struct sta_info *rtw_pre_link_sta_add(struct sta_priv *stapriv, u8 *hwaddr)
 	}
 	_exit_critical_bh(&(pre_link_sta_ctl->lock), &irqL);
 
-	if (node == NULL)
+	if (!node)
 		goto exit;
 
 	sta = rtw_get_stainfo(stapriv, hwaddr);

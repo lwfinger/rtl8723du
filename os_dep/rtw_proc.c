@@ -1813,7 +1813,7 @@ static ssize_t proc_set_btreg_read(struct file *file, const char __user *buffer,
 
 	adapt = (struct adapter *)rtw_netdev_priv(dev);
 
-	if (NULL == buffer) {
+	if (!buffer) {
 		RTW_INFO(FUNC_ADPT_FMT ": input buffer is NULL!\n",
 			 FUNC_ADPT_ARG(adapt));
 		err = -EFAULT;
@@ -1893,7 +1893,7 @@ static ssize_t proc_set_btreg_write(struct file *file, const char __user *buffer
 
 	adapt = (struct adapter *)rtw_netdev_priv(dev);
 
-	if (NULL == buffer) {
+	if (!buffer) {
 		RTW_INFO(FUNC_ADPT_FMT ": input buffer is NULL!\n",
 			 FUNC_ADPT_ARG(adapt));
 		err = -EFAULT;
@@ -2483,9 +2483,9 @@ static int proc_get_phydm_cmd(struct seq_file *m, void *v)
 	adapt = (struct adapter *)rtw_netdev_priv(netdev);
 	phydm = adapter_to_phydm(adapt);
 
-	if (NULL == phydm_msg) {
+	if (!phydm_msg) {
 		phydm_msg = rtw_zmalloc(PHYDM_MSG_LEN);
-		if (NULL == phydm_msg)
+		if (!phydm_msg)
 			return -ENOMEM;
 
 		phydm_cmd(phydm, NULL, 0, 0, phydm_msg, PHYDM_MSG_LEN);
@@ -2518,9 +2518,9 @@ static ssize_t proc_set_phydm_cmd(struct file *file, const char __user *buffer, 
 		return -EFAULT;
 
 	if (buffer && !copy_from_user(tmp, buffer, count)) {
-		if (NULL == phydm_msg) {
+		if (!phydm_msg) {
 			phydm_msg = rtw_zmalloc(PHYDM_MSG_LEN);
-			if (NULL == phydm_msg)
+			if (!phydm_msg)
 				return -ENOMEM;
 		} else
 			memset(phydm_msg, 0, PHYDM_MSG_LEN);

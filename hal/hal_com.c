@@ -3207,7 +3207,7 @@ void rtw_hal_construct_NullFunctionData(
 	if (bForcePowerSave)
 		SetPwrMgt(fctrl);
 
-	if (NULL == StaAddr) {
+	if (!StaAddr) {
 		memcpy(bssid, adapter_mac_addr(adapt), ETH_ALEN);
 		StaAddr = bssid;
 	}

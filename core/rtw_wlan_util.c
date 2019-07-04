@@ -1045,7 +1045,7 @@ static s16 rtw_get_camid(struct adapter *adapter, struct sta_info *sta, u8 *addr
 	u8 start_id = 0;
 	s16 cam_id = -1;
 
-	if (addr == NULL) {
+	if (!addr) {
 		RTW_PRINT(FUNC_ADPT_FMT" mac_address is NULL\n"
 			  , FUNC_ADPT_ARG(adapter));
 		rtw_warn_on(1);
@@ -1625,7 +1625,7 @@ void HT_caps_handler(struct adapter *adapt, struct ndis_802_11_variable_ies * pI
 	struct registry_priv	*pregistrypriv = &adapt->registrypriv;
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapt);
 
-	if (pIE == NULL)
+	if (!pIE)
 		return;
 
 	if (!phtpriv->ht_option)
@@ -1719,7 +1719,7 @@ void HT_info_handler(struct adapter *adapt, struct ndis_802_11_variable_ies * pI
 	struct mlme_priv		*pmlmepriv = &adapt->mlmepriv;
 	struct ht_priv			*phtpriv = &pmlmepriv->htpriv;
 
-	if (pIE == NULL)
+	if (!pIE)
 		return;
 
 	if (!phtpriv->ht_option)
@@ -2648,7 +2648,7 @@ int rtw_ies_get_supported_rate(u8 *ies, uint ies_len, u8 *rate_set, u8 *rate_num
 	*rate_num = 0;
 
 	ie = rtw_get_ie(ies, _SUPPORTEDRATES_IE_, &ie_len, ies_len);
-	if (ie == NULL)
+	if (!ie)
 		goto ext_rate;
 
 	memcpy(rate_set, ie + 2, ie_len);
@@ -2715,7 +2715,7 @@ void rtw_process_bar_frame(struct adapter *adapt, union recv_frame *precv_frame)
 	u16 start_seq=0;
 
 	psta = rtw_get_stainfo(pstapriv, get_addr2_ptr(pframe));
-	if (psta == NULL)
+	if (!psta)
 		goto exit;
 
 	tid = ((le16_to_cpu((*(__le16 *)(pframe + 16))) & 0xf000) >> 12);

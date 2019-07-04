@@ -877,157 +877,157 @@ u8 rtw_hal_ops_check(struct adapter *adapt)
 {
 	u8 ret = _SUCCESS;
 	/*** initialize section ***/
-	if (NULL == adapt->hal_func.read_chip_version) {
+	if (!adapt->hal_func.read_chip_version) {
 		rtw_hal_error_msg("read_chip_version");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.init_default_value) {
+	if (!adapt->hal_func.init_default_value) {
 		rtw_hal_error_msg("init_default_value");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.intf_chip_configure) {
+	if (!adapt->hal_func.intf_chip_configure) {
 		rtw_hal_error_msg("intf_chip_configure");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.read_adapter_info) {
+	if (!adapt->hal_func.read_adapter_info) {
 		rtw_hal_error_msg("read_adapter_info");
 		ret = _FAIL;
 	}
 
-	if (NULL == adapt->hal_func.hal_power_on) {
+	if (!adapt->hal_func.hal_power_on) {
 		rtw_hal_error_msg("hal_power_on");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.hal_power_off) {
+	if (!adapt->hal_func.hal_power_off) {
 		rtw_hal_error_msg("hal_power_off");
 		ret = _FAIL;
 	}
 
-	if (NULL == adapt->hal_func.hal_init) {
+	if (!adapt->hal_func.hal_init) {
 		rtw_hal_error_msg("hal_init");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.hal_deinit) {
+	if (!adapt->hal_func.hal_deinit) {
 		rtw_hal_error_msg("hal_deinit");
 		ret = _FAIL;
 	}
 
 	/*** xmit section ***/
-	if (NULL == adapt->hal_func.init_xmit_priv) {
+	if (!adapt->hal_func.init_xmit_priv) {
 		rtw_hal_error_msg("init_xmit_priv");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.free_xmit_priv) {
+	if (!adapt->hal_func.free_xmit_priv) {
 		rtw_hal_error_msg("free_xmit_priv");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.hal_xmit) {
+	if (!adapt->hal_func.hal_xmit) {
 		rtw_hal_error_msg("hal_xmit");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.mgnt_xmit) {
+	if (!adapt->hal_func.mgnt_xmit) {
 		rtw_hal_error_msg("mgnt_xmit");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.hal_xmitframe_enqueue) {
+	if (!adapt->hal_func.hal_xmitframe_enqueue) {
 		rtw_hal_error_msg("hal_xmitframe_enqueue");
 		ret = _FAIL;
 	}
 	/*** recv section ***/
-	if (NULL == adapt->hal_func.init_recv_priv) {
+	if (!adapt->hal_func.init_recv_priv) {
 		rtw_hal_error_msg("init_recv_priv");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.free_recv_priv) {
+	if (!adapt->hal_func.free_recv_priv) {
 		rtw_hal_error_msg("free_recv_priv");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.inirp_init) {
+	if (!adapt->hal_func.inirp_init) {
 		rtw_hal_error_msg("inirp_init");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.inirp_deinit) {
+	if (!adapt->hal_func.inirp_deinit) {
 		rtw_hal_error_msg("inirp_deinit");
 		ret = _FAIL;
 	}
 
 	/*** DM section ***/
-	if (NULL == adapt->hal_func.dm_init) {
+	if (!adapt->hal_func.dm_init) {
 		rtw_hal_error_msg("dm_init");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.dm_deinit) {
+	if (!adapt->hal_func.dm_deinit) {
 		rtw_hal_error_msg("dm_deinit");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.hal_dm_watchdog) {
+	if (!adapt->hal_func.hal_dm_watchdog) {
 		rtw_hal_error_msg("hal_dm_watchdog");
 		ret = _FAIL;
 	}
 
 	/*** xxx section ***/
-	if (NULL == adapt->hal_func.set_chnl_bw_handler) {
+	if (!adapt->hal_func.set_chnl_bw_handler) {
 		rtw_hal_error_msg("set_chnl_bw_handler");
 		ret = _FAIL;
 	}
 
-	if (NULL == adapt->hal_func.set_hw_reg_handler) {
+	if (!adapt->hal_func.set_hw_reg_handler) {
 		rtw_hal_error_msg("set_hw_reg_handler");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.GetHwRegHandler) {
+	if (!adapt->hal_func.GetHwRegHandler) {
 		rtw_hal_error_msg("GetHwRegHandler");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.get_hal_def_var_handler) {
+	if (!adapt->hal_func.get_hal_def_var_handler) {
 		rtw_hal_error_msg("get_hal_def_var_handler");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.SetHalDefVarHandler) {
+	if (!adapt->hal_func.SetHalDefVarHandler) {
 		rtw_hal_error_msg("SetHalDefVarHandler");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.GetHalODMVarHandler) {
+	if (!adapt->hal_func.GetHalODMVarHandler) {
 		rtw_hal_error_msg("GetHalODMVarHandler");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.SetHalODMVarHandler) {
+	if (!adapt->hal_func.SetHalODMVarHandler) {
 		rtw_hal_error_msg("SetHalODMVarHandler");
 		ret = _FAIL;
 	}
 
-	if (NULL == adapt->hal_func.SetBeaconRelatedRegistersHandler) {
+	if (!adapt->hal_func.SetBeaconRelatedRegistersHandler) {
 		rtw_hal_error_msg("SetBeaconRelatedRegistersHandler");
 		ret = _FAIL;
 	}
 
-	if (NULL == adapt->hal_func.fill_h2c_cmd) {
+	if (!adapt->hal_func.fill_h2c_cmd) {
 		rtw_hal_error_msg("fill_h2c_cmd");
 		ret = _FAIL;
 	}
 
-	if (NULL == adapt->hal_func.c2h_handler) {
+	if (!adapt->hal_func.c2h_handler) {
 		rtw_hal_error_msg("c2h_handler");
 		ret = _FAIL;
 	}
-	if (NULL == adapt->hal_func.fill_fake_txdesc) {
+	if (!adapt->hal_func.fill_fake_txdesc) {
 		rtw_hal_error_msg("fill_fake_txdesc");
 		ret = _FAIL;
 	}
 
-	if (NULL == adapt->hal_func.hal_get_tx_buff_rsvd_page_num) {
+	if (!adapt->hal_func.hal_get_tx_buff_rsvd_page_num) {
 		rtw_hal_error_msg("hal_get_tx_buff_rsvd_page_num");
 		ret = _FAIL;
 	}
 
-	if (NULL == adapt->hal_func.fw_dl) {
+	if (!adapt->hal_func.fw_dl) {
 		rtw_hal_error_msg("fw_dl");
 		ret = _FAIL;
 	}
 
 	if ((IS_HARDWARE_TYPE_8814A(adapt)
 	     || IS_HARDWARE_TYPE_8822BU(adapt) || IS_HARDWARE_TYPE_8822BS(adapt))
-	    && NULL == adapt->hal_func.fw_correct_bcn) {
+	    && !adapt->hal_func.fw_correct_bcn) {
 		rtw_hal_error_msg("fw_correct_bcn");
 		ret = _FAIL;
 	}

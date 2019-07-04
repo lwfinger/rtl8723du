@@ -164,7 +164,7 @@ void rtw_report_sec_ie(struct adapter *adapter, u8 authmode, u8 *sec_ie)
 	if (authmode == _WPA_IE_ID_) {
 
 		buff = rtw_zmalloc(IW_CUSTOM_MAX);
-		if (NULL == buff) {
+		if (!buff) {
 			RTW_INFO(FUNC_ADPT_FMT ": alloc memory FAIL!!\n",
 				 FUNC_ADPT_ARG(adapter));
 			return;

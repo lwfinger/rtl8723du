@@ -2749,7 +2749,7 @@ static int rtw_wx_read32(struct net_device *dev,
 		return -EINVAL;
 
 	ptmp = (u8 *)rtw_malloc(len);
-	if (NULL == ptmp)
+	if (!ptmp)
 		return -ENOMEM;
 
 	if (copy_from_user(ptmp, p->pointer, len)) {
@@ -3223,7 +3223,7 @@ static int rtw_wps_start(struct net_device *dev,
 	u32   u32wps_start = 0;
 	unsigned int uintRet = 0;
 
-	if (RTW_CANNOT_RUN(adapt) || (NULL == pdata)) {
+	if (RTW_CANNOT_RUN(adapt) || (!pdata)) {
 		ret = -EINVAL;
 		goto exit;
 	}
@@ -8814,7 +8814,7 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 	if (!input_len)
 		return -EINVAL;
 	input = rtw_zmalloc(input_len);
-	if (NULL == input)
+	if (!input)
 		return -ENOMEM;
 	if (copy_from_user(input, wdata.data.pointer, input_len)) {
 		err = -EFAULT;
@@ -8900,7 +8900,7 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 	}
 
 	buffer = rtw_zmalloc(4096);
-	if (NULL == buffer) {
+	if (!buffer) {
 		err = -ENOMEM;
 		goto exit;
 	}
@@ -8921,7 +8921,7 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 			count = 0;
 			do {
 				str = strsep(&ptr, delim);
-				if (NULL == str)
+				if (!str)
 					break;
 				sscanf(str, "%i", &temp);
 				buffer[count++] = (u8)temp;
@@ -8940,7 +8940,7 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 			count = 0;
 			do {
 				str = strsep(&ptr, delim);
-				if (NULL == str)
+				if (!str)
 					break;
 				sscanf(str, "%i", &temp);
 				((int *)buffer)[count++] = (int)temp;
@@ -9059,7 +9059,7 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 			n = wdata.data.length;
 
 		output = rtw_zmalloc(4096);
-		if (NULL == output) {
+		if (!output) {
 			err =  -ENOMEM;
 			goto exit;
 		}

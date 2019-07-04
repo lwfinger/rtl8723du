@@ -75,7 +75,7 @@ int _rtw_init_recv_priv(struct recv_priv *precvpriv, struct adapter *adapt)
 
 	precvpriv->pallocated_frame_buf = vzalloc(NR_RECVFRAME * sizeof(union recv_frame) + RXFRAME_ALIGN_SZ);
 
-	if (precvpriv->pallocated_frame_buf == NULL) {
+	if (!precvpriv->pallocated_frame_buf) {
 		res = _FAIL;
 		goto exit;
 	}
@@ -935,7 +935,7 @@ static int sta2sta_data_frame(
 	} else
 		ret  = _FAIL;
 	*psta = rtw_get_stainfo(pstapriv, sta_addr);
-	if (*psta == NULL) {
+	if (!*psta) {
 		ret = _FAIL;
 		goto exit;
 	}
@@ -992,7 +992,7 @@ static int ap2sta_data_frame(
 		}
 
 		*psta = rtw_get_stainfo(pstapriv, pattrib->ta);
-		if (*psta == NULL) {
+		if (!*psta) {
 			ret = _FAIL;
 			goto exit;
 		}
@@ -1018,7 +1018,7 @@ static int ap2sta_data_frame(
 
 
 		*psta = rtw_get_stainfo(pstapriv, pattrib->bssid); /* get sta_info */
-		if (*psta == NULL) {
+		if (!*psta) {
 			ret = _FAIL;
 			goto exit;
 		}
@@ -1031,7 +1031,7 @@ static int ap2sta_data_frame(
 	} else {
 		if (!memcmp(myhwaddr, pattrib->dst, ETH_ALEN) && (!bmcast)) {
 			*psta = rtw_get_stainfo(pstapriv, pattrib->ta);
-			if (*psta == NULL) {
+			if (!*psta) {
 
 				/* for AP multicast issue , modify by yiwei */
 				static unsigned long send_issue_deauth_time = 0;
@@ -1079,7 +1079,7 @@ static int sta2ap_data_frame(
 		}
 
 		*psta = rtw_get_stainfo(pstapriv, pattrib->ta);
-		if (*psta == NULL) {
+		if (!*psta) {
 			RTW_INFO("issue_deauth to sta=" MAC_FMT " for the reason(7)\n", MAC_ARG(pattrib->src));
 
 			issue_deauth(adapter, pattrib->src, WLAN_REASON_CLASS3_FRAME_FROM_NONASSOC_STA);
@@ -1109,7 +1109,7 @@ static int sta2ap_data_frame(
 
 
 		*psta = rtw_get_stainfo(pstapriv, pattrib->bssid); /* get sta_info */
-		if (*psta == NULL) {
+		if (!*psta) {
 			ret = _FAIL;
 			goto exit;
 		}
@@ -1152,7 +1152,7 @@ int validate_recv_ctrl_frame(struct adapter *adapt, union recv_frame *precv_fram
 		return _FAIL;
 
 	psta = rtw_get_stainfo(pstapriv, get_addr2_ptr(pframe));
-	if (psta == NULL)
+	if (!psta)
 		return _FAIL;
 
 	/* for rx pkt statistics */
@@ -1440,7 +1440,7 @@ bip_verify:
 	/* actual management data frame body */
 	data_len = pattrib->pkt_len - pattrib->hdrlen - pattrib->iv_len - pattrib->icv_len;
 	mgmt_DATA = rtw_zmalloc(data_len);
-	if (mgmt_DATA == NULL) {
+	if (!mgmt_DATA) {
 		RTW_INFO(FUNC_ADPT_FMT" mgmt allocate fail  !!!!!!!!!\n", FUNC_ADPT_ARG(adapter));
 		goto fail;
 	}
@@ -1509,7 +1509,7 @@ static int validate_recv_mgnt_frame(struct adapter * adapt, union recv_frame *pr
 #endif
 
 	precv_frame = recvframe_chk_defrag(adapt, precv_frame);
-	if (precv_frame == NULL)
+	if (!precv_frame)
 		return _SUCCESS;
 
 	/* for rx pkt statistics */
@@ -1588,7 +1588,7 @@ static int validate_recv_data_frame(struct adapter *adapter, union recv_frame *p
 		goto exit;
 
 
-	if (psta == NULL) {
+	if (!psta) {
 		ret = _FAIL;
 		goto exit;
 	}
@@ -1940,7 +1940,7 @@ union recv_frame *recvframe_chk_defrag(struct adapter * adapt, union recv_frame 
 
 	psta_addr = pfhdr->attrib.ta;
 	psta = rtw_get_stainfo(pstapriv, psta_addr);
-	if (psta == NULL) {
+	if (!psta) {
 		u8 type = GetFrameType(pfhdr->rx_data);
 		if (type != WIFI_DATA_TYPE) {
 			psta = rtw_get_bcmc_stainfo(adapt);
@@ -2075,7 +2075,7 @@ static int amsdu_to_msdu(struct adapter *adapt, union recv_frame *prframe)
 		}
 
 		sub_pkt = rtw_os_alloc_msdu_pkt(prframe, nSubframe_Length, pdata);
-		if (sub_pkt == NULL) {
+		if (!sub_pkt) {
 			RTW_INFO("%s(): allocate sub packet fail !!!\n", __func__);
 			break;
 		}
@@ -2753,20 +2753,20 @@ static int recv_func_posthandle(struct adapter *adapt, union recv_frame *prframe
 	rtw_led_control(adapt, LED_CTL_RX);
 
 	prframe = decryptor(adapt, prframe);
-	if (prframe == NULL) {
+	if (!prframe) {
 		ret = _FAIL;
 		DBG_COUNTER(adapt->rx_logs.core_rx_post_decrypt_err);
 		goto _recv_data_drop;
 	}
 
 	prframe = recvframe_chk_defrag(adapt, prframe);
-	if (prframe == NULL)	{
+	if (!prframe)	{
 		DBG_COUNTER(adapt->rx_logs.core_rx_post_defrag_err);
 		goto _recv_data_drop;
 	}
 
 	prframe = portctrl(adapt, prframe);
-	if (prframe == NULL) {
+	if (!prframe) {
 		ret = _FAIL;
 		DBG_COUNTER(adapt->rx_logs.core_rx_post_portctrl_err);
 		goto _recv_data_drop;
@@ -3004,7 +3004,7 @@ static void rx_process_link_qual(struct adapter *adapt, union recv_frame *prfram
 	struct rx_pkt_attrib *pattrib;
 	struct signal_stat *signal_stat;
 
-	if (prframe == NULL || adapt == NULL)
+	if (!prframe || !adapt)
 		return;
 
 	pattrib = &prframe->u.hdr.attrib;
@@ -3167,7 +3167,7 @@ int pre_recv_entry(union recv_frame *precvframe, u8 *pphy_status)
 
 	if (!ra_is_bmc) { /*unicast packets*/
 		iface = rtw_get_iface_by_macddr(primary_adapt , pda);
-		if (NULL == iface) {
+		if (!iface) {
 			RTW_INFO("%s [WARN] Cannot find appropriate adapter - mac_addr : "MAC_FMT"\n", __func__, MAC_ARG(pda));
 			/*rtw_warn_on(1);*/
 		} else

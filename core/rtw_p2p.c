@@ -38,7 +38,7 @@ static u32 go_add_group_info_attr(struct wifidirect_info *pwdinfo, u8 *pbuf)
 
 	pdata_attr = rtw_zmalloc(MAX_P2P_IE_LEN);
 
-	if (NULL == pdata_attr) {
+	if (!pdata_attr) {
 		RTW_INFO("%s pdata_attr malloc failed\n", __func__);
 		goto _exit;
 	}

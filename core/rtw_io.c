@@ -267,7 +267,7 @@ int rtw_init_io_priv(struct adapter *adapt, void (*set_intf_ops)(struct adapter 
 	struct io_priv	*piopriv = &adapt->iopriv;
 	struct intf_hdl *pintf = &piopriv->intf;
 
-	if (set_intf_ops == NULL)
+	if (!set_intf_ops)
 		return _FAIL;
 
 	piopriv->adapt = adapt;

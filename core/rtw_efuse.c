@@ -982,7 +982,7 @@ u8 rtw_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 		return _FAIL;
 
 	map = rtw_zmalloc(mapLen);
-	if (map == NULL) {
+	if (!map) {
 		rtw_mfree(efuse, mapLen);
 		return _FAIL;
 	}
@@ -1117,7 +1117,7 @@ u8 rtw_BT_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 	RT_ASSERT_RET((mapLen & 0x7) == 0); /* have to be PGPKT_DATA_SIZE alignment for memcpy */
 
 	map = rtw_zmalloc(mapLen);
-	if (map == NULL)
+	if (!map)
 		return _FAIL;
 
 	ret = rtw_BT_efuse_map_read(adapt, 0, mapLen, map);
@@ -1571,7 +1571,7 @@ u8 rtw_efuse_file_read(struct adapter * adapt, u8 *filepatch, u8 *buf, u32 len)
 	u32 bufsize = 4096;
 
 	ptmpbuf = rtw_zmalloc(bufsize);
-	if (ptmpbuf == NULL)
+	if (!ptmpbuf)
 		return false;
 
 	count = rtw_retrieve_from_file(filepatch, ptmpbuf, bufsize);

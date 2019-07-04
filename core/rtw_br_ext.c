@@ -476,7 +476,7 @@ static void __nat25_db_network_insert(struct adapter *priv,
 	}
 
 	db = (struct nat25_network_db_entry *) rtw_malloc(sizeof(*db));
-	if (db == NULL) {
+	if (!db) {
 		_exit_critical_bh(&priv->br_ext_lock, &irqL);
 		return;
 	}
@@ -729,7 +729,7 @@ int nat25_db_handle(struct adapter *priv, struct sk_buff *skb, int method)
 	__be16 protocol;
 	unsigned char networkAddr[MAX_NETWORK_ADDR_LEN];
 
-	if (skb == NULL)
+	if (!skb)
 		return -1;
 
 	if ((method <= NAT25_MIN) || (method >= NAT25_MAX))
@@ -1457,7 +1457,7 @@ struct dhcpMessage {
 
 void dhcp_flag_bcast(struct adapter *priv, struct sk_buff *skb)
 {
-	if (skb == NULL)
+	if (!skb)
 		return;
 
 	if (!priv->ethBrExtInfo.dhcp_bcst_disable) {

@@ -2965,7 +2965,7 @@ ssize_t proc_set_btcoex_dbg(struct file *file, const char __user *buffer, size_t
 	u32 num;
 
 	adapt = (struct adapter *)rtw_netdev_priv(dev);
-	if (NULL == buffer) {
+	if (!buffer) {
 		RTW_INFO(FUNC_ADPT_FMT ": input buffer is NULL!\n",
 			 FUNC_ADPT_ARG(adapt));
 
@@ -3019,7 +3019,7 @@ int proc_get_btcoex_info(struct seq_file *m, void *v)
 	adapt = (struct adapter *)rtw_netdev_priv(dev);
 
 	pbuf = rtw_zmalloc(bufsize);
-	if (NULL == pbuf)
+	if (!pbuf)
 		return -ENOMEM;
 
 	rtw_btcoex_DisplayBtCoexInfo(adapt, pbuf, bufsize);

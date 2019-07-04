@@ -507,7 +507,7 @@ int rtw_hw_suspend(struct adapter *adapt)
 	struct usb_interface *pusb_intf;
 	struct net_device *pnetdev;
 
-	if (NULL == adapt)
+	if (!adapt)
 		goto error_exit;
 
 	if ((false == adapt->bup) || RTW_CANNOT_RUN(adapt)) {

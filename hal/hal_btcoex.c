@@ -202,7 +202,7 @@ static struct btcoexdbginfo GLBtcDbgInfo; /* TODO - Remove global */
 
 static void DBG_BT_INFO_INIT(struct btcoexdbginfo * pinfo, u8 *pbuf, u32 size)
 {
-	if (NULL == pinfo)
+	if (!pinfo)
 		return;
 
 	memset(pinfo, 0, sizeof(struct btcoexdbginfo));
@@ -222,7 +222,7 @@ void DBG_BT_INFO(u8 *dbgmsg)
 
 	pinfo = &GLBtcDbgInfo;
 
-	if (NULL == pinfo->info)
+	if (!pinfo->info)
 		return;
 
 	msglen = strlen(dbgmsg);
@@ -240,7 +240,7 @@ void DBG_BT_INFO(u8 *dbgmsg)
 static u8 halbtcoutsrc_IsBtCoexistAvailable(struct btc_coexist * pBtCoexist)
 {
 	if (!pBtCoexist->bBinded ||
-	    NULL == pBtCoexist->Adapter)
+	    !pBtCoexist->Adapter)
 		return false;
 	return true;
 }
@@ -3287,7 +3287,7 @@ void hal_btcoex_SetDBG(struct adapter * adapt, u32 *pDbgModule)
 	u32 i;
 
 
-	if (NULL == pDbgModule)
+	if (!pDbgModule)
 		return;
 
 	for (i = 0; i < COMP_MAX; i++)
@@ -3301,7 +3301,7 @@ u32 hal_btcoex_GetDBG(struct adapter * adapt, u8 *pStrBuf, u32 bufSize)
 	u32 leftSize;
 
 
-	if ((NULL == pStrBuf) || (0 == bufSize))
+	if ((!pStrBuf) || (0 == bufSize))
 		return 0;
 
 	count = 0;

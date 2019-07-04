@@ -879,7 +879,7 @@ u8 rtw_is_wps_ie(u8 *ie_ptr, uint *wps_ielen)
 	u8 match = false;
 	u8 eid, wps_oui[4] = {0x0, 0x50, 0xf2, 0x04};
 
-	if (ie_ptr == NULL)
+	if (!ie_ptr)
 		return match;
 
 	eid = ie_ptr[0];
@@ -1398,7 +1398,7 @@ void rtw_macaddr_cfg(u8 *out, const u8 *hw_mac_addr)
 #define DEFAULT_RANDOM_MACADDR 1
 	u8 mac[ETH_ALEN];
 
-	if (out == NULL) {
+	if (!out) {
 		rtw_warn_on(1);
 		return;
 	}

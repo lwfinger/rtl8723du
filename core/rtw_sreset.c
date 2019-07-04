@@ -52,7 +52,7 @@ static void sreset_restore_security_station(struct adapter *adapt)
 	if ((adapt->securitypriv.dot11PrivacyAlgrthm == _TKIP_) ||
 	    (adapt->securitypriv.dot11PrivacyAlgrthm == _AES_)) {
 		psta = rtw_get_stainfo(pstapriv, get_bssid(mlmepriv));
-		if (psta == NULL) {
+		if (!psta) {
 			/* DEBUG_ERR( ("Set wpa_set_encryption: Obtain Sta_info fail\n")); */
 		} else {
 			/* pairwise key */
@@ -139,7 +139,7 @@ void sreset_stop_adapter(struct adapter *adapt)
 	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
 	struct xmit_priv	*pxmitpriv = &adapt->xmitpriv;
 
-	if (adapt == NULL)
+	if (!adapt)
 		return;
 
 	RTW_INFO(FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(adapt));
@@ -165,7 +165,7 @@ void sreset_start_adapter(struct adapter *adapt)
 	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
 	struct xmit_priv	*pxmitpriv = &adapt->xmitpriv;
 
-	if (adapt == NULL)
+	if (!adapt)
 		return;
 
 	RTW_INFO(FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(adapt));

@@ -269,7 +269,7 @@ exit:
 
 static void _rtw_free_mlme_priv(struct mlme_priv *pmlmepriv)
 {
-	if (NULL == pmlmepriv) {
+	if (!pmlmepriv) {
 		rtw_warn_on(1);
 		goto exit;
 	}

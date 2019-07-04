@@ -467,7 +467,7 @@ int rtw_recv_monitor(struct adapter *adapt, union recv_frame *precv_frame)
 	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 	struct rx_pkt_attrib *pattrib;
 
-	if (NULL == precv_frame)
+	if (!precv_frame)
 		goto _recv_drop;
 
 	pattrib = &precv_frame->u.hdr.attrib;
