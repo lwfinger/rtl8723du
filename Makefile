@@ -16,33 +16,18 @@ EXTRA_CFLAGS += -I$(src)/include
 
 EXTRA_LDFLAGS += --strip-debug
 
-########################## WIFI IC ############################
-CONFIG_RTL8723D = y
-######################### Interface ###########################
-CONFIG_USB_HCI = y
 ########################## Features ###########################
 CONFIG_EFUSE_CONFIG_FILE = y
 CONFIG_LOAD_PHY_PARA_FROM_FILE = y
-CONFIG_TXPWR_BY_RATE_EN = y
-CONFIG_TXPWR_LIMIT_EN = n
-CONFIG_RTW_CHPLAN = 0xFF
-CONFIG_RTW_ADAPTIVITY_EN = disable
-CONFIG_RTW_ADAPTIVITY_MODE = normal
 CONFIG_RTW_NAPI = y
 CONFIG_RTW_WIFI_HAL = y
 ########################## Debug ###########################
 CONFIG_RTW_DEBUG = y
-# default log level is _DRV_INFO_ = 4,
+# default log level is _DRV_INFO_ = 2,
 # please refer to "How_to_set_driver_debug_log_level.doc" to set the available level.
 CONFIG_RTW_LOG_LEVEL = 2
 ######################## Wake On Lan ##########################
 CONFIG_WAKEUP_TYPE = 0x7 #bit2: deauth, bit1: unicast, bit0: magic pkt.
-CONFIG_WAKEUP_GPIO_IDX = default
-CONFIG_HIGH_ACTIVE = n
-###################### MP HW TX MODE FOR VHT #######################
-CONFIG_MP_VHT_HW_TX_MODE = n
-###################### Platform Related #######################
-CONFIG_PLATFORM_I386_PC = y
 ###############################################################
 
 CONFIG_DRVEXT_MODULE = n
@@ -54,8 +39,8 @@ HCI_NAME = usb
 
 _OS_INTFS_FILES :=	os_dep/osdep_service.o \
 			os_dep/os_intfs.o \
-			os_dep/$(HCI_NAME)_intf.o \
-			os_dep/$(HCI_NAME)_ops_linux.o \
+			os_dep/usb_intf.o \
+			os_dep/usb_ops_linux.o \
 			os_dep/ioctl_linux.o \
 			os_dep/xmit_linux.o \
 			os_dep/mlme_linux.o \
@@ -84,14 +69,8 @@ EXTRA_CFLAGS += -I$(src)/hal
 
 include $(TopDIR)/hal/phydm/phydm.mk
 ########### HAL_RTL8723D #################################
-ifeq ($(CONFIG_RTL8723D), y)
 
-ifeq ($(CONFIG_USB_HCI), y)
 MODULE_NAME = 8723du
-MODULE_SUB_NAME = 8723du
-endif
-
-EXTRA_CFLAGS += -DCONFIG_RTL8723D
 
 _HAL_INTFS_FILES += hal/HalPwrSeqCmd.o hal/Hal8723DPwrSeq.o
 
@@ -105,20 +84,16 @@ _HAL_INTFS_FILES +=	hal/rtl8723d_hal_init.o \
 
 
 _HAL_INTFS_FILES +=	\
-			hal/$(HCI_NAME)_halinit.o \
-			hal/rtl$(MODULE_SUB_NAME)_led.o \
-			hal/rtl$(MODULE_SUB_NAME)_xmit.o \
-			hal/rtl$(MODULE_SUB_NAME)_recv.o
+			hal/usb_halinit.o \
+			hal/rtl8723du_led.o \
+			hal/rtl8723du_xmit.o \
+			hal/rtl8723du_recv.o
 
-_HAL_INTFS_FILES += hal/$(HCI_NAME)_ops.o
+_HAL_INTFS_FILES += hal/usb_ops.o
 
-ifeq ($(CONFIG_USB_HCI), y)
 _HAL_INTFS_FILES +=hal/HalEfuseMask8723D_USB.o
-endif
 _BTC_FILES += hal/halbtc8723d1ant.o \
 				hal/halbtc8723d2ant.o
-
-endif
 
 ########### END OF PATH  #################################
 
@@ -153,69 +128,12 @@ EXTRA_CFLAGS += -DCONFIG_LOAD_PHY_PARA_FROM_FILE
 EXTRA_CFLAGS += -DREALTEK_CONFIG_PATH=\"/lib/firmware/\"
 endif
 
-ifeq ($(CONFIG_TXPWR_BY_RATE_EN), n)
-EXTRA_CFLAGS += -DCONFIG_TXPWR_BY_RATE_EN=0
-else ifeq ($(CONFIG_TXPWR_BY_RATE_EN), y)
-EXTRA_CFLAGS += -DCONFIG_TXPWR_BY_RATE_EN=1
-else ifeq ($(CONFIG_TXPWR_BY_RATE_EN), auto)
-EXTRA_CFLAGS += -DCONFIG_TXPWR_BY_RATE_EN=2
-endif
-
-ifeq ($(CONFIG_TXPWR_LIMIT_EN), n)
-EXTRA_CFLAGS += -DCONFIG_TXPWR_LIMIT_EN=0
-else ifeq ($(CONFIG_TXPWR_LIMIT_EN), y)
-EXTRA_CFLAGS += -DCONFIG_TXPWR_LIMIT_EN=1
-else ifeq ($(CONFIG_TXPWR_LIMIT_EN), auto)
-EXTRA_CFLAGS += -DCONFIG_TXPWR_LIMIT_EN=2
-endif
-
-ifneq ($(CONFIG_RTW_CHPLAN), 0xFF)
-EXTRA_CFLAGS += -DCONFIG_RTW_CHPLAN=$(CONFIG_RTW_CHPLAN)
-endif
-
-ifeq ($(CONFIG_CALIBRATE_TX_POWER_BY_REGULATORY), y)
-EXTRA_CFLAGS += -DCONFIG_CALIBRATE_TX_POWER_BY_REGULATORY
-endif
-
-ifeq ($(CONFIG_CALIBRATE_TX_POWER_TO_MAX), y)
-EXTRA_CFLAGS += -DCONFIG_CALIBRATE_TX_POWER_TO_MAX
-endif
-
-ifeq ($(CONFIG_RTW_ADAPTIVITY_EN), disable)
-EXTRA_CFLAGS += -DCONFIG_RTW_ADAPTIVITY_EN=0
-else ifeq ($(CONFIG_RTW_ADAPTIVITY_EN), enable)
-EXTRA_CFLAGS += -DCONFIG_RTW_ADAPTIVITY_EN=1
-endif
-
-ifeq ($(CONFIG_RTW_ADAPTIVITY_MODE), normal)
-EXTRA_CFLAGS += -DCONFIG_RTW_ADAPTIVITY_MODE=0
-else ifeq ($(CONFIG_RTW_ADAPTIVITY_MODE), carrier_sense)
-EXTRA_CFLAGS += -DCONFIG_RTW_ADAPTIVITY_MODE=1
-endif
-
-EXTRA_CFLAGS += -DHIGH_ACTIVE=0
-
-ifneq ($(CONFIG_WAKEUP_GPIO_IDX), default)
-EXTRA_CFLAGS += -DWAKEUP_GPIO_IDX=$(CONFIG_WAKEUP_GPIO_IDX)
-endif
-
 ifeq ($(CONFIG_RTW_NAPI), y)
 EXTRA_CFLAGS += -DCONFIG_RTW_NAPI
 endif
 
 ifeq ($(CONFIG_RTW_WIFI_HAL), y)
 EXTRA_CFLAGS += -DCONFIG_RTW_WIFI_HAL
-endif
-
-ifeq ($(CONFIG_MP_VHT_HW_TX_MODE), y)
-EXTRA_CFLAGS += -DCONFIG_MP_VHT_HW_TX_MODE
-ifeq ($(CONFIG_PLATFORM_I386_PC), y)
-## For I386 X86 ToolChain use Hardware FLOATING
-EXTRA_CFLAGS += -mhard-float
-else
-## For ARM ToolChain use Hardware FLOATING
-EXTRA_CFLAGS += -mfloat-abi=hard
-endif
 endif
 
 ifeq ($(CONFIG_RTW_DEBUG), y)
@@ -225,8 +143,6 @@ endif
 
 EXTRA_CFLAGS += -DDM_ODM_SUPPORT_TYPE=0x04
 
-ifeq ($(CONFIG_PLATFORM_I386_PC), y)
-EXTRA_CFLAGS += -DCONFIG_IOCTL_CFG80211
 SUBARCH := $(shell uname -m | sed -e s/i.86/i386/)
 ARCH ?= $(SUBARCH)
 CROSS_COMPILE ?=
@@ -235,7 +151,6 @@ KSRC := /lib/modules/$(KVER)/build
 MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/net/wireless/
 INSTALL_PREFIX :=
 STAGINGMODDIR := /lib/modules/$(KVER)/kernel/drivers/staging
-endif
 
 USER_MODULE_NAME ?=
 ifneq ($(USER_MODULE_NAME),)
@@ -279,11 +194,9 @@ $(MODULE_NAME)-y += $(_PHYDM_FILES)
 $(MODULE_NAME)-y += $(_BTC_FILES)
 $(MODULE_NAME)-y += $(_PLATFORM_FILES)
 
-obj-$(CONFIG_RTL8723DU) := $(MODULE_NAME).o
+obj-m := $(MODULE_NAME).o
 
 else
-
-export CONFIG_RTL8723DU = m
 
 all: modules
 
@@ -344,8 +257,8 @@ config_r:
 
 clean:
 	#$(MAKE) -C $(KSRC) M=$(shell pwd) clean
-	cd hal ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d
-	cd hal ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	cd hal ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d .*.cmd
+	cd hal/phydm ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
 	cd core ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
 	cd os_dep ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
 	cd os_dep/linux ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d

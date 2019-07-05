@@ -76,10 +76,7 @@
 	#define CONFIG_IEEE80211_HT_ADDT_INFO
 #endif
 
-#ifdef CONFIG_IOCTL_CFG80211
-	/*	#include <linux/ieee80211.h> */
-	#include <net/cfg80211.h>
-#endif /* CONFIG_IOCTL_CFG80211 */
+#include <net/cfg80211.h>
 
 #ifdef CONFIG_TCP_CSUM_OFFLOAD_TX
 	#include <linux/in.h>

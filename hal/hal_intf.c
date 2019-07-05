@@ -552,7 +552,6 @@ bool rtw_hal_c2h_reg_hdr_parse(struct adapter *adapter, u8 *buf, u8 *id, u8 *seq
 }
 #endif /* CONFIG_FW_C2H_REG */
 
-#ifdef CONFIG_FW_C2H_PKT
 bool rtw_hal_c2h_pkt_hdr_parse(struct adapter *adapter, u8 *buf, u16 len, u8 *id, u8 *seq, u8 *plen, u8 **payload)
 {
 	struct hal_com_data *HalData = GET_HAL_DATA(adapter);
@@ -571,7 +570,6 @@ bool rtw_hal_c2h_pkt_hdr_parse(struct adapter *adapter, u8 *buf, u16 len, u8 *id
 exit:
 	return ret;
 }
-#endif /* CONFIG_FW_C2H_PKT */
 
 int c2h_handler(struct adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 {
@@ -582,7 +580,6 @@ int c2h_handler(struct adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 	case C2H_FW_SCAN_COMPLETE:
 		RTW_INFO("[C2H], FW Scan Complete\n");
 		break;
-
 	case C2H_BT_INFO:
 		rtw_btcoex_BtInfoNotify(adapter, plen, payload);
 		break;
@@ -595,24 +592,18 @@ int c2h_handler(struct adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 	case C2H_WLAN_INFO:
 		rtw_btcoex_WlFwDbgInfoNotify(adapter, payload, plen);
 		break;
-
 	case C2H_IQK_FINISH:
 		c2h_iqk_offload(adapter, payload, plen);
 		break;
-
-#ifdef CONFIG_RTW_MAC_HIDDEN_RPT
 	case C2H_MAC_HIDDEN_RPT:
 		c2h_mac_hidden_rpt_hdl(adapter, payload, plen);
 		break;
 	case C2H_MAC_HIDDEN_RPT_2:
 		c2h_mac_hidden_rpt_2_hdl(adapter, payload, plen);
 		break;
-#endif
-
 	case C2H_DEFEATURE_DBG:
 		c2h_defeature_dbg_hdl(adapter, payload, plen);
 		break;
-
 	case C2H_CUSTOMER_STR_RPT:
 		c2h_customer_str_rpt_hdl(adapter, payload, plen);
 		break;
@@ -621,8 +612,7 @@ int c2h_handler(struct adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 		break;
 	case C2H_EXTEND:
 		sub_id = payload[0];
-		/* no handle, goto default */
-
+		/* fall thru here */
 	default:
 		if (!phydm_c2H_content_parsing(adapter_to_phydm(adapter), id, plen, payload))
 			ret = _FAIL;
@@ -636,7 +626,6 @@ exit:
 		else
 			RTW_WARN("%s: unknown C2H(0x%02x)\n", __func__, id);
 	}
-
 	return ret;
 }
 

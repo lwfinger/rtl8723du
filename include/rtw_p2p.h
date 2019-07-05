@@ -54,12 +54,9 @@ void	process_p2p_ps_ie(struct adapter * adapt, u8 *IEs, u32 IELength);
 void	p2p_ps_wk_hdl(struct adapter *adapt, u8 p2p_ps_state);
 u8	p2p_ps_wk_cmd(struct adapter *adapt, u8 p2p_ps_state, u8 enqueue);
 
-#ifdef CONFIG_IOCTL_CFG80211
 u8 roch_stay_in_cur_chan(struct adapter *adapt);
 void rtw_init_cfg80211_wifidirect_info(struct adapter	*adapt);
 int rtw_p2p_check_frames(struct adapter *adapt, const u8 *buf, u32 len, u8 tx);
-#endif /* CONFIG_IOCTL_CFG80211 */
-
 void reset_global_wifidirect_info(struct adapter *adapt);
 void rtw_init_wifidirect_timers(struct adapter *adapt);
 void rtw_init_wifidirect_addrs(struct adapter *adapt, u8 *dev_addr, u8 *iface_addr);

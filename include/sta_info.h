@@ -303,10 +303,8 @@ struct sta_info {
 
 	u8 keep_alive_trycnt;
 
-#ifdef CONFIG_IOCTL_CFG80211
 	u8 *passoc_req;
 	u32 assoc_req_len;
-#endif
 
 	u8		IOTPeer;			/* Enum value.	enum ht_iot_peer */
 

@@ -4,9 +4,7 @@
 #define _RTW_MLME_EXT_C_
 
 #include <drv_types.h>
-#ifdef CONFIG_IOCTL_CFG80211
-	#include <rtw_wifi_regd.h>
-#endif /* CONFIG_IOCTL_CFG80211 */
+#include <rtw_wifi_regd.h>
 #include <hal_data.h>
 
 
@@ -1081,13 +1079,11 @@ static void init_mlme_ext_priv_value(struct adapter *adapt)
 	pmlmeext->sitesurvey_res.scan_ch_ms = SURVEY_TO;
 	pmlmeext->sitesurvey_res.rx_ampdu_accept = RX_AMPDU_ACCEPT_INVALID;
 	pmlmeext->sitesurvey_res.rx_ampdu_size = RX_AMPDU_SIZE_INVALID;
-#ifdef CONFIG_SCAN_BACKOP
 	mlmeext_assign_scan_backop_flags_sta(pmlmeext, /*SS_BACKOP_EN|*/SS_BACKOP_PS_ANNC | SS_BACKOP_TX_RESUME);
 	mlmeext_assign_scan_backop_flags_ap(pmlmeext, SS_BACKOP_EN | SS_BACKOP_PS_ANNC | SS_BACKOP_TX_RESUME);
 	pmlmeext->sitesurvey_res.scan_cnt = 0;
 	pmlmeext->sitesurvey_res.scan_cnt_max = RTW_SCAN_NUM_OF_CH;
 	pmlmeext->sitesurvey_res.backop_ms = RTW_BACK_OP_CH_MS;
-#endif
 #if defined(DBG_SCAN_SW_ANTDIV_BL)
 	pmlmeext->sitesurvey_res.is_sw_antdiv_bl_scan = 0;
 #endif
@@ -1285,7 +1281,6 @@ static u32 p2p_listen_state_process(struct adapter *adapt, unsigned char *da)
 {
 	bool response = true;
 
-#ifdef CONFIG_IOCTL_CFG80211
 	if (adapt->wdinfo.driver_interface == DRIVER_CFG80211) {
 		if (!rtw_cfg80211_get_is_roch(adapt) ||
 		    rtw_get_oper_ch(adapt) !=
@@ -1296,7 +1291,6 @@ static u32 p2p_listen_state_process(struct adapter *adapt, unsigned char *da)
 			response = false;
 		}
 	} else
-#endif /* CONFIG_IOCTL_CFG80211 */
 		if (adapt->wdinfo.driver_interface == DRIVER_WEXT) {
 			/*	do nothing if the device name is empty */
 			if (!adapt->wdinfo.device_name_len)
@@ -1332,7 +1326,6 @@ unsigned int OnProbeReq(struct adapter *adapt, union recv_frame *precv_frame)
 	struct rx_pkt_attrib	*pattrib = &precv_frame->u.hdr.attrib;
 	u8 wifi_test_chk_rate = 1;
 
-#ifdef CONFIG_IOCTL_CFG80211
 	if ((pwdinfo->driver_interface == DRIVER_CFG80211)
 	    && !rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE)
 	    && (GET_CFG80211_REPORT_MGMT(adapter_wdev_data(adapt), IEEE80211_STYPE_PROBE_REQ))
@@ -1340,7 +1333,6 @@ unsigned int OnProbeReq(struct adapter *adapt, union recv_frame *precv_frame)
 		rtw_cfg80211_rx_probe_request(adapt, precv_frame);
 		return _SUCCESS;
 	}
-#endif /* CONFIG_IOCTL_CFG80211 */
 
 	if (!rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE) &&
 	    !rtw_p2p_chk_state(pwdinfo, P2P_STATE_IDLE) &&
@@ -2241,7 +2233,6 @@ unsigned int OnAssocReq(struct adapter *adapt, union recv_frame *precv_frame)
 		else
 			issue_asocrsp(adapt, status, pstat, WIFI_REASSOCRSP);
 
-#ifdef CONFIG_IOCTL_CFG80211
 		_enter_critical_bh(&pstat->lock, &irqL);
 		if (pstat->passoc_req) {
 			rtw_mfree(pstat->passoc_req, pstat->assoc_req_len);
@@ -2255,7 +2246,6 @@ unsigned int OnAssocReq(struct adapter *adapt, union recv_frame *precv_frame)
 			pstat->assoc_req_len = pkt_len;
 		}
 		_exit_critical_bh(&pstat->lock, &irqL);
-#endif /* CONFIG_IOCTL_CFG80211 */
 #ifdef CONFIG_IEEE80211W
 		if (!pstat->bpairwise_key_installed)
 #endif /* CONFIG_IEEE80211W */
@@ -2682,10 +2672,8 @@ unsigned int on_action_wnm(struct adapter *adapter, union recv_frame *rframe)
 		break;
 #endif		
 	default:
-		#ifdef CONFIG_IOCTL_CFG80211
 		cnt += sprintf((msg + cnt), "ACT_WNM %u", action);
 		rtw_cfg80211_rx_action(adapter, rframe, msg);
-		#endif
 		ret = _SUCCESS;
 		break;
 	}
@@ -4903,7 +4891,6 @@ void issue_probersp_p2p(struct adapter *adapt, unsigned char *da)
 	/* DS parameter set */
 	pframe = rtw_set_ie(pframe, _DSSET_IE_, 1, (unsigned char *)&pwdinfo->listen_channel, &pattrib->pktlen);
 
-#ifdef CONFIG_IOCTL_CFG80211
 	if (adapter_wdev_data(adapt)->p2p_enabled && pwdinfo->driver_interface == DRIVER_CFG80211) {
 		if (pmlmepriv->wps_probe_resp_ie && pmlmepriv->p2p_probe_resp_ie) {
 			/* WPS IE */
@@ -4916,10 +4903,7 @@ void issue_probersp_p2p(struct adapter *adapt, unsigned char *da)
 			pattrib->pktlen += pmlmepriv->p2p_probe_resp_ie_len;
 			pframe += pmlmepriv->p2p_probe_resp_ie_len;
 		}
-	} else
-#endif /* CONFIG_IOCTL_CFG80211		 */
-	{
-
+	} else {
 		/*	Todo: WPS IE */
 		/*	Noted by Albert 20100907 */
 		/*	According to the WPS specification, all the WPS attribute is presented by Big Endian. */
@@ -5211,7 +5195,6 @@ static int _issue_probereq_p2p(struct adapter *adapt, u8 *da, int wait_ack)
 	/*	Use the OFDM rate in the P2P probe request frame. ( 6(B), 9(B), 12(B), 24(B), 36, 48, 54 ) */
 	pframe = rtw_set_ie(pframe, _SUPPORTEDRATES_IE_, 8, pwdinfo->support_rate, &pattrib->pktlen);
 
-#ifdef CONFIG_IOCTL_CFG80211
 	if (adapter_wdev_data(adapt)->p2p_enabled && pwdinfo->driver_interface == DRIVER_CFG80211) {
 		if (pmlmepriv->wps_probe_req_ie && pmlmepriv->p2p_probe_req_ie) {
 			/* WPS IE */
@@ -5224,10 +5207,7 @@ static int _issue_probereq_p2p(struct adapter *adapt, u8 *da, int wait_ack)
 			pattrib->pktlen += pmlmepriv->p2p_probe_req_ie_len;
 			pframe += pmlmepriv->p2p_probe_req_ie_len;
 		}
-	} else
-#endif /* CONFIG_IOCTL_CFG80211 */
-	{
-
+	} else {
 		/*	WPS IE */
 		/*	Noted by Albert 20110221 */
 		/*	According to the WPS specification, all the WPS attribute is presented by Big Endian. */
@@ -5542,12 +5522,10 @@ static unsigned int on_action_public_p2p(union recv_frame *precv_frame)
 	frame_body = (unsigned char *)(pframe + sizeof(struct rtw_ieee80211_hdr_3addr));
 
 	_cancel_timer_ex(&pwdinfo->reset_ch_sitesurvey);
-#ifdef CONFIG_IOCTL_CFG80211
-	if (adapter_wdev_data(adapt)->p2p_enabled && pwdinfo->driver_interface == DRIVER_CFG80211)
+	if (adapter_wdev_data(adapt)->p2p_enabled &&
+	    pwdinfo->driver_interface == DRIVER_CFG80211) {
 		rtw_cfg80211_rx_p2p_action_public(adapt, precv_frame);
-	else
-#endif /* CONFIG_IOCTL_CFG80211 */
-	{
+	} else {
 		/*	Do nothing if the driver doesn't enable the P2P function. */
 		if (rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE) || rtw_p2p_chk_state(pwdinfo, P2P_STATE_IDLE))
 			return _SUCCESS;
@@ -5929,13 +5907,9 @@ static unsigned int on_action_public_default(union recv_frame *precv_frame, u8 a
 	if (rtw_action_public_decache(precv_frame, 2) == _FAIL)
 		goto exit;
 
-#ifdef CONFIG_IOCTL_CFG80211
 	cnt += sprintf((msg + cnt), "%s(token:%u)", action_public_str(action), token);
 	rtw_cfg80211_rx_action(adapter, precv_frame, msg);
-#endif
-
 	ret = _SUCCESS;
-
 exit:
 	return ret;
 }
@@ -6641,15 +6615,12 @@ unsigned int OnAction_p2p(struct adapter *adapt, union recv_frame *precv_frame)
 	if (be32_to_cpu(*((__be32 *)(frame_body + 1))) != P2POUI)
 		return _SUCCESS;
 
-#ifdef CONFIG_IOCTL_CFG80211
 	if (adapter_wdev_data(adapt)->p2p_enabled
 		&& pwdinfo->driver_interface == DRIVER_CFG80211
 	) {
 		rtw_cfg80211_rx_action_p2p(adapt, precv_frame);
 		return _SUCCESS;
-	} else
-#endif /* CONFIG_IOCTL_CFG80211 */
-	{
+	} else {
 		len -= sizeof(struct rtw_ieee80211_hdr_3addr);
 		OUI_Subtype = frame_body[5];
 		dialogToken = frame_body[6];
@@ -6678,7 +6649,6 @@ unsigned int OnAction_p2p(struct adapter *adapt, union recv_frame *precv_frame)
 
 		}
 	}
-
 	return _SUCCESS;
 }
 
@@ -7054,7 +7024,6 @@ void issue_beacon(struct adapter *adapt, int timeout_ms)
 
 			remainder_ielen = cur_network->IELength - wps_offset - wpsielen;
 
-#ifdef CONFIG_IOCTL_CFG80211
 			if (adapter_wdev_data(adapt)->p2p_enabled && pwdinfo->driver_interface == DRIVER_CFG80211) {
 				if (pmlmepriv->wps_beacon_ie && pmlmepriv->wps_beacon_ie_len > 0) {
 					memcpy(pframe, cur_network->IEs, wps_offset);
@@ -7074,9 +7043,7 @@ void issue_beacon(struct adapter *adapt, int timeout_ms)
 					pframe += cur_network->IELength;
 					pattrib->pktlen += cur_network->IELength;
 				}
-			} else
-#endif /* CONFIG_IOCTL_CFG80211 */
-			{
+			} else {
 				pframe_wscie = pframe + wps_offset;
 				memcpy(pframe, cur_network->IEs, wps_offset + wpsielen);
 				pframe += (wps_offset + wpsielen);
@@ -7160,14 +7127,12 @@ void issue_beacon(struct adapter *adapt, int timeout_ms)
 
 		if (rtw_p2p_chk_role(pwdinfo, P2P_ROLE_GO)) {
 			u32 len;
-#ifdef CONFIG_IOCTL_CFG80211
+
 			if (adapter_wdev_data(adapt)->p2p_enabled && pwdinfo->driver_interface == DRIVER_CFG80211) {
 				len = pmlmepriv->p2p_beacon_ie_len;
 				if (pmlmepriv->p2p_beacon_ie && len > 0)
 					memcpy(pframe, pmlmepriv->p2p_beacon_ie, len);
-			} else
-#endif /* CONFIG_IOCTL_CFG80211 */
-			{
+			} else {
 				len = build_beacon_p2p_ie(pwdinfo, pframe);
 			}
 
@@ -7442,15 +7407,12 @@ void issue_probersp(struct adapter *adapt, unsigned char *da, u8 is_valid_p2p_pr
 	    /* IOT issue, When wifi_spec is not set, send probe_resp with P2P IE even if probe_req has no P2P IE */
 	    && (is_valid_p2p_probereq || !adapt->registrypriv.wifi_spec)) {
 		u32 len;
-#ifdef CONFIG_IOCTL_CFG80211
 		if (adapter_wdev_data(adapt)->p2p_enabled && pwdinfo->driver_interface == DRIVER_CFG80211) {
 			/* if pwdinfo->role == P2P_ROLE_DEVICE will call issue_probersp_p2p() */
 			len = pmlmepriv->p2p_go_probe_resp_ie_len;
 			if (pmlmepriv->p2p_go_probe_resp_ie && len > 0)
 				memcpy(pframe, pmlmepriv->p2p_go_probe_resp_ie, len);
-		} else
-#endif /* CONFIG_IOCTL_CFG80211 */
-		{
+		} else {
 			len = build_probe_resp_p2p_ie(pwdinfo, pframe);
 		}
 
@@ -8184,16 +8146,13 @@ void _issue_assocreq(struct adapter *adapt, u8 is_reassoc)
 	if (pmlmeinfo->assoc_AP_vendor == HT_IOT_PEER_REALTEK)
 		pframe = rtw_set_ie(pframe, _VENDOR_SPECIFIC_IE_, 6 , REALTEK_96B_IE, &(pattrib->pktlen));
 
-#ifdef CONFIG_IOCTL_CFG80211
 	if (adapter_wdev_data(adapt)->p2p_enabled && pwdinfo->driver_interface == DRIVER_CFG80211) {
 		if (pmlmepriv->p2p_assoc_req_ie && pmlmepriv->p2p_assoc_req_ie_len > 0) {
 			memcpy(pframe, pmlmepriv->p2p_assoc_req_ie, pmlmepriv->p2p_assoc_req_ie_len);
 			pframe += pmlmepriv->p2p_assoc_req_ie_len;
 			pattrib->pktlen += pmlmepriv->p2p_assoc_req_ie_len;
 		}
-	} else
-#endif /* CONFIG_IOCTL_CFG80211 */
-	{
+	} else {
 		if (!rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE) && !rtw_p2p_chk_state(pwdinfo, P2P_STATE_IDLE)) {
 			/*	Should add the P2P IE in the association request frame.	 */
 			/*	P2P OUI */
@@ -10930,12 +10889,6 @@ void mlmeext_joinbss_event_callback(struct adapter *adapt, int join_res)
 			the subsequent data frames can be sent out normally */
 		rtw_hal_macid_wakeup(adapt, psta->cmn.mac_id);
 	}
-
-#ifndef CONFIG_IOCTL_CFG80211
-	if (is_wep_enc(psecuritypriv->dot11PrivacyAlgrthm))
-		rtw_sec_restore_wep_key(adapt);
-#endif /* CONFIG_IOCTL_CFG80211 */
-
 	if (rtw_port_switch_chk(adapt))
 		rtw_hal_set_hwreg(adapt, HW_VAR_PORT_SWITCH, NULL);
 
@@ -10945,14 +10898,8 @@ void mlmeext_joinbss_event_callback(struct adapter *adapt, int join_res)
 	if ((pmlmeinfo->state & 0x03) == WIFI_FW_STATION_STATE) {
 		/* correcting TSF */
 		correct_TSF(adapt, pmlmeext);
-
-		/* set_link_timer(pmlmeext, DISCONNECT_TO); */
 	}
-
-	#ifndef CONFIG_FW_MULTI_PORT_SUPPORT
-	if (get_hw_port(adapt) == HW_PORT0)
-	#endif
-		rtw_lps_ctrl_wk_cmd(adapt, LPS_CTRL_CONNECT, 0);
+	rtw_lps_ctrl_wk_cmd(adapt, LPS_CTRL_CONNECT, 0);
 
 exit_mlmeext_joinbss_event_callback:
 
@@ -12380,11 +12327,8 @@ u32 rtw_scan_timeout_decision(struct adapter *adapt)
 	else
 		max_chan_num = MAX_CHANNEL_NUM_2G;/*single band*/
 
-	#ifdef CONFIG_SCAN_BACKOP
 	if (rtw_mi_buddy_check_mlmeinfo_state(adapt, WIFI_FW_AP_STATE))
 		back_op_times = (max_chan_num / ss->scan_cnt_max) * ss->backop_ms;
-	#endif
-
 	if (ss->duration)
 		scan_ms = ss->duration;
 	else
@@ -12474,9 +12418,7 @@ static void sitesurvey_res_reset(struct adapter *adapter, struct sitesurvey_parm
 #endif
 	ss->igi_scan = 0;
 	ss->igi_before_scan = 0;
-#ifdef CONFIG_SCAN_BACKOP
 	ss->scan_cnt = 0;
-#endif
 #if defined(DBG_SCAN_SW_ANTDIV_BL)
 	ss->is_sw_antdiv_bl_scan = 0;
 #endif
@@ -12565,32 +12507,28 @@ static u8 sitesurvey_pick_ch_behavior(struct adapter *adapt, u8 *ch, enum rt_sca
 	}
 
 	if (scan_ch != 0) {
+		struct mi_state mstate;
+		u8 backop_flags = 0;
+
 		next_state = SCAN_PROCESS;
-#ifdef CONFIG_SCAN_BACKOP
-		{
-			struct mi_state mstate;
-			u8 backop_flags = 0;
+		rtw_mi_status(adapt, &mstate);
 
-			rtw_mi_status(adapt, &mstate);
+		if ((MSTATE_STA_LD_NUM(&mstate) && mlmeext_chk_scan_backop_flags_sta(pmlmeext, SS_BACKOP_EN))
+			|| (MSTATE_STA_NUM(&mstate) && mlmeext_chk_scan_backop_flags_sta(pmlmeext, SS_BACKOP_EN_NL)))
+			backop_flags |= mlmeext_scan_backop_flags_sta(pmlmeext);
 
-			if ((MSTATE_STA_LD_NUM(&mstate) && mlmeext_chk_scan_backop_flags_sta(pmlmeext, SS_BACKOP_EN))
-				|| (MSTATE_STA_NUM(&mstate) && mlmeext_chk_scan_backop_flags_sta(pmlmeext, SS_BACKOP_EN_NL)))
-				backop_flags |= mlmeext_scan_backop_flags_sta(pmlmeext);
+		if ((MSTATE_AP_LD_NUM(&mstate) && mlmeext_chk_scan_backop_flags_ap(pmlmeext, SS_BACKOP_EN))
+			|| (MSTATE_AP_NUM(&mstate) && mlmeext_chk_scan_backop_flags_ap(pmlmeext, SS_BACKOP_EN_NL)))
+			backop_flags |= mlmeext_scan_backop_flags_ap(pmlmeext);
 
-			if ((MSTATE_AP_LD_NUM(&mstate) && mlmeext_chk_scan_backop_flags_ap(pmlmeext, SS_BACKOP_EN))
-				|| (MSTATE_AP_NUM(&mstate) && mlmeext_chk_scan_backop_flags_ap(pmlmeext, SS_BACKOP_EN_NL)))
-				backop_flags |= mlmeext_scan_backop_flags_ap(pmlmeext);
-
-			if (backop_flags) {
-				if (ss->scan_cnt < ss->scan_cnt_max)
-					ss->scan_cnt++;
-				else {
-					mlmeext_assign_scan_backop_flags(pmlmeext, backop_flags);
-					next_state = SCAN_BACKING_OP;
-				}
+		if (backop_flags) {
+			if (ss->scan_cnt < ss->scan_cnt_max) {
+				ss->scan_cnt++;
+			} else {
+				mlmeext_assign_scan_backop_flags(pmlmeext, backop_flags);
+				next_state = SCAN_BACKING_OP;
 			}
 		}
-#endif /* CONFIG_SCAN_BACKOP */
 	} else if (rtw_p2p_findphase_ex_is_needed(pwdinfo)) {
 		/* go p2p listen */
 		next_state = SCAN_TO_P2P_LISTEN;
@@ -12621,11 +12559,8 @@ static u8 sitesurvey_pick_ch_behavior(struct adapter *adapt, u8 *ch, enum rt_sca
 		}
 #endif /* defined(DBG_SCAN_SW_ANTDIV_BL) */
 	}
-
-#ifdef CONFIG_SCAN_BACKOP
 	if (next_state != SCAN_PROCESS)
 		ss->scan_cnt = 0;
-#endif
 	if (ch)
 		*ch = scan_ch;
 	if (type)
@@ -12651,13 +12586,7 @@ void site_survey(struct adapter *adapt, u8 survey_channel, enum rt_scan_type Sca
 		else
 #endif
 		if (ScanType == SCAN_ACTIVE) {
-			#ifdef CONFIG_IOCTL_CFG80211
-			if (rtw_cfg80211_is_p2p_scan(adapt))
-			#else
-			if (rtw_p2p_chk_state(pwdinfo, P2P_STATE_SCAN)
-				|| rtw_p2p_chk_state(pwdinfo, P2P_STATE_FIND_PHASE_SEARCH))
-			#endif
-			{
+			if (rtw_cfg80211_is_p2p_scan(adapt)) {
 				issue_probereq_p2p(adapt, NULL);
 				issue_probereq_p2p(adapt, NULL);
 				issue_probereq_p2p(adapt, NULL);
@@ -12714,12 +12643,8 @@ static void survey_done_set_ch_bw(struct adapter *adapt)
 			iface = dvobj->adapters[i];
 			if (!iface)
 				continue;
-
-#ifdef CONFIG_IOCTL_CFG80211
 			if (iface->wdinfo.driver_interface == DRIVER_CFG80211 && !adapter_wdev_data(iface)->p2p_enabled)
 				continue;
-#endif
-
 			if (rtw_p2p_chk_state(&iface->wdinfo, P2P_STATE_LISTEN)) {
 				cur_channel = iface->wdinfo.listen_channel;
 				cur_bwmode = CHANNEL_WIDTH_20;
@@ -12817,15 +12742,11 @@ static void sitesurvey_set_igi(struct adapter *adapter)
 
 	switch (mlmeext_scan_state(mlmeext)) {
 	case SCAN_ENTER:
-		#ifdef CONFIG_IOCTL_CFG80211
 		if (pwdinfo->driver_interface == DRIVER_CFG80211 && rtw_cfg80211_is_p2p_scan(adapter))
 			igi = 0x30;
-		else
-		#endif /* CONFIG_IOCTL_CFG80211 */
-		if (!rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE))
+		else if (!rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE))
 			igi = 0x28;
-		else
-		if (ss->igi)
+		else if (ss->igi)
 			igi = ss->igi;
 		else
 			igi = 0x1e;
@@ -12843,7 +12764,6 @@ static void sitesurvey_set_igi(struct adapter *adapter)
 		igi = 0xff;
 		rtw_hal_set_odm_var(adapter, HAL_ODM_INITIAL_GAIN, &igi, false);
 		break;
-#ifdef CONFIG_SCAN_BACKOP
 	case SCAN_BACKING_OP:
 		/* write IGI for op channel when DIG is not enabled */
 		odm_write_dig(adapter_to_phydm(adapter), ss->igi_before_scan);
@@ -12852,7 +12772,6 @@ static void sitesurvey_set_igi(struct adapter *adapter)
 		/* write IGI for scan when DIG is not enabled */
 		odm_write_dig(adapter_to_phydm(adapter), ss->igi_scan);
 		break;
-#endif /* CONFIG_SCAN_BACKOP */
 	default:
 		rtw_warn_on(1);
 		break;
@@ -13013,8 +12932,6 @@ operation_by_state:
 		set_survey_timer(pmlmeext, scan_ms);
 		break;
 	}
-
-#ifdef CONFIG_SCAN_BACKOP
 	case SCAN_BACKING_OP: {
 		u8 back_ch, back_bw, back_ch_offset;
 		u8 need_ch_setting_union = true;
@@ -13045,7 +12962,6 @@ operation_by_state:
 
 		goto operation_by_state;
 	}
-
 	case SCAN_BACK_OP:
 		if (rtw_get_passing_time_ms(ss->backop_time) >= ss->backop_ms
 		    || pmlmeext->scan_abort
@@ -13055,34 +12971,26 @@ operation_by_state:
 		}
 		set_survey_timer(pmlmeext, 50);
 		break;
-
 	case SCAN_LEAVING_OP:
-		/*
-		 * prepare to leave operating channel
-		 */
-
+		/* prepare to leave operating channel */
 		/* clear HW TX queue before scan */
 		rtw_hal_set_hwreg(adapt, HW_VAR_CHECK_TXBUF, NULL);
 
 		rtw_hal_macid_sleep_all_used(adapt);
-		if (mlmeext_chk_scan_backop_flags(pmlmeext, SS_BACKOP_PS_ANNC)
-			&& rtw_ps_annc(adapt, 1)
-		) {
+		if (mlmeext_chk_scan_backop_flags(pmlmeext,
+						  SS_BACKOP_PS_ANNC) &&
+						  rtw_ps_annc(adapt, 1)) {
 			mlmeext_set_scan_state(pmlmeext, SCAN_PS_ANNC_WAIT);
 			mlmeext_set_scan_next_state(pmlmeext, SCAN_LEAVE_OP);
-			set_survey_timer(pmlmeext, 50); /* delay 50ms to protect nulldata(1) */
+			/* delay 50ms to protect nulldata(1) */
+			set_survey_timer(pmlmeext, 50);
 		} else {
 			mlmeext_set_scan_state(pmlmeext, SCAN_LEAVE_OP);
 			goto operation_by_state;
 		}
-
 		break;
-
 	case SCAN_LEAVE_OP:
-		/*
-		* HW register and DM setting for enter scan
-		*/
-
+		/* HW register and DM setting for enter scan */
 		if (mlmeext_chk_scan_backop_flags(pmlmeext, SS_BACKOP_PS_ANNC))
 			sitesurvey_set_igi(adapt);
 
@@ -13093,9 +13001,6 @@ operation_by_state:
 
 		mlmeext_set_scan_state(pmlmeext, SCAN_PROCESS);
 		goto operation_by_state;
-
-#endif /* CONFIG_SCAN_BACKOP */
-
 #if defined(DBG_SCAN_SW_ANTDIV_BL)
 	case SCAN_SW_ANTDIV_BL:
 		/*
@@ -13788,7 +13693,7 @@ void rtw_join_done_chk_ch(struct adapter *adapter, int join_res)
 					rtw_start_bss_hdl_after_chbw_decided(iface);
 
 					if (MLME_IS_GO(iface) || MLME_IS_MESH(iface)) { /* pure AP is not needed*/
-						#if defined(CONFIG_IOCTL_CFG80211) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 5, 0))
+						#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 5, 0)
 						rtw_cfg80211_ch_switch_notify(iface
 							, mlmeext->cur_channel, mlmeext->cur_bwmode, mlmeext->cur_ch_offset
 							, mlme->htpriv.ht_option);
@@ -14015,13 +13920,8 @@ u8 set_chplan_hdl(struct adapter *adapt, unsigned char *pbuf)
 #ifdef CONFIG_TXPWR_LIMIT
 	rtw_txpwr_init_regd(rfctl);
 #endif
-
 	rtw_hal_set_odm_var(adapt, HAL_ODM_REGULATION, NULL, true);
-
-#ifdef CONFIG_IOCTL_CFG80211
 	rtw_reg_notify_by_driver(adapt);
-#endif /* CONFIG_IOCTL_CFG80211 */
-
 	return	H2C_SUCCESS;
 }
 

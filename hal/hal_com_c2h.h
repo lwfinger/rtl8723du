@@ -72,7 +72,6 @@ void c2h_iqk_offload(struct adapter *adapter, u8 *data, u8 len);
 int	c2h_iqk_offload_wait(struct adapter *adapter, u32 timeout_ms);
 #define rtl8812_iqk_wait c2h_iqk_offload_wait /* TODO: remove this after phydm call c2h_iqk_offload_wait instead */
 
-#ifdef CONFIG_RTW_MAC_HIDDEN_RPT
 /* C2H_MAC_HIDDEN_RPT, 0x19 */
 #define MAC_HIDDEN_RPT_LEN 8
 int c2h_mac_hidden_rpt_hdl(struct adapter *adapter, u8 *data, u8 len);
@@ -81,7 +80,6 @@ int c2h_mac_hidden_rpt_hdl(struct adapter *adapter, u8 *data, u8 len);
 #define MAC_HIDDEN_RPT_2_LEN 5
 int c2h_mac_hidden_rpt_2_hdl(struct adapter *adapter, u8 *data, u8 len);
 int hal_read_mac_hidden_rpt(struct adapter *adapter);
-#endif /* CONFIG_RTW_MAC_HIDDEN_RPT */
 
 /* C2H_DEFEATURE_DBG, 0x22 */
 #define DEFEATURE_DBG_LEN 1

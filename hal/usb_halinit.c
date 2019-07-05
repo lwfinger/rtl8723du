@@ -1641,11 +1641,8 @@ InitadaptVariablesByPROM_8723du(
 	rtw_btcoex_set_ant_info(adapt);
 
 	/* Hal_EfuseParseKFreeData_8723D(adapt, hwinfo, pHalData->bautoload_fail_flag); */
-#ifdef CONFIG_RTW_MAC_HIDDEN_RPT
 	if (hal_read_mac_hidden_rpt(adapt) != _SUCCESS)
 		goto exit;
-#endif
-
 	ret = _SUCCESS;
 
 exit:

@@ -2675,7 +2675,6 @@ exit:
 
 }
 
-#ifdef CONFIG_IOCTL_CFG80211
 static u8 _p2p_roch_cmd(struct adapter *adapter
 	, u64 cookie, struct wireless_dev *wdev
 	, struct ieee80211_channel *ch, enum nl80211_channel_type ch_type
@@ -2771,9 +2770,6 @@ inline u8 p2p_cancel_roch_cmd(struct adapter *adapter, u64 cookie, struct wirele
 	return _p2p_roch_cmd(adapter, cookie, wdev, NULL, 0, 0, flags);
 }
 
-#endif /* CONFIG_IOCTL_CFG80211 */
-
-#ifdef CONFIG_IOCTL_CFG80211 
 inline u8 rtw_mgnt_tx_cmd(struct adapter *adapter, u8 tx_ch, u8 no_cck, const u8 *buf, size_t len, int wait_ack, u8 flags)
 {
 	struct cmd_obj *cmdobj;
@@ -2845,7 +2841,6 @@ inline u8 rtw_mgnt_tx_cmd(struct adapter *adapter, u8 tx_ch, u8 no_cck, const u8
 exit:
 	return res;
 }
-#endif
 
 u8 rtw_ps_cmd(struct adapter *adapt)
 {
@@ -3271,12 +3266,10 @@ inline u8 rtw_c2h_reg_wk_cmd(struct adapter *adapt, u8 *c2h_evt)
 }
 #endif
 
-#ifdef CONFIG_FW_C2H_PKT
 inline u8 rtw_c2h_packet_wk_cmd(struct adapter *adapt, u8 *c2h_evt, u16 length)
 {
 	return rtw_c2h_wk_cmd(adapt, c2h_evt, length, C2H_TYPE_PKT);
 }
-#endif
 
 u8 rtw_run_in_thread_cmd(struct adapter * adapt, void (*func)(void *), void *context)
 {
@@ -3675,11 +3668,9 @@ u8 rtw_drvextra_cmd_hdl(struct adapter *adapt, unsigned char *pbuf)
 			c2h_evt_hdl(adapt, pdrvextra_cmd->pbuf, NULL);
 			break;
 		#endif
-		#ifdef CONFIG_FW_C2H_PKT
 		case C2H_TYPE_PKT:
 			rtw_hal_c2h_pkt_hdl(adapt, pdrvextra_cmd->pbuf, pdrvextra_cmd->size);
 			break;
-		#endif
 		default:
 			RTW_ERR("unknown C2H type:%d\n", pdrvextra_cmd->type);
 			rtw_warn_on(1);
@@ -3706,12 +3697,9 @@ u8 rtw_drvextra_cmd_hdl(struct adapter *adapt, unsigned char *pbuf)
 	case CUSTOMER_STR_WK_CID:
 		ret = rtw_customer_str_cmd_hdl(adapt, pdrvextra_cmd->type, pdrvextra_cmd->pbuf);
 		break;
-
-#ifdef CONFIG_IOCTL_CFG80211
 	case MGNT_TX_WK_CID:
 		ret = rtw_mgnt_tx_handler(adapt, pdrvextra_cmd->pbuf);
 		break;
-#endif /* CONFIG_IOCTL_CFG80211 */
 	default:
 		break;
 	}

@@ -85,9 +85,7 @@ void rtw_inetaddr_notifier_unregister(void);
 
 #include "../os_dep/rtw_proc.h"
 
-#ifdef CONFIG_IOCTL_CFG80211
-	#include "../os_dep/ioctl_cfg80211.h"
-#endif /* CONFIG_IOCTL_CFG80211 */
+#include "../os_dep/ioctl_cfg80211.h"
 
 u8 rtw_rtnl_lock_needed(struct dvobj_priv *dvobj);
 void rtw_set_rtnl_lock_holder(struct dvobj_priv *dvobj, void * thd_hdl);

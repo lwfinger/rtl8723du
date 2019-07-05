@@ -165,10 +165,7 @@ static int rtw_android_set_block_scan(struct net_device *net, char *command, int
 	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(net);
 	char *block_value = command + strlen(android_wifi_cmd_str[ANDROID_WIFI_CMD_BLOCK_SCAN]) + 1;
 
-#ifdef CONFIG_IOCTL_CFG80211
 	adapter_wdev_data(adapter)->block_scan = (*block_value == '0') ? false : true;
-#endif
-
 	return 0;
 }
 
@@ -177,10 +174,7 @@ static int rtw_android_set_block(struct net_device *net, char *command, int tota
 	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(net);
 	char *block_value = command + strlen(android_wifi_cmd_str[ANDROID_WIFI_CMD_BLOCK]) + 1;
 
-#ifdef CONFIG_IOCTL_CFG80211
 	adapter_wdev_data(adapter)->block = (*block_value == '0') ? false : true;
-#endif
-
 	return 0;
 }
 
@@ -462,29 +456,20 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		bytes_written = rtw_android_get_p2p_dev_addr(net, command, priv_cmd.total_len);
 		break;
 	case ANDROID_WIFI_CMD_P2P_SET_NOA:
-		/* int skip = strlen(CMD_P2P_SET_NOA) + 1; */
-		/* bytes_written = wl_cfg80211_set_p2p_noa(net, command + skip, priv_cmd.total_len - skip); */
 		break;
 	case ANDROID_WIFI_CMD_P2P_GET_NOA:
-		/* bytes_written = wl_cfg80211_get_p2p_noa(net, command, priv_cmd.total_len); */
 		break;
 	case ANDROID_WIFI_CMD_P2P_SET_PS:
-		/* int skip = strlen(CMD_P2P_SET_PS) + 1; */
-		/* bytes_written = wl_cfg80211_set_p2p_ps(net, command + skip, priv_cmd.total_len - skip); */
 		break;
-
-#ifdef CONFIG_IOCTL_CFG80211
 	case ANDROID_WIFI_CMD_SET_AP_WPS_P2P_IE: {
 		int skip = strlen(android_wifi_cmd_str[ANDROID_WIFI_CMD_SET_AP_WPS_P2P_IE]) + 3;
+
 		bytes_written = rtw_cfg80211_set_mgnt_wpsp2pie(net, command + skip, priv_cmd.total_len - skip, *(command + skip - 2) - '0');
 		break;
 	}
-#endif /* CONFIG_IOCTL_CFG80211 */
-
 	case ANDROID_WIFI_CMD_MIRACAST:
 		bytes_written = rtw_android_set_miracast_mode(net, command, priv_cmd.total_len);
 		break;
-
 	case ANDROID_WIFI_CMD_WFD_ENABLE: {
 		/*	Commented by Albert 2012/07/24 */
 		/*	We can enable the WFD function by using the following command: */
@@ -494,7 +479,6 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 			rtw_wfd_enable(adapt, 1);
 		break;
 	}
-
 	case ANDROID_WIFI_CMD_WFD_DISABLE: {
 		/*	Commented by Albert 2012/07/24 */
 		/*	We can disable the WFD function by using the following command: */

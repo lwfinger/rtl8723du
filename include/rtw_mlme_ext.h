@@ -295,7 +295,6 @@ struct ss_res {
 	u8 rx_ampdu_size;
 	u8 igi_scan;
 	u8 igi_before_scan; /* used for restoring IGI value without enable DIG & FA_CNT */
-#ifdef CONFIG_SCAN_BACKOP
 	u8 backop_flags_sta; /* policy for station mode*/
 	u8 backop_flags_ap; /* policy for ap mode */
 	u8 backop_flags; /* per backop runtime decision */
@@ -303,7 +302,6 @@ struct ss_res {
 	u8 scan_cnt_max;
 	unsigned long backop_time; /* the start time of backop */
 	u16 backop_ms;
-#endif
 	u8 ssid_num;
 	u8 ch_num;
 	struct ndis_802_11_ssid ssid[RTW_SSID_SCAN_AMOUNT];
@@ -594,7 +592,6 @@ void sitesurvey_set_offch_state(struct adapter *adapter, u8 scan_state);
 		/* RTW_INFO("set_scan_next_state:%s\n", scan_state_str(_state)); */ \
 	} while (0)
 
-#ifdef CONFIG_SCAN_BACKOP
 #define mlmeext_scan_backop_flags(mlmeext) ((mlmeext)->sitesurvey_res.backop_flags)
 #define mlmeext_chk_scan_backop_flags(mlmeext, flags) ((mlmeext)->sitesurvey_res.backop_flags & (flags))
 #define mlmeext_assign_scan_backop_flags(mlmeext, flags) \
@@ -616,19 +613,7 @@ void sitesurvey_set_offch_state(struct adapter *adapter, u8 scan_state);
 	do { \
 		((mlmeext)->sitesurvey_res.backop_flags_ap = (flags)); \
 	} while (0)
-#else
-#define mlmeext_scan_backop_flags(mlmeext) (0)
-#define mlmeext_chk_scan_backop_flags(mlmeext, flags) (0)
-#define mlmeext_assign_scan_backop_flags(mlmeext, flags) do {} while (0)
 
-#define mlmeext_scan_backop_flags_sta(mlmeext) (0)
-#define mlmeext_chk_scan_backop_flags_sta(mlmeext, flags) (0)
-#define mlmeext_assign_scan_backop_flags_sta(mlmeext, flags) do {} while (0)
-
-#define mlmeext_scan_backop_flags_ap(mlmeext) (0)
-#define mlmeext_chk_scan_backop_flags_ap(mlmeext, flags) (0)
-#define mlmeext_assign_scan_backop_flags_ap(mlmeext, flags) do {} while (0)
-#endif
 u32 rtw_scan_timeout_decision(struct adapter *adapt);
 
 void init_mlme_default_rate_set(struct adapter *adapt);
@@ -638,7 +623,6 @@ void free_mlme_ext_priv(struct mlme_ext_priv *pmlmeext);
 extern struct xmit_frame *alloc_mgtxmitframe(struct xmit_priv *pxmitpriv);
 struct xmit_frame *alloc_mgtxmitframe_once(struct xmit_priv *pxmitpriv);
 
-/* void fill_fwpriv(struct adapter * adapt, struct fw_priv *pfwpriv); */
 u8 judge_network_type(struct adapter *adapt, unsigned char *rate, int ratelen);
 void get_rate_set(struct adapter *adapt, unsigned char *pbssrate, int *bssrate_len);
 void set_mcs_rate_by_mask(u8 *mcs_set, u32 mask);

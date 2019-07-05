@@ -2,9 +2,6 @@
 /* Copyright(c) 2009-2010 - 2017 Realtek Corporation */
 
 #include <drv_types.h>
-
-#ifdef CONFIG_IOCTL_CFG80211
-
 #include <rtw_wifi_regd.h>
 
 static struct country_code_to_enum_rd allCountries[] = {
@@ -286,4 +283,3 @@ int rtw_regd_init(struct adapter *adapt)
 
 	return 0;
 }
-#endif /* CONFIG_IOCTL_CFG80211 */

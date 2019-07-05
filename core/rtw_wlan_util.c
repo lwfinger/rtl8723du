@@ -2609,13 +2609,9 @@ void update_wireless_mode(struct adapter *adapt)
 
 	rtw_hal_set_hwreg(adapt, HW_VAR_WIRELESS_MODE, (u8 *)&(pmlmeext->cur_wireless_mode));
 
-	if ((pmlmeext->cur_wireless_mode & WIRELESS_11B)
-		&& (rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE)
-			#ifdef CONFIG_IOCTL_CFG80211
-			|| !rtw_cfg80211_iface_has_p2p_group_cap(adapt)
-			#endif
-			)
-	)
+	if ((pmlmeext->cur_wireless_mode & WIRELESS_11B) &&
+	    (rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE) ||
+	     !rtw_cfg80211_iface_has_p2p_group_cap(adapt)))
 		update_mgnt_tx_rate(adapt, IEEE80211_CCK_RATE_1MB);
 	else
 		update_mgnt_tx_rate(adapt, IEEE80211_OFDM_RATE_6MB);

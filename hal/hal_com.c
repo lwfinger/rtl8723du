@@ -1140,7 +1140,6 @@ exit:
 }
 #endif /* CONFIG_FW_C2H_REG */
 
-#ifdef CONFIG_FW_C2H_PKT
 #ifndef DBG_C2H_PKT_PRE_HDL
 #define DBG_C2H_PKT_PRE_HDL 0
 #endif
@@ -1206,7 +1205,6 @@ exit:
 			RTW_PRINT_DUMP("dump: ", buf, len);
 	}
 }
-#endif /* CONFIG_FW_C2H_PKT */
 
 void c2h_iqk_offload(struct adapter *adapter, u8 *data, u8 len)
 {
@@ -1247,7 +1245,6 @@ int c2h_iqk_offload_wait(struct adapter *adapter, u32 timeout_ms)
 #define DBG_C2H_MAC_HIDDEN_RPT_HANDLE 0
 #endif
 
-#ifdef CONFIG_RTW_MAC_HIDDEN_RPT
 int c2h_mac_hidden_rpt_hdl(struct adapter *adapter, u8 *data, u8 len)
 {
 	struct hal_com_data	*hal_data = GET_HAL_DATA(adapter);
@@ -1442,7 +1439,6 @@ exit:
 
 	return ret;
 }
-#endif /* CONFIG_RTW_MAC_HIDDEN_RPT */
 
 int c2h_defeature_dbg_hdl(struct adapter *adapter, u8 *data, u8 len)
 {

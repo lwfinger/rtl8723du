@@ -1300,7 +1300,7 @@ chbw_decision:
 		&& (MLME_IS_GO(adapt) || MLME_IS_MESH(adapt)) /* pure AP is not needed*/
 		&& check_fwstate(pmlmepriv, WIFI_ASOC_STATE)
 	) {
-		#if defined(CONFIG_IOCTL_CFG80211) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 5, 0))
+		#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 5, 0))
 		rtw_cfg80211_ch_switch_notify(adapt
 			, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset
 			, pmlmepriv->htpriv.ht_option);
@@ -2910,19 +2910,13 @@ u8 ap_free_sta(struct adapter *adapt, struct sta_info *psta, bool active, u16 re
 	psta->state &= ~_FW_LINKED;
 	_exit_critical_bh(&psta->lock, &irqL);
 
-	{
-#ifdef CONFIG_IOCTL_CFG80211
-		#ifdef COMPAT_KERNEL_RELEASE
-		rtw_cfg80211_indicate_sta_disassoc(adapt, psta->cmn.mac_addr, reason);
-		#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) && !defined(CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER)
-		rtw_cfg80211_indicate_sta_disassoc(adapt, psta->cmn.mac_addr, reason);
-		#else /* (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) && !defined(CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER) */
-		/* will call rtw_cfg80211_indicate_sta_disassoc() in cmd_thread for old API context */
-		#endif /* (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) && !defined(CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER) */
-#else
-		rtw_indicate_sta_disassoc_event(adapt, psta);
-#endif
-	}
+	#ifdef COMPAT_KERNEL_RELEASE
+	rtw_cfg80211_indicate_sta_disassoc(adapt, psta->cmn.mac_addr, reason);
+	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) && !defined(CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER)
+	rtw_cfg80211_indicate_sta_disassoc(adapt, psta->cmn.mac_addr, reason);
+	#else /* (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) && !defined(CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER) */
+	/* will call rtw_cfg80211_indicate_sta_disassoc() in cmd_thread for old API context */
+	#endif /* (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) && !defined(CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER) */
 
 	report_del_sta_event(adapt, psta->cmn.mac_addr, reason, enqueue, false);
 

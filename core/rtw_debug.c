@@ -38,15 +38,11 @@ void dump_drv_cfg(struct seq_file *sel)
 
 	RTW_PRINT_SEL(sel, "Driver Version: %s\n", DRIVERVERSION);
 	RTW_PRINT_SEL(sel, "------------------------------------------------\n");
-#ifdef CONFIG_IOCTL_CFG80211
 	RTW_PRINT_SEL(sel, "CFG80211\n");
 	RTW_PRINT_SEL(sel, "RTW_USE_CFG80211_STA_EVENT\n");
 	#ifdef CONFIG_RADIO_WORK
 	RTW_PRINT_SEL(sel, "CONFIG_RADIO_WORK\n");
 	#endif
-#else
-	RTW_PRINT_SEL(sel, "WEXT\n");
-#endif
 
 	RTW_PRINT_SEL(sel, "DBG:%d\n", DBG);
 #ifdef CONFIG_RTW_DEBUG
@@ -68,9 +64,6 @@ void dump_drv_cfg(struct seq_file *sel)
 /* configurations about TX power */
 #ifdef CONFIG_CALIBRATE_TX_POWER_BY_REGULATORY
 	RTW_PRINT_SEL(sel, "CONFIG_CALIBRATE_TX_POWER_BY_REGULATORY\n");
-#endif
-#ifdef CONFIG_CALIBRATE_TX_POWER_TO_MAX
-	RTW_PRINT_SEL(sel, "CONFIG_CALIBRATE_TX_POWER_TO_MAX\n");
 #endif
 #endif
 	RTW_PRINT_SEL(sel, "CONFIG_TXPWR_BY_RATE_EN=%d\n", CONFIG_TXPWR_BY_RATE_EN);
@@ -284,13 +277,8 @@ void dump_adapters_status(void *sel, struct dvobj_priv *dvobj)
 
 #define P2P_INFO_TITLE_FMT	" %-3s %-4s"
 #define P2P_INFO_TITLE_ARG	, "lch", "p2ps"
-#ifdef CONFIG_IOCTL_CFG80211
 #define P2P_INFO_VALUE_FMT	" %3u %c%3u"
 #define P2P_INFO_VALUE_ARG	, iface->wdinfo.listen_channel, iface->wdev_data.p2p_enabled ? 'e' : ' ', rtw_p2p_state(&iface->wdinfo)
-#else
-#define P2P_INFO_VALUE_FMT	" %3u %4u"
-#define P2P_INFO_VALUE_ARG	, iface->wdinfo.listen_channel, rtw_p2p_state(&iface->wdinfo)
-#endif
 #define P2P_INFO_DASH		"---------"
 
 	RTW_PRINT_SEL(sel, "%-2s %-15s %c %-3s %-3s %-3s %-17s %-4s %-7s"
@@ -891,17 +879,10 @@ int proc_get_scan_param(struct seq_file *m, void *v)
 #define SCAN_PARAM_VALUE_FMT_HT " %-15u %-13u"
 #define SCAN_PARAM_TITLE_ARG_HT , "rx_ampdu_accept", "rx_ampdu_size"
 #define SCAN_PARAM_VALUE_ARG_HT , ss->rx_ampdu_accept, ss->rx_ampdu_size
-#ifdef CONFIG_SCAN_BACKOP
 #define SCAN_PARAM_TITLE_FMT_BACKOP " %9s %12s"
 #define SCAN_PARAM_VALUE_FMT_BACKOP " %-9u %-12u"
 #define SCAN_PARAM_TITLE_ARG_BACKOP , "backop_ms", "scan_cnt_max"
 #define SCAN_PARAM_VALUE_ARG_BACKOP , ss->backop_ms, ss->scan_cnt_max
-#else
-#define SCAN_PARAM_TITLE_FMT_BACKOP ""
-#define SCAN_PARAM_VALUE_FMT_BACKOP ""
-#define SCAN_PARAM_TITLE_ARG_BACKOP
-#define SCAN_PARAM_VALUE_ARG_BACKOP
-#endif
 
 	RTW_PRINT_SEL(m,
 		SCAN_PARAM_TITLE_FMT
@@ -942,15 +923,10 @@ ssize_t proc_set_scan_param(struct file *file, const char __user *buffer, size_t
 	u8 rx_ampdu_size;
 #define SCAN_PARAM_INPUT_FMT_HT " %hhu %hhu"
 #define SCAN_PARAM_INPUT_ARG_HT , &rx_ampdu_accept, &rx_ampdu_size
-#ifdef CONFIG_SCAN_BACKOP
 	u16 backop_ms;
 	u8 scan_cnt_max;
 #define SCAN_PARAM_INPUT_FMT_BACKOP " %hu %hhu"
 #define SCAN_PARAM_INPUT_ARG_BACKOP , &backop_ms, &scan_cnt_max
-#else
-#define SCAN_PARAM_INPUT_FMT_BACKOP ""
-#define SCAN_PARAM_INPUT_ARG_BACKOP
-#endif
 
 	if (count < 1)
 		return -EFAULT;
@@ -977,12 +953,10 @@ ssize_t proc_set_scan_param(struct file *file, const char __user *buffer, size_t
 			ss->rx_ampdu_accept = rx_ampdu_accept;
 		if (num-- > 0)
 			ss->rx_ampdu_size = rx_ampdu_size;
-#ifdef CONFIG_SCAN_BACKOP
 		if (num-- > 0)
 			ss->backop_ms = backop_ms;
 		if (num-- > 0)
 			ss->scan_cnt_max = scan_cnt_max;
-#endif
 	}
 
 	return count;
@@ -1001,7 +975,6 @@ int proc_get_scan_abort(struct seq_file *m, void *v)
 	return 0;
 }
 
-#ifdef CONFIG_SCAN_BACKOP
 int proc_get_backop_flags_sta(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;
@@ -1079,8 +1052,6 @@ ssize_t proc_set_backop_flags_ap(struct file *file, const char __user *buffer, s
 
 	return count;
 }
-
-#endif /* CONFIG_SCAN_BACKOP */
 
 int proc_get_survey_info(struct seq_file *m, void *v)
 {

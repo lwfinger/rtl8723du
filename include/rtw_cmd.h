@@ -152,7 +152,6 @@ extern void rtw_cmd_clr_isr(struct cmd_priv *pcmdpriv);
 extern void rtw_evt_notify_isr(struct evt_priv *pevtpriv);
 u8 p2p_protocol_wk_cmd(struct adapter *adapt, int intCmdType);
 
-#ifdef CONFIG_IOCTL_CFG80211
 struct p2p_roch_parm {
 	u64 cookie;
 	struct wireless_dev *wdev;
@@ -169,9 +168,6 @@ u8 p2p_roch_cmd(struct adapter *adapter
 );
 u8 p2p_cancel_roch_cmd(struct adapter *adapter, u64 cookie, struct wireless_dev *wdev, u8 flags);
 
-#endif /* CONFIG_IOCTL_CFG80211 */
-
-#ifdef CONFIG_IOCTL_CFG80211 
 u8 rtw_mgnt_tx_cmd(struct adapter *adapter, u8 tx_ch, u8 no_cck, const u8 *buf, size_t len, int wait_ack, u8 flags);
 struct mgnt_tx_parm {
 	u8 tx_ch;
@@ -180,7 +176,6 @@ struct mgnt_tx_parm {
 	size_t len;
 	int wait_ack;
 };
-#endif
 
 enum rtw_drvextra_cmd_id {
 	NONE_WK_CID,
@@ -964,9 +959,7 @@ u8 rtw_customer_str_write_cmd(struct adapter *adapter, const u8 *cstr);
 #ifdef CONFIG_FW_C2H_REG
 u8 rtw_c2h_reg_wk_cmd(struct adapter *adapter, u8 *c2h_evt);
 #endif
-#ifdef CONFIG_FW_C2H_PKT
 u8 rtw_c2h_packet_wk_cmd(struct adapter *adapter, u8 *c2h_evt, u16 length);
-#endif
 
 u8 rtw_run_in_thread_cmd(struct adapter * adapt, void (*func)(void *), void *context);
 

@@ -90,17 +90,9 @@ void rtw_wfd_st_switch(struct sta_info *sta, bool on);
 #define MLME_IS_OPCH_SW(adapter) CHK_MLME_STATE(adapter, WIFI_OP_CH_SWITCHING)
 #define MLME_IS_WPS(adapter) CHK_MLME_STATE(adapter, WIFI_UNDER_WPS)
 
-#if defined(CONFIG_IOCTL_CFG80211)
 #define MLME_IS_ROCH(adapter) (rtw_cfg80211_get_is_roch(adapter))
-#else
-#define MLME_IS_ROCH(adapter) 0
-#endif
 
-#ifdef CONFIG_IOCTL_CFG80211
 #define MLME_IS_MGMT_TX(adapter) rtw_cfg80211_get_is_mgmt_tx(adapter)
-#else
-#define MLME_IS_MGMT_TX(adapter) 0
-#endif
 
 #define MLME_STATE_FMT "%s%s%s%s%s%s%s%s%s%s%s%s"
 #define MLME_STATE_ARG(adapter) \
@@ -295,7 +287,6 @@ struct scan_limit_info {
 	u8 operation_ch[5];		/*	Store additional channel 1,6,11  for Android 4.2 IOT & Nexus 4 */
 };
 
-#ifdef CONFIG_IOCTL_CFG80211
 struct cfg80211_wifidirect_info {
 	struct timer_list					remain_on_ch_timer;
 	u8						restore_channel;
@@ -307,7 +298,6 @@ struct cfg80211_wifidirect_info {
 	struct wireless_dev *ro_ch_wdev;
 	unsigned long last_ro_ch_time; /* this will be updated at the beginning and end of ro_ch */
 };
-#endif /* CONFIG_IOCTL_CFG80211 */
 
 struct wifidirect_info {
 	struct adapter				*adapt;
@@ -834,7 +824,6 @@ struct mlme_priv {
 	u8 ori_bw;
 	u8 ori_offset;
 
-#if defined(CONFIG_IOCTL_CFG80211)
 	u8 *wfd_beacon_ie;
 	u32 wfd_beacon_ie_len;
 
@@ -852,7 +841,6 @@ struct mlme_priv {
 
 	u8 *wfd_assoc_resp_ie;
 	u32 wfd_assoc_resp_ie_len;
-#endif
 
 #ifdef RTK_DMP_PLATFORM
 	/* DMP kobject_hotplug function  signal need in passive level */
@@ -1107,13 +1095,7 @@ void rtw_free_mlme_priv_ie_data(struct mlme_priv *pmlmepriv);
 #define MLME_ASSOC_REQ_IE		4
 #define MLME_ASSOC_RESP_IE		5
 
-#if defined(CONFIG_IOCTL_CFG80211)
 int rtw_mlme_update_wfd_ie_data(struct mlme_priv *mlme, u8 type, u8 *ie, u32 ie_len);
-#endif
-
-
-/* extern struct wlan_network* _rtw_dequeue_network(struct __queue *queue); */
-
 extern struct wlan_network *_rtw_alloc_network(struct mlme_priv *pmlmepriv);
 
 

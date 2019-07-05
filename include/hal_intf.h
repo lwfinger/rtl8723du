@@ -460,9 +460,7 @@ bool rtw_hal_c2h_valid(struct adapter *adapter, u8 *buf);
 int rtw_hal_c2h_evt_read(struct adapter *adapter, u8 *buf);
 #endif
 
-#ifdef CONFIG_FW_C2H_PKT
 bool rtw_hal_c2h_pkt_hdr_parse(struct adapter *adapter, u8 *buf, u16 len, u8 *id, u8 *seq, u8 *plen, u8 **payload);
-#endif
 
 int c2h_handler(struct adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload);
 int rtw_hal_c2h_handler(struct adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload);

@@ -81,14 +81,12 @@ int recvbuf2recvframe(struct adapter * adapt, void *ptr)
 		if (pattrib->pkt_rpt_type == NORMAL_RX)
 			pre_recv_entry(precvframe, pattrib->physt ? (pbuf + RXDESC_OFFSET) : NULL);
 		else {
-#ifdef CONFIG_FW_C2H_PKT
 			if (pattrib->pkt_rpt_type == C2H_PACKET)
 				rtw_hal_c2h_pkt_pre_hdl(adapt, precvframe->u.hdr.rx_data, pattrib->pkt_len);
 			else {
 				RTW_INFO("%s: [WARNNING] RX type(%d) not be handled!\n",
 					 __func__, pattrib->pkt_rpt_type);
 			}
-#endif /* CONFIG_FW_C2H_PKT */
 			rtw_free_recvframe(precvframe, pfree_recv_queue);
 		}
 		transfer_len -= pkt_offset;

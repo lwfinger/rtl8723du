@@ -163,9 +163,7 @@ static bool rtw_pwr_unassociated_idle(struct adapter *adapter)
 	struct xmit_priv *pxmit_priv = &adapter->xmitpriv;
 	struct mlme_priv *pmlmepriv;
 	struct wifidirect_info	*pwdinfo;
-#ifdef CONFIG_IOCTL_CFG80211
 	struct cfg80211_wifidirect_info *pcfg80211_wdinfo;
-#endif
 	bool ret = false;
 
 	if (adapter_to_pwrctl(adapter)->bpower_saving) {
@@ -183,23 +181,14 @@ static bool rtw_pwr_unassociated_idle(struct adapter *adapter)
 		if ((iface) && rtw_is_adapter_up(iface)) {
 			pmlmepriv = &(iface->mlmepriv);
 			pwdinfo = &(iface->wdinfo);
-#ifdef CONFIG_IOCTL_CFG80211
 			pcfg80211_wdinfo = &iface->cfg80211_wdinfo;
-#endif
 			if (check_fwstate(pmlmepriv, WIFI_ASOC_STATE | WIFI_SITE_MONITOR)
 				|| check_fwstate(pmlmepriv, WIFI_UNDER_LINKING | WIFI_UNDER_WPS)
 				|| MLME_IS_AP(iface)
 				|| MLME_IS_MESH(iface)
 				|| check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE | WIFI_ADHOC_STATE)
-				#if defined(CONFIG_IOCTL_CFG80211)
 				|| rtw_cfg80211_get_is_roch(iface)
-				#else
-				|| rtw_p2p_chk_state(pwdinfo, P2P_STATE_IDLE)
-				|| rtw_p2p_chk_state(pwdinfo, P2P_STATE_LISTEN)
-				#endif
-				#if defined(CONFIG_IOCTL_CFG80211)
 				|| rtw_get_passing_time_ms(pcfg80211_wdinfo->last_ro_ch_time) < 3000
-				#endif
 			)
 				goto exit;
 
@@ -465,9 +454,7 @@ static u8 PS_RDY_CHECK(struct adapter *adapt)
 	struct pwrctrl_priv	*pwrpriv = adapter_to_pwrctl(adapt);
 	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
 	struct wifidirect_info *pwdinfo = &(adapt->wdinfo);
-#ifdef CONFIG_IOCTL_CFG80211
 	struct cfg80211_wifidirect_info *pcfg80211_wdinfo = &adapt->cfg80211_wdinfo;
-#endif /* CONFIG_IOCTL_CFG80211 */
 
 	if (pwrpriv->bInSuspend)
 		return false;
@@ -481,9 +468,7 @@ static u8 PS_RDY_CHECK(struct adapter *adapt)
 		|| MLME_IS_AP(adapt)
 		|| MLME_IS_MESH(adapt)
 		|| check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE | WIFI_ADHOC_STATE)
-		#if defined(CONFIG_IOCTL_CFG80211)
 		|| rtw_cfg80211_get_is_roch(adapt)
-		#endif
 		|| rtw_is_scan_deny(adapt))
 		return false;
 
@@ -492,10 +477,8 @@ static u8 PS_RDY_CHECK(struct adapter *adapt)
 		return false;
 	}
 
-#ifdef CONFIG_IOCTL_CFG80211
 	if (!rtw_cfg80211_pwr_mgmt(adapt))
 		return false;
-#endif
 
 	return true;
 }

@@ -6,8 +6,6 @@
 #include <drv_types.h>
 #include <hal_data.h>
 
-#ifdef CONFIG_IOCTL_CFG80211
-
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0))
 #define STATION_INFO_SIGNAL		BIT(NL80211_STA_INFO_SIGNAL)
 #define STATION_INFO_TX_BITRATE		BIT(NL80211_STA_INFO_TX_BITRATE)
@@ -6278,5 +6276,3 @@ void rtw_cfg80211_dev_res_unregister(struct dvobj_priv *dvobj)
 	rtw_wiphy_unregister(dvobj_to_wiphy(dvobj));
 #endif
 }
-
-#endif /* CONFIG_IOCTL_CFG80211 */

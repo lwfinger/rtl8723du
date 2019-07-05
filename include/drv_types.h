@@ -785,7 +785,7 @@ struct dvobj_priv {
 
 	void * rtnl_lock_holder;
 
-	#if defined(CONFIG_IOCTL_CFG80211) && defined(RTW_SINGLE_WIPHY)
+	#if defined(RTW_SINGLE_WIPHY)
 	struct wiphy *wiphy;
 	#endif
 
@@ -850,7 +850,7 @@ struct dvobj_priv {
 #define dvobj_to_macidctl(dvobj) (&(dvobj->macid_ctl))
 #define dvobj_to_sec_camctl(dvobj) (&(dvobj->cam_ctl))
 #define dvobj_to_regsty(dvobj) (&(dvobj->adapters[IFACE_ID0]->registrypriv))
-#if defined(CONFIG_IOCTL_CFG80211) && defined(RTW_SINGLE_WIPHY)
+#if defined(RTW_SINGLE_WIPHY)
 #define dvobj_to_wiphy(dvobj) ((dvobj)->wiphy)
 #endif
 #define dvobj_to_rfctl(dvobj) (&(dvobj->rf_ctl))
@@ -962,18 +962,12 @@ struct adapter {
 	spinlock_t   security_key_mutex; /* add for CONFIG_IEEE80211W, none 11w also can use */
 	struct	registry_priv	registrypriv;
 	struct	led_priv	ledpriv;
-
-
 #ifdef CONFIG_RTW_NAPI
 	struct	napi_struct napi;
 	u8	napi_state;
 #endif
-
 	struct	hostapd_priv	*phostapdpriv;
-
-#ifdef CONFIG_IOCTL_CFG80211
 	struct cfg80211_wifidirect_info	cfg80211_wdinfo;
-#endif /* CONFIG_IOCTL_CFG80211 */
 	u32	setband;
 	ATOMIC_T bandskip;
 
@@ -1021,16 +1015,11 @@ struct adapter {
 	struct proc_dir_entry *dir_dev;/* for proc directory */
 	struct proc_dir_entry *dir_odm;
 
-#ifdef CONFIG_IOCTL_CFG80211
 	struct wireless_dev *rtw_wdev;
 	struct rtw_wdev_priv wdev_data;
-
 #if !defined(RTW_SINGLE_WIPHY)
 	struct wiphy *wiphy;
 #endif
-
-#endif /* CONFIG_IOCTL_CFG80211 */
-
 	u8 mac_addr[ETH_ALEN];
 	int net_closed;
 

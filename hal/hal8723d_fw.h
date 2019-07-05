@@ -2,8 +2,6 @@
 /* Copyright(c) 2012 - 2017 Realtek Corporation */
 
 
-#ifdef CONFIG_RTL8723D
-
 #ifndef _FW_HEADER_8723D_H
 #define _FW_HEADER_8723D_H
 
@@ -13,6 +11,3 @@ extern u32 array_length_mp_8723d_fw_nic;
 #endif /* end of LOAD_FW_HEADER_FROM_DRIVER */
 
 #endif
-
-#endif
-

@@ -366,10 +366,8 @@ void c2h_evt_clear(struct adapter *adapter);
 int c2h_evt_read_88xx(struct adapter *adapter, u8 *buf);
 #endif
 
-#ifdef CONFIG_FW_C2H_PKT
 void rtw_hal_c2h_pkt_pre_hdl(struct adapter *adapter, u8 *buf, u16 len);
 void rtw_hal_c2h_pkt_hdl(struct adapter *adapter, u8 *buf, u16 len);
-#endif
 
 u8 rtw_get_mgntframe_raid(struct adapter *adapter, unsigned char network_type);
 
