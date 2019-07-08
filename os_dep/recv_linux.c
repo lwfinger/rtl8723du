@@ -5,11 +5,14 @@
 
 #include <drv_types.h>
 
+u8 rtw_rfc1042_header[] = {0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00};
+/* Bridge-Tunnel header (for EtherTypes ETH_P_AARP and ETH_P_IPX) */
+u8 rtw_bridge_tunnel_header[] = {0xaa, 0xaa, 0x03, 0x00, 0x00, 0xf8};
+
 int rtw_os_recvframe_duplicate_skb(struct adapter *adapt, union recv_frame *pcloneframe, struct sk_buff *pskb)
 {
 	int res = _SUCCESS;
 	struct sk_buff	*pkt_copy = NULL;
-	struct rx_pkt_attrib *pattrib = &pcloneframe->u.hdr.attrib;
 
 	if (!pskb) {
 		RTW_INFO("%s [WARN] skb is NULL, drop frag frame\n", __func__);
@@ -165,9 +168,6 @@ void rtw_os_recv_resource_free(struct recv_priv *precvpriv)
 int rtw_os_recvbuf_resource_alloc(struct adapter *adapt, struct recv_buf *precvbuf)
 {
 	int res = _SUCCESS;
-
-	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(adapt);
-	struct usb_device	*pusbd = pdvobjpriv->pusbdev;
 
 	precvbuf->irp_pending = false;
 	precvbuf->purb = usb_alloc_urb(0, GFP_KERNEL);
@@ -413,7 +413,6 @@ void rtw_handle_tkip_mic_err(struct adapter *adapt, struct sta_info *sta, u8 bgr
 	enum nl80211_key_type key_type = 0;
 	union iwreq_data wrqu;
 	struct iw_michaelmicfailure    ev;
-	struct mlme_priv              *pmlmepriv  = &adapt->mlmepriv;
 	struct security_priv	*psecuritypriv = &adapt->securitypriv;
 	unsigned long cur_time = 0;
 
@@ -455,12 +454,10 @@ int rtw_recv_monitor(struct adapter *adapt, union recv_frame *precv_frame)
 	struct recv_priv *precvpriv;
 	struct __queue	*pfree_recv_queue;
 	struct sk_buff *skb;
-	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 	struct rx_pkt_attrib *pattrib;
 
 	if (!precv_frame)
 		goto _recv_drop;
-
 	pattrib = &precv_frame->u.hdr.attrib;
 	precvpriv = &(adapt->recvpriv);
 	pfree_recv_queue = &(precvpriv->free_recv_queue);
@@ -500,7 +497,6 @@ int rtw_recv_indicatepkt(struct adapter *adapt, union recv_frame *precv_frame)
 	struct recv_priv *precvpriv;
 	struct __queue	*pfree_recv_queue;
 	struct sk_buff *skb;
-	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 
 	precvpriv = &(adapt->recvpriv);
 	pfree_recv_queue = &(precvpriv->free_recv_queue);
@@ -515,7 +511,6 @@ int rtw_recv_indicatepkt(struct adapter *adapt, union recv_frame *precv_frame)
 
 	rtw_os_recv_indicate_pkt(adapt, skb, precv_frame);
 
-_recv_indicatepkt_end:
 	precv_frame->u.hdr.pkt = NULL;
 	rtw_free_recvframe(precv_frame, pfree_recv_queue);
 	return _SUCCESS;

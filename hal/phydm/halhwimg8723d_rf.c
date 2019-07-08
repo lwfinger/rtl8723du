@@ -93,15 +93,6 @@ check_positive(
 	} else
 		return false;
 }
-static bool
-check_negative(
-	struct PHY_DM_STRUCT *p_dm,
-	const u32	condition1,
-	const u32	condition2
-)
-{
-	return true;
-}
 
 /******************************************************************************
 *                           radioa.TXT

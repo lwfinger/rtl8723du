@@ -30,14 +30,8 @@ phydm_init_trx_antenna_setting(
 	}
 }
 
-static void
-phydm_config_ofdm_tx_path(
-	void			*p_dm_void,
-	u32			path
-)
+static void phydm_config_ofdm_tx_path(void *p_dm_void, u32 path)
 {
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-
 }
 
 void
@@ -53,8 +47,6 @@ phydm_config_cck_rx_antenna_init(
 	void		*p_dm_void
 )
 {
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-
 #if (defined(PHYDM_COMPILE_ABOVE_2SS))
 	/*CCK 2R CCA parameters*/
 	odm_set_bb_reg(p_dm, 0xa00, BIT(15), 0x0); /*Disable antenna diversity*/

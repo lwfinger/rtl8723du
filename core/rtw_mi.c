@@ -16,24 +16,6 @@ void rtw_mi_update_union_chan_inf(struct adapter *adapter, u8 ch, u8 offset , u8
 	iface_state->union_offset = offset;
 }
 
-static u8 _rtw_mi_p2p_listen_scan_chk(struct adapter *adapter)
-{
-	int i;
-	struct adapter *iface;
-	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
-	u8 p2p_listen_scan_state = false;
-
-	for (i = 0; i < dvobj->iface_nums; i++) {
-		iface = dvobj->adapters[i];
-		if (rtw_p2p_chk_state(&iface->wdinfo, P2P_STATE_LISTEN) ||
-			rtw_p2p_chk_state(&iface->wdinfo, P2P_STATE_SCAN)) {
-			p2p_listen_scan_state = true;
-			break;
-		}
-	}
-	return p2p_listen_scan_state;
-}
-
 u8 rtw_mi_stayin_union_ch_chk(struct adapter *adapter)
 {
 	u8 rst = true;
@@ -292,15 +274,10 @@ inline void rtw_mi_update_iface_status(struct mlme_priv *pmlmepriv, int state)
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct mi_state *iface_state = &dvobj->iface_state;
 	struct mi_state tmp_mstate;
-	u8 i;
 	u8 u_ch, u_offset, u_bw;
-	struct adapter *iface;
 
-	if (state == WIFI_MONITOR_STATE
-		|| state == 0xFFFFFFFF
-	)
+	if (state == WIFI_MONITOR_STATE || state == 0xFFFFFFFF)
 		return;
-
 	rtw_mi_status(adapter, &tmp_mstate);
 	memcpy(iface_state, &tmp_mstate, sizeof(struct mi_state));
 
@@ -1127,9 +1104,7 @@ static void rtw_dbg_skb_process(struct adapter *adapt, union recv_frame *precvfr
 static int _rtw_mi_buddy_clone_bcmc_packet(struct adapter *adapter, union recv_frame *precvframe, u8 *pphy_status, union recv_frame *pcloneframe)
 {
 	int ret = _SUCCESS;
-	u8 *pbuf = precvframe->u.hdr.rx_data;
 	struct rx_pkt_attrib *pattrib = NULL;
-	struct hal_com_data	*pHalData = GET_HAL_DATA(adapter);
 
 	if (pcloneframe) {
 		pcloneframe->u.hdr.adapter = adapter;

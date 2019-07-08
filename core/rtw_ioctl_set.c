@@ -31,7 +31,9 @@ u8 rtw_validate_bssid(u8 *bssid)
 
 u8 rtw_validate_ssid(struct ndis_802_11_ssid *ssid)
 {
+#ifdef CONFIG_VALIDATE_SSID
 	u8	 i;
+#endif
 	u8	ret = true;
 
 
@@ -242,7 +244,6 @@ u8 rtw_set_802_11_ssid(struct adapter *adapt, struct ndis_802_11_ssid *ssid)
 {
 	unsigned long irqL;
 	u8 status = _SUCCESS;
-	u32 cur_time = 0;
 
 	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 	struct wlan_network *pnetwork = &pmlmepriv->cur_network;
@@ -338,7 +339,6 @@ u8 rtw_set_802_11_connect(struct adapter *adapt, u8 *bssid, struct ndis_802_11_s
 {
 	unsigned long irqL;
 	u8 status = _SUCCESS;
-	u32 cur_time = 0;
 	bool bssid_valid = true;
 	bool ssid_valid = true;
 	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
@@ -659,9 +659,6 @@ int rtw_set_scan_mode(struct adapter *adapter, enum rt_scan_type scan_mode)
 */
 int rtw_set_channel_plan(struct adapter *adapter, u8 channel_plan)
 {
-	struct registry_priv *pregistrypriv = &adapter->registrypriv;
-	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
-
 	/* handle by cmd_thread to sync with scan operation */
 	return rtw_set_chplan_cmd(adapter, RTW_CMDF_WAIT_ACK, channel_plan, 1);
 }

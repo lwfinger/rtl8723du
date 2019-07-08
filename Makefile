@@ -1,11 +1,5 @@
 EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
 EXTRA_CFLAGS += -O1
-EXTRA_CFLAGS += -Wno-unused-variable
-EXTRA_CFLAGS += -Wno-unused-value
-EXTRA_CFLAGS += -Wno-unused-label
-EXTRA_CFLAGS += -Wno-unused-parameter
-EXTRA_CFLAGS += -Wno-unused-function
-EXTRA_CFLAGS += -Wno-unused
 
 GCC_VER_49 := $(shell echo `$(CC) -dumpversion | cut -f1-2 -d.` \>= 4.9 | bc )
 ifeq ($(GCC_VER_49),1)
@@ -22,7 +16,6 @@ CONFIG_LOAD_PHY_PARA_FROM_FILE = y
 CONFIG_RTW_NAPI = y
 CONFIG_RTW_WIFI_HAL = y
 ########################## Debug ###########################
-CONFIG_RTW_DEBUG = y
 # default log level is _DRV_INFO_ = 2,
 # please refer to "How_to_set_driver_debug_log_level.doc" to set the available level.
 CONFIG_RTW_LOG_LEVEL = 2
@@ -136,10 +129,8 @@ ifeq ($(CONFIG_RTW_WIFI_HAL), y)
 EXTRA_CFLAGS += -DCONFIG_RTW_WIFI_HAL
 endif
 
-ifeq ($(CONFIG_RTW_DEBUG), y)
 EXTRA_CFLAGS += -DCONFIG_RTW_DEBUG
 EXTRA_CFLAGS += -DRTW_LOG_LEVEL=$(CONFIG_RTW_LOG_LEVEL)
-endif
 
 EXTRA_CFLAGS += -DDM_ODM_SUPPORT_TYPE=0x04
 
@@ -182,7 +173,7 @@ rtk_core :=	core/rtw_cmd.o \
 		core/rtw_btcoex.o \
 		core/rtw_odm.o \
 		core/rtw_rm.o \
-		core//rtw_efuse.o 
+		core/rtw_efuse.o 
 
 $(MODULE_NAME)-y += $(rtk_core)
 

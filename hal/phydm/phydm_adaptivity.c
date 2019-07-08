@@ -46,7 +46,6 @@ phydm_check_adaptivity(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct phydm_adaptivity_struct	*adaptivity = (struct phydm_adaptivity_struct *)phydm_get_structure(p_dm, PHYDM_ADAPTIVITY);
 
 	if (!(p_dm->support_ability & ODM_BB_ADAPTIVITY)) {
 		p_dm->adaptivity_enable = false;

@@ -193,7 +193,6 @@ static struct center_chs_ent_t center_chs_5g_by_bw[] = {
  */
 u8 rtw_get_scch_by_cch_offset(u8 cch, u8 bw, u8 offset)
 {
-	int i;
 	u8 t_cch = 0;
 
 	if (bw == CHANNEL_WIDTH_20) {
@@ -459,7 +458,6 @@ bool rtw_chbw_to_freq_range(u8 ch, u8 bw, u8 offset, u32 *hi, u32 *lo)
 	u8 c_ch;
 	u32 freq;
 	u32 hi_ret = 0, lo_ret = 0;
-	int i;
 	bool valid = false;
 
 	if (hi)
@@ -837,8 +835,6 @@ const struct country_chplan *rtw_get_chplan_from_country(const char *country_cod
 			break;
 		}
 	}
-
-exit:
 	return ent;
 }
 
@@ -1435,8 +1431,6 @@ int rtw_ch_to_bb_gain_sel(int ch)
 static s8 rtw_rf_get_kfree_tx_gain_offset(struct adapter *adapt, u8 path, u8 ch)
 {
 	s8 kfree_offset = 0;
-
-	struct hal_com_data *hal_data = GET_HAL_DATA(adapt);
 	struct kfree_data_t *kfree_data = GET_KFREE_DATA(adapt);
 	s8 bb_gain_sel = rtw_ch_to_bb_gain_sel(ch);
 
@@ -1491,7 +1485,6 @@ void rtw_rf_set_tx_gain_offset(struct adapter *adapter, u8 path, s8 offset)
 
 void rtw_rf_apply_tx_gain_offset(struct adapter *adapter, u8 ch)
 {
-	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	s8 kfree_offset = 0;
 	s8 tx_pwr_track_offset = 0; /* TODO: 8814A should consider tx pwr track when setting tx gain offset */
 	s8 total_offset;

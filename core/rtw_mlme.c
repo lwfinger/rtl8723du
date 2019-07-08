@@ -690,7 +690,6 @@ struct wlan_network *_rtw_find_same_network(struct __queue *scanned_queue, struc
 
 	if (plist == phead)
 		found = NULL;
-exit:
 	return found;
 }
 
@@ -742,14 +741,8 @@ struct	wlan_network	*rtw_get_oldest_wlan_network(struct __queue *scanned_queue)
 void update_network(struct wlan_bssid_ex *dst, struct wlan_bssid_ex *src,
 		    struct adapter *adapt, bool update_ie)
 {
-	u8 ss_ori = dst->PhyInfo.SignalStrength;
-	u8 sq_ori = dst->PhyInfo.SignalQuality;
 	long rssi_ori = dst->Rssi;
-
-	u8 ss_smp = src->PhyInfo.SignalStrength;
 	u8 sq_smp = src->PhyInfo.SignalQuality;
-	long rssi_smp = src->Rssi;
-
 	u8 ss_final;
 	u8 sq_final;
 	long rssi_final;
@@ -825,7 +818,6 @@ bool rtw_update_scanned_network(struct adapter *adapter, struct wlan_bssid_ex *t
 	struct list_head	*plist, *phead;
 	u32	bssid_ex_sz;
 	struct mlme_priv	*pmlmepriv = &(adapter->mlmepriv);
-	struct mlme_ext_priv	*pmlmeext = &(adapter->mlmeextpriv);
 	struct wifidirect_info *pwdinfo = &(adapter->wdinfo);
 	struct __queue	*queue	= &(pmlmepriv->scanned_queue);
 	struct wlan_network	*pnetwork = NULL;
@@ -958,13 +950,7 @@ exit:
 void rtw_add_network(struct adapter *adapter, struct wlan_bssid_ex *pnetwork);
 void rtw_add_network(struct adapter *adapter, struct wlan_bssid_ex *pnetwork)
 {
-	unsigned long irqL;
-	struct	mlme_priv	*pmlmepriv = &(((struct adapter *)adapter)->mlmepriv);
 	bool update_ie;
-	/* struct __queue	*queue	= &(pmlmepriv->scanned_queue); */
-
-
-	/* _enter_critical_bh(&queue->lock, &irqL); */
 
 	if (adapter->registrypriv.wifi_spec == 0)
 		rtw_bss_ex_del_p2p_attr(pnetwork, P2P_ATTR_GROUP_INFO);
@@ -977,9 +963,6 @@ void rtw_add_network(struct adapter *adapter, struct wlan_bssid_ex *pnetwork)
 
 	if (update_ie)
 		update_current_network(adapter, pnetwork);
-
-	/* _exit_critical_bh(&queue->lock, &irqL); */
-
 }
 
 /* select the desired network based on the capability of the (i)bss.
@@ -1299,7 +1282,6 @@ void rtw_free_assoc_resources(struct adapter *adapter, int lock_scanned_queue)
 	unsigned long irqL;
 	struct wlan_network *pwlan = NULL;
 	struct	mlme_priv *pmlmepriv = &adapter->mlmepriv;
-	struct	sta_priv *pstapriv = &adapter->stapriv;
 	struct wlan_network *tgt_network = &pmlmepriv->cur_network;
 
 	RTW_INFO("%s-"ADPT_FMT" tgt_network MacAddress=" MAC_FMT" ssid=%s\n",
@@ -1359,9 +1341,6 @@ void rtw_free_assoc_resources(struct adapter *adapter, int lock_scanned_queue)
 void rtw_indicate_connect(struct adapter *adapt)
 {
 	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
-	struct xmit_priv	*pxmitpriv = &adapt->xmitpriv;
-
-
 
 	pmlmepriv->to_join = false;
 
@@ -1395,15 +1374,8 @@ void rtw_indicate_connect(struct adapter *adapt)
 void rtw_indicate_disconnect(struct adapter *adapt, u16 reason, u8 locally_generated)
 {
 	struct	mlme_priv *pmlmepriv = &adapt->mlmepriv;
-	struct mlme_ext_priv *pmlmeext = &(adapt->mlmeextpriv);
-	struct mlme_ext_info *pmlmeinfo = &(pmlmeext->mlmext_info);
-	struct wlan_bssid_ex	*cur_network = &(pmlmeinfo->network);
-	struct sta_info *psta;
-	struct sta_priv *pstapriv = &adapt->stapriv;
 	u8 *wps_ie = NULL;
 	uint wpsie_len = 0;
-
-
 
 	_clr_fwstate_(pmlmepriv, _FW_UNDER_LINKING | WIFI_UNDER_WPS);
 
@@ -1505,7 +1477,6 @@ static u32 _rtw_wait_scan_done(struct adapter *adapter, u8 abort, u32 timeout_ms
 void rtw_scan_wait_completed(struct adapter *adapter)
 {
 	struct mlme_ext_priv *pmlmeext = &adapter->mlmeextpriv;
-	struct mlme_ext_info *pmlmeinfo = &pmlmeext->mlmext_info;
 	struct ss_res *ss = &pmlmeext->sitesurvey_res;
 
 	_rtw_wait_scan_done(adapter, false, ss->scan_timeout_ms);
@@ -1719,7 +1690,7 @@ static void rtw_joinbss_update_network(struct adapter *adapt, struct wlan_networ
 /* #define REJOIN */
 void rtw_joinbss_event_prehandle(struct adapter *adapter, u8 *pbuf)
 {
-	unsigned long irqL, irqL2;
+	unsigned long irqL;
 	static u8 retry = 0;
 	struct sta_info *ptarget_sta = NULL, *pcur_sta = NULL;
 	struct	sta_priv *pstapriv = &adapter->stapriv;
@@ -2333,11 +2304,7 @@ void rtw_stadel_event_callback(struct adapter *adapter, u8 *pbuf)
 	u8 *pibss = NULL;
 	struct	mlme_priv	*pmlmepriv = &(adapter->mlmepriv);
 	struct	stadel_event *pstadel	= (struct stadel_event *)pbuf;
-	struct	sta_priv *pstapriv = &adapter->stapriv;
 	struct wlan_network *tgt_network = &(pmlmepriv->cur_network);
-	struct mlme_ext_priv	*pmlmeext = &adapter->mlmeextpriv;
-	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
-
 
 	RTW_INFO("%s(mac_id=%d)=" MAC_FMT "\n", __func__, pstadel->mac_id, MAC_ARG(pstadel->macaddr));
 	rtw_sta_mstatus_disc_rpt(adapter, pstadel->mac_id);
@@ -2579,9 +2546,6 @@ void rtw_scan_timeout_handler(void *FunctionContext)
 
 void rtw_mlme_reset_auto_scan_int(struct adapter *adapter, u8 *reason)
 {
-	struct mlme_priv *mlme = &adapter->mlmepriv;
-	struct mlme_ext_priv	*pmlmeext = &adapter->mlmeextpriv;
-	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	u8 u_ch;
 	u32 interval_ms = 0xffffffff; /* 0xffffffff: special value to make min() works well, also means no auto scan */
 
@@ -2597,8 +2561,6 @@ void rtw_mlme_reset_auto_scan_int(struct adapter *adapter, u8 *reason)
 		interval_ms = rtw_min(interval_ms, 60 * 1000);
 		*reason |= RTW_AUTO_SCAN_REASON_2040_BSS;
 	}
-
-exit:
 	if (interval_ms == 0xffffffff)
 		interval_ms = 0;
 
@@ -2967,8 +2929,6 @@ int rtw_select_roaming_candidate(struct mlme_priv *mlme)
 	struct __queue	*queue	= &(mlme->scanned_queue);
 	struct	wlan_network	*pnetwork = NULL;
 	struct	wlan_network	*candidate = NULL;
-	u8		bSupportAntDiv = false;
-
 
 	if (!mlme->cur_network_scanned) {
 		rtw_warn_on(1);
@@ -3095,8 +3055,6 @@ int rtw_select_and_join_from_scanned_queue(struct mlme_priv *pmlmepriv)
 	struct __queue	*queue	= &(pmlmepriv->scanned_queue);
 	struct	wlan_network	*pnetwork = NULL;
 	struct	wlan_network	*candidate = NULL;
-	u8		bSupportAntDiv = false;
-
 
 	adapter = (struct adapter *)pmlmepriv->nic_hdl;
 
@@ -3207,9 +3165,7 @@ int rtw_set_key(struct adapter *adapter, struct security_priv *psecuritypriv, in
 	struct cmd_obj		*pcmd;
 	struct setkey_parm	*psetkeyparm;
 	struct cmd_priv		*pcmdpriv = &(adapter->cmdpriv);
-	struct mlme_priv		*pmlmepriv = &(adapter->mlmepriv);
 	int	res = _SUCCESS;
-
 
 	psetkeyparm = (struct setkey_parm *)rtw_zmalloc(sizeof(struct setkey_parm));
 	if (!psetkeyparm) {
@@ -3417,16 +3373,12 @@ exit:
 
 int rtw_restruct_sec_ie(struct adapter *adapter, u8 *out_ie)
 {
-	u8 authmode = 0x0, securitytype, match;
-	u8 sec_ie[255], uncst_oui[4], bkup_ie[255];
-	u8 wpa_oui[4] = {0x0, 0x50, 0xf2, 0x01};
-	uint	ielength = 0, cnt, remove_cnt;
+	u8 authmode = 0x0;
+	uint ielength = 0;
 	int iEntry;
-
 	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
 	struct security_priv *psecuritypriv = &adapter->securitypriv;
 	uint	ndisauthmode = psecuritypriv->ndisauthtype;
-	uint ndissecuritytype = psecuritypriv->ndisencryptstatus;
 
 	if ((ndisauthmode == Ndis802_11AuthModeWPA) || (ndisauthmode == Ndis802_11AuthModeWPAPSK))
 		authmode = _WPA_IE_ID_;
@@ -3658,7 +3610,7 @@ unsigned int rtw_restructure_ht_ie(struct adapter *adapt, u8 *in_ie, u8 *out_ie,
 	enum ht_cap_ampdu_density best_ampdu_density;
 	unsigned char *p, *pframe;
 	struct rtw_ieee80211_ht_cap ht_capie;
-	u8	cbw40_enable = 0, rf_type = 0, operation_bw = 0, rf_num = 0, rx_stbc_nss = 0, rx_nss = 0;
+	u8	cbw40_enable = 0, rf_type = 0, operation_bw = 0, rx_stbc_nss = 0, rx_nss = 0;
 	struct registry_priv *pregistrypriv = &adapt->registrypriv;
 	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
 	struct ht_priv		*phtpriv = &pmlmepriv->htpriv;

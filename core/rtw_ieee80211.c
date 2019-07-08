@@ -654,7 +654,6 @@ int rtw_parse_wpa_ie(u8 *wpa_ie, int wpa_ie_len, int *group_cipher, int *pairwis
 
 int rtw_rsne_info_parse(const u8 *ie, uint ie_len, struct rsne_info *info)
 {
-	int i;
 	const u8 *pos = ie;
 	u16 cnt;
 
@@ -795,7 +794,7 @@ exit:
 int rtw_get_wapi_ie(u8 *in_ie, uint in_len, u8 *wapi_ie, u16 *wapi_len)
 {
 	int len = 0;
-	u8 authmode, i;
+	u8 authmode;
 	uint	cnt;
 	u8 wapi_oui1[4] = {0x0, 0x14, 0x72, 0x01};
 	u8 wapi_oui2[4] = {0x0, 0x14, 0x72, 0x02};
@@ -833,13 +832,11 @@ int rtw_get_wapi_ie(u8 *in_ie, uint in_len, u8 *wapi_ie, u16 *wapi_len)
 
 int rtw_get_sec_ie(u8 *in_ie, uint in_len, u8 *rsn_ie, u16 *rsn_len, u8 *wpa_ie, u16 *wpa_len)
 {
-	u8 authmode, sec_idx, i;
+	u8 authmode, sec_idx;
 	u8 wpa_oui[4] = {0x0, 0x50, 0xf2, 0x01};
 	uint	cnt;
 
-
 	/* Search required WPA or WPA2 IE and copy to sec_ie[ ] */
-
 	cnt = (_TIMESTAMP_ + _BEACON_ITERVAL_ + _CAPABILITY_);
 
 	sec_idx = 0;
@@ -1459,10 +1456,6 @@ void dump_ht_cap_ie_content(void *sel, const u8 *buf, u32 buf_len)
 
 static void dump_ht_cap_ie(void *sel, const u8 *ie, u32 ie_len)
 {
-	const u8 *pos = ie;
-	u16 id;
-	u16 len;
-
 	const u8 *ht_cap_ie;
 	int ht_cap_ielen;
 
@@ -1496,10 +1489,6 @@ static void dump_ht_op_ie_content(void *sel, const u8 *buf, u32 buf_len)
 
 static void dump_ht_op_ie(void *sel, const u8 *ie, u32 ie_len)
 {
-	const u8 *pos = ie;
-	u16 id;
-	u16 len;
-
 	const u8 *ht_op_ie;
 	int ht_op_ielen;
 
@@ -1727,7 +1716,7 @@ u32 rtw_get_p2p_merged_ies_len(u8 *in_ie, u32 in_len)
 	struct ndis_802_11_variable_ies *	pIE;
 	u8 OUI[4] = { 0x50, 0x6f, 0x9a, 0x09 };
 	int i = 0;
-	int j = 0, len = 0;
+	int len = 0;
 
 	while (i < in_len) {
 		pIE = (struct ndis_802_11_variable_ies *)(in_ie + i);

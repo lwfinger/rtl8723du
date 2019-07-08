@@ -26,7 +26,6 @@ static void rtw_dev_shutdown(struct device *dev)
 	struct usb_interface *usb_intf = container_of(dev, struct usb_interface, dev);
 	struct dvobj_priv *dvobj = NULL;
 	struct adapter *adapter = NULL;
-	int i;
 
 	RTW_INFO("%s\n", __func__);
 
@@ -36,8 +35,6 @@ static void rtw_dev_shutdown(struct device *dev)
 			adapter = dvobj_get_primary_adapter(dvobj);
 			if (adapter) {
 				if (!rtw_is_surprise_removed(adapter)) {
-					struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(adapter);
-
 					rtw_btcoex_HaltNotify(adapter);
 					rtw_hal_deinit(adapter);
 					rtw_set_surprise_removed(adapter);
@@ -238,7 +235,6 @@ static void rtw_decide_chip_type_by_usb_info(struct dvobj_priv *pdvobjpriv, cons
 static struct dvobj_priv *usb_dvobj_init(struct usb_interface *usb_intf, const struct usb_device_id *pdid)
 {
 	int	i;
-	u8	val8;
 	int	status = _FAIL;
 	struct dvobj_priv *pdvobjpriv;
 	struct usb_device_descriptor	*pdev_desc;
@@ -646,7 +642,7 @@ exit:
 
 static int rtw_resume_process(struct adapter *adapt)
 {
-	int ret, pm_cnt = 0;
+	int ret;
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
 	struct dvobj_priv *pdvobj = adapt->dvobj;
 	struct debug_priv *pdbgpriv = &pdvobj->drv_dbg;
@@ -846,8 +842,6 @@ error_exit:
  * notes: drv_init() is called when the bus driver has located a card for us to support.
  *        We accept the new device by returning 0.
 */
-
-static struct adapter  *rtw_sw_export = NULL;
 
 static struct adapter *rtw_usb_primary_adapter_init(struct dvobj_priv *dvobj,
 	struct usb_interface *pusb_intf)
@@ -1092,11 +1086,7 @@ exit:
 static void rtw_dev_remove(struct usb_interface *pusb_intf)
 {
 	struct dvobj_priv *dvobj = usb_get_intfdata(pusb_intf);
-	struct pwrctrl_priv *pwrctl = dvobj_to_pwrctl(dvobj);
 	struct adapter *adapt = dvobj_get_primary_adapter(dvobj);
-	struct net_device *pnetdev = adapt->pnetdev;
-	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
-
 
 	RTW_INFO("+rtw_dev_remove\n");
 

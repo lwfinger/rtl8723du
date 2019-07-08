@@ -13,7 +13,6 @@ int rtw_fw_ps_state(struct adapter * adapt)
 	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
 	int ret = _FAIL, dont_care = 0;
 	u16 fw_ps_state = 0;
-	u32 start_time;
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
 	struct registry_priv  *registry_par = &adapt->registrypriv;
 
@@ -125,8 +124,6 @@ int _ips_leave(struct adapter *adapt)
 int ips_leave(struct adapter *adapt)
 {
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
-	struct dvobj_priv *psdpriv = adapt->dvobj;
-	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
 	int ret;
 
 	if (!is_primary_adapter(adapt))
@@ -221,7 +218,6 @@ exit:
  */
 void rtw_ps_processor(struct adapter *adapt)
 {
-	struct wifidirect_info	*pwdinfo = &(adapt->wdinfo);
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
 	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
 	struct dvobj_priv *psdpriv = adapt->dvobj;
@@ -416,8 +412,6 @@ void rtw_set_rpwm(struct adapter * adapt, u8 pslv)
 {
 	u8	rpwm;
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
-	struct dvobj_priv *psdpriv = adapt->dvobj;
-	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
 
 	pslv = PS_STATE(pslv);
 
@@ -453,8 +447,6 @@ static u8 PS_RDY_CHECK(struct adapter *adapt)
 	u32 delta_ms;
 	struct pwrctrl_priv	*pwrpriv = adapter_to_pwrctl(adapt);
 	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
-	struct wifidirect_info *pwdinfo = &(adapt->wdinfo);
-	struct cfg80211_wifidirect_info *pcfg80211_wdinfo = &adapt->cfg80211_wdinfo;
 
 	if (pwrpriv->bInSuspend)
 		return false;
@@ -534,9 +526,6 @@ void rtw_set_fw_in_ips_mode(struct adapter * adapt, u8 enable)
 void rtw_set_ps_mode(struct adapter * adapt, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode, const char *msg)
 {
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
-	struct dvobj_priv *psdpriv = adapt->dvobj;
-	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
-	struct registry_priv *pregistrypriv = &adapt->registrypriv;
 	struct wifidirect_info	*pwdinfo = &(adapt->wdinfo);
 
 	if (ps_mode > PM_Card_Disable) {
@@ -666,7 +655,6 @@ void LPS_Enter(struct adapter * adapt, const char *msg)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapt);
 	struct pwrctrl_priv	*pwrpriv = dvobj_to_pwrctl(dvobj);
-	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
 	int n_assoc_iface = 0;
 	int i;
 	char buf[32] = {0};
@@ -729,13 +717,7 @@ void LPS_Leave(struct adapter * adapt, const char *msg)
 
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapt);
 	struct pwrctrl_priv	*pwrpriv = dvobj_to_pwrctl(dvobj);
-	u32 start_time;
-	u8 bAwake = false;
 	char buf[32] = {0};
-	struct debug_priv *pdbgpriv = &dvobj->drv_dbg;
-
-
-	/*	RTW_INFO("+LeisurePSLeave\n"); */
 
 	if (rtw_btcoex_IsBtControlLps(adapt))
 		return;
@@ -762,15 +744,7 @@ void rtw_wow_lps_level_decide(struct adapter *adapter, u8 wow_en)
 void LeaveAllPowerSaveModeDirect(struct adapter * Adapter)
 {
 	struct adapter * pri_adapt = GET_PRIMARY_ADAPTER(Adapter);
-	struct mlme_priv	*pmlmepriv = &(Adapter->mlmepriv);
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(Adapter);
-	struct dvobj_priv *psdpriv = Adapter->dvobj;
-	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
-#ifndef CONFIG_DETECT_CPWM_BY_POLLING
-	u8 cpwm_orig, cpwm_now;
-	unsigned long start_time;
-#endif /* CONFIG_DETECT_CPWM_BY_POLLING */
-
 
 	RTW_INFO("%s.....\n", __func__);
 
@@ -807,7 +781,6 @@ void LeaveAllPowerSaveModeDirect(struct adapter * Adapter)
 			}
 		}
 	}
-
 }
 
 /*
@@ -817,13 +790,9 @@ void LeaveAllPowerSaveModeDirect(struct adapter * Adapter)
 void LeaveAllPowerSaveMode(struct adapter * Adapter)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(Adapter);
-	struct mlme_priv	*pmlmepriv = &(Adapter->mlmepriv);
 	u8	enqueue = 0;
 	int n_assoc_iface = 0;
 	int i;
-
-
-	/* RTW_INFO("%s.....\n",__func__); */
 
 	if (false == Adapter->bup) {
 		RTW_INFO(FUNC_ADPT_FMT ": bup=%d Skip!\n",
@@ -876,9 +845,6 @@ void LeaveAllPowerSaveMode(struct adapter * Adapter)
 void rtw_init_pwrctrl_priv(struct adapter * adapt)
 {
 	struct pwrctrl_priv *pwrctrlpriv = adapter_to_pwrctl(adapt);
-	struct registry_priv  *registry_par = &adapt->registrypriv;
-
-	u8 val8 = 0;
 
 #if defined(CONFIG_CONCURRENT_MODE)
 	if (adapt->adapter_type != PRIMARY_ADAPTER)
@@ -987,7 +953,6 @@ int _rtw_pwr_wakeup(struct adapter *adapt, u32 ips_deffer_ms, const char *caller
 	struct pwrctrl_priv *pwrpriv = dvobj_to_pwrctl(dvobj);
 	struct mlme_priv *pmlmepriv;
 	int ret = _SUCCESS;
-	int i;
 	unsigned long start = rtw_get_current_time();
 
 	/* for LPS */
@@ -1171,8 +1136,6 @@ int rtw_pm_set_ips(struct adapter *adapt, u8 mode)
 void rtw_ps_deny(struct adapter * adapt, enum ps_deny_reason reason)
 {
 	struct pwrctrl_priv *pwrpriv;
-	int ret;
-
 
 	/* 	RTW_INFO("+" FUNC_ADPT_FMT ": Request PS deny for %d (0x%08X)\n",
 	 *		FUNC_ADPT_ARG(adapt), reason, BIT(reason)); */

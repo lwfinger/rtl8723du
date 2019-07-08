@@ -106,7 +106,6 @@ phydm_cckpd(
 )
 {
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
 	struct phydm_cckpd_struct	*p_cckpd_t = &p_dm->dm_cckpd_table;
 	u8	cur_cck_cca_th= p_cckpd_t->cur_cck_cca_thres;
 

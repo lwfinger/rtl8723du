@@ -16,6 +16,9 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
+/* <20121018, Kordan> In case fail to read TxPowerTrack.txt, we use the table of 88E as the default table. */
+static u8 delta_swing_table_idx_2ga_n_8188e[] = {0, 0, 0, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5,  6,  6,  7,  7,  7,  7,  8,  8,  9,  9, 10, 10, 10, 11, 11, 11, 11};
+static u8 delta_swing_table_idx_2ga_p_8188e[] = {0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 4,  4,  4,  4,  4,  4,  5,  5,  7,  7,  8,  8,  8,  9,  9,  9,  9,  9};
 
 /*---------------------------Define Local Constant---------------------------*/
 /*IQK*/
@@ -208,8 +211,6 @@ odm_tx_pwr_track_set_pwr_8723d(
 )
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct adapter			*adapter = p_dm->adapter;
-	//struct hal_com_data *			p_hal_data = GET_HAL_DATA(adapter);
 	struct odm_rf_calibration_structure			*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
 	struct _hal_rf_ *p_rf = &(p_dm->rf_table);
 	u8 pwr_tracking_limit_ofdm = 30;
@@ -217,9 +218,8 @@ odm_tx_pwr_track_set_pwr_8723d(
 	u8 tx_rate = 0xFF;
 	u8 final_ofdm_swing_index = 0;
 	u8 final_cck_swing_index = 0;
-	u8 i = 0;
 
-if (*(p_dm->p_mp_mode)) {
+	if (*(p_dm->p_mp_mode)) {
 	} else {
 		u16 rate	 = *(p_dm->p_forced_data_rate);
 
@@ -231,8 +231,6 @@ if (*(p_dm->p_mp_mode)) {
 		} else   /*force rate*/
 			tx_rate = (u8)rate;
 	}
-
-
 	ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("===>ODM_TxPwrTrackSetPwr8723DA\n"));
 
 	if (tx_rate != 0xFF) {
@@ -265,10 +263,6 @@ if (*(p_dm->p_mp_mode)) {
 	}
 
 	if (method == TXAGC) {
-		u8 rf = 0;
-		u32 pwr = 0, tx_agc = 0;
-		//struct adapter *adapter = p_dm->adapter;
-
 		ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("odm_TxPwrTrackSetPwr_8723D CH=%d\n", *(p_dm->p_channel)));
 
 		p_rf_calibrate_info->remnant_ofdm_swing_idx[rf_path] = p_rf_calibrate_info->absolute_ofdm_swing_idx[rf_path];   /* Remnant index equal to aboslute compensate value. */
@@ -543,7 +537,6 @@ get_delta_swing_table_8723d(
 )
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct adapter		*adapter		 = p_dm->adapter;
 	struct _hal_rf_ *p_rf = &(p_dm->rf_table);
 	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
 	u8 tx_rate			= 0xFF;
@@ -993,7 +986,7 @@ phy_path_s0_iqk_8723d(
 	struct PHY_DM_STRUCT *p_dm
 )
 {
-	u32 reg_eac, reg_e94, reg_e9c, reg_e94_s0, reg_e9c_s0, reg_ea4_s0, reg_eac_s0, tmp, path_sel_bb;
+	u32 reg_e94_s0, reg_e9c_s0, reg_eac_s0, path_sel_bb;
 	u8 result = 0x00, ktime;
 	u32 original_path, original_gnt;
 
@@ -1103,7 +1096,7 @@ phy_path_s0_iqk_8723d(
 static u8 phy_path_s0_rx_iqk_8723d(struct PHY_DM_STRUCT *p_dm,
 				   bool config_path_s0)
 {
-	u32 reg_e94, reg_e9c, reg_ea4, reg_eac, reg_e94_s0, reg_e9c_s0, reg_ea4_s0, reg_eac_s0, tmp, u4tmp, path_sel_bb;
+	u32 reg_e94_s0, reg_e9c_s0, reg_ea4_s0, reg_eac_s0, tmp, u4tmp, path_sel_bb;
 	u8 result = 0x00, ktime;
 	u32 original_path, original_gnt;
 
@@ -1563,19 +1556,6 @@ _phy_path_b_stand_by_8723d(
 	odm_set_bb_reg(p_dm, REG_FPGA0_IQK, 0xffffff00, 0x808000);
 }
 
-static void
-_phy_pi_mode_switch_8723d(
-	struct PHY_DM_STRUCT *p_dm,
-	bool pi_mode
-)
-{
-	u32 mode;
-
-	mode = pi_mode ? 0x01000100 : 0x01000000;
-	odm_set_bb_reg(p_dm, REG_FPGA0_XA_HSSI_PARAMETER1, MASKDWORD, mode);
-	odm_set_bb_reg(p_dm, REG_FPGA0_XB_HSSI_PARAMETER1, MASKDWORD, mode);
-}
-
 static bool
 phy_simularity_compare_8723d(
 	struct PHY_DM_STRUCT *p_dm,
@@ -1900,7 +1880,7 @@ static void _phy_iq_calibrate_8723d(struct PHY_DM_STRUCT *p_dm, s32 result[][8],
 static void _phy_lc_calibrate_8723d(struct PHY_DM_STRUCT *p_dm, bool is2T)
 {
 	u8 tmp_reg;
-	u32 rf_bmode = 0, lc_cal, cnt;
+	u32 lc_cal, cnt;
 
 	tmp_reg = odm_read_1byte(p_dm, 0xd03);
 	if ((tmp_reg & 0x70) != 0)
@@ -1934,7 +1914,6 @@ phy_iq_calibrate_8723d(
 )
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	u16 count = 0;
 	s32 result[4][8];
 	u8 i, final_candidate, indexforchannel;
 	bool is_path_s1_ok, is_path_s0_ok;
@@ -2146,12 +2125,8 @@ void phy_set_rf_path_switch_8723d(
 	bool is_main
 )
 {
-	struct hal_com_data	*p_hal_data = GET_HAL_DATA(adapt);
-	struct PHY_DM_STRUCT *p_dm = &p_hal_data->odmpriv;
-
 #if DISABLE_BB_RF
 	return;
 #endif
-
 	_phy_set_rf_path_switch_8723d(adapt, is_main, true);
 }

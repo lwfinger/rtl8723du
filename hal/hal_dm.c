@@ -6,34 +6,6 @@
 #include <hal_data.h>
 
 /* A mapping from HalData to ODM. */
-static enum odm_board_type_e boardType(u8 InterfaceSel)
-{
-	enum odm_board_type_e        board	= ODM_BOARD_DEFAULT;
-
-	enum INTERFACE_SELECT_USB    usb	= (enum INTERFACE_SELECT_USB)InterfaceSel;
-	switch (usb) {
-	case INTF_SEL1_USB_High_Power:
-		board |= ODM_BOARD_EXT_LNA;
-		board |= ODM_BOARD_EXT_PA;
-		break;
-	case INTF_SEL2_MINICARD:
-		board |= ODM_BOARD_MINICARD;
-		break;
-	case INTF_SEL4_USB_Combo:
-		board |= ODM_BOARD_BT;
-		break;
-	case INTF_SEL5_USB_Combo_MF:
-		board |= ODM_BOARD_BT;
-		break;
-	case INTF_SEL0_USB:
-	case INTF_SEL3_USB_Solo:
-	default:
-		board = ODM_BOARD_DEFAULT;
-		break;
-	}
-	return board;
-}
-
 void rtw_hal_update_iqk_fw_offload_cap(struct adapter *adapter)
 {
 	struct hal_com_data * hal = GET_HAL_DATA(adapter);
@@ -48,19 +20,6 @@ void rtw_hal_update_iqk_fw_offload_cap(struct adapter *adapter)
 	RTW_INFO("IQK FW offload:%s\n", hal->RegIQKFWOffload ? "enable" : "disable");
 }
 
-static void rtw_phydm_iqk_trigger_dbg(struct adapter *adapter, bool recovery, bool clear, bool segment)
-{
-	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(adapter);
-
-	halrf_iqk_trigger(p_dm_odm, recovery);
-}
-
-static void rtw_phydm_lck_trigger(struct adapter *adapter)
-{
-	struct PHY_DM_STRUCT *p_dm_odm = adapter_to_phydm(adapter);
-
-	halrf_lck_trigger(p_dm_odm);
-}
 #ifdef CONFIG_DBG_RF_CAL
 void rtw_hal_iqk_test(struct adapter *adapter, bool recovery, bool clear, bool segment)
 {
@@ -598,8 +557,6 @@ void GetHalODMVar(
 	void *					pValue1,
 	void *					pValue2)
 {
-	struct PHY_DM_STRUCT *podmpriv = adapter_to_phydm(Adapter);
-
 	switch (eVariable) {
 	case HAL_ODM_INITIAL_GAIN:
 		*((u8 *)pValue1) = rtw_phydm_get_cur_igi(Adapter);
@@ -751,7 +708,6 @@ void rtw_phydm_watchdog(struct adapter *adapter)
 	u8	bsta_state = false;
 	u8	bBtDisabled = true;
 	u8	rfk_forbidden = true;
-	u8	segment_iqk = true;
 	u8	tx_unlinked_low_rate = 0xFF;
 	struct hal_com_data *	pHalData = GET_HAL_DATA(adapter);
 	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(adapter);
@@ -790,8 +746,6 @@ void rtw_phydm_watchdog(struct adapter *adapter)
 		phydm_watchdog_lps(&pHalData->odmpriv);
 	else
 		phydm_watchdog(&pHalData->odmpriv);
-
-_exit:
 	return;
 }
 

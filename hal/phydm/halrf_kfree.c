@@ -177,7 +177,6 @@ phydm_set_kfree_to_rf_8821c(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
 	u8	wlg, btg;
 
 	odm_set_rf_reg(p_dm, e_rf_path, 0xde, BIT(0), 1);
@@ -216,7 +215,6 @@ phydm_clear_kfree_to_rf_8821c(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
 
 	odm_set_rf_reg(p_dm, e_rf_path, 0xde, BIT(0), 1);
 	odm_set_rf_reg(p_dm, e_rf_path, 0xde, BIT(5), 1);
@@ -277,8 +275,6 @@ phydm_get_power_trim_offset_8822b(
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct odm_power_trim_data	*p_power_trim_info = &(p_dm->power_trim_data);
-	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
-
 	u8 pg_power = 0xff, i, j;
 
 	odm_efuse_one_byte_read(p_dm, PPG_BB_GAIN_2G_TXAB_OFFSET, &pg_power, false);
@@ -345,7 +341,6 @@ phydm_set_pa_bias_to_rf_8822b(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
 	u32	rf_reg_51 = 0, rf_reg_52 = 0, rf_reg_3f = 0;
 
 	rf_reg_51 = odm_get_rf_reg(p_dm, e_rf_path, 0x51, RFREGOFFSETMASK);
@@ -403,8 +398,6 @@ phydm_get_pa_bias_offset_8822b(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct odm_power_trim_data	*p_power_trim_info = &(p_dm->power_trim_data);
-
 	u8 pg_pa_bias = 0xff, e_rf_path = 0;
 	s8 tx_pa_bias[2] = {0};
 
@@ -448,7 +441,6 @@ phydm_set_kfree_to_rf_8822b(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
 
 	odm_set_rf_reg(p_dm, e_rf_path, 0xde, BIT(0), 1);
 	odm_set_rf_reg(p_dm, e_rf_path, 0xde, BIT(4), 1);
@@ -475,7 +467,6 @@ phydm_clear_kfree_to_rf_8822b(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
 
 	odm_set_rf_reg(p_dm, e_rf_path, 0xde, BIT(0), 1);
 	odm_set_rf_reg(p_dm, e_rf_path, 0xde, BIT(4), 1);
@@ -533,8 +524,6 @@ phydm_get_power_trim_offset_8710b(
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct odm_power_trim_data	*p_power_trim_info = &(p_dm->power_trim_data);
-	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
-
 	u8 pg_power = 0xff;
 
 	odm_efuse_one_byte_read(p_dm, 0xEE, &pg_power, false);
@@ -565,7 +554,6 @@ phydm_set_kfree_to_rf_8710b(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
 
 	odm_set_rf_reg(p_dm, e_rf_path, 0x55, BIT(19), (data & BIT(0)));
 	odm_set_rf_reg(p_dm, e_rf_path, 0x55, (BIT(18) | BIT(17) | BIT(16) | BIT(15)), ((data & 0xf) >> 1));
@@ -585,7 +573,6 @@ phydm_clear_kfree_to_rf_8710b(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct odm_rf_calibration_structure	*p_rf_calibrate_info = &(p_dm->rf_calibrate_info);
 
 	odm_set_rf_reg(p_dm, e_rf_path, 0x55, BIT(19), (data & BIT(0)));
 	odm_set_rf_reg(p_dm, e_rf_path, 0x55, (BIT(18) | BIT(17) | BIT(16) | BIT(15) | BIT(14)), ((data & 0x1f) >> 1));

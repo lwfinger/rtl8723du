@@ -32,8 +32,6 @@ SwLedOn_8723DU(
 	struct led_usb * pLed
 )
 {
-	u8 LedCfg;
-
 	if (RTW_CANNOT_RUN(adapt))
 		return;
 
@@ -52,14 +50,11 @@ SwLedOff_8723DU(
 	struct led_usb * pLed
 )
 {
-	u8 LedCfg;
-
 	if (RTW_CANNOT_RUN(adapt))
 		goto exit;
 
 exit:
 	pLed->bLedOn = false;
-
 }
 
 /*

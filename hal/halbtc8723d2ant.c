@@ -226,29 +226,6 @@ static void halbtc8723d2ant_coex_switch_threshold(struct btc_coexist *btcoexist,
 	*/
 }
 
-
-static void halbtc8723d2ant_limited_rx(struct btc_coexist *btcoexist,
-			bool force_exec, bool rej_ap_agg_pkt,
-			bool bt_ctrl_agg_buf_size, u8 agg_buf_size)
-{
-	bool	reject_rx_agg = rej_ap_agg_pkt;
-	bool	bt_ctrl_rx_agg_size = bt_ctrl_agg_buf_size;
-	u8	rx_agg_size = agg_buf_size;
-
-	/* ============================================ */
-	/*	Rx Aggregation related setting */
-	/* ============================================ */
-	btcoexist->btc_set(btcoexist, BTC_SET_BL_TO_REJ_AP_AGG_PKT,
-			   &reject_rx_agg);
-	/* decide BT control aggregation buf size or not */
-	btcoexist->btc_set(btcoexist, BTC_SET_BL_BT_CTRL_AGG_SIZE,
-			   &bt_ctrl_rx_agg_size);
-	/* aggregation buf size, only work when BT control Rx aggregation size. */
-	btcoexist->btc_set(btcoexist, BTC_SET_U1_AGG_BUF_SIZE, &rx_agg_size);
-	/* real update aggregation setting */
-	btcoexist->btc_set(btcoexist, BTC_SET_ACT_AGGREGATE_CTRL, NULL);
-}
-
 static void halbtc8723d2ant_query_bt_info(struct btc_coexist *btcoexist)
 {
 	u8			h2c_parameter[1] = {0};
@@ -386,11 +363,10 @@ static void halbtc8723d2ant_monitor_wifi_ctr(struct btc_coexist *btcoexist)
 {
 	int wifi_rssi = 0;
 	bool wifi_busy = false, wifi_under_b_mode = false,
-			wifi_scan = false, wifi_connected = false;
-	bool bt_idle = false, wl_idle = false, is_cck_deadlock = false;
-	static u8 cck_lock_counter = 0, wl_noisy_count0 = 0,
+			wifi_scan = false;
+	static u8 wl_noisy_count0 = 0,
 		  wl_noisy_count1 = 3, wl_noisy_count2 = 0;
-	u32 total_cnt, reg_val1, reg_val2, cnt_cck;
+	u32 cnt_cck;
 	u32 cnt_crcok = 0, cnt_crcerr = 0, cnt_ccklocking = 0;
 	static u8 cnt = 0, cnt_cal = 0;
 	u8	h2c_parameter[1] = {0};
@@ -948,34 +924,6 @@ static void halbtc8723d2ant_low_penalty_ra(struct btc_coexist *btcoexist,
 	coex_dm->pre_low_penalty_ra = coex_dm->cur_low_penalty_ra;
 }
 
-static void halbtc8723d2ant_set_bt_auto_report(struct btc_coexist *btcoexist,
-					bool enable_auto_report)
-{
-	u8			h2c_parameter[1] = {0};
-
-	h2c_parameter[0] = 0;
-
-	if (enable_auto_report)
-		h2c_parameter[0] |= BIT(0);
-
-	btcoexist->btc_fill_h2c(btcoexist, 0x68, 1, h2c_parameter);
-}
-
-static void halbtc8723d2ant_bt_auto_report(struct btc_coexist *btcoexist,
-		    bool force_exec, bool enable_auto_report)
-{
-	coex_dm->cur_bt_auto_report = enable_auto_report;
-
-	if (!force_exec) {
-		if (coex_dm->pre_bt_auto_report == coex_dm->cur_bt_auto_report)
-			return;
-	}
-	halbtc8723d2ant_set_bt_auto_report(btcoexist,
-					   coex_dm->cur_bt_auto_report);
-
-	coex_dm->pre_bt_auto_report = coex_dm->cur_bt_auto_report;
-}
-
 static bool halbtc8723d2ant_is_wifibt_status_changed(struct btc_coexist
 		*btcoexist)
 {
@@ -1176,7 +1124,7 @@ static void halbtc8723d2ant_enable_gnt_to_gpio(struct btc_coexist *btcoexist,
 static u32 halbtc8723d2ant_ltecoex_indirect_read_reg(struct btc_coexist *btcoexist,
 		u16 reg_addr)
 {
-	u32 j = 0, delay_count = 0;
+	u32 delay_count = 0;
 
 	/* wait for ready bit before access 0x7c0/0x7c4 */
 	while (1) {
@@ -1202,7 +1150,7 @@ static void halbtc8723d2ant_ltecoex_indirect_write_reg(struct btc_coexist
 		*btcoexist,
 		u16 reg_addr, u32 bit_mask, u32 reg_value)
 {
-	u32 val, i = 0, j = 0, bitpos = 0, delay_count = 0;
+	u32 val, i, bitpos = 0, delay_count = 0;
 
 
 	if (bit_mask == 0x0)
@@ -1251,15 +1199,11 @@ static void halbtc8723d2ant_ltecoex_indirect_write_reg(struct btc_coexist
 			} else
 				break;
 		}
-
 		btcoexist->btc_write_4byte(btcoexist, 0x7c4,
 					   val); /* put write data */
-
 		btcoexist->btc_write_4byte(btcoexist, 0x7c0,
 					   0xc00F0000 | reg_addr);
-
 	}
-
 }
 
 static void halbtc8723d2ant_ltecoex_enable(struct btc_coexist *btcoexist,
@@ -1368,69 +1312,6 @@ static void halbtc8723d2ant_ltecoex_set_coex_table(struct btc_coexist *btcoexist
 			0xffff, table_content); /* 0xa0[15:0] or 0xa4[15:0] */
 
 
-}
-
-
-static void halbtc8723d2ant_ltecoex_set_break_table(struct btc_coexist *btcoexist,
-		u8 table_type, u8 table_content)
-{
-	u16 reg_addr = 0x0000;
-
-	switch (table_type) {
-	case BT_8723D_2ANT_LBTT_WL_BREAK_LTE:
-		reg_addr = 0xa8;
-		break;
-	case BT_8723D_2ANT_LBTT_BT_BREAK_LTE:
-		reg_addr = 0xac;
-		break;
-	case BT_8723D_2ANT_LBTT_LTE_BREAK_WL:
-		reg_addr = 0xb0;
-		break;
-	case BT_8723D_2ANT_LBTT_LTE_BREAK_BT:
-		reg_addr = 0xb4;
-		break;
-	}
-
-	if (reg_addr != 0x0000)
-		halbtc8723d2ant_ltecoex_indirect_write_reg(btcoexist, reg_addr,
-			0xff, table_content); /* 0xa8[15:0] or 0xb4[15:0] */
-
-
-}
-
-static void halbtc8723d2ant_set_wltoggle_coex_table(struct btc_coexist *btcoexist,
-		bool force_exec,  u8 interval,
-		u8 val0x6c4_b0, u8 val0x6c4_b1, u8 val0x6c4_b2,
-		u8 val0x6c4_b3)
-{
-	static u8 pre_h2c_parameter[6] = {0};
-	u8	cur_h2c_parameter[6] = {0};
-	u8 i, match_cnt = 0;
-
-	cur_h2c_parameter[0] = 0x7;	/* op_code, 0x7= wlan toggle slot*/
-
-	cur_h2c_parameter[1] = interval;
-	cur_h2c_parameter[2] = val0x6c4_b0;
-	cur_h2c_parameter[3] = val0x6c4_b1;
-	cur_h2c_parameter[4] = val0x6c4_b2;
-	cur_h2c_parameter[5] = val0x6c4_b3;
-
-	if (!force_exec) {
-		for (i = 1; i <= 5; i++) {
-			if (cur_h2c_parameter[i] != pre_h2c_parameter[i])
-				break;
-
-			match_cnt++;
-		}
-
-		if (match_cnt == 5)
-			return;
-	}
-
-	for (i = 1; i <= 5; i++)
-		pre_h2c_parameter[i] = cur_h2c_parameter[i];
-
-	btcoexist->btc_fill_h2c(btcoexist, 0x69, 6, cur_h2c_parameter);
 }
 
 static void halbtc8723d2ant_set_coex_table(struct btc_coexist *btcoexist,
@@ -1984,20 +1865,14 @@ static void halbtc8723d2ant_set_ant_path(struct btc_coexist *btcoexist,
 				  u8 phase)
 {
 	struct  btc_board_info *board_info = &btcoexist->board_info;
-	u32			u32tmp = 0;
-	bool			pg_ext_switch = false,  is_hw_ant_div_on = false;
-	u8			h2c_parameter[2] = {0};
-	u32			cnt_bt_cal_chk = 0;
-	u8			u8tmp0 = 0, u8tmp1 = 0;
-	bool			is_in_mp_mode = false;
-	u32				u32tmp0 = 0, u32tmp1 = 0, u32tmp2 = 0;
-	u16				u16tmp0 = 0,  u16tmp1 = 0;
-
+	bool is_hw_ant_div_on = false;
+	u32 cnt_bt_cal_chk = 0;
+	u8 u8tmp0 = 0, u8tmp1 = 0;
+	u32 u32tmp1;
 
 	u32tmp1 = halbtc8723d2ant_ltecoex_indirect_read_reg(btcoexist,
 			0x38);
-
-     /* To avoid indirect access fail   */
+	/* To avoid indirect access fail   */
 	if (((u32tmp1 & 0xf000) >> 12) != ((u32tmp1 & 0x0f00) >> 8)) {
 		force_exec = true;
 		coex_sta->gnt_error_cnt++;
@@ -3047,8 +2922,6 @@ static void halbtc8723d2ant_action_a2dpsink(struct btc_coexist *btcoexist)
 	static u8	pre_bt_rssi_state2 = BTC_RSSI_STATE_LOW;
 	u8		wifi_rssi_state2, bt_rssi_state2;
 	bool wifi_busy = false, wifi_turbo = false;
-	struct	btc_bt_link_info *bt_link_info = &btcoexist->bt_link_info;
-
 
 	btcoexist->btc_get(btcoexist, BTC_GET_BL_WIFI_BUSY, &wifi_busy);
 	btcoexist->btc_get(btcoexist, BTC_GET_U1_AP_NUM,
@@ -3940,7 +3813,7 @@ static void halbtc8723d2ant_run_coexist_mechanism(struct btc_coexist *btcoexist)
 	bool miracast_plus_bt = false;
 	bool	scan = false, link = false, roam = false,
 			under_4way = false,
-			wifi_connected = false, wifi_under_5g = false,
+			wifi_connected = false,
 			bt_hs_on = false;
 
 	btcoexist->btc_get(btcoexist, BTC_GET_BL_WIFI_SCAN, &scan);
@@ -4157,12 +4030,7 @@ static void halbtc8723d2ant_init_coex_dm(struct btc_coexist *btcoexist)
 static void halbtc8723d2ant_init_hw_config(struct btc_coexist *btcoexist,
 				    bool wifi_only)
 {
-	u8	u8tmp0 = 0, u8tmp1 = 0;
-	u32	vendor;
-	u32	u32tmp0 = 0, u32tmp1 = 0, u32tmp2 = 0;
-	u16 u16tmp1 = 0;
-	u8 i = 0;
-
+	u8 i;
 
 	BTC_SPRINTF(trace_buf, BT_TMP_BUF_SIZE,
 		    "[BTCoex], 2Ant Init HW Config!!\n");
@@ -5077,9 +4945,7 @@ static bool halbtc8723d2ant_psd_antenna_detection(struct btc_coexist
 	int	wlpsd_offset = -4;
 	u32 bt_tx_time, bt_le_channel;
 	u8	bt_le_ch[13] = {3, 6, 8, 11, 13, 16, 18, 21, 23, 26, 28, 31, 33};
-
-	u8	h2c_parameter[3] = {0}, u8tmpa, u8tmpb;
-
+	u8	h2c_parameter[3] = {0};
 	u8	state = 0;
 	bool		outloop = false, bt_resp = false, ant_det_finish = false;
 	u32		freq, freq1, freq2, psd_rep1, psd_rep2, delta_freq_per_point,
@@ -5431,8 +5297,6 @@ static bool halbtc8723d2ant_psd_antenna_detection_check(struct btc_coexist
 		*btcoexist)
 {
 	static u32 ant_det_count = 0, ant_det_fail_count = 0;
-	struct  btc_board_info	*board_info = &btcoexist->board_info;
-
 	bool scan, roam, ant_det_finish = false;
 
 	btcoexist->btc_get(btcoexist, BTC_GET_BL_WIFI_SCAN, &scan);
@@ -6253,10 +6117,7 @@ void ex_halbtc8723d2ant_lps_notify(struct btc_coexist *btcoexist, u8 type)
 void ex_halbtc8723d2ant_scan_notify(struct btc_coexist *btcoexist,
 				    u8 type)
 {
-	u32	u32tmp;
-	u8	u8tmpa, u8tmpb;
 	bool	wifi_connected = false;
-
 
 	if (btcoexist->manual_control ||
 	    btcoexist->stop_coex_dm)
@@ -6360,10 +6221,6 @@ void ex_halbtc8723d2ant_connect_notify(struct btc_coexist *btcoexist,
 void ex_halbtc8723d2ant_media_status_notify(struct btc_coexist *btcoexist,
 		u8 type)
 {
-	u8			h2c_parameter[3] = {0};
-	u32			wifi_bw;
-	u8			wifi_central_chnl;
-	u8			ap_num = 0;
 	bool		wifi_under_b_mode = false;
 
 	if (btcoexist->manual_control ||
@@ -6895,9 +6752,6 @@ void ex_halbtc8723d2ant_pnp_notify(struct btc_coexist *btcoexist,
 void ex_halbtc8723d2ant_periodical(struct btc_coexist *btcoexist)
 {
 	struct  btc_board_info	*board_info = &btcoexist->board_info;
-	bool wifi_busy = false;
-	u32	bt_patch_ver;
-	static u8 cnt = 0;
 	bool bt_relink_finish = false;
 
 	BTC_SPRINTF(trace_buf, BT_TMP_BUF_SIZE,

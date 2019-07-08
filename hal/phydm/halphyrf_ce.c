@@ -625,29 +625,6 @@ u8 odm_get_right_chnl_place_for_iqk(u8 chnl)
 
 }
 
-static void
-odm_iq_calibrate(
-	struct PHY_DM_STRUCT	*p_dm
-)
-{
-	struct adapter	*adapter = p_dm->adapter;
-	struct _IQK_INFORMATION	*p_iqk_info = &p_dm->IQK_info;
-
-	if ((p_dm->is_linked) && (!p_iqk_info->rfk_forbidden)) {
-		if ((*p_dm->p_channel != p_dm->pre_channel) && (!*p_dm->p_is_scan_in_process)) {
-			p_dm->pre_channel = *p_dm->p_channel;
-			p_dm->linked_interval = 0;
-		}
-
-		if (p_dm->linked_interval < 3)
-			p_dm->linked_interval++;
-
-		if (p_dm->linked_interval == 2)
-			halrf_iqk_trigger(p_dm, false);
-	} else
-		p_dm->linked_interval = 0;
-}
-
 void phydm_rf_init(void		*p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;

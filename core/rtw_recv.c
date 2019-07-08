@@ -6,6 +6,9 @@
 #include <drv_types.h>
 #include <hal_data.h>
 
+static u8 SNAP_ETH_TYPE_APPLETALK_AARP[2] = {0x80, 0xf3};
+static u8 SNAP_ETH_TYPE_IPX[2] = {0x81, 0x37};
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 void rtw_signal_stat_timer_hdl(struct timer_list *t);
 #else
@@ -681,15 +684,12 @@ static int recv_decache(union recv_frame *precv_frame, u8 bretry)
 #define PN_LESS_CHK(a, b)	(((a-b) & 0x800000000000L) != 0)
 #define VALID_PN_CHK(new, old)	(((old) == 0) || PN_LESS_CHK(old, new))
 #define CCMPH_2_KEYID(ch)	(((ch) & 0x00000000c0000000L) >> 30)
-int recv_ucast_pn_decache(union recv_frame *precv_frame);
 int recv_ucast_pn_decache(union recv_frame *precv_frame)
 {
-	struct adapter *adapt = precv_frame->u.hdr.adapter;
 	struct rx_pkt_attrib *pattrib = &precv_frame->u.hdr.attrib;
 	struct sta_info *sta = precv_frame->u.hdr.psta;
 	struct stainfo_rxcache *prxcache = &sta->sta_recvpriv.rxcache;
 	u8 *pdata = precv_frame->u.hdr.rx_data;
-	u32 data_len = precv_frame->u.hdr.len;
 	int tid = precv_frame->u.hdr.attrib.priority;
 	u64 tmp_iv_hdr = 0;
 	u64 curr_pn = 0, pkt_pn = 0;
@@ -724,7 +724,6 @@ int recv_bcast_pn_decache(union recv_frame *precv_frame)
 	struct security_priv *psecuritypriv = &adapt->securitypriv;
 	struct rx_pkt_attrib *pattrib = &precv_frame->u.hdr.attrib;
 	u8 *pdata = precv_frame->u.hdr.rx_data;
-	u32 data_len = precv_frame->u.hdr.len;
 	u64 tmp_iv_hdr = 0;
 	u64 curr_pn = 0, pkt_pn = 0;
 	u8 key_id;
@@ -752,11 +751,8 @@ static void process_pwrbit_data(struct adapter *adapt, union recv_frame *precv_f
 {
 	unsigned char pwrbit;
 	u8 *ptr = precv_frame->u.hdr.rx_data;
-	struct rx_pkt_attrib *pattrib = &precv_frame->u.hdr.attrib;
-	struct sta_priv *pstapriv = &adapt->stapriv;
 
 	pwrbit = GetPwrMgt(ptr);
-
 	if (pwrbit) {
 		if (!(psta->state & WIFI_SLEEP_STATE)) {
 			stop_sta_xmit(adapt, psta);
@@ -771,7 +767,6 @@ static void process_pwrbit_data(struct adapter *adapt, union recv_frame *precv_f
 static void process_wmmps_data(struct adapter *adapt, union recv_frame *precv_frame, struct sta_info *psta)
 {
 	struct rx_pkt_attrib *pattrib = &precv_frame->u.hdr.attrib;
-	struct sta_priv *pstapriv = &adapt->stapriv;
 
 	if (!psta->qos_option)
 		return;
@@ -822,8 +817,6 @@ void count_rx_stats(struct adapter *adapt, union recv_frame *prframe, struct sta
 	struct stainfo_stats	*pstats = NULL;
 	struct rx_pkt_attrib	*pattrib = &prframe->u.hdr.attrib;
 	struct recv_priv		*precvpriv = &adapt->recvpriv;
-	struct mlme_ext_priv	*pmlmeext = &adapt->mlmeextpriv;
-	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
 	sz = get_recvframe_len(prframe);
 	precvpriv->rx_bytes += sz;
@@ -1531,7 +1524,6 @@ static int validate_recv_mgnt_frame(struct adapter * adapt, union recv_frame *pr
 	}
 	mgt_dispatcher(adapt, precv_frame);
 
-exit:
 	return _SUCCESS;
 }
 
@@ -1541,7 +1533,6 @@ static int validate_recv_data_frame(struct adapter *adapter, union recv_frame *p
 	struct sta_info *psta = NULL;
 	u8 *ptr = precv_frame->u.hdr.rx_data;
 	struct rx_pkt_attrib	*pattrib = &precv_frame->u.hdr.attrib;
-	struct sta_priv	*pstapriv = &adapter->stapriv;
 	struct security_priv	*psecuritypriv = &adapter->securitypriv;
 	int ret = _SUCCESS;
 
@@ -2025,7 +2016,6 @@ static int rtw_recv_indicatepkt_check(union recv_frame *rframe, u8 *ehdr_pos, u3
 	struct adapter *adapter = rframe->u.hdr.adapter;
 	struct recv_priv *recvpriv = &adapter->recvpriv;
 	struct ethhdr *ehdr = (struct ethhdr *)ehdr_pos;
-	int ret = _FAIL;
 
 	if (rframe->u.hdr.psta)
 		rtw_st_ctl_rx(rframe->u.hdr.psta, ehdr_pos);
@@ -2036,10 +2026,7 @@ static int rtw_recv_indicatepkt_check(union recv_frame *rframe, u8 *ehdr_pos, u3
 	if (recvpriv->sink_udpport > 0)
 		rtw_sink_rtp_seq_dbg(adapter, ehdr_pos);
 
-	ret = _SUCCESS;
-
-exit:
-	return ret;
+	return _SUCCESS;
 }
 
 static int amsdu_to_msdu(struct adapter *adapt, union recv_frame *prframe)
@@ -2127,7 +2114,6 @@ static int amsdu_to_msdu(struct adapter *adapt, union recv_frame *prframe)
 
 static int recv_process_mpdu(struct adapter *adapt, union recv_frame *prframe)
 {
-	struct recv_priv *precvpriv = &adapt->recvpriv;
 	struct __queue *pfree_recv_queue = &adapt->recvpriv.free_recv_queue;
 	struct rx_pkt_attrib *pattrib = &prframe->u.hdr.attrib;
 	int ret;
@@ -2312,7 +2298,6 @@ static int recv_indicatepkts_in_order(struct adapter *adapt, struct recv_reorder
 static int recv_indicatepkt_reorder(struct adapter *adapt, union recv_frame *prframe)
 {
 	unsigned long irql;
-	int retval = _SUCCESS;
 	struct rx_pkt_attrib *pattrib = &prframe->u.hdr.attrib;
 	struct recv_reorder_ctrl *preorder_ctrl = prframe->u.hdr.preorder_ctrl;
 	struct __queue *ppending_recvframe_queue = preorder_ctrl ? &preorder_ctrl->pending_recvframe_queue : NULL;
@@ -2442,12 +2427,8 @@ static int fill_radiotap_hdr(struct adapter *adapt, union recv_frame *precvframe
 #endif
 
 	int ret = _SUCCESS;
-	struct adapter			*adapter = precvframe->u.hdr.adapter;
-	struct mlme_priv	*pmlmepriv = &adapter->mlmepriv;
 	struct rx_pkt_attrib *pattrib = &precvframe->u.hdr.attrib;
-
 	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
-
 	u16 tmp_16bit = 0;
 	__le16 le_tmp;
 	u8 data_rate[] = {
@@ -2460,12 +2441,9 @@ static int fill_radiotap_hdr(struct adapter *adapt, union recv_frame *precvframe
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, /* VHT Nss 3 */
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, /* VHT Nss 4 */
 	};
-
 	struct sk_buff *pskb = NULL;
-
 	struct ieee80211_radiotap_header *rtap_hdr = NULL;
 	u8 *ptr = NULL;
-
 	u8 hdr_buf[64] = {0};
 	u16 rt_len = 8;
 
@@ -2678,8 +2656,6 @@ static int fill_radiotap_hdr(struct adapter *adapt, union recv_frame *precvframe
 static int recv_frame_monitor(struct adapter *adapt, union recv_frame *rframe)
 {
 	int ret = _SUCCESS;
-	struct rx_pkt_attrib *pattrib = &rframe->u.hdr.attrib;
-	struct recv_priv *precvpriv = &adapt->recvpriv;
 	struct __queue *pfree_recv_queue = &adapt->recvpriv.free_recv_queue;
 	struct sk_buff *pskb = NULL;
 
@@ -2725,8 +2701,6 @@ exit:
 static int recv_func_prehandle(struct adapter *adapt, union recv_frame *rframe)
 {
 	int ret = _SUCCESS;
-	struct rx_pkt_attrib *pattrib = &rframe->u.hdr.attrib;
-	struct recv_priv *precvpriv = &adapt->recvpriv;
 	struct __queue *pfree_recv_queue = &adapt->recvpriv.free_recv_queue;
 
 	/* check the frame crtl field and decache */
@@ -2983,7 +2957,6 @@ set_timer:
 
 static void rx_process_rssi(struct adapter *adapt, union recv_frame *prframe)
 {
-	u32	last_rssi, tmp_val;
 	struct rx_pkt_attrib *pattrib = &prframe->u.hdr.attrib;
 	struct signal_stat *signal_stat = &adapt->recvpriv.signal_strength_data;
 
@@ -3000,7 +2973,6 @@ static void rx_process_rssi(struct adapter *adapt, union recv_frame *prframe)
 
 static void rx_process_link_qual(struct adapter *adapt, union recv_frame *prframe)
 {
-	u32	last_evm = 0, tmpVal;
 	struct rx_pkt_attrib *pattrib;
 	struct signal_stat *signal_stat;
 

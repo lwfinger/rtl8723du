@@ -317,7 +317,6 @@ phydm_c2h_clm_report_handler(
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _CCX_INFO			*ccx_info = &p_dm->dm_ccx_info;
 	u8	clm_report = cmd_buf[0];
-	u8	clm_report_idx = cmd_buf[1];
 
 	if (cmd_len >=12)
 		return;
@@ -717,25 +716,6 @@ phydm_check_nhm_rdy(
 	}
 	PHYDM_DBG(p_dm, DBG_ENV_MNTR, ("NHM rdy=%d\n", is_ready));
 	return is_ready;
-}
-
-static void
-phydm_store_nhm_setting(
-	void		*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-
-	PHYDM_DBG(p_dm, DBG_ENV_MNTR, ("[%s]===>\n", __func__));
-
-	if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {
-
-
-	} else if (p_dm->support_ic_type & ODM_IC_11N_SERIES) {
-
-
-
-	}
 }
 
 void

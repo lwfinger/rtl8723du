@@ -86,14 +86,12 @@ phydm_ra_debug(
 	u32 out_len = *_out_len;
 	char	help[] = "-h";
 	u32	var1[5] = {0};
-	u8	i = 0;
-	u32	reg_u32_tmp;
+	u8	i;
 
 	for (i = 0; i < 5; i++) {
 		if (input[i + 1])
 			PHYDM_SSCANF(input[i + 1], DCMD_DECIMAL, &var1[i]);
 	}
-	
 	if ((strcmp(input[1], help) == 0)) {
 		PHYDM_SNPRINTF((output + used, out_len - used, "{1} {0:-,1:+} {ofst}: set offset\n"));
 		PHYDM_SNPRINTF((output + used, out_len - used, "{1} {100}: show offset\n"));

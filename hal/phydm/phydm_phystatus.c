@@ -15,18 +15,14 @@ phydm_rx_statistic_cal(
 	struct phydm_perpkt_info_struct				*p_pktinfo
 )
 {
-	struct _phy_status_rpt_jaguar2_type1	*p_phy_sta_rpt = (struct _phy_status_rpt_jaguar2_type1 *)p_phy_status;
-	u8									date_rate = (p_pktinfo->data_rate & 0x7f);
+	u8 date_rate = (p_pktinfo->data_rate & 0x7f);
 
 	if (date_rate <= ODM_RATE54M) {
-
 		p_phydm->phy_dbg_info.num_qry_legacy_pkt[date_rate]++;
 		/**/
 	} else if (date_rate <= ODM_RATEMCS31) {
-
 		p_phydm->phy_dbg_info.num_qry_ht_pkt[date_rate - ODM_RATEMCS0]++;
 		p_phydm->phy_dbg_info.ht_pkt_not_zero = true;
-
 	}
 	#if ODM_IC_11AC_SERIES_SUPPORT
 	else if (date_rate <= ODM_RATEVHTSS4MCS9) {
@@ -201,36 +197,6 @@ phydm_query_rx_pwr_percentage(
 		return 100 + ant_power;
 }
 
-
-static s32
-phydm_signal_scale_mapping_92c_series(
-	struct PHY_DM_STRUCT *p_dm,
-	s32 curr_sig
-)
-{
-	s32 ret_sig = 0;
-	if ((p_dm->support_interface  == ODM_ITRF_USB) || (p_dm->support_interface  == ODM_ITRF_SDIO)) {
-		if (curr_sig >= 51 && curr_sig <= 100)
-			ret_sig = 100;
-		else if (curr_sig >= 41 && curr_sig <= 50)
-			ret_sig = 80 + ((curr_sig - 40) * 2);
-		else if (curr_sig >= 31 && curr_sig <= 40)
-			ret_sig = 66 + (curr_sig - 30);
-		else if (curr_sig >= 21 && curr_sig <= 30)
-			ret_sig = 54 + (curr_sig - 20);
-		else if (curr_sig >= 10 && curr_sig <= 20)
-			ret_sig = 42 + (((curr_sig - 10) * 2) / 3);
-		else if (curr_sig >= 5 && curr_sig <= 9)
-			ret_sig = 22 + (((curr_sig - 5) * 3) / 2);
-		else if (curr_sig >= 1 && curr_sig <= 4)
-			ret_sig = 6 + (((curr_sig - 1) * 3) / 2);
-		else
-			ret_sig = curr_sig;
-	}
-
-	return ret_sig;
-}
-
 s32
 phydm_signal_scale_mapping(
 	struct PHY_DM_STRUCT *p_dm,
@@ -279,51 +245,6 @@ phydm_evm_db_to_percentage(
 #endif
 
 	return (u8)ret_val;
-}
-
-static u8
-phydm_evm_dbm_jaguar_series(
-	s8 value
-)
-{
-	s8 ret_val = value;
-
-	/* -33dB~0dB to 33dB ~ 0dB */
-	if (ret_val == -128)
-		ret_val = 127;
-	else if (ret_val < 0)
-		ret_val = 0 - ret_val;
-
-	ret_val  = ret_val >> 1;
-	return (u8)ret_val;
-}
-
-static s16
-phydm_cfo(
-	s8 value
-)
-{
-	s16  ret_val;
-
-	if (value < 0) {
-		ret_val = 0 - value;
-		ret_val = (ret_val << 1) + (ret_val >> 1) ;  /* *2.5~=312.5/2^7 */
-		ret_val = ret_val | BIT(12);  /* set bit12 as 1 for negative cfo */
-	} else {
-		ret_val = value;
-		ret_val = (ret_val << 1) + (ret_val >> 1) ; /* *2.5~=312.5/2^7 */
-	}
-	return ret_val;
-}
-
-static s8
-phydm_cck_rssi_convert(
-	struct PHY_DM_STRUCT	*p_dm,
-	u16		lna_idx,
-	u8		vga_idx
-)
-{
-	return (p_dm->cck_lna_gain_table[lna_idx] - (vga_idx << 1));
 }
 
 void
@@ -1592,13 +1513,6 @@ phydm_get_rx_phy_status_type2(
 	/* Update packet information */
 	phydm_set_common_phy_info(rx_pwr_db, p_phy_sta_rpt->channel, (bool)p_phy_sta_rpt->beamformed,
 				  false, bw, 0, rxsc, p_phy_info);
-}
-
-static void
-phydm_get_rx_phy_status_type5(
-	u8				*p_phy_status
-)
-{
 }
 
 static void

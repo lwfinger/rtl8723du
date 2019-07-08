@@ -478,13 +478,7 @@ static u16 hal_load_pg_txpwr_info_path_5g(
 	u16 pg_offset)
 {
 #define PG_TXPWR_1PATH_BYTE_NUM_5G 24
-
-	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	u16 offset = pg_offset;
-	u8 group, tx_idx;
-	u8 val;
-	u8 tmp_base;
-	s8 tmp_diff;
 
 	offset += PG_TXPWR_1PATH_BYTE_NUM_5G;
 	return offset;
@@ -735,7 +729,6 @@ static s8 rtw_regsty_get_target_tx_power(
 static bool rtw_regsty_chk_target_tx_power_valid(struct adapter *adapter)
 {
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
-	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	int path, tx_num, band, rs;
 	s8 target;
 
@@ -849,7 +842,6 @@ phy_SetTxPowerByRateBase(
 
 static inline bool phy_is_txpwr_by_rate_undefined_of_band_path(struct adapter *adapter, u8 band, u8 path)
 {
-	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	u8 rate_idx = 0;
 
@@ -864,7 +856,6 @@ exit:
 
 static inline void phy_txpwr_by_rate_duplicate_band_path(struct adapter *adapter, u8 band, u8 s_path, u8 t_path)
 {
-	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	u8 rate_idx = 0;
 
@@ -950,7 +941,7 @@ phy_StoreTxPowerByRateBase(
 		MGN_VHT4SS_MCS7,
 	};
 
-	u8 band, path, rs, tx_num, base, index;
+	u8 band, path, rs, tx_num, base;
 
 	for (band = BAND_ON_2_4G; band <= BAND_ON_5G; band++) {
 		if (!hal_is_band_support(pAdapter, band))
@@ -992,9 +983,7 @@ PHY_GetRateValuesOfTxPowerByRate(
 	u8 *RateNum
 )
 {
-	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
-	struct PHY_DM_STRUCT		*pDM_Odm = &pHalData->odmpriv;
-	u8				index = 0, i = 0;
+	u8 i;
 
 	switch (RegAddr) {
 	case rTxAGC_A_Rate18_06:
@@ -1009,7 +998,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case rTxAGC_A_Rate54_24:
 	case rTxAGC_B_Rate54_24:
 		Rate[0] = MGN_24M;
@@ -1022,14 +1010,12 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case rTxAGC_A_CCK1_Mcint:
 		Rate[0] = MGN_1M;
 		PwrByRateVal[0] = (s8)((((Value >> (8 + 4)) & 0xF)) * 10 +
 				       ((Value >> 8) & 0xF));
 		*RateNum = 1;
 		break;
-
 	case rTxAGC_B_CCK11_A_CCK2_11:
 		if (BitMask == 0xffffff00) {
 			Rate[0] = MGN_2M;
@@ -1047,7 +1033,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 			*RateNum = 1;
 		}
 		break;
-
 	case rTxAGC_A_Mcs03_Mcs00:
 	case rTxAGC_B_Mcs03_Mcs00:
 		Rate[0] = MGN_MCS0;
@@ -1060,7 +1045,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case rTxAGC_A_Mcs07_Mcs04:
 	case rTxAGC_B_Mcs07_Mcs04:
 		Rate[0] = MGN_MCS4;
@@ -1073,7 +1057,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case rTxAGC_A_Mcs11_Mcs08:
 	case rTxAGC_B_Mcs11_Mcs08:
 		Rate[0] = MGN_MCS8;
@@ -1086,7 +1069,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case rTxAGC_A_Mcs15_Mcs12:
 	case rTxAGC_B_Mcs15_Mcs12:
 		Rate[0] = MGN_MCS12;
@@ -1098,9 +1080,7 @@ PHY_GetRateValuesOfTxPowerByRate(
 					       ((Value >> (i * 8)) & 0xF));
 		}
 		*RateNum = 4;
-
 		break;
-
 	case rTxAGC_B_CCK1_55_Mcint:
 		Rate[0] = MGN_1M;
 		Rate[1] = MGN_2M;
@@ -1111,7 +1091,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 3;
 		break;
-
 	case 0xC20:
 	case 0xE20:
 	case 0x1820:
@@ -1126,7 +1105,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC24:
 	case 0xE24:
 	case 0x1824:
@@ -1141,7 +1119,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC28:
 	case 0xE28:
 	case 0x1828:
@@ -1156,7 +1133,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC2C:
 	case 0xE2C:
 	case 0x182C:
@@ -1171,7 +1147,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC30:
 	case 0xE30:
 	case 0x1830:
@@ -1186,7 +1161,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC34:
 	case 0xE34:
 	case 0x1834:
@@ -1201,7 +1175,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC38:
 	case 0xE38:
 	case 0x1838:
@@ -1216,7 +1189,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC3C:
 	case 0xE3C:
 	case 0x183C:
@@ -1231,7 +1203,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC40:
 	case 0xE40:
 	case 0x1840:
@@ -1246,7 +1217,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC44:
 	case 0xE44:
 	case 0x1844:
@@ -1261,7 +1231,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC48:
 	case 0xE48:
 	case 0x1848:
@@ -1276,7 +1245,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xC4C:
 	case 0xE4C:
 	case 0x184C:
@@ -1291,7 +1259,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xCD8:
 	case 0xED8:
 	case 0x18D8:
@@ -1306,7 +1273,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xCDC:
 	case 0xEDC:
 	case 0x18DC:
@@ -1321,7 +1287,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xCE0:
 	case 0xEE0:
 	case 0x18E0:
@@ -1336,7 +1301,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xCE4:
 	case 0xEE4:
 	case 0x18E4:
@@ -1351,7 +1315,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 4;
 		break;
-
 	case 0xCE8:
 	case 0xEE8:
 	case 0x18E8:
@@ -1364,7 +1327,6 @@ PHY_GetRateValuesOfTxPowerByRate(
 		}
 		*RateNum = 2;
 		break;
-
 	default:
 		RTW_PRINT("Invalid RegAddr 0x%x in %s()\n", RegAddr, __func__);
 		break;
@@ -1410,7 +1372,7 @@ PHY_InitTxPowerByRate(
 )
 {
 	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
-	u8	band = 0, rfPath = 0, rate = 0, i = 0, j = 0;
+	u8	band = 0, rfPath = 0, rate = 0;
 
 	for (band = BAND_ON_2_4G; band <= BAND_ON_5G; ++band)
 		for (rfPath = 0; rfPath < TX_PWR_BY_RATE_NUM_RF; ++rfPath)
@@ -1444,10 +1406,7 @@ phy_ConvertTxPowerByRateInDbmToRelativeValues(
 	struct adapter *	pAdapter
 )
 {
-	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
-	u8			base = 0, i = 0, value = 0,
-				band = 0, path = 0, index = 0,
-				startIndex = 0, endIndex = 0;
+	u8 base = 0, i = 0, value = 0, band = 0, path = 0;
 	u8	cckRates[4] = {MGN_1M, MGN_2M, MGN_5_5M, MGN_11M},
 		ofdmRates[8] = {MGN_6M, MGN_9M, MGN_12M, MGN_18M, MGN_24M, MGN_36M, MGN_48M, MGN_54M},
 		mcs0_7Rates[8] = {MGN_MCS0, MGN_MCS1, MGN_MCS2, MGN_MCS3, MGN_MCS4, MGN_MCS5, MGN_MCS6, MGN_MCS7},
@@ -1536,8 +1495,6 @@ PHY_TxPowerByRateConfiguration(
 	struct adapter *			pAdapter
 )
 {
-	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
-
 	phy_txpwr_by_rate_chk_for_path_dup(pAdapter);
 	phy_StoreTxPowerByRateBase(pAdapter);
 	phy_ConvertTxPowerByRateInDbmToRelativeValues(pAdapter);
@@ -1607,8 +1564,6 @@ PHY_GetTxPowerIndexBase(
 )
 {
 	struct hal_com_data *		pHalData = GET_HAL_DATA(pAdapter);
-	struct PHY_DM_STRUCT			*pDM_Odm = &pHalData->odmpriv;
-	u8					i = 0;	/* default set to 1S */
 	u8					txPower = 0;
 	u8					chnlIdx = (Channel - 1);
 
@@ -2638,9 +2593,6 @@ void dump_tx_power_idx(void *sel, struct adapter *adapter)
 
 bool phy_is_tx_power_limit_needed(struct adapter *adapter)
 {
-	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
-	struct registry_priv *regsty = dvobj_to_regsty(adapter_to_dvobj(adapter));
-
 #ifdef CONFIG_TXPWR_LIMIT
 	if (regsty->RegEnableTxPowerLimit == 1
 		|| (regsty->RegEnableTxPowerLimit == 2 && hal_data->EEPROMRegulatory == 1))
@@ -2664,7 +2616,6 @@ bool phy_is_tx_power_by_rate_needed(struct adapter *adapter)
 int phy_load_tx_power_by_rate(struct adapter *adapter, u8 chk_file)
 {
 	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
-	struct registry_priv *regsty = dvobj_to_regsty(adapter_to_dvobj(adapter));
 	int ret = _FAIL;
 
 	hal_data->txpwr_by_rate_loaded = 0;
@@ -2849,8 +2800,6 @@ void dump_target_tx_power(void *sel, struct adapter *adapter)
 			}
 		}
 	}
-
-exit:
 	return;
 }
 
@@ -2923,7 +2872,6 @@ void dump_tx_power_by_rate(void *sel, struct adapter *adapter)
 int rtw_get_phy_file_path(struct adapter *adapter, const char *file_name)
 {
 #ifdef CONFIG_LOAD_PHY_PARA_FROM_FILE
-	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	int len = 0;
 
 	if (file_name) {
@@ -3281,7 +3229,7 @@ phy_ParseBBPgParaFile(
 					}
 				}
 			} else if (pHalData->odmpriv.phy_reg_pg_version > 0) {
-				u32	index = 0, cnt = 0;
+				u32	index = 0;
 
 				if (eqNByte(szLine, "0xffff", 6))
 					break;
@@ -3749,12 +3697,9 @@ PHY_ConfigRFWithTxPwrTrackParaFile(
 )
 {
 	struct hal_com_data		*pHalData = GET_HAL_DATA(Adapter);
-	struct PHY_DM_STRUCT			*pDM_Odm = &pHalData->odmpriv;
-	struct odm_rf_calibration_structure		*pRFCalibrateInfo = &(pDM_Odm->rf_calibrate_info);
 	int	rlen = 0, rtStatus = _FAIL;
 	char	*szLine, *ptmp;
-	u32	i = 0, j = 0;
-	char	c = 0;
+	u32	i = 0;
 
 	if (!(Adapter->registrypriv.load_phy_file & LOAD_RF_TXPWR_TRACK_PARA_FILE))
 		return rtStatus;

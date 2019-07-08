@@ -536,7 +536,6 @@ inline unsigned long rtw_get_on_cur_ch_time(struct adapter *adapter)
 void set_channel_bwmode(struct adapter *adapt, unsigned char channel, unsigned char channel_offset, unsigned short bwmode)
 {
 	u8 center_ch, chnl_offset80 = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
-	struct mlme_ext_priv *pmlmeext = &adapt->mlmeextpriv;
 
 	if (adapt->bNotifyChannelChange)
 		RTW_INFO("[%s] ch = %d, offset = %d, bwmode = %d\n", __func__, channel, channel_offset, bwmode);
@@ -1282,11 +1281,6 @@ void rtw_clean_hw_dk_cam(struct adapter *adapter)
 
 void flush_all_cam_entry(struct adapter *adapt)
 {
-	struct mlme_ext_priv *pmlmeext = &adapt->mlmeextpriv;
-	struct mlme_ext_info *pmlmeinfo = &(pmlmeext->mlmext_info);
-	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
-	struct security_priv *psecpriv = &adapt->securitypriv;
-
 #ifdef CONFIG_CONCURRENT_MODE
 	if (check_fwstate(pmlmepriv, WIFI_STATION_STATE)) {
 		struct sta_priv	*pstapriv = &adapt->stapriv;
@@ -1617,12 +1611,11 @@ void HT_caps_handler(struct adapter *adapt, struct ndis_802_11_variable_ies * pI
 	unsigned int	i;
 	u8	rf_type = RF_1T1R;
 	u8	max_AMPDU_len, min_MPDU_spacing;
-	u8	cur_ldpc_cap = 0, cur_stbc_cap = 0, cur_beamform_cap = 0, tx_nss = 0;
+	u8	cur_ldpc_cap = 0, cur_stbc_cap = 0, tx_nss = 0;
 	struct mlme_ext_priv	*pmlmeext = &adapt->mlmeextpriv;
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	struct mlme_priv		*pmlmepriv = &adapt->mlmepriv;
 	struct ht_priv			*phtpriv = &pmlmepriv->htpriv;
-	struct registry_priv	*pregistrypriv = &adapt->registrypriv;
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapt);
 
 	if (!pIE)
@@ -1781,7 +1774,6 @@ void ERP_IE_handler(struct adapter *adapt, struct ndis_802_11_variable_ies * pIE
 void VCS_update(struct adapter *adapt, struct sta_info *psta)
 {
 	struct registry_priv	*pregpriv = &adapt->registrypriv;
-	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
 	struct mlme_ext_priv	*pmlmeext = &adapt->mlmeextpriv;
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
@@ -1843,7 +1835,6 @@ static int check_ielen(u8 *start, uint len)
 {
 	int left = len;
 	u8 *pos = start;
-	int unknown = 0;
 	u8 id, elen;
 
 	while (left >= 2) {
@@ -1974,8 +1965,6 @@ int rtw_get_bcn_keys(struct adapter *Adapter, u8 *pframe, u32 packet_len,
 
 void rtw_dump_bcn_keys(struct beacon_keys *recv_beacon)
 {
-	int i;
-	char *p;
 	u8 ssid[IW_ESSID_MAX_SIZE + 1];
 
 	memcpy(ssid, recv_beacon->ssid, recv_beacon->ssid_len);
@@ -2669,8 +2658,6 @@ void process_addba_req(struct adapter *adapt, u8 *paddba_req, u8 *addr)
 	u16 tid, start_seq, param;
 	struct sta_priv *pstapriv = &adapt->stapriv;
 	struct ADDBA_request	*preq = (struct ADDBA_request *)paddba_req;
-	struct mlme_ext_priv	*pmlmeext = &adapt->mlmeextpriv;
-	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	u8 size, accept = false;
 
 	psta = rtw_get_stainfo(pstapriv, addr);
@@ -2702,7 +2689,6 @@ exit:
 
 void rtw_process_bar_frame(struct adapter *adapt, union recv_frame *precv_frame)
 {
-	struct rx_pkt_attrib *pattrib = &precv_frame->u.hdr.attrib;
 	struct sta_priv *pstapriv = &adapt->stapriv;
 	u8 *pframe = precv_frame->u.hdr.rx_data;
 	struct sta_info *psta = NULL;

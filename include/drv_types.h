@@ -25,8 +25,10 @@
 #define DRIVERVERSION	"v5.2.15.2_27977.20180529_COEX20171212-2222"
 #define BTCOEXVERSION	"COEX20171212-2222"
 
-enum _NIC_VERSION {
+extern u8 rtw_bridge_tunnel_header[];
+extern u8 rtw_rfc1042_header[];
 
+enum _NIC_VERSION {
 	RTL8711_NIC,
 	RTL8712_NIC,
 	RTL8713_NIC,
@@ -875,7 +877,7 @@ static inline void dev_clr_drv_stopped(struct dvobj_priv *dvobj)
 #define dev_is_surprise_removed(dvobj)	(ATOMIC_READ(&dvobj->bSurpriseRemoved))
 #define dev_is_drv_stopped(dvobj)	(ATOMIC_READ(&dvobj->bDriverStopped))
 
-static struct device *dvobj_to_dev(struct dvobj_priv *dvobj)
+static inline struct device *dvobj_to_dev(struct dvobj_priv *dvobj)
 {
 	/* todo: get interface type from dvobj and the return the dev accordingly */
 

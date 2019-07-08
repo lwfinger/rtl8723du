@@ -52,8 +52,6 @@ int FillH2CCmd8723D(struct adapter * adapt, u8 ElementID, u32 CmdLen, u8 *pCmdBu
 	u32	h2c_cmd_ex = 0;
 	int ret = _FAIL;
 	struct hal_com_data * pHalData;		
-	struct dvobj_priv *psdpriv = adapt->dvobj;
-	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
 	__le32 le_tmp;
 
 	adapt = GET_PRIMARY_ADAPTER(adapt);
@@ -114,7 +112,6 @@ exit:
  *   */
 u8 GetTxBufferRsvdPageNum8723D(struct adapter *adapt, bool wowlan)
 {
-	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
 	u8	RsvdPageNum = 0;
 	/* default reseved 1 page for the IC type which is undefined. */
 	u8	TxPageBndy = LAST_ENTRY_OF_TX_PKT_BUFFER_8723D;
@@ -153,10 +150,8 @@ static void rtl8723d_set_FwAoacRsvdPage_cmd(struct adapter * adapt, struct rsvd_
 
 void rtl8723d_set_FwPwrMode_cmd(struct adapter * adapt, u8 psmode)
 {
-	int i;
 	u8 smart_ps = 0;
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
-	struct mlme_ext_priv	*pmlmeext = &adapt->mlmeextpriv;
 	u8 u1H2CPwrModeParm[H2C_PWRMODE_LEN] = {0};
 	u8 PowerState = 0, awake_intvl = 1, byte5 = 0, rlbm = 0;
 	struct wifidirect_info *wdinfo = &(adapt->wdinfo);
@@ -237,7 +232,6 @@ void rtl8723d_set_FwPwrMode_cmd(struct adapter * adapt, u8 psmode)
 
 void rtl8723d_set_FwPsTuneParam_cmd(struct adapter * adapt)
 {
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
 	u8 u1H2CPsTuneParm[H2C_PSTUNEPARAM_LEN] = {0};
 	u8 bcn_to_limit = 10; /* 10 * 100 * awakeinterval (ms) */
 	u8 dtim_timeout = 5; /* ms //wait broadcast data timer */
@@ -260,10 +254,8 @@ void rtl8723d_set_FwPsTuneParam_cmd(struct adapter * adapt)
 
 void rtl8723d_download_rsvd_page(struct adapter * adapt, u8 mstatus)
 {
-	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
 	struct mlme_ext_priv	*pmlmeext = &(adapt->mlmeextpriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
 	bool		bcn_valid = false;
 	u8	DLBcnCount = 0;
 	u32 poll = 0;
@@ -359,12 +351,8 @@ void rtl8723d_download_rsvd_page(struct adapter * adapt, u8 mstatus)
 	}
 }
 
-void rtl8723d_set_FwJoinBssRpt_cmd(struct adapter * adapt, u8 mstatus)
+void rtl8723d_set_FwJoinBssRpt_cmd(struct adapter *adapt, u8 mstatus)
 {
-	struct sta_info *psta = NULL;
-	struct pwrctrl_priv *ppwrpriv = adapter_to_pwrctl(adapt);
-	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
-
 	if (mstatus == 1)
 		rtl8723d_download_rsvd_page(adapt, RT_MEDIA_CONNECT);
 }
@@ -576,7 +564,6 @@ void rtl8723d_download_BTCoex_AP_mode_rsvd_page(struct adapter * adapt)
 void rtl8723d_set_p2p_ps_offload_cmd(struct adapter *adapt, u8 p2p_ps_state)
 {
 	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
-	struct pwrctrl_priv		*pwrpriv = adapter_to_pwrctl(adapt);
 	struct wifidirect_info	*pwdinfo = &(adapt->wdinfo);
 	struct P2P_PS_Offload_t	*p2p_ps_offload = (struct P2P_PS_Offload_t *)(&pHalData->p2p_ps_offload);
 	u8	i;

@@ -495,7 +495,6 @@ SwLedBlink4(
 {
 	struct adapter			*adapt = pLed->adapt;
 	struct led_priv	*ledpriv = &(adapt->ledpriv);
-	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
 	struct led_usb *		pLed1 = &(ledpriv->SwLed1);
 	u8				bStopBlinking = false;
 
@@ -682,7 +681,6 @@ SwLedBlink5(
 )
 {
 	struct adapter			*adapt = pLed->adapt;
-	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
 	u8				bStopBlinking = false;
 
 	/* Change LED according to BlinkingLedState specified. */
@@ -772,8 +770,6 @@ SwLedBlink6(
 )
 {
 	struct adapter			*adapt = pLed->adapt;
-	struct mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
-	u8				bStopBlinking = false;
 
 	/* Change LED according to BlinkingLedState specified. */
 	if (pLed->BlinkingLedState == RTW_LED_ON) {
@@ -1384,7 +1380,6 @@ SwLedBlink12(
 )
 {
 	struct adapter * Adapter = pLed->adapt;
-	struct mlme_priv	*pmlmepriv = &(Adapter->mlmepriv);
 	bool bStopBlinking = false;
 
 	/* Change LED according to BlinkingLedState specified. */
@@ -1452,8 +1447,6 @@ SwLedBlink13(
 )
 {
 	struct adapter * Adapter = pLed->adapt;
-	struct mlme_priv	*pmlmepriv = &(Adapter->mlmepriv);
-	bool bStopBlinking = false;
 	static u8	LinkBlinkCnt = 0;
 
 	/* Change LED according to BlinkingLedState specified. */
@@ -1513,7 +1506,6 @@ SwLedBlink14(
 )
 {
 	struct adapter * Adapter = pLed->adapt;
-	struct mlme_priv	*pmlmepriv = &(Adapter->mlmepriv);
 	bool bStopBlinking = false;
 	static u8	LinkBlinkCnt = 0;
 
@@ -2841,7 +2833,6 @@ SwLedControlMode6(
 )
 {
 	struct led_priv	*ledpriv = &(adapt->ledpriv);
-	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
 	struct led_usb *	pLed0 = &(ledpriv->SwLed0);
 
 	switch (LedAction) {
@@ -3011,7 +3002,6 @@ SwLedControlMode8(
 )
 {
 	struct led_priv	*ledpriv = &(Adapter->ledpriv);
-	struct mlme_priv	*pmlmepriv = &Adapter->mlmepriv;
 	struct led_usb *	pLed0 = &(ledpriv->SwLed0);
 
 	switch (LedAction) {
@@ -3513,7 +3503,6 @@ SwLedControlMode11(
 )
 {
 	struct led_priv	*ledpriv = &(Adapter->ledpriv);
-	struct mlme_priv	*pmlmepriv = &Adapter->mlmepriv;
 	struct led_usb *	pLed = &(ledpriv->SwLed0);
 
 	switch (LedAction) {
@@ -3612,7 +3601,6 @@ SwLedControlMode12(
 )
 {
 	struct led_priv	*ledpriv = &(Adapter->ledpriv);
-	struct mlme_priv	*pmlmepriv = &Adapter->mlmepriv;
 	struct led_usb *	pLed = &(ledpriv->SwLed0);
 
 	switch (LedAction) {
@@ -3693,7 +3681,6 @@ SwLedControlMode13(
 )
 {
 	struct led_priv	*ledpriv = &(Adapter->ledpriv);
-	struct mlme_priv	*pmlmepriv = &Adapter->mlmepriv;
 	struct led_usb *	pLed = &(ledpriv->SwLed0);
 
 	switch (LedAction) {

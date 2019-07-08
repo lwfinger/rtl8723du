@@ -4,10 +4,6 @@
 #include <drv_types.h>
 #include <rtw_wifi_regd.h>
 
-static struct country_code_to_enum_rd allCountries[] = {
-	{COUNTRY_CODE_USER, "RD"},
-};
-
 /*
  * REG_RULE(freq start, freq end, bandwidth, max gain, eirp, reg_flags)
  */
@@ -111,7 +107,6 @@ static void _rtw_reg_apply_flags(struct wiphy *wiphy)
 {
 	struct adapter *adapt = wiphy_to_adapter(wiphy);
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapt);
-	u8 channel_plan = rfctl->ChannelPlan;
 	struct rt_channel_info *channel_set = rfctl->channel_set;
 	u8 max_chan_nums = rfctl->max_chan_nums;
 
@@ -262,17 +257,6 @@ static void _rtw_regd_init_wiphy(struct rtw_regulatory *reg, struct wiphy *wiphy
 	_rtw_reg_apply_flags(wiphy);
 	_rtw_reg_apply_radar_flags(wiphy);
 	_rtw_reg_apply_world_flags(wiphy, NL80211_REGDOM_SET_BY_DRIVER, reg);
-}
-
-static struct country_code_to_enum_rd *_rtw_regd_find_country(u16 countrycode)
-{
-	int i;
-
-	for (i = 0; i < ARRAY_SIZE(allCountries); i++) {
-		if (allCountries[i].countrycode == countrycode)
-			return &allCountries[i];
-	}
-	return NULL;
 }
 
 int rtw_regd_init(struct adapter *adapt)

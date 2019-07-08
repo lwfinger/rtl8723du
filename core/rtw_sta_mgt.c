@@ -5,18 +5,6 @@
 
 #include <drv_types.h>
 
-static bool test_st_match_rule(struct adapter *adapter, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port)
-{
-	if (ntohs(*((__be16 *)local_port)) == 5001 || ntohs(*((__be16 *)remote_port)) == 5001)
-		return true;
-	return false;
-}
-
-static struct st_register test_st_reg = {
-	.s_proto = 0x06,
-	.rule = test_st_match_rule,
-};
-
 inline void rtw_st_ctl_init(struct st_ctl_t *st_ctl)
 {
 	memset(st_ctl->reg, 0 , sizeof(struct st_register) * SESSION_TRACKER_REG_ID_NUM);
@@ -419,8 +407,6 @@ u32	_rtw_free_sta_priv(struct	sta_priv *pstapriv)
 
 static void rtw_init_recv_timer(struct recv_reorder_ctrl *preorder_ctrl)
 {
-	struct adapter *adapt = preorder_ctrl->adapt;
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 	timer_setup(&preorder_ctrl->reordering_ctrl_timer, rtw_reordering_ctrl_timeout_handler, 0);
 #else
@@ -431,7 +417,7 @@ static void rtw_init_recv_timer(struct recv_reorder_ctrl *preorder_ctrl)
 /* struct	sta_info *rtw_alloc_stainfo(struct __queue *pfree_sta_queue, unsigned char *hwaddr) */
 struct	sta_info *rtw_alloc_stainfo(struct	sta_priv *pstapriv, const u8 *hwaddr)
 {
-	unsigned long irqL, irqL2;
+	unsigned long irqL2;
 	int	index;
 	struct list_head	*phash_list;
 	struct sta_info	*psta;

@@ -132,14 +132,6 @@ odm_fa_threshold_check(
 
 }
 
-static void
-phydm_set_big_jump_step(
-	void			*p_dm_void,
-	u8			current_igi
-)
-{
-}
-
 void
 odm_write_dig(
 	void			*p_dm_void,
@@ -381,8 +373,6 @@ phydm_dig_init(
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct phydm_dig_struct		*p_dig_t = &p_dm->dm_dig_table;
-	u32			ret_value = 0;
-	u8			i;
 
 	p_dig_t->dm_dig_max = DIG_MAX_BALANCE_MODE;
 	p_dig_t->dm_dig_min = DIG_MIN_PERFORMANCE;
@@ -845,7 +835,6 @@ phydm_false_alarm_counter_reg_reset(
 )
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
 	struct phydm_fa_struct *p_falm_cnt = &p_dm->false_alm_cnt;
 #ifdef PHYDM_TDMA_DIG_SUPPORT
 	struct phydm_fa_acc_struct *p_falm_cnt_acc = &p_dm->false_alm_cnt_acc;

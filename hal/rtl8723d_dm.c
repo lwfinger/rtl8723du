@@ -20,13 +20,6 @@
  * ************************************************************ */
 
 
-static void
-dm_CheckProtection(
-	struct adapter *	Adapter
-)
-{
-}
-
 #ifdef CONFIG_SUPPORT_HW_WPS_PBC
 static void dm_CheckPbcGPIO(struct adapter *adapt)
 {
@@ -71,8 +64,6 @@ dm_InitGPIOSetting(
 	struct adapter *	Adapter
 )
 {
-	struct hal_com_data *		pHalData = GET_HAL_DATA(Adapter);
-
 	u8	tmp1byte;
 
 	tmp1byte = rtw_read8(Adapter, REG_GPIO_MUXCFG);
@@ -121,7 +112,6 @@ rtl8723d_HalDmWatchDog(
 {
 	bool		bFwCurrentInPSMode = false;
 	u8 bFwPSAwake = true;
-	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
 
 	if (!rtw_is_hw_init_completed(Adapter))
 		goto skip_dm;

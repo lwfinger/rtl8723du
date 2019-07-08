@@ -242,7 +242,6 @@ static int pre_xmitframe(struct adapter * adapt, struct xmit_frame *pxmitframe)
 	struct xmit_buf *pxmitbuf = NULL;
 	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
 	struct pkt_attrib *pattrib = &pxmitframe->attrib;
-	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 
 	_enter_critical_bh(&pxmitpriv->lock, &irqL);
 

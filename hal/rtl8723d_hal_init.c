@@ -135,26 +135,6 @@ _PageWrite(
 	return _BlockWrite(adapt, buffer, size);
 }
 
-static void
-_FillDummy(
-	u8		*pFwBuf,
-	u32	*pFwLen
-)
-{
-	u32	FwLen = *pFwLen;
-	u8	remain = (u8)(FwLen % 4);
-
-	remain = (remain == 0) ? 0 : (4 - remain);
-
-	while (remain > 0) {
-		pFwBuf[FwLen] = 0;
-		FwLen++;
-		remain--;
-	}
-
-	*pFwLen = FwLen;
-}
-
 static int
 _WriteFW(
 	struct adapter * adapt,
@@ -340,10 +320,6 @@ int rtl8723d_FirmwareDownload(struct adapter * adapt, bool  bUsedWoWLANFw)
 	u8 write_fw = 0;
 	unsigned long fwdl_start_time;
 	struct hal_com_data *	pHalData = GET_HAL_DATA(adapt);
-	u8			*FwImage;
-	u32			FwImageLen;
-	u8			*pFwImageFileName;
-	u8			*pucMappedFile = NULL;
 	struct rt_firmware	*pFirmware = NULL;
 	struct rt_8723d_firmware_hdr *pFwHdr = NULL;
 	u8			*pFirmwareBuf;
@@ -352,17 +328,8 @@ int rtl8723d_FirmwareDownload(struct adapter * adapt, bool  bUsedWoWLANFw)
 	u8 *fwfilepath;
 #endif /* CONFIG_FILE_FWIMG */
 	u8			value8;
-	u16			value16;
-	u32			value32;
-	u8			dma_iram_sel;
-	u16		new_chk_sum = 0;
-	u32		send_pkt_size, pkt_size_tmp;
-	u32		mem_offset;
-	u32			counter;
 	struct dvobj_priv *psdpriv = adapt->dvobj;
 	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
-
 
 	pFirmware = rtw_zmalloc(sizeof(struct rt_firmware));
 
@@ -372,7 +339,7 @@ int rtl8723d_FirmwareDownload(struct adapter * adapt, bool  bUsedWoWLANFw)
 	}
 
 	{
-		u8 tmp_ps = 0, tmp_rf = 0;
+		u8 tmp_ps = 0;
 
 		tmp_ps = rtw_read8(adapt, 0xa3);
 		tmp_ps &= 0xf8;
@@ -1235,8 +1202,6 @@ hal_EfuseGetCurrentSize_BT(
 	u8	hoffset = 0, hworden = 0;
 	u8	efuse_data, word_cnts = 0;
 	u16	retU2 = 0;
-	u8 bContinual = true;
-
 
 	if (bPseudoTest) {
 #ifdef HAL_EFUSE_MEMORY
@@ -1397,7 +1362,6 @@ static bool Hal_EfusePgPacketRead(struct adapter *	adapt,
 	u8			*data,
 	bool			bPseudoTest)
 {
-	u8	bDataEmpty = true;
 	u8	efuse_data, word_cnts = 0;
 	u16	efuse_addr = 0;
 	u8	hoffset = 0, hworden = 0;
@@ -1578,7 +1542,6 @@ hal_EfusePgPacketWrite1ByteHeader(
 	struct pg_pkt_struct *	pTargetPkt,
 	u8				bPseudoTest)
 {
-	u8	bRet = false;
 	u8	pg_header = 0, tmp_header = 0;
 	u16	efuse_addr = *pAddr;
 	u8	repeatcnt = 0;
@@ -1818,7 +1781,6 @@ static void read_chip_version_8723d(struct adapter * adapt)
 
 void rtl8723d_InitBeaconParameters(struct adapter * adapt)
 {
-	struct hal_com_data * pHalData = GET_HAL_DATA(adapt);
 	u16 val16;
 	u8 val8;
 
@@ -1898,7 +1860,6 @@ static void rtl8723d_SetBeaconRelatedRegisters(struct adapter * adapt)
 {
 	u8 val8;
 	u32 value32;
-	struct hal_com_data * pHalData = GET_HAL_DATA(adapt);
 	struct mlme_ext_priv *pmlmeext = &adapt->mlmeextpriv;
 	struct mlme_ext_info *pmlmeinfo = &pmlmeext->mlmext_info;
 	u32 bcn_ctrl_reg;
@@ -1969,68 +1930,6 @@ static void hal_notch_filter_8723d(struct adapter *adapter, bool enable)
 		RTW_INFO("Disable notch filter\n");
 		rtw_write8(adapter, rOFDM0_RxDSP + 1, rtw_read8(adapter, rOFDM0_RxDSP + 1) & ~BIT(1));
 	}
-}
-
-static u8 rtl8723d_MRateIdxToARFRId(struct adapter * adapt, u8 rate_idx)
-{
-	u8 ret = 0;
-	enum rf_type rftype = (enum rf_type)GET_RF_TYPE(adapt);
-
-	switch (rate_idx) {
-
-	case RATR_INX_WIRELESS_NGB:
-		if (rftype == RF_1T1R)
-			ret = 1;
-		else
-			ret = 0;
-		break;
-
-	case RATR_INX_WIRELESS_N:
-	case RATR_INX_WIRELESS_NG:
-		if (rftype == RF_1T1R)
-			ret = 5;
-		else
-			ret = 4;
-		break;
-
-	case RATR_INX_WIRELESS_NB:
-		if (rftype == RF_1T1R)
-			ret = 3;
-		else
-			ret = 2;
-		break;
-
-	case RATR_INX_WIRELESS_GB:
-		ret = 6;
-		break;
-
-	case RATR_INX_WIRELESS_G:
-		ret = 7;
-		break;
-
-	case RATR_INX_WIRELESS_B:
-		ret = 8;
-		break;
-
-	case RATR_INX_WIRELESS_MC:
-		if (adapt->mlmeextpriv.cur_wireless_mode & WIRELESS_11BG_24N)
-			ret = 6;
-		else
-			ret = 7;
-		break;
-	case RATR_INX_WIRELESS_AC_N:
-		if (rftype == RF_1T1R) /* || adapt->MgntInfo.VHTHighestOperaRate <= MGN_VHT1SS_MCS9) */
-			ret = 10;
-		else
-			ret = 9;
-		break;
-
-	default:
-		ret = 0;
-		break;
-	}
-
-	return ret;
 }
 
 /*
@@ -2435,7 +2334,6 @@ static void _ResetDigitalProcedure2(struct adapter * adapt)
 
 static void _DisableAnalog(struct adapter * adapt, bool bWithoutHWSM)
 {
-	struct hal_com_data	*pHalData	= GET_HAL_DATA(adapt);
 	u16 value16 = 0;
 	u8 value8 = 0;
 
@@ -2537,7 +2435,6 @@ Hal_InitPGData(
 
 	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
 	u32			i;
-	u16			value16;
 
 	if (false == pHalData->bautoload_fail_flag) {
 		/* autoload OK.
@@ -2588,31 +2485,6 @@ Hal_EfuseParseIDCode(
 	} else
 		pHalData->bautoload_fail_flag = false;
 
-}
-
-static void
-Hal_EEValueCheck(
-	u8		EEType,
-	void *		pInValue,
-	void *		pOutValue
-)
-{
-	switch (EEType) {
-	case EETYPE_TX_PWR: {
-		u8	*pIn, *pOut;
-
-		pIn = (u8 *)pInValue;
-		pOut = (u8 *)pOutValue;
-		if (*pIn <= 63)
-			*pOut = *pIn;
-		else {
-			*pOut = EEPROM_Default_TxPowerLevel;
-		}
-	}
-	break;
-	default:
-		break;
-	}
 }
 
 void
@@ -3254,7 +3126,6 @@ static void hw_var_set_monitor(struct adapter * Adapter, u8 variable, u8 *val)
 	u32	rcr_bits;
 	u16	value_rxfltmap2;
 	struct hal_com_data *pHalData = GET_HAL_DATA(Adapter);
-	struct mlme_priv *pmlmepriv = &(Adapter->mlmepriv);
 
 	if (*((u8 *)val) == _HW_STATE_MONITOR_) {
 
@@ -3521,7 +3392,6 @@ static void hw_var_set_mlme_join(struct adapter * adapt, u8 variable, u8 *val)
 {
 	u8 val8;
 	u16 val16;
-	u32 val32;
 	u8 RetryLimit;
 	u8 type;
 	struct hal_com_data * pHalData;
@@ -3643,8 +3513,6 @@ static int c2h_handler_8723d(struct adapter *adapter, u8 id, u8 seq, u8 plen, u8
 		ret = _FAIL;
 		break;
 	}
-
-exit:
 	return ret;
 }
 
@@ -3653,9 +3521,7 @@ u8 SetHwReg8723D(struct adapter * adapt, u8 variable, u8 *val)
 	struct hal_com_data *	pHalData = GET_HAL_DATA(adapt);
 	u8 ret = _SUCCESS;
 	u8 val8;
-	u16 val16;
 	u32 val32;
-
 
 	switch (variable) {
 	case HW_VAR_SET_OPMODE:
@@ -4118,7 +3984,6 @@ void GetHwReg8723D(struct adapter * adapt, u8 variable, u8 *val)
 	struct hal_com_data * pHalData = GET_HAL_DATA(adapt);
 	u8 val8;
 	u16 val16;
-	u32 val32;
 
 	switch (variable) {
 	case HW_VAR_TXPAUSE:
@@ -4187,7 +4052,6 @@ void GetHwReg8723D(struct adapter * adapt, u8 variable, u8 *val)
  */
 u8 SetHalDefVar8723D(struct adapter * adapt, enum hal_def_variable variable, void *pval)
 {
-	struct hal_com_data * pHalData;
 	u8 bResult;
 
 	bResult = _SUCCESS;
@@ -4211,7 +4075,6 @@ static void hal_ra_info_dump(struct adapter *adapt , void *sel)
 	u8 curr_tx_rate, curr_tx_sgi, hight_rate, lowest_rate;
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapt);
 	struct macid_ctl_t *macid_ctl = dvobj_to_macidctl(dvobj);
-	struct hal_com_data *HalData = GET_HAL_DATA(adapt);
 
 	for (i = 0; i < macid_ctl->num; i++) {
 

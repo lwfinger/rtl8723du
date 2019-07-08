@@ -155,18 +155,12 @@ extern u8 fakeBTEfuseContent[EFUSE_MAX_BT_BANK][EFUSE_MAX_HW_SIZE];
 extern u8 fakeBTEfuseInitMap[];
 extern u8 fakeBTEfuseModifiedMap[];
 /*------------------------Export global variable----------------------------*/
-#define		MAX_SEGMENT_SIZE			200
-#define		MAX_SEGMENT_NUM			200
-#define		MAX_BUF_SIZE				(MAX_SEGMENT_SIZE*MAX_SEGMENT_NUM)
-#define		TMP_BUF_SIZE				100
+#define		MAX_SEGMENT_SIZE	200
+#define		MAX_SEGMENT_NUM		200
+#define		MAX_BUF_SIZE		(MAX_SEGMENT_SIZE*MAX_SEGMENT_NUM)
+#define		TMP_BUF_SIZE		100
 
-static	u8	dcmd_Return_Buffer[MAX_BUF_SIZE] = {0};
-static	u32	dcmd_Buf_Idx = 0;
-static	u32	dcmd_Finifh_Flag = 0;
-
-static	char	dcmd_Buf[TMP_BUF_SIZE];
-
-#define		rtprintf					dcmd_Store_Return_Buf
+#define		rtprintf		dcmd_Store_Return_Buf
 
 u8	efuse_bt_GetCurrentSize(struct adapter * adapt, u16 *size);
 u16	efuse_bt_GetMaxSize(struct adapter * adapt);

@@ -5,19 +5,6 @@
 
 #include <rtl8723d_hal.h>
 
-static void _dbg_dump_macreg(struct adapter * adapt)
-{
-	u32 offset = 0;
-	u32 val32 = 0;
-	u32 index = 0;
-
-	for (index = 0; index < 64; index++) {
-		offset = index * 4;
-		val32 = rtw_read32(adapt, offset);
-		RTW_INFO("offset : 0x%02x ,val:0x%08x\n", offset, val32);
-	}
-}
-
 static void
 _ConfigChipOutEP_8723(
 	struct adapter * adapt,
@@ -96,7 +83,6 @@ static void rtl8723du_interface_configure(
 static u32 _InitPowerOn_8723du(struct adapter * adapt)
 {
 	u32 status = _SUCCESS;
-	u32 value32 = 0;
 	u16 value16 = 0;
 	u8 value8 = 0;
 
@@ -127,57 +113,6 @@ static u32 _InitPowerOn_8723du(struct adapter * adapt)
  * LLT R/W/Init function
  * -------------------------------------------------------------------------
  */
-static u8 _LLTWrite(
-	struct adapter * adapt,
-	u32 address,
-	u32 data
-)
-{
-	u8 status = _SUCCESS;
-	s8 count = POLLING_LLT_THRESHOLD;
-	u32 value = _LLT_INIT_ADDR(address) | _LLT_INIT_DATA(data) | _LLT_OP(_LLT_WRITE_ACCESS);
-
-	rtw_write32(adapt, REG_LLT_INIT, value);
-
-	/* polling */
-	do {
-		value = rtw_read32(adapt, REG_LLT_INIT);
-		if (_LLT_NO_ACTIVE == _LLT_OP_VALUE(value))
-			break;
-	} while (--count);
-
-	if (count <= 0) {
-		RTW_INFO("Failed to polling write LLT done at address %d!\n", address);
-		status = _FAIL;
-	}
-	return status;
-}
-
-static u8 _LLTRead(
-	struct adapter * adapt,
-	u32 address
-)
-{
-	int count = 0;
-	u32 value = _LLT_INIT_ADDR(address) | _LLT_OP(_LLT_READ_ACCESS);
-
-	rtw_write32(adapt, REG_LLT_INIT, value);
-
-	/* polling and get value */
-	do {
-		value = rtw_read32(adapt, REG_LLT_INIT);
-		if (_LLT_NO_ACTIVE == _LLT_OP_VALUE(value))
-			return (u8)value;
-
-		if (count > POLLING_LLT_THRESHOLD) {
-			break;
-		}
-	} while (count++);
-
-	return 0xFF;
-}
-
-
 /*
  * ---------------------------------------------------------------
  * MAC init functions
@@ -196,7 +131,6 @@ static void _InitQueueReservedPage(struct adapter * adapt)
 {
 	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
 	struct registry_priv *pregistrypriv = &adapt->registrypriv;
-	u32 outEPNum = (u32)pHalData->OutEpNumber;
 	u32 numHQ = 0;
 	u32 numLQ = 0;
 	u32 numNQ = 0;
@@ -437,7 +371,6 @@ _InitWMACSetting(
 )
 {
 	u16 value16;
-	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
 	u32 rcr;
 
 	rcr = RCR_APM | RCR_AM | RCR_AB | RCR_CBSSID_DATA | RCR_CBSSID_BCN | RCR_APP_ICV | RCR_AMF | RCR_HTC_LOC_CTRL | RCR_APP_MIC | RCR_APP_PHYST_RXFF;
@@ -632,7 +565,6 @@ usb_AggSettingRxUpdate(struct adapter * adapt)
 	struct hal_com_data * pHalData;
 	u8 aggctrl;
 	u32 aggrx;
-	u32 agg_size;
 
 	pHalData = GET_HAL_DATA(adapt);
 
@@ -667,7 +599,6 @@ static void PHY_InitAntennaSelection8723D(struct adapter * adapt)
 
 static void _InitRFType(struct adapter * Adapter)
 {
-	struct registry_priv *pregpriv = &Adapter->registrypriv;
 	struct hal_com_data *pHalData = GET_HAL_DATA(Adapter);
 
 #if	DISABLE_BB_RF
@@ -727,13 +658,6 @@ HalDetectPwrDownMode(
  * If Efuse 0x0e bit1 is not enabled, we can not support selective suspend for Minicard and
  * slim card.
  */
-static void
-HalDetectSelectiveSuspendMode(
-	struct adapter * adapt
-)
-{
-}   /* HalDetectSelectiveSuspendMode */
-
 /*-----------------------------------------------------------------------------
  * Function:	HwSuspendModeEnable()
  *
@@ -749,29 +673,6 @@ HalDetectSelectiveSuspendMode(
  *	When		Who		Remark
  *	08/23/2010	MHC		HW suspend mode switch test..
  *---------------------------------------------------------------------------*/
-static void HwSuspendModeEnable(struct adapter * adapt, u8 Type)
-{
-}
-
-static enum rt_rf_power_state RfOnOffDetect(struct adapter * adapt)
-{
-	/* struct hal_com_data *pHalData = GET_HAL_DATA(adapt); */
-	u8 val8;
-	enum rt_rf_power_state rfpowerstate = rf_off;
-
-	if (adapter_to_pwrctl(adapt)->bHWPowerdown) {
-		val8 = rtw_read8(adapt, REG_HSISR);
-		RTW_INFO("pwrdown, 0x5c(BIT(7))=%02x\n", val8);
-		rfpowerstate = (val8 & BIT(7)) ? rf_off : rf_on;
-	} else { /* rf on/off */
-		rtw_write8(adapt, REG_MAC_PINMUX_CFG, rtw_read8(adapt, REG_MAC_PINMUX_CFG) & ~(BIT(3)));
-		val8 = rtw_read8(adapt, REG_GPIO_IO_SEL);
-		RTW_INFO("GPIO_IN=%02x\n", val8);
-		rfpowerstate = (val8 & BIT(3)) ? rf_on : rf_off;
-	}
-	return rfpowerstate;
-}   /* HalDetectPwrDownMode */
-
 static void _InitBBRegBackup_8723du(struct adapter * adapt)
 {
 	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
@@ -800,9 +701,7 @@ static u32 rtl8723du_hal_init(struct adapter * adapt)
 	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
 	struct pwrctrl_priv *pwrctrlpriv = adapter_to_pwrctl(adapt);
 	struct registry_priv *pregistrypriv = &adapt->registrypriv;
-	enum rt_rf_power_state eRfPowerStateToSet;
 	u32 NavUpper = WiFiNavUpperUs;
-	u32 value32;
 	unsigned long init_start_time = rtw_get_current_time();
 
 
@@ -1040,313 +939,6 @@ exit:
 	return status;
 }
 
-static void _DisableGPIO(struct adapter * adapt)
-{
-	/*
-	 * j. GPIO_PIN_CTRL 0x44[31:0]=0x000
-	 * k. Value = GPIO_PIN_CTRL[7:0]
-	 * l. GPIO_PIN_CTRL 0x44[31:0] = 0x00FF0000 | (value <<8); write external Plevel
-	 * m. GPIO_MUXCFG 0x42 [15:0] = 0x0780
-	 * n. LEDCFG 0x4C[15:0] = 0x8080
-	 */
-	u8 value8;
-	u16 value16;
-	u32 value32;
-
-	/* 1. Disable GPIO[7:0] */
-	rtw_write16(adapt, REG_GPIO_PIN_CTRL + 2, 0x0000);
-	value32 = rtw_read32(adapt, REG_GPIO_PIN_CTRL) & 0xFFFF00FF;
-	value8 = (u8)(value32 & 0x000000FF);
-	value32 |= ((value8 << 8) | 0x00FF0000);
-	rtw_write32(adapt, REG_GPIO_PIN_CTRL, value32);
-
-	/* 2. Disable GPIO[10:8] */
-	rtw_write8(adapt, REG_GPIO_MUXCFG + 3, 0x00);
-	value16 = rtw_read16(adapt, REG_GPIO_MUXCFG + 2) & 0xFF0F;
-	value8 = (u8)(value16 & 0x000F);
-	value16 |= ((value8 << 4) | 0x0780);
-	rtw_write16(adapt, REG_GPIO_MUXCFG + 2, value16);
-
-	/* 3. Disable LED0 & 1 */
-	rtw_write16(adapt, REG_LEDCFG0, 0x8080);
-} /* end of _DisableGPIO() */
-
-static void
-_ResetFWDownloadRegister(
-	struct adapter * adapt
-)
-{
-	u32 value32;
-
-	value32 = rtw_read32(adapt, REG_MCUFWDL);
-	value32 &= ~(MCUFWDL_EN | MCUFWDL_RDY);
-	rtw_write32(adapt, REG_MCUFWDL, value32);
-}
-
-static void
-_ResetBB(
-	struct adapter * adapt
-)
-{
-	u16 value16;
-
-	/* reset BB */
-	value16 = rtw_read16(adapt, REG_SYS_FUNC_EN);
-	value16 &= ~(FEN_BBRSTB | FEN_BB_GLB_RSTn);
-	rtw_write16(adapt, REG_SYS_FUNC_EN, value16);
-}
-
-static void
-_ResetMCU(
-	struct adapter * adapt
-)
-{
-	u16 value16;
-
-	/* reset MCU */
-	value16 = rtw_read16(adapt, REG_SYS_FUNC_EN);
-	value16 &= ~FEN_CPUEN;
-	rtw_write16(adapt, REG_SYS_FUNC_EN, value16);
-}
-
-static void
-_DisableMAC_AFE_PLL(
-	struct adapter * adapt
-)
-{
-	u32 value32;
-
-	/* disable MAC/ AFE PLL */
-	value32 = rtw_read32(adapt, REG_APS_FSMCO);
-	value32 |= APDM_MAC;
-	rtw_write32(adapt, REG_APS_FSMCO, value32);
-
-	value32 |= APFM_OFF;
-	rtw_write32(adapt, REG_APS_FSMCO, value32);
-}
-
-static void
-_AutoPowerDownToHostOff(
-	struct adapter * adapt
-)
-{
-	u32 value32;
-
-	rtw_write8(adapt, REG_SPS0_CTRL, 0x22);
-
-	value32 = rtw_read32(adapt, REG_APS_FSMCO);
-
-	value32 |= APDM_HOST; /* card disable */
-	rtw_write32(adapt, REG_APS_FSMCO, value32);
-
-	/* set USB suspend */
-	value32 = rtw_read32(adapt, REG_APS_FSMCO);
-	value32 &= ~AFSM_PCIE;
-	rtw_write32(adapt, REG_APS_FSMCO, value32);
-
-}
-
-static void
-_SetUsbSuspend(
-	struct adapter * adapt
-)
-{
-	u32 value32;
-
-	value32 = rtw_read32(adapt, REG_APS_FSMCO);
-
-	/* set USB suspend */
-	value32 |= AFSM_HSUS;
-	rtw_write32(adapt, REG_APS_FSMCO, value32);
-
-	/* RT_ASSERT(0 == (rtw_read32(adapt, REG_APS_FSMCO) & BIT(12)),("")); */
-
-}
-
-static void
-_DisableRFAFEAndResetBB(
-	struct adapter * adapt
-)
-{
-	/*
-	 * a.	TXPAUSE 0x522[7:0] = 0xFF			Pause MAC TX queue
-	 * b.	RF path 0 offset 0x00 = 0x00		disable RF
-	 * c.	APSD_CTRL 0x600[7:0] = 0x40
-	 * d.	SYS_FUNC_EN 0x02[7:0] = 0x16		reset BB state machine
-	 * e.	SYS_FUNC_EN 0x02[7:0] = 0x14		reset BB state machine
-	 */
-	enum rf_path eRFPath = RF_PATH_A, value8 = 0;
-
-	rtw_write8(adapt, REG_TXPAUSE, 0xFF);
-	phy_set_rf_reg(adapt, eRFPath, 0x0, bMaskByte0, 0x0);
-
-	value8 |= APSDOFF;
-	rtw_write8(adapt, REG_APSD_CTRL, value8); /*0x40 */
-
-	value8 = 0;
-	value8 |= (FEN_USBD | FEN_USBA | FEN_BB_GLB_RSTn);
-	rtw_write8(adapt, REG_SYS_FUNC_EN, value8); /*0x16 */
-
-	value8 &= (~FEN_BB_GLB_RSTn);
-	rtw_write8(adapt, REG_SYS_FUNC_EN, value8); /*0x14 */
-
-}
-
-static void
-_ResetDigitalProcedure1(
-	struct adapter * adapt,
-	bool bWithoutHWSM
-)
-{
-
-	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
-
-	if (pHalData->firmware_version <= 0x20) {
-		/*
-		 * f.	MCUFWDL 0x80[7:0]=0				reset MCU ready status
-		 * g.	SYS_FUNC_EN 0x02[10]= 0			reset MCU register, (8051 reset)
-		 * h.	SYS_FUNC_EN 0x02[15-12]= 5		reset MAC register, DCORE
-		 * i.     SYS_FUNC_EN 0x02[10]= 1		enable MCU register, (8051 enable)
-		 */
-		u16 valu16 = 0;
-
-		rtw_write8(adapt, REG_MCUFWDL, 0);
-
-		valu16 = rtw_read16(adapt, REG_SYS_FUNC_EN);
-		rtw_write16(adapt, REG_SYS_FUNC_EN, (valu16 & (~FEN_CPUEN))); /*reset MCU ,8051 */
-
-		valu16 = rtw_read16(adapt, REG_SYS_FUNC_EN) & 0x0FFF;
-		rtw_write16(adapt, REG_SYS_FUNC_EN, (valu16 | (FEN_HWPDN | FEN_ELDR))); /*reset MAC */
-
-		valu16 = rtw_read16(adapt, REG_SYS_FUNC_EN);
-		rtw_write16(adapt, REG_SYS_FUNC_EN, (valu16 | FEN_CPUEN)); /*enable MCU ,8051 */
-	} else {
-		u8 retry_cnts = 0;
-
-		if (rtw_read8(adapt, REG_MCUFWDL) & BIT(1)) {
-			/* IF fw in RAM code, do reset */
-
-			rtw_write8(adapt, REG_MCUFWDL, 0);
-			if (GET_HAL_DATA(adapt)->bFWReady) {
-				/* 2010/08/25 MH According to RD alfred's suggestion, we need to disable other */
-				/* HRCV INT to influence 8051 reset. */
-				rtw_write8(adapt, REG_FWIMR, 0x20);
-
-				rtw_write8(adapt, REG_HMETFR + 3, 0x20); /*8051 reset by self */
-
-				while ((retry_cnts++ < 100) && (FEN_CPUEN & rtw_read16(adapt, REG_SYS_FUNC_EN)))
-					rtw_udelay_os(50); /* us */
-
-				if (retry_cnts >= 100) {
-					RTW_INFO("%s #####=> 8051 reset failed!.........................\n", __func__);
-					/* if 8051 reset fail we trigger GPIO 0 for LA */
-					/*PlatformEFIOWrite4Byte(	adapt, */
-					/*						REG_GPIO_PIN_CTRL, */
-					/*						0x00010100); */
-					/* 2010/08/31 MH According to Filen's info, if 8051 reset fail, reset MAC directly. */
-					rtw_write8(adapt, REG_SYS_FUNC_EN + 1, 0x50); /*Reset MAC and Enable 8051 */
-					rtw_mdelay_os(10);
-				} else {
-					/*RTW_INFO("%s =====> 8051 reset success (%d) .\n", __func__, retry_cnts); */
-				}
-			} else
-				RTW_INFO("%s =====> 8051 in RAM but !hal_data->bFWReady\n", __func__);
-		} else {
-			/*RTW_INFO("%s =====> 8051 in ROM.\n", __func__); */
-		}
-
-		rtw_write8(adapt, REG_SYS_FUNC_EN + 1, 0x54); /*Reset MAC and Enable 8051 */
-	}
-
-	/* Clear rpwm value for initial toggle bit trigger. */
-	rtw_write8(adapt, REG_USB_HRPWM, 0x00);
-
-	if (bWithoutHWSM) {
-		/*
-		 * Without HW auto state machine
-		 * g.	SYS_CLKR 0x08[15:0] = 0x30A3			disable MAC clock
-		 * h.	AFE_PLL_CTRL 0x28[7:0] = 0x80			disable AFE PLL
-		 * i.	AFE_XTAL_CTRL 0x24[15:0] = 0x880F		gated AFE DIG_CLOCK
-		 * j.	SYS_ISO_CTRL 0x00[7:0] = 0xF9			isolated digital to PON
-		 */
-		/*rtw_write16(adapt, REG_SYS_CLKR, 0x30A3); */
-		rtw_write16(adapt, REG_SYS_CLKR, 0x70A3); /*modify to 0x70A3 by Scott. */
-		rtw_write8(adapt, REG_AFE_PLL_CTRL, 0x80);
-		rtw_write16(adapt, REG_AFE_XTAL_CTRL, 0x880F);
-		rtw_write8(adapt, REG_SYS_ISO_CTRL, 0xF9);
-	} else {
-		/* Disable all RF/BB power */
-		rtw_write8(adapt, REG_RF_CTRL, 0x00);
-	}
-
-}
-
-static void
-_ResetDigitalProcedure2(
-	struct adapter * adapt
-)
-{
-	/*
-	 * k.	SYS_FUNC_EN 0x03[7:0] = 0x44			disable ELDR runction
-	 * l.	SYS_CLKR 0x08[15:0] = 0x3083			disable ELDR clock
-	 * m.	SYS_ISO_CTRL 0x01[7:0] = 0x83			isolated ELDR to PON
-	 ******************************/
-	/*rtw_write8(adapt, REG_SYS_FUNC_EN+1, 0x44); */ /* marked by Scott. */
-	/*rtw_write16(adapt, REG_SYS_CLKR, 0x3083); */
-	/*rtw_write8(adapt, REG_SYS_ISO_CTRL+1, 0x83); */
-
-	rtw_write16(adapt, REG_SYS_CLKR, 0x70a3); /* modify to 0x70a3 by Scott. */
-	rtw_write8(adapt, REG_SYS_ISO_CTRL + 1, 0x82); /* modify to 0x82 by Scott. */
-}
-
-static void
-_DisableAnalog(
-	struct adapter * adapt,
-	bool bWithoutHWSM
-)
-{
-	u16 value16 = 0;
-	u8 value8 = 0;
-	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
-
-	if (bWithoutHWSM) {
-		/*
-		 * n.	LDOA15_CTRL 0x20[7:0] = 0x04		disable A15 power
-		 * o.	LDOV12D_CTRL 0x21[7:0] = 0x54		disable digital core power
-		 * r.	When driver call disable, the ASIC will turn off remaining clock automatically
-		 */
-
-		rtw_write8(adapt, REG_LDOA15_CTRL, 0x04);
-		/* PlatformIOWrite1Byte(adapt, REG_LDOV12D_CTRL, 0x54); */
-
-		value8 = rtw_read8(adapt, REG_LDOV12D_CTRL);
-		value8 &= (~LDV12_EN);
-		rtw_write8(adapt, REG_LDOV12D_CTRL, value8);
-	}
-
-	/*
-	 * h.	SPS0_CTRL 0x11[7:0] = 0x23			enter PFM mode
-	 * i.	APS_FSMCO 0x04[15:0] = 0x4802		set USB suspend
-	 */
-
-
-	value8 = 0x23;
-
-	rtw_write8(adapt, REG_SPS0_CTRL, value8);
-
-
-	if (bWithoutHWSM) {
-		/* 2010/08/31 According to Filen description, we need to use HW to shut down 8051 automatically. */
-		/* Because suspend operation need the asistance of 8051 to wait for 3ms. */
-		value16 |= (APDM_HOST | AFSM_HSUS | PFM_ALDN);
-	} else
-		value16 |= (APDM_HOST | AFSM_HSUS | PFM_ALDN);
-
-	rtw_write16(adapt, REG_APS_FSMCO, value16); /* 0x4802 */
-
-	rtw_write8(adapt, REG_RSV_CTRL, 0x0e);
-}
-
 static void rtl8723du_hw_power_down(struct adapter * adapt)
 {
 	u8 u1bTmp;
@@ -1453,7 +1045,6 @@ static unsigned int rtl8723du_inirp_init(struct adapter * adapt)
 	u8 i;
 	struct recv_buf *precvbuf;
 	uint status;
-	struct dvobj_priv *pdev = adapter_to_dvobj(adapt);
 	struct intf_hdl *pintfhdl = &adapt->iopriv.intf;
 	struct recv_priv *precvpriv = &(adapt->recvpriv);
 	u32(*_read_port)(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *pmem);
@@ -1491,16 +1082,6 @@ static unsigned int rtl8723du_inirp_deinit(struct adapter * adapt)
 	return _SUCCESS;
 }
 
-static u32 _GetChannelGroup(u32 channel)
-{
-	if (channel < 3)    /* Channel 1~3 */
-		return 0;
-	else if (channel < 9)   /* Channel 4~9 */
-		return 1;
-
-	return 2;               /* Channel 10~14 */
-}
-
 /*
  *-------------------------------------------------------------------
  *	EEPROM/EFUSE Content Parsing
@@ -1508,15 +1089,6 @@ static u32 _GetChannelGroup(u32 channel)
  */
 static void
 hal_EfuseParseLEDSetting(
-	struct adapter * adapt,
-	u8 *PROMContent,
-	bool AutoloadFail
-)
-{
-}
-
-static void
-hal_EfuseParseRFSetting(
 	struct adapter * adapt,
 	u8 *PROMContent,
 	bool AutoloadFail
@@ -1655,10 +1227,7 @@ hal_EfuseParsePROMContent(
 )
 {
 	struct hal_com_data * pHalData = GET_HAL_DATA(adapt);
-
 	u8 eeValue;
-	u32 i;
-	u16 value16;
 	u8 ret = _FAIL;
 
 	eeValue = rtw_read8(adapt, REG_9346CR);
@@ -1750,7 +1319,6 @@ static void rtl8723du_trigger_gpio_0(struct adapter * adapt)
  */
 static u8 SetHwReg8723du(struct adapter * adapt, u8 variable, u8 *val)
 {
-	struct hal_com_data * pHalData = GET_HAL_DATA(adapt);
 	u8 ret = _SUCCESS;
 
 	switch (variable) {
@@ -1775,9 +1343,6 @@ static u8 SetHwReg8723du(struct adapter * adapt, u8 variable, u8 *val)
  */
 static void GetHwReg8723du(struct adapter * adapt, u8 variable, u8 *val)
 {
-	struct hal_com_data * pHalData = GET_HAL_DATA(adapt);
-
-
 	switch (variable) {
 	default:
 		GetHwReg8723D(adapt, variable, val);
@@ -1797,7 +1362,6 @@ GetHalDefVar8723du(
 	void * pValue
 )
 {
-	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
 	u8 bResult = _SUCCESS;
 
 	switch (eVariable) {
@@ -1837,7 +1401,6 @@ SetHalDefVar8723du(
 	void * pValue
 )
 {
-	struct hal_com_data *pHalData = GET_HAL_DATA(adapt);
 	u8 bResult = _SUCCESS;
 
 	switch (eVariable) {
@@ -1847,26 +1410,6 @@ SetHalDefVar8723du(
 	}
 
 	return bResult;
-}
-
-static void _update_response_rate(struct adapter * adapt, unsigned int mask)
-{
-	u8 RateIndex = 0;
-	/* Set RRSR rate table. */
-	rtw_write8(adapt, REG_RRSR, mask & 0xff);
-	rtw_write8(adapt, REG_RRSR + 1, (mask >> 8) & 0xff);
-
-	/* Set RTS initial rate */
-	while (mask > 0x1) {
-		mask = (mask >> 1);
-		RateIndex++;
-	}
-	rtw_write8(adapt, REG_INIRTS_RATE_SEL, RateIndex);
-}
-
-static void rtl8723du_init_default_value(struct adapter * adapt)
-{
-	rtl8723d_init_default_value(adapt);
 }
 
 static u8 rtl8723du_ps_func(struct adapter * adapt, enum hal_intf_ps_func efunc_id, u8 *val)

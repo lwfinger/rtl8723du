@@ -105,19 +105,17 @@ static ssize_t proc_set_log_level(struct file *file, const char __user *buffer, 
 
 #ifdef CONFIG_RTW_DEBUG
 	if (buffer && !copy_from_user(tmp, buffer, count)) {
-
-		int num = sscanf(tmp, "%d ", &log_level);
-
+		sscanf(tmp, "%d ", &log_level);
 		if (log_level >= _DRV_NONE_ && log_level <= _DRV_MAX_) {
 			rtw_drv_log_level = log_level;
 			printk("rtw_drv_log_level:%d\n", rtw_drv_log_level);
 		}
-	} else
+	} else {
 		return -EFAULT;
+	}
 #else
 	printk("CONFIG_RTW_DEBUG is disabled\n");
 #endif
-
 	return count;
 }
 
@@ -475,11 +473,8 @@ static ssize_t proc_set_rx_info_msg(struct file *file, const char __user *buffer
 	}
 
 	if (buffer && !copy_from_user(tmp, buffer, count)) {
-		int num = sscanf(tmp, "%d", &phy_info_flag);
-
-		precvpriv->store_law_data_flag = (bool) phy_info_flag;
-
-		/*RTW_INFO("precvpriv->store_law_data_flag = %d\n",( bool )(precvpriv->store_law_data_flag));*/
+		sscanf(tmp, "%d", &phy_info_flag);
+		precvpriv->store_law_data_flag = (bool)phy_info_flag;
 	}
 	return count;
 }
@@ -496,8 +491,6 @@ static int proc_get_tx_info_msg(struct seq_file *m, void *v)
 	unsigned long irqL;
 	struct net_device *dev = m->private;
 	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
-	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
-	struct macid_ctl_t *macid_ctl = dvobj_to_macidctl(dvobj);
 	struct sta_info *psta;
 	u8 bc_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 	u8 null_addr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -833,8 +826,6 @@ static ssize_t proc_set_macaddr_acl(struct file *file, const char __user *buffer
 {
 	struct net_device *dev = data;
 	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
-	struct mlme_priv *mlme = &adapter->mlmepriv;
-	struct mlme_ext_priv *mlmeext = &adapter->mlmeextpriv;
 	char tmp[17 * NUM_ACL + 32] = {0};
 	u8 mode;
 	u8 addr[ETH_ALEN];
@@ -879,8 +870,6 @@ static ssize_t proc_set_macaddr_acl(struct file *file, const char __user *buffer
 		}
 
 	}
-
-exit:
 	return count;
 }
 #endif /* CONFIG_RTW_MACADDR_ACL */
@@ -1221,7 +1210,6 @@ static ssize_t proc_set_change_bss_chbw(struct file *file, const char __user *bu
 	struct net_device *dev = data;
 	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct mlme_priv *mlme = &(adapter->mlmepriv);
-	struct mlme_ext_priv *mlmeext = &(adapter->mlmeextpriv);
 	char tmp[32];
 	s16 ch;
 	s8 bw = -1, offset = -1;
@@ -1266,7 +1254,6 @@ static ssize_t proc_set_tx_bw_mode(struct file *file, const char __user *buffer,
 	struct net_device *dev = data;
 	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	struct macid_ctl_t *macid_ctl = &adapter->dvobj->macid_ctl;
-	struct mlme_priv *mlme = &(adapter->mlmepriv);
 	struct mlme_ext_priv *mlmeext = &(adapter->mlmeextpriv);
 	char tmp[32];
 	u8 bw_mode;
@@ -1406,10 +1393,7 @@ clear_ps_deny:
 
 static void *proc_start_tx_power_idx(struct seq_file *m, loff_t *pos)
 {
-	struct net_device *dev = m->private;
-	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	u8 path = ((*pos) & 0xFF00) >> 8;
-	u8 rs = *pos & 0xFF;
 
 	if (path >= RF_PATH_MAX)
 		return NULL;
@@ -1418,14 +1402,10 @@ static void *proc_start_tx_power_idx(struct seq_file *m, loff_t *pos)
 }
 static void proc_stop_tx_power_idx(struct seq_file *m, void *v)
 {
-	struct net_device *dev = m->private;
-	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 }
 
 static void *proc_next_tx_power_idx(struct seq_file *m, void *v, loff_t *pos)
 {
-	struct net_device *dev = m->private;
-	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
 	u8 path = ((*pos) & 0xFF00) >> 8;
 	u8 rs = *pos & 0xFF;
 
@@ -1536,10 +1516,9 @@ static ssize_t proc_set_kfree_bb_gain(struct file *file, const char __user *buff
 {
 	struct net_device *dev = data;
 	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
-	struct hal_com_data *hal_data = GET_HAL_DATA(adapter);
 	struct kfree_data_t *kfree_data = GET_KFREE_DATA(adapter);
 	char tmp[BB_GAIN_NUM * RF_PATH_MAX] = {0};
-	u8 path, chidx;
+	u8 chidx;
 	s8 bb_gain[BB_GAIN_NUM];
 	char ch_band_Group[6];
 
@@ -1639,7 +1618,6 @@ static ssize_t proc_set_tx_gain_offset(struct file *file, const char __user *buf
 	}
 
 	if (buffer && !copy_from_user(tmp, buffer, count)) {
-		u8 write_value;
 		int num = sscanf(tmp, "%hhu %hhd", &rf_path, &offset);
 
 		if (num < 2)
@@ -2671,7 +2649,6 @@ struct proc_dir_entry *rtw_adapter_proc_init(struct net_device *dev)
 	struct proc_dir_entry *dir_dev = NULL;
 	struct proc_dir_entry *entry = NULL;
 	struct adapter *adapter = rtw_netdev_priv(dev);
-	u8 rf_type;
 	ssize_t i;
 
 	if (!drv_proc) {

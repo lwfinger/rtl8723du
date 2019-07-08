@@ -337,21 +337,6 @@ u8 rtw_btcoex_IsBtLinkExist(struct adapter * adapt)
 	return hal_btcoex_IsBtLinkExist(adapt);
 }
 
-static void rtw_btcoex_SetBtPatchVersion(struct adapter * adapt, u16 btHciVer, u16 btPatchVer)
-{
-	hal_btcoex_SetBtPatchVersion(adapt, btHciVer, btPatchVer);
-}
-
-static void rtw_btcoex_SetHciVersion(struct adapter *  adapt, u16 hciVersion)
-{
-	hal_btcoex_SetHciVersion(adapt, hciVersion);
-}
-
-static void rtw_btcoex_StackUpdateProfileInfo(void)
-{
-	hal_btcoex_StackUpdateProfileInfo();
-}
-
 void rtw_btcoex_pta_off_on_notify(struct adapter * adapt, u8 bBTON)
 {
 	hal_btcoex_pta_off_on_notify(adapt, bBTON);

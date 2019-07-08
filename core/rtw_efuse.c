@@ -44,10 +44,8 @@ static bool rtw_file_efuse_IsMasked(struct adapter * pAdapter, u16 Offset)
 	return (result > 0) ? 0 : 1;
 }
 
-static bool efuse_IsMasked(struct adapter * pAdapter, u16 Offset)
+static bool efuse_IsMasked(struct adapter *pAdapter, u16 Offset)
 {
-	struct hal_com_data * pHalData = GET_HAL_DATA(pAdapter);
-
 	if (pAdapter->registrypriv.boffefusemask)
 		return false;
 
@@ -155,7 +153,6 @@ void rtw_efuse_analyze(struct adapter *	adapt, u8 Type, u8 Fake)
 	u16 eFuse_Addr = 0;
 	u8 offset, wden;
 	u16  i, j;
-	u8 u1temp = 0;
 	u8 efuseHeader = 0, efuseExtHdr = 0;
 	u8 efuseData[EFUSE_MAX_WORD_UNIT*2] = {0}, dataCnt = 0;
 	u16 efuseHeader2Byte = 0;
@@ -939,9 +936,6 @@ u8 rtw_efuse_map_write(struct adapter * adapt, u16 addr, u16 cnts, u8 *data)
 	u8 ret = _SUCCESS;
 	u16 mapLen = 0, startAddr = 0, efuse_max_available_len = 0;
 	u32 backupRegs[4] = {0};
-	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
-	struct efuse_hal *	pEfuseHal = &pHalData->EfuseHal;
-
 
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI, TYPE_EFUSE_MAP_LEN, (void *)&mapLen, false);
 	EFUSE_GetEfuseDefinition(adapt, EFUSE_WIFI, TYPE_AVAILABLE_EFUSE_BYTES_TOTAL, &efuse_max_available_len, false);
@@ -1693,9 +1687,8 @@ u32 rtw_read_macaddr_from_file(const char *path, u8 *buf)
 	u32 i;
 	u8 temp[3];
 	u32 ret = _FAIL;
-
 	u8 file_data[17];
-	u32 read_size, pos = 0;
+	u32 read_size;
 	u8 addr[ETH_ALEN];
 
 	if (!rtw_is_file_readable(path)) {

@@ -28,13 +28,6 @@ void halrf_basic_profile(void *p_dm_void, u32 *_used, char *output,
 
 void halrf_rf_lna_setting(void *p_dm_void, enum phydm_lna_set type)
 {
-	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _hal_rf_	 *p_rf = &(p_dm->rf_table);
-
-		switch (p_dm->support_ic_type) {
-		default:
-			break;
-		}
 }
 
 void halrf_support_ability_debug(void *p_dm_void, char input[][16], u32 *_used,

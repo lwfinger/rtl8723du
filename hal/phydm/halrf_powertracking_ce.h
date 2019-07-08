@@ -50,10 +50,6 @@ extern	u32 cck_swing_table_ch1_ch14_8710b[CCK_TABLE_SIZE_8710B];
 
 extern  u32 tx_scaling_table_jaguar[TXSCALE_TABLE_SIZE];
 
-/* <20121018, Kordan> In case fail to read TxPowerTrack.txt, we use the table of 88E as the default table. */
-static u8 delta_swing_table_idx_2ga_p_8188e[] = {0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 4,  4,  4,  4,  4,  4,  5,  5,  7,  7,  8,  8,  8,  9,  9,  9,  9,  9};
-static u8 delta_swing_table_idx_2ga_n_8188e[] = {0, 0, 0, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5,  6,  6,  7,  7,  7,  7,  8,  8,  9,  9, 10, 10, 10, 11, 11, 11, 11};
-
 #define dm_check_txpowertracking	odm_txpowertracking_check
 
 struct _IQK_MATRIX_REGS_SETTING {
@@ -151,29 +147,29 @@ struct odm_rf_calibration_structure {
 	u8  delta_swing_tssi_table_5gd[BAND_NUM][DELTA_SWINTSSI_SIZE];
 	s8  delta_swing_table_xtal_p[DELTA_SWINGIDX_SIZE];
 	s8  delta_swing_table_xtal_n[DELTA_SWINGIDX_SIZE];
-	u8  delta_swing_table_idx_2ga_p_8188e[DELTA_SWINGIDX_SIZE];
-	u8  delta_swing_table_idx_2ga_n_8188e[DELTA_SWINGIDX_SIZE];
+//	u8  delta_swing_table_idx_2ga_p_8188e[DELTA_SWINGIDX_SIZE];
+//	u8  delta_swing_table_idx_2ga_n_8188e[DELTA_SWINGIDX_SIZE];
 
-	u8			bb_swing_idx_ofdm[MAX_RF_PATH];
-	u8			bb_swing_idx_ofdm_current;
-	u8			bb_swing_idx_ofdm_base[MAX_RF_PATH];
-	bool		default_bb_swing_index_flag;
-	bool			bb_swing_flag_ofdm;
-	u8			bb_swing_idx_cck;
-	u8			bb_swing_idx_cck_current;
-	u8			bb_swing_idx_cck_base;
-	u8			default_ofdm_index;
-	u8			default_cck_index;
-	bool			bb_swing_flag_cck;
+	u8 bb_swing_idx_ofdm[MAX_RF_PATH];
+	u8 bb_swing_idx_ofdm_current;
+	u8 bb_swing_idx_ofdm_base[MAX_RF_PATH];
+	bool default_bb_swing_index_flag;
+	bool bb_swing_flag_ofdm;
+	u8 bb_swing_idx_cck;
+	u8 bb_swing_idx_cck_current;
+	u8 bb_swing_idx_cck_base;
+	u8 default_ofdm_index;
+	u8 default_cck_index;
+	bool bb_swing_flag_cck;
 
-	s8			absolute_ofdm_swing_idx[MAX_RF_PATH];
-	s8			remnant_ofdm_swing_idx[MAX_RF_PATH];
-	s8			absolute_cck_swing_idx[MAX_RF_PATH];
-	s8			remnant_cck_swing_idx;
-	s8			modify_tx_agc_value;       /*Remnat compensate value at tx_agc */
-	bool			modify_tx_agc_flag_path_a;
-	bool			modify_tx_agc_flag_path_b;
-	bool			modify_tx_agc_flag_path_c;
+	s8 absolute_ofdm_swing_idx[MAX_RF_PATH];
+	s8 remnant_ofdm_swing_idx[MAX_RF_PATH];
+	s8 absolute_cck_swing_idx[MAX_RF_PATH];
+	s8 remnant_cck_swing_idx;
+	s8 modify_tx_agc_value;       /*Remnat compensate value at tx_agc */
+	bool modify_tx_agc_flag_path_a;
+	bool modify_tx_agc_flag_path_b;
+	bool modify_tx_agc_flag_path_c;
 	bool			modify_tx_agc_flag_path_d;
 	bool			modify_tx_agc_flag_path_a_cck;
 

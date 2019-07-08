@@ -80,7 +80,6 @@ PHY_QueryBBReg_8723D(
 )
 {
 	u32	ReturnValue = 0, OriginalValue, BitShift;
-	u16	BBWaitCounter = 0;
 
 #if (DISABLE_BB_RF == 1)
 	return 0;
@@ -122,15 +121,11 @@ PHY_SetBBReg_8723D(
 	u32		Data
 )
 {
-	struct hal_com_data	*pHalData		= GET_HAL_DATA(Adapter);
-	/* u16			BBWaitCounter	= 0; */
 	u32			OriginalValue, BitShift;
 
 #if (DISABLE_BB_RF == 1)
 	return;
 #endif
-
-
 	if (BitMask != bMaskDWord) { /* if not "double word" write */
 		OriginalValue = rtw_read32(Adapter, RegAddr);
 		BitShift = phy_CalculateBitShift(BitMask);
@@ -138,68 +133,11 @@ PHY_SetBBReg_8723D(
 	}
 
 	rtw_write32(Adapter, RegAddr, Data);
-
 }
-
 
 /*
  * 2. RF register R/W API
  *   */
-
-/*-----------------------------------------------------------------------------
- * Function:	phy_FwRFSerialRead()
- *
- * Overview:	We support firmware to execute RF-R/W.
- *
- * Input:		NONE
- *
- * Output:		NONE
- *
- * Return:		NONE
- *
- * Revised History:
- *	When		Who		Remark
- *	01/21/2008	MHC		Create Version 0.
- *
- *---------------------------------------------------------------------------*/
-static	u32
-phy_FwRFSerialRead(
-	struct adapter *			Adapter,
-	enum rf_path			eRFPath,
-	u32				Offset)
-{
-	u32		retValue = 0;
-	/* RT_ASSERT(false,("deprecate!\n")); */
-	return	retValue;
-
-}	/* phy_FwRFSerialRead */
-
-
-/*-----------------------------------------------------------------------------
- * Function:	phy_FwRFSerialWrite()
- *
- * Overview:	We support firmware to execute RF-R/W.
- *
- * Input:		NONE
- *
- * Output:		NONE
- *
- * Return:		NONE
- *
- * Revised History:
- *	When		Who		Remark
- *	01/21/2008	MHC		Create Version 0.
- *
- *---------------------------------------------------------------------------*/
-static	void
-phy_FwRFSerialWrite(
-	struct adapter *			Adapter,
-	enum rf_path			eRFPath,
-	u32				Offset,
-	u32				Data)
-{
-	/* RT_ASSERT(false,("deprecate!\n")); */
-}
 
 static	u32
 phy_RFSerialRead_8723D(
@@ -212,10 +150,10 @@ phy_RFSerialRead_8723D(
 	struct hal_com_data				*pHalData = GET_HAL_DATA(Adapter);
 	struct bb_register_definition	*pPhyReg = &pHalData->PHYRegDef[eRFPath];
 	u32						NewOffset;
-	u32						tmplong, tmplong2;
+	u32						tmplong2;
 	u8					RfPiEnable = 0;
 	u32						MaskforPhySet = 0;
-	int i = 0;
+	int i;
 
 	_enter_critical_mutex(&(adapter_to_dvobj(Adapter)->rf_read_reg_mutex) , NULL);
 	/* */
@@ -585,8 +523,6 @@ PHY_BBConfig8723D(
 	int	rtStatus = _SUCCESS;
 	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	u32	RegVal;
-	u8	TmpU1B = 0;
-	u8	value8;
 
 	phy_InitBBRFRegisterDefinition(Adapter);
 
@@ -619,7 +555,6 @@ PHY_RFConfig8723D(
 	struct adapter *	Adapter
 )
 {
-	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	int		rtStatus = _SUCCESS;
 
 	/* */
@@ -756,7 +691,6 @@ PHY_GetTxPowerIndex_8723D(
 	struct txpwr_idx_comp *tic
 )
 {
-	struct hal_com_data * pHalData = GET_HAL_DATA(pAdapter);
 	s16 power_idx;
 	u8 base_idx = 0;
 	s8 by_rate_diff = 0, limit = 0, tpt_offset = 0, extra_bias = 0;
@@ -796,7 +730,6 @@ PHY_SetTxPowerLevel8723D(
 )
 {
 	struct hal_com_data *	pHalData = GET_HAL_DATA(Adapter);
-	u8				cur_antenna;
 	enum rf_path		RFPath = RF_PATH_A;
 
 	RFPath = pHalData->ant_path;
@@ -1117,9 +1050,6 @@ enum EXTCHNL_OFFSET	ExtChnlOffsetOf80MHz,
 	u8					tmpnCur40MhzPrimeSC = pHalData->nCur40MhzPrimeSC;
 	u8					tmpnCur80MhzPrimeSC = pHalData->nCur80MhzPrimeSC;
 	u8					tmpCenterFrequencyIndex1 = pHalData->CurrentCenterFrequencyIndex1;
-	struct mlme_ext_priv	*pmlmeext = &Adapter->mlmeextpriv;
-
-	/* RTW_INFO("=> PHY_HandleSwChnlAndSetBW8812: bSwitchChannel %d, bSetBandWidth %d\n",bSwitchChannel,bSetBandWidth); */
 
 	/* check is swchnl or setbw */
 	if (!bSwitchChannel && !bSetBandWidth) {
@@ -1129,11 +1059,8 @@ enum EXTCHNL_OFFSET	ExtChnlOffsetOf80MHz,
 
 	/* skip change for channel or bandwidth is the same */
 	if (bSwitchChannel) {
-		/* if(pHalData->current_channel != ChannelNum) */
-		{
-			if (HAL_IsLegalChannel(Adapter, ChannelNum))
-				pHalData->bSwChnl = true;
-		}
+		if (HAL_IsLegalChannel(Adapter, ChannelNum))
+			pHalData->bSwChnl = true;
 	}
 
 	if (bSetBandWidth)
@@ -1194,15 +1121,4 @@ PHY_SetSwChnlBWMode8723D(
 	PHY_HandleSwChnlAndSetBW8723D(Adapter, true, true, channel, Bandwidth, Offset40, Offset80, channel);
 
 	/* RTW_INFO("<==%s()\n",__func__); */
-}
-
-static void
-_PHY_DumpRFReg_8723D(struct adapter *	pAdapter)
-{
-	u32 rfRegValue, rfRegOffset;
-
-
-	for (rfRegOffset = 0x00; rfRegOffset <= 0x30; rfRegOffset++) {
-		rfRegValue = PHY_QueryRFReg_8723D(pAdapter, RF_PATH_A, rfRegOffset, bMaskDWord);
-	}
 }

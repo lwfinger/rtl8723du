@@ -87,9 +87,6 @@ struct compat_android_wifi_priv_cmd {
  */
 static int g_wifi_on = true;
 
-static unsigned int oob_irq = 0;
-static unsigned int oob_gpio = 0;
-
 int rtw_android_cmdstr_to_num(char *cmdstr)
 {
 	int cmd_num;
@@ -118,8 +115,6 @@ static int rtw_android_get_rssi(struct net_device *net, char *command, int total
 static int rtw_android_get_link_speed(struct net_device *net, char *command, int total_len)
 {
 	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(net);
-	struct	mlme_priv	*pmlmepriv = &(adapt->mlmepriv);
-	struct	wlan_network	*pcur_network = &pmlmepriv->cur_network;
 	int bytes_written = 0;
 	u16 link_speed = 0;
 
@@ -131,11 +126,7 @@ static int rtw_android_get_link_speed(struct net_device *net, char *command, int
 
 static int rtw_android_get_macaddr(struct net_device *net, char *command, int total_len)
 {
-	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(net);
-	int bytes_written = 0;
-
-	bytes_written = snprintf(command, total_len, "Macaddr = "MAC_FMT, MAC_ARG(net->dev_addr));
-	return bytes_written;
+	return snprintf(command, total_len, "Macaddr = "MAC_FMT, MAC_ARG(net->dev_addr));
 }
 
 static int rtw_android_set_country(struct net_device *net, char *command, int total_len)
@@ -548,18 +539,13 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		rtw_gtk_offload(net, (u8 *)command);
 		break;
 #endif /* CONFIG_GTK_OL		 */
-	case ANDROID_WIFI_CMD_P2P_DISABLE: {
-		struct mlme_ext_priv	*pmlmeext = &adapt->mlmeextpriv;
-		u8 channel, ch_offset;
-		u16 bwmode;
+	case ANDROID_WIFI_CMD_P2P_DISABLE:
 		rtw_p2p_enable(adapt, P2P_ROLE_DISABLE);
 		break;
-	}
-	case ANDROID_WIFI_CMD_DRIVERVERSION: {
+	case ANDROID_WIFI_CMD_DRIVERVERSION:
 		bytes_written = strlen(DRIVERVERSION);
 		snprintf(command, bytes_written + 1, DRIVERVERSION);
 		break;
-	}
 	default:
 		RTW_INFO("Unknown PRIVATE command %s - ignored\n", command);
 		snprintf(command, 3, "OK");
@@ -604,35 +590,6 @@ static struct resource *wifi_irqres = NULL;
 
 static int wifi_add_dev(void);
 static void wifi_del_dev(void);
-
-int rtw_android_wifictrl_func_add(void)
-{
-	int ret = 0;
-	sema_init(&wifi_control_sem, 0);
-
-	ret = wifi_add_dev();
-	if (ret) {
-		RTW_INFO("%s: platform_driver_register failed\n", __func__);
-		return ret;
-	}
-	g_wifidev_registered = 1;
-
-	/* Waiting callback after platform_driver_register is done or exit with error */
-	if (down_timeout(&wifi_control_sem,  msecs_to_jiffies(1000)) != 0) {
-		ret = -EINVAL;
-		RTW_INFO("%s: platform_driver_register timeout\n", __func__);
-	}
-
-	return ret;
-}
-
-void rtw_android_wifictrl_func_del(void)
-{
-	if (g_wifidev_registered) {
-		wifi_del_dev();
-		g_wifidev_registered = 0;
-	}
-}
 
 void *wl_android_prealloc(int section, unsigned long size)
 {

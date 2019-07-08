@@ -8,7 +8,6 @@
 int recvbuf2recvframe(struct adapter * adapt, void *ptr)
 {
 	u8 *pbuf;
-	u8 pkt_cnt = 0;
 	u32 pkt_offset;
 	int transfer_len;
 	u8 *pdata;

@@ -216,9 +216,8 @@ static void DBG_BT_INFO_INIT(struct btcoexdbginfo * pinfo, u8 *pbuf, u32 size)
 void DBG_BT_INFO(u8 *dbgmsg)
 {
 	struct btcoexdbginfo * pinfo;
-	u32 msglen, buflen;
+	u32 msglen;
 	u8 *pbuf;
-
 
 	pinfo = &GLBtcDbgInfo;
 
@@ -251,15 +250,6 @@ static void halbtcoutsrc_DbgInit(void)
 
 	for (i = 0; i < COMP_MAX; i++)
 		GLBtcDbgType[i] = 0;
-}
-
-static u8 halbtcoutsrc_IsCsrBtCoex(struct btc_coexist * pBtCoexist)
-{
-	if (pBtCoexist->board_info.bt_chip_type == BTC_CHIP_CSR_BC4
-	    || pBtCoexist->board_info.bt_chip_type == BTC_CHIP_CSR_BC8
-	   )
-		return true;
-	return false;
 }
 
 static void halbtcoutsrc_EnterPwrLock(struct btc_coexist * pBtCoexist)
@@ -645,8 +635,6 @@ static u32 halbtcoutsrc_GetBtPatchVer(struct btc_coexist * pBtCoexist)
 			_exit_critical_mutex(&GLBtcBtMpOperLock, &irqL);
 		}
 	}
-
-exit:
 	return pBtCoexist->bt_info.bt_real_fw_ver;
 }
 
@@ -1311,14 +1299,12 @@ static void halbtcoutsrc_DisplayBtLinkInfo(struct btc_coexist * pBtCoexist)
 static void halbtcoutsrc_DisplayWifiStatus(struct btc_coexist * pBtCoexist)
 {
 	struct adapter *	adapt = pBtCoexist->Adapter;
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
 	u8			*cliBuf = pBtCoexist->cli_buf;
-	int			wifiRssi = 0, btHsRssi = 0;
+	int			wifiRssi = 0;
 	bool	bScan = false, bLink = false, bRoam = false, bWifiBusy = false, bWifiUnderBMode = false;
 	u32			wifiBw = BTC_WIFI_BW_HT20, wifiTrafficDir = BTC_WIFI_TRAFFIC_TX, wifiFreq = BTC_FREQ_2_4G;
 	u32			wifiLinkStatus = 0x0;
-	bool	bBtHsOn = false, bLowPower = false;
-	u8			wifiChnl = 0, wifiP2PChnl = 0, nScanAPNum = 0, FwPSState;
+	u8			wifiChnl = 0, wifiP2PChnl = 0, nScanAPNum = 0;
 	u32			iqk_cnt_total = 0, iqk_cnt_ok = 0, iqk_cnt_fail = 0;
 	u16			wifiBcnInterval = 0;
 
@@ -1693,17 +1679,12 @@ static void halbtcoutsrc_coex_offload_init(void)
 static enum col_h2c_status halbtcoutsrc_send_h2c(struct adapter * Adapter, struct COL_H2C * pcol_h2c, u16 h2c_cmd_len)
 {
 	enum col_h2c_status		h2c_status = COL_STATUS_C2H_OK;
-	u8				i;
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0))
 	reinit_completion(&coex_offload.c2h_event[pcol_h2c->req_num]);		/* set event to un signaled state */
 #else
 	INIT_COMPLETION(coex_offload.c2h_event[pcol_h2c->req_num]);
 #endif
-
-	if (true) {
-	}
-
 	return h2c_status;
 }
 
@@ -1743,10 +1724,9 @@ static enum col_h2c_status halbtcoutsrc_CoexH2cProcess(void *pBtCoexist,
 	struct adapter *			Adapter = ((struct btc_coexist *)pBtCoexist)->Adapter;
 	u8				H2C_Parameter[BTC_TMP_BUF_SHORT] = {0};
 	struct COL_H2C *			pcol_h2c = (struct COL_H2C *)&H2C_Parameter[0];
-	u16				paraLen = 0;
 	enum col_h2c_status		h2c_status = COL_STATUS_C2H_OK, c2h_status = COL_STATUS_C2H_OK;
 	enum col_h2c_status		ret_status = COL_STATUS_C2H_OK;
-	u16				i, col_h2c_len = 0;
+	u16				col_h2c_len = 0;
 
 	pcol_h2c->opcode = opcode;
 	pcol_h2c->opcode_ver = opcode_ver;
@@ -2400,14 +2380,6 @@ static void EXhalbtcoutsrc_periodical(struct btc_coexist * pBtCoexist)
 		ex_halbtc8723d1ant_periodical(pBtCoexist);
 }
 
-static void EXhalbtcoutsrc_dbg_control(struct btc_coexist * pBtCoexist, u8 opCode, u8 opLen, u8 *pData)
-{
-	if (!halbtcoutsrc_IsBtCoexistAvailable(pBtCoexist))
-		return;
-
-	pBtCoexist->statistics.cnt_dbg_ctrl++;
-}
-
 void EXhalbtcoutsrc_StackUpdateProfileInfo(void)
 {
 }
@@ -2806,53 +2778,6 @@ static u8 EXhalbtcoutsrc_rate_id_to_btc_rate_id(u8 rate_id)
 	return btc_rate_id;
 }
 
-static void halbt_init_hw_config92C(struct adapter * adapt)
-{
-	struct hal_com_data * pHalData;
-	u8 u1Tmp;
-
-
-	pHalData = GET_HAL_DATA(adapt);
-	if ((pHalData->bt_coexist.btChipType == BT_CSR_BC4) ||
-	    (pHalData->bt_coexist.btChipType == BT_CSR_BC8)) {
-		if (pHalData->rf_type == RF_1T1R) {
-			/* Config to 1T1R */
-			u1Tmp = rtw_read8(adapt, rOFDM0_TRxPathEnable);
-			u1Tmp &= ~BIT(1);
-			rtw_write8(adapt, rOFDM0_TRxPathEnable, u1Tmp);
-			RT_DISP(FBT, BT_TRACE, ("[BTCoex], BT write 0xC04 = 0x%x\n", u1Tmp));
-
-			u1Tmp = rtw_read8(adapt, rOFDM1_TRxPathEnable);
-			u1Tmp &= ~BIT(1);
-			rtw_write8(adapt, rOFDM1_TRxPathEnable, u1Tmp);
-			RT_DISP(FBT, BT_TRACE, ("[BTCoex], BT write 0xD04 = 0x%x\n", u1Tmp));
-		}
-	}
-}
-
-static void halbt_init_hw_config92D(struct adapter * adapt)
-{
-	struct hal_com_data * pHalData;
-	u8 u1Tmp;
-
-	pHalData = GET_HAL_DATA(adapt);
-	if ((pHalData->bt_coexist.btChipType == BT_CSR_BC4) ||
-	    (pHalData->bt_coexist.btChipType == BT_CSR_BC8)) {
-		if (pHalData->rf_type == RF_1T1R) {
-			/* Config to 1T1R */
-			u1Tmp = rtw_read8(adapt, rOFDM0_TRxPathEnable);
-			u1Tmp &= ~BIT(1);
-			rtw_write8(adapt, rOFDM0_TRxPathEnable, u1Tmp);
-			RT_DISP(FBT, BT_TRACE, ("[BTCoex], BT write 0xC04 = 0x%x\n", u1Tmp));
-
-			u1Tmp = rtw_read8(adapt, rOFDM1_TRxPathEnable);
-			u1Tmp &= ~BIT(1);
-			rtw_write8(adapt, rOFDM1_TRxPathEnable, u1Tmp);
-			RT_DISP(FBT, BT_TRACE, ("[BTCoex], BT write 0xD04 = 0x%x\n", u1Tmp));
-		}
-	}
-}
-
 /*
  * Description:
  *	Run BT-Coexist mechansim or not
@@ -2914,14 +2839,9 @@ void hal_btcoex_SetPgAntNum(struct adapter * adapt, u8 antNum)
 
 u8 hal_btcoex_Initialize(struct adapter * adapt)
 {
-	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
-	u8 ret;
-
 	memset(&GLBtCoexist, 0, sizeof(GLBtCoexist));
 
-	ret = EXhalbtcoutsrc_InitlizeVariables((void *)adapt);
-
-	return ret;
+	return EXhalbtcoutsrc_InitlizeVariables((void *)adapt);
 }
 
 void hal_btcoex_PowerOnSetting(struct adapter * adapt)
@@ -3360,31 +3280,22 @@ hal_btcoex_ParseAntIsolationConfigFile(
 	char			*buffer
 )
 {
-	struct hal_com_data	*pHalData = GET_HAL_DATA(Adapter);
 	u32	i = 0 , j = 0;
 	char	*szLine , *ptmp;
 	int rtStatus = _SUCCESS;
 	char param_value_string[10];
-	u8 param_value;
 	u8 anttype = 4;
-
 	u8 ant_num = 3 , ant_distance = 50 , rfe_type = 1;
-
 	struct ant_isolation {
 		char *param_name;  /* antenna isolation config parameter name */
 		u8 *value; /* antenna isolation config parameter value */
 	};
-
 	struct ant_isolation ant_isolation_param[] = {
 		{"ANT_NUMBER" , &ant_num},
 		{"ANT_DISTANCE" , &ant_distance},
 		{"RFE_TYPE" , &rfe_type},
 		{NULL , NULL}
 	};
-
-
-
-	/* RTW_INFO("===>Hal_ParseAntIsolationConfigFile()\n" ); */
 
 	ptmp = buffer;
 	for (szLine = GetLineFromBuffer(ptmp) ; szLine; szLine = GetLineFromBuffer(ptmp)) {

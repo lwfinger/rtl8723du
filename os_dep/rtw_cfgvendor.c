@@ -110,11 +110,9 @@ static int rtw_cfgvendor_send_cmd_reply(struct wiphy *wiphy,
 #include <hal_data.h>
 static int rtw_dev_get_feature_set(struct net_device *dev)
 {
-	struct adapter *adapter = (struct adapter *)rtw_netdev_priv(dev);
+	int feature_set;
 
-	int feature_set = 0;
-
-	feature_set |= WIFI_FEATURE_INFRA;
+	feature_set = WIFI_FEATURE_INFRA;
 
 	feature_set |= WIFI_FEATURE_P2P;
 	feature_set |= WIFI_FEATURE_SOFT_AP;

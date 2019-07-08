@@ -25,20 +25,6 @@
 
 #include <rtl8723d_hal.h>
 
-/*---------------------------Define Local Constant---------------------------*/
-/*---------------------------Define Local Constant---------------------------*/
-
-
-/*------------------------Define global variable-----------------------------*/
-/*------------------------Define global variable-----------------------------*/
-
-
-/*------------------------Define local variable------------------------------*/
-/* 2008/11/20 MH For Debug only, RF
- * static	struct shadow_compare_map	RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG] = {0}; */
-static	struct shadow_compare_map	RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG];
-/*------------------------Define local variable------------------------------*/
-
 /*-----------------------------------------------------------------------------
  * Function:    PHY_RF6052SetBandwidth()
  *
@@ -80,19 +66,6 @@ PHY_RF6052SetBandwidth8723D(
 	default:
 		break;
 	}
-}
-
-static void
-phy_RF6052_Config_HardCode(
-	struct adapter *		Adapter
-)
-{
-
-	/* Set Default Bandwidth to 20M */
-	/* Adapter->HalFunc	.SetBWModeHandler(Adapter, CHANNEL_WIDTH_20); */
-
-	/* TODO: Set Default Channel to channel one for RTL8225 */
-
 }
 
 static int

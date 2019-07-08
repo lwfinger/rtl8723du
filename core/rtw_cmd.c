@@ -372,8 +372,6 @@ void rtw_cmd_clr_isr(struct	cmd_priv *pcmdpriv)
 
 void rtw_free_cmd_obj(struct cmd_obj *pcmd)
 {
-	struct drvextra_cmd_parm *extra_parm = NULL;
-
 	if (pcmd->parmbuf) {
 		/* free parmbuf in cmd_obj */
 		rtw_mfree((unsigned char *)pcmd->parmbuf, pcmd->cmdsz);
@@ -384,12 +382,9 @@ void rtw_free_cmd_obj(struct cmd_obj *pcmd)
 			rtw_mfree((unsigned char *)pcmd->rsp, pcmd->rspsz);
 		}
 	}
-
 	/* free cmd_obj */
 	rtw_mfree((unsigned char *)pcmd, sizeof(struct cmd_obj));
-
 }
-
 
 void rtw_stop_cmd_thread(struct adapter *adapter)
 {
@@ -692,7 +687,6 @@ u8 rtw_sitesurvey_cmd(struct adapter *adapt, struct sitesurvey_parm *pparm)
 	struct sitesurvey_parm	*psurveyPara;
 	struct cmd_priv	*pcmdpriv = &adapt->cmdpriv;
 	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
-	struct wifidirect_info *pwdinfo = &(adapt->wdinfo);
 
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		rtw_lps_ctrl_wk_cmd(adapt, LPS_CTRL_SCAN, 1);
@@ -1028,7 +1022,6 @@ static u8 rtw_createbss_cmd(struct adapter  *adapter, int flags, bool adhoc
 	struct cmd_obj *cmdobj;
 	struct createbss_parm *parm;
 	struct cmd_priv *pcmdpriv = &adapter->cmdpriv;
-	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
 	struct submit_ctx sctx;
 	u8 res = _SUCCESS;
 
@@ -1167,7 +1160,6 @@ u8 rtw_joinbss_cmd(struct adapter  *adapt, struct wlan_network *pnetwork)
 	enum ndis_802_11_network_infrastructure ndis_network_mode = pnetwork->network.InfrastructureMode;
 	struct mlme_ext_priv	*pmlmeext = &adapt->mlmeextpriv;
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
-	struct rf_ctl_t *rfctl = adapter_to_rfctl(adapt);
 	u32 tmp_len;
 	u8 *ptmp = NULL;
 
@@ -1470,8 +1462,6 @@ u8 rtw_clearstakey_cmd(struct adapter *adapt, struct sta_info *sta, u8 enqueue)
 	struct set_stakey_parm	*psetstakey_para;
 	struct cmd_priv			*pcmdpriv = &adapt->cmdpriv;
 	struct set_stakey_rsp		*psetstakey_rsp = NULL;
-	struct mlme_priv			*pmlmepriv = &adapt->mlmepriv;
-	struct security_priv		*psecuritypriv = &adapt->securitypriv;
 	s16 cam_id = 0;
 	u8	res = _SUCCESS;
 
@@ -1903,7 +1893,6 @@ static u8 _rtw_set_chplan_cmd(struct adapter *adapter, int flags, u8 chplan, con
 	struct cmd_obj *cmdobj;
 	struct	SetChannelPlan_param *parm;
 	struct cmd_priv *pcmdpriv = &adapter->cmdpriv;
-	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
 	struct submit_ctx sctx;
 	u8 res = _SUCCESS;
 
@@ -2037,12 +2026,8 @@ u8 rtw_set_csa_cmd(struct adapter *adapt, u8 new_ch_no)
 {
 	struct	cmd_obj	*pcmdobj;
 	struct	SetChannelSwitch_param *setChannelSwitch_param;
-	struct	mlme_priv *pmlmepriv = &adapt->mlmepriv;
 	struct	cmd_priv   *pcmdpriv = &adapt->cmdpriv;
-
 	u8	res = _SUCCESS;
-
-
 
 	pcmdobj = (struct	cmd_obj *)rtw_zmalloc(sizeof(struct	cmd_obj));
 	if (!pcmdobj) {
@@ -2118,10 +2103,7 @@ u8 traffic_status_watchdog(struct adapter *adapt, u8 from_timer)
 	u16	BusyThreshold;
 	u8	bBusyTraffic = false, bTxBusyTraffic = false, bRxBusyTraffic = false;
 	u8	bHigherBusyTraffic = false, bHigherBusyRxTraffic = false, bHigherBusyTxTraffic = false;
-
 	struct mlme_priv		*pmlmepriv = &(adapt->mlmepriv);
-
-	struct rt_link_detect *link_detect = &pmlmepriv->LinkDetectInfo;
 
 	BusyThresholdHigh = 100;
 	BusyThresholdLow = 75;
@@ -2292,8 +2274,6 @@ static void dynamic_update_bcn_check(struct adapter *adapt)
 }
 void rtw_iface_dynamic_chk_wk_hdl(struct adapter *adapt)
 {
-	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
-
 	if (MLME_IS_AP(adapt) || MLME_IS_MESH(adapt))
 		expire_timeout_chk(adapt);
 	dynamic_update_bcn_check(adapt);
@@ -2988,37 +2968,6 @@ struct btinfo {
 	u8 rsvd_6;
 	u8 rsvd_7;
 };
-
-static void btinfo_evt_dump(struct seq_file *sel, void *buf)
-{
-	struct btinfo *info = (struct btinfo *)buf;
-
-	RTW_PRINT_SEL(sel, "cid:0x%02x, len:%u\n", info->cid, info->len);
-
-	if (info->len > 2)
-		RTW_PRINT_SEL(sel, "byte2:%s%s%s%s%s%s%s%s\n"
-			      , info->bConnection ? "bConnection " : ""
-			      , info->bSCOeSCO ? "bSCOeSCO " : ""
-			      , info->bInQPage ? "bInQPage " : ""
-			      , info->bACLBusy ? "bACLBusy " : ""
-			      , info->bSCOBusy ? "bSCOBusy " : ""
-			      , info->bHID ? "bHID " : ""
-			      , info->bA2DP ? "bA2DP " : ""
-			      , info->bFTP ? "bFTP" : ""
-			     );
-
-	if (info->len > 3)
-		RTW_PRINT_SEL(sel, "retry_cnt:%u\n", info->retry_cnt);
-
-	if (info->len > 4)
-		RTW_PRINT_SEL(sel, "rssi:%u\n", info->rssi);
-
-	if (info->len > 5)
-		RTW_PRINT_SEL(sel, "byte5:%s%s\n"
-			      , info->eSCO_SCO ? "eSCO_SCO " : ""
-			      , info->Master_Slave ? "Master_Slave " : ""
-			     );
-}
 
 static void rtw_btinfo_hdl(struct adapter *adapter, u8 *buf, u16 buf_len)
 {
@@ -3777,7 +3726,6 @@ void rtw_joinbss_cmd_callback(struct adapter	*adapt,  struct cmd_obj *pcmd)
 void rtw_create_ibss_post_hdl(struct adapter *adapt, int status)
 {
 	unsigned long irqL;
-	struct sta_info *psta = NULL;
 	struct wlan_network *pwlan = NULL;
 	struct	mlme_priv *pmlmepriv = &adapt->mlmepriv;
 	struct wlan_bssid_ex *pdev_network = &adapt->registrypriv.dev_network;
@@ -3819,11 +3767,8 @@ void rtw_create_ibss_post_hdl(struct adapter *adapt, int status)
 
 createbss_cmd_fail:
 	_exit_critical_bh(&pmlmepriv->lock, &irqL);
-exit:
 	return;
 }
-
-
 
 void rtw_setstaKey_cmdrsp_callback(struct adapter	*adapt ,  struct cmd_obj *pcmd)
 {

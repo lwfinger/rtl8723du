@@ -127,7 +127,6 @@ void rtw_odm_adaptivity_config_msg(void *sel, struct adapter *adapter)
 bool rtw_odm_adaptivity_needed(struct adapter *adapter)
 {
 	struct registry_priv *regsty = &adapter->registrypriv;
-	struct mlme_priv *mlme = &adapter->mlmepriv;
 	bool ret = false;
 
 	if (regsty->adaptivity_en == RTW_ADAPTIVITY_EN_ENABLE)
@@ -220,7 +219,6 @@ void rtw_odm_parse_rx_phy_status_chinfo(union recv_frame *rframe, u8 *phys)
 	struct adapter *adapter = rframe->u.hdr.adapter;
 	struct PHY_DM_STRUCT *phydm = adapter_to_phydm(adapter);
 	struct rx_pkt_attrib *attrib = &rframe->u.hdr.attrib;
-	u8 *wlanhdr = get_recvframe_data(rframe);
 
 	if (phydm->support_ic_type & ODM_IC_PHY_STATUE_NEW_TYPE) {
 		if ((*phys & 0xf) == 1) {

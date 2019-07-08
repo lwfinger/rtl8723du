@@ -6,7 +6,6 @@
 
 u8 beamforming_get_htndp_tx_rate(void *p_dm_void, u8 comp_steering_num_of_bfer)
 {
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8 nr_index = 0;
 	u8 ndp_tx_rate;
 	/*Find nr*/
@@ -32,7 +31,6 @@ u8 beamforming_get_htndp_tx_rate(void *p_dm_void, u8 comp_steering_num_of_bfer)
 u8 beamforming_get_vht_ndp_tx_rate(void *p_dm_void,
 				   u8 comp_steering_num_of_bfer)
 {
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8 nr_index = 0;
 	u8 ndp_tx_rate;
 	/*Find nr*/

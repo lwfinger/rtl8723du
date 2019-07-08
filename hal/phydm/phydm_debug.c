@@ -808,7 +808,7 @@ phydm_rx_rate_distribution
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _odm_phy_dbg_info_		*p_dbg = &(p_dm->phy_dbg_info);
-	u8	i = 0, j = 0;
+	u8	i;
 	u8	rate_num = 1, rate_ss_shift = 0;
 
 	if (p_dm->support_ic_type & ODM_IC_4SS)
@@ -838,9 +838,7 @@ phydm_rx_rate_distribution
 
 	/*======HT==============================================================*/
 	if (p_dbg->ht_pkt_not_zero) {
-		
 		for (i = 0; i < rate_num; i++) {
-			
 			rate_ss_shift = (i << 3);
 			
 			PHYDM_DBG(p_dm, ODM_COMP_COMMON, ("* HT MCS[%d :%d ] = {%d, %d, %d, %d, %d, %d, %d, %d}\n",
@@ -1015,10 +1013,8 @@ phydm_basic_dbg_message
 	struct phydm_fa_struct *false_alm_cnt = (struct phydm_fa_struct *)phydm_get_structure(p_dm, PHYDM_FALSEALMCNT);
 	struct phydm_cfo_track_struct				*p_cfo_track = (struct phydm_cfo_track_struct *)phydm_get_structure(p_dm, PHYDM_CFOTRACK);
 	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
-	struct _rate_adaptive_table_	*p_ra_table = &p_dm->dm_ra_table;
 	u16	macid, phydm_macid, client_cnt = 0;
 	struct cmn_sta_info	*p_entry = NULL;
-	s32	tmp_val = 0;
 	u8	tmp_val_u1 = 0;
 
 	if (!(p_dm->debug_components & ODM_COMP_COMMON))
@@ -1226,9 +1222,6 @@ phydm_get_per_path_txagc(
 	u32			*_out_len
 )
 {
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	u8			rate_idx;
-	u8			txagc;
 	u32			used = *_used;
 	u32			out_len = *_out_len;
 
@@ -1279,7 +1272,6 @@ phydm_set_txagc(
 	u32			*_out_len
 )
 {
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u32			used = *_used;
 	u32			out_len = *_out_len;
 
@@ -1517,14 +1509,6 @@ phydm_dump_all_reg(
 }
 
 static void
-phydm_enable_big_jump(
-	struct PHY_DM_STRUCT	*p_dm,
-	bool		state
-)
-{
-}
-
-static void
 phydm_api_adjust(
 	void		*p_dm_void,
 	char		input[][16],
@@ -1534,15 +1518,8 @@ phydm_api_adjust(
 	u32		input_num
 )
 {
-	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	char		help[] = "-h";
-	u32		var1[10] = {0};
 	u32		used = *_used;
 	u32		out_len = *_out_len;
-	u8		i;
-	bool	is_enable_dbg_mode;
-	u8 central_ch, primary_ch_idx;
-	enum channel_width	bandwidth;
 	
 	PHYDM_SNPRINTF((output + used, out_len - used, "This IC doesn't support PHYDM API function\n"));
 
@@ -1566,7 +1543,6 @@ phydm_parameter_adjust(
 	u32		var1[10] = {0};
 	u32		used = *_used;
 	u32		out_len = *_out_len;
-	u8		i;
 
 	if ((strcmp(input[1], help) == 0)) {
 		PHYDM_SNPRINTF((output + used, out_len - used, "1. X_cap = ((0x%x))\n", p_cfo_track->crystal_cap));

@@ -526,8 +526,6 @@ int rtw_free_xmitbuf(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf);
 
 void rtw_count_tx_stats(struct adapter *adapt, struct xmit_frame *pxmitframe, int sz);
 void rtw_update_protection(struct adapter *adapt, u8 *ie, uint ie_len);
-static int update_attrib_sec_info(struct adapter *adapt, struct pkt_attrib *pattrib, struct sta_info *psta);
-static void update_attrib_phy_info(struct adapter *adapt, struct pkt_attrib *pattrib, struct sta_info *psta);
 
 int rtw_make_wlanhdr(struct adapter *adapt, u8 *hdr, struct pkt_attrib *pattrib);
 int rtw_put_snap(u8 *data, u16 h_proto);
@@ -603,7 +601,6 @@ int check_amsdu_tx_support(struct adapter *adapt);
 struct xmit_frame *rtw_get_xframe(struct xmit_priv *pxmitpriv, int *num_frame);
 #endif
 
-static void do_queue_select(struct adapter *adapt, struct pkt_attrib *pattrib);
 u32	rtw_get_ff_hwaddr(struct xmit_frame	*pxmitframe);
 int rtw_ack_tx_wait(struct xmit_priv *pxmitpriv, u32 timeout_ms);
 void rtw_ack_tx_done(struct xmit_priv *pxmitpriv, int status);

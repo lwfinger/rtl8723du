@@ -274,26 +274,7 @@ static int update_nd_link_layer_addr(unsigned char *data, int len, unsigned char
 	}
 	return 0;
 }
-
-
-static void convert_ipv6_mac_to_mc(struct sk_buff *skb)
-{
-	struct ipv6hdr *iph = (struct ipv6hdr *)(skb->data + ETH_HLEN);
-	unsigned char *dst_mac = skb->data;
-
-	/* dst_mac[0] = 0xff; */
-	/* dst_mac[1] = 0xff; */
-	/*modified by qinjunjie,ipv6 multicast address ix 0x33-33-xx-xx-xx-xx*/
-	dst_mac[0] = 0x33;
-	dst_mac[1] = 0x33;
-	memcpy(&dst_mac[2], &iph->daddr.s6_addr32[3], 4);
-#if defined(__LINUX_2_6__)
-	/*modified by qinjunjie,warning:should not remove next line*/
-	skb->pkt_type = PACKET_MULTICAST;
-#endif
-}
 #endif /* CL_IPV6_PASS */
-
 
 static inline int __nat25_network_hash(unsigned char *networkAddr)
 {

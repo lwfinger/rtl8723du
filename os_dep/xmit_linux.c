@@ -232,7 +232,6 @@ void rtw_os_xmit_schedule(struct adapter *adapt)
 static bool rtw_check_xmit_resource(struct adapter *adapt, struct sk_buff *pkt)
 {
 	bool busy = false;
-	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
 	u16	qidx;
 
@@ -360,12 +359,7 @@ int _rtw_xmit_entry(struct sk_buff *pkt, struct  net_device * pnetdev)
 {
 	struct adapter *adapt = (struct adapter *)rtw_netdev_priv(pnetdev);
 	struct xmit_priv *pxmitpriv = &adapt->xmitpriv;
-	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
 	int res = 0;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
-	u16 queue;
-#endif
-
 
 	if (adapt->registrypriv.mp_mode) {
 		RTW_INFO("MP_TX_DROP_OS_FRAME\n");

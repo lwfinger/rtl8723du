@@ -959,48 +959,6 @@ static void _ThreeOutPipeMapping(
 	}
 
 }
-static void _FourOutPipeMapping(
-	struct adapter *	pAdapter,
-	bool		bWIFICfg
-)
-{
-	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(pAdapter);
-
-	if (bWIFICfg) { /* for WMM */
-
-		/*	BK, 	BE, 	VI, 	VO, 	BCN,	CMD,MGT,HIGH,HCCA  */
-		/* {  1, 	2, 	1, 	0, 	0, 	0, 	0, 	0, 		0	}; */
-		/* 0:H, 1:N, 2:L ,3:E */
-
-		pdvobjpriv->Queue2Pipe[0] = pdvobjpriv->RtOutPipe[0];/* VO */
-		pdvobjpriv->Queue2Pipe[1] = pdvobjpriv->RtOutPipe[1];/* VI */
-		pdvobjpriv->Queue2Pipe[2] = pdvobjpriv->RtOutPipe[2];/* BE */
-		pdvobjpriv->Queue2Pipe[3] = pdvobjpriv->RtOutPipe[1];/* BK */
-
-		pdvobjpriv->Queue2Pipe[4] = pdvobjpriv->RtOutPipe[0];/* BCN */
-		pdvobjpriv->Queue2Pipe[5] = pdvobjpriv->RtOutPipe[0];/* MGT */
-		pdvobjpriv->Queue2Pipe[6] = pdvobjpriv->RtOutPipe[3];/* HIGH */
-		pdvobjpriv->Queue2Pipe[7] = pdvobjpriv->RtOutPipe[0];/* TXCMD */
-
-	} else { /* typical setting */
-
-
-		/*	BK, 	BE, 	VI, 	VO, 	BCN,	CMD,MGT,HIGH,HCCA  */
-		/* {  2, 	2, 	1, 	0, 	0, 	0, 	0, 	0, 		0	};			 */
-		/* 0:H, 1:N, 2:L */
-
-		pdvobjpriv->Queue2Pipe[0] = pdvobjpriv->RtOutPipe[0];/* VO */
-		pdvobjpriv->Queue2Pipe[1] = pdvobjpriv->RtOutPipe[1];/* VI */
-		pdvobjpriv->Queue2Pipe[2] = pdvobjpriv->RtOutPipe[2];/* BE */
-		pdvobjpriv->Queue2Pipe[3] = pdvobjpriv->RtOutPipe[2];/* BK */
-
-		pdvobjpriv->Queue2Pipe[4] = pdvobjpriv->RtOutPipe[0];/* BCN */
-		pdvobjpriv->Queue2Pipe[5] = pdvobjpriv->RtOutPipe[0];/* MGT */
-		pdvobjpriv->Queue2Pipe[6] = pdvobjpriv->RtOutPipe[3];/* HIGH */
-		pdvobjpriv->Queue2Pipe[7] = pdvobjpriv->RtOutPipe[0];/* TXCMD	 */
-	}
-
-}
 
 bool
 Hal_MappingOutPipe(
@@ -1250,8 +1208,6 @@ int c2h_mac_hidden_rpt_hdl(struct adapter *adapter, u8 *data, u8 len)
 	struct hal_com_data	*hal_data = GET_HAL_DATA(adapter);
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	int ret = _FAIL;
-
-	u32 uuid;
 	u8 uuid_x;
 	u8 uuid_y;
 	u8 uuid_z;
@@ -1333,10 +1289,7 @@ exit:
 
 int c2h_mac_hidden_rpt_2_hdl(struct adapter *adapter, u8 *data, u8 len)
 {
-	struct hal_com_data	*hal_data = GET_HAL_DATA(adapter);
-	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	int ret = _FAIL;
-
 	int i;
 
 	if (len < MAC_HIDDEN_RPT_2_LEN) {
@@ -1357,19 +1310,13 @@ exit:
 
 static int c2h_mac_hidden_rpt_bt_info_hdl(struct adapter *adapter, u8 val)
 {
-	struct hal_com_data	*hal_data = GET_HAL_DATA(adapter);
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
-	int ret = _FAIL;
 
-	if(IS_8723D_SERIES(hal_data->version_id))
-		hal_spec->bt_ft_ver = (val == 0xff) ? 0 : 1;
+	hal_spec->bt_ft_ver = (val == 0xff) ? 0 : 1;
 
 	RTW_INFO("%s bt_ft_ver: %d\n", __func__, hal_spec->bt_ft_ver);
 
-	ret = _SUCCESS;
-
-exit:
-	return ret;
+	return _SUCCESS;
 }
 
 int hal_read_mac_hidden_rpt(struct adapter *adapter)
@@ -1427,25 +1374,17 @@ mac_hidden_rpt_hdl:
 
 	if (ret_fwdl == _SUCCESS && id == C2H_MAC_HIDDEN_RPT)
 		ret = _SUCCESS;
-
-exit:
-
 	if ((hci_type == RTW_USB || hci_type == RTW_PCIE)
 		&& !rtw_is_hw_init_completed(adapter))
 		rtw_hal_power_off(adapter);
-
 	RTW_INFO("%s %s! (%u, %dms), fwdl:%d, id:0x%02x\n", __func__
 		, (ret == _SUCCESS) ? "OK" : "Fail", cnt, rtw_get_passing_time_ms(start), ret_fwdl, id);
-
 	return ret;
 }
 
 int c2h_defeature_dbg_hdl(struct adapter *adapter, u8 *data, u8 len)
 {
-	struct hal_com_data	*hal_data = GET_HAL_DATA(adapter);
-	struct hal_spec_t *hal_spec = GET_HAL_SPEC(adapter);
 	int ret = _FAIL;
-
 	int i;
 
 	if (len < DEFEATURE_DBG_LEN) {
@@ -1481,7 +1420,6 @@ int c2h_customer_str_rpt_hdl(struct adapter *adapter, u8 *data, u8 len)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	int ret = _FAIL;
-	int i;
 
 	if (len < CUSTOMER_STR_RPT_LEN) {
 		RTW_WARN("%s len(%u) < %d\n", __func__, len, CUSTOMER_STR_RPT_LEN);
@@ -1513,7 +1451,6 @@ int c2h_customer_str_rpt_2_hdl(struct adapter *adapter, u8 *data, u8 len)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	int ret = _FAIL;
-	int i;
 
 	if (len < CUSTOMER_STR_RPT_2_LEN) {
 		RTW_WARN("%s len(%u) < %d\n", __func__, len, CUSTOMER_STR_RPT_2_LEN);
@@ -1880,7 +1817,6 @@ void rtw_sec_write_cam(struct adapter *adapter, u8 addr, u32 wdata)
 
 void rtw_sec_read_cam_ent(struct adapter *adapter, u8 id, u8 *ctrl, u8 *mac, u8 *key)
 {
-	unsigned int val, addr;
 	u8 i;
 	u32 rdata;
 	u8 begin = 0;
@@ -2938,7 +2874,6 @@ inline int rtw_hal_set_FwMediaStatusRpt_range_cmd(struct adapter *adapter, bool 
 
 static void rtw_hal_set_FwRsvdPage_cmd(struct adapter * adapt, struct rsvd_page * rsvdpageloc)
 {
-	struct	hal_ops *pHalFunc = &adapt->hal_func;
 	u8	u1H2CRsvdPageParm[H2C_RSVDPAGE_LOC_LEN] = {0};
 	u8	ret = 0;
 
@@ -2958,10 +2893,6 @@ static void rtw_hal_set_FwRsvdPage_cmd(struct adapter * adapt, struct rsvd_page 
 				   H2C_RSVDPAGE_LOC_LEN,
 				   u1H2CRsvdPageParm);
 
-}
-
-static void rtw_hal_set_FwAoacRsvdPage_cmd(struct adapter * adapt, struct rsvd_page * rsvdpageloc)
-{
 }
 
 int rtw_hal_get_rsvd_page(struct adapter *adapter, u32 page_offset,
@@ -3137,7 +3068,6 @@ static void rtw_hal_construct_PSPoll(struct adapter *adapt,
 {
 	struct rtw_ieee80211_hdr	*pwlanhdr;
 	__le16 *fctrl;
-	u32 pktlen;
 	struct mlme_ext_priv	*pmlmeext = &(adapt->mlmeextpriv);
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
@@ -3310,10 +3240,8 @@ static void _rtw_hal_set_fw_rsvd_page(struct adapter *adapter, bool finished, u8
 	struct mlme_ext_info	*pmlmeinfo;
 	struct pwrctrl_priv *pwrctl;
 	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
-	struct hal_ops *pHalFunc = &adapter->hal_func;
 	u32	BeaconLength = 0, ProbeRspLength = 0, PSPollLength = 0;
 	u32	NullDataLength = 0, QosNullLength = 0, BTQosNullLength = 0;
-	u32	ProbeReqLength = 0, NullFunctionDataLength = 0;
 	u8	TxDescLen = TXDESC_SIZE, TxDescOffset = TXDESC_OFFSET;
 	u8	TotalPageNum = 0 , CurtPktPageNum = 0 , RsvdPageNum = 0;
 	u8	*ReservedPagePacket;
@@ -3690,7 +3618,6 @@ int rtw_hal_reset_tsf(struct adapter *adapter, u8 reset_port)
 static void rtw_hal_set_hw_update_tsf(struct adapter * adapt)
 {
 	struct mlme_ext_priv *pmlmeext = &adapt->mlmeextpriv;
-	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 
 #if defined(CONFIG_MI_WITH_MBSSID_CAM)
 	RTW_INFO("[Warn] %s "ADPT_FMT" enter func\n", __func__, ADPT_ARG(adapt));
@@ -4397,11 +4324,9 @@ void rtw_store_phy_info(struct adapter *adapt, union recv_frame *prframe)
 {
 	u8 isCCKrate, rf_path , dframe_type;
 	u8 *ptr;
-	u8	bc_addr[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 	struct recv_priv *precvpriv = &(adapt->recvpriv);
 	struct hal_com_data *	pHalData =  GET_HAL_DATA(adapt);
 	struct rx_pkt_attrib *pattrib = &prframe->u.hdr.attrib;
-	struct sta_info *psta = prframe->u.hdr.psta;
 	struct phydm_phyinfo_struct *p_phy_info = &pattrib->phy_info;
 	struct rx_raw_rssi *psample_pkt_rssi = &adapt->recvpriv.raw_rssi_info;
 	psample_pkt_rssi->data_rate = pattrib->data_rate;
@@ -4524,7 +4449,6 @@ exit:
 
 void rtw_dump_cur_efuse(struct adapter * adapt)
 {
-	int i =0;
 	int mapsize =0;
 	struct hal_com_data *hal_data = GET_HAL_DATA(adapt);
 
@@ -4634,30 +4558,11 @@ exit:
 	return ret;
 }
 
-static u32 Array_kfreemap[] = {
-	0x08, 0xe,
-	0x06, 0xc,
-	0x04, 0xa,
-	0x02, 0x8,
-	0x00, 0x6,
-	0x03, 0x4,
-	0x05, 0x2,
-	0x07, 0x0,
-	0x09, 0x0,
-	0x0c, 0x0,
-};
-
 void rtw_bb_rf_gain_offset(struct adapter *adapt)
 {
 	struct hal_com_data	*pHalData = GET_HAL_DATA(adapt);
 	struct registry_priv  *registry_par = &adapt->registrypriv;
 	struct kfree_data_t *kfree_data = &pHalData->kfree_data;
-	u8		value = pHalData->EEPROMRFGainOffset;
-	u8		tmp = 0x3e;
-	u32		res, i = 0;
-	u32		ArrayLen	= sizeof(Array_kfreemap) / sizeof(u32);
-	u32 *		Array	= Array_kfreemap;
-	u32		v1 = 0, v2 = 0, GainValue = 0, target = 0;
 
 	if (registry_par->RegPwrTrimEnable == 2) {
 		RTW_INFO("Registry kfree default force disable.\n");
@@ -4687,7 +4592,6 @@ void dm_DynamicUsbTxAgg(struct adapter *adapt, u8 from_timer)
 /* bus-agg check for SoftAP mode */
 inline u8 rtw_hal_busagg_qsel_check(struct adapter *adapt, u8 pre_qsel, u8 next_qsel)
 {
-	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
 	u8 chk_rst = _SUCCESS;
 
 	if (!MLME_IS_AP(adapt) && !MLME_IS_MESH(adapt))

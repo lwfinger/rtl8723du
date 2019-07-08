@@ -129,12 +129,10 @@ void rtw_hal_dm_init(struct adapter *adapt)
 }
 void rtw_hal_dm_deinit(struct adapter *adapt)
 {
-	if (is_primary_adapter(adapt)) {
-		struct hal_com_data *	pHalData = GET_HAL_DATA(adapt);
-
+	if (is_primary_adapter(adapt))
 		adapt->hal_func.dm_deinit(adapt);
-	}
 }
+
 void	rtw_hal_sw_led_init(struct adapter *adapt)
 {
 	if (adapt->hal_func.InitSwLeds)
@@ -225,9 +223,7 @@ uint	 rtw_hal_init(struct adapter *adapt)
 uint rtw_hal_deinit(struct adapter *adapt)
 {
 	uint	status = _SUCCESS;
-	struct dvobj_priv *dvobj = adapter_to_dvobj(adapt);
 	struct hal_com_data *	pHalData = GET_HAL_DATA(adapt);
-	int i;
 
 	status = adapt->hal_func.hal_deinit(adapt);
 
@@ -333,8 +329,6 @@ int	rtw_hal_xmit(struct adapter *adapt, struct xmit_frame *pxmitframe)
  */
 int	rtw_hal_mgnt_xmit(struct adapter *adapt, struct xmit_frame *pmgntframe)
 {
-	int ret = _FAIL;
-
 	update_mgntframe_attrib_addr(adapt, pmgntframe);
 
 #if defined(CONFIG_IEEE80211W) || defined(CONFIG_RTW_MESH)
@@ -346,9 +340,7 @@ int	rtw_hal_mgnt_xmit(struct adapter *adapt, struct xmit_frame *pmgntframe)
 		rtw_mgmt_xmitframe_coalesce(adapt, pmgntframe->pkt, pmgntframe);
 #endif
 
-no_mgmt_coalesce:
-	ret = adapt->hal_func.mgnt_xmit(adapt, pmgntframe);
-	return ret;
+	return adapt->hal_func.mgnt_xmit(adapt, pmgntframe);
 }
 
 int	rtw_hal_init_xmit_priv(struct adapter *adapt)
@@ -371,7 +363,6 @@ void	rtw_hal_free_recv_priv(struct adapter *adapt)
 
 static void rtw_sta_ra_registed(struct adapter *adapt, struct sta_info *psta)
 {
-	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
 	struct hal_com_data *hal_data = GET_HAL_DATA(adapt);
 
 	if (!psta) {
@@ -461,7 +452,6 @@ void rtw_hal_write_rfreg(struct adapter *adapt, enum rf_path eRFPath, u32 RegAdd
 void	rtw_hal_set_chnl_bw(struct adapter *adapt, u8 channel, enum channel_width Bandwidth, u8 Offset40, u8 Offset80)
 {
 	struct hal_com_data *	pHalData = GET_HAL_DATA(adapt);
-	u8 cch_160 = Bandwidth == CHANNEL_WIDTH_160 ? channel : 0;
 	u8 cch_80 = Bandwidth == CHANNEL_WIDTH_80 ? channel : 0;
 	u8 cch_40 = Bandwidth == CHANNEL_WIDTH_40 ? channel : 0;
 	u8 cch_20 = Bandwidth == CHANNEL_WIDTH_20 ? channel : 0;
@@ -554,13 +544,10 @@ bool rtw_hal_c2h_reg_hdr_parse(struct adapter *adapter, u8 *buf, u8 *id, u8 *seq
 
 bool rtw_hal_c2h_pkt_hdr_parse(struct adapter *adapter, u8 *buf, u16 len, u8 *id, u8 *seq, u8 *plen, u8 **payload)
 {
-	struct hal_com_data *HalData = GET_HAL_DATA(adapter);
-	struct hal_version *hal_ver = &HalData->version_id;
 	bool ret = _FAIL;
 
 	if (!buf || len > 256 || len < 3)
 		goto exit;
-
 	*id = C2H_ID_88XX(buf);
 	*seq = C2H_SEQ_88XX(buf);
 	*plen = len - 2;
@@ -618,8 +605,6 @@ int c2h_handler(struct adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 			ret = _FAIL;
 		break;
 	}
-
-exit:
 	if (ret != _SUCCESS) {
 		if (id == C2H_EXTEND)
 			RTW_WARN("%s: unknown C2H(0x%02x, 0x%02x)\n", __func__, id, sub_id);

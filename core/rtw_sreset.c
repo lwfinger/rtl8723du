@@ -32,11 +32,9 @@ bool sreset_inprogress(struct adapter *adapt)
 
 static void sreset_restore_security_station(struct adapter *adapt)
 {
-	u8 EntryId = 0;
 	struct mlme_priv *mlmepriv = &adapt->mlmepriv;
 	struct sta_priv *pstapriv = &adapt->stapriv;
 	struct sta_info *psta;
-	struct security_priv *psecuritypriv = &(adapt->securitypriv);
 	struct mlme_ext_info	*pmlmeinfo = &adapt->mlmeextpriv.mlmext_info;
 
 	{
@@ -119,8 +117,6 @@ static void sreset_restore_network_station(struct adapter *adapt)
 static void sreset_restore_network_status(struct adapter *adapt)
 {
 	struct mlme_priv *mlmepriv = &adapt->mlmepriv;
-	struct mlme_ext_priv	*pmlmeext = &adapt->mlmeextpriv;
-	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 
 	if (check_fwstate(mlmepriv, WIFI_STATION_STATE)) {
 		RTW_INFO(FUNC_ADPT_FMT" fwstate:0x%08x - WIFI_STATION_STATE\n", FUNC_ADPT_ARG(adapt), get_fwstate(mlmepriv));

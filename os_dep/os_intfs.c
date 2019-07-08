@@ -218,8 +218,6 @@ static int rtw_80211d = 0;
 #ifdef CONFIG_PCI_ASPM
 /* CLK_REQ:BIT0 L0s:BIT1 ASPM_L1:BIT2 L1Off:BIT3*/
 int	rtw_pci_aspm_enable = 0x5;
-#else
-static int	rtw_pci_aspm_enable;
 #endif
 
 #ifdef CONFIG_QOS_OPTIMIZATION
@@ -1028,11 +1026,8 @@ static const struct net_device_ops rtw_netdev_ops = {
 
 int rtw_init_netdev_name(struct net_device *pnetdev, const char *ifname)
 {
-	struct adapter *adapt = rtw_netdev_priv(pnetdev);
-
 	if (dev_alloc_name(pnetdev, ifname) < 0)
 		RTW_ERR("dev_alloc_name, fail!\n");
-
 	rtw_netif_carrier_off(pnetdev);
 
 	return 0;
@@ -1393,7 +1388,6 @@ u8 rtw_init_default_value(struct adapter *adapt)
 	u8 ret  = _SUCCESS;
 	struct registry_priv *pregistrypriv = &adapt->registrypriv;
 	struct xmit_priv	*pxmitpriv = &adapt->xmitpriv;
-	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
 	struct security_priv *psecuritypriv = &adapt->securitypriv;
 
 	/* xmit_priv */
@@ -1585,7 +1579,6 @@ u8 rtw_reset_drv_sw(struct adapter *adapt)
 {
 	u8	ret8 = _SUCCESS;
 	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
-	struct pwrctrl_priv *pwrctrlpriv = adapter_to_pwrctl(adapt);
 
 	/* hal_priv */
 	if (is_primary_adapter(adapt))
@@ -2452,9 +2445,6 @@ int _netdev_open(struct net_device *pnetdev)
 	rtw_netif_wake_queue(pnetdev);
 
 	netdev_br_init(pnetdev);
-
-netdev_open_normal_process:
-
 #ifdef CONFIG_CONCURRENT_MODE
 	{
 		struct adapter *secstruct adapter = adapter_to_dvobj(adapt)->adapters[IFACE_ID1];
@@ -2554,7 +2544,6 @@ netdev_open_error:
 int rtw_ips_pwr_up(struct adapter *adapt)
 {
 	int result;
-	struct hal_com_data * pHalData = GET_HAL_DATA(adapt);
 	unsigned long start_time = rtw_get_current_time();
 	RTW_INFO("===>  rtw_ips_pwr_up..............\n");
 	rtw_reset_drv_sw(adapt);
@@ -2581,17 +2570,12 @@ void rtw_ips_pwr_down(struct adapter *adapt)
 
 void rtw_ips_dev_unload(struct adapter *adapt)
 {
-	struct net_device *pnetdev = (struct net_device *)adapt->pnetdev;
-	struct xmit_priv	*pxmitpriv = &(adapt->xmitpriv);
-	struct hal_com_data * pHalData = GET_HAL_DATA(adapt);
 	RTW_INFO("====> %s...\n", __func__);
-
 	rtw_hal_set_hwreg(adapt, HW_VAR_FIFO_CLEARN_UP, NULL);
 	rtw_intf_stop(adapt);
 
 	if (!rtw_is_surprise_removed(adapt))
 		rtw_hal_deinit(adapt);
-
 }
 
 static int pm_netdev_open(struct net_device *pnetdev, u8 bnormal)
@@ -2659,15 +2643,6 @@ static int netdev_close(struct net_device *pnetdev)
 	RTW_INFO("-871x_drv - drv_close, bup=%d\n", adapt->bup);
 
 	return 0;
-}
-
-static int pm_netdev_close(struct net_device *pnetdev, u8 bnormal)
-{
-	int status = 0;
-
-	status = netdev_close(pnetdev);
-
-	return status;
 }
 
 void rtw_ndev_destructor(struct net_device *ndev)
@@ -2972,13 +2947,10 @@ int	rtw_gw_addr_query(struct adapter *adapt)
 
 void rtw_dev_unload(struct adapter * adapt)
 {
-	struct net_device *pnetdev = (struct net_device *)adapt->pnetdev;
 	struct pwrctrl_priv *pwrctl = adapter_to_pwrctl(adapt);
 	struct dvobj_priv *pobjpriv = adapt->dvobj;
 	struct debug_priv *pdbgpriv = &pobjpriv->drv_dbg;
 	struct cmd_priv *pcmdpriv = &adapt->cmdpriv;
-	u8 cnt = 0;
-
 
 	if (adapt->bup) {
 		RTW_INFO("==> "FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(adapt));
@@ -3024,7 +2996,6 @@ void rtw_dev_unload(struct adapter * adapt)
 int rtw_suspend_free_assoc_resource(struct adapter *adapt)
 {
 	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
-	struct net_device *pnetdev = adapt->pnetdev;
 	struct wifidirect_info	*pwdinfo = &adapt->wdinfo;
 
 	RTW_INFO("==> "FUNC_ADPT_FMT" entry....\n", FUNC_ADPT_ARG(adapt));
@@ -3076,8 +3047,6 @@ int rtw_suspend_free_assoc_resource(struct adapter *adapt)
 
 static int rtw_suspend_normal(struct adapter *adapt)
 {
-	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
-	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
 	int ret = _SUCCESS;
 
 	RTW_INFO("==> "FUNC_ADPT_FMT" entry....\n", FUNC_ADPT_ARG(adapt));
@@ -3110,8 +3079,6 @@ int rtw_suspend_common(struct adapter *adapt)
 	struct dvobj_priv *dvobj = adapt->dvobj;
 	struct debug_priv *pdbgpriv = &dvobj->drv_dbg;
 	struct pwrctrl_priv *pwrpriv = dvobj_to_pwrctl(dvobj);
-	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
-
 	int ret = 0;
 	unsigned long start_time = rtw_get_current_time();
 
@@ -3243,8 +3210,6 @@ int rtw_resume_common(struct adapter *adapt)
 	int ret = 0;
 	unsigned long start_time = rtw_get_current_time();
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(adapt);
-	struct mlme_priv *pmlmepriv = &adapt->mlmepriv;
-
 
 	if (!pwrpriv->bInSuspend)
 		return 0;

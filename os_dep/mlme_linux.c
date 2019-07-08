@@ -74,7 +74,6 @@ void rtw_reset_securitypriv(struct adapter *adapter)
 	u32	backupTKIPcountermeasure_time = 0;
 	/* add for CONFIG_IEEE80211W, none 11w also can use */
 	unsigned long irqL;
-	struct mlme_ext_priv	*pmlmeext = &adapter->mlmeextpriv;
 
 	_enter_critical_bh(&adapter->security_key_mutex, &irqL);
 
