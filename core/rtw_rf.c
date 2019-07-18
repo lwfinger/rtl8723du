@@ -1456,13 +1456,13 @@ void rtw_rf_set_tx_gain_offset(struct adapter *adapter, u8 path, s8 offset)
 	u32 val32 = 0;
 
 	target_path = RF_PATH_A; /*in 8723D case path means S0/S1*/
-	if (path == PPG_8723D_S1)
+	if (path == PPG_8723D_S1) {
 		RTW_INFO("kfree gain_offset 0x55:0x%x ",
 		rtw_hal_read_rfreg(adapter, target_path, 0x55, 0xffffffff));
-	else if (path == PPG_8723D_S0)
+	} else if (path == PPG_8723D_S0) {
 		RTW_INFO("kfree gain_offset 0x65:0x%x ",
 		rtw_hal_read_rfreg(adapter, target_path, 0x65, 0xffffffff));
-
+	}
 	switch (rtw_get_chip_type(adapter)) {
 	case RTL8723D:
 		write_value = RF_TX_GAIN_OFFSET_8723D(offset);
