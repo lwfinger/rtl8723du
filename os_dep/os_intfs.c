@@ -2503,11 +2503,11 @@ netdev_open_normal_process:
 
 #ifdef CONFIG_CONCURRENT_MODE
 	{
-		struct adapter *secstruct adapter = adapter_to_dvobj(adapt)->adapters[IFACE_ID1];
+		struct adapter *sec_adapter = adapter_to_dvobj(adapt)->adapters[IFACE_ID1];
 
 		#ifndef CONFIG_RTW_DYNAMIC_NDEV
-		if (secstruct adapter && (!secstruct adapter->bup))
-			_netdev_vir_if_open(secstruct adapter->pnetdev);
+		if (sec_adapter && (!sec_adapter->bup))
+			_netdev_vir_if_open(sec_adapter->pnetdev);
 		#endif
 	}
 #endif
