@@ -2059,7 +2059,7 @@ u8 rtw_cfg80211_scan_via_buddy(struct adapter *adapt, struct cfg80211_scan_reque
 		struct mlme_priv *buddy_mlmepriv;
 		struct rtw_wdev_priv *buddy_wdev_priv;
 
-		iface = dvobj->adapt[i];
+		iface = dvobj->adapters[i];
 		if (!iface)
 			continue;
 
@@ -2107,7 +2107,7 @@ void rtw_cfg80211_indicate_scan_done_for_buddy(struct adapter *adapt, bool bscan
 	bool indicate_buddy_scan;
 
 	for (i = 0; i < dvobj->iface_nums; i++) {
-		iface = dvobj->adapt[i];
+		iface = dvobj->adapters[i];
 		if ((iface) && rtw_is_adapter_up(iface)) {
 
 			if (iface == adapt)
