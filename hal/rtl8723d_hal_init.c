@@ -3798,6 +3798,7 @@ u8 SetHwReg8723D(struct adapter * adapt, u8 variable, u8 *val)
 		u32 i;
 		u8 RetryLimit = 0x01;
 		u32 reg_200, reg_204;
+		u16 val16;
 
 		val16 = RetryLimit << RETRY_LIMIT_SHORT_SHIFT | RetryLimit << RETRY_LIMIT_LONG_SHIFT;
 		rtw_write16(adapt, REG_RL, val16);

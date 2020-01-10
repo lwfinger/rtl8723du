@@ -2650,7 +2650,6 @@ void hw_var_port_switch(struct adapter *adapter)
 	u8 macid_1[6];
 	u8 bssid_1[6];
 
-	u8 hw_port;
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct adapter *iface = NULL;
 

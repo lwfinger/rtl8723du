@@ -1282,6 +1282,10 @@ void rtw_clean_hw_dk_cam(struct adapter *adapter)
 void flush_all_cam_entry(struct adapter *adapt)
 {
 #ifdef CONFIG_CONCURRENT_MODE
+	struct mlme_ext_priv *pmlmeext = &adapt->mlmeextpriv;
+	struct mlme_ext_info *pmlmeinfo = &(pmlmeext->mlmext_info);
+	struct mlme_priv *pmlmepriv = &(adapt->mlmepriv);
+
 	if (check_fwstate(pmlmepriv, WIFI_STATION_STATE)) {
 		struct sta_priv	*pstapriv = &adapt->stapriv;
 		struct sta_info		*psta;

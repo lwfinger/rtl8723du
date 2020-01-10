@@ -10492,7 +10492,6 @@ bool rtw_port_switch_chk(struct adapter *adapter)
 #ifdef CONFIG_CONCURRENT_MODE
 #ifdef CONFIG_RUNTIME_PORT_SWITCH
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
-	struct pwrctrl_priv *pwrctl = dvobj_to_pwrctl(dvobj);
 	struct adapter *if_port0 = NULL;
 	struct adapter *if_port1 = NULL;
 	struct mlme_ext_info *if_port0_mlmeinfo = NULL;
@@ -13578,6 +13577,7 @@ int rtw_chk_start_clnt_join(struct adapter *adapter, u8 *ch, u8 *bw, u8 *offset)
 		struct mlme_priv *mlme;
 		struct mlme_ext_priv *mlmeext;
 		struct mi_state mstate;
+		bool chbw_allow = true;
 		int i;
 
 		dvobj = adapter_to_dvobj(adapter);
