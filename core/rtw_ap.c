@@ -3047,7 +3047,7 @@ void start_ap_mode(struct adapter *adapt)
 	pmlmepriv->ext_capab_ie_len = 0;
 
 #ifdef CONFIG_CONCURRENT_MODE
-	psecuritypriv->dot118021x_bmc_cam_id = INVALID_SEC_MAC_CAM_ID;
+	adapt->securitypriv.dot118021x_bmc_cam_id = INVALID_SEC_MAC_CAM_ID;
 #endif
 
 	for (i = 0 ;  i < pstapriv->max_aid; i++)

@@ -2098,7 +2098,6 @@ exit:
 void rtw_cfg80211_indicate_scan_done_for_buddy(struct adapter *adapt, bool bscan_aborted)
 {
 	int i;
-	u8 ret = 0;
 	struct adapter *iface = NULL;
 	unsigned long	irqL;
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapt);
@@ -4513,6 +4512,9 @@ static int cfg80211_rtw_remain_on_channel(struct wiphy *wiphy,
 	struct rtw_wdev_priv *pwdev_priv;
 	struct wifidirect_info *pwdinfo;
 	struct cfg80211_wifidirect_info *pcfg80211_wdinfo;
+#ifdef CONFIG_CONCURRENT_MODE
+	u8 is_p2p_find;
+#endif
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
 	if (wdev_to_ndev(wdev))
@@ -4711,6 +4713,9 @@ static int _cfg80211_rtw_mgmt_tx(struct adapter *adapt, u8 tx_ch, u8 no_cck, con
 	u8 u_ch = rtw_mi_get_union_chan(adapt);
 	u8 leave_op = 0;
 	struct cfg80211_wifidirect_info *pcfg80211_wdinfo = &adapt->cfg80211_wdinfo;
+#if defined(RTW_ROCH_BACK_OP) && defined(CONFIG_CONCURRENT_MODE)
+	struct rtw_wdev_priv *pwdev_priv = adapter_wdev_data(adapt);
+#endif
 
 	rtw_cfg80211_set_is_mgmt_tx(adapt, 1);
 
@@ -4720,7 +4725,7 @@ static int _cfg80211_rtw_mgmt_tx(struct adapter *adapt, u8 tx_ch, u8 no_cck, con
 		#ifdef CONFIG_CONCURRENT_MODE
 		if (!check_fwstate(&adapt->mlmepriv, _FW_LINKED)) {
 			RTW_INFO("%s, extend ro ch time\n", __func__);
-			_set_timer(&adapt->cfg80211_wdinfo.remain_on_ch_timer, pwdinfo->ext_listen_period);
+			_set_timer(&adapt->cfg80211_wdinfo.remain_on_ch_timer, adapt->wdinfo.ext_listen_period);
 		}
 		#endif /* CONFIG_CONCURRENT_MODE */
 	}
@@ -4733,6 +4738,7 @@ static int _cfg80211_rtw_mgmt_tx(struct adapter *adapt, u8 tx_ch, u8 no_cck, con
 		if (rtw_cfg80211_get_is_roch(adapt) &&
 		    ATOMIC_READ(&pwdev_priv->switch_ch_to) == 1) {
 			u16 ext_listen_period;
+			struct wifidirect_info *pwdinfo = &adapt->wdinfo;
 
 			if (check_fwstate(&adapt->mlmepriv, _FW_LINKED))
 				ext_listen_period = 500;

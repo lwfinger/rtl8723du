@@ -1464,9 +1464,7 @@ static int rtw_wx_set_wap(struct net_device *dev,
 	if (rtw_mi_buddy_check_fwstate(adapt, _FW_UNDER_SURVEY | _FW_UNDER_LINKING)) {
 		RTW_INFO("set bssid, but buddy_intf is under scanning or linking\n");
 
-		ret = -EINVAL;
-
-		goto exit;
+		return -EINVAL;
 	}
 #endif
 

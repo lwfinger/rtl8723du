@@ -3146,7 +3146,6 @@ int pre_recv_entry(union recv_frame *precvframe, u8 *pphy_status)
 			precvframe->u.hdr.adapter = iface;
 	} else   /* Handle BC/MC Packets	*/
 		rtw_mi_buddy_clone_bcmc_packet(primary_adapt, precvframe, pphy_status);
-bypass_concurrent_hdl:
 #endif /* CONFIG_CONCURRENT_MODE */
 
 	/* skip unnecessary bmc data frame for primary adapter */

@@ -2917,8 +2917,8 @@ u8 process_p2p_group_negotation_confirm(struct wifidirect_info *pwdinfo, u8 *pfr
 				}
 
 #ifdef CONFIG_CONCURRENT_MODE
-				if (rtw_mi_check_status(adapt, MI_LINKED)
-				    && adapt->registrypriv.full_ch_in_p2p_handshake == 0) {
+				if (rtw_mi_check_status(pwdinfo->adapt, MI_LINKED)
+				    && pwdinfo->adapt->registrypriv.full_ch_in_p2p_handshake == 0) {
 					/*	Switch back to the AP channel soon. */
 					_set_timer(&pwdinfo->ap_p2p_switch_timer, 100);
 				}
@@ -3071,8 +3071,6 @@ static void pre_tx_negoreq_handler(struct adapter	*adapt)
 void p2p_concurrent_handler(struct adapter	*adapt)
 {
 	struct wifidirect_info	*pwdinfo = &adapt->wdinfo;
-	struct mlme_ext_priv	*pmlmeext = &(adapt->mlmeextpriv);
-	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	u8					val8;
 
 	if (pwdinfo->driver_interface == DRIVER_CFG80211
@@ -3254,6 +3252,9 @@ static int ro_ch_handler(struct adapter *adapter, u8 *buf)
 	#ifdef CONFIG_CONCURRENT_MODE
 	if (rtw_mi_check_status(adapter, MI_LINKED) && (0 != rtw_mi_get_union_chan(adapter))) {
 		if ((remain_ch != rtw_mi_get_union_chan(adapter)) && !check_fwstate(&adapter->mlmepriv, _FW_LINKED)) {
+			struct wifidirect_info *pwdinfo = &adapter->wdinfo;
+			struct mlme_ext_priv *pmlmeext = &adapter->mlmeextpriv;
+
 			if (remain_ch != pmlmeext->cur_channel
 				#ifdef RTW_ROCH_BACK_OP
 				|| ATOMIC_READ(&pwdev_priv->switch_ch_to) == 1
@@ -3385,6 +3386,191 @@ static void ro_ch_timer_process (struct timer_list *t)
 
 	p2p_cancel_roch_cmd(adapter, 0, NULL, 0);
 }
+
+#ifdef CONFIG_CONCURRENT_MODE
+static void rtw_change_p2pie_ch_list(struct adapter *adapt, const u8 *frame_body, u32 len, u8 ch)
+{
+	u8 *ies, *p2p_ie;
+	u32 ies_len, p2p_ielen;
+
+	ies = (u8 *)(frame_body + _PUBLIC_ACTION_IE_OFFSET_);
+	ies_len = len - _PUBLIC_ACTION_IE_OFFSET_;
+
+	p2p_ie = rtw_get_p2p_ie(ies, ies_len, NULL, &p2p_ielen);
+
+	while (p2p_ie) {
+		u32	attr_contentlen = 0;
+		u8 *pattr = NULL;
+
+		/* Check P2P_ATTR_CH_LIST */
+		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_CH_LIST, NULL, (uint *)&attr_contentlen);
+		if (pattr) {
+			int i;
+			u32 num_of_ch;
+			u8 *pattr_temp = pattr + 3 ;
+
+			attr_contentlen -= 3;
+
+			while (attr_contentlen > 0) {
+				num_of_ch = *(pattr_temp + 1);
+
+				for (i = 0; i < num_of_ch; i++)
+					*(pattr_temp + 2 + i) = ch;
+
+				pattr_temp += (2 + num_of_ch);
+				attr_contentlen -= (2 + num_of_ch);
+			}
+		}
+
+		/* Get the next P2P IE */
+		p2p_ie = rtw_get_p2p_ie(p2p_ie + p2p_ielen, ies_len - (p2p_ie - ies + p2p_ielen), NULL, &p2p_ielen);
+	}
+}
+
+static bool rtw_chk_p2pie_ch_list_with_buddy(struct adapter *adapt, const u8 *frame_body, u32 len)
+{
+	bool fit = false;
+	u8 *ies, *p2p_ie;
+	u32 ies_len, p2p_ielen;
+	u8 union_ch = rtw_mi_get_union_chan(adapt);
+
+	ies = (u8 *)(frame_body + _PUBLIC_ACTION_IE_OFFSET_);
+	ies_len = len - _PUBLIC_ACTION_IE_OFFSET_;
+
+	p2p_ie = rtw_get_p2p_ie(ies, ies_len, NULL, &p2p_ielen);
+
+	while (p2p_ie) {
+		u32	attr_contentlen = 0;
+		u8 *pattr = NULL;
+
+		/* Check P2P_ATTR_CH_LIST */
+		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_CH_LIST, NULL, (uint *)&attr_contentlen);
+		if (pattr) {
+			int i;
+			u32 num_of_ch;
+			u8 *pattr_temp = pattr + 3 ;
+
+			attr_contentlen -= 3;
+
+			while (attr_contentlen > 0) {
+				num_of_ch = *(pattr_temp + 1);
+
+				for (i = 0; i < num_of_ch; i++) {
+					if (*(pattr_temp + 2 + i) == union_ch) {
+						RTW_INFO(FUNC_ADPT_FMT" ch_list fit buddy_ch:%u\n", FUNC_ADPT_ARG(adapt), union_ch);
+						fit = true;
+						break;
+					}
+				}
+
+				pattr_temp += (2 + num_of_ch);
+				attr_contentlen -= (2 + num_of_ch);
+			}
+		}
+
+		/* Get the next P2P IE */
+		p2p_ie = rtw_get_p2p_ie(p2p_ie + p2p_ielen, ies_len - (p2p_ie - ies + p2p_ielen), NULL, &p2p_ielen);
+	}
+
+	return fit;
+}
+
+static bool rtw_chk_p2pie_op_ch_with_buddy(struct adapter *adapt, const u8 *frame_body, u32 len)
+{
+	bool fit = false;
+	u8 *ies, *p2p_ie;
+	u32 ies_len, p2p_ielen;
+	u8 union_ch = rtw_mi_get_union_chan(adapt);
+
+	ies = (u8 *)(frame_body + _PUBLIC_ACTION_IE_OFFSET_);
+	ies_len = len - _PUBLIC_ACTION_IE_OFFSET_;
+
+	p2p_ie = rtw_get_p2p_ie(ies, ies_len, NULL, &p2p_ielen);
+
+	while (p2p_ie) {
+		u32	attr_contentlen = 0;
+		u8 *pattr = NULL;
+
+		/* Check P2P_ATTR_OPERATING_CH */
+		attr_contentlen = 0;
+		pattr = NULL;
+		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_OPERATING_CH, NULL, (uint *)&attr_contentlen);
+		if (pattr) {
+			if (*(pattr + 4) == union_ch) {
+				RTW_INFO(FUNC_ADPT_FMT" op_ch fit buddy_ch:%u\n", FUNC_ADPT_ARG(adapt), union_ch);
+				fit = true;
+				break;
+			}
+		}
+
+		/* Get the next P2P IE */
+		p2p_ie = rtw_get_p2p_ie(p2p_ie + p2p_ielen, ies_len - (p2p_ie - ies + p2p_ielen), NULL, &p2p_ielen);
+	}
+
+	return fit;
+}
+
+static void rtw_cfg80211_adjust_p2pie_channel(struct adapter *adapt, const u8 *frame_body, u32 len)
+{
+	u8 *ies, *p2p_ie;
+	u32 ies_len, p2p_ielen;
+	u8 union_ch = rtw_mi_get_union_chan(adapt);
+
+	ies = (u8 *)(frame_body + _PUBLIC_ACTION_IE_OFFSET_);
+	ies_len = len - _PUBLIC_ACTION_IE_OFFSET_;
+
+	p2p_ie = rtw_get_p2p_ie(ies, ies_len, NULL, &p2p_ielen);
+
+	while (p2p_ie) {
+		u32	attr_contentlen = 0;
+		u8 *pattr = NULL;
+
+		/* Check P2P_ATTR_CH_LIST */
+		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_CH_LIST, NULL, (uint *)&attr_contentlen);
+		if (pattr) {
+			int i;
+			u32 num_of_ch;
+			u8 *pattr_temp = pattr + 3 ;
+
+			attr_contentlen -= 3;
+
+			while (attr_contentlen > 0) {
+				num_of_ch = *(pattr_temp + 1);
+
+				for (i = 0; i < num_of_ch; i++) {
+					if (*(pattr_temp + 2 + i) && *(pattr_temp + 2 + i) != union_ch) {
+						#ifdef RTW_SINGLE_WIPHY
+						RTW_ERR("replace ch_list:%u with:%u\n", *(pattr_temp + 2 + i), union_ch);
+						#endif
+						*(pattr_temp + 2 + i) = union_ch; /*forcing to the same channel*/
+					}
+				}
+
+				pattr_temp += (2 + num_of_ch);
+				attr_contentlen -= (2 + num_of_ch);
+			}
+		}
+
+		/* Check P2P_ATTR_OPERATING_CH */
+		attr_contentlen = 0;
+		pattr = NULL;
+		pattr = rtw_get_p2p_attr_content(p2p_ie, p2p_ielen, P2P_ATTR_OPERATING_CH, NULL, (uint *)&attr_contentlen);
+		if (pattr) {
+			if (*(pattr + 4) && *(pattr + 4) != union_ch) {
+				#ifdef RTW_SINGLE_WIPHY
+				RTW_ERR("replace op_ch:%u with:%u\n", *(pattr + 4), union_ch);
+				#endif
+				*(pattr + 4) = union_ch; /*forcing to the same channel	*/
+			}
+		}
+
+		/* Get the next P2P IE */
+		p2p_ie = rtw_get_p2p_ie(p2p_ie + p2p_ielen, ies_len - (p2p_ie - ies + p2p_ielen), NULL, &p2p_ielen);
+
+	}
+
+}
+#endif
 
 static u32 rtw_xframe_build_wfd_ie(struct xmit_frame *xframe)
 {
@@ -4658,6 +4844,8 @@ void init_wifidirect_info(struct adapter *adapt, enum P2P_ROLE role)
 		&& pwdinfo->driver_interface != DRIVER_CFG80211
 	) {
 		#ifdef CONFIG_CONCURRENT_MODE
+		u8 union_ch = 0;
+
 		if (rtw_mi_check_status(adapt, MI_LINKED))
 			union_ch = rtw_mi_get_union_chan(adapt);
 
