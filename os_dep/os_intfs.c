@@ -2152,7 +2152,6 @@ static int rtw_inet6addr_notifier_call(struct notifier_block *nb,
 {
 	struct inet6_ifaddr *inet6_ifa = data;
 	struct net_device *ndev;
-	struct ipv6_addr *_ipv6_addr = NULL;
 	struct pwrctrl_priv *pwrctl = NULL;
 	struct mlme_ext_priv *pmlmeext = NULL;
 	struct mlme_ext_info *pmlmeinfo = NULL;
