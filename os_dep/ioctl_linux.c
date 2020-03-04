@@ -40,8 +40,10 @@ extern u8 str_2char2num(u8 hch, u8 lch);
 extern void macstr2num(u8 *dst, u8 *src);
 extern u8 convert_ip_addr(u8 hch, u8 mch, u8 lch);
 
+#ifdef CONFIG_WIRELESS_EXT
 static u32 rtw_rates[] = {1000000, 2000000, 5500000, 11000000,
 	6000000, 9000000, 12000000, 18000000, 24000000, 36000000, 48000000, 54000000};
+#endif
 
 static const char *const iw_operation_mode[] = {
 	"Auto", "Ad-Hoc", "Managed",  "Master", "Repeater", "Secondary", "Monitor"
@@ -167,6 +169,7 @@ uint	rtw_is_cckratesonly_included(u8 *rate)
 }
 */
 
+#ifdef CONFIG_WIRELESS_EXT
 static int search_p2p_wfd_ie(struct adapter *adapt,
 		struct iw_request_info *info, struct wlan_network *pnetwork,
 		char *start, char *stop)
@@ -231,6 +234,7 @@ static int search_p2p_wfd_ie(struct adapter *adapt,
 	}
 	return true;
 }
+#endif
 
 static inline char *iwe_stream_mac_addr_proess(struct adapter *adapt,
 		struct iw_request_info *info, struct wlan_network *pnetwork,
@@ -570,6 +574,7 @@ static inline char   *iwe_stream_net_rsv_process(struct adapter *adapt,
 	return start;
 }
 
+#ifdef CONFIG_WIRELESS_EXT
 static char *translate_scan(struct adapter *adapt,
 		struct iw_request_info *info, struct wlan_network *pnetwork,
 		char *start, char *stop)
@@ -604,6 +609,7 @@ static char *translate_scan(struct adapter *adapt,
 
 	return start;
 }
+#endif
 
 static int wpa_set_auth_algs(struct net_device *dev, u32 value)
 {
@@ -963,6 +969,7 @@ exit:
 	return ret;
 }
 
+#ifdef CONFIG_WIRELESS_EXT
 static int rtw_wx_get_name(struct net_device *dev,
 			   struct iw_request_info *info,
 			   union iwreq_data *wrqu, char *extra)
@@ -2626,6 +2633,7 @@ static int rtw_wx_get_nick(struct net_device *dev,
 	}
 	return 0;
 }
+#endif
 
 static int rtw_wx_read32(struct net_device *dev,
 			 struct iw_request_info *info,
@@ -2769,6 +2777,7 @@ static int rtw_wx_priv_null(struct net_device *dev, struct iw_request_info *a,
 	return -1;
 }
 
+#ifdef CONFIG_WIRELESS_EXT
 static int dummy(struct net_device *dev, struct iw_request_info *a,
 		 union iwreq_data *wrqu, char *b)
 {
@@ -2780,6 +2789,7 @@ static int dummy(struct net_device *dev, struct iw_request_info *a,
 	return -1;
 
 }
+#endif
 
 static int rtw_wx_set_channel_plan(struct net_device *dev,
 				   struct iw_request_info *info,
@@ -6508,6 +6518,7 @@ out:
 
 }
 
+#ifdef CONFIG_WIRELESS_EXT
 static int rtw_wx_set_priv(struct net_device *dev,
 			   struct iw_request_info *info,
 			   union iwreq_data *awrq,
@@ -6602,6 +6613,7 @@ FREE_EXT:
 	return ret;
 
 }
+#endif
 
 static int rtw_pm_set(struct net_device *dev,
 		      struct iw_request_info *info,
@@ -7970,6 +7982,7 @@ free_buf:
 	return 0;
 }
 
+#ifdef CONFIG_WIRELESS_EXT
 static iw_handler rtw_handlers[] = {
 	NULL,					/* SIOCSIWCOMMIT */
 	rtw_wx_get_name,		/* SIOCGIWNAME */
@@ -8028,6 +8041,7 @@ static iw_handler rtw_handlers[] = {
 	rtw_wx_set_pmkid,		/* SIOCSIWPMKSA */
 	NULL,					/*---hole---*/
 };
+#endif
 
 
 static const struct iw_priv_args rtw_private_args[] = {
@@ -8199,6 +8213,7 @@ static iw_handler rtw_private_handler[] = {
 #endif /* CONFIG_INTEL_WIDI */
 };
 
+#ifdef CONFIG_WIRELESS_EXT
 #if WIRELESS_EXT >= 17
 static struct iw_statistics *rtw_get_wireless_stats(struct net_device *dev)
 {
@@ -8238,7 +8253,6 @@ static struct iw_statistics *rtw_get_wireless_stats(struct net_device *dev)
 }
 #endif
 
-#ifdef CONFIG_WIRELESS_EXT
 struct iw_handler_def rtw_handlers_def = {
 	.standard = rtw_handlers,
 	.num_standard = sizeof(rtw_handlers) / sizeof(iw_handler),
