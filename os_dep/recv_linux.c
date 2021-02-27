@@ -267,8 +267,12 @@ static int napi_recv(struct adapter *adapt, int budget)
 		rx_ok = false;
 
 		if (pregistrypriv->en_gro) {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 12, 0)
 			if (rtw_napi_gro_receive(&adapt->napi, pskb) != GRO_DROP)
 				rx_ok = true;
+#else
+			rx_ok = true;
+#endif
 			goto next;
 		}
 		if (rtw_netif_receive_skb(adapt->pnetdev, pskb) == NET_RX_SUCCESS)
