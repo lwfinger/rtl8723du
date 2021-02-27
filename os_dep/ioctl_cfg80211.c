@@ -387,9 +387,7 @@ static int rtw_cfg80211_sync_iftype(struct adapter *adapter)
 static u64 rtw_get_systime_us(void)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
-	ktime_t ts;
-	ts = ktime_get_boottime();
-	return do_div(ts, 1000);	
+	return ktime_to_us(ktime_get_boottime());
 #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 39))
 	struct timespec ts;
 	get_monotonic_boottime(&ts);
