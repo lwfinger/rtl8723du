@@ -3624,7 +3624,7 @@ u8 SetHwReg8723D(struct adapter * adapt, u8 variable, u8 *val)
 		regTmp = 0;
 		if (bShortPreamble)
 			regTmp |= 0x80;
-			rtw_write8(adapt, REG_RRSR + 2, regTmp);
+		rtw_write8(adapt, REG_RRSR + 2, regTmp);
 	}
 		break;
 

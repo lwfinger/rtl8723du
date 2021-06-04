@@ -368,10 +368,9 @@ void rtw_efuse_analyze(struct adapter *	adapt, u8 Type, u8 Fake)
 	for (i = 0; i < mapLen; i++) {
 		if (i % 16 == 0)
 			RTW_PRINT_SEL(RTW_DBGDUMP, "0x%03x: ", i);
-			_RTW_PRINT_SEL(RTW_DBGDUMP, "%02X%s"
-				, pEfuseHal->fakeEfuseInitMap[i]
-				, ((i + 1) % 16 == 0) ? "\n" : (((i + 1) % 8 == 0) ? "	  " : " ")
-			);
+		_RTW_PRINT_SEL(RTW_DBGDUMP, "%02X%s", pEfuseHal->fakeEfuseInitMap[i],
+			       ((i + 1) % 16 == 0) ? "\n" : (((i + 1) % 8 == 0) ? "	  " : " ")
+			      );
 		}
 	_RTW_PRINT_SEL(RTW_DBGDUMP, "\n");
 	if (eFuseWord)
