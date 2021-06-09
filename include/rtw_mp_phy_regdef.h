@@ -1,6 +1,17 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2017 Realtek Corporation */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2017 Realtek Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ *****************************************************************************/
 /*****************************************************************************
  *
  * Module:	__RTW_MP_PHY_REGDEF_H_
@@ -283,7 +294,7 @@
  *   */
 #define		rTxAGC_Rate18_06				0xe00
 #define		rTxAGC_Rate54_24				0xe04
-#define		rTxAGC_CCK_Mcint				0xe08
+#define		rTxAGC_CCK_Mcs32				0xe08
 #define		rTxAGC_Mcs03_Mcs00			0xe10
 #define		rTxAGC_Mcs07_Mcs04			0xe14
 #define		rTxAGC_Mcs11_Mcs08			0xe18
@@ -1048,6 +1059,15 @@
 #define		bPMACControl	0x0		/* Useless */
 #define		bWMACControl	0x1
 #define		bWNICControl	0x2
+
+#if 0
+#define		ANTENNA_A	0x1	/* Useless */
+#define		ANTENNA_B	0x2
+#define		ANTENNA_AB	0x3	/* ANTENNA_A | ANTENNA_B */
+
+#define		ANTENNA_C	0x4
+#define		ANTENNA_D	0x8
+#endif
 
 #define RCR_AAP			BIT(0)				/* accept all physical address */
 #define RCR_APM			BIT(1)				/* accept physical match */

@@ -1,7 +1,20 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2017 Realtek Corporation */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2017 Realtek Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ *****************************************************************************/
 /*++
+Copyright (c) Realtek Semiconductor Corp. All rights reserved.
+
 Module Name:
 	HalPwrSeqCmd.c
 
@@ -28,15 +41,15 @@ Major Change History:
  *	2011.07.07, added by Roger.
  *   */
 u8 HalPwrSeqCmdParsing(
-	struct adapter *		adapt,
+	PADAPTER		padapter,
 	u8				CutVersion,
 	u8				FabVersion,
 	u8				InterfaceType,
-	struct wlan_pwr_cfg	PwrSeqCmd[])
+	WLAN_PWR_CFG	PwrSeqCmd[])
 {
-	struct wlan_pwr_cfg	PwrCfgCmd = {0};
-	u8				bPollingBit = false;
-	u8				bHWICSupport = false;
+	WLAN_PWR_CFG	PwrCfgCmd = {0};
+	u8				bPollingBit = _FALSE;
+	u8				bHWICSupport = _FALSE;
 	u32				AryIdx = 0;
 	u8				value = 0;
 	u32				offset = 0;
@@ -55,35 +68,69 @@ u8 HalPwrSeqCmdParsing(
 			switch (GET_PWR_CFG_CMD(PwrCfgCmd)) {
 			case PWR_CMD_READ:
 				break;
+
 			case PWR_CMD_WRITE:
 				offset = GET_PWR_CFG_OFFSET(PwrCfgCmd);
 
-				/* Read the value from system register */
-				value = rtw_read8(adapt, offset);
+#ifdef CONFIG_SDIO_HCI
+				/*  */
+				/* <Roger_Notes> We should deal with interface specific address mapping for some interfaces, e.g., SDIO interface */
+				/* 2011.07.07. */
+				/*  */
+				if (GET_PWR_CFG_BASE(PwrCfgCmd) == PWR_BASEADDR_SDIO) {
+					/* Read Back SDIO Local value */
+					value = SdioLocalCmd52Read1Byte(padapter, offset);
 
-				value = value & (~(GET_PWR_CFG_MASK(PwrCfgCmd)));
-				value = value | (GET_PWR_CFG_VALUE(PwrCfgCmd) & GET_PWR_CFG_MASK(PwrCfgCmd));
+					value &= ~(GET_PWR_CFG_MASK(PwrCfgCmd));
+					value |= (GET_PWR_CFG_VALUE(PwrCfgCmd) & GET_PWR_CFG_MASK(PwrCfgCmd));
 
-				/* Write the value back to sytem register */
-				rtw_write8(adapt, offset, value);
+					/* Write Back SDIO Local value */
+					SdioLocalCmd52Write1Byte(padapter, offset, value);
+				} else
+#endif
+				{
+#ifdef CONFIG_GSPI_HCI
+					if (GET_PWR_CFG_BASE(PwrCfgCmd) == PWR_BASEADDR_SDIO)
+						offset = SPI_LOCAL_OFFSET | offset;
+#endif
+					/* Read the value from system register */
+					value = rtw_read8(padapter, offset);
+
+					value = value & (~(GET_PWR_CFG_MASK(PwrCfgCmd)));
+					value = value | (GET_PWR_CFG_VALUE(PwrCfgCmd) & GET_PWR_CFG_MASK(PwrCfgCmd));
+
+					/* Write the value back to sytem register */
+					rtw_write8(padapter, offset, value);
+				}
 				break;
+
 			case PWR_CMD_POLLING:
-				bPollingBit = false;
+
+				bPollingBit = _FALSE;
 				offset = GET_PWR_CFG_OFFSET(PwrCfgCmd);
 
-				rtw_hal_get_hwreg(adapt, HW_VAR_PWR_CMD, &bHWICSupport);
+				rtw_hal_get_hwreg(padapter, HW_VAR_PWR_CMD, &bHWICSupport);
 				if (bHWICSupport && offset == 0x06) {
 					flag = 0;
 					maxPollingCnt = 100000;
 				} else
 					maxPollingCnt = 5000;
 
+#ifdef CONFIG_GSPI_HCI
+				if (GET_PWR_CFG_BASE(PwrCfgCmd) == PWR_BASEADDR_SDIO)
+					offset = SPI_LOCAL_OFFSET | offset;
+#endif
 				do {
-					value = rtw_read8(adapt, offset);
+#ifdef CONFIG_SDIO_HCI
+					if (GET_PWR_CFG_BASE(PwrCfgCmd) == PWR_BASEADDR_SDIO)
+						value = SdioLocalCmd52Read1Byte(padapter, offset);
+					else
+#endif
+						value = rtw_read8(padapter, offset);
 
 					value = value & GET_PWR_CFG_MASK(PwrCfgCmd);
 					if (value == (GET_PWR_CFG_VALUE(PwrCfgCmd) & GET_PWR_CFG_MASK(PwrCfgCmd)))
-						bPollingBit = true;
+						bPollingBit = _TRUE;
 					else
 						rtw_udelay_os(10);
 
@@ -94,18 +141,26 @@ u8 HalPwrSeqCmdParsing(
 						if (bHWICSupport && offset == 0x06  && flag == 0) {
 
 							RTW_ERR("[WARNING] PCIE polling(0x%X) timeout(%d), Toggle 0x04[3] and try again.\n", offset, maxPollingCnt);
-							PlatformEFIOWrite1Byte(adapt, 0x04, PlatformEFIORead1Byte(adapt, 0x04) | BIT3);
-							PlatformEFIOWrite1Byte(adapt, 0x04, PlatformEFIORead1Byte(adapt, 0x04) & ~BIT3);
+							if (IS_HARDWARE_TYPE_8723DE(padapter))
+								PlatformEFIOWrite1Byte(padapter, 0x40, (PlatformEFIORead1Byte(padapter, 0x40)) & (~BIT3));
+
+							PlatformEFIOWrite1Byte(padapter, 0x04, PlatformEFIORead1Byte(padapter, 0x04) | BIT3);
+							PlatformEFIOWrite1Byte(padapter, 0x04, PlatformEFIORead1Byte(padapter, 0x04) & ~BIT3);
+
+							if (IS_HARDWARE_TYPE_8723DE(padapter))
+								PlatformEFIOWrite1Byte(padapter, 0x40, PlatformEFIORead1Byte(padapter, 0x40)|BIT3);
 
 							/* Retry Polling Process one more time */
 							pollingCount = 0;
 							flag = 1;
 						} else {
-							return false;
+							return _FALSE;
 						}
 					}
 				} while (!bPollingBit);
+
 				break;
+
 			case PWR_CMD_DELAY:
 				if (GET_PWR_CFG_VALUE(PwrCfgCmd) == PWRSEQ_DELAY_US)
 					rtw_udelay_os(GET_PWR_CFG_OFFSET(PwrCfgCmd));
@@ -115,7 +170,7 @@ u8 HalPwrSeqCmdParsing(
 
 			case PWR_CMD_END:
 				/* When this command is parsed, end the process */
-				return true;
+				return _TRUE;
 				break;
 
 			default:
@@ -126,5 +181,5 @@ u8 HalPwrSeqCmdParsing(
 		AryIdx++;/* Add Array Index */
 	} while (1);
 
-	return true;
+	return _TRUE;
 }

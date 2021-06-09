@@ -1,6 +1,17 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2017 Realtek Corporation */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2017 Realtek Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ *****************************************************************************/
 #ifndef __RTW_EEPROM_H__
 #define __RTW_EEPROM_H__
 
@@ -37,7 +48,7 @@
  * Besides, CustomerID of registry has precedence of that of EEPROM.
  * defined below. 060703, by rcnjko.
  *   */
-enum rt_customer_id {
+typedef enum _RT_CUSTOMER_ID {
 	RT_CID_DEFAULT = 0,
 	RT_CID_8187_ALPHA0 = 1,
 	RT_CID_8187_SERCOMM_PS = 2,
@@ -85,13 +96,21 @@ enum rt_customer_id {
 	RT_CID_819x_ALPHA_Dlink = 44,/* add by ylb 20121012 for customer led for alpha */
 	RT_CID_WNC_NEC = 45,/* add by page for NEC */
 	RT_CID_DNI_BUFFALO = 46,/* add by page for NEC */
-};
+} RT_CUSTOMER_ID, *PRT_CUSTOMER_ID;
 
-extern void eeprom_write16(struct adapter *adapt, u16 reg, u16 data);
-extern u16 eeprom_read16(struct adapter *adapt, u16 reg);
-extern void read_eeprom_content(struct adapter *adapt);
-extern void eeprom_read_sz(struct adapter *adapt, u16 reg, u8 *data, u32 sz);
+extern void eeprom_write16(_adapter *padapter, u16 reg, u16 data);
+extern u16 eeprom_read16(_adapter *padapter, u16 reg);
+extern void read_eeprom_content(_adapter *padapter);
+extern void eeprom_read_sz(_adapter *padapter, u16 reg, u8 *data, u32 sz);
 
-extern void read_eeprom_content_by_attrib(struct adapter	*adapt);
+extern void read_eeprom_content_by_attrib(_adapter	*padapter);
+
+#ifdef PLATFORM_LINUX
+#ifdef CONFIG_ADAPTOR_INFO_CACHING_FILE
+extern int isAdaptorInfoFileValid(void);
+extern int storeAdaptorInfoFile(char *path, u8 *efuse_data);
+extern int retriveAdaptorInfoFile(char *path, u8 *efuse_data);
+#endif /* CONFIG_ADAPTOR_INFO_CACHING_FILE */
+#endif /* PLATFORM_LINUX */
 
 #endif /* __RTL871X_EEPROM_H__ */

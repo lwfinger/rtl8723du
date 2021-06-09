@@ -1,6 +1,17 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2017 Realtek Corporation */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2017 Realtek Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ *****************************************************************************/
 #ifndef __RTL8723D_SPEC_H__
 #define __RTL8723D_SPEC_H__
 
@@ -226,6 +237,10 @@
 #define REG_FAST_EDCA_CTRL_8723D		0x0460
 #define REG_RD_RESP_PKT_TH_8723D		0x0463
 #define REG_DATA_SC_8723D				0x0483
+#ifdef CONFIG_WOWLAN
+	#define REG_TXPKTBUF_IV_LOW             0x0484
+	#define REG_TXPKTBUF_IV_HIGH            0x0488
+#endif
 #define REG_TXRPT_START_OFFSET		0x04AC
 #define REG_POWER_STAGE1_8723D		0x04B4
 #define REG_POWER_STAGE2_8723D		0x04B8
@@ -373,6 +388,18 @@
 #define REG_LTECOEX_READ_DATA		0x07C8
 #define REG_LTECOEX_PATH_CONTROL	0x70
 
+/* ************************************************************
+ * SDIO Bus Specification
+ * ************************************************************ */
+
+/* -----------------------------------------------------
+ * SDIO CMD Address Mapping
+ * ----------------------------------------------------- */
+
+/* -----------------------------------------------------
+ * I/O bus domain (Host)
+ * ----------------------------------------------------- */
+
 /* -----------------------------------------------------
  * SDIO register
  * ----------------------------------------------------- */
@@ -386,6 +413,12 @@
 #define BIT_USB_RXDMA_AGG_EN	BIT(31)
 #define RXDMA_AGG_MODE_EN		BIT(1)
 
+#ifdef CONFIG_WOWLAN
+	#define RXPKT_RELEASE_POLL		BIT(16)
+	#define RXDMA_IDLE				BIT(17)
+	#define RW_RELEASE_EN			BIT(18)
+#endif
+
 /* 2 HSISR
  * interrupt mask which needs to clear */
 #define MASK_HSISR_CLEAR		(HSISR_GPIO12_0_INT |\
@@ -394,8 +427,21 @@
 		HSISR_PDNINT |\
 		HSISR_GPIO9_INT)
 
-#define EEPROM_RF_GAIN_OFFSET			0xC1
+#ifdef CONFIG_RF_POWER_TRIM
+	#ifdef CONFIG_RTL8723D
+		#define EEPROM_RF_GAIN_OFFSET			0xC1
+	#endif
 
-#define EEPROM_RF_GAIN_VAL				0x1F6
+	#define EEPROM_RF_GAIN_VAL				0x1F6
+#endif /*CONFIG_RF_POWER_TRIM*/
+
+#ifdef CONFIG_PCI_HCI
+	/* #define IMR_RX_MASK		(IMR_ROK_8723D|IMR_RDU_8723D|IMR_RXFOVW_8723D) */
+	#define IMR_TX_MASK			(IMR_VODOK_8723D | IMR_VIDOK_8723D | IMR_BEDOK_8723D | IMR_BKDOK_8723D | IMR_MGNTDOK_8723D | IMR_HIGHDOK_8723D)
+
+	#define RT_BCN_INT_MASKS	(IMR_BCNDMAINT0_8723D | IMR_TXBCN0OK_8723D | IMR_TXBCN0ERR_8723D | IMR_BCNDERR0_8723D)
+
+	#define RT_AC_INT_MASKS	(IMR_VIDOK_8723D | IMR_VODOK_8723D | IMR_BEDOK_8723D | IMR_BKDOK_8723D)
+#endif
 
 #endif /* __RTL8723D_SPEC_H__ */

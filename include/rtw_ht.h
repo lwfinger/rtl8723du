@@ -1,6 +1,17 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2017 Realtek Corporation */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2017 Realtek Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ *****************************************************************************/
 #ifndef _RTW_HT_H_
 #define _RTW_HT_H_
 
@@ -33,11 +44,29 @@ struct ht_priv {
 	u8	beamform_cap;
 	u8	smps_cap; /*spatial multiplexing power save mode. 0:static SMPS, 1:dynamic SMPS, 3:SMPS disabled, 2:reserved*/
 
+	u8 op_present:1; /* ht_op is present */
+
 	struct rtw_ieee80211_ht_cap ht_cap;
+	u8 ht_op[HT_OP_IE_LEN];
 
 };
 
-enum aggre_size {
+#ifdef ROKU_PRIVATE
+struct ht_priv_infra_ap {
+
+	/*Infra mode, only store AP's info , not intersection of STA and AP*/
+	u8	channel_width_infra_ap;
+	u8	sgi_20m_infra_ap;
+	u8	sgi_40m_infra_ap;
+	u8	ldpc_cap_infra_ap;
+	u8	stbc_cap_infra_ap;
+	u8	MCS_set_infra_ap[16];
+	u8	Rx_ss_infra_ap;
+	u16	rx_highest_data_rate_infra_ap;
+};
+#endif /* ROKU_PRIVATE */
+
+typedef enum AGGRE_SIZE {
 	HT_AGG_SIZE_8K = 0,
 	HT_AGG_SIZE_16K = 1,
 	HT_AGG_SIZE_32K = 2,
@@ -46,24 +75,7 @@ enum aggre_size {
 	VHT_AGG_SIZE_256K = 5,
 	VHT_AGG_SIZE_512K = 6,
 	VHT_AGG_SIZE_1024K = 7,
-};
-
-enum rt_ht_info_capability {
-	RT_HT_CAP_USE_TURBO_AGGR = 0x01,
-	RT_HT_CAP_USE_LONG_PREAMBLE = 0x02,
-	RT_HT_CAP_USE_AMPDU = 0x04,
-	RT_HT_CAP_USE_WOW = 0x8,
-	RT_HT_CAP_USE_SOFTAP = 0x10,
-	RT_HT_CAP_USE_92SE = 0x20,
-	RT_HT_CAP_USE_88C_92C = 0x40,
-	RT_HT_CAP_USE_AP_CLIENT_MODE = 0x80,	/* AP team request to reserve this bit, by Emily */
-};
-
-enum rt_ht_inf1_capability {
-	RT_HT_CAP_USE_VIDEO_CLIENT = 0x01,
-	RT_HT_CAP_USE_JAGUAR_BCUT = 0x02,
-	RT_HT_CAP_USE_JAGUAR_CCUT = 0x04,
-};
+} AGGRE_SIZE_E, *PAGGRE_SIZE_E;
 
 #define	LDPC_HT_ENABLE_RX			BIT0
 #define	LDPC_HT_ENABLE_TX			BIT1

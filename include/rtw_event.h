@@ -1,6 +1,17 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2017 Realtek Corporation */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2017 Realtek Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ *****************************************************************************/
 #ifndef _RTW_EVENT_H_
 #define _RTW_EVENT_H_
 
@@ -13,7 +24,7 @@ Used to report a bss has been scanned
 
 */
 struct survey_event	{
-	struct wlan_bssid_ex bss;
+	WLAN_BSSID_EX bss;
 };
 
 /*
@@ -25,7 +36,8 @@ bss_cnt indicates the number of bss that has been reported.
 */
 struct surveydone_event {
 	unsigned int	bss_cnt;
-
+	u8 activate_ch_cnt;
+	bool acs; /* aim to trigger channel selection */
 };
 
 /*
@@ -59,10 +71,6 @@ struct stadel_event {
 	int mac_id;
 };
 
-struct addba_event {
-	unsigned int tid;
-};
-
 struct wmm_event {
 	unsigned char wmm;
 };
@@ -80,40 +88,8 @@ struct c2hlbk_event {
 };
 #endif/* CONFIG_H2CLBK */
 
-#define GEN_EVT_CODE(event)	event ## _EVT_
-
-
-
-struct fwevent {
-	u32	parmsize;
-	void (*event_callback)(struct adapter *dev, u8 *pbuf);
+struct rtw_event {
+	u32 parmsize;
+	void (*event_callback)(_adapter *dev, u8 *pbuf);
 };
-
-
-#define C2HEVENT_SZ			32
-
-struct event_node {
-	unsigned char *node;
-	unsigned char evt_code;
-	unsigned short evt_sz;
-	volatile int	*caller_ff_tail;
-	int	caller_ff_sz;
-};
-
-struct c2hevent_queue {
-	volatile int	head;
-	volatile int	tail;
-	struct	event_node	nodes[C2HEVENT_SZ];
-	unsigned char	seq;
-};
-
-#define NETWORK_QUEUE_SZ	4
-
-struct network_queue {
-	volatile int	head;
-	volatile int	tail;
-	struct wlan_bssid_ex networks[NETWORK_QUEUE_SZ];
-};
-
-
 #endif /* _WLANEVENT_H_ */

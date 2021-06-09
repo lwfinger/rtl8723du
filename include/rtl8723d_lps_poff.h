@@ -1,6 +1,17 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2017 Realtek Corporation */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2017 Realtek Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ *****************************************************************************/
 
 /******************************************** CONST  ************************/
 #define NUM_OF_REGISTER_BANK	13
@@ -36,10 +47,10 @@
 	SET_BITS_TO_LE_4BYTE((__pHOIE)+4, 24, 8, __Value)
 
 /*********************Function Definition*******************************************/
-void rtl8723d_lps_poff_init(struct adapter * adapt);
-void rtl8723d_lps_poff_deinit(struct adapter * adapt);
-bool rtl8723d_lps_poff_get_txbndy_status(struct adapter * adapt);
-void rtl8723d_lps_poff_h2c_ctrl(struct adapter * adapt, u8 enable);
-void rtl8723d_lps_poff_set_ps_mode(struct adapter * adapt, bool bEnterLPS);
-bool rtl8723d_lps_poff_get_status(struct adapter * adapt);
-void rtl8723d_lps_poff_wow(struct adapter * adapt);
+void rtl8723d_lps_poff_init(PADAPTER padapter);
+void rtl8723d_lps_poff_deinit(PADAPTER padapter);
+bool rtl8723d_lps_poff_get_txbndy_status(PADAPTER padapter);
+void rtl8723d_lps_poff_h2c_ctrl(PADAPTER padapter, u8 enable);
+void rtl8723d_lps_poff_set_ps_mode(PADAPTER padapter, bool bEnterLPS);
+bool rtl8723d_lps_poff_get_status(PADAPTER padapter);
+void rtl8723d_lps_poff_wow(PADAPTER padapter);

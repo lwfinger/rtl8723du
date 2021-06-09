@@ -1,6 +1,17 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2017 Realtek Corporation */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2017 Realtek Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ *****************************************************************************/
 #ifndef _LINUX_IP_H
 #define _LINUX_IP_H
 
@@ -74,6 +85,8 @@
 #define	IPOPT_TS_TSANDADDR	1		/* timestamps and addresses */
 #define	IPOPT_TS_PRESPEC	3		/* specified modules only */
 
+#ifdef PLATFORM_LINUX
+
 struct ip_options {
 	__u32		faddr;				/* Saved first hop address */
 	unsigned char	optlen;
@@ -95,14 +108,17 @@ struct ip_options {
 };
 
 #define optlength(opt) (sizeof(struct ip_options) + opt->optlen)
+#endif
 
 struct iphdr {
-#if defined(__LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 	__u8	ihl:4,
 		version:4;
-#else
+#elif defined (__BIG_ENDIAN_BITFIELD)
 	__u8	version:4,
 		ihl:4;
+#else
+#error	"Please fix <asm/byteorder.h>"
 #endif
 	__u8	tos;
 	__u16	tot_len;

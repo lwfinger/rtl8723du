@@ -1,6 +1,17 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2016 - 2017 Realtek Corporation */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2016 - 2017 Realtek Corporation.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ *****************************************************************************/
 #ifndef __HAL8723PWRSEQ_H__
 #define __HAL8723PWRSEQ_H__
 /*
@@ -159,14 +170,14 @@
 	{0xFFFF, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK, 0, PWR_CMD_END, 0, 0},
 
 
-	extern struct wlan_pwr_cfg rtl8723A_power_on_flow[RTL8723A_TRANS_CARDEMU_TO_ACT_STEPS + RTL8723A_TRANS_END_STEPS];
-	extern struct wlan_pwr_cfg rtl8723A_radio_off_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_END_STEPS];
-	extern struct wlan_pwr_cfg rtl8723A_card_disable_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_CARDEMU_TO_PDN_STEPS + RTL8723A_TRANS_END_STEPS];
-	extern struct wlan_pwr_cfg rtl8723A_card_enable_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_CARDEMU_TO_PDN_STEPS + RTL8723A_TRANS_END_STEPS];
-	extern struct wlan_pwr_cfg rtl8723A_suspend_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_CARDEMU_TO_SUS_STEPS + RTL8723A_TRANS_END_STEPS];
-	extern struct wlan_pwr_cfg rtl8723A_resume_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_CARDEMU_TO_SUS_STEPS + RTL8723A_TRANS_END_STEPS];
-	extern struct wlan_pwr_cfg rtl8723A_hwpdn_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_CARDEMU_TO_PDN_STEPS + RTL8723A_TRANS_END_STEPS];
-	extern struct wlan_pwr_cfg rtl8723A_enter_lps_flow[RTL8723A_TRANS_ACT_TO_LPS_STEPS + RTL8723A_TRANS_END_STEPS];
-	extern struct wlan_pwr_cfg rtl8723A_leave_lps_flow[RTL8723A_TRANS_LPS_TO_ACT_STEPS + RTL8723A_TRANS_END_STEPS];
+	extern WLAN_PWR_CFG rtl8723A_power_on_flow[RTL8723A_TRANS_CARDEMU_TO_ACT_STEPS + RTL8723A_TRANS_END_STEPS];
+	extern WLAN_PWR_CFG rtl8723A_radio_off_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_END_STEPS];
+	extern WLAN_PWR_CFG rtl8723A_card_disable_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_CARDEMU_TO_PDN_STEPS + RTL8723A_TRANS_END_STEPS];
+	extern WLAN_PWR_CFG rtl8723A_card_enable_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_CARDEMU_TO_PDN_STEPS + RTL8723A_TRANS_END_STEPS];
+	extern WLAN_PWR_CFG rtl8723A_suspend_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_CARDEMU_TO_SUS_STEPS + RTL8723A_TRANS_END_STEPS];
+	extern WLAN_PWR_CFG rtl8723A_resume_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_CARDEMU_TO_SUS_STEPS + RTL8723A_TRANS_END_STEPS];
+	extern WLAN_PWR_CFG rtl8723A_hwpdn_flow[RTL8723A_TRANS_ACT_TO_CARDEMU_STEPS + RTL8723A_TRANS_CARDEMU_TO_PDN_STEPS + RTL8723A_TRANS_END_STEPS];
+	extern WLAN_PWR_CFG rtl8723A_enter_lps_flow[RTL8723A_TRANS_ACT_TO_LPS_STEPS + RTL8723A_TRANS_END_STEPS];
+	extern WLAN_PWR_CFG rtl8723A_leave_lps_flow[RTL8723A_TRANS_LPS_TO_ACT_STEPS + RTL8723A_TRANS_END_STEPS];
 
 #endif
