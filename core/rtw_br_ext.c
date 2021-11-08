@@ -14,11 +14,14 @@
  *****************************************************************************/
 #define _RTW_BR_EXT_C_
 
+#include <linux/version.h>
 #ifdef __KERNEL__
 	#include <linux/if_arp.h>
 	#include <net/ip.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
 	#include <net/ipx.h>
 	#include <linux/atalk.h>
+#endif
 	#include <linux/udp.h>
 	#include <linux/if_pppox.h>
 #endif
@@ -888,7 +891,7 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 			return -1;
 		}
 	}
-
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
 	/*---------------------------------------------------*/
 	/*         Handle IPX and Apple Talk frame          */
 	/*---------------------------------------------------*/
@@ -1109,6 +1112,7 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 
 		return -1;
 	}
+#endif
 
 	/*---------------------------------------------------*/
 	/*                Handle PPPoE frame                */
