@@ -206,7 +206,11 @@ u32 _rtw_down_sema(struct semaphore *sema)
 
 inline void thread_exit(struct completion *comp)
 {
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0))
 	complete_and_exit(comp, 0);
+#else
+	kthread_complete_and_exit(comp, 0);
+#endif
 }
 
 void	_rtw_mutex_init(_mutex *pmutex)
