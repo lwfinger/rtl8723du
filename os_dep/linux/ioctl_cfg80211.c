@@ -10558,8 +10558,6 @@ int rtw_wiphy_register(struct wiphy *wiphy)
 	rtw_cfgvendor_attach(wiphy);
 #endif
 
-	rtw_regd_init(wiphy);
-
 	return wiphy_register(wiphy);
 }
 
@@ -10625,6 +10623,7 @@ int rtw_wdev_alloc(_adapter *padapter, struct wiphy *wiphy)
 #ifdef CONFIG_CONCURRENT_MODE
 	ATOMIC_SET(&pwdev_priv->switch_ch_to, 1);
 #endif
+	rtw_regd_init(wiphy);
 
 #ifdef CONFIG_RTW_CFGVENDOR_RSSIMONITOR
         pwdev_priv->rssi_monitor_enable = 0;
