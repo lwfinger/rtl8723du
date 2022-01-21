@@ -5497,9 +5497,6 @@ void rtw_cfg80211_init_wiphy(struct adapter *adapt)
 		if (band)
 			rtw_cfg80211_init_ht_capab(adapt, &band->ht_cap, BAND_ON_2_4G, rf_type);
 	}
-	/* init regulary domain */
-	rtw_regd_init(adapt);
-
 	/* copy mac_addr to wiphy */
 	memcpy(wiphy->perm_addr, adapter_mac_addr(adapt), ETH_ALEN);
 }
@@ -5775,6 +5772,8 @@ int rtw_wdev_alloc(struct adapter *adapt, struct wiphy *wiphy)
 #ifdef CONFIG_CONCURRENT_MODE
 	ATOMIC_SET(&pwdev_priv->switch_ch_to, 1);
 #endif
+	/* init regulary domain */
+	rtw_regd_init(adapt);
 
 exit:
 	return ret;
