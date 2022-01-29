@@ -271,6 +271,7 @@ static int napi_recv(struct adapter *adapt, int budget)
 			if (rtw_napi_gro_receive(&adapt->napi, pskb) != GRO_DROP)
 				rx_ok = true;
 #else
+			rtw_napi_gro_receive(&adapt->napi, pskb);
 			rx_ok = true;
 #endif
 			goto next;
