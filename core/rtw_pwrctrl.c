@@ -89,7 +89,6 @@ void _ips_enter(_adapter *padapter)
 
 	if (rf_off == pwrpriv->change_rfpwrstate) {
 		pwrpriv->bpower_saving = _TRUE;
-		RTW_PRINT("nolinked power save enter\n");
 
 		if (pwrpriv->ips_mode == IPS_LEVEL_2)
 			pwrpriv->bkeepfwalive = _TRUE;
@@ -142,9 +141,6 @@ int _ips_leave(_adapter *padapter)
 		pwrpriv->pwr_saving_time += rtw_get_passing_time_ms(pwrpriv->pwr_saving_start_time);
 #endif /* CONFIG_RTW_CFGVENDOR_LLSTATS */
 
-		RTW_PRINT("nolinked power save leave\n");
-
-		RTW_INFO("==> ips_leave.....LED(0x%08x)...\n", rtw_read32(padapter, 0x4c));
 		pwrpriv->bips_processing = _FALSE;
 
 		pwrpriv->bkeepfwalive = _FALSE;
@@ -285,10 +281,6 @@ void rtw_ps_processor(_adapter *padapter)
 	ps_deny = rtw_ps_deny_get(padapter);
 	_exit_pwrlock(&adapter_to_pwrctl(padapter)->lock);
 	if (ps_deny != 0) {
-		if (!MLME_IS_MONITOR(padapter)) {
-			RTW_INFO(FUNC_ADPT_FMT ": ps_deny=0x%08X, skip power save!\n",
-				 FUNC_ADPT_ARG(padapter), ps_deny);
-		}
 		goto exit;
 	}
 
@@ -1014,9 +1006,6 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 #endif /* CONFIG_P2P_PS */
 #endif /* !CONFIG_BT_COEXIST */
 		   ) {
-			RTW_INFO(FUNC_ADPT_FMT" Leave 802.11 power save - %s\n",
-				 FUNC_ADPT_ARG(padapter), msg);
-
 			if (pwrpriv->lps_leave_cnts < UINT_MAX)
 				pwrpriv->lps_leave_cnts++;
 			else
@@ -1109,9 +1098,6 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 #endif /* CONFIG_WOWLAN */
 		   ) {
 			u8 pslv;
-
-			RTW_INFO(FUNC_ADPT_FMT" Enter 802.11 power save - %s\n",
-				 FUNC_ADPT_ARG(padapter), msg);
 
 			if (pwrpriv->lps_enter_cnts < UINT_MAX)
 				pwrpriv->lps_enter_cnts++;
