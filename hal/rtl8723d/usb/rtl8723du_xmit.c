@@ -67,7 +67,7 @@ s32 rtl8723du_init_xmit_priv(PADAPTER padapter)
 
 #ifdef PLATFORM_LINUX
 	tasklet_init(&pxmitpriv->xmit_tasklet,
-		     (void (*)(unsigned long))rtl8723du_xmit_tasklet,
+		     (void *)rtl8723du_xmit_tasklet,
 		     (unsigned long)padapter);
 #endif
 	return _SUCCESS;
