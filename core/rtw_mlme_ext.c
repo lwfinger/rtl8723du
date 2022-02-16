@@ -439,8 +439,6 @@ void rtw_rfctl_update_op_mode(struct rf_ctl_t *rfctl, u8 ifbmp_mod, u8 if_op)
 	_rtw_memcpy(rfctl->if_op_class, if_op_class, sizeof(u8) * CONFIG_IFACE_NUMBER);
 	_rtw_memcpy(rfctl->if_op_ch, if_op_ch, sizeof(u8) * CONFIG_IFACE_NUMBER);
 
-	if (0)
-		RTW_INFO("radio: %u,%u,%u %d notify:%d\n", u_ch, u_bw, u_offset, op_txpwr_max, notify);
 	for (i = 0; i < dvobj->iface_nums; i++) {
 		iface = dvobj->padapters[i];
 		if (!iface)
@@ -452,9 +450,6 @@ void rtw_rfctl_update_op_mode(struct rf_ctl_t *rfctl, u8 ifbmp_mod, u8 if_op)
 				continue;
 		} else if (!MLME_IS_ASOC(iface))
 			continue;
-		if (0)
-			RTW_INFO(ADPT_FMT": %u,%u,%u\n", ADPT_ARG(iface)
-				, mlmeext->cur_channel, mlmeext->cur_bwmode, mlmeext->cur_ch_offset);
 	}
 
 	if (notify)
@@ -727,8 +722,6 @@ static bool rtw_chset_chk_non_ocp_finish_for_chbw(struct rf_ctl_t *rfctl, u8 ch,
 		goto exit;
 
 	for (i = 0; i < op_ch_num; i++) {
-		if (0)
-			RTW_INFO("%u,%u,%u - cch:%u, bw:%u, op_ch:%u\n", ch, bw, offset, cch, bw, *(op_chs + i));
 		ch_idx = rtw_chset_search_ch(ch_set, *(op_chs + i));
 		if (ch_idx == -1)
 			break;
@@ -9324,7 +9317,6 @@ void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
 	for (i = 0; i < NDIS_802_11_LENGTH_RATES_EX; i++) {
 		if (pmlmeinfo->network.SupportedRates[i] == 0)
 			break;
-		RTW_INFO("network.SupportedRates[%d]=%02X\n", i, pmlmeinfo->network.SupportedRates[i]);
 	}
 
 
@@ -9356,21 +9348,6 @@ void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
 
 	bssrate_len = index;
 	RTW_INFO("bssrate_len = %d\n", bssrate_len);
-
-#else	/* Check if the AP's supported rates are also supported by STA. */
-#if 0
-	get_rate_set(padapter, bssrate, &bssrate_len);
-#else
-	for (bssrate_len = 0; bssrate_len < NumRates; bssrate_len++) {
-		if (pmlmeinfo->network.SupportedRates[bssrate_len] == 0)
-			break;
-
-		if (pmlmeinfo->network.SupportedRates[bssrate_len] == 0x2C) /* Avoid the proprietary data rate (22Mbps) of Handlink WSG-4000 AP */
-			break;
-
-		bssrate[bssrate_len] = pmlmeinfo->network.SupportedRates[bssrate_len];
-	}
-#endif
 #endif /* Check if the AP's supported rates are also supported by STA. */
 
 	if ((bssrate_len == 0) && (pmlmeinfo->network.SupportedRates[0] != 0)) {
@@ -9378,7 +9355,6 @@ void _issue_assocreq(_adapter *padapter, u8 is_reassoc)
 		rtw_free_xmitframe(pxmitpriv, pmgntframe);
 		goto exit; /* don't connect to AP if no joint supported rate */
 	}
-
 
 	if (bssrate_len > 8) {
 		pframe = rtw_set_ie(pframe, _SUPPORTEDRATES_IE_ , 8, bssrate, &(pattrib->pktlen));

@@ -2249,8 +2249,6 @@ static int cfg80211_rtw_del_key(struct wiphy *wiphy, struct net_device *ndev,
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
 	struct security_priv *psecuritypriv = &padapter->securitypriv;
 
-	RTW_INFO(FUNC_NDEV_FMT" key_index=%d, addr=%pM\n", FUNC_NDEV_ARG(ndev), key_index, mac_addr);
-
 	if (key_index == psecuritypriv->dot11PrivacyKeyIndex) {
 		/* clear the flag of wep default key set. */
 		psecuritypriv->bWepDefaultKeyIdxSet = 0;
@@ -2279,14 +2277,6 @@ static int cfg80211_rtw_set_default_key(struct wiphy *wiphy,
 	#define SET_DEF_KEY_PARAM_ARG_2_6_38
 #endif
 
-	RTW_INFO(FUNC_NDEV_FMT
-		SET_DEF_KEY_PARAM_FMT
-		SET_DEF_KEY_PARAM_FMT_2_6_38
-		"\n", FUNC_NDEV_ARG(ndev)
-		SET_DEF_KEY_PARAM_ARG
-		SET_DEF_KEY_PARAM_ARG_2_6_38
-	);
-
 	if ((key_index < WEP_KEYS) && ((psecuritypriv->dot11PrivacyAlgrthm == _WEP40_) || (psecuritypriv->dot11PrivacyAlgrthm == _WEP104_))) { /* set wep default key */
 		psecuritypriv->ndisencryptstatus = Ndis802_11Encryption1Enabled;
 
@@ -2312,12 +2302,6 @@ int cfg80211_rtw_set_default_mgmt_key(struct wiphy *wiphy,
 {
 #define SET_DEF_KEY_PARAM_FMT " key_index=%d"
 #define SET_DEF_KEY_PARAM_ARG , key_index
-
-	RTW_INFO(FUNC_NDEV_FMT
-		SET_DEF_KEY_PARAM_FMT
-		"\n", FUNC_NDEV_ARG(ndev)
-		SET_DEF_KEY_PARAM_ARG
-	);
 
 	return 0;
 }
@@ -2474,7 +2458,6 @@ static int cfg80211_rtw_get_station(struct wiphy *wiphy,
 	sinfo->filled = 0;
 
 	if (!mac) {
-		RTW_INFO(FUNC_NDEV_FMT" mac==%p\n", FUNC_NDEV_ARG(ndev), mac);
 		ret = -ENOENT;
 		goto exit;
 	}
@@ -2590,21 +2573,16 @@ static int cfg80211_rtw_change_iface(struct wiphy *wiphy,
 	int ret = 0;
 	u8 change = _FALSE;
 
-	RTW_INFO(FUNC_NDEV_FMT" type=%d, hw_port:%d\n", FUNC_NDEV_ARG(ndev), type, padapter->hw_port);
-
 	if (adapter_to_dvobj(padapter)->processing_dev_remove == _TRUE) {
 		ret = -EPERM;
 		goto exit;
 	}
 
-
-	RTW_INFO(FUNC_NDEV_FMT" call netdev_open\n", FUNC_NDEV_ARG(ndev));
 	if (netdev_open(ndev) != 0) {
 		RTW_INFO(FUNC_NDEV_FMT" call netdev_open fail\n", FUNC_NDEV_ARG(ndev));
 		ret = -EPERM;
 		goto exit;
 	}
-
 
 	if (_FAIL == rtw_pwr_wakeup(padapter)) {
 		RTW_INFO(FUNC_NDEV_FMT" call rtw_pwr_wakeup fail\n", FUNC_NDEV_ARG(ndev));
@@ -2613,8 +2591,6 @@ static int cfg80211_rtw_change_iface(struct wiphy *wiphy,
 	}
 
 	old_type = rtw_wdev->iftype;
-	RTW_INFO(FUNC_NDEV_FMT" old_iftype=%d, new_iftype=%d\n",
-		FUNC_NDEV_ARG(ndev), old_type, type);
 
 	if (old_type != type) {
 		change = _TRUE;
@@ -2740,7 +2716,6 @@ static int cfg80211_rtw_change_iface(struct wiphy *wiphy,
 
 exit:
 
-	RTW_INFO(FUNC_NDEV_FMT" ret:%d\n", FUNC_NDEV_ARG(ndev), ret);
 	return ret;
 }
 
@@ -4111,8 +4086,6 @@ static int cfg80211_rtw_leave_ibss(struct wiphy *wiphy, struct net_device *ndev)
 	enum nl80211_iftype old_type;
 	int ret = 0;
 
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
-
 #if (RTW_CFG80211_BLOCK_STA_DISCON_EVENT & RTW_CFG80211_BLOCK_DISCON_WHEN_DISCONNECT)
 	rtw_wdev_set_not_indic_disco(adapter_wdev_data(padapter), 1);
 #endif
@@ -4242,7 +4215,6 @@ static int cfg80211_rtw_connect(struct wiphy *wiphy, struct net_device *ndev,
 	rtw_wdev_set_not_indic_disco(pwdev_priv, 1);
 #endif
 
-	RTW_INFO("=>"FUNC_NDEV_FMT" - Start to Connection\n", FUNC_NDEV_ARG(ndev));
 	RTW_INFO("privacy=%d, key=%p, key_len=%d, key_idx=%d, auth_type=%d\n",
 		sme->privacy, sme->key, sme->key_len, sme->key_idx, sme->auth_type);
 
@@ -4461,7 +4433,6 @@ static int cfg80211_rtw_connect(struct wiphy *wiphy, struct net_device *ndev,
 
 	if (pwdev_priv->connect_req) {
 		rtw_wdev_free_connect_req(pwdev_priv);
-		RTW_INFO(FUNC_NDEV_FMT" free existing connect_req\n", FUNC_NDEV_ARG(ndev));
 	}
 
 	pwdev_priv->connect_req = (struct cfg80211_connect_params *)rtw_malloc(sizeof(*pwdev_priv->connect_req));
@@ -4493,8 +4464,6 @@ static int cfg80211_rtw_disconnect(struct wiphy *wiphy, struct net_device *ndev,
 {
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
 
-	RTW_INFO(FUNC_NDEV_FMT" - Start to Disconnect\n", FUNC_NDEV_ARG(ndev));
-
 #if (RTW_CFG80211_BLOCK_STA_DISCON_EVENT & RTW_CFG80211_BLOCK_DISCON_WHEN_DISCONNECT)
 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0))
 	if (!wiphy->dev.power.is_prepared)
@@ -4513,7 +4482,6 @@ static int cfg80211_rtw_disconnect(struct wiphy *wiphy, struct net_device *ndev,
 	rtw_wdev_set_not_indic_disco(adapter_wdev_data(padapter), 0);
 #endif
 
-	RTW_INFO(FUNC_NDEV_FMT" return 0\n", FUNC_NDEV_ARG(ndev));
 	return 0;
 }
 
@@ -4637,9 +4605,6 @@ static int cfg80211_rtw_set_power_mgmt(struct wiphy *wiphy,
 {
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
 
-	RTW_INFO(FUNC_NDEV_FMT" enabled:%u, timeout:%d\n", FUNC_NDEV_ARG(ndev),
-		enabled, timeout);
-
 #ifdef CONFIG_LPS
 	if (!enabled)
 		rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_LEAVE_CFG80211_PWRMGMT, 0);
@@ -4694,9 +4659,6 @@ static int cfg80211_rtw_set_pmksa(struct wiphy *wiphy,
 	u8	strZeroMacAddress[ETH_ALEN] = { 0x00 };
 	bool sae_auth = rtw_sec_chk_auth_type(padapter, MLME_AUTHTYPE_SAE);
 
-	RTW_INFO(FUNC_NDEV_FMT" "MAC_FMT" "KEY_FMT"\n", FUNC_NDEV_ARG(ndev)
-		, MAC_ARG(pmksa->bssid), KEY_ARG(pmksa->pmkid));
-
 	if (_rtw_memcmp((u8 *)pmksa->bssid, strZeroMacAddress, ETH_ALEN) == _TRUE)
 		return -EINVAL;
 
@@ -4718,9 +4680,6 @@ static int cfg80211_rtw_del_pmksa(struct wiphy *wiphy,
 	u8	index, bMatched = _FALSE;
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
 	struct security_priv	*psecuritypriv = &padapter->securitypriv;
-
-	RTW_INFO(FUNC_NDEV_FMT" "MAC_FMT" "KEY_FMT"\n", FUNC_NDEV_ARG(ndev)
-		, MAC_ARG(pmksa->bssid), KEY_ARG(pmksa->pmkid));
 
 	for (index = 0 ; index < NUM_PMKID_CACHE; index++) {
 		if (_rtw_memcmp(psecuritypriv->PMKIDList[index].Bssid, (u8 *)pmksa->bssid, ETH_ALEN) == _TRUE) {
@@ -4748,8 +4707,6 @@ static int cfg80211_rtw_flush_pmksa(struct wiphy *wiphy,
 {
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
 	struct security_priv	*psecuritypriv = &padapter->securitypriv;
-
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
 
 	_rtw_memset(&psecuritypriv->PMKIDList[0], 0x00, sizeof(RT_PMKID_LIST) * NUM_PMKID_CACHE);
 	psecuritypriv->PMKIDIndex = 0;
@@ -4792,8 +4749,6 @@ static int rtw_cfg80211_monitor_if_xmit_entry(struct sk_buff *skb, struct net_de
 #ifdef CONFIG_DFS_MASTER
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(padapter);
 #endif
-
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
 
 	rtw_mstat_update(MSTAT_TYPE_SKB, MSTAT_ALLOC_SUCCESS, skb->truesize);
 
@@ -5263,8 +5218,6 @@ static int cfg80211_rtw_add_beacon(struct wiphy *wiphy, struct net_device *ndev,
 	int ret = 0;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(ndev);
 
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
-
 	if (rtw_cfg80211_sync_iftype(adapter) != _SUCCESS) {
 		ret = -ENOTSUPP;
 		goto exit;
@@ -5283,8 +5236,6 @@ static int cfg80211_rtw_set_beacon(struct wiphy *wiphy, struct net_device *ndev,
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(ndev);
 	struct mlme_ext_priv *pmlmeext = &(adapter->mlmeextpriv);
 
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
-
 	pmlmeext->bstart_bss = _TRUE;
 
 	cfg80211_rtw_add_beacon(wiphy, ndev, info);
@@ -5296,8 +5247,6 @@ static int	cfg80211_rtw_del_beacon(struct wiphy *wiphy, struct net_device *ndev)
 {
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(ndev);
 
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
-
 	rtw_stop_ap_cmd(adapter, RTW_CMDF_WAIT_ACK);
 	return 0;
 }
@@ -5307,9 +5256,6 @@ static int cfg80211_rtw_start_ap(struct wiphy *wiphy, struct net_device *ndev,
 {
 	int ret = 0;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(ndev);
-
-	RTW_INFO(FUNC_NDEV_FMT" hidden_ssid:%d, auth_type:%d\n", FUNC_NDEV_ARG(ndev),
-		settings->hidden_ssid, settings->auth_type);
 
 	if (rtw_cfg80211_sync_iftype(adapter) != _SUCCESS) {
 		ret = -ENOTSUPP;
@@ -5361,8 +5307,6 @@ static int cfg80211_rtw_change_beacon(struct wiphy *wiphy, struct net_device *nd
 	int ret = 0;
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(ndev);
 
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
-
 	ret = rtw_add_beacon(adapter, info->head, info->head_len, info->tail, info->tail_len);
 
 	return ret;
@@ -5371,8 +5315,6 @@ static int cfg80211_rtw_change_beacon(struct wiphy *wiphy, struct net_device *nd
 static int cfg80211_rtw_stop_ap(struct wiphy *wiphy, struct net_device *ndev)
 {
 	_adapter *adapter = (_adapter *)rtw_netdev_priv(ndev);
-
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
 
 	rtw_stop_ap_cmd(adapter, RTW_CMDF_WAIT_ACK);
 	return 0;
@@ -5610,8 +5552,6 @@ static int	cfg80211_rtw_add_station(struct wiphy *wiphy, struct net_device *ndev
 	struct sta_info *psta;
 #endif /* CONFIG_TDLS */
 
-	RTW_INFO(FUNC_NDEV_FMT" mac:"MAC_FMT"\n", FUNC_NDEV_ARG(ndev), MAC_ARG(mac));
-
 #if CONFIG_RTW_MACADDR_ACL
 	if (rtw_access_ctrl(padapter, mac) == _FALSE) {
 		RTW_INFO(FUNC_NDEV_FMT" deny by macaddr ACL\n", FUNC_NDEV_ARG(ndev));
@@ -5787,8 +5727,6 @@ static int	cfg80211_rtw_del_station(struct wiphy *wiphy, struct net_device *ndev
 	target_mac = params->mac;
 #endif
 
-	RTW_INFO("+"FUNC_NDEV_FMT" mac=%pM\n", FUNC_NDEV_ARG(ndev), target_mac);
-
 	if (check_fwstate(pmlmepriv, (WIFI_ASOC_STATE | WIFI_AP_STATE | WIFI_MESH_STATE)) != _TRUE) {
 		RTW_INFO("%s, fw_state != FW_LINKED|WIFI_AP_STATE|WIFI_MESH_STATE\n", __func__);
 		return -EINVAL;
@@ -5880,8 +5818,6 @@ static int	cfg80211_rtw_del_station(struct wiphy *wiphy, struct net_device *ndev
 	if (MLME_IS_MESH(padapter))
 		rtw_mesh_plink_del(padapter, target_mac);
 #endif
-
-	RTW_INFO("-"FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
 
 	return ret;
 
@@ -6172,10 +6108,6 @@ static int	cfg80211_rtw_set_channel(struct wiphy *wiphy
 	int chan_offset = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
 	int chan_width = CHANNEL_WIDTH_20;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
-#endif
-
 	switch (channel_type) {
 	case NL80211_CHAN_NO_HT:
 	case NL80211_CHAN_HT20:
@@ -6205,24 +6137,6 @@ static int	cfg80211_rtw_set_channel(struct wiphy *wiphy
 }
 #endif /*#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 6, 0))*/
 
-/*
-static int	cfg80211_rtw_auth(struct wiphy *wiphy, struct net_device *ndev,
-		struct cfg80211_auth_request *req)
-{
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
-
-	return 0;
-}
-
-static int	cfg80211_rtw_assoc(struct wiphy *wiphy, struct net_device *ndev,
-		struct cfg80211_assoc_request *req)
-{
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
-
-	return 0;
-}
-*/
-
 static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
 {
 	int ret = 0;
@@ -6236,8 +6150,6 @@ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, 
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
 	struct mlme_ext_priv *pmlmeext = &(padapter->mlmeextpriv);
-
-	RTW_INFO(FUNC_NDEV_FMT" ielen=%d\n", FUNC_NDEV_ARG(ndev), len);
 
 	if (len > 0) {
 		wps_ie = rtw_get_wps_ie(buf, len, NULL, &wps_ielen);
@@ -8488,8 +8400,6 @@ static int cfg80211_rtw_tdls_oper(struct wiphy *wiphy,
 	struct tdls_txmgmt	txmgmt;
 	struct sta_info *ptdls_sta = NULL;
 
-	RTW_INFO(FUNC_NDEV_FMT", nl80211_tdls_operation:%d\n", FUNC_NDEV_ARG(ndev), oper);
-
 	if (hal_chk_wl_func(padapter, WL_FUNC_TDLS) == _FALSE) {
 		RTW_INFO("Discard tdls oper:%d, since hal doesn't support tdls\n", oper);
 		return 0;
@@ -10272,8 +10182,6 @@ int cfg80211_rtw_external_auth(struct wiphy *wiphy, struct net_device *dev,
 {
 	PADAPTER padapter = (_adapter *)rtw_netdev_priv(dev);
 
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(dev));
-
 	rtw_cfg80211_external_auth_status(wiphy, dev,
 		(struct rtw_external_auth_params *)params);
 
@@ -10292,9 +10200,6 @@ void rtw_cfg80211_external_auth_status(struct wiphy *wiphy, struct net_device *d
 	u32 len = 0;
 	_irqL irqL;
 
-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(dev));
-
-	RTW_INFO("SAE: action: %u, status: %u\n", params->action, params->status);
 	if (params->status == WLAN_STATUS_SUCCESS) {
 		RTW_INFO("bssid: "MAC_FMT"\n", MAC_ARG(params->bssid));
 		RTW_INFO("SSID: [%s]\n",

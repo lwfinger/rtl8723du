@@ -12036,23 +12036,18 @@ static void _rtw_hal_set_fw_rsvd_page(_adapter *adapter, bool finished, u8 *page
 	u32	TotalPacketLen = 0, MaxRsvdPageBufSize = 0, PageSize = 0;
 	RSVDPAGE_LOC	RsvdPageLoc;
 	struct registry_priv  *registry_par = &adapter->registrypriv;
-
 #ifdef DBG_FW_DEBUG_MSG_PKT
 	u32	fw_dbg_msg_pkt_len = 0;
 #endif /*DBG_FW_DEBUG_MSG_PKT*/
-
 #ifdef DBG_CONFIG_ERROR_DETECT
 	struct sreset_priv *psrtpriv;
 #endif /* DBG_CONFIG_ERROR_DETECT */
-
 #ifdef CONFIG_MCC_MODE
 	u8 dl_mcc_page = _FAIL;
 #endif /* CONFIG_MCC_MODE */
 	u8 nr_assoc_if;
-
 	_adapter *sta_iface = NULL;
 	_adapter *ap_iface = NULL;
-
 	bool is_wow_mode = _FALSE;
 
 	pHalData = GET_HAL_DATA(adapter);

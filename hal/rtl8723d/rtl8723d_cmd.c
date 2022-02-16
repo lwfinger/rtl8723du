@@ -27,10 +27,7 @@ static u8 _is_fw_read_cmd_down(_adapter *padapter, u8 msgbox_num)
 {
 	u8	read_down = _FALSE;
 	int	retry_cnts = 100;
-
 	u8 valid;
-
-	/* RTW_INFO(" _is_fw_read_cmd_down ,reg_1cc(%x),msg_box(%d)...\n",rtw_read8(padapter,REG_HMETFR),msgbox_num); */
 
 	do {
 		valid = rtw_read8(padapter, REG_HMETFR) & BIT(msgbox_num);
@@ -76,7 +73,6 @@ s32 FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer)
 		pdbgpriv->dbg_h2c_leave32k_fail_cnt++;
 	}
 
-	/* RTW_INFO("H2C ElementID=%02x , pHalData->LastHMEBoxNum=%02x\n", ElementID, pHalData->LastHMEBoxNum); */
 #endif /* DBG_CHECK_FW_PS_STATE_H2C */
 #endif /* DBG_CHECK_FW_PS_STATE */
 	_enter_critical_mutex(&(adapter_to_dvobj(padapter)->h2c_fwcmd_mutex), NULL);
@@ -101,8 +97,6 @@ s32 FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer)
 			RTW_INFO("MAC_1C0=%08x, MAC_1C4=%08x, MAC_1C8=%08x, MAC_1CC=%08x\n", rtw_read32(padapter, 0x1c0), rtw_read32(padapter, 0x1c4)
 				, rtw_read32(padapter, 0x1c8), rtw_read32(padapter, 0x1cc));
 #endif /* DBG_CHECK_FW_PS_STATE */
-			/* RTW_INFO(" 0x1c0: 0x%8x\n", rtw_read32(padapter, 0x1c0)); */
-			/* RTW_INFO(" 0x1c4: 0x%8x\n", rtw_read32(padapter, 0x1c4)); */
 			goto exit;
 		}
 
@@ -116,9 +110,6 @@ s32 FillH2CCmd8723D(PADAPTER padapter, u8 ElementID, u32 CmdLen, u8 *pCmdBuffer)
 		_rtw_memcpy((u8 *)(&h2c_cmd), h2c, 4);
 		h2c_cmd = le32_to_cpu(h2c_cmd);
 		rtw_write32(padapter, msgbox_addr, h2c_cmd);
-
-		/* RTW_INFO("MSG_BOX:%d, CmdLen(%d), CmdID(0x%x), reg:0x%x =>h2c_cmd:0x%.8x, reg:0x%x =>h2c_cmd_ex:0x%.8x\n" */
-		/*	,pHalData->LastHMEBoxNum , CmdLen, ElementID, msgbox_addr, h2c_cmd, msgbox_ex_addr, h2c_cmd_ex); */
 
 		/* update last msg box number */
 		pHalData->LastHMEBoxNum = (h2c_box_num + 1) % MAX_H2C_BOX_NUMS;
@@ -247,8 +238,6 @@ void rtl8723d_set_FwPsTuneParam_cmd(PADAPTER padapter)
 	u8 ps_timeout = 20;  /* ms //Keep awake when tx */
 	u8 dtim_period = 3;
 
-	/* RTW_INFO("%s(): FW LPS mode = %d\n", __func__, psmode); */
-
 	SET_8723D_H2CCMD_PSTUNE_PARM_BCN_TO_LIMIT(u1H2CPsTuneParm, bcn_to_limit);
 	SET_8723D_H2CCMD_PSTUNE_PARM_DTIM_TIMEOUT(u1H2CPsTuneParm, dtim_timeout);
 	SET_8723D_H2CCMD_PSTUNE_PARM_PS_TIMEOUT(u1H2CPsTuneParm, ps_timeout);
@@ -272,9 +261,6 @@ void rtl8723d_download_rsvd_page(PADAPTER padapter, u8 mstatus)
 	u32 poll = 0;
 	u8 RegFwHwTxQCtrl;
 
-
-	RTW_INFO("+" FUNC_ADPT_FMT ": hw_port=%d mstatus(%x)\n",
-		 FUNC_ADPT_ARG(padapter), get_hw_port(padapter), mstatus);
 
 	if (mstatus == RT_MEDIA_CONNECT) {
 		u8 bcn_ctrl = rtw_read8(padapter, REG_BCN_CTRL);
@@ -387,11 +373,9 @@ void rtl8723d_set_p2p_ps_offload_cmd(_adapter *padapter, u8 p2p_ps_state)
 #if 1
 	switch (p2p_ps_state) {
 	case P2P_PS_DISABLE:
-		RTW_INFO("P2P_PS_DISABLE\n");
 		_rtw_memset(p2p_ps_offload, 0 , 1);
 		break;
 	case P2P_PS_ENABLE:
-		RTW_INFO("P2P_PS_ENABLE\n");
 		/* update CTWindow value. */
 		if (pwdinfo->ctwindow > 0) {
 			p2p_ps_offload->CTWindow_En = 1;
@@ -408,16 +392,12 @@ void rtl8723d_set_p2p_ps_offload_cmd(_adapter *padapter, u8 p2p_ps_state)
 				p2p_ps_offload->NoA1_En = 1;
 
 			/* config P2P NoA Descriptor Register */
-			/* RTW_INFO("%s(): noa_duration = %x\n",__FUNCTION__,pwdinfo->noa_duration[i]); */
 			rtw_write32(padapter, REG_NOA_DESC_DURATION, pwdinfo->noa_duration[i]);
 
-			/* RTW_INFO("%s(): noa_interval = %x\n",__FUNCTION__,pwdinfo->noa_interval[i]); */
 			rtw_write32(padapter, REG_NOA_DESC_INTERVAL, pwdinfo->noa_interval[i]);
 
-			/* RTW_INFO("%s(): start_time = %x\n",__FUNCTION__,pwdinfo->noa_start_time[i]); */
 			rtw_write32(padapter, REG_NOA_DESC_START, pwdinfo->noa_start_time[i]);
 
-			/* RTW_INFO("%s(): noa_count = %x\n",__FUNCTION__,pwdinfo->noa_count[i]); */
 			rtw_write8(padapter, REG_NOA_DESC_COUNT, pwdinfo->noa_count[i]);
 		}
 
@@ -437,11 +417,9 @@ void rtl8723d_set_p2p_ps_offload_cmd(_adapter *padapter, u8 p2p_ps_state)
 		}
 		break;
 	case P2P_PS_SCAN:
-		RTW_INFO("P2P_PS_SCAN\n");
 		p2p_ps_offload->discovery = 1;
 		break;
 	case P2P_PS_SCAN_DONE:
-		RTW_INFO("P2P_PS_SCAN_DONE\n");
 		p2p_ps_offload->discovery = 0;
 		pwdinfo->p2p_ps_state = P2P_PS_ENABLE;
 		break;
