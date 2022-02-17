@@ -102,8 +102,7 @@ static int	_rtw_init_mlme_priv(struct adapter *adapt)
 
 	pmlmepriv->roam_flags = 0
 				| RTW_ROAM_ON_EXPIRED
-				| RTW_ROAM_ON_RESUME
-				| RTW_ROAM_ACTIVE;
+				| RTW_ROAM_ON_RESUME;
 
 	pmlmepriv->roam_scanr_exp_ms = RTW_ROAM_SCAN_RESULT_EXP_MS;
 	pmlmepriv->roam_rssi_diff_th = RTW_ROAM_RSSI_DIFF_TH;
@@ -117,7 +116,7 @@ static int	_rtw_init_mlme_priv(struct adapter *adapt)
 #if defined(CONFIG_RTW_WNM)
 	rtw_roam_nb_info_init(adapt);
 	pmlmepriv->ch_cnt = 0;
-#endif	
+#endif
 	rtw_init_mlme_timer(adapt);
 
 exit:
@@ -640,8 +639,8 @@ int is_same_network(struct wlan_bssid_ex *src, struct wlan_bssid_ex *dst, u8 fea
 	   )
 		return true;
 
-	/* Wi-Fi driver doesn't consider the situation of BCN and ProbRsp sent from the same hidden AP, 
-	  * it considers these two packets are sent from different AP. 
+	/* Wi-Fi driver doesn't consider the situation of BCN and ProbRsp sent from the same hidden AP,
+	  * it considers these two packets are sent from different AP.
 	  * Therefore, the scan queue may store two scan results of the same hidden AP, likes below.
 	  *
 	  *  index            bssid              ch    RSSI   SdBm  Noise   age          flag             ssid
@@ -654,11 +653,11 @@ int is_same_network(struct wlan_bssid_ex *src, struct wlan_bssid_ex *dst, u8 fea
 	  * It means the scan queue will not store two scan results of the same hidden AP, it only store ProbRsp.
 	  * For customer request.
 	  */
-	  
+
 	if (((!memcmp(src->MacAddress, dst->MacAddress, ETH_ALEN))) &&
 		((s_cap & WLAN_CAPABILITY_IBSS) == (d_cap & WLAN_CAPABILITY_IBSS)) &&
 		((s_cap & WLAN_CAPABILITY_BSS) == (d_cap & WLAN_CAPABILITY_BSS))) {
-		if ((src->Ssid.SsidLength == dst->Ssid.SsidLength) && 
+		if ((src->Ssid.SsidLength == dst->Ssid.SsidLength) &&
 			(((!memcmp(src->Ssid.Ssid, dst->Ssid.Ssid, src->Ssid.SsidLength))) || //Case of normal AP
 			(is_all_null(src->Ssid.Ssid, src->Ssid.SsidLength) || is_all_null(dst->Ssid.Ssid, dst->Ssid.SsidLength)))) //Case of hidden AP
 			return true;
@@ -2105,10 +2104,10 @@ u8 rtw_ft_chk_roaming_candidate(
 	/*The candidate don't support over-the-DS*/
 	if (rtw_ft_valid_otd_candidate(adapt, pmdie)) {
 		RTW_INFO("FT: ignore the candidate("
-			MAC_FMT ") for over-the-DS\n", 
+			MAC_FMT ") for over-the-DS\n",
 			MAC_ARG(competitor->network.MacAddress));
 			rtw_ft_clr_flags(adapt, RTW_FT_PEER_OTD_EN);
-		return false;	
+		return false;
 	}
 
 	return true;
@@ -2184,7 +2183,7 @@ err_2:
 void rtw_roam_nb_info_init(struct adapter *adapt)
 {
 	struct roam_nb_info *pnb = &(adapt->mlmepriv.nb_info);
-	
+
 	memset(&pnb->nb_rpt, 0, sizeof(pnb->nb_rpt));
 	memset(&pnb->nb_rpt_ch_list, 0, sizeof(pnb->nb_rpt_ch_list));
 	memset(&pnb->roam_target_addr, 0, ETH_ALEN);
@@ -2193,8 +2192,8 @@ void rtw_roam_nb_info_init(struct adapter *adapt)
 	pnb->preference_en = false;
 	pnb->nb_rpt_is_same = true;
 	pnb->last_nb_rpt_entries = 0;
-	rtw_init_timer(&pnb->roam_scan_timer, 
-		adapt, rtw_wnm_roam_scan_hdl, 
+	rtw_init_timer(&pnb->roam_scan_timer,
+		adapt, rtw_wnm_roam_scan_hdl,
 		adapt);
 }
 
@@ -2221,7 +2220,7 @@ u8 rtw_roam_nb_scan_list_set(
 	rtw_init_sitesurvey_parm(adapt, pparm);
 	if (rtw_roam_busy_scan(adapt, pnb)) {
 		pparm->ch_num = 1;
-		pparm->ch[pmlmepriv->ch_cnt].hw_value = 
+		pparm->ch[pmlmepriv->ch_cnt].hw_value =
 			pnb->nb_rpt_ch_list[pmlmepriv->ch_cnt].hw_value;
 		pmlmepriv->ch_cnt++;
 		ret = true;
@@ -2240,7 +2239,7 @@ u8 rtw_roam_nb_scan_list_set(
 	}
 
 	pmlmepriv->nb_info.nb_rpt_valid = false;
-	pmlmepriv->ch_cnt = 0;		
+	pmlmepriv->ch_cnt = 0;
 	ret = true;
 
 set_bssid_list:
@@ -2620,7 +2619,7 @@ void rtw_drv_scan_by_self(struct adapter *adapt, u8 reason)
 	}
 
 #if defined(CONFIG_RTW_WNM)
-	if ((reason == RTW_AUTO_SCAN_REASON_ROAM) 
+	if ((reason == RTW_AUTO_SCAN_REASON_ROAM)
 		&& (rtw_roam_nb_scan_list_set(adapt, &parm)))
 		goto exit;
 #endif
@@ -2901,10 +2900,10 @@ static int rtw_check_roaming_candidate(struct mlme_priv *mlme
 		goto exit;
 
 #if defined(CONFIG_RTW_80211R) && defined(CONFIG_RTW_WNM)
-	if (rtw_wnm_btm_diff_bss(adapter) && 
+	if (rtw_wnm_btm_diff_bss(adapter) &&
 		rtw_wnm_btm_roam_candidate(adapter, competitor)) {
 		goto update;
-	}	
+	}
 #endif
 
 	if (competitor->network.Rssi - mlme->cur_network_scanned->network.Rssi < mlme->roam_rssi_diff_th)
@@ -3261,7 +3260,7 @@ int rtw_restruct_wmm_ie(struct adapter *adapter, u8 *in_ie, u8 *out_ie, uint in_
 			}
 			out_ie[initial_out_len + 1] = 0x07;
 			out_ie[initial_out_len + 6] = 0x00;
-		
+
 			out_ie[initial_out_len + 8] = qos_info;
 
 			break;
@@ -3364,7 +3363,7 @@ static int rtw_rsn_sync_pmkid(struct adapter *adapter, u8 *ie, uint ie_len, int 
 		+ 2 + 16 * info.pmkid_cnt
 		+ (info.gmcs ? 4 : 0)
 		;
-	
+
 	ie[1] = (u8)(ie_len - 2);
 
 exit:
@@ -3808,7 +3807,7 @@ void rtw_update_ht_cap(struct adapter *adapt, u8 *pie, uint ie_len, u8 channel)
 			phtpriv->ampdu_enable = true;
 		} else
 			phtpriv->ampdu_enable = true;
-	} 
+	}
 
 
 	/* check Max Rx A-MPDU Size */
@@ -4156,3 +4155,4 @@ inline void rtw_wfd_st_switch(struct sta_info *sta, bool on)
 	else
 		rtw_st_ctl_unregister(&sta->st_ctl, SESSION_TRACKER_REG_ID_WFD);
 }
+
