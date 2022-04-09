@@ -10,6 +10,10 @@ EXTRA_CFLAGS += -I$(src)/include
 
 EXTRA_LDFLAGS += --strip-debug
 
+ifeq ("","$(wildcard MOK.der)")
+NO_SKIP_SIGN := y
+endif
+
 ########################## Features ###########################
 CONFIG_EFUSE_CONFIG_FILE = y
 CONFIG_LOAD_PHY_PARA_FROM_FILE = y
@@ -265,4 +269,15 @@ clean:
 	rm -fr *.mod.c *.mod *.o .*.cmd *.ko *~ .*.d
 	rm -fr .tmp_versions
 endif
+
+sign:
+ifeq ($(NO_SKIP_SIGN), y)
+	@openssl req -new -x509 -newkey rsa:2048 -keyout MOK.priv -outform DER -out MOK.der -nodes -days 36500 -subj "/CN=Custom MOK/"
+	@mokutil --import MOK.der
+else
+	echo "Skipping key creation"
+endif
+	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der 8723du.ko
+
+sign-install: all sign install
 
