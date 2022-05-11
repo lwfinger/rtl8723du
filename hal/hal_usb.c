@@ -13,7 +13,7 @@ int	usb_init_recv_priv(struct adapter *adapt, u16 ini_in_buf_sz)
 	struct recv_buf *precvbuf;
 
 	tasklet_init(&precvpriv->recv_tasklet,
-		     (void(*)(unsigned long))usb_recv_tasklet,
+		     (void(*))usb_recv_tasklet,
 		     (unsigned long)adapt);
 
 	/* init recv_buf */
