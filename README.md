@@ -35,7 +35,7 @@ For all distros:
 ```bash
 git clone git://github.com/lwfinger/rtl8723du.git -b v5.13.4
 cd rtl8723du
-make
+make -j$(nproc)
 sudo make install
 ```
 
@@ -52,7 +52,7 @@ When your kernel changes, then you need to do the following:
 cd ~/rtl8723du
 git pull
 make clean
-make
+make -j$(nproc)
 sudo make install
 ```
 
@@ -63,7 +63,7 @@ For all distros:
 ```bash
 git clone git://github.com/lwfinger/rtl8723du.git
 cd rtl8723du
-make
+make -j$(nproc)
 sudo make sign-install
 ```
 You will be promted a password, please keep it in mind and use it in next steps.
