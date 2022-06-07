@@ -107,7 +107,7 @@ static void rtw_dev_shutdown(struct device *dev)
 static struct usb_device_id rtw_usb_id_tbl[] = {
 	/*=== Realtek demoboard ===*/
 	{USB_DEVICE_AND_INTERFACE_INFO(USB_VENDER_ID_REALTEK, 0xD723, 0xff, 0xff, 0xff), .driver_info = RTL8723D}, /* 8723DU 1*1 */
-	{USB_DEVICE_AND_INTERFACE_INFO(0x0792, 0xD611, 0xff, 0xff, 0xff), .driver_info = RTL8723D}, /* 8723DU 1*1 */
+	{USB_DEVICE_AND_INTERFACE_INFO(0x7392, 0xD611, 0xff, 0xff, 0xff), .driver_info = RTL8723D}, /* 8723DU 1*1 */
 
 	{}	/* Terminating entry */
 };
