@@ -159,12 +159,12 @@ enum ieee80211_back_parties {
 };
 
 struct ieee80211_mgmt {
-	u16 frame_control;
-	u16 duration;
+	__le16 frame_control;
+	__le16 duration;
 	u8 da[6];
 	u8 sa[6];
 	u8 bssid[6];
-	u16 seq_ctrl;
+	__lu16 seq_ctrl;
 	union {
 		struct {
 			__le16 auth_alg;
@@ -185,7 +185,7 @@ struct ieee80211_mgmt {
 		struct {
 			__le16 capab_info;
 			__le16 status_code;
-			u16 aid;
+			__le16 aid;
 			/* followed by Supported rates */
 			u8 variable[0];
 		}  __attribute__((packed)) assoc_resp, reassoc_resp;
