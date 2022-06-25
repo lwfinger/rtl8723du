@@ -1956,9 +1956,9 @@ void rtl8723d_fill_fake_txdesc(
 	SET_TX_DESC_QUEUE_SEL_8723D(pDesc, QSLT_MGNT); /* Fixed queue of Mgnt queue */
 
 	/* Set NAVUSEHDR to prevent Ps-poll AId filed to be changed to error vlaue by Hw. */
-	if (IsPsPoll)
+	if (IsPsPoll) {
 		SET_TX_DESC_NAV_USE_HDR_8723D(pDesc, 1);
-	else {
+	} else {
 		SET_TX_DESC_HWSEQ_EN_8723D(pDesc, 1); /* Hw set sequence number */
 		SET_TX_DESC_HWSEQ_SEL_8723D(pDesc, 0);
 	}

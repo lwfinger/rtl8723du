@@ -1620,8 +1620,8 @@ static struct sta_info *rtw_joinbss_update_stainfo(struct adapter *adapt, struct
 			/* preorder_ctrl = &precvpriv->recvreorder_ctrl[i]; */
 			preorder_ctrl = &psta->recvreorder_ctrl[i];
 			preorder_ctrl->enable = false;
-			preorder_ctrl->indicate_seq = 0xffff;
-			preorder_ctrl->wend_b = 0xffff;
+			preorder_ctrl->indicate_seq = cpu_to_le16(0xffff);
+			preorder_ctrl->wend_b = cpu_to_le16(0xffff);
 			preorder_ctrl->wsize_b = 64;/* max_ampdu_sz; */ /* ex. 32(kbytes) -> wsize_b=32 */
 			preorder_ctrl->ampdu_size = RX_AMPDU_SIZE_INVALID;
 		}

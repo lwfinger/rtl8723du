@@ -2707,7 +2707,7 @@ void rtw_process_bar_frame(struct adapter *adapt, union recv_frame *precv_frame)
 	tid = ((le16_to_cpu((*(__le16 *)(pframe + 16))) & 0xf000) >> 12);
 	preorder_ctrl = &psta->recvreorder_ctrl[tid];
 	start_seq = ((__le16_to_cpu(*(__le16 *)(pframe + 18))) >> 4);
-	preorder_ctrl->indicate_seq = start_seq;
+	preorder_ctrl->indicate_seq = cpu_to_le16(start_seq);
 
 exit:
 	return;

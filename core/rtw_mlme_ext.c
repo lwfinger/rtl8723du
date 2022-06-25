@@ -13183,7 +13183,7 @@ u8 add_ba_rsp_hdl(struct adapter *adapt, unsigned char *pbuf)
 		preorder_ctrl->indicate_seq = pparm->start_seq;
 	}
 #else
-	preorder_ctrl->indicate_seq = 0xffff;
+	preorder_ctrl->indicate_seq = cpu_to_le16(0xffff);
 #endif
 
 	/*
