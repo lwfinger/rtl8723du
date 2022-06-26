@@ -4,6 +4,7 @@
 #define _RTW_MLME_C_
 
 #include <hal_data.h>
+#include <rtw_mlme.h>
 
 extern void indicate_wx_scan_complete_event(struct adapter *adapt);
 extern u8 rtw_do_join(struct adapter *adapt);
@@ -280,26 +281,6 @@ exit:
 	return;
 }
 
-static int	_rtw_enqueue_network(struct __queue *queue, struct wlan_network *pnetwork)
-{
-	unsigned long irqL;
-
-
-	if (!pnetwork)
-		goto exit;
-
-	_enter_critical_bh(&queue->lock, &irqL);
-
-	list_add_tail(&pnetwork->list, &queue->queue);
-
-	_exit_critical_bh(&queue->lock, &irqL);
-
-exit:
-
-
-	return _SUCCESS;
-}
-
 struct	wlan_network *_rtw_alloc_network(struct	mlme_priv *pmlmepriv) /* (struct __queue *free_queue) */
 {
 	unsigned long	irqL;
@@ -543,41 +524,18 @@ void rtw_free_mlme_priv(struct mlme_priv *pmlmepriv)
 	_rtw_free_mlme_priv(pmlmepriv);
 }
 
-int	rtw_enqueue_network(struct __queue *queue, struct wlan_network *pnetwork)
-{
-	int	res;
-	res = _rtw_enqueue_network(queue, pnetwork);
-	return res;
-}
-
-/*
-static struct	wlan_network *rtw_dequeue_network(struct __queue *queue)
-{
-	struct wlan_network *pnetwork;
-	pnetwork = _rtw_dequeue_network(queue);
-	return pnetwork;
-}
-*/
-
-struct	wlan_network *rtw_alloc_network(struct	mlme_priv *pmlmepriv);
-struct	wlan_network *rtw_alloc_network(struct	mlme_priv *pmlmepriv) /* (struct __queue	*free_queue) */
+static struct	wlan_network *rtw_alloc_network(struct	mlme_priv *pmlmepriv) /* (struct __queue	*free_queue) */
 {
 	struct	wlan_network	*pnetwork;
 	pnetwork = _rtw_alloc_network(pmlmepriv);
 	return pnetwork;
 }
 
-void rtw_free_network(struct mlme_priv *pmlmepriv, struct	wlan_network *pnetwork, u8 is_freeall)/* (struct	wlan_network *pnetwork, struct __queue	*free_queue) */
-{
-	_rtw_free_network(pmlmepriv, pnetwork, is_freeall);
-}
-
-void rtw_free_network_nolock(struct adapter *adapt, struct wlan_network *pnetwork)
+static void rtw_free_network_nolock(struct adapter *adapt, struct wlan_network *pnetwork)
 {
 	_rtw_free_network_nolock(&(adapt->mlmepriv), pnetwork);
 	rtw_cfg80211_unlink_bss(adapt, pnetwork);
 }
-
 
 void rtw_free_network_queue(struct adapter *dev, u8 isfreeall)
 {
@@ -1334,9 +1292,7 @@ void rtw_free_assoc_resources(struct adapter *adapter, int lock_scanned_queue)
 	rtw_reset_rx_info(adapter);
 }
 
-/*
-*rtw_indicate_connect: the caller has to lock pmlmepriv->lock
-*/
+/* rtw_indicate_connect: the caller has to lock pmlmepriv->lock */
 void rtw_indicate_connect(struct adapter *adapt)
 {
 	struct mlme_priv	*pmlmepriv = &adapt->mlmepriv;
@@ -1344,14 +1300,10 @@ void rtw_indicate_connect(struct adapter *adapt)
 	pmlmepriv->to_join = false;
 
 	if (!check_fwstate(&adapt->mlmepriv, _FW_LINKED)) {
-
 		set_fwstate(pmlmepriv, _FW_LINKED);
-
 		rtw_led_control(adapt, LED_CTL_LINK);
-
 		rtw_os_indicate_connect(adapt);
 	}
-
 	rtw_set_to_roam(adapt, 0);
 #ifdef CONFIG_INTEL_WIDI
 	if (adapt->mlmepriv.widi_state == INTEL_WIDI_STATE_ROAMING) {
@@ -1362,14 +1314,9 @@ void rtw_indicate_connect(struct adapter *adapt)
 #endif /* CONFIG_INTEL_WIDI */
 	if (!MLME_IS_AP(adapt) && !MLME_IS_MESH(adapt))
 		rtw_mi_set_scan_deny(adapt, 3000);
-
-
 }
 
-
-/*
-*rtw_indicate_disconnect: the caller has to lock pmlmepriv->lock
-*/
+/* rtw_indicate_disconnect: the caller has to lock pmlmepriv->lock */
 void rtw_indicate_disconnect(struct adapter *adapt, u16 reason, u8 locally_generated)
 {
 	struct	mlme_priv *pmlmepriv = &adapt->mlmepriv;
