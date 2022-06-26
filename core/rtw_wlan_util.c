@@ -2610,10 +2610,6 @@ void update_wireless_mode(struct adapter *adapt)
 		update_mgnt_tx_rate(adapt, IEEE80211_OFDM_RATE_6MB);
 }
 
-void fire_write_MAC_cmd(struct adapter *adapt, unsigned int addr, unsigned int value)
-{
-}
-
 void update_sta_basic_rate(struct sta_info *psta, u8 wireless_mode)
 {
 	if (IsSupportedTxCCK(wireless_mode)) {

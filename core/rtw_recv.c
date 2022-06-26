@@ -124,7 +124,7 @@ exit:
 	return res;
 }
 
-void rtw_mfree_recv_priv_lock(struct recv_priv *precvpriv)
+static void rtw_mfree_recv_priv_lock(struct recv_priv *precvpriv)
 {
 }
 
@@ -684,7 +684,7 @@ static int recv_decache(union recv_frame *precv_frame, u8 bretry)
 #define PN_LESS_CHK(a, b)	(((a-b) & 0x800000000000L) != 0)
 #define VALID_PN_CHK(new, old)	(((old) == 0) || PN_LESS_CHK(old, new))
 #define CCMPH_2_KEYID(ch)	(((ch) & 0x00000000c0000000L) >> 30)
-int recv_ucast_pn_decache(union recv_frame *precv_frame)
+static int recv_ucast_pn_decache(union recv_frame *precv_frame)
 {
 	struct rx_pkt_attrib *pattrib = &precv_frame->u.hdr.attrib;
 	struct sta_info *sta = precv_frame->u.hdr.psta;
@@ -810,7 +810,7 @@ static void process_wmmps_data(struct adapter *adapt, union recv_frame *precv_fr
 	}
 }
 
-void count_rx_stats(struct adapter *adapt, union recv_frame *prframe, struct sta_info *sta)
+static void count_rx_stats(struct adapter *adapt, union recv_frame *prframe, struct sta_info *sta)
 {
 	int	sz;
 	struct sta_info		*psta = NULL;
