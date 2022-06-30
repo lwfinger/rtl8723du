@@ -252,15 +252,26 @@ config_r:
 
 clean:
 	#$(MAKE) -C $(KSRC) M=$(shell pwd) clean
-	cd hal ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d .*.cmd
-	cd hal/phydm ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
-	cd core ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
-	cd os_dep ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
-	cd os_dep/linux ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
-	cd platform ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
-	rm -fr Module.symvers ; rm -fr Module.markers ; rm -fr modules.order
-	rm -fr *.mod.c *.mod *.o .*.cmd *.ko *~ .*.d
-	rm -fr .tmp_versions
+	@cd hal ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d .*.cmd
+	@cd hal/phydm/halrf ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d .*.cmd
+	@cd hal/phydm/halrf/rtl8723d ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d .*.cmd
+	@cd hal/phydm/txbf ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d .*.cmd
+	@cd hal/efuse/rtl8723d ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d .*.cmd
+	@cd hal/phydm/rtl8723d ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d .*.cmd
+	@cd hal/rtl8723d/usb ; rm -fr */*.mod.c */*.mod */*.o */.*.cmd */*.ko *.d .*.cmd
+	@cd hal/phydm ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d .*.cmd
+	@cd core ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	@cd core/crypto ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	@cd core/monitor ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	@cd core/mesh ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	@cd core/wds ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	@cd core/efuse ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	@cd os_dep ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	@cd os_dep/linux ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	@cd platform ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko .*.d
+	@rm -fr Module.symvers ; rm -fr Module.markers ; rm -fr modules.order
+	@rm -fr *.mod.c *.mod *.o .*.cmd *.ko *~ .*.d
+	@rm -fr .tmp_versions
 endif
 
 sign:
