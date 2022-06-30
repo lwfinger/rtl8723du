@@ -114,6 +114,7 @@ _BlockWrite(
 			}
 		}
 	}
+	pr_info("******************* rtl8723du firmware loaded.");
 exit:
 	return ret;
 }
