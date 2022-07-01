@@ -654,7 +654,7 @@ efuse_OneByteRead(
 		rtw_mdelay_os(1);
 		tmpidx++;
 	}
-	if (tmpidx < 100) {
+	if (tmpidx < 1000) {
 		*data = rtw_read8(pAdapter, EFUSE_CTRL);
 		bResult = true;
 	} else {
