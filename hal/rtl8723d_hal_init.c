@@ -114,7 +114,6 @@ _BlockWrite(
 			}
 		}
 	}
-	pr_info("******************* rtl8723du firmware loaded.");
 exit:
 	return ret;
 }
@@ -1744,6 +1743,8 @@ static void read_chip_version_8723d(struct adapter * adapt)
 	pHalData = GET_HAL_DATA(adapt);
 
 	value32 = rtw_read32(adapt, REG_SYS_CFG);
+	pr_info("*********** Contents of REG_SYS_CFG 0x%x\n", value32);
+
 	pHalData->version_id.ICType = CHIP_8723D;
 	pHalData->version_id.ChipType = ((value32 & RTL_ID) ? TEST_CHIP : NORMAL_CHIP);
 	pHalData->version_id.RFType = RF_TYPE_1T1R;
@@ -1754,11 +1755,13 @@ static void read_chip_version_8723d(struct adapter * adapt)
 	pHalData->RegulatorMode = ((value32 & SPS_SEL) ? RT_LDO_REGULATOR : RT_SWITCHING_REGULATOR);
 
 	value32 = rtw_read32(adapt, REG_GPIO_OUTSTS);
+	pr_info("*********** Contents of REG_GPIO_OUTSTS 0x%x\n", value32);
 	pHalData->version_id.ROMVer = ((value32 & RF_RL_ID) >> 20);	/* ROM code version. */
 
 	/* For multi-function consideration. Added by Roger, 2010.10.06. */
 	pHalData->MultiFunc = RT_MULTI_FUNC_NONE;
 	value32 = rtw_read32(adapt, REG_MULTI_FUNC_CTRL);
+	pr_info("*********** Contents of REG_MULTI_FUNC_CTRL 0x%x\n", value32);
 	pHalData->MultiFunc |= ((value32 & WL_FUNC_EN) ? RT_MULTI_FUNC_WIFI : 0);
 	pHalData->MultiFunc |= ((value32 & BT_FUNC_EN) ? RT_MULTI_FUNC_BT : 0);
 	pHalData->MultiFunc |= ((value32 & GPS_FUNC_EN) ? RT_MULTI_FUNC_GPS : 0);
