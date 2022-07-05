@@ -614,17 +614,13 @@ EFUSE_GetEfuseDefinition(
 
 
 /*  11/16/2008 MH Read one byte from real Efuse. */
-u8
-efuse_OneByteRead(
-	struct adapter *	pAdapter,
-	u16 addr,
-	u8 *data,
-	bool bPseudoTest)
+u8 efuse_OneByteRead(struct adapter *pAdapter, u16 addr, u8 *data, bool bPseudoTest)
 {
 	u32 tmpidx = 0;
 	u8 bResult;
 	u8 readbyte;
 	struct hal_com_data	*pHalData = GET_HAL_DATA(pAdapter);
+	u8 tmp;
 
 	/* RTW_INFO("===> EFUSE_OneByteRead(), addr = %x\n", addr); */
 	/* RTW_INFO("===> EFUSE_OneByteRead() start, 0x34 = 0x%X\n", rtw_read32(pAdapter, EFUSE_TEST)); */
@@ -637,18 +633,23 @@ efuse_OneByteRead(
 		/* <20130121, Kordan> For SMIC EFUSE specificatoin. */
 		/* 0x34[11]: SW force PGMEN input of efuse to high. (for the bank selected by 0x34[9:8])         */
 		rtw_write16(pAdapter, 0x34, rtw_read16(pAdapter, 0x34) & (~BIT11));
+		pr_info("*************** IS_CHIP_VENDOR_SMIC code was executed.");
 	}
 
 	/* -----------------e-fuse reg ctrl --------------------------------- */
 	/* address			 */
-	rtw_write8(pAdapter, EFUSE_CTRL + 1, (u8)(addr & 0xff));
-	rtw_write8(pAdapter, EFUSE_CTRL + 2, ((u8)((addr >> 8) & 0x03)) |
-		   (rtw_read8(pAdapter, EFUSE_CTRL + 2) & 0xFC));
+	tmp =  (u8)(addr & 0xff);
+	rtw_write8(pAdapter, EFUSE_CTRL + 1, tmp);
+	pr_info("*************** wrote 0x%x to EFUSE_CTRL + 1\n", tmp);
+	tmp = (u8)((addr >> 8) & 0x03) | (rtw_read8(pAdapter, EFUSE_CTRL + 2) & 0xFC);
+	rtw_write8(pAdapter, EFUSE_CTRL + 2, tmp);
+	pr_info("*************** wrote 0x%x to EyyFUSE_CTRL + 2\n", tmp);
 
-	/* rtw_write8(pAdapter, EFUSE_CTRL+3,  0x72); */ /* read cmd	 */
-	/* Write bit 32 0 */
 	readbyte = rtw_read8(pAdapter, EFUSE_CTRL + 3);
-	rtw_write8(pAdapter, EFUSE_CTRL + 3, (readbyte & 0x7f));
+	tmp = readbyte & 0x7f;
+
+	rtw_write8(pAdapter, EFUSE_CTRL + 3, tmp);
+	pr_info("*************** wrote 0x%x to EFUSE_CTRL + 3, readbyte 0x%x\n", tmp, readbyte);
 
 	while (!(0x80 & rtw_read8(pAdapter, EFUSE_CTRL + 3)) && (tmpidx < 1000)) {
 		rtw_mdelay_os(1);
