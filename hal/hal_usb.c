@@ -178,7 +178,7 @@ u16 usb_read16(struct intf_hdl *pintfhdl, u32 addr)
 	u16 wvalue;
 	u16 index;
 	u16 len;
-	__le16 data = 0;
+	__le32 data = 0;
 
 	request = 0x05;
 	requesttype = 0x01;/* read_in */
@@ -189,7 +189,7 @@ u16 usb_read16(struct intf_hdl *pintfhdl, u32 addr)
 	usbctrl_vendorreq(pintfhdl, request, wvalue, index,
 			  &data, len, requesttype);
 
-	return le16_to_cpu(data);
+	return (u16)(le32_to_cpu(data)&0xffff);
 }
 
 u32 usb_read32(struct intf_hdl *pintfhdl, u32 addr)
