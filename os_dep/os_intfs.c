@@ -1044,7 +1044,7 @@ static void rtw_hook_if_ops(struct net_device *ndev)
 #else
 	ndev->init = rtw_ndev_init;
 	ndev->uninit = rtw_ndev_uninit;
-	ndev->open = netdev_open;
+	ndev->open = _netdev_open;
 	ndev->stop = netdev_close;
 	ndev->hard_start_xmit = rtw_xmit_entry;
 	ndev->set_mac_address = rtw_net_set_mac_address;
