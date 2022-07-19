@@ -633,23 +633,19 @@ u8 efuse_OneByteRead(struct adapter *pAdapter, u16 addr, u8 *data, bool bPseudoT
 		/* <20130121, Kordan> For SMIC EFUSE specificatoin. */
 		/* 0x34[11]: SW force PGMEN input of efuse to high. (for the bank selected by 0x34[9:8])         */
 		rtw_write16(pAdapter, 0x34, rtw_read16(pAdapter, 0x34) & (~BIT11));
-		pr_info("*************** IS_CHIP_VENDOR_SMIC code was executed.");
 	}
 
 	/* -----------------e-fuse reg ctrl --------------------------------- */
 	/* address			 */
 	tmp =  (u8)(addr & 0xff);
 	rtw_write8(pAdapter, EFUSE_CTRL + 1, tmp);
-	pr_info("*************** wrote 0x%x to EFUSE_CTRL + 1\n", tmp);
 	tmp = (u8)((addr >> 8) & 0x03) | (rtw_read8(pAdapter, EFUSE_CTRL + 2) & 0xFC);
 	rtw_write8(pAdapter, EFUSE_CTRL + 2, tmp);
-	pr_info("*************** wrote 0x%x to EyyFUSE_CTRL + 2\n", tmp);
 
 	readbyte = rtw_read8(pAdapter, EFUSE_CTRL + 3);
 	tmp = readbyte & 0x7f;
 
 	rtw_write8(pAdapter, EFUSE_CTRL + 3, tmp);
-	pr_info("*************** wrote 0x%x to EFUSE_CTRL + 3, readbyte 0x%x\n", tmp, readbyte);
 
 	while (!(0x80 & rtw_read8(pAdapter, EFUSE_CTRL + 3)) && (tmpidx < 1000)) {
 		rtw_mdelay_os(1);
