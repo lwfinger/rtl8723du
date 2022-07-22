@@ -22,12 +22,6 @@ For **openSUSE**: Install necessary headers with
 ```bash
 sudo zypper install make gcc kernel-devel kernel-default-devel git libopenssl-devel
 ```
-For **Arch**: After installing the necessary kernel headers and base-devel,
-```bash
-git clone https://aur.archlinux.org/rtw89-dkms-git.git
-cd rtw89-dkms-git
-makepkg -sri
-```
 If any of the packages above are not found check if your distro installs them like that.
 
 ##### Installation
