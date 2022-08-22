@@ -171,7 +171,7 @@ u8 rtw_cfg80211_ch_switch_notify(struct adapter *adapter, u8 ch, u8 bw, u8 offse
 	if (ret != _SUCCESS)
 		goto exit;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 2)
 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef);
 #else
 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef, 0);
@@ -187,7 +187,11 @@ u8 rtw_cfg80211_ch_switch_notify(struct adapter *adapter, u8 ch, u8 bw, u8 offse
 	}
 
 	ctype = rtw_chbw_to_nl80211_channel_type(ch, bw, offset, ht);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 2)
 	cfg80211_ch_switch_notify(adapter->pnetdev, freq, ctype);
+#else
+	cfg80211_ch_switch_notify(adapter->pnetdev, freq, ctype, 0);
+#endif
 #endif
 
 exit:
