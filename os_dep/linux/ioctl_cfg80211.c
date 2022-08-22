@@ -485,7 +485,11 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset,
 	}
 
 	ctype = rtw_chbw_to_nl80211_channel_type(ch, bw, offset, ht);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2)
+	cfg80211_ch_switch_notify(adapter->pnetdev, freq, ctype, 0);
+#else
 	cfg80211_ch_switch_notify(adapter->pnetdev, freq, ctype);
+#endif
 #endif
 
 exit:
