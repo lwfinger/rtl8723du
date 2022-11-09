@@ -37,6 +37,8 @@
 #define CONFIG_80211N_HT
 #define CONFIG_RECV_REORDERING_CTRL
 
+#define CONFIG_IEEE80211W
+
 /* #define CONFIG_IOCTL_CFG80211 */		/* Set from Makefile */
 #ifdef CONFIG_IOCTL_CFG80211
 	/*
