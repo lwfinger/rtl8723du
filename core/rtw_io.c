@@ -83,7 +83,7 @@ u16 _rtw_read16(_adapter *adapter, u32 addr)
 	_read16 = pintfhdl->io_ops._read16;
 
 	r_val = _read16(pintfhdl, addr);
-	return rtw_le16_to_cpu(r_val);
+	return r_val;
 }
 
 u32 _rtw_read32(_adapter *adapter, u32 addr)
