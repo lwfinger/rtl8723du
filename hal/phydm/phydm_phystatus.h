@@ -61,7 +61,7 @@
  ************************************************************/
 
 __PACK struct phy_rx_agc_info {
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 gain : 7, trsw : 1;
 #else
 	u8 trsw : 1, gain : 7;
@@ -87,7 +87,7 @@ __PACK struct phy_status_rpt_8192cd {
 	s8	sig_evm;
 	u8	rsvd_3;
 
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8	antsel_rx_keep_2: 1;	/*@ex_intf_flg:1;*/
 	u8	sgi_en: 1;
 	u8	rxsc: 2;
@@ -110,7 +110,7 @@ struct phy_status_rpt_8812 {
 	/*	@DWORD 0*/
 	u8 gain_trsw[2]; /*path-A and path-B {TRSW, gain[6:0] }*/
 	u8 chl_num_LSB; /*@channel number[7:0]*/
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 chl_num_MSB : 2; /*@channel number[9:8]*/
 	u8 sub_chnl : 4; /*sub-channel location[3:0]*/
 	u8 r_RFMOD : 2; /*RF mode[1:0]*/
@@ -124,7 +124,7 @@ struct phy_status_rpt_8812 {
 	u8 pwdb_all; /*@CCK signal quality / OFDM pwdb all*/
 	s8 cfosho[2]; /*@CCK AGC report and CCK_BB_Power*/
 		      /*OFDM path-A and path-B short CFO*/
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 resvd_0 : 6;
 	u8 bt_RF_ch_MSB : 2; /*@8812A:2'b0  8814A: bt rf channel keep[7:6]*/
 #else /*@_BIG_ENDIAN_*/
@@ -133,7 +133,7 @@ struct phy_status_rpt_8812 {
 #endif
 
 /*	@DWORD 2*/
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 ant_div_sw_a : 1; /*@8812A: ant_div_sw_a    8814A: 1'b0*/
 	u8 ant_div_sw_b : 1; /*@8812A: ant_div_sw_b    8814A: 1'b0*/
 	u8 bt_RF_ch_LSB : 6; /*@8812A: 6'b0     8814A: bt rf channel keep[5:0]*/
@@ -152,7 +152,7 @@ struct phy_status_rpt_8812 {
 
 	/*	@DWORD 4*/
 	u8 PCTS_MSK_RPT_2; /*PCTS mask report[23:16]*/
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 PCTS_MSK_RPT_3 : 6; /*PCTS mask report[29:24]*/
 	u8 pcts_rpt_valid : 1; /*pcts_rpt_valid*/
 	u8 resvd_1 : 1; /*@1'b0*/
@@ -170,7 +170,7 @@ struct phy_status_rpt_8812 {
 
 	/*	@DWORD 6*/
 	s8 sigevm; /*signal field EVM*/
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_antc : 3;	/*@8812A: 3'b0	8814A: antidx_antc[2:0]*/
 	u8 antidx_antd : 3;	/*@8812A: 3'b0	8814A: antidx_antd[2:0]*/
 	u8 dpdt_ctrl_keep : 1;	/*@8812A: 1'b0	8814A: dpdt_ctrl_keep*/
@@ -181,7 +181,7 @@ struct phy_status_rpt_8812 {
 	u8 antidx_antd : 3;
 	u8 antidx_antc : 3;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_anta : 3; /*@antidx_anta[2:0]*/
 	u8 antidx_antb : 3; /*@antidx_antb[2:0]*/
 	u8 hw_antsw_occur : 2; /*@1'b0*/
@@ -198,7 +198,7 @@ __PACK struct phy_sts_rpt_jgr2_type0 {
 	/* @DW0 */
 	u8 page_num;
 	u8 pwdb;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 gain : 6;
 	u8 rsvd_0 : 1;
 	u8 trsw : 1;
@@ -211,7 +211,7 @@ __PACK struct phy_sts_rpt_jgr2_type0 {
 
 	/* @DW1 */
 	u8 rsvd_2;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 rxsc : 4;
 	u8 agc_table : 4;
 #else
@@ -223,7 +223,7 @@ __PACK struct phy_sts_rpt_jgr2_type0 {
 
 	/* @DW2 */
 	u16 length;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_a : 3;
 	u8 antidx_b : 3;
 	u8 rsvd_3 : 2;
@@ -241,7 +241,7 @@ __PACK struct phy_sts_rpt_jgr2_type0 {
 
 	/* @DW3 */
 	u8 signal_quality;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 vga : 5;
 	u8 lna_l : 3;
 	u8 bb_power : 6;
@@ -270,7 +270,7 @@ __PACK struct phy_sts_rpt_jgr2_type1 {
 	/* @DW0 and DW1 */
 	u8 page_num;
 	u8 pwdb[4];
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 l_rxsc : 4;
 	u8 ht_rxsc : 4;
 #else
@@ -278,7 +278,7 @@ __PACK struct phy_sts_rpt_jgr2_type1 {
 	u8 l_rxsc : 4;
 #endif
 	u8 channel;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 band : 2;
 	u8 rsvd_0 : 1;
 	u8 hw_antsw_occu : 1;
@@ -298,7 +298,7 @@ __PACK struct phy_sts_rpt_jgr2_type1 {
 
 	/* @DW2 */
 	u16 lsig_length;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_a : 3;
 	u8 antidx_b : 3;
 	u8 rsvd_1 : 2;
@@ -316,7 +316,7 @@ __PACK struct phy_sts_rpt_jgr2_type1 {
 
 	/* @DW3 */
 	u8 paid;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 paid_msb : 1;
 	u8 gid : 6;
 	u8 rsvd_3 : 1;
@@ -326,7 +326,7 @@ __PACK struct phy_sts_rpt_jgr2_type1 {
 	u8 paid_msb : 1;
 #endif
 	u8 intf_pos;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 intf_pos_msb : 1;
 	u8 rsvd_4 : 2;
 	u8 nb_intf_flag : 1;
@@ -354,7 +354,7 @@ __PACK struct phy_sts_rpt_jgr2_type2 {
 	/* @DW0 ane DW1 */
 	u8 page_num;
 	u8 pwdb[4];
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 l_rxsc : 4;
 	u8 ht_rxsc : 4;
 #else
@@ -362,7 +362,7 @@ __PACK struct phy_sts_rpt_jgr2_type2 {
 	u8 l_rxsc : 4;
 #endif
 	u8 channel;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 band : 2;
 	u8 rsvd_0 : 1;
 	u8 hw_antsw_occu : 1;
@@ -381,7 +381,7 @@ __PACK struct phy_sts_rpt_jgr2_type2 {
 #endif
 
 /* @DW2 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 shift_l_map : 6;
 	u8 rsvd_1 : 2;
 #else
@@ -389,7 +389,7 @@ __PACK struct phy_sts_rpt_jgr2_type2 {
 	u8 shift_l_map : 6;
 #endif
 	u8 cnt_pw2cca;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 agc_table_a : 4;
 	u8 agc_table_b : 4;
 	u8 agc_table_c : 4;
@@ -403,7 +403,7 @@ __PACK struct phy_sts_rpt_jgr2_type2 {
 
 	/* @DW3 ~ DW6*/
 	u8 cnt_cca2agc_rdy;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 gain_a : 6;
 	u8 rsvd_2 : 1;
 	u8 trsw_a : 1;
@@ -440,7 +440,7 @@ __PACK struct phy_sts_rpt_jgr2_type2 {
 #endif
 	u8 ht_aagc_gain[4];
 	u8 dagc_gain[4];
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 counter : 6;
 	u8 rsvd_6 : 2;
 	u8 syn_count : 5;
@@ -458,7 +458,7 @@ __PACK struct phy_sts_rpt_jgr2_type2 {
 #ifdef PHYSTS_3RD_TYPE_SUPPORT
 __PACK struct phy_sts_rpt_jgr3_type0 {
 /* @DW0 : Offset 0 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 page_num : 4;
 	u8 pkt_cnt : 2;
 	u8 channel_msb : 2;
@@ -468,7 +468,7 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 	u8 page_num : 4;
 #endif
 	u8 pwdb_a;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 gain_a : 6;
 	u8 rsvd_0 : 1;
 	u8 trsw : 1;
@@ -478,7 +478,7 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 	u8 gain_a : 6;
 #endif
 
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 agc_table_b : 4;
 	u8 agc_table_c : 4;
 #else
@@ -487,14 +487,14 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 #endif
 
 /* @DW1 : Offset 4 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 rsvd_1 : 4;
 	u8 agc_table_d : 4;
 #else
 	u8 agc_table_d : 4;
 	u8 rsvd_1 : 4;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 l_rxsc : 4;
 	u8 agc_table_a : 4;
 #else
@@ -502,7 +502,7 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 	u8 l_rxsc : 4;
 #endif
 	u8 channel;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 band : 2;
 	u8 rsvd_2_1 : 1;
 	u8 hw_antsw_occur_keep_cck : 1;
@@ -520,14 +520,14 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 
 	/* @DW2 : Offset 8 */
 	u16 length;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_a : 4;
 	u8 antidx_b : 4;
 #else
 	u8 antidx_b : 4;
 	u8 antidx_a : 4;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_c : 4;
 	u8 antidx_d : 4;
 #else
@@ -537,14 +537,14 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 
 	/* @DW3 : Offset 12 */
 	u8 signal_quality;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 vga_a : 5;
 	u8 lna_l_a : 3;
 #else
 	u8 lna_l_a : 3;
 	u8 vga_a : 5;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 bb_power_a : 6;
 	u8 rsvd_3_1 : 1;
 	u8 lna_h_a : 1;
@@ -554,7 +554,7 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 	u8 rsvd_3_1 : 1;
 	u8 bb_power_a : 6;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 rxrate : 2;
 	u8 raterr : 1;
 	u8 lockbit : 1;
@@ -572,14 +572,14 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 
 	/* @DW4 : Offset 16 */
 	u8 pwdb_b;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 vga_b : 5;
 	u8 lna_l_b : 3;
 #else
 	u8 lna_l_b : 3;
 	u8 vga_b : 5;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 bb_power_b : 6;
 	u8 rsvd_4_1 : 1;
 	u8 lna_h_b : 1;
@@ -588,7 +588,7 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 	u8 rsvd_4_1 : 1;
 	u8 bb_power_b : 6;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 gain_b : 6;
 	u8 rsvd_4_2 : 2;
 #else
@@ -598,14 +598,14 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 
 	/* @DW5 : Offset 20 */
 	u8 pwdb_c;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 vga_c : 5;
 	u8 lna_l_c : 3;
 #else
 	u8 lna_l_c : 3;
 	u8 vga_c : 5;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 bb_power_c : 6;
 	u8 rsvd_5_1 : 1;
 	u8 lna_h_c : 1;
@@ -614,7 +614,7 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 	u8 rsvd_5_1 : 1;
 	u8 bb_power_c : 6;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 gain_c : 6;
 	u8 rsvd_5_2 : 2;
 #else
@@ -624,14 +624,14 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 
 	/* @DW6 : Offset 24 */
 	u8 pwdb_d;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 vga_d : 5;
 	u8 lna_l_d : 3;
 #else
 	u8 lna_l_d : 3;
 	u8 vga_d : 5;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 bb_power_d : 6;
 	u8 rsvd_6_1 : 1;
 	u8 lna_h_d : 1;
@@ -640,7 +640,7 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 	u8 rsvd_6_1 : 1;
 	u8 bb_power_d : 6;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 gain_d : 6;
 	u8 rsvd_6_2 : 2;
 #else
@@ -652,7 +652,7 @@ __PACK struct phy_sts_rpt_jgr3_type0 {
 __PACK struct phy_sts_rpt_jgr3_type6 {
 	/* judy_add_8723F_0512 */
 /* @DW0 : Offset 0 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 pop_idx : 4;
 	u8 pkt_cnt : 2;
 	u8 channel_msb : 2;
@@ -662,7 +662,7 @@ __PACK struct phy_sts_rpt_jgr3_type6 {
 	u8 pop_idx : 4;
 #endif
 
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 agc_table_a : 4;
 	u8 rsvd_0 : 4;
 #else
@@ -670,7 +670,7 @@ __PACK struct phy_sts_rpt_jgr3_type6 {
 	u8 agc_table_a : 4;
 #endif
 	u8 rsvd_1 : 8;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 trsw : 1;
 	u8 hw_antsw_occur_keep_cck : 1;
 	u8 gnt_bt_keep_cck : 1;
@@ -686,7 +686,7 @@ __PACK struct phy_sts_rpt_jgr3_type6 {
 
 /* @DW1 : Offset 4 */
 	u8 channel;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_a : 4;
 	u8 rsvd_2_1 : 4;
 #else
@@ -707,7 +707,7 @@ __PACK struct phy_sts_rpt_jgr3_type6 {
 	u8 avg_cfo;	
 /* @DW4 : Offset 16 */
 	u8 coarse_cfo;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 coarse_cfo_msb : 4;
 	u8 avg_cfo_msb : 4;
 #else
@@ -723,7 +723,7 @@ __PACK struct phy_sts_rpt_jgr3_type6 {
 #endif
 __PACK struct phy_sts_rpt_jgr3_type1 {
 /* @DW0 : Offset 0 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 page_num : 4;
 	u8 pkt_cnt : 2;
 	u8 channel_pri_msb : 2;
@@ -738,7 +738,7 @@ __PACK struct phy_sts_rpt_jgr3_type1 {
 
 	/* @DW1 : Offset 4 */
 	u8 pwdb_d;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 l_rxsc : 4;
 	u8 ht_rxsc : 4;
 #else
@@ -746,7 +746,7 @@ __PACK struct phy_sts_rpt_jgr3_type1 {
 	u8 l_rxsc : 4;
 #endif
 	u8 channel_pri_lsb;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 band : 2;
 	u8 rsvd_0 : 2;
 	u8 gnt_bt : 1;
@@ -764,7 +764,7 @@ __PACK struct phy_sts_rpt_jgr3_type1 {
 
 	/* @DW2 : Offset 8 */
 	u8 channel_sec_lsb;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 channel_sec_msb : 2;
 	u8 rsvd_1 : 2;
 	u8 hw_antsw_occur_a : 1;
@@ -780,14 +780,14 @@ __PACK struct phy_sts_rpt_jgr3_type1 {
 	u8 channel_sec_msb : 2;
 
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_a : 4;
 	u8 antidx_b : 4;
 #else
 	u8 antidx_b : 4;
 	u8 antidx_a : 4;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_c : 4;
 	u8 antidx_d : 4;
 #else
@@ -797,7 +797,7 @@ __PACK struct phy_sts_rpt_jgr3_type1 {
 
 	/* @DW3 : Offset 12 */
 	u8 paid;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 paid_msb : 1;
 	u8 gid : 6;
 	u8 rsvd_3 : 1;
@@ -810,7 +810,7 @@ __PACK struct phy_sts_rpt_jgr3_type1 {
 #if 0
 	/*@
 	u8		rsvd_4;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8		rsvd_5: 6;
 	u8		rf_mode: 2;
 #else
@@ -832,7 +832,7 @@ __PACK struct phy_sts_rpt_jgr3_type1 {
 __PACK struct phy_sts_rpt_jgr3_type2_3 {
 /* Type2 is primary channel & type3 is secondary channel */
 /* @DW0 and DW1: Offest 0 and Offset 4 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 page_num : 4;
 	u8 pkt_cnt : 2;
 	u8 channel_msb : 2;
@@ -842,7 +842,7 @@ __PACK struct phy_sts_rpt_jgr3_type2_3 {
 	u8 page_num : 4;
 #endif
 	u8 pwdb[4];
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 l_rxsc : 4;
 	u8 ht_rxsc : 4;
 #else
@@ -850,7 +850,7 @@ __PACK struct phy_sts_rpt_jgr3_type2_3 {
 	u8 l_rxsc : 4;
 #endif
 	u8 channel_lsb;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 band : 2;
 	u8 rsvd_0 : 2;
 	u8 gnt_bt : 1;
@@ -867,7 +867,7 @@ __PACK struct phy_sts_rpt_jgr3_type2_3 {
 #endif
 
 /* @DW2 : Offset 8 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 shift_l_map : 6;
 	u8 rsvd_1 : 2;
 #else
@@ -875,14 +875,14 @@ __PACK struct phy_sts_rpt_jgr3_type2_3 {
 	u8 shift_l_map : 6;
 #endif
 	s8 pwed_th; /* @dynamic energy threshold S(8,2) */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 agc_table_a : 4;
 	u8 agc_table_b : 4;
 #else
 	u8 agc_table_b : 4;
 	u8 agc_table_a : 4;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 agc_table_c : 4;
 	u8 agc_table_d : 4;
 #else
@@ -892,21 +892,21 @@ __PACK struct phy_sts_rpt_jgr3_type2_3 {
 
 	/* @DW3 : Offset 12 */
 	u8 cnt_cca2agc_rdy; /* Time(ns) = cnt_cca2agc_ready*25 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 mp_gain_a : 6;
 	u8 mp_gain_b_lsb : 2;
 #else
 	u8 mp_gain_b_lsb : 2;
 	u8 mp_gain_a : 6;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 mp_gain_b_msb : 4;
 	u8 mp_gain_c_lsb : 4;
 #else
 	u8 mp_gain_c_lsb : 4;
 	u8 mp_gain_b_msb : 4;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 mp_gain_c_msb : 2;
 	u8 avg_noise_pwr_lsb : 4;
 	u8 rsvd_3 : 2;
@@ -918,7 +918,7 @@ __PACK struct phy_sts_rpt_jgr3_type2_3 {
 	u8 mp_gain_c_msb : 2;
 #endif
 	/* @DW4 ~ 5: offset 16 ~20 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 mp_gain_d : 6;
 	u8 is_freq_select_fading : 1;
 	u8 rsvd_2 : 1;
@@ -927,7 +927,7 @@ __PACK struct phy_sts_rpt_jgr3_type2_3 {
 	u8 is_freq_select_fading : 1;
 	u8 mp_gain_d : 6;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 aagc_step_a : 2;
 	u8 aagc_step_b : 2;
 	u8 aagc_step_c : 2;
@@ -940,14 +940,14 @@ __PACK struct phy_sts_rpt_jgr3_type2_3 {
 #endif
 	u8 ht_aagc_gain[4];
 	u8 dagc_gain[4];
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 counter : 6;
 	u8 syn_count_lsb : 2;
 #else
 	u8 syn_count_lsb : 2;
 	u8 counter : 6;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 syn_count_msb : 3;
 	u8 avg_noise_pwr_msb : 5;
 #else
@@ -959,7 +959,7 @@ __PACK struct phy_sts_rpt_jgr3_type2_3 {
 __PACK struct phy_sts_rpt_jgr3_type4 {
 /* smart antenna */
 /* @DW0 and DW1 : offset 0 and 4  */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 page_num : 4;
 	u8 pkt_cnt : 2;
 	u8 channel_msb : 2;
@@ -969,7 +969,7 @@ __PACK struct phy_sts_rpt_jgr3_type4 {
 	u8 page_num : 4;
 #endif
 	u8 pwdb[4];
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 l_rxsc : 4;
 	u8 ht_rxsc : 4;
 #else
@@ -977,7 +977,7 @@ __PACK struct phy_sts_rpt_jgr3_type4 {
 	u8 l_rxsc : 4;
 #endif
 	u8 channel_lsb;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 band : 2;
 	u8 rsvd_0 : 2;
 	u8 gnt_bt : 1;
@@ -994,14 +994,14 @@ __PACK struct phy_sts_rpt_jgr3_type4 {
 #endif
 
 /* @DW2 : offset 8 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 bad_tone_cnt_min_eign_0 : 4;
 	u8 bad_tone_cnt_cn_excess_0 : 4;
 #else
 	u8 bad_tone_cnt_cn_excess_0 : 4;
 	u8 bad_tone_cnt_min_eign_0 : 4;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 training_done_a : 1;
 	u8 training_done_b : 1;
 	u8 training_done_c : 1;
@@ -1020,14 +1020,14 @@ __PACK struct phy_sts_rpt_jgr3_type4 {
 	u8 training_done_b : 1;
 	u8 training_done_a : 1;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_a : 4;
 	u8 antidx_b : 4;
 #else
 	u8 antidx_b : 4;
 	u8 antidx_a : 4;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_c : 4;
 	u8 antidx_d : 4;
 #else
@@ -1036,21 +1036,21 @@ __PACK struct phy_sts_rpt_jgr3_type4 {
 #endif
 /* @DW3 : offset 12 */
 	u8 tx_pkt_cnt;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 bad_tone_cnt_min_eign_1 : 4;
 	u8 bad_tone_cnt_cn_excess_1 : 4;
 #else
 	u8 bad_tone_cnt_cn_excess_1 : 4;
 	u8 bad_tone_cnt_min_eign_1 : 4;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 avg_cond_num_0 : 7;
 	u8 avg_cond_num_1_lsb : 1;
 #else
 	u8 avg_cond_num_1_lsb : 1;
 	u8 avg_cond_num_0 : 7;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 avg_cond_num_1_msb : 6;
 	u8 rsvd_1 : 2;
 #else
@@ -1071,7 +1071,7 @@ __PACK struct phy_sts_rpt_jgr3_type4 {
 __PACK struct phy_sts_rpt_jgr3_type5 {
 /* @Debug */
 /* @DW0 ane DW1 : offset 0 and 4 */
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 page_num : 4;
 	u8 pkt_cnt : 2;
 	u8 channel_msb : 2;
@@ -1081,7 +1081,7 @@ __PACK struct phy_sts_rpt_jgr3_type5 {
 	u8 page_num : 4;
 #endif
 	u8 pwdb[4];
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 l_rxsc : 4;
 	u8 ht_rxsc : 4;
 #else
@@ -1089,7 +1089,7 @@ __PACK struct phy_sts_rpt_jgr3_type5 {
 	u8 l_rxsc : 4;
 #endif
 	u8 channel_lsb;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 band : 2;
 	u8 rsvd_0 : 2;
 	u8 gnt_bt : 1;
@@ -1106,7 +1106,7 @@ __PACK struct phy_sts_rpt_jgr3_type5 {
 #endif
 	/* @DW2 : offset 8 */
 	u8 rsvd_1;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 rsvd_2 : 4;
 	u8 hw_antsw_occur_a : 1;
 	u8 hw_antsw_occur_b : 1;
@@ -1119,14 +1119,14 @@ __PACK struct phy_sts_rpt_jgr3_type5 {
 	u8 hw_antsw_occur_a : 1;
 	u8 rsvd_2 : 4;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_a : 4;
 	u8 antidx_b : 4;
 #else
 	u8 antidx_b : 4;
 	u8 antidx_a : 4;
 #endif
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 antidx_c : 4;
 	u8 antidx_d : 4;
 #else
@@ -1135,7 +1135,7 @@ __PACK struct phy_sts_rpt_jgr3_type5 {
 #endif
 	/* @DW3 : offset 12 */
 	u8 tx_pkt_cnt;
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+#ifdef __LITTLE_ENDIAN
 	u8 inf_pos_0_A_flg : 1;
 	u8 inf_pos_1_A_flg : 1;
 	u8 inf_pos_0_B_flg : 1;
@@ -1169,7 +1169,7 @@ __PACK struct phy_sts_rpt_jgr3_type5 {
 };
 
 __PACK struct phy_sts_rpt_jgr3_ofdm_cmn {
-	#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+	#ifdef __LITTLE_ENDIAN
 	u8 page_num : 4;
 	u8 pkt_cnt : 2;
 	u8 channel_msb : 2;
@@ -1179,7 +1179,7 @@ __PACK struct phy_sts_rpt_jgr3_ofdm_cmn {
 	u8 page_num : 4;
 	#endif
 	u8 pwdb[4];
-	#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+	#ifdef __LITTLE_ENDIAN
 	u8 l_rxsc : 4;
 	u8 ht_rxsc : 4;
 	#else
@@ -1187,7 +1187,7 @@ __PACK struct phy_sts_rpt_jgr3_ofdm_cmn {
 	u8 l_rxsc : 4;
 	#endif
 	u8 channel_lsb;
-	#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+	#ifdef __LITTLE_ENDIAN
 	u8 band : 2;
 	u8 rsvd_0 : 2;
 	u8 gnt_bt : 1;

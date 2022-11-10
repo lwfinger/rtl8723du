@@ -68,7 +68,7 @@ struct wme_ac_parameter {
 	/* byte 2 */
 	u8	eCWmin:4,
 	     eCWmax:4;
-#elif defined(CONFIG_BIG_ENDIAN)
+#elif defined(__BIG_ENDIAN)
 	/* byte 1 */
 	u8	reserved:1,
 	     aci:2,
