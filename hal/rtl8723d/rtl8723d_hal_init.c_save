@@ -3550,7 +3550,7 @@ Hal_EfuseParseIDCode(
 
 
 	/* Checl 0x8129 again for making sure autoload status!! */
-	EEPROMId = le16_to_cpu(*((__le16 *)hwinfo));
+	EEPROMId = le16_to_cpu(*((u16 *)hwinfo));
 	if (EEPROMId != RTL_EEPROM_ID) {
 		RTW_INFO("EEPROM ID(%#x) is invalid!!\n", EEPROMId);
 		pHalData->bautoload_fail_flag = _TRUE;
