@@ -760,6 +760,8 @@ static char *translate_scan(_adapter *padapter,
 {
 	struct iw_event iwe;
 	u16 cap = 0;
+	__le16 le_cap;
+
 	_rtw_memset(&iwe, 0, sizeof(iwe));
 
 	if (_FALSE == search_p2p_wfd_ie(padapter, info, pnetwork, start, stop))
@@ -769,10 +771,10 @@ static char *translate_scan(_adapter *padapter,
 	start = iwe_stream_essid_proess(padapter, info, pnetwork, start, stop, &iwe);
 	start = iwe_stream_protocol_process(padapter, info, pnetwork, start, stop, &iwe);
 	if (pnetwork->network.Reserved[0] == BSS_TYPE_PROB_REQ) /* Probe Request */
-		cap = 0;
+		le_cap = 0;
 	else {
-		_rtw_memcpy((u8 *)&cap, rtw_get_capability_from_ie(pnetwork->network.IEs), 2);
-		cap = le16_to_cpu(cap);
+		_rtw_memcpy((u8 *)&le_cap, rtw_get_capability_from_ie(pnetwork->network.IEs), 2);
+		cap = le16_to_cpu(le_cap);
 	}
 
 	start = iwe_stream_mode_process(padapter, info, pnetwork, start, stop, &iwe, cap);
@@ -4273,7 +4275,7 @@ static int rtw_p2p_get_wps_configmethod(struct net_device *dev,
 	_queue *queue = &(pmlmepriv->scanned_queue);
 	struct wlan_network *pnetwork = NULL;
 	u8 blnMatch = 0;
-	u16	attr_content = 0;
+	__be16	attr_content = 0;
 	uint attr_contentlen = 0;
 	u8	attr_content_str[P2P_PRIVATE_IOCTL_SET_LEN] = { 0x00 };
 
@@ -4521,10 +4523,10 @@ static int rtw_p2p_get_device_type(struct net_device *dev,
 			if (wpsie) {
 				rtw_get_wps_attr_content(wpsie, wpsie_len, WPS_ATTR_PRIMARY_DEV_TYPE, dev_type, &dev_type_len);
 				if (dev_type_len) {
-					u16	type = 0;
+					__be16	be_type = 0;
 
-					_rtw_memcpy(&type, dev_type, 2);
-					type = be16_to_cpu(type);
+					_rtw_memcpy(&be_type, dev_type, 2);
+					type = be16_to_cpu(be_type);
 					sprintf(dev_type_str, "\n\nN=%.2d", type);
 					blnMatch = 1;
 				}

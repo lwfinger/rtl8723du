@@ -369,7 +369,7 @@ _pkt *rtw_os_alloc_msdu_pkt(union recv_frame *prframe, const u8 *da, const u8 *s
 		_rtw_memcpy(skb_push(sub_skb, ETH_ALEN), da, ETH_ALEN);
 	} else {
 		/* Leave Ethernet header part of hdr and full payload */
-		u16 len;
+		__be16 len;
 
 		len = htons(sub_skb->len);
 		_rtw_memcpy(skb_push(sub_skb, 2), &len, 2);
