@@ -4524,6 +4524,7 @@ static int rtw_p2p_get_device_type(struct net_device *dev,
 				rtw_get_wps_attr_content(wpsie, wpsie_len, WPS_ATTR_PRIMARY_DEV_TYPE, dev_type, &dev_type_len);
 				if (dev_type_len) {
 					__be16	be_type = 0;
+					u16 type;
 
 					_rtw_memcpy(&be_type, dev_type, 2);
 					type = be16_to_cpu(be_type);
