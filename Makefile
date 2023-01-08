@@ -243,6 +243,20 @@ endif
 	@/sbin/depmod -a ${KVER}
 	@echo "Please reboot your system"
 
+DRIVER_VERSION = $(shell grep "\#define DRIVERVERSION" include/drv_types.h | awk '{print $$3}' | tr -d v\")
+
+dkms_install:
+	@mkdir -vp /usr/src/$(MODULE_NAME)-$(DRIVER_VERSION)
+	cp -r * /usr/src/$(MODULE_NAME)-$(DRIVER_VERSION)
+	dkms add -m $(MODULE_NAME) -v $(DRIVER_VERSION)
+	+ dkms build -m $(MODULE_NAME) -v $(DRIVER_VERSION)
+	dkms install -m $(MODULE_NAME) -v $(DRIVER_VERSION)
+	dkms status -m $(MODULE_NAME)
+
+dkms_remove:
+	dkms remove $(MODULE_NAME)/$(DRIVER_VERSION) --all
+	rm -rf /usr/src/$(MODULE_NAME)-$(DRIVER_VERSION)
+
 config_r:
 	@echo "make config"
 	/bin/bash script/Configure script/config.in
