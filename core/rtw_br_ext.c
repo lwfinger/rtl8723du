@@ -1490,7 +1490,7 @@ void *scdb_findEntry(struct adapter *priv, unsigned char *macAddr,
 	/* unsigned long irqL; */
 	/* _enter_critical_bh(&priv->br_ext_lock, &irqL); */
 
-	__nat25_generate_ipv4_network_addr(networkAddr, (unsigned int *)ipAddr);
+	__nat25_generate_ipv4_network_addr(networkAddr, (__be32 *)ipAddr);
 	hash = __nat25_network_hash(networkAddr);
 	db = priv->nethash[hash];
 	while (db) {
