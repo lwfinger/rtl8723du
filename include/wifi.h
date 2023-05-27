@@ -1366,4 +1366,8 @@ struct rtw_regulatory {
 #endif
 #endif
 
+#ifndef fallthrough
+#define fallthrouge do {} while(0)
+#endif
+
 #endif /* _WIFI_H_ */

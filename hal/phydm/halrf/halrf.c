@@ -820,8 +820,7 @@ void halrf_support_ability_debug(void *dm_void, char input[][16], u32 *_used,
 	u8 i;
 
 	for (i = 0; i < 5; i++)
-		if (input[i + 1])
-			PHYDM_SSCANF(input[i + 2], DCMD_DECIMAL, &dm_value[i]);
+		PHYDM_SSCANF(input[i + 2], DCMD_DECIMAL, &dm_value[i]);
 
 	if (dm_value[0] == 100) {
 		PDM_SNPF(out_len, used, output + used, out_len - used,
@@ -4119,8 +4118,7 @@ void halrf_dump_rfk_reg(void *dm_void, char input[][16], u32 *_used,
 
 	reg_1b00 = odm_get_bb_reg(dm, R_0x1b00, MASKDWORD);
 
-	if (input[2])
-		PHYDM_SSCANF(input[2], DCMD_DECIMAL, &var1[0]);
+	PHYDM_SSCANF(input[2], DCMD_DECIMAL, &var1[0]);
 
 	if ((strcmp(input[2], help) == 0))
 		PDM_SNPF(out_len, used, output + used, out_len - used,
