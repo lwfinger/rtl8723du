@@ -1,12 +1,14 @@
-rtl8723du
-===========
-This repository is no longer supported! Use https:github.com/lwfinger/rtw88.git instead.
-It contains the wireless-next driver for this card, which will be in the next kernel after
-the current release.
+THIS DRIVER IS OBSOLETE AND SHOULD BE REPLACED BY THE rtw88 DRIVERS AT
+https://github.com/lwfinger/rtw88.git.
 
+
+===========
+rtl8723du
 ===========
 
 This repository includes drivers for the following card:
+=======
+This repository includes obsolete drivers for the following card:
 
 Realtek RTL8723DU
 
